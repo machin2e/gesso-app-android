@@ -56,8 +56,18 @@ public class MainActivityFragment extends Fragment {
 
         // Define the data
         ArrayList<String> httpRequests = new ArrayList<String>();
-        httpRequests.add("turn 1 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn 1 off");
+        httpRequests.add("turn light 1 on"); // GET /message?content=turn%201%20on
+        httpRequests.add("turn light 1 off");
+        httpRequests.add("turn light 2 on"); // GET /message?content=turn%201%20on
+        httpRequests.add("turn light 2 off");
+        httpRequests.add("turn light 3 on"); // GET /message?content=turn%201%20on
+        httpRequests.add("turn light 3 off");
+        httpRequests.add("turn light 4 on"); // GET /message?content=turn%201%20on
+        httpRequests.add("turn light 4 off");
+        httpRequests.add("turn light 5 on"); // GET /message?content=turn%201%20on
+        httpRequests.add("turn light 5 off");
+        httpRequests.add("turn light 6 on"); // GET /message?content=turn%201%20on
+        httpRequests.add("turn light 6 off");
 //        httpRequests.add("GET /channels");
 //        httpRequests.add("POST /channel/1");
 //        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
