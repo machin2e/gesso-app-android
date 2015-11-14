@@ -1,4 +1,4 @@
-package computer.clay.sculptor.sculptor;
+package computer.clay.protocolizer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,7 +26,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -180,7 +183,7 @@ public class MainActivityFragment extends Fragment {
 //                URL url = new URL (builder.build().toString());
 
                 //final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-                final String CLAY_UNIT_BASE_URL = "http://192.168.0.113/message?";
+                final String CLAY_UNIT_BASE_URL = "http://192.168.43.235/message?";
                 final String CONTENT_PARAM = "content";
 //                final String FORMAT_PARAM = "mode";
 //                final String UNITS_PARAM = "units";
@@ -202,6 +205,37 @@ public class MainActivityFragment extends Fragment {
                         .build();
 
                 URL url = new URL(builtUri.toString());
+
+
+
+
+
+                String messageStr = params[0]; // "turn light 1 on";
+                int server_port = 4445;
+                DatagramSocket s = new DatagramSocket();
+                InetAddress local = InetAddress.getByName("192.168.43.235");
+//                InetAddress local = InetAddress.getByName("255.255.255.255");
+                int msg_length = messageStr.length();
+                byte[] message = messageStr.getBytes();
+                DatagramPacket p = new DatagramPacket(message, msg_length, local, server_port);
+                s.send(p);
+                s.close();
+
+
+
+//                String text;
+//                int server_port = 4445;
+//                byte[] message = new byte[1500];
+//                DatagramPacket p = new DatagramPacket(message, message.length);
+//                DatagramSocket s = new DatagramSocket(server_port);
+//                s.receive(p);
+//                text = new String(message, 0, p.getLength());
+//                Log.d("Udp tutorial","message:" + text);
+//                s.close();
+
+
+
+
 
                 Log.v(LOG_TAG, "SENDING REQUEST TO: " + url.toString());
 
