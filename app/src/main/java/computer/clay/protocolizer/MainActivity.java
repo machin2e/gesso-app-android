@@ -1,4 +1,4 @@
-package computer.clay.sculptor.sculptor;
+package computer.clay.protocolizer;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,14 +13,15 @@ import java.net.DatagramSocket;
 
 public class MainActivity extends ActionBarActivity {
 
+    private static final int UDP_SERVER_PORT = 4445;
+    private static final int MAX_UDP_DATAGRAM_LEN = 1500;
+    private TextView textMessage;
+    private MyDatagramReceiver myDatagramReceiver = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        textMessage = (TextView) findViewById(R.id.messageText);
-//        runServer = new RunServerInThread();
-//        runServer.start();
     }
 
 
@@ -49,11 +50,6 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    private static final int UDP_SERVER_PORT = 4445;
-    private static final int MAX_UDP_DATAGRAM_LEN = 1500;
-    private TextView textMessage;
-    private MyDatagramReceiver myDatagramReceiver = null;
 
     @Override
     protected void onPause() {

@@ -1,4 +1,4 @@
-package computer.clay.sculptor.sculptor;
+package computer.clay.protocolizer;
 
 import android.os.Bundle;
 import android.preference.ListPreference;

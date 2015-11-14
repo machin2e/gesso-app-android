@@ -1,4 +1,4 @@
-package computer.clay.sculptor.sculptor;
+package computer.clay.protocolizer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

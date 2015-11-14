@@ -1,4 +1,4 @@
-package computer.clay.sculptor.sculptor;
+package computer.clay.protocolizer;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
