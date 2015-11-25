@@ -1,27 +1,30 @@
 package computer.clay.protocolizer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
-
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 
 public class MainActivity extends ActionBarActivity {
 
-    private static final int UDP_SERVER_PORT = 4445;
-    private static final int MAX_UDP_DATAGRAM_LEN = 1500;
-    private TextView textMessage;
-    private MyDatagramReceiver myDatagramReceiver = null;
+//    private static final int UDP_SERVER_PORT = 4446;
+//    private static final int MAX_UDP_DATAGRAM_LEN = 1500;
+////    private TextView textMessage;
+//    private MyDatagramReceiver myDatagramReceiver = null;
+
+    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.context = getApplicationContext();
         setContentView(R.layout.activity_main);
+    }
+
+    public static Context getAppContext() {
+        return MainActivity.context;
     }
 
 
@@ -54,75 +57,78 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        myDatagramReceiver.kill();
+//        myDatagramReceiver.kill();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        myDatagramReceiver = new MyDatagramReceiver();
-        myDatagramReceiver.start();
+//        myDatagramReceiver = new MyDatagramReceiver();
+//        myDatagramReceiver.start();
     }
 
     /**
      * UDP Server
-     */
-    private class MyDatagramReceiver extends Thread {
-        private boolean bKeepRunning = true;
-        private String lastMessage = "";
+//     */
+//    private class MyDatagramReceiver extends Thread {
+//        private boolean bKeepRunning = true;
+//        private String lastMessage = "";
+//
+//        public void run() {
+//            String message;
+//            byte[] lmessage = new byte[MAX_UDP_DATAGRAM_LEN];
+//            DatagramPacket packet = new DatagramPacket(lmessage, lmessage.length);
+//
+//            try {
+//                DatagramSocket socket = new DatagramSocket(UDP_SERVER_PORT);
+//
+//                while(bKeepRunning) {
+//                    socket.receive(packet);
+//                    message = new String(lmessage, 0, packet.getLength());
+//                    lastMessage = message;
+//                    runOnUiThread(updateTextMessage);
+//
+////                    // Send response datagram
+////                    DatagramPacket p = new DatagramPacket(message, msg_length, local, server_port);
+////                    s.send(p);
+//                }
+//
+//                if (socket != null) {
+//                    socket.close();
+//                }
+//            } catch (Throwable e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        public void kill() {
+//            bKeepRunning = false;
+//        }
+//
+//        public String getLastMessage() {
+//            return lastMessage;
+//        }
+//
+//        // Protocaller
+//        // Transmitter
+//        // Protocolist
+//        // Relay
+//        // Router
+//        // Networking
+//        // Socializer
+//        // Synchronizer
+//    }
 
-        public void run() {
-            String message;
-            byte[] lmessage = new byte[MAX_UDP_DATAGRAM_LEN];
-            DatagramPacket packet = new DatagramPacket(lmessage, lmessage.length);
-
-            DatagramSocket socket = null;
-            try {
-                socket = new DatagramSocket(UDP_SERVER_PORT);
-
-                while(bKeepRunning) {
-                    socket.receive(packet);
-                    message = new String(lmessage, 0, packet.getLength());
-                    lastMessage = message;
-                    runOnUiThread(updateTextMessage);
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-
-            if (socket != null) {
-                socket.close();
-            }
-        }
-
-        public void kill() {
-            bKeepRunning = false;
-        }
-
-        public String getLastMessage() {
-            return lastMessage;
-        }
-
-        // Protocaller
-        // Transmitter
-        // Protocolist
-        // Relay
-        // Router
-        // Networking
-        // Socializer
-        // Synchronizer
-    }
-
-    private Runnable updateTextMessage = new Runnable() {
-        public void run() {
-            if (myDatagramReceiver == null) return;
-//            textMessage.setText(myDatagramReceiver.getLastMessage());
-
-//            String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
-//                int duration = Toast.LENGTH_SHORT;
-//            Toast toast = Toast.makeText(getParent(), myDatagramReceiver.getLastMessage(), Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-//            toast.show();
-            Log.v("Messenger", myDatagramReceiver.getLastMessage());
-        }
-    };
+//    private Runnable updateTextMessage = new Runnable() {
+//        public void run() {
+//            if (myDatagramReceiver == null) return;
+////            textMessage.setText(myDatagramReceiver.getLastMessage());
+//
+////            String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+////                int duration = Toast.LENGTH_SHORT;
+////            Toast toast = Toast.makeText(getParent(), myDatagramReceiver.getLastMessage(), Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+////            toast.show();
+//            Log.v("UDP", myDatagramReceiver.getLastMessage());
+//        }
+//    };
 }

@@ -1,6 +1,5 @@
 package computer.clay.protocolizer;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -26,10 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,7 +35,26 @@ import java.util.ArrayList;
  */
 public class MainActivityFragment extends Fragment {
 
+    private Communication communication = null;
     ArrayAdapter<String> httpRequestAdapter;
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        communication.stopDatagramServer();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        communication = new Communication();
+        communication.startDatagramServer();
+    }
 
     public MainActivityFragment() {
     }
@@ -59,6 +74,20 @@ public class MainActivityFragment extends Fragment {
 
         // Define the data
         ArrayList<String> httpRequests = new ArrayList<String>();
+
+//        httpRequests.add("1");
+//        httpRequests.add("2");
+//        httpRequests.add("3");
+//        httpRequests.add("4");
+//        httpRequests.add("5");
+//        httpRequests.add("6");
+//        httpRequests.add("7");
+//        httpRequests.add("8");
+//        httpRequests.add("9");
+//        httpRequests.add("10");
+//        httpRequests.add("11");
+//        httpRequests.add("12");
+
         httpRequests.add("turn light 1 on"); // GET /message?content=turn%201%20on
         httpRequests.add("turn light 1 off");
         httpRequests.add("turn light 2 on"); // GET /message?content=turn%201%20on
@@ -71,6 +100,7 @@ public class MainActivityFragment extends Fragment {
         httpRequests.add("turn light 5 off");
         httpRequests.add("turn light 6 on"); // GET /message?content=turn%201%20on
         httpRequests.add("turn light 6 off");
+
 //        httpRequests.add("GET /channels");
 //        httpRequests.add("POST /channel/1");
 //        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
@@ -88,19 +118,51 @@ public class MainActivityFragment extends Fragment {
         ListView listView = (ListView) rootView.findViewById(R.id.listview_http_requests);
         listView.setAdapter(httpRequestAdapter);
 
+        // Handle TextView and display string from your list
+//        ToggleButton ioBtn = (ToggleButton) listView.findViewById(R.id.io_btn);
+//        ioBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+////                if (isChecked) {
+////                    // The toggle is enabled
+////                    Toast toast = Toast.makeText(getActivity(), (String) "set as output", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+////                    toast.show();
+////                } else {
+////                    // The toggle is disabled
+////                    Toast toast = Toast.makeText(getActivity(), (String) "set as input", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+////                    toast.show();
+////                }
+//            }
+//        });
+
+//        ToggleButton lightBtn = (ToggleButton) listView.findViewById(R.id.light_btn);
+//        lightBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+////                if (isChecked) {
+////                    // The toggle is enabled
+////                    Toast toast = Toast.makeText(getActivity(), (String) "light on", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+////                    toast.show();
+////                } else {
+////                    // The toggle is disabled
+////                    Toast toast = Toast.makeText(getActivity(), (String) "light off", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+////                    toast.show();
+////                }
+//            }
+//        });
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
 //                Context context = view.getContext();
-                String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
-//                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
+//                String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+////                int duration = Toast.LENGTH_SHORT;
+//                Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+//                toast.show();
 
-                HttpRequestTask httpRequestTask = new HttpRequestTask();
+                UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
 //                httpRequestTask.execute("94110");
-                httpRequestTask.execute(httpRequestAdapter.getItem(position));
+                udpDatagramTask.execute(httpRequestAdapter.getItem(position));
 
 //                // Executed in an Activity, so 'this' is the Context
 //                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
@@ -112,14 +174,23 @@ public class MainActivityFragment extends Fragment {
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-//                String httpRequestText = httpRequestAdapter.getItem(position);
-//                Toast toast = Toast.makeText(getActivity(), "foo", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-//                toast.show();
+//                Context context = view.getContext();
+                String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+//                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
 
+                HttpRequestTask httpRequestTask = new HttpRequestTask();
+//                httpRequestTask.execute("94110");
+                httpRequestTask.execute(httpRequestAdapter.getItem(position));
+
+
+                /*
                 Intent settingsIntent = new Intent(getActivity(), HttpRequestActivity.class);
                 startActivity(settingsIntent);
+                */
 
                 return false;
             }
@@ -134,6 +205,23 @@ public class MainActivityFragment extends Fragment {
         // TODO: Handle the selected options item.
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class UdpDatagramTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+                /* Get weather data from an Internet source. */
+
+            if (params.length == 0) {
+                return null;
+            }
+
+            communication.sendDatagram (params[0]);
+
+            // This only happens if there was an error getting or parsing the forecast.
+            return null;
+        }
     }
 
     public class HttpRequestTask extends AsyncTask<String, Void, String[]> { // Extend AsyncTask and use void generics (for now)
@@ -209,28 +297,19 @@ public class MainActivityFragment extends Fragment {
 
 
 
+                communication.sendDatagram (params[0]);
 
-                String messageStr = params[0]; // "turn light 1 on";
-                int server_port = 4445;
-                DatagramSocket s = new DatagramSocket();
-                InetAddress local = InetAddress.getByName("192.168.43.235");
-//                InetAddress local = InetAddress.getByName("255.255.255.255");
-                int msg_length = messageStr.length();
-                byte[] message = messageStr.getBytes();
-                DatagramPacket p = new DatagramPacket(message, msg_length, local, server_port);
-                s.send(p);
-                s.close();
-
-
-
-//                String text;
+//                // Broadcast UDP packet to the specified address.
+//                String messageStr = params[0]; // "turn light 1 on";
+//                int local_port = 4445;
 //                int server_port = 4445;
-//                byte[] message = new byte[1500];
-//                DatagramPacket p = new DatagramPacket(message, message.length);
-//                DatagramSocket s = new DatagramSocket(server_port);
-//                s.receive(p);
-//                text = new String(message, 0, p.getLength());
-//                Log.d("Udp tutorial","message:" + text);
+//                DatagramSocket s = new DatagramSocket(local_port);
+////                InetAddress local = InetAddress.getByName("192.168.43.235");
+//                InetAddress local = InetAddress.getByName("255.255.255.255");
+//                int msg_length = messageStr.length();
+//                byte[] message = messageStr.getBytes();
+//                DatagramPacket p = new DatagramPacket(message, msg_length, local, server_port);
+//                s.send(p);
 //                s.close();
 
 
