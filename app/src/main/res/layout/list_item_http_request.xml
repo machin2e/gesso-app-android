@@ -1,9 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:gravity="center_vertical"
-    android:id="@+id/list_item_http_request_textview">
+    android:gravity="center_vertical">
 
-</TextView>
+    <TextView
+        android:id="@+id/list_item_clay_unit_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        android:text="Clay" />
+
+    <TextView
+        android:id="@+id/list_item_http_request_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/list_item_clay_unit_name"
+        android:layout_alignLeft="@+id/list_item_clay_unit_name"
+        android:paddingLeft="8dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_below="@+id/list_item_clay_unit_name"/>
+
+    <!--<ToggleButton-->
+        <!--android:id="@+id/light_btn"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginRight="5dp"-->
+        <!--android:textOff="Light"-->
+        <!--android:textOn="Light" />-->
+
+    <!--<ToggleButton-->
+        <!--android:id="@+id/io_btn"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_toLeftOf="@id/light_btn"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginRight="10dp"-->
+        <!--android:textOff="Input"-->
+        <!--android:textOn="Output" />-->
+
+</RelativeLayout>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<TextView xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:minHeight="?android:attr/listPreferredItemHeight"-->
+    <!--android:gravity="center_vertical"-->
+    <!--android:id="@+id/list_item_http_request_textview">-->
+
+<!--</TextView>-->
