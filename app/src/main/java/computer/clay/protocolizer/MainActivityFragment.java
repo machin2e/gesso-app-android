@@ -1,5 +1,6 @@
 package computer.clay.protocolizer;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,7 +29,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -37,6 +37,9 @@ public class MainActivityFragment extends Fragment {
 
     private Communication communication = null;
     ArrayAdapter<String> httpRequestAdapter;
+
+    public MainActivityFragment() {
+    }
 
     @Override
     public void onPause() {
@@ -50,13 +53,21 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        communication = new Communication();
-        communication.startDatagramServer();
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (communication == null) {
+            communication = new Communication();
+            communication.startDatagramServer();
+        }
     }
 
-    public MainActivityFragment() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (communication == null) {
+            communication = new Communication();
+            communication.startDatagramServer();
+        }
     }
 
     @Override
@@ -72,8 +83,13 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+
+        if (this.communication == null) {
+            Log.e ("Clay", "Communication subsystem does not exist in memory.");
+        }
+
         // Define the data
-        ArrayList<String> httpRequests = new ArrayList<String>();
+//        ArrayList<String> httpRequests = new ArrayList<String>();
 
 //        httpRequests.add("1");
 //        httpRequests.add("2");
@@ -88,31 +104,35 @@ public class MainActivityFragment extends Fragment {
 //        httpRequests.add("11");
 //        httpRequests.add("12");
 
-        httpRequests.add("turn light 1 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 1 off");
-        httpRequests.add("turn light 2 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 2 off");
-        httpRequests.add("turn light 3 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 3 off");
-        httpRequests.add("turn light 4 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 4 off");
-        httpRequests.add("turn light 5 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 5 off");
-        httpRequests.add("turn light 6 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 6 off");
+//        httpRequests.add("turn light 1 on"); // GET /message?content=turn%201%20on
+//        httpRequests.add("turn light 1 off");
+//        httpRequests.add("turn light 2 on"); // GET /message?content=turn%201%20on
+//        httpRequests.add("turn light 2 off");
+//        httpRequests.add("turn light 3 on"); // GET /message?content=turn%201%20on
+//        httpRequests.add("turn light 3 off");
+//        httpRequests.add("turn light 4 on"); // GET /message?content=turn%201%20on
+//        httpRequests.add("turn light 4 off");
+//        httpRequests.add("turn light 5 on"); // GET /message?content=turn%201%20on
+//        httpRequests.add("turn light 5 off");
+//        httpRequests.add("turn light 6 on"); // GET /message?content=turn%201%20on
+//        httpRequests.add("turn light 6 off");
 
 //        httpRequests.add("GET /channels");
 //        httpRequests.add("POST /channel/1");
 //        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
 //        httpRequests.add("GET /behavior");
 
+        communication.getUnits().add("N/A");
+
         // Define the adapter (adapts the data to the actual rendered view)
         httpRequestAdapter = new ArrayAdapter<String>( // ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(), // The current context (this fragment's parent activity).
                 R.layout.list_item_http_request, // ID of list item layout
                 R.id.list_item_http_request_textview, // ID of textview to populate (using the specified list item layout)
-                httpRequests // The list of forecast data
+                this.communication.getUnits() // httpRequests // The list of forecast data
         );
+
+        communication.listAdapter = httpRequestAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
 
         // Define the view (get a reference to it and pass it an adapter)
         ListView listView = (ListView) rootView.findViewById(R.id.listview_http_requests);
@@ -217,7 +237,8 @@ public class MainActivityFragment extends Fragment {
                 return null;
             }
 
-            communication.sendDatagram (params[0]);
+            communication.sendDatagram("192.168.43.86", params[0]);
+//            communication.sendDatagram (params[0]);
 
             // This only happens if there was an error getting or parsing the forecast.
             return null;
