@@ -122,7 +122,7 @@ public class MainActivityFragment extends Fragment {
 //        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
 //        httpRequests.add("GET /behavior");
 
-        communication.getUnits().add("N/A");
+        // communication.getUnits().add("N/A");
 
         // Define the adapter (adapts the data to the actual rendered view)
         httpRequestAdapter = new ArrayAdapter<String>( // ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
@@ -136,7 +136,9 @@ public class MainActivityFragment extends Fragment {
 
         // Define the view (get a reference to it and pass it an adapter)
         ListView listView = (ListView) rootView.findViewById(R.id.listview_http_requests);
-        listView.setAdapter(httpRequestAdapter);
+        listView.setAdapter (httpRequestAdapter);
+
+//        httpRequestAdapter.notifyDataSetChanged ();
 
         // Handle TextView and display string from your list
 //        ToggleButton ioBtn = (ToggleButton) listView.findViewById(R.id.io_btn);

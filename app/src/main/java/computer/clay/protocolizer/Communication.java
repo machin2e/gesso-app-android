@@ -1,8 +1,11 @@
 package computer.clay.protocolizer;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -82,7 +85,7 @@ public class Communication {
 
             String ipAddress = message.split(" ")[2];
 
-            if (!units.contains(ipAddress)) {
+            if (!units.contains (ipAddress)) {
                 Log.v("Clay", "Adding Clay with address " + ipAddress);
                 units.add(ipAddress);
 
@@ -91,14 +94,16 @@ public class Communication {
                 for (String clayUnit : units) {
                     currentUnits += clayUnit + " ";
                 }
-                Log.v("Clay", "Network: [ " + currentUnits + " ]");
+                Log.v ("Clay", "Network: [ " + currentUnits + " ]");
 
                 // HACK: Updates the list of discovered Clay units.
-//                listAdapter.notifyDataSetChanged(); // TODO: Remove this! Make it automatic and abstracted away!
-                listAdapter.clear();
-                for (String clayUnit : units) {
-                    listAdapter.add(clayUnit);
-                }
+//                this.getUnits().add("N/A");
+//                listAdapter.add ("N/A");
+                listAdapter.notifyDataSetChanged(); // TODO: Remove this! Make it automatic and abstracted away!
+//                listAdapter.clear();
+//                for (String clayUnit : units) {
+//                    listAdapter.add(clayUnit);
+//                }
 
             } else {
                 Log.v("Clay", "Updating Clay with address " + ipAddress);
@@ -131,6 +136,12 @@ public class Communication {
             datagramServer = new DatagramServer();
         }
         datagramServer.start();
+
+        // Display (or store) sever information
+        Context context = MainActivity.getAppContext();
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        String ip = Formatter.formatIpAddress (wm.getConnectionInfo ().getIpAddress ());
+        Log.v ("Clay", "Internet address: " + ip);
     }
 
     public void stopDatagramServer() {
@@ -171,7 +182,7 @@ public class Communication {
 //                    lastMessage = message;
 //                    runOnUiThread(updateTextMessage);
 
-//                    Log.v("Clay Datagram Server", "lastMessage = " + lastMessage);
+                    Log.v("Clay Datagram Server", "lastMessage = " + message);
 
                     // Get IP Address
 //                    Context context = MainActivity.getAppContext();
