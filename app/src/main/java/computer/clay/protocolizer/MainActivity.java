@@ -124,7 +124,7 @@ public class MainActivity extends ActionBarActivity {
 //            if (myDatagramReceiver == null) return;
 ////            textMessage.setText(myDatagramReceiver.getLastMessage());
 //
-////            String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+////            String httpRequestText = listAdapter.getItem(position); //CharSequence text = "Hello toast!";
 ////                int duration = Toast.LENGTH_SHORT;
 ////            Toast toast = Toast.makeText(getParent(), myDatagramReceiver.getLastMessage(), Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
 ////            toast.show();
