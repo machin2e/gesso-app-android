@@ -1,4 +1,4 @@
-package computer.clay.protocolizer;
+package computer.clay.protocolizer.clay.protocolizer;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
