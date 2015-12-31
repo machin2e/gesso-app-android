@@ -1,4 +1,4 @@
-package computer.clay.sculptor.sculptor;
+package computer.clay.protocolizer;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
