@@ -36,7 +36,9 @@ import java.util.ArrayList;
  */
 public class MainActivityFragment extends Fragment {
 
-    ArrayAdapter<String> httpRequestAdapter;
+    private ArrayAdapter<String> httpRequestAdapter;
+
+    private ArrayList<String> behaviorSequence = new ArrayList<String>();
 
     public MainActivityFragment() {
     }
@@ -50,35 +52,24 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Define the data
-        ArrayList<String> httpRequests = new ArrayList<String>();
-        httpRequests.add("turn light 1 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 1 off");
-        httpRequests.add("turn light 2 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 2 off");
-        httpRequests.add("turn light 3 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 3 off");
-        httpRequests.add("turn light 4 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 4 off");
-        httpRequests.add("turn light 5 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 5 off");
-        httpRequests.add("turn light 6 on"); // GET /message?content=turn%201%20on
-        httpRequests.add("turn light 6 off");
-//        httpRequests.add("GET /channels");
-//        httpRequests.add("POST /channel/1");
-//        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
-//        httpRequests.add("GET /behavior");
+        behaviorSequence.add("create");
 
         // Define the adapter (adapts the data to the actual rendered view)
         httpRequestAdapter = new ArrayAdapter<String>( // ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(), // The current context (this fragment's parent activity).
                 R.layout.list_item_http_request, // ID of list item layout
                 R.id.list_item_http_request_textview, // ID of textview to populate (using the specified list item layout)
-                httpRequests // The list of forecast data
+                behaviorSequence // The list of forecast data
         );
 
         // Define the view (get a reference to it and pass it an adapter)
@@ -95,9 +86,19 @@ public class MainActivityFragment extends Fragment {
                 Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
 
+                if (httpRequestText.equals("create")) {
+
+                    // Add a new behavior construct to the looping sequence.
+                    behaviorSequence.add("<Construct>");
+                    httpRequestAdapter.notifyDataSetChanged();
+
+                }
+
+                /*
                 HttpRequestTask httpRequestTask = new HttpRequestTask();
 //                httpRequestTask.execute("94110");
                 httpRequestTask.execute(httpRequestAdapter.getItem(position));
+                */
 
 //                // Executed in an Activity, so 'this' is the Context
 //                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
@@ -121,6 +122,14 @@ public class MainActivityFragment extends Fragment {
                 return false;
             }
         });
+
+        // Disable the scrollbars.
+        listView.setScrollbarFadingEnabled(false);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setHorizontalScrollBarEnabled(false);
+
+        // Disable overscroll effect.
+        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         return rootView;
     }
