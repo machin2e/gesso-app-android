@@ -35,8 +35,14 @@ import java.text.SimpleDateFormat;
  */
 public class MainActivityFragment extends Fragment {
 
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+    private ArrayAdapter<String> httpRequestAdapter;
+
+    private ArrayList<String> behaviorSequence = new ArrayList<String>();
+=======
     private Communication communication = null;
-    ArrayAdapter<String> httpRequestAdapter;
+    ArrayAdapter<String> listAdapter;
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
     public MainActivityFragment() {
     }
@@ -79,6 +85,11 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -89,6 +100,9 @@ public class MainActivityFragment extends Fragment {
         }
 
         // Define the data
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+        behaviorSequence.add("create");
+=======
 //        ArrayList<String> httpRequests = new ArrayList<String>();
 
 //        httpRequests.add("1");
@@ -121,22 +135,29 @@ public class MainActivityFragment extends Fragment {
 //        httpRequests.add("POST /channel/1");
 //        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
 //        httpRequests.add("GET /behavior");
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
-        communication.getUnits().add("N/A");
+        // communication.getUnits().add("N/A");
 
         // Define the adapter (adapts the data to the actual rendered view)
-        httpRequestAdapter = new ArrayAdapter<String>( // ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
+        listAdapter = new ArrayAdapter<String>( // ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
                 getActivity(), // The current context (this fragment's parent activity).
                 R.layout.list_item_http_request, // ID of list item layout
                 R.id.list_item_http_request_textview, // ID of textview to populate (using the specified list item layout)
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+                behaviorSequence // The list of forecast data
+=======
                 this.communication.getUnits() // httpRequests // The list of forecast data
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
         );
 
-        communication.listAdapter = httpRequestAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
+        communication.listAdapter = listAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
 
         // Define the view (get a reference to it and pass it an adapter)
         ListView listView = (ListView) rootView.findViewById(R.id.listview_http_requests);
-        listView.setAdapter(httpRequestAdapter);
+        listView.setAdapter (listAdapter);
+
+//        listAdapter.notifyDataSetChanged ();
 
         // Handle TextView and display string from your list
 //        ToggleButton ioBtn = (ToggleButton) listView.findViewById(R.id.io_btn);
@@ -175,14 +196,30 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
 //                Context context = view.getContext();
-//                String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+//                String httpRequestText = listAdapter.getItem(position); //CharSequence text = "Hello toast!";
 ////                int duration = Toast.LENGTH_SHORT;
 //                Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
 //                toast.show();
 
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+                if (httpRequestText.equals("create")) {
+
+                    // Add a new behavior construct to the looping sequence.
+                    behaviorSequence.add("<Construct>");
+                    httpRequestAdapter.notifyDataSetChanged();
+
+                }
+
+                /*
+                HttpRequestTask httpRequestTask = new HttpRequestTask();
+//                httpRequestTask.execute("94110");
+                httpRequestTask.execute(httpRequestAdapter.getItem(position));
+                */
+=======
                 UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
 //                httpRequestTask.execute("94110");
-                udpDatagramTask.execute(httpRequestAdapter.getItem(position));
+                udpDatagramTask.execute (listAdapter.getItem (position));
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
 //                // Executed in an Activity, so 'this' is the Context
 //                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
@@ -197,14 +234,14 @@ public class MainActivityFragment extends Fragment {
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
 
 //                Context context = view.getContext();
-                String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+                String httpRequestText = listAdapter.getItem(position); //CharSequence text = "Hello toast!";
 //                int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
 
                 HttpRequestTask httpRequestTask = new HttpRequestTask();
 //                httpRequestTask.execute("94110");
-                httpRequestTask.execute(httpRequestAdapter.getItem(position));
+                httpRequestTask.execute (listAdapter.getItem (position));
 
 
                 /*
@@ -215,6 +252,14 @@ public class MainActivityFragment extends Fragment {
                 return false;
             }
         });
+
+        // Disable the scrollbars.
+        listView.setScrollbarFadingEnabled(false);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setHorizontalScrollBarEnabled(false);
+
+        // Disable overscroll effect.
+        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         return rootView;
     }
@@ -237,7 +282,7 @@ public class MainActivityFragment extends Fragment {
                 return null;
             }
 
-            communication.sendDatagram("192.168.43.86", params[0]);
+            communication.sendDatagram(params[0], "connected");
 //            communication.sendDatagram (params[0]);
 
             // This only happens if there was an error getting or parsing the forecast.
@@ -399,9 +444,9 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             if (result != null) {
-                httpRequestAdapter.clear();
+                listAdapter.clear ();
                 for (String dayForecastStr : result) {
-                    httpRequestAdapter.add(dayForecastStr);
+                    listAdapter.add (dayForecastStr);
                 }
                 // New day is back from the server at this point!
 

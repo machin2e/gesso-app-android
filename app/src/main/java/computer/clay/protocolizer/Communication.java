@@ -1,8 +1,11 @@
 package computer.clay.protocolizer;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -27,6 +30,9 @@ public class Communication {
 
     private ArrayList<String> incomingMessages = new ArrayList<String>(); // Create incoming message queue.
     private ArrayList<String> outgoigMessages = new ArrayList<String>(); // Create outgoing message queue.
+
+    // UDP server
+    WifiManager.MulticastLock multicastLock;
 
     Communication () {
 //        startDatagramServer();
@@ -82,7 +88,7 @@ public class Communication {
 
             String ipAddress = message.split(" ")[2];
 
-            if (!units.contains(ipAddress)) {
+            if (!units.contains (ipAddress)) {
                 Log.v("Clay", "Adding Clay with address " + ipAddress);
                 units.add(ipAddress);
 
@@ -91,14 +97,16 @@ public class Communication {
                 for (String clayUnit : units) {
                     currentUnits += clayUnit + " ";
                 }
-                Log.v("Clay", "Network: [ " + currentUnits + " ]");
+                Log.v ("Clay", "Network: [ " + currentUnits + " ]");
 
                 // HACK: Updates the list of discovered Clay units.
-//                listAdapter.notifyDataSetChanged(); // TODO: Remove this! Make it automatic and abstracted away!
-                listAdapter.clear();
-                for (String clayUnit : units) {
-                    listAdapter.add(clayUnit);
-                }
+//                this.getUnits().add("N/A");
+//                listAdapter.add ("N/A");
+                listAdapter.notifyDataSetChanged(); // TODO: Remove this! Make it automatic and abstracted away!
+//                listAdapter.clear();
+//                for (String clayUnit : units) {
+//                    listAdapter.add(clayUnit);
+//                }
 
             } else {
                 Log.v("Clay", "Updating Clay with address " + ipAddress);
@@ -126,23 +134,37 @@ public class Communication {
     }
 
     public void startDatagramServer () {
+
+        // Acquire a multicast lock to enable receiving broadcast packets
+        Context context = MainActivity.getAppContext();
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        multicastLock = wm.createMulticastLock("mydebuginfo");
+        multicastLock.acquire();
+
         Log.v("Clay", "Starting datagram server.");
         if (datagramServer == null) {
             datagramServer = new DatagramServer();
         }
         datagramServer.start();
+
+        // Display (or store) sever information
+//        Context context = MainActivity.getAppContext();
+//        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        String ip = Formatter.formatIpAddress (wm.getConnectionInfo ().getIpAddress ());
+        Log.v ("Clay", "Internet address: " + ip);
     }
 
     public void stopDatagramServer() {
         Log.v("Clay", "Stopping datagram server.");
-        datagramServer.kill();
+        datagramServer.kill ();
+
+        multicastLock.release ();
     }
 
     /**
      * UDP Incoming Message Server
      */
 
-    private static final int UDP_SERVER_PORT = 4446;
     private static final int MAX_UDP_DATAGRAM_LEN = 1500;
 
     private DatagramServer datagramServer = null;
@@ -159,10 +181,12 @@ public class Communication {
             try {
 
                 // Open socket for UDP communications.
-                Log.v("Clay", "Opening socket on port " + UDP_SERVER_PORT + ".");
-                DatagramSocket socket = new DatagramSocket(UDP_SERVER_PORT); // "Constructs a UDP datagram socket which is bound to the specific port aPort on the local host using a wildcard address."
+                Log.v("Clay", "Opening socket on port " + DISCOVERY_BROADCAST_PORT + ".");
+                DatagramSocket socket = new DatagramSocket(DISCOVERY_BROADCAST_PORT); // "Constructs a UDP datagram socket which is bound to the specific port aPort on the local host using a wildcard address."
                 if (socket.isBound()) {
                     Log.v("Clay", "Bound socket to local port " + socket.getLocalPort() + ".");
+                } else {
+                    Log.v("Clay", "Error: Could not bind to local port " + socket.getLocalPort() + ".");
                 }
 
                 while(bKeepRunning) {
@@ -171,7 +195,7 @@ public class Communication {
 //                    lastMessage = message;
 //                    runOnUiThread(updateTextMessage);
 
-//                    Log.v("Clay Datagram Server", "lastMessage = " + lastMessage);
+                    Log.v("Clay Datagram Server", "lastMessage = " + message);
 
                     // Get IP Address
 //                    Context context = MainActivity.getAppContext();
@@ -233,7 +257,7 @@ public class Communication {
             if (datagramServer == null) return;
 //            textMessage.setText(myDatagramReceiver.getLastMessage());
 
-//            String httpRequestText = httpRequestAdapter.getItem(position); //CharSequence text = "Hello toast!";
+//            String httpRequestText = listAdapter.getItem(position); //CharSequence text = "Hello toast!";
 //                int duration = Toast.LENGTH_SHORT;
 //            Toast toast = Toast.makeText(getParent(), myDatagramReceiver.getLastMessage(), Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
 //            toast.show();
@@ -246,21 +270,22 @@ public class Communication {
      * UDP Outbound Messaging
      */
 
-    private static final int UDP_LOCAL_PORT = 4445;
-    private static final int UDP_MESSAGE_PORT = 4445;
+    private static final String BROADCAST_ADDRESS = "255.255.255.255";
+
+    private static final int DISCOVERY_BROADCAST_PORT = 4445;
+    private static final int BROADCAST_PORT = 4446;
+    private static final int MESSAGE_PORT = BROADCAST_PORT; // or 4446
 
     public void sendDatagram (String ipAddress, String message) {
         try {
             // Send UDP packet to the specified address.
             String messageStr = message; // "turn light 1 on";
-            int local_port = UDP_LOCAL_PORT;
-            int server_port = UDP_MESSAGE_PORT;
-            DatagramSocket s = new DatagramSocket(local_port);
+            DatagramSocket s = new DatagramSocket(MESSAGE_PORT);
             InetAddress local = InetAddress.getByName(ipAddress); // ("192.168.43.235");
 //                InetAddress local = InetAddress.getByName("255.255.255.255");
             int msg_length = messageStr.length();
             byte[] messageBytes = messageStr.getBytes();
-            DatagramPacket p = new DatagramPacket(messageBytes, msg_length, local, server_port);
+            DatagramPacket p = new DatagramPacket (messageBytes, msg_length, local, MESSAGE_PORT);
             s.send(p);
             s.close();
         } catch (IOException e) {
@@ -294,14 +319,12 @@ public class Communication {
 
             // Send UDP packet to the specified address.
             String messageStr = message; // "turn light 1 on";
-            int local_port = UDP_LOCAL_PORT;
-            int server_port = UDP_MESSAGE_PORT;
-            DatagramSocket s = new DatagramSocket(local_port);
-            InetAddress local = InetAddress.getByName("255.255.255.255"); // ("192.168.43.235");
+            DatagramSocket s = new DatagramSocket(BROADCAST_PORT);
+            InetAddress local = InetAddress.getByName(BROADCAST_ADDRESS); // ("192.168.43.235");
 //                InetAddress local = InetAddress.getByName("255.255.255.255");
             int msg_length = messageStr.length();
             byte[] messageBytes = messageStr.getBytes();
-            DatagramPacket p = new DatagramPacket(messageBytes, msg_length, local, server_port);
+            DatagramPacket p = new DatagramPacket(messageBytes, msg_length, local, BROADCAST_PORT);
             s.send(p);
             s.close();
         } catch (IOException e) {
