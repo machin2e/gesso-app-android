@@ -29,20 +29,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
-<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
     private ArrayAdapter<String> httpRequestAdapter;
 
     private ArrayList<String> behaviorSequence = new ArrayList<String>();
-=======
+
     private Communication communication = null;
     ArrayAdapter<String> listAdapter;
->>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
     public MainActivityFragment() {
     }
@@ -100,42 +99,7 @@ public class MainActivityFragment extends Fragment {
         }
 
         // Define the data
-<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
         behaviorSequence.add("create");
-=======
-//        ArrayList<String> httpRequests = new ArrayList<String>();
-
-//        httpRequests.add("1");
-//        httpRequests.add("2");
-//        httpRequests.add("3");
-//        httpRequests.add("4");
-//        httpRequests.add("5");
-//        httpRequests.add("6");
-//        httpRequests.add("7");
-//        httpRequests.add("8");
-//        httpRequests.add("9");
-//        httpRequests.add("10");
-//        httpRequests.add("11");
-//        httpRequests.add("12");
-
-//        httpRequests.add("turn light 1 on"); // GET /message?content=turn%201%20on
-//        httpRequests.add("turn light 1 off");
-//        httpRequests.add("turn light 2 on"); // GET /message?content=turn%201%20on
-//        httpRequests.add("turn light 2 off");
-//        httpRequests.add("turn light 3 on"); // GET /message?content=turn%201%20on
-//        httpRequests.add("turn light 3 off");
-//        httpRequests.add("turn light 4 on"); // GET /message?content=turn%201%20on
-//        httpRequests.add("turn light 4 off");
-//        httpRequests.add("turn light 5 on"); // GET /message?content=turn%201%20on
-//        httpRequests.add("turn light 5 off");
-//        httpRequests.add("turn light 6 on"); // GET /message?content=turn%201%20on
-//        httpRequests.add("turn light 6 off");
-
-//        httpRequests.add("GET /channels");
-//        httpRequests.add("POST /channel/1");
-//        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
-//        httpRequests.add("GET /behavior");
->>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
         // communication.getUnits().add("N/A");
 
@@ -144,11 +108,7 @@ public class MainActivityFragment extends Fragment {
                 getActivity(), // The current context (this fragment's parent activity).
                 R.layout.list_item_http_request, // ID of list item layout
                 R.id.list_item_http_request_textview, // ID of textview to populate (using the specified list item layout)
-<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
                 behaviorSequence // The list of forecast data
-=======
-                this.communication.getUnits() // httpRequests // The list of forecast data
->>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
         );
 
         communication.listAdapter = listAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
@@ -196,12 +156,10 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
 //                Context context = view.getContext();
-//                String httpRequestText = listAdapter.getItem(position); //CharSequence text = "Hello toast!";
+                String httpRequestText = listAdapter.getItem(position); //CharSequence text = "Hello toast!";
 ////                int duration = Toast.LENGTH_SHORT;
 //                Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
 //                toast.show();
-
-<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
                 if (httpRequestText.equals("create")) {
 
                     // Add a new behavior construct to the looping sequence.
@@ -215,11 +173,6 @@ public class MainActivityFragment extends Fragment {
 //                httpRequestTask.execute("94110");
                 httpRequestTask.execute(httpRequestAdapter.getItem(position));
                 */
-=======
-                UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
-//                httpRequestTask.execute("94110");
-                udpDatagramTask.execute (listAdapter.getItem (position));
->>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
 //                // Executed in an Activity, so 'this' is the Context
 //                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
