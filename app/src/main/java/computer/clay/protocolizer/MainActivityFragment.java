@@ -35,8 +35,14 @@ import java.text.SimpleDateFormat;
  */
 public class MainActivityFragment extends Fragment {
 
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+    private ArrayAdapter<String> httpRequestAdapter;
+
+    private ArrayList<String> behaviorSequence = new ArrayList<String>();
+=======
     private Communication communication = null;
     ArrayAdapter<String> listAdapter;
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
     public MainActivityFragment() {
     }
@@ -79,6 +85,11 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -89,6 +100,9 @@ public class MainActivityFragment extends Fragment {
         }
 
         // Define the data
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+        behaviorSequence.add("create");
+=======
 //        ArrayList<String> httpRequests = new ArrayList<String>();
 
 //        httpRequests.add("1");
@@ -121,6 +135,7 @@ public class MainActivityFragment extends Fragment {
 //        httpRequests.add("POST /channel/1");
 //        httpRequests.add("GET /experience"); // i.e., this is rather than the memory, store, or database
 //        httpRequests.add("GET /behavior");
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
         // communication.getUnits().add("N/A");
 
@@ -129,7 +144,11 @@ public class MainActivityFragment extends Fragment {
                 getActivity(), // The current context (this fragment's parent activity).
                 R.layout.list_item_http_request, // ID of list item layout
                 R.id.list_item_http_request_textview, // ID of textview to populate (using the specified list item layout)
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+                behaviorSequence // The list of forecast data
+=======
                 this.communication.getUnits() // httpRequests // The list of forecast data
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
         );
 
         communication.listAdapter = listAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
@@ -182,9 +201,25 @@ public class MainActivityFragment extends Fragment {
 //                Toast toast = Toast.makeText(getActivity(), httpRequestText, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
 //                toast.show();
 
+<<<<<<< HEAD:app/src/main/java/computer/clay/sculptor/sculptor/MainActivityFragment.java
+                if (httpRequestText.equals("create")) {
+
+                    // Add a new behavior construct to the looping sequence.
+                    behaviorSequence.add("<Construct>");
+                    httpRequestAdapter.notifyDataSetChanged();
+
+                }
+
+                /*
+                HttpRequestTask httpRequestTask = new HttpRequestTask();
+//                httpRequestTask.execute("94110");
+                httpRequestTask.execute(httpRequestAdapter.getItem(position));
+                */
+=======
                 UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
 //                httpRequestTask.execute("94110");
                 udpDatagramTask.execute (listAdapter.getItem (position));
+>>>>>>> origin/master:app/src/main/java/computer/clay/protocolizer/MainActivityFragment.java
 
 //                // Executed in an Activity, so 'this' is the Context
 //                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
@@ -217,6 +252,14 @@ public class MainActivityFragment extends Fragment {
                 return false;
             }
         });
+
+        // Disable the scrollbars.
+        listView.setScrollbarFadingEnabled(false);
+        listView.setVerticalScrollBarEnabled(false);
+        listView.setHorizontalScrollBarEnabled(false);
+
+        // Disable overscroll effect.
+        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         return rootView;
     }
