@@ -36,11 +36,9 @@ import java.util.ArrayList;
  */
 public class MainActivityFragment extends Fragment {
 
-    private ArrayAdapter<String> httpRequestAdapter;
-
     private ArrayList<String> behaviorSequence = new ArrayList<String>();
 
-    private Communication communication = null;
+//    private Communication communication = null;
     ArrayAdapter<String> listAdapter;
 
     public MainActivityFragment() {
@@ -49,7 +47,9 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        communication.stopDatagramServer();
+//        if (((MainActivity) this.getActivity()).getClay ().getCommunication() != null) {
+//            ((MainActivity) this.getActivity()).getClay().getCommunication().stopDatagramServer();
+//        }
     }
 
     @Override
@@ -60,19 +60,21 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (communication == null) {
-            communication = new Communication();
-            communication.startDatagramServer();
+        if (((MainActivity) activity).getClay ().getCommunication() == null) {
+//            communication = new Communication ();
+//            communication.startDatagramServer ();
+            (((MainActivity) activity)).getClay ().getCommunication().startDatagramServer ();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (communication == null) {
-            communication = new Communication();
-            communication.startDatagramServer();
-        }
+//        if (communication == null) {
+//            communication = new Communication();
+//            communication.startDatagramServer();
+//        (((MainActivity) activity).getClay ().getCommunication().startDatagramServer ();
+//        }
     }
 
     @Override
@@ -94,7 +96,7 @@ public class MainActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
 
-        if (this.communication == null) {
+        if (((MainActivity) this.getActivity()).getClay ().getCommunication() == null) {
             Log.e ("Clay", "Communication subsystem does not exist in memory.");
         }
 
@@ -111,45 +113,11 @@ public class MainActivityFragment extends Fragment {
                 behaviorSequence // The list of forecast data
         );
 
-        communication.listAdapter = listAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
+//        communication.listAdapter = listAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
 
         // Define the view (get a reference to it and pass it an adapter)
         ListView listView = (ListView) rootView.findViewById(R.id.listview_http_requests);
         listView.setAdapter (listAdapter);
-
-//        listAdapter.notifyDataSetChanged ();
-
-        // Handle TextView and display string from your list
-//        ToggleButton ioBtn = (ToggleButton) listView.findViewById(R.id.io_btn);
-//        ioBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-////                if (isChecked) {
-////                    // The toggle is enabled
-////                    Toast toast = Toast.makeText(getActivity(), (String) "set as output", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-////                    toast.show();
-////                } else {
-////                    // The toggle is disabled
-////                    Toast toast = Toast.makeText(getActivity(), (String) "set as input", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-////                    toast.show();
-////                }
-//            }
-//        });
-
-//        ToggleButton lightBtn = (ToggleButton) listView.findViewById(R.id.light_btn);
-//        lightBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-////                if (isChecked) {
-////                    // The toggle is enabled
-////                    Toast toast = Toast.makeText(getActivity(), (String) "light on", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-////                    toast.show();
-////                } else {
-////                    // The toggle is disabled
-////                    Toast toast = Toast.makeText(getActivity(), (String) "light off", Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-////                    toast.show();
-////                }
-//            }
-//        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -164,7 +132,7 @@ public class MainActivityFragment extends Fragment {
 
                     // Add a new behavior construct to the looping sequence.
                     behaviorSequence.add("<Construct>");
-                    httpRequestAdapter.notifyDataSetChanged();
+                    listAdapter.notifyDataSetChanged();
 
                 }
 
@@ -235,8 +203,7 @@ public class MainActivityFragment extends Fragment {
                 return null;
             }
 
-            communication.sendDatagram(params[0], "connected");
-//            communication.sendDatagram (params[0]);
+//            communication.sendDatagram(params[0], "connected");
 
             // This only happens if there was an error getting or parsing the forecast.
             return null;
@@ -316,7 +283,9 @@ public class MainActivityFragment extends Fragment {
 
 
 
+                /*
                 communication.sendDatagram (params[0]);
+                */
 
 //                // Broadcast UDP packet to the specified address.
 //                String messageStr = params[0]; // "turn light 1 on";
@@ -383,12 +352,12 @@ public class MainActivityFragment extends Fragment {
             }
 
             // All this just for: return getWeatherDataFromJson(forecastJsonStr, numDays);
-            try {
-                return getWeatherDataFromJson(forecastJsonStr, numDays);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
+//            try {
+//                return getWeatherDataFromJson(forecastJsonStr, numDays);
+//            } catch (JSONException e) {
+//                Log.e(LOG_TAG, e.getMessage(), e);
+//                e.printStackTrace();
+//            }
 
             // This only happens if there was an error getting or parsing the forecast.
             return null;
@@ -427,80 +396,6 @@ public class MainActivityFragment extends Fragment {
 
             String highLowStr = roundedHigh + "/" + roundedLow;
             return highLowStr;
-        }
-
-        /**
-         * Take the String representing the complete forecast in JSON Format and
-         * pull out the data we need to construct the Strings needed for the wireframes.
-         *
-         * Fortunately parsing is easy:  constructor takes the JSON string and converts it
-         * into an Object hierarchy for us.
-         */
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
-                throws JSONException {
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String OWM_LIST = "list";
-            final String OWM_WEATHER = "weather";
-            final String OWM_TEMPERATURE = "temp";
-            final String OWM_MAX = "max";
-            final String OWM_MIN = "min";
-            final String OWM_DESCRIPTION = "main";
-
-            JSONObject forecastJson = new JSONObject(forecastJsonStr);
-            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-            // OWM returns daily forecasts based upon the local time of the city that is being
-            // asked for, which means that we need to know the GMT offset to translate this data
-            // properly.
-
-            // Since this data is also sent in-order and the first day is always the
-            // current day, we're going to take advantage of that to get a nice
-            // normalized UTC date for all of our weather.
-
-            Time dayTime = new Time();
-            dayTime.setToNow();
-
-            // we start at the day returned by local time. Otherwise this is a mess.
-            int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-
-            // now we work exclusively in UTC
-            dayTime = new Time();
-
-            String[] resultStrs = new String[numDays];
-            for(int i = 0; i < weatherArray.length(); i++) {
-                // For now, using the format "Day, description, hi/low"
-                String day;
-                String description;
-                String highAndLow;
-
-                // Get the JSON object representing the day
-                JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-                // The date/time is returned as a long.  We need to convert that
-                // into something human-readable, since most people won't read "1400356800" as
-                // "this saturday".
-                long dateTime;
-                // Cheating to convert this to UTC time, which is what we want anyhow
-                dateTime = dayTime.setJulianDay(julianStartDay+i);
-                day = getReadableDateString(dateTime);
-
-                // description is in a child array called "weather", which is 1 element long.
-                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-                description = weatherObject.getString(OWM_DESCRIPTION);
-
-                // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature.  It confuses everybody.
-                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
-
-                highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
-            }
-
-            return resultStrs;
-
         }
     }
 }
