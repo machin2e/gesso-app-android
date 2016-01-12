@@ -5,11 +5,17 @@ import java.util.ArrayList;
 /**
  * Loop
  */
-public class Loop { // TODO: Possibly rename to LoopOperation
+public class Loop {
 
     private ArrayList<Behavior> behaviors = new ArrayList<Behavior> ();
 
     private Unit unit = null;
+
+    public Loop () {
+        super();
+
+        this.unit = null;
+    }
 
     public Loop (Unit unit) {
         super();

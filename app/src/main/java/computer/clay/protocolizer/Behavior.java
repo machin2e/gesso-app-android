@@ -16,6 +16,7 @@ public class Behavior {
 
     private BehaviorConstruct behaviorConstruct;
 
+    /** The loop is null unless the behavior is a complex behavior. */
 //    private Loop loop = null;
 
     Behavior (String title) {
@@ -27,7 +28,7 @@ public class Behavior {
         this.description = "";
         this.transform = "";
 
-//        this.loop = new Loop ();
+//        this.loop = new Loop()
     }
 
     // TODO: Remove this!
