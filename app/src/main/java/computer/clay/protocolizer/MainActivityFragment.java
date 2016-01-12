@@ -211,7 +211,8 @@ public class MainActivityFragment extends Fragment {
 
                     // Create new behavior construct to encapsulate the loop (as a complex behavior)
 
-                    listAdapter.notifyDataSetChanged();
+                    refreshTimeline();
+//                    listAdapter.notifyDataSetChanged();
 
                 } else if (touchedEntryText.equals ("<select>")) {
 
