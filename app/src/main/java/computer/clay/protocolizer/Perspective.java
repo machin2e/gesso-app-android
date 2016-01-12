@@ -110,29 +110,4 @@ public class Perspective {
         }
         return null;
     }
-
-    // TODO: getLoopConstruct (Behavior behavior)
-
-    // TODO: getLoopConstruct (Loop loop, Behavior behavior)
-    // TODO: (...) Loop.getLoopConstruct (Behavior behavior)
-
-    public LoopConstruct getNearestLoopConstruct (BehaviorConstruct behaviorConstruct) {
-        LoopConstruct nearestLoop = null;
-        double nearestLoopDistance = Double.POSITIVE_INFINITY;
-        for (LoopConstruct loopConstruct : getLoopConstructs ()) {
-            if (behaviorConstruct.getDistanceToLoop (loopConstruct) < nearestLoopDistance) {
-                nearestLoop = loopConstruct;
-            }
-        }
-        return nearestLoop;
-    }
-
-    public BehaviorConstruct createBehaviorConstruct (Point touchPoint) {
-        BehaviorConstruct behaviorConstruct = new BehaviorConstruct (this, touchPoint.x, touchPoint.y);
-        // <HACK>
-        ((MainActivity) getClay ().getPlatformContext()).Hack_PromptForBehaviorSelection(behaviorConstruct);
-        // </HACK>
-        addBehaviorConstruct (behaviorConstruct);
-        return behaviorConstruct;
-    }
 }
