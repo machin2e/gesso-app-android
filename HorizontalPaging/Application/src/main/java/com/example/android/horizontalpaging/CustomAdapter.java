@@ -116,6 +116,7 @@ public class CustomAdapter extends BaseAdapter {
         // Get the data corresponding to the view
         ListItem listItem = data.get(position);
 
+        // Update the list item's view according to the type
         updateViewForType(view, listItem);
 
         // bind the data to the view object

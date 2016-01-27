@@ -34,7 +34,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
     CustomViewPager mViewPager;
 
-    // Configure the interface
+    // Configure the interface settings
     private boolean hideTitle = true;
     private boolean hideActionBar = false;
     private boolean hideActionBarOnScroll = false;
@@ -225,6 +225,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * This would be replaced with your application's content.
      */
     public static class DummySectionFragment extends Fragment {
+
+        // Configure the interface settings
+        boolean disableScrollbarFading = true;
+        boolean disableScrollbars = true;
+        boolean disableOverscrollEffect = true;
+
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -263,6 +269,21 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             // Define the view (get a reference to it and pass it an adapter)
             final CustomListView listView = (CustomListView) rootView.findViewById(R.id.listview_timeline);
 //            listView.setAdapter(listAdapter);
+
+            if (disableScrollbarFading) {
+                listView.setScrollbarFadingEnabled(false);
+            }
+
+            // Disable the scrollbars.
+            if (disableScrollbars) {
+                listView.setVerticalScrollBarEnabled(false);
+                listView.setHorizontalScrollBarEnabled(false);
+            }
+
+            // Disable overscroll effect.
+            if (disableOverscrollEffect) {
+                listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            }
 
             return rootView;
         }
