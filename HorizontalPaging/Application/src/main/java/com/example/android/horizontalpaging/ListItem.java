@@ -31,6 +31,10 @@ public class ListItem {
     // for Say
     public String phrase;
 
+    // for Complex
+    public String summary;
+    public ArrayList<ListItem> listItems;
+
     public static int DEFAULT_TYPE = CustomAdapter.IO_CONTROL_LAYOUT;
 
     public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_light.
@@ -92,6 +96,11 @@ public class ListItem {
         } else if (this.type == CustomAdapter.SAY_CONTROL_LAYOUT) {
 
             phrase = "oh, that's great";
+
+        } else if (this.type == CustomAdapter.COMPLEX_LAYOUT) {
+
+            listItems = new ArrayList<>();
+            summary = "invalid complex layout";
 
         }
     }

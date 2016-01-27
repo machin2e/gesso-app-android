@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/icon"
         android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_height="fill_parent"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="0dp"
@@ -44,7 +44,7 @@
 
             <ImageView
                 android:id="@+id/preview_1"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -79,7 +79,7 @@
 
             <ImageView
                 android:id="@+id/preview_2"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -114,7 +114,7 @@
 
             <ImageView
                 android:id="@+id/preview_3"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -149,7 +149,7 @@
 
             <ImageView
                 android:id="@+id/preview_4"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -184,7 +184,7 @@
 
             <ImageView
                 android:id="@+id/preview_5"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -219,7 +219,7 @@
 
             <ImageView
                 android:id="@+id/preview_6"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -254,7 +254,7 @@
 
             <ImageView
                 android:id="@+id/preview_7"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -289,7 +289,7 @@
 
             <ImageView
                 android:id="@+id/preview_8"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -324,7 +324,7 @@
 
             <ImageView
                 android:id="@+id/preview_9"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -359,7 +359,7 @@
 
             <ImageView
                 android:id="@+id/preview_10"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -394,7 +394,7 @@
 
             <ImageView
                 android:id="@+id/preview_11"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"
@@ -429,7 +429,7 @@
 
             <ImageView
                 android:id="@+id/preview_12"
-                android:layout_width="10dp"
+                android:layout_width="20dp"
                 android:layout_height="10dp"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="0dp"

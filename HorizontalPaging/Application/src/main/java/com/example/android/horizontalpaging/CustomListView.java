@@ -953,6 +953,10 @@ public class CustomListView extends ListView {
                     int type = CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT;
 
                     addData (new ListItem (title, subtitle, type));
+                } else if (item.title == "abstract") {
+
+                    abstractSelectedItems ();
+
                 }
                 // TODO: (?)
             }
@@ -971,6 +975,51 @@ public class CustomListView extends ListView {
             }
 
         }
+
+    }
+
+    private void abstractSelectedItems() {
+
+        int index = 0;
+
+        // Get list of the selected items
+        ArrayList<ListItem> selectedListItems = new ArrayList<>();
+        for (ListItem listItem : this.data) {
+            if (listItem.selected) {
+                selectedListItems.add(listItem);
+            }
+            if (selectedListItems.size() == 0) {
+                index++;
+            }
+        }
+
+        // Return if there are no selected items
+        if (selectedListItems.size() == 0) {
+            return;
+        }
+
+        // Get the first item in the sequence
+        ListItem item = selectedListItems.get(0);
+
+        // Remove the selected items from the list
+        for (ListItem listItem : selectedListItems) {
+            data.remove(listItem);
+        }
+        updateViewFromData(); // Update view after removing items from the list
+
+        // Create a new abstract item in the list that represents the selected item sequence at the position of the first item in the sequence
+
+        // <HACK>
+        // This removes the specified item from the list and replaces it with an item of a specific type.
+        // TODO: Replace view, not data! (i.e., item.type = CustomAdapter.LIGHT_CONTROL_LAYOUT;)
+//        int index = data.indexOf(item);
+//        data.remove(index);
+        // Add the new item.
+        ListItem replacementItem = new ListItem("complex", "", CustomAdapter.COMPLEX_LAYOUT);
+        replacementItem.listItems.addAll(selectedListItems); // Add the selected items to the list
+        replacementItem.summary = "" + selectedListItems.size() + " behaviors";
+        data.add(index, replacementItem);
+        // </HACK>
 
     }
 }

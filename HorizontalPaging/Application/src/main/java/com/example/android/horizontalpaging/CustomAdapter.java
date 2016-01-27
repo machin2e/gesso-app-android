@@ -1,10 +1,13 @@
 package com.example.android.horizontalpaging;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +34,7 @@ public class CustomAdapter extends BaseAdapter {
     public static final int MESSAGE_CONTROL_LAYOUT = 4;
     public static final int WAIT_CONTROL_LAYOUT = 5;
     public static final int SAY_CONTROL_LAYOUT = 6;
+    public static final int COMPLEX_LAYOUT = 7;
 
     /**
      * Default constructor. Creates the new Adaptor object to
@@ -96,6 +100,8 @@ public class CustomAdapter extends BaseAdapter {
             resourceForType = R.layout.list_item_type_wait;
         } else if (type == SAY_CONTROL_LAYOUT) {
             resourceForType = R.layout.list_item_type_say;
+        } else if (type == COMPLEX_LAYOUT) {
+            resourceForType = R.layout.list_item_type_complex;
         } else {
             resourceForType = R.layout.list_item_type_light;
         }
@@ -147,21 +153,7 @@ public class CustomAdapter extends BaseAdapter {
         if (listItem.type == LIGHT_CONTROL_LAYOUT) {
 
             // Update image
-            ImageView icon = (ImageView) view.findViewById(R.id.icon);
-
-            //int w = WIDTH_PX, h = HEIGHT_PX;
-            int w = 40, h = 40;
-
-            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-            Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
-            Canvas canvas = new Canvas(bmp);
-
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(Color.rgb(61, 61, 61));
-            canvas.drawRect(0, 0, w, h, paint);
-
-            icon.setImageBitmap(bmp);
-
+//            drawTimelineSegment (view, listItem);
 
             // Get layout containing light state visualizations
             LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
@@ -216,25 +208,11 @@ public class CustomAdapter extends BaseAdapter {
 
                 preview_layout.setX(label.getX());
             }
-        }
 
-        if (listItem.type == IO_CONTROL_LAYOUT) {
+        } else if (listItem.type == IO_CONTROL_LAYOUT) {
 
             // Update image
-            ImageView icon = (ImageView) view.findViewById(R.id.icon);
-
-            //int w = WIDTH_PX, h = HEIGHT_PX;
-            int w = 40, h = 40;
-
-            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-            Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
-            Canvas canvas = new Canvas(bmp);
-
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(Color.rgb(61, 61, 61));
-            canvas.drawRect(0, 0, w, h, paint);
-
-            icon.setImageBitmap(bmp);
+//            drawTimelineSegment (view, listItem);
 
 
             // Get layout containing light state visualizations
@@ -285,12 +263,83 @@ public class CustomAdapter extends BaseAdapter {
                 }
 
                 TextView label = (TextView) view.findViewById(R.id.label);
-//            preview.setX (label.getX());
-//            preview.setX(0);
 
                 preview_layout.setX(label.getX());
             }
+        } else if (listItem.type == CustomAdapter.MESSAGE_CONTROL_LAYOUT) {
+
+            // Update image
+//            drawTimelineSegment (view, listItem);
+
+        } else if (listItem.type == CustomAdapter.WAIT_CONTROL_LAYOUT) {
+
+            // Update image
+//            drawTimelineSegment (view, listItem);
+
+        } else if (listItem.type == CustomAdapter.SAY_CONTROL_LAYOUT) {
+
+            // Update image
+//            drawTimelineSegment (view, listItem);
+
+        } else if (listItem.type == CustomAdapter.COMPLEX_LAYOUT) {
+
+            // Update image
+//            drawTimelineSegment (view, listItem);
+
         }
+    }
+
+    /**
+     * This method converts dp unit to equivalent pixels, depending on device density.
+     *
+     * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+     * @param context Context to get resources and device specific display metrics
+     * @return A float value to represent px equivalent to dp depending on device density
+     */
+    public static float convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * (metrics.densityDpi / 160f);
+        return px;
+    }
+
+    /**
+     * This method converts device specific pixels to density independent pixels.
+     *
+     * @param px A value in px (pixels) unit. Which we need to convert into db
+     * @param context Context to get resources and device specific display metrics
+     * @return A float value to represent dp equivalent to px value
+     */
+    public static float convertPixelsToDp(float px, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / (metrics.densityDpi / 160f);
+        return dp;
+    }
+
+    /**
+     * Draws the timeline segment for the specified view
+     * @param icon
+     */
+    private void drawTimelineSegment(View view, ListItem listItem) {
+
+        ImageView imageView = (ImageView) view.findViewById(R.id.icon);
+
+        int w = (int) convertDpToPixel((float) 22.0, view.getContext());
+        int h = (int) convertDpToPixel((float) 22.0, view.getContext());
+
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+        Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+        Canvas canvas = new Canvas(bmp);
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.rgb(61, 61, 61));
+        paint.setStrokeWidth(3.0f);
+
+        canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) h, paint);
+
+        imageView.setImageBitmap(bmp);
+
     }
 
     /**
@@ -321,13 +370,16 @@ public class CustomAdapter extends BaseAdapter {
         if (item.type == SYSTEM_CONTROL_LAYOUT) {
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageResource(R.drawable.tile);
+//            drawTimelineSegment (view, item);
         }
 
         // Update the icon in the item's layout
         if (item.type == LIGHT_CONTROL_LAYOUT) {
 
-            ImageView icon = (ImageView) view.findViewById(R.id.icon);
-            icon.setImageResource(R.drawable.tile);
+//            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+//            icon.setImageResource(R.drawable.tile);
+
+            drawTimelineSegment (view, item);
 
             // Set states of I/O visualization
             // Get layout containing light state visualizations
@@ -384,6 +436,8 @@ public class CustomAdapter extends BaseAdapter {
 
         } else if (item.type == IO_CONTROL_LAYOUT) {
 
+            drawTimelineSegment (view, item);
+
             // Set states of I/O visualization
             // Get layout containing light state visualizations
             LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
@@ -438,19 +492,36 @@ public class CustomAdapter extends BaseAdapter {
             }
 
         } else if (item.type == MESSAGE_CONTROL_LAYOUT) {
+
+            drawTimelineSegment (view, item);
+
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
                 textView.setText("\"" + item.message + "\"");
             }
         } else if (item.type == WAIT_CONTROL_LAYOUT) {
+
+            drawTimelineSegment (view, item);
+
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
                 textView.setText(item.time + " ms");
             }
         } else if (item.type == SAY_CONTROL_LAYOUT) {
+
+            drawTimelineSegment (view, item);
+
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
                 textView.setText("\"" + item.phrase + "\"");
+            }
+        } else if (item.type == COMPLEX_LAYOUT) {
+
+            drawTimelineSegment (view, item);
+
+            TextView textView = (TextView) view.findViewById (R.id.text);
+            if (textView != null) {
+                textView.setText(item.summary);
             }
         }
 
