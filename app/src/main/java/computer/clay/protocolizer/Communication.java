@@ -557,7 +557,7 @@ public class Communication {
     private static final int MESSAGE_PORT = BROADCAST_PORT; // or 4446
 
     public void sendMessage (String address, String content) {
-        Log.v("Clay", "sendMessageAsync");
+        Log.v("Clay", "sendMessage");
         try {
             Message message = null;
             message = new Message (InetAddress.getByName (address), content);
