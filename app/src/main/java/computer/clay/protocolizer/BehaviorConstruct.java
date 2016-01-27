@@ -6,7 +6,9 @@ public class BehaviorConstruct {
 
     private UUID uuid = null;
 
+    // HACK: Use either Behavior or Loop
     private Behavior behavior = null;
+    private Loop loop = null;
 
     private BehaviorTrigger condition = null;
 
@@ -112,14 +114,28 @@ public class BehaviorConstruct {
 
     public void setBehavior (Behavior behavior) {
         this.behavior = behavior;
+        this.loop = null;
+    }
+
+    public void setLoop (Loop loop) {
+        this.loop = loop;
+        this.behavior = null;
     }
 
     public Behavior getBehavior () {
         return this.behavior;
     }
 
+    public Loop getLoop () {
+        return this.loop;
+    }
+
     public boolean hasBehavior () {
         return (this.behavior != null);
+    }
+
+    public boolean hasLoop () {
+        return (this.loop != null);
     }
 
     public void setCondition (BehaviorTrigger condition) {

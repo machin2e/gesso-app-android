@@ -10,10 +10,10 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,10 +27,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,7 +43,7 @@ import java.util.Random;
  */
 public class MainActivityFragment extends Fragment {
 
-    private ArrayList<String> behaviorSequence = new ArrayList<String>();
+    private ArrayList<String> behaviorEvents = new ArrayList<String>();
 
 //    private Communication communication = null;
     ArrayAdapter<String> listAdapter;
@@ -101,23 +97,23 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
     public void refreshTimeline () {
         // <HACK>
         // Add the current behavior's constructs to the current perspective.
-        behaviorSequence.clear();
-        behaviorSequence.add("abstract");
+        behaviorEvents.clear();
+        behaviorEvents.add("abstract");
         for (int i = 0; i < getApplication().getClay().getPerspective().getBehaviorConstructs().size(); i++) {
             BehaviorConstruct behaviorConstruct = getApplication().getClay().getPerspective().getBehaviorConstructs().get (i);
 
-            String title = behaviorConstruct.getBehavior ().getTitle ();
-            behaviorSequence.add (title);
+            if (behaviorConstruct.hasBehavior()) {
+                String title = behaviorConstruct.getBehavior().getTitle();
+                behaviorEvents.add(title);
+            } else if (behaviorConstruct.hasLoop()) {
+                String title = "timeline (" + behaviorConstruct.getLoop().getBehaviors().size() + ")";
+                behaviorEvents.add(title);
+            }
         }
-        behaviorSequence.add("create");
+        behaviorEvents.add("create");
         // </HACK>
 
         listAdapter.notifyDataSetChanged();
@@ -134,43 +130,59 @@ public class MainActivityFragment extends Fragment {
         }
 
         // Sequence abstraction behaviors.
-        behaviorSequence.add("abstract");
+        behaviorEvents.add("abstract");
 
         // Add the current behavior's constructs to the current perspective.
         for (int i = 0; i < getApplication().getClay().getPerspective().getBehaviorConstructs().size(); i++) {
             BehaviorConstruct behaviorConstruct = getApplication().getClay().getPerspective().getBehaviorConstructs().get (i);
 
             String title = behaviorConstruct.getBehavior().getTitle();
-            behaviorSequence.add (title);
+            behaviorEvents.add(title);
         }
 
         // Sequence behaviors.
-        behaviorSequence.add("create");
+        behaviorEvents.add("create");
+
+        // TODO: Remove this! It's just for testing.
+        behaviorEvents.add("update");
 
         // Define the adapter (adapts the data to the actual rendered view)
-        listAdapter = new ArrayAdapter<String>( // ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
+        listAdapter = new ArrayAdapter<String>(
                 getActivity(), // The current context (this fragment's parent activity).
-                R.layout.list_item_http_request, // ID of list item layout
-                R.id.list_item_http_request_textview, // ID of textview to populate (using the specified list item layout)
-                behaviorSequence // The list of forecast data
+                R.layout.list_item_behavior_event, // ID of list item layout
+                R.id.list_item_behavior_event_label, // ID of textview to populate (using the specified list item layout)
+                behaviorEvents // The list containing the behaviors to show on the timeline.
         );
 
-//        communication.listAdapter = listAdapter; // TODO: (HACK) This shouldn't be necessary or should be elsewhere!
-
         // Define the view (get a reference to it and pass it an adapter)
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_http_requests);
-        listView.setAdapter (listAdapter);
+        final ListView listView = (ListView) rootView.findViewById(R.id.listview_timeline);
+        listView.setAdapter(listAdapter);
+
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                String pointers = "";
+                for (int i = 0; i < event.getPointerCount(); i++) {
+                    pointers = pointers + event.getPointerId(i) + " ";
+                }
+                Log.v("Clay_Gesture", "Gesture (" + event.getActionMasked() + "): " + pointers); // event);
+
+                return false;
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                Log.v("Clay_Gesture", "Touched behavior " + position);
 
                 String touchedEntryText = listAdapter.getItem (position);
 
                 if (touchedEntryText.equals("create")) {
 
                     // Add a new behavior construct to the looping sequence.
-//                    behaviorSequence.add(1, "<select>");
+//                    behaviorEvents.add(1, "<select>");
 //                    listAdapter.notifyDataSetChanged();
 
                     // TODO: Get Clay
@@ -186,7 +198,7 @@ public class MainActivityFragment extends Fragment {
                     // <HACK>
                     Hack_PromptForBehaviorSelection(perspective);
                     //((AppActivity) getClay ().getPlatformContext()).Hack_PromptForBehaviorSelection(behaviorConstruct);
-//                    behaviorSequence.set (position, "Set");
+//                    behaviorEvents.set (position, "Set");
 //                    listAdapter.notifyDataSetChanged();
 
                 } else if (touchedEntryText.equals("abstract")) {
@@ -196,18 +208,41 @@ public class MainActivityFragment extends Fragment {
                     // TODO: Display the name of the complex behavior as a single item in the list.
                     // TODO: Behavior newComplexBehavior = new Behavior ("complex");
 
-                    // Create new loop of behaviors
-                    Loop loop = new Loop ();
+                    // Create a new timeline that will include the current behaviors.
+                    Loop newLoop = new Loop ();
+
+                    // Copy the behaviors into the new timeline.
                     for (int i = 0; i < getApplication().getClay().getPerspective().getBehaviorConstructs().size(); i++) {
+
+                        // Get the next behavior constructs
                         BehaviorConstruct behaviorConstruct = getApplication().getClay().getPerspective().getBehaviorConstructs().get (i);
                         Behavior behavior = behaviorConstruct.getBehavior ();
-                        loop.addBehavior (behavior);
 
-                        // Get the selected behavior construct
-                        String title = "" + behavior.getTitle();
-                        Toast toast = Toast.makeText(getActivity(), title, Toast.LENGTH_SHORT); //Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
+                        // Add the behavior to the new timeline.
+                        newLoop.addBehavior(behavior);
                     }
+
+                    // Create sequence
+                    Behavior newBehavior = new Behavior ("> timeline");
+                    newBehavior.setTransform("abstracted????");
+                    BehaviorConstruct newBehaviorConstruct = new BehaviorConstruct(getApplication().getClay().getPerspective());
+                    newBehaviorConstruct.setLoop(newLoop); // newBehaviorConstruct.setBehavior(newBehavior);
+
+                    // Remove the selected behaviors from the timeline. Replace them with the sequence.
+                    getApplication().getClay().getPerspective().getBehaviorConstructs().clear();
+
+                    // TODO: Create behavior construct to represent the new timeline.
+
+                    // Add sequence to the timeline
+                    getApplication().getClay().getPerspective().addBehaviorConstruct(newBehaviorConstruct);
+
+                    // Refresh the timeline view
+                    refreshTimeline();
+
+//                    BehaviorConstruct behaviorConstruct = getApplication().getClay().getPerspective().getBehaviorConstructs().get (i);
+//
+//                    String title = behaviorConstruct.getBehavior ().getTitle ();
+//                    behaviorEvents.add (title);
 
                     // Create new behavior construct to encapsulate the loop (as a complex behavior)
 
@@ -229,8 +264,16 @@ public class MainActivityFragment extends Fragment {
 //                    // <HACK>
 //                    getApplication().Hack_PromptForBehaviorSelection(behaviorConstruct);
 //                    //((AppActivity) getClay ().getPlatformContext()).Hack_PromptForBehaviorSelection(behaviorConstruct);
-////                    behaviorSequence.set (position, "Set");
+////                    behaviorEvents.set (position, "Set");
 //                    listAdapter.notifyDataSetChanged();
+
+                } else if (touchedEntryText.equals ("update")) { // HACK
+
+                    // TODO: Send UDP message "update" to a device to request a firmware update.
+
+                    getApplication().getClay().getCommunication().sendMessage("192.168.2.255", "update"); // HACK
+
+                    getApplication().getClay().getCommunication ().processOutgoingMessages(); // HACK
 
                 }
 
@@ -260,6 +303,7 @@ public class MainActivityFragment extends Fragment {
                 httpRequestTask.execute (listAdapter.getItem (position));
                 */
 
+                /*
                 // Get the selected behavior construct
                 BehaviorConstruct behaviorConstruct = getApplication().getClay().getPerspective().getBehaviorConstructs().get(position - 1);
                 String title = behaviorConstruct.getBehavior().getTitle();
@@ -267,7 +311,24 @@ public class MainActivityFragment extends Fragment {
                 toast.show();
 
                 getApplication().getClay().getPerspective().getBehaviorConstructs().remove (position - 1);
-//                behaviorSequence.remove (position);
+//                behaviorEvents.remove (position);
+                */
+
+                // TODO: Get Clay
+                MainActivity application = getApplication();
+                Log.v("Clay_Construct", "application: " + application);
+                Clay clay = application.getClay();
+                Log.v ("Clay_Construct", "clay: " + clay);
+                // TODO: Get Perspective
+                Perspective perspective = clay.getPerspective();
+                Log.v("Clay_Construct", "perspective: " + perspective);
+//                    BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective, 0, 0);
+//                    perspective.addBehaviorConstruct(behaviorConstruct);
+                // <HACK>
+                Hack_PromptForBehaviorModification (perspective);
+                //((AppActivity) getClay ().getPlatformContext()).Hack_PromptForBehaviorSelection(behaviorConstruct);
+//                    behaviorEvents.set (position, "Set");
+//                    listAdapter.notifyDataSetChanged();
 
                 /*
                 Intent settingsIntent = new Intent(getActivity(), HttpRequestActivity.class);
@@ -1047,7 +1108,9 @@ public class MainActivityFragment extends Fragment {
         });
 
         builder.show ();
-    }/**
+    }
+
+    /**
      * Show behavior browser and prompt for selection.
      */
     public void Hack_PromptForBehaviorSelection (final Perspective perspective) {
@@ -1098,6 +1161,63 @@ public class MainActivityFragment extends Fragment {
         // Verbalize the phrase
 //        Hack_Speak(phrases.get(phraseChoice));
         // TODO: Adapt voice recognition to look for context-specfic speech.
+
+        alert.show();
+    }
+
+    /**
+     * Show behavior browser and prompt for selection.
+     */
+    public void Hack_PromptForBehaviorModification (final Perspective perspective) {
+
+        // Create the list of options
+        final String[] options = new String[5];
+        options[0] = "Delete";
+        options[1] = "Move Up";
+        options[2] = "Move Down";
+        options[3] = "Change";
+        options[4] = "Replace";
+
+        // Show the list of behaviors
+        AlertDialog.Builder builder = new AlertDialog.Builder (getActivity());
+        builder.setTitle ("What do you want to do?");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+
+//                if (options[item].toString().equals("control")) {
+//                    Hack_PromptForBehaviorTransform(perspective);
+//                } else if (options[item].toString().equals("time")) {
+//                    Hack_PromptForTimeTransform(perspective);
+//                } else if (options[item].toString().equals("cause/effect")) {
+//                    Hack_PromptForSwitchBehaviorTransform(perspective);
+//                } else if (options[item].toString().equals("message")) {
+//                    Hack_PromptForMessage(perspective);
+//                } else if (options[item].toString().equals("say")) {
+//                    Hack_PromptForSpeech(perspective);
+//                }
+            }
+        });
+        AlertDialog alert = builder.create();
+
+        /*
+        // Verbalize creative scaffolding for context
+        ArrayList<String> phrases = new ArrayList<String> ();
+        phrases.add ("hi. what do you want me to do?");
+        phrases.add("choose one of these behaviors.");
+        phrases.add("do what?");
+        phrases.add("what're you thinking?");
+        phrases.add("tell me what to do");
+        phrases.add("which one?");
+        phrases.add("select a behavior");
+        phrases.add("adding a behavior");
+        // Choose the phrase to verbalize. Default to random selection algorithm.
+        // TODO: Choose the verbalization pattern based on the speed of interaction (metric for experience and comfort level).
+        Random random = new Random();
+        int phraseChoice = random.nextInt (phrases.size ());
+        // Verbalize the phrase
+//        Hack_Speak(phrases.get(phraseChoice));
+        // TODO: Adapt voice recognition to look for context-specfic speech.
+        */
 
         alert.show();
     }
