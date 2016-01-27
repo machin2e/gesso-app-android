@@ -10,12 +10,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
@@ -34,10 +38,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      */
     CustomViewPager mViewPager;
 
-    // Configure the interface settings
-    private boolean hideTitle = true;
+    // Configure the interface
     private boolean hideActionBar = false;
-    private boolean hideActionBarOnScroll = false;
     private boolean fullscreen = true;
 
     /**
@@ -55,7 +57,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Load the UI from res/layout/activity_main.xml
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.sample_main);
 
         // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
         // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
@@ -66,14 +68,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         if (hideActionBar) {
             actionBar.hide();
-        }
-
-        if (hideTitle) {
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
-
-        if (hideActionBarOnScroll) {
-            actionBar.setHideOnContentScrollEnabled(true);
         }
         // END_INCLUDE (set_navigation_mode)
 
@@ -225,36 +219,30 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * This would be replaced with your application's content.
      */
     public static class DummySectionFragment extends Fragment {
-
-        // Configure the interface settings
-        boolean disableScrollbarFading = true;
-        boolean disableScrollbars = true;
-        boolean disableOverscrollEffect = true;
-
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         public static final String ARG_SECTION_NUMBER = "section_number";
 
-//        private ArrayList<String> behaviorEvents = new ArrayList<String>();
-//        ArrayAdapter<String> listAdapter;
+        private ArrayList<String> behaviorEvents = new ArrayList<String>();
+        ArrayAdapter<String> listAdapter;
 
         public DummySectionFragment() {
 
-//            behaviorEvents.add("hello a");
-//            behaviorEvents.add("hello b");
-//            behaviorEvents.add("hello c");
-//            behaviorEvents.add("hello d");
-//            behaviorEvents.add("hello e");
-//            behaviorEvents.add("hello f");
-//            behaviorEvents.add("hello g");
+            behaviorEvents.add("hello a");
+            behaviorEvents.add("hello b");
+            behaviorEvents.add("hello c");
+            behaviorEvents.add("hello d");
+            behaviorEvents.add("hello e");
+            behaviorEvents.add("hello f");
+            behaviorEvents.add("hello g");
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_listview, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_main_dummy, container, false);
 //            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
 //            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
 
@@ -269,21 +257,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             // Define the view (get a reference to it and pass it an adapter)
             final CustomListView listView = (CustomListView) rootView.findViewById(R.id.listview_timeline);
 //            listView.setAdapter(listAdapter);
-
-            if (disableScrollbarFading) {
-                listView.setScrollbarFadingEnabled(false);
-            }
-
-            // Disable the scrollbars.
-            if (disableScrollbars) {
-                listView.setVerticalScrollBarEnabled(false);
-                listView.setHorizontalScrollBarEnabled(false);
-            }
-
-            // Disable overscroll effect.
-            if (disableOverscrollEffect) {
-                listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-            }
 
             return rootView;
         }

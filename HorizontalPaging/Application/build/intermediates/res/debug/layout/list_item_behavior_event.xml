@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:padding="5dip"
+    android:gravity="center_vertical">
+
+    <!--<LinearLayout android:id="@+id/thumbnail"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="3dip"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_marginRight="5dip">-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/list_image"-->
+            <!--android:layout_width="50dip"-->
+            <!--android:layout_height="50dip"/>-->
+
+    <!--</LinearLayout>-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:id="@+id/list_item_behavior_event_label"
+        android:layout_marginTop="1dip"
+        android:textStyle="bold" />
+
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:id="@+id/list_item_behavior_event_label"-->
+        <!--android:layout_marginTop="1dip"-->
+        <!--android:textStyle="bold"-->
+        <!--android:paddingBottom="10dp"/>-->
+
+    <!--<TextView-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:id="@+id/list_item_behavior_event_description"-->
+        <!--android:layout_below="@+id/list_item_behavior_event_label"-->
+        <!--android:minHeight="0dp"-->
+        <!--android:text="[options]" />-->
+
+</RelativeLayout><!-- From: file:/Users/mokogobo/Workspace/HorizontalPaging/Application/src/main/res/layout/list_item_behavior_event.xml -->
