@@ -69,9 +69,17 @@ public class CustomAdapter extends BaseAdapter {
         int type = getItemType (position);
         int resourceForType; // Default resource
         if (type == 0) {
-            resourceForType = R.layout.list_item_type_001; // Select the layout for the list_item_type_001 type
+            resourceForType = R.layout.list_item_type_000; // Select the layout for the list_item_type_001 type
         } else if (type == 1) {
+            resourceForType = R.layout.list_item_type_001;
+        } else if (type == 2) {
             resourceForType = R.layout.list_item_type_002;
+        } else if (type == 3) {
+            resourceForType = R.layout.list_item_type_003;
+        } else if (type == 4) {
+            resourceForType = R.layout.list_item_type_004;
+        } else if (type == 5) {
+            resourceForType = R.layout.list_item_type_005;
         } else {
             resourceForType = R.layout.list_item_type_001;
         }
@@ -116,6 +124,17 @@ public class CustomAdapter extends BaseAdapter {
         if (item.type == 1) {
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageResource(R.drawable.tile);
+        }
+
+        else if (item.type == 3) {
+            TextView textView = (TextView) view.findViewById (R.id.text);
+            textView.setText("\"" + item.subTitle + "\"");
+        } else if (item.type == 4) {
+            TextView textView = (TextView) view.findViewById (R.id.text);
+            textView.setText(item.subTitle);
+        } else if (item.type == 5) {
+            TextView textView = (TextView) view.findViewById (R.id.text);
+            textView.setText("\"" + item.subTitle + "\"");
         }
 
         // return the final view object

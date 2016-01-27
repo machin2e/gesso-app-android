@@ -41,7 +41,7 @@ public class CustomListView extends ListView {
 
 //        adapter = new ArrayAdapter<String>(getContext(),R.layout.list_item_type_001, R.id.label, data);
         // setup the data adaptor
-        CustomAdapter adapter = new CustomAdapter(getContext(), R.layout.list_item_type_001, this.data);
+        this.adapter = new CustomAdapter(getContext(), R.layout.list_item_type_001, this.data);
         setAdapter(adapter);
         setOnItemClickListener(new ListSelection());
     }
@@ -56,58 +56,99 @@ public class CustomListView extends ListView {
         // create some objects... and add them into the array list
         this.data.add(new ListItem("abstract", "Subtitle", 0));
 
-        this.data.add(new ListItem("behavior 1", "Subtitle", 1));
-        this.data.add(new ListItem("behavior 2", "Subtitle", 1));
-        this.data.add(new ListItem("behavior 3", "Subtitle", 1));
+        // Basic behaviors
+        this.data.add(new ListItem("lights", "Subtitle", 1));
+        this.data.add(new ListItem("io", "Subtitle", 2));
+        this.data.add(new ListItem("message", "turn lights on", 3));
+        this.data.add(new ListItem("wait", "500 ms", 4));
+        this.data.add(new ListItem("say", "oh, that's great", 5));
 
         this.data.add(new ListItem("create", "Subtitle", 0));
+    }
+
+    private void addData (ListItem item) {
+        if (adapter != null) {
+            data.add(data.size() - 2, item);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private class ListSelection implements OnItemClickListener
     {
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id)
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
 
             ListItem item = (ListItem) data.get (position);
 
-            // Update layout
-            // HACK: Separate the state and view!
-            if (item.selected == false) {
-                // Update state of data
-                item.selected = true;
-                // Update state of view
-                view.setPadding(view.getPaddingLeft() + 100, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+            // Check if the list item was a constructor
+            if (item.type == 0) {
+                if (item.title == "create") {
+                    String title = "behavior";
+                    String subtitle = "Subtitle";
+                    int type = 1;
+                    //data.add(data.size() - 2, new ListItem (title, subtitle, type));
+                    ListItem newItem = new ListItem (title, subtitle, type);
+                    addData(newItem);
+                }
+                // TODO: (?)
             } else {
-                // Update state of data
-                item.selected = false;
-                // Update state of view
-                view.setPadding(20, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+
+                // Update layout
+                // HACK: Separate the state and view!
+                if (item.selected == false) {
+                    // Update state of data
+                    item.selected = true;
+                    // Update state of view
+                    view.setPadding(view.getPaddingLeft() + 100, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+                } else {
+                    // Update state of data
+                    item.selected = false;
+                    // Update state of view
+                    view.setPadding(20, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+                }
+
+                // Update image
+                ImageView icon = (ImageView) view.findViewById(R.id.icon);
+
+                //int w = WIDTH_PX, h = HEIGHT_PX;
+                int w = icon.getWidth(), h = icon.getHeight();
+
+                Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+                Canvas canvas = new Canvas(bmp);
+
+                Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                paint.setColor(Color.rgb(61, 61, 61));
+                canvas.drawRect(0, 0, w, h, paint);
+
+                icon.setImageBitmap(bmp);
+
+                if (item.type == 1 || item.type == 2) {
+                    // Update image preview
+                    ImageView preview = (ImageView) view.findViewById(R.id.preview);
+
+                    //int w = WIDTH_PX, h = HEIGHT_PX;
+                    int w2 = preview.getWidth(), h2 = preview.getHeight();
+
+                    Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
+                    Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
+                    Canvas canvas2 = new Canvas(bmp2);
+
+                    Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    paint2.setColor(Color.rgb(255, 61, 61));
+                    canvas2.drawRect(0, 0, w2, h2, paint2);
+
+                    preview.setImageBitmap(bmp2);
+                }
+
+                // Show options
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("You pressed item #" + (position + 1));
+                builder.setPositiveButton("OK", null);
+                builder.show();
             }
-
-            // Update image
-            ImageView icon = (ImageView) view.findViewById(R.id.icon);
-
-            //int w = WIDTH_PX, h = HEIGHT_PX;
-            int w = icon.getWidth(), h = icon.getHeight();
-
-            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-            Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
-            Canvas canvas = new Canvas(bmp);
-
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(Color.rgb(61, 61, 61));
-            canvas.drawRect(0, 0, w, h, paint);
-
-            icon.setImageBitmap(bmp);
-
-            // Show options
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage("You pressed item #" + (position+1));
-            builder.setPositiveButton("OK", null);
-            builder.show();
         }
 
     }

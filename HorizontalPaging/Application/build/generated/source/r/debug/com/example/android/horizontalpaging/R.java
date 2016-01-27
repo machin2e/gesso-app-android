@@ -292,17 +292,22 @@ containing a value of this type.
         public static final int left=0x7f08000e;
         public static final int listview_timeline=0x7f080013;
         public static final int pager=0x7f080012;
+        public static final int preview=0x7f080016;
         public static final int right=0x7f08000f;
         public static final int start=0x7f080010;
+        public static final int text=0x7f080017;
         public static final int top=0x7f080011;
         public static final int vertical=0x7f080001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int fragment_listview=0x7f030001;
-        public static final int list_item_type_001=0x7f030002;
-        public static final int list_item_type_002=0x7f030003;
-        public static final int list_item_type_003=0x7f030004;
+        public static final int list_item_type_000=0x7f030002;
+        public static final int list_item_type_001=0x7f030003;
+        public static final int list_item_type_002=0x7f030004;
+        public static final int list_item_type_003=0x7f030005;
+        public static final int list_item_type_004=0x7f030006;
+        public static final int list_item_type_005=0x7f030007;
     }
     public static final class string {
         public static final int action_settings=0x7f070000;
