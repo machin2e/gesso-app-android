@@ -164,14 +164,14 @@ public class CustomListView extends ListView {
         final TextView lightLabel = new TextView (getContext());
         lightLabel.setText("Enable LED feedback");
         lightLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView (lightLabel);
+        transformLayout.addView(lightLabel);
 
         LinearLayout lightLayout = new LinearLayout (getContext());
-        lightLayout.setOrientation (LinearLayout.HORIZONTAL);
+        lightLayout.setOrientation(LinearLayout.HORIZONTAL);
 //        channelLayout.setLayoutParams (new LinearLayout.LayoutParams (MATCH_PARENT));
         final ArrayList<ToggleButton> lightToggleButtons = new ArrayList<> ();
         for (int i = 0; i < 12; i++) {
-            final String channelLabel = Integer.toString (i + 1);
+            final String channelLabel = Integer.toString(i + 1);
             final ToggleButton toggleButton = new ToggleButton (getContext());
             toggleButton.setPadding(0, 0, 0, 0);
             toggleButton.setText(channelLabel);
@@ -182,7 +182,7 @@ public class CustomListView extends ListView {
             params.setMargins (0, 0, 0, 0);
             toggleButton.setLayoutParams (params);
             lightToggleButtons.add (toggleButton); // Add the button to the list.
-            lightLayout.addView (toggleButton);
+            lightLayout.addView(toggleButton);
         }
 
         transformLayout.addView (lightLayout);
@@ -213,8 +213,10 @@ public class CustomListView extends ListView {
 
                     if (lightEnableButton.isChecked ()) {
                         transformString = transformString.concat ("T");
+                        item.lightStates.set(i, true);
                     } else {
                         transformString = transformString.concat ("F");
+                        item.lightStates.set(i, false);
                     }
                     // transformString = transformString.concat (","); // Add comma
 
@@ -265,7 +267,7 @@ public class CustomListView extends ListView {
 
         // Declare transformation layout
         LinearLayout transformLayout = new LinearLayout (getContext());
-        transformLayout.setOrientation (LinearLayout.VERTICAL);
+        transformLayout.setOrientation(LinearLayout.VERTICAL);
 
         // Channels
 
@@ -557,8 +559,10 @@ public class CustomListView extends ListView {
 
                     if (channelEnableButton.isChecked ()) {
                         transformString = transformString.concat ("T");
+                        item.ioStates.set(i, true);
                     } else {
                         transformString = transformString.concat ("F");
+                        item.ioStates.set(i, false);
                     }
                     // transformString = transformString.concat (","); // Add comma
 
@@ -608,7 +612,6 @@ public class CustomListView extends ListView {
                 // TODO: Store the state of the lights in the object associated with the ListItem
 
                 // Refresh the timeline view
-//                refreshTimeline();
                 updateViewFromData();
             }
         });
@@ -643,11 +646,10 @@ public class CustomListView extends ListView {
 //                behaviorConstruct.setBehavior(behavior);
 //                perspective.addBehaviorConstruct(behaviorConstruct);
 
-                item.subTitle = input.getText().toString();
+                item.message = input.getText().toString();
 
                 // Refresh the timeline view
                 updateViewFromData();
-//                refreshTimeline();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -681,11 +683,10 @@ public class CustomListView extends ListView {
 //                behaviorConstruct.setBehavior(behavior);
 //                perspective.addBehaviorConstruct(behaviorConstruct);
 
-                item.subTitle = input.getText().toString();
+                item.phrase = input.getText().toString();
 
                 // Refresh the timeline view
                 updateViewFromData();
-//                refreshTimeline();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -755,10 +756,9 @@ public class CustomListView extends ListView {
 //                BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective);
 //                behaviorConstruct.setBehavior(behavior);
 //                perspective.addBehaviorConstruct(behaviorConstruct);
-                item.subTitle = transformString.concat (Integer.toString (waitVal.getProgress ())).concat(" ms");
+                item.time = waitVal.getProgress ();
 
                 // Refresh the timeline view
-//                refreshTimeline();
                 updateViewFromData();
             }
         });

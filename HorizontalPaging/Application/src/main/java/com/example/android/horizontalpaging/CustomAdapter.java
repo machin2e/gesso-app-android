@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CustomAdapter extends BaseAdapter {
     // store the context (as an inflated layout)
@@ -315,9 +314,9 @@ public class CustomAdapter extends BaseAdapter {
         // set the value
         tv.setText(item.title);
 
-//        viewElement = view.findViewById(R.id.subTitle);
+//        viewElement = view.findViewById(R.id.message);
 //        tv = (TextView)viewElement;
-//        tv.setText(item.subTitle);
+//        tv.setText(item.message);
 
         if (item.type == SYSTEM_CONTROL_LAYOUT) {
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
@@ -326,24 +325,132 @@ public class CustomAdapter extends BaseAdapter {
 
         // Update the icon in the item's layout
         if (item.type == LIGHT_CONTROL_LAYOUT) {
+
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageResource(R.drawable.tile);
-        }
 
-        else if (item.type == MESSAGE_CONTROL_LAYOUT) {
+            // Set states of I/O visualization
+            // Get layout containing light state visualizations
+            LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
+
+            int[] previews = new int[12];
+            previews[0] = R.id.preview_1;
+            previews[1] = R.id.preview_2;
+            previews[2] = R.id.preview_3;
+            previews[3] = R.id.preview_4;
+            previews[4] = R.id.preview_5;
+            previews[5] = R.id.preview_6;
+            previews[6] = R.id.preview_7;
+            previews[7] = R.id.preview_8;
+            previews[8] = R.id.preview_9;
+            previews[9] = R.id.preview_10;
+            previews[10] = R.id.preview_11;
+            previews[11] = R.id.preview_12;
+
+            if (preview_layout != null) {
+
+                for (int i = 0; i < previews.length; i++) {
+
+                    // Update image preview
+                    ImageView preview = (ImageView) view.findViewById(previews[i]);
+
+                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
+                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
+
+                    if (preview != null) {
+
+                        Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
+                        Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
+                        Canvas canvas2 = new Canvas(bmp2);
+
+                        Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+                        if (item.lightStates.get(i) == true) {
+                            paint2.setColor(item.lightColors.get(i));
+                        } else {
+                            paint2.setColor(Color.rgb(100, 100, 100));
+                        }
+
+                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+
+                        preview.setImageBitmap(bmp2);
+
+                    }
+                }
+
+                TextView label = (TextView) view.findViewById(R.id.label);
+
+                preview_layout.setX(label.getX());
+            }
+
+        } else if (item.type == IO_CONTROL_LAYOUT) {
+
+            // Set states of I/O visualization
+            // Get layout containing light state visualizations
+            LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
+
+            int[] previews = new int[12];
+            previews[0] = R.id.preview_1;
+            previews[1] = R.id.preview_2;
+            previews[2] = R.id.preview_3;
+            previews[3] = R.id.preview_4;
+            previews[4] = R.id.preview_5;
+            previews[5] = R.id.preview_6;
+            previews[6] = R.id.preview_7;
+            previews[7] = R.id.preview_8;
+            previews[8] = R.id.preview_9;
+            previews[9] = R.id.preview_10;
+            previews[10] = R.id.preview_11;
+            previews[11] = R.id.preview_12;
+
+            if (preview_layout != null) {
+
+                for (int i = 0; i < previews.length; i++) {
+
+                    // Update image preview
+                    ImageView preview = (ImageView) view.findViewById(previews[i]);
+
+                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
+                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
+
+                    if (preview != null) {
+
+                        Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
+                        Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
+                        Canvas canvas2 = new Canvas(bmp2);
+
+                        Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+                        if (item.ioStates.get(i) == true) {
+                            paint2.setColor(Color.rgb(61, 255, 61));
+                        } else {
+                            paint2.setColor(Color.rgb(255, 61, 61));
+                        }
+
+                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+
+                        preview.setImageBitmap(bmp2);
+
+                    }
+                }
+
+                TextView label = (TextView) view.findViewById(R.id.label);
+
+                preview_layout.setX(label.getX());
+            }
+
+        } else if (item.type == MESSAGE_CONTROL_LAYOUT) {
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + item.subTitle + "\"");
+                textView.setText("\"" + item.message + "\"");
             }
         } else if (item.type == WAIT_CONTROL_LAYOUT) {
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText(item.subTitle);
+                textView.setText(item.time + " ms");
             }
         } else if (item.type == SAY_CONTROL_LAYOUT) {
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + item.subTitle + "\"");
+                textView.setText("\"" + item.phrase + "\"");
             }
         }
 
