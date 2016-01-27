@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.InputType;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -914,11 +915,18 @@ public class CustomListView extends ListView {
                     addData (new ListItem (title, subtitle, type));
                 }
                 // TODO: (?)
-            }
 
-            if (item.type != CustomAdapter.SYSTEM_CONTROL_LAYOUT && item.type != CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (item.type != CustomAdapter.SYSTEM_CONTROL_LAYOUT && item.type != CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
-                displayListItemOptions (item);
+                if (item.type == CustomAdapter.COMPLEX_LAYOUT) {
+
+                    unabstractSelectedItem (item);
+
+                } else {
+
+                    displayListItemOptions (item);
+
+                }
 
                 /*
                 // Show options
@@ -942,6 +950,7 @@ public class CustomListView extends ListView {
         @Override
         public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
         {
+            Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
 
             final ListItem item = (ListItem) data.get (position);
 
@@ -1020,6 +1029,29 @@ public class CustomListView extends ListView {
         replacementItem.summary = "" + selectedListItems.size() + " behaviors";
         data.add(index, replacementItem);
         // </HACK>
+
+    }
+
+    private void unabstractSelectedItem(ListItem item) {
+
+        int index = 0;
+
+        // Get list of the abstracted items
+        ArrayList<ListItem> abstractedListItems = item.listItems;
+
+        // Get position of the selected item
+        index = data.indexOf(item);
+
+        // Remove the selected item from the list (it will be replaced by the abstracted behviors)
+        data.remove (index);
+        updateViewFromData(); // Update view after removing items from the list
+
+        // Add the abstracted items back to the list
+        for (ListItem listItem : abstractedListItems) {
+            data.add (index, listItem);
+            index++; // Increment the index of the insertion position
+        }
+        updateViewFromData(); // Update view after removing items from the list
 
     }
 }

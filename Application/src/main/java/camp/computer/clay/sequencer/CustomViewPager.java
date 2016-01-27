@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class CustomViewPager extends ViewPager {
@@ -17,6 +18,7 @@ public class CustomViewPager extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.v("Gesture_Log", "onTouchEvent from CustomViewPager");
         if (this.enabled) {
             return super.onTouchEvent(event);
         }
@@ -26,6 +28,9 @@ public class CustomViewPager extends ViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        Log.v("Gesture_Log", "onInterceptTouchEvent from CustomViewPager");
+        String touchLocation = "" + event.getX() + ", " + event.getY();
+        Log.v("Gesture_Log", "\tat " + touchLocation);
         if (this.enabled) {
             return super.onInterceptTouchEvent(event);
         }
@@ -35,4 +40,5 @@ public class CustomViewPager extends ViewPager {
 
     public void setPagingEnabled(boolean enabled) {
         this.enabled = enabled;
-    } }
+    }
+}
