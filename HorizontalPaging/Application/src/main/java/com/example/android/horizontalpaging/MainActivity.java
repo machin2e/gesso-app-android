@@ -35,7 +35,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     CustomViewPager mViewPager;
 
     // Configure the interface
+    private boolean hideTitle = true;
     private boolean hideActionBar = false;
+    private boolean hideActionBarOnScroll = false;
     private boolean fullscreen = true;
 
     /**
@@ -64,6 +66,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         if (hideActionBar) {
             actionBar.hide();
+        }
+
+        if (hideTitle) {
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
+
+        if (hideActionBarOnScroll) {
+            actionBar.setHideOnContentScrollEnabled(true);
         }
         // END_INCLUDE (set_navigation_mode)
 
@@ -221,18 +231,18 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
          */
         public static final String ARG_SECTION_NUMBER = "section_number";
 
-        private ArrayList<String> behaviorEvents = new ArrayList<String>();
-        ArrayAdapter<String> listAdapter;
+//        private ArrayList<String> behaviorEvents = new ArrayList<String>();
+//        ArrayAdapter<String> listAdapter;
 
         public DummySectionFragment() {
 
-            behaviorEvents.add("hello a");
-            behaviorEvents.add("hello b");
-            behaviorEvents.add("hello c");
-            behaviorEvents.add("hello d");
-            behaviorEvents.add("hello e");
-            behaviorEvents.add("hello f");
-            behaviorEvents.add("hello g");
+//            behaviorEvents.add("hello a");
+//            behaviorEvents.add("hello b");
+//            behaviorEvents.add("hello c");
+//            behaviorEvents.add("hello d");
+//            behaviorEvents.add("hello e");
+//            behaviorEvents.add("hello f");
+//            behaviorEvents.add("hello g");
         }
 
         @Override

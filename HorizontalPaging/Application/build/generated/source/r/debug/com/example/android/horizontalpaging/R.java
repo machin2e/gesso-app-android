@@ -292,22 +292,47 @@ containing a value of this type.
         public static final int left=0x7f08000e;
         public static final int listview_timeline=0x7f080013;
         public static final int pager=0x7f080012;
-        public static final int preview=0x7f080016;
+        public static final int preview_1=0x7f080017;
+        public static final int preview_10=0x7f080029;
+        public static final int preview_10_label=0x7f08002a;
+        public static final int preview_11=0x7f08002b;
+        public static final int preview_11_label=0x7f08002c;
+        public static final int preview_12=0x7f08002d;
+        public static final int preview_12_label=0x7f08002e;
+        public static final int preview_1_label=0x7f080018;
+        public static final int preview_2=0x7f080019;
+        public static final int preview_2_label=0x7f08001a;
+        public static final int preview_3=0x7f08001b;
+        public static final int preview_3_label=0x7f08001c;
+        public static final int preview_4=0x7f08001d;
+        public static final int preview_4_label=0x7f08001e;
+        public static final int preview_5=0x7f08001f;
+        public static final int preview_5_label=0x7f080020;
+        public static final int preview_6=0x7f080021;
+        public static final int preview_6_label=0x7f080022;
+        public static final int preview_7=0x7f080023;
+        public static final int preview_7_label=0x7f080024;
+        public static final int preview_8=0x7f080025;
+        public static final int preview_8_label=0x7f080026;
+        public static final int preview_9=0x7f080027;
+        public static final int preview_9_label=0x7f080028;
+        public static final int preview_layout=0x7f080016;
         public static final int right=0x7f08000f;
         public static final int start=0x7f080010;
-        public static final int text=0x7f080017;
+        public static final int text=0x7f08002f;
         public static final int top=0x7f080011;
         public static final int vertical=0x7f080001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int fragment_listview=0x7f030001;
-        public static final int list_item_type_000=0x7f030002;
-        public static final int list_item_type_001=0x7f030003;
-        public static final int list_item_type_002=0x7f030004;
-        public static final int list_item_type_003=0x7f030005;
-        public static final int list_item_type_004=0x7f030006;
-        public static final int list_item_type_005=0x7f030007;
+        public static final int list_item_type_io=0x7f030002;
+        public static final int list_item_type_light=0x7f030003;
+        public static final int list_item_type_message=0x7f030004;
+        public static final int list_item_type_placeholder=0x7f030005;
+        public static final int list_item_type_say=0x7f030006;
+        public static final int list_item_type_system=0x7f030007;
+        public static final int list_item_type_wait=0x7f030008;
     }
     public static final class string {
         public static final int action_settings=0x7f070000;

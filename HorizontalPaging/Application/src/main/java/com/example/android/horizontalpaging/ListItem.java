@@ -8,8 +8,9 @@ public class ListItem {
     public String title;
     public String subTitle;
 
-    public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_001.
-    public static int DEFAULT_TYPE = 0;
+    public static int DEFAULT_TYPE = CustomAdapter.IO_CONTROL_LAYOUT;
+
+    public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_light.
 
     public boolean selected = false;
 
@@ -21,9 +22,14 @@ public class ListItem {
     // main constructor
     public ListItem(String title, String subTitle, int type) {
         super();
+
+        // Set parameters
         this.title = title;
         this.subTitle = subTitle;
         this.type = type;
+
+        // Initialize
+        this.selected = false;
     }
 
     // String representation

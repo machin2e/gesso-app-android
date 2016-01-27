@@ -1,22 +1,37 @@
 package com.example.android.horizontalpaging;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CustomAdapter extends BaseAdapter {
     // store the context (as an inflated layout)
-    private LayoutInflater inflater;
+    LayoutInflater inflater;
     // store the resource (typically list_item.xml)
     private int resource;
     // store (a reference to) the data
     private ArrayList<ListItem> data;
+
+    // Layout types
+    public static final int SYSTEM_CONTROL_LAYOUT = 0; // This controls the programming interface, not the modules. It's a different category of behavior for managing other behavior controls.
+    public static final int CONTROL_PLACEHOLDER_LAYOUT = 1;
+    public static final int LIGHT_CONTROL_LAYOUT = 2;
+    public static final int IO_CONTROL_LAYOUT = 3;
+    public static final int MESSAGE_CONTROL_LAYOUT = 4;
+    public static final int WAIT_CONTROL_LAYOUT = 5;
+    public static final int SAY_CONTROL_LAYOUT = 6;
 
     /**
      * Default constructor. Creates the new Adaptor object to
@@ -68,21 +83,28 @@ public class CustomAdapter extends BaseAdapter {
         // Select the layout for the view based on the type of object being displayed in the view
         int type = getItemType (position);
         int resourceForType; // Default resource
-        if (type == 0) {
-            resourceForType = R.layout.list_item_type_000; // Select the layout for the list_item_type_001 type
-        } else if (type == 1) {
-            resourceForType = R.layout.list_item_type_001;
-        } else if (type == 2) {
-            resourceForType = R.layout.list_item_type_002;
-        } else if (type == 3) {
-            resourceForType = R.layout.list_item_type_003;
-        } else if (type == 4) {
-            resourceForType = R.layout.list_item_type_004;
-        } else if (type == 5) {
-            resourceForType = R.layout.list_item_type_005;
+        if (type == SYSTEM_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_system;
+        } else if (type == CONTROL_PLACEHOLDER_LAYOUT) {
+            resourceForType = R.layout.list_item_type_placeholder;
+        } else if (type == LIGHT_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_light;
+        } else if (type == IO_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_io;
+        } else if (type == MESSAGE_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_message;
+        } else if (type == WAIT_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_wait;
+        } else if (type == SAY_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_say;
         } else {
-            resourceForType = R.layout.list_item_type_001;
+            resourceForType = R.layout.list_item_type_light;
         }
+
+        // <HACK>
+        // This prevents view recycling.
+        convertView = null;
+        // </HACK>
 
         if (convertView == null) {
             //view = this.inflater.inflate(resource, parent, false);
@@ -91,8 +113,184 @@ public class CustomAdapter extends BaseAdapter {
             view = convertView;
         }
 
+        // Get the data corresponding to the view
+        ListItem listItem = data.get(position);
+
+        updateViewForType(view, listItem);
+
         // bind the data to the view object
         return this.bindData(view, position);
+    }
+
+    /**
+     * Updates the view layout specifically for the type of data that is displayed in it.
+     *
+     * @param view
+     * @param listItem
+     */
+    private void updateViewForType (View view, ListItem listItem) {
+        // Update layout of a behavior control
+        if (listItem.type != SYSTEM_CONTROL_LAYOUT
+                && listItem.type != CONTROL_PLACEHOLDER_LAYOUT) {
+
+            // Update layout based on state
+            if (listItem.selected == false) {
+                // Update left padding
+                view.setPadding(20, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+            } else {
+                // Update left padding to indent the item
+                view.setPadding(120, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+            }
+
+        }
+
+        if (listItem.type == LIGHT_CONTROL_LAYOUT) {
+
+            // Update image
+            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+
+            //int w = WIDTH_PX, h = HEIGHT_PX;
+            int w = 40, h = 40;
+
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+            Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+            Canvas canvas = new Canvas(bmp);
+
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.rgb(61, 61, 61));
+            canvas.drawRect(0, 0, w, h, paint);
+
+            icon.setImageBitmap(bmp);
+
+
+            // Get layout containing light state visualizations
+            LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
+
+            int[] previews = new int[12];
+            previews[0] = R.id.preview_1;
+            previews[1] = R.id.preview_2;
+            previews[2] = R.id.preview_3;
+            previews[3] = R.id.preview_4;
+            previews[4] = R.id.preview_5;
+            previews[5] = R.id.preview_6;
+            previews[6] = R.id.preview_7;
+            previews[7] = R.id.preview_8;
+            previews[8] = R.id.preview_9;
+            previews[9] = R.id.preview_10;
+            previews[10] = R.id.preview_11;
+            previews[11] = R.id.preview_12;
+
+            if (preview_layout != null) {
+
+                for (int i = 0; i < previews.length; i++) {
+
+                    // Update image preview
+                    ImageView preview = (ImageView) view.findViewById(previews[i]);
+
+                    //int w = WIDTH_PX, h = HEIGHT_PX;
+                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
+                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
+                    //            if (listItem.selected) {
+                    //                w2 = 300;
+                    //            }
+
+                    if (preview != null) {
+
+                        Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
+                        Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
+                        Canvas canvas2 = new Canvas(bmp2);
+
+                        Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+                        paint2.setColor(Color.rgb(255, 61, 61));
+                        //canvas2.drawRect(0, 0, w2, h2, paint2);
+                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+
+                        preview.setImageBitmap(bmp2);
+
+                    }
+                }
+
+                TextView label = (TextView) view.findViewById(R.id.label);
+//            preview.setX (label.getX());
+//            preview.setX(0);
+
+                preview_layout.setX(label.getX());
+            }
+        }
+
+        if (listItem.type == IO_CONTROL_LAYOUT) {
+
+            // Update image
+            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+
+            //int w = WIDTH_PX, h = HEIGHT_PX;
+            int w = 40, h = 40;
+
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+            Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+            Canvas canvas = new Canvas(bmp);
+
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.rgb(61, 61, 61));
+            canvas.drawRect(0, 0, w, h, paint);
+
+            icon.setImageBitmap(bmp);
+
+
+            // Get layout containing light state visualizations
+            LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
+
+            int[] previews = new int[12];
+            previews[0] = R.id.preview_1;
+            previews[1] = R.id.preview_2;
+            previews[2] = R.id.preview_3;
+            previews[3] = R.id.preview_4;
+            previews[4] = R.id.preview_5;
+            previews[5] = R.id.preview_6;
+            previews[6] = R.id.preview_7;
+            previews[7] = R.id.preview_8;
+            previews[8] = R.id.preview_9;
+            previews[9] = R.id.preview_10;
+            previews[10] = R.id.preview_11;
+            previews[11] = R.id.preview_12;
+
+            if (preview_layout != null) {
+
+                for (int i = 0; i < previews.length; i++) {
+
+                    // Update image preview
+                    ImageView preview = (ImageView) view.findViewById(previews[i]);
+
+                    //int w = WIDTH_PX, h = HEIGHT_PX;
+                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
+                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
+                    //            if (listItem.selected) {
+                    //                w2 = 300;
+                    //            }
+
+                    if (preview != null) {
+
+                        Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
+                        Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
+                        Canvas canvas2 = new Canvas(bmp2);
+
+                        Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+                        paint2.setColor(Color.rgb(255, 61, 61));
+                        //canvas2.drawRect(0, 0, w2, h2, paint2);
+                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+
+                        preview.setImageBitmap(bmp2);
+
+                    }
+                }
+
+                TextView label = (TextView) view.findViewById(R.id.label);
+//            preview.setX (label.getX());
+//            preview.setX(0);
+
+                preview_layout.setX(label.getX());
+            }
+        }
     }
 
     /**
@@ -120,21 +318,32 @@ public class CustomAdapter extends BaseAdapter {
 //        tv = (TextView)viewElement;
 //        tv.setText(item.subTitle);
 
-        // Update the icon in the item's layout
-        if (item.type == 1) {
+        if (item.type == SYSTEM_CONTROL_LAYOUT) {
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageResource(R.drawable.tile);
         }
 
-        else if (item.type == 3) {
+        // Update the icon in the item's layout
+        if (item.type == LIGHT_CONTROL_LAYOUT) {
+            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+            icon.setImageResource(R.drawable.tile);
+        }
+
+        else if (item.type == MESSAGE_CONTROL_LAYOUT) {
             TextView textView = (TextView) view.findViewById (R.id.text);
-            textView.setText("\"" + item.subTitle + "\"");
-        } else if (item.type == 4) {
+            if (textView != null) {
+                textView.setText("\"" + item.subTitle + "\"");
+            }
+        } else if (item.type == WAIT_CONTROL_LAYOUT) {
             TextView textView = (TextView) view.findViewById (R.id.text);
-            textView.setText(item.subTitle);
-        } else if (item.type == 5) {
+            if (textView != null) {
+                textView.setText(item.subTitle);
+            }
+        } else if (item.type == SAY_CONTROL_LAYOUT) {
             TextView textView = (TextView) view.findViewById (R.id.text);
-            textView.setText("\"" + item.subTitle + "\"");
+            if (textView != null) {
+                textView.setText("\"" + item.subTitle + "\"");
+            }
         }
 
         // return the final view object
