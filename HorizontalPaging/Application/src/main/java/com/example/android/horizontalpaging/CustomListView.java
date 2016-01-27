@@ -5,7 +5,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -43,9 +42,9 @@ public class CustomListView extends ListView {
         this.data.add(new ListItem("behavior 4", "Subtitle", 1));
         this.data.add(new ListItem("behavior 5", "Subtitle", 0));
 
-//        adapter = new ArrayAdapter<String>(getContext(),R.layout.row, R.id.label, data);
+//        adapter = new ArrayAdapter<String>(getContext(),R.layout.list_item_type_001, R.id.label, data);
         // setup the data adaptor
-        CustomAdapter adapter = new CustomAdapter(getContext(), R.layout.row, this.data);
+        CustomAdapter adapter = new CustomAdapter(getContext(), R.layout.list_item_type_001, this.data);
         setAdapter (adapter);
         setOnItemClickListener (new ListSelection());
     }

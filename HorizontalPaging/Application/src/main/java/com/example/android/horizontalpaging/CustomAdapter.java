@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -68,11 +69,11 @@ public class CustomAdapter extends BaseAdapter {
         int type = getItemType (position);
         int resourceForType; // Default resource
         if (type == 0) {
-            resourceForType = R.layout.row; // Select the layout for the row type
+            resourceForType = R.layout.list_item_type_001; // Select the layout for the list_item_type_001 type
         } else if (type == 1) {
-            resourceForType = R.layout.row2;
+            resourceForType = R.layout.list_item_type_002;
         } else {
-            resourceForType = R.layout.row;
+            resourceForType = R.layout.list_item_type_001;
         }
 
         if (convertView == null) {
@@ -110,6 +111,12 @@ public class CustomAdapter extends BaseAdapter {
 //        viewElement = view.findViewById(R.id.subTitle);
 //        tv = (TextView)viewElement;
 //        tv.setText(item.subTitle);
+
+        // Update the icon in the item's layout
+        if (item.type == 1) {
+            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+            icon.setImageResource(R.drawable.tile);
+        }
 
         // return the final view object
         return view;

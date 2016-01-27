@@ -8,7 +8,7 @@ public class ListItem {
     public String title;
     public String subTitle;
 
-    public int type; // Used by the custom BaseAdapter to select the layout for the row.
+    public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_001.
     public static int DEFAULT_TYPE = 0;
 
     // default constructor
