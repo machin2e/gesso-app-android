@@ -11,6 +11,8 @@ public class ListItem {
     public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_001.
     public static int DEFAULT_TYPE = 0;
 
+    public boolean selected = false;
+
     // default constructor
     public ListItem() {
         this("Title", "Subtitle", DEFAULT_TYPE);
