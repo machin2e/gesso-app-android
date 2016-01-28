@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/Users/mokogobo/Workspace/Sequencer/Application/src/main/res/values-v21/base-template-styles.xml -->
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values-v21/base-template-styles.xml -->
     <eat-comment/>
     <style name="Theme.Base" parent="android:Theme.Material.Light">
     </style>

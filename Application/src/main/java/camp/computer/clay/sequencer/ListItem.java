@@ -10,8 +10,11 @@ package camp.computer.clay.sequencer;
 import android.graphics.Color;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class ListItem {
+
+    private UUID uuid;
 
     public String title;
 
@@ -49,6 +52,9 @@ public class ListItem {
     // main constructor
     public ListItem(String title, String subTitle, int type) {
         super();
+
+        // Assign instance UUID to the list item
+        this.uuid = UUID.randomUUID();
 
         // Set parameters
         this.title = title;

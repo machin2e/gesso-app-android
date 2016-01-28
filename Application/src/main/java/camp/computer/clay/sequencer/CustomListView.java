@@ -3,9 +3,12 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Rect;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,6 +24,8 @@ import android.widget.ToggleButton;
 import java.util.ArrayList;
 
 public class CustomListView extends ListView {
+
+    private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
 
     private CustomAdapter adapter;
     private ArrayList<ListItem> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
@@ -45,14 +50,28 @@ public class CustomListView extends ListView {
      */
     public void init()
     {
+        initLayout();
+
         initData();
 
+        // Set up data adapter
 //        adapter = new ArrayAdapter<String>(getContext(),R.layout.list_item_type_light, R.id.label, data);
         // setup the data adaptor
         this.adapter = new CustomAdapter(getContext(), R.layout.list_item_type_light, this.data);
         setAdapter(adapter);
+
+        // Set up gesture recognition
+        setOnTouchListener(new ListTouchListener());
         setOnItemClickListener(new ListSelection());
         setOnItemLongClickListener(new ListLongSelection());
+        setOnDragListener(new ListDrag());
+    }
+
+    private void initLayout() {
+        if (CustomListView.HIDE_LIST_ITEM_SEPARATOR) {
+            setDivider(null);
+            setDividerHeight(0);
+        }
     }
 
     /**
@@ -89,7 +108,7 @@ public class CustomListView extends ListView {
         }
     }
 
-    private void updateViewFromData () {
+    public void updateViewFromData () {
         // TODO: Perform callbacks into data model to propagate changes based on view state and data item state.
         adapter.notifyDataSetChanged();
     }
@@ -897,6 +916,24 @@ public class CustomListView extends ListView {
         alert.show();
     }
 
+    private class ListDrag implements OnDragListener {
+
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            Log.v ("Gesture_Log", "OnDragLister from CustomListView");
+            return false;
+        }
+    }
+
+    private class ListTouchListener implements OnTouchListener {
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            Log.v ("Gesture_Log", "OnTouchListener from CustomListView");
+            return false;
+        }
+    }
+
     private class ListLongSelection implements OnItemLongClickListener
     {
 
@@ -987,7 +1024,7 @@ public class CustomListView extends ListView {
 
     }
 
-    private void abstractSelectedItems() {
+    public void abstractSelectedItems() {
 
         int index = 0;
 
@@ -995,6 +1032,7 @@ public class CustomListView extends ListView {
         ArrayList<ListItem> selectedListItems = new ArrayList<>();
         for (ListItem listItem : this.data) {
             if (listItem.selected) {
+                listItem.selected = false; // Deselect the item
                 selectedListItems.add(listItem);
             }
             if (selectedListItems.size() == 0) {
@@ -1053,5 +1091,40 @@ public class CustomListView extends ListView {
         }
         updateViewFromData(); // Update view after removing items from the list
 
+    }
+
+    public View getViewByPosition (int xPosition, int yPosition) {
+        View mDownView = null;
+        // Find the child view that was touched (perform a hit test)
+        Rect rect = new Rect();
+        int childCount = this.getChildCount();
+        int[] listViewCoords = new int[2];
+        this.getLocationOnScreen(listViewCoords);
+        int x = (int) xPosition - listViewCoords[0];
+        int y = (int) yPosition - listViewCoords[1];
+        View child;
+        int i = 0;
+        for ( ; i < childCount; i++) {
+            child = this.getChildAt(i);
+            child.getHitRect(rect);
+            if (rect.contains(x, y)) {
+                mDownView = child; // This is your down view
+                break;
+            }
+        }
+
+        if (i < data.size()) {
+            ListItem item = (ListItem) data.get(i);
+            item.selected = true;
+            updateViewFromData();
+        }
+        Log.v ("Gesture_Log", "index = " + i);
+
+        return mDownView;
+    }
+
+    public ListItem getItemByView (View view) {
+        int position = this.getPositionForView(view);
+        return (ListItem) data.get(position);
     }
 }
