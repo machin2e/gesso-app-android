@@ -3,9 +3,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dip"
+    android:padding="0dp"
+    android:layout_margin="0dp"
     android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight" >
+    android:minHeight="?android:attr/listPreferredItemHeight">
 
     <ImageView
         android:id="@+id/icon"
@@ -456,4 +457,4 @@
 
     </LinearLayout>
 
-</RelativeLayout><!-- From: file:/Users/mokogobo/Workspace/Sequencer/Application/src/main/res/layout/list_item_type_io.xml -->
+</RelativeLayout><!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/layout/list_item_type_io.xml -->

@@ -265,6 +265,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
             // Define the view (get a reference to it and pass it an adapter)
             final CustomListView listView = (CustomListView) rootView.findViewById(R.id.listview_timeline);
+            listView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
 //            listView.setAdapter(listAdapter);
 
             if (disableScrollbarFading) {
