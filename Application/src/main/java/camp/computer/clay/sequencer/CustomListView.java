@@ -31,6 +31,9 @@ public class CustomListView extends ListView {
     private CustomAdapter adapter;
     private ArrayList<ListItem> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
 
+    boolean itemHasFocus = false;
+    ListItem itemWithFocus = null;
+
     public CustomListView(Context context) {
         super(context);
         init ();
@@ -972,6 +975,29 @@ public class CustomListView extends ListView {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             Log.v ("Gesture_Log", "OnTouchListener from CustomListView");
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                if (itemHasFocus) {
+                    Log.v ("Gesture_Log_2", "itemHasFocus (CustomListView.onTouch) = " + itemHasFocus);
+//                    itemHasFocus = false;
+//                    Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
+                    // TODO: Set to itemHasFocus to false if the touch was not in its bounding rect!
+
+                    int position = getViewIndexByPosition((int) event.getRawX(), (int) event.getRawY());
+                    ListItem item = (ListItem) getItemAtPosition(position);
+
+                    if (item == null || itemWithFocus != item) {
+                        Log.v ("Gesture_Log_2", "Removing focus");
+                        // If touching the item that has focus, remove it from focus.
+                        itemHasFocus = false;
+                        itemWithFocus = null;
+                    }
+                    Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
+                }
+
+            }
+
             return false;
         }
     }
@@ -1047,9 +1073,7 @@ public class CustomListView extends ListView {
 
                 }
                 // TODO: (?)
-            }
-
-            if (item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
                 // Show options
 //                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -1059,6 +1083,25 @@ public class CustomListView extends ListView {
 //                builder.show();
 
                 selectBehaviorType (item);
+
+            } else {
+
+                Log.v ("Gesture_Log_2", "itemWithFocus = " + itemWithFocus);
+                Log.v ("Gesture_Log_2", "         item = " + item);
+
+                Log.v ("Gesture_Log_2", "itemHasFocus (before) = " + itemHasFocus);
+                if (itemWithFocus == null) {
+                    // If there is no item with focus, focus on the touched item.
+                    itemHasFocus = true;
+                    itemWithFocus = item;
+                }
+
+                else if (itemWithFocus != item) {
+                    // If touching the item that has focus, remove it from focus.
+                    itemHasFocus = false;
+                    itemWithFocus = null;
+                }
+                Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
 
             }
 
@@ -1155,18 +1198,54 @@ public class CustomListView extends ListView {
             }
         }
 
-        if (i < data.size()) {
-            ListItem item = (ListItem) data.get(i);
-            selectListItem(item);
-            updateViewFromData();
-        }
-        Log.v ("Gesture_Log", "index = " + i);
-
         return mDownView;
     }
 
-    public ListItem getItemByView (View view) {
-        int position = this.getPositionForView(view);
-        return (ListItem) data.get(position);
+    public int getViewIndexByPosition (int xPosition, int yPosition) {
+        View mDownView = null;
+        // Find the child view that was touched (perform a hit test)
+        Rect rect = new Rect();
+        int childCount = this.getChildCount();
+        int[] listViewCoords = new int[2];
+        this.getLocationOnScreen(listViewCoords);
+        int x = (int) xPosition - listViewCoords[0];
+        int y = (int) yPosition - listViewCoords[1];
+        View child;
+        int i = 0;
+        for ( ; i < childCount; i++) {
+            child = this.getChildAt(i);
+            child.getHitRect(rect);
+            if (rect.contains(x, y)) {
+                mDownView = child; // This is your down view
+                break;
+            }
+        }
+
+        // Check if the specified position is within the bounds of a view in the ListView.
+        // If so, select the item.
+        if (mDownView != null) {
+            int itemIndex = this.getFirstVisiblePosition() + i;
+            return itemIndex;
+        }
+
+        return -1;
     }
+
+    public void selectItemByIndex (int index) {
+        // Check if the specified position is within the bounds of a view in the ListView.
+        // If so, select the item.
+//        if (mDownView != null) {
+//            int itemIndex = this.getFirstVisiblePosition() + i;
+            if (index < data.size()) {
+                ListItem item = (ListItem) data.get(index);
+                selectListItem(item);
+                updateViewFromData();
+            }
+//        }
+    }
+
+//    public ListItem getItemByView (View view) {
+//        int position = this.getPositionForView(view);
+//        return (ListItem) data.get(position);
+//    }
 }
