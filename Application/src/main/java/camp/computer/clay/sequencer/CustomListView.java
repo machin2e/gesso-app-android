@@ -33,6 +33,8 @@ public class CustomListView extends ListView {
 
     boolean itemHasFocus = false;
     ListItem itemWithFocus = null;
+    private ListItem movingItem = null;
+//    private int movingItemFrom = -1;
 
     public CustomListView(Context context) {
         super(context);
@@ -120,7 +122,7 @@ public class CustomListView extends ListView {
     }
 
     private void displayListItemOptions(final ListItem item) {
-        int basicBehaviorCount = 6;
+        int basicBehaviorCount = 7;
         final String[] behaviorOptions = new String[basicBehaviorCount];
         // loop, condition, branch
         behaviorOptions[0] = "delete";
@@ -129,6 +131,7 @@ public class CustomListView extends ListView {
         behaviorOptions[3] = (item.selected ? "deselect" : "select");
         behaviorOptions[4] = (item.repeat ? "do once" : "repeat");
         behaviorOptions[5] = "add condition";
+        behaviorOptions[6] = "move";
         // cause/effect (i.e., condition)
         // HTTP API interface (general wrapper, with authentication options)
 
@@ -166,6 +169,10 @@ public class CustomListView extends ListView {
                         stepListItem(item);
                     }
 
+                } else if (behaviorOptions[itemIndex].toString().equals("move")) {
+
+                    startMoveListItem (item);
+
                 }
 
                 updateViewFromData();
@@ -173,6 +180,26 @@ public class CustomListView extends ListView {
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void startMoveListItem(ListItem item) {
+        movingItem = item;
+        item.moving = true;
+    }
+
+    private void moveListItem (int toIndex) {
+
+        // Remove the item from the old position...
+        data.remove(movingItem);
+        updateViewFromData();
+
+        // ...and move the data to the new position...
+        data.add(toIndex, movingItem);
+        updateViewFromData();
+
+        // ...then reset the state that denotes that a move is being performed.
+        movingItem.moving = false;
+        movingItem = null;
     }
 
     public void displayConfigureController (final ListItem item) {
@@ -977,6 +1004,17 @@ public class CustomListView extends ListView {
             Log.v ("Gesture_Log", "OnTouchListener from CustomListView");
 
             if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                // Move the item being moved, if any
+                if (movingItem != null) {
+
+//                    ListItem item = getListItemAtPosition ((int) event.getRawX(), (int) event.getRawY());
+//                    int newPosition = getPositionForView(v);
+                    int newPosition = getViewIndexByPosition ((int) event.getRawX(), (int) event.getRawY());
+                    moveListItem (newPosition);
+
+//                    movingItem = null;
+                }
 
                 if (itemHasFocus) {
                     Log.v ("Gesture_Log_2", "itemHasFocus (CustomListView.onTouch) = " + itemHasFocus);

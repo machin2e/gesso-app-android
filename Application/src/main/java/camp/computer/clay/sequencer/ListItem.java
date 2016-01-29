@@ -48,6 +48,8 @@ public class ListItem {
 
     public boolean repeat = false;
 
+    public boolean moving = false;
+
     // default constructor
     public ListItem() {
         this("Title", "Subtitle", DEFAULT_TYPE);
