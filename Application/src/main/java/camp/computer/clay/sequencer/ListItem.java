@@ -44,6 +44,8 @@ public class ListItem {
 
     public boolean selected = false;
 
+    public boolean repeat = false;
+
     // default constructor
     public ListItem() {
         this("Title", "Subtitle", DEFAULT_TYPE);

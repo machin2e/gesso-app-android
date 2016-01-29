@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public class CustomListView extends ListView {
 
     private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
+    private static final boolean HIDE_ABSTRACT_OPTION = true;
 
     private CustomAdapter adapter;
     private ArrayList<ListItem> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
@@ -84,7 +85,9 @@ public class CustomListView extends ListView {
         this.data = new ArrayList<ListItem>();
 
         // create some objects... and add them into the array list
-        this.data.add(new ListItem("abstract", "Subtitle", CustomAdapter.SYSTEM_CONTROL_LAYOUT));
+        if (!CustomListView.HIDE_ABSTRACT_OPTION) {
+            this.data.add(new ListItem("abstract", "Subtitle", CustomAdapter.SYSTEM_CONTROL_LAYOUT));
+        }
 
         // Basic behaviors
         this.data.add(new ListItem("lights", "Subtitle", CustomAdapter.LIGHT_CONTROL_LAYOUT));
@@ -114,13 +117,15 @@ public class CustomListView extends ListView {
     }
 
     private void displayListItemOptions(final ListItem item) {
-        int basicBehaviorCount = 4;
+        int basicBehaviorCount = 6;
         final String[] behaviorOptions = new String[basicBehaviorCount];
         // loop, condition, branch
         behaviorOptions[0] = "delete";
         behaviorOptions[1] = "configure";
         behaviorOptions[2] = "change type";
-        behaviorOptions[3] = "select";
+        behaviorOptions[3] = (item.selected ? "deselect" : "select");
+        behaviorOptions[4] = (item.repeat ? "do once" : "repeat");
+        behaviorOptions[5] = "add condition";
         // cause/effect (i.e., condition)
         // HTTP API interface (general wrapper, with authentication options)
 
@@ -142,9 +147,21 @@ public class CustomListView extends ListView {
 
                     selectBehaviorType(item);
 
-                } else if (behaviorOptions[itemIndex].toString().equals("select")) {
+                } else if (behaviorOptions[itemIndex].toString().equals("select") || behaviorOptions[itemIndex].toString().equals("deselect")) {
 
-                    selectListItem(item);
+                    if (behaviorOptions[itemIndex].toString().equals("select")) {
+                        selectListItem(item);
+                    } else if (behaviorOptions[itemIndex].toString().equals("deselect")) {
+                        deselectListItem(item);
+                    }
+
+                } else if (behaviorOptions[itemIndex].toString().equals("repeat") || behaviorOptions[itemIndex].toString().equals("do once")) {
+
+                    if (behaviorOptions[itemIndex].toString().equals("repeat")) {
+                        repeatListItem(item);
+                    } else if (behaviorOptions[itemIndex].toString().equals("do once")) {
+                        stepListItem(item);
+                    }
 
                 }
 
@@ -794,15 +811,40 @@ public class CustomListView extends ListView {
 
     private void selectListItem (final ListItem item) {
 
+        // Do not select system controllers
+        if (item.type == CustomAdapter.SYSTEM_CONTROL_LAYOUT || item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            item.selected = false;
+            return;
+        }
+
         // Update state of the object associated with the selected view.
         if (item.selected == false) {
-            // Toggle the item as selected
             item.selected = true;
-        } else {
-            // Toggle the item as not selected
+        }
+
+    }
+
+    private void deselectListItem (final ListItem item) {
+
+        // Update state of the object associated with the selected view.
+        if (item.selected == true) {
             item.selected = false;
         }
 
+    }
+
+    private void stepListItem(ListItem item) {
+
+        if (item.repeat == true) {
+            item.repeat = false;
+        }
+    }
+
+    private void repeatListItem(ListItem item) {
+
+        if (item.repeat == false) {
+            item.repeat = true;
+        }
     }
 
     private void deleteListItem (final ListItem item) {
@@ -1032,7 +1074,7 @@ public class CustomListView extends ListView {
         ArrayList<ListItem> selectedListItems = new ArrayList<>();
         for (ListItem listItem : this.data) {
             if (listItem.selected) {
-                listItem.selected = false; // Deselect the item
+                listItem.selected = false; // Deselect the item about to be abstracted
                 selectedListItems.add(listItem);
             }
             if (selectedListItems.size() == 0) {
@@ -1040,8 +1082,8 @@ public class CustomListView extends ListView {
             }
         }
 
-        // Return if there are no selected items
-        if (selectedListItems.size() == 0) {
+        // Return if there are fewer than two selected items
+        if (selectedListItems.size() < 2) {
             return;
         }
 
@@ -1115,7 +1157,7 @@ public class CustomListView extends ListView {
 
         if (i < data.size()) {
             ListItem item = (ListItem) data.get(i);
-            item.selected = true;
+            selectListItem(item);
             updateViewFromData();
         }
         Log.v ("Gesture_Log", "index = " + i);

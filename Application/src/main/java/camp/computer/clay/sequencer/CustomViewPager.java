@@ -136,54 +136,74 @@ public class CustomViewPager extends ViewPager {
         String touchLocation = "" + event.getX() + ", " + event.getY();
         Log.v("Gesture_Log", "\tat " + touchLocation);
 
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        // Get the number of touch points
+        int touchPointCount = event.getPointerCount();
+        Log.v ("Gesture_Log", "Touch points detected: " + touchPointCount);
 
-            // Save the start point and time of the gesture...
-            startTouch.set((int) event.getX(), (int) event.getY());
-            startTime = calendar.getTime();
+        // Handle touch event based on the number of touches detected and the current state
+        // of the gesture recognition logic.
+        if (touchPointCount == 1) {
 
-            // ...and the previous touch...
-            previousTouch.set((int) event.getX(), (int) event.getY());
-            previousTime = startTime;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-            // ...and the current touch.
-            currentTouch.set((int) event.getX(), (int) event.getY());
-            currentTime = startTime;
+                // Save the start point and time of the gesture...
+                startTouch.set((int) event.getX(), (int) event.getY());
+                startTime = calendar.getTime();
 
-            // Reset the touch distance
-            touchDistance = 0;
+                // ...and the previous touch...
+                previousTouch.set((int) event.getX(), (int) event.getY());
+                previousTime = startTime;
 
-            // Update the gesture classification
-            if (startTouch.x < 200) {
-                interceptTouches = true;
-            } else {
-                interceptTouches = false;
+                // ...and the current touch.
+                currentTouch.set((int) event.getX(), (int) event.getY());
+                currentTime = startTime;
+
+                // Reset the touch distance
+                touchDistance = 0;
+
+                // Update the gesture classification
+                if (startTouch.x < 200) {
+                    interceptTouches = true;
+                } else {
+                    interceptTouches = false;
+                }
+
             }
 
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            /*
+            else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 
-            // Update the previous touch...
-            previousTouch.set (currentTouch.x, currentTouch.y);
-            previousTime = currentTime;
+                // Update the previous touch...
+                previousTouch.set(currentTouch.x, currentTouch.y);
+                previousTime = currentTime;
 
-            // ...and update the current point and time of the gesture.
-            currentTouch.set((int) event.getX(), (int) event.getY());
-            currentTime = calendar.getTime();
+                // ...and update the current point and time of the gesture.
+                currentTouch.set((int) event.getX(), (int) event.getY());
+                currentTime = calendar.getTime();
 
-            // Update the gesture classification
-            // TODO:
+                // Update the gesture classification
+                // TODO:
 
-            int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow (currentTouch.y - previousTouch.y, 2));
-            touchDistance += distance;
-            Log.v ("Gesture_Log", "distance = " + touchDistance);
+                int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow(currentTouch.y - previousTouch.y, 2));
+                touchDistance += distance;
+                Log.v("Gesture_Log", "distance = " + touchDistance);
 
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
-            Log.v ("Gesture_Log", "ACTION_UP (intercept)");
+                Log.v("Gesture_Log", "ACTION_UP (intercept)");
 
-            // Save the stop point and time of the gesture
-            stopTouch.set((int) event.getX(), (int) event.getY());
-            stopTime = calendar.getTime();
+                // Save the stop point and time of the gesture
+                stopTouch.set((int) event.getX(), (int) event.getY());
+                stopTime = calendar.getTime();
+
+            }
+            */
+
+        } else if (touchPointCount == 2) {
+
+            // TODO: If there's a single touch, then wait for a second touch for some small amount of time (less than 500 ms) to detect a second touch, to account for timing difference between pointer touches.
+
+            interceptTouches = false;
 
         }
 
