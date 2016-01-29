@@ -175,7 +175,7 @@ public class CustomViewPager extends ViewPager {
         // Check if interacting with a list item
         int currentViewTag = 1; // TODO: Get the tag for the active page in the ViewPager
         CustomListView currentListView = (CustomListView) findViewWithTag(currentViewTag);
-        if (currentListView.itemHasFocus) {
+        if (currentListView != null && currentListView.itemHasFocus) {
             Log.v ("Gesture_Log_2", "itemHasFocus!");
             return false;
         }

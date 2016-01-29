@@ -10,9 +10,11 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -147,6 +149,13 @@ public class CustomAdapter extends BaseAdapter {
                 view.setPadding(120, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
             }
 
+        }
+
+        // Set the background color
+        if (listItem.hasFocus) {
+            view.setBackgroundColor(Color.LTGRAY);
+        } else {
+            view.setBackgroundColor(Color.TRANSPARENT);
         }
 
         if (listItem.type == LIGHT_CONTROL_LAYOUT) {

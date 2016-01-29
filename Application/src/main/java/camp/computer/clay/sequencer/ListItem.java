@@ -44,6 +44,8 @@ public class ListItem {
 
     public boolean selected = false;
 
+    public boolean hasFocus = false;
+
     public boolean repeat = false;
 
     // default constructor
