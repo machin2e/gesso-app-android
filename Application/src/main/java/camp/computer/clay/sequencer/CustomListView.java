@@ -980,15 +980,22 @@ public class CustomListView extends ListView {
 
                 if (itemHasFocus) {
                     Log.v ("Gesture_Log_2", "itemHasFocus (CustomListView.onTouch) = " + itemHasFocus);
-//                    itemHasFocus = false;
-//                    Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
+
                     // TODO: Set to itemHasFocus to false if the touch was not in its bounding rect!
 
-                    int position = getViewIndexByPosition((int) event.getRawX(), (int) event.getRawY());
-                    ListItem item = (ListItem) getItemAtPosition(position);
+                    // Get the list item corresponding to the specified touch point
+                    ListItem item = getListItemAtPosition ((int) event.getRawX(), (int) event.getRawY());
 
+                    // Remove focus from the item with focus (if any) if it was not touched
                     if (item == null || itemWithFocus != item) {
                         Log.v ("Gesture_Log_2", "Removing focus");
+
+                        // Remove focus from the item that has it.
+                        if (itemWithFocus != null) {
+                            itemWithFocus.hasFocus = false;
+                            updateViewFromData();
+                        }
+
                         // If touching the item that has focus, remove it from focus.
                         itemHasFocus = false;
                         itemWithFocus = null;
@@ -1000,6 +1007,19 @@ public class CustomListView extends ListView {
 
             return false;
         }
+    }
+
+    /**
+     * Returns the list item corresponding to the specified position.
+     * @param x
+     * @param y
+     * @return
+     */
+    public ListItem getListItemAtPosition(int x, int y) {
+        // Get the list item corresponding to the specified touch point
+        int position = getViewIndexByPosition(x, y);
+        ListItem item = (ListItem) getItemAtPosition(position);
+        return item;
     }
 
     private class ListLongSelection implements OnItemLongClickListener
@@ -1094,12 +1114,16 @@ public class CustomListView extends ListView {
                     // If there is no item with focus, focus on the touched item.
                     itemHasFocus = true;
                     itemWithFocus = item;
+                    item.hasFocus = true;
+                    updateViewFromData();
                 }
 
                 else if (itemWithFocus != item) {
                     // If touching the item that has focus, remove it from focus.
                     itemHasFocus = false;
                     itemWithFocus = null;
+                    item.hasFocus = false;
+                    updateViewFromData();
                 }
                 Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
 
@@ -1155,7 +1179,12 @@ public class CustomListView extends ListView {
 
     }
 
-    private void unabstractSelectedItem(ListItem item) {
+    private void unabstractSelectedItem (ListItem item) {
+
+        // Return if the item is not a complex item.
+        if (item.type != CustomAdapter.COMPLEX_LAYOUT) {
+            return;
+        }
 
         int index = 0;
 
