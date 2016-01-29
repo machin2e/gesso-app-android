@@ -26,9 +26,13 @@ import java.util.ArrayList;
 public class CustomListView extends ListView {
 
     private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
+    private static final boolean HIDE_ABSTRACT_OPTION = true;
 
     private CustomAdapter adapter;
     private ArrayList<ListItem> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
+
+    boolean itemHasFocus = false;
+    ListItem itemWithFocus = null;
 
     public CustomListView(Context context) {
         super(context);
@@ -84,7 +88,9 @@ public class CustomListView extends ListView {
         this.data = new ArrayList<ListItem>();
 
         // create some objects... and add them into the array list
-        this.data.add(new ListItem("abstract", "Subtitle", CustomAdapter.SYSTEM_CONTROL_LAYOUT));
+        if (!CustomListView.HIDE_ABSTRACT_OPTION) {
+            this.data.add(new ListItem("abstract", "Subtitle", CustomAdapter.SYSTEM_CONTROL_LAYOUT));
+        }
 
         // Basic behaviors
         this.data.add(new ListItem("lights", "Subtitle", CustomAdapter.LIGHT_CONTROL_LAYOUT));
@@ -114,13 +120,15 @@ public class CustomListView extends ListView {
     }
 
     private void displayListItemOptions(final ListItem item) {
-        int basicBehaviorCount = 4;
+        int basicBehaviorCount = 6;
         final String[] behaviorOptions = new String[basicBehaviorCount];
         // loop, condition, branch
         behaviorOptions[0] = "delete";
         behaviorOptions[1] = "configure";
         behaviorOptions[2] = "change type";
-        behaviorOptions[3] = "select";
+        behaviorOptions[3] = (item.selected ? "deselect" : "select");
+        behaviorOptions[4] = (item.repeat ? "do once" : "repeat");
+        behaviorOptions[5] = "add condition";
         // cause/effect (i.e., condition)
         // HTTP API interface (general wrapper, with authentication options)
 
@@ -142,9 +150,21 @@ public class CustomListView extends ListView {
 
                     selectBehaviorType(item);
 
-                } else if (behaviorOptions[itemIndex].toString().equals("select")) {
+                } else if (behaviorOptions[itemIndex].toString().equals("select") || behaviorOptions[itemIndex].toString().equals("deselect")) {
 
-                    selectListItem(item);
+                    if (behaviorOptions[itemIndex].toString().equals("select")) {
+                        selectListItem(item);
+                    } else if (behaviorOptions[itemIndex].toString().equals("deselect")) {
+                        deselectListItem(item);
+                    }
+
+                } else if (behaviorOptions[itemIndex].toString().equals("repeat") || behaviorOptions[itemIndex].toString().equals("do once")) {
+
+                    if (behaviorOptions[itemIndex].toString().equals("repeat")) {
+                        repeatListItem(item);
+                    } else if (behaviorOptions[itemIndex].toString().equals("do once")) {
+                        stepListItem(item);
+                    }
 
                 }
 
@@ -794,15 +814,40 @@ public class CustomListView extends ListView {
 
     private void selectListItem (final ListItem item) {
 
+        // Do not select system controllers
+        if (item.type == CustomAdapter.SYSTEM_CONTROL_LAYOUT || item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            item.selected = false;
+            return;
+        }
+
         // Update state of the object associated with the selected view.
         if (item.selected == false) {
-            // Toggle the item as selected
             item.selected = true;
-        } else {
-            // Toggle the item as not selected
+        }
+
+    }
+
+    private void deselectListItem (final ListItem item) {
+
+        // Update state of the object associated with the selected view.
+        if (item.selected == true) {
             item.selected = false;
         }
 
+    }
+
+    private void stepListItem(ListItem item) {
+
+        if (item.repeat == true) {
+            item.repeat = false;
+        }
+    }
+
+    private void repeatListItem(ListItem item) {
+
+        if (item.repeat == false) {
+            item.repeat = true;
+        }
     }
 
     private void deleteListItem (final ListItem item) {
@@ -930,6 +975,29 @@ public class CustomListView extends ListView {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             Log.v ("Gesture_Log", "OnTouchListener from CustomListView");
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                if (itemHasFocus) {
+                    Log.v ("Gesture_Log_2", "itemHasFocus (CustomListView.onTouch) = " + itemHasFocus);
+//                    itemHasFocus = false;
+//                    Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
+                    // TODO: Set to itemHasFocus to false if the touch was not in its bounding rect!
+
+                    int position = getViewIndexByPosition((int) event.getRawX(), (int) event.getRawY());
+                    ListItem item = (ListItem) getItemAtPosition(position);
+
+                    if (item == null || itemWithFocus != item) {
+                        Log.v ("Gesture_Log_2", "Removing focus");
+                        // If touching the item that has focus, remove it from focus.
+                        itemHasFocus = false;
+                        itemWithFocus = null;
+                    }
+                    Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
+                }
+
+            }
+
             return false;
         }
     }
@@ -1005,9 +1073,7 @@ public class CustomListView extends ListView {
 
                 }
                 // TODO: (?)
-            }
-
-            if (item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
                 // Show options
 //                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -1017,6 +1083,25 @@ public class CustomListView extends ListView {
 //                builder.show();
 
                 selectBehaviorType (item);
+
+            } else {
+
+                Log.v ("Gesture_Log_2", "itemWithFocus = " + itemWithFocus);
+                Log.v ("Gesture_Log_2", "         item = " + item);
+
+                Log.v ("Gesture_Log_2", "itemHasFocus (before) = " + itemHasFocus);
+                if (itemWithFocus == null) {
+                    // If there is no item with focus, focus on the touched item.
+                    itemHasFocus = true;
+                    itemWithFocus = item;
+                }
+
+                else if (itemWithFocus != item) {
+                    // If touching the item that has focus, remove it from focus.
+                    itemHasFocus = false;
+                    itemWithFocus = null;
+                }
+                Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
 
             }
 
@@ -1032,7 +1117,7 @@ public class CustomListView extends ListView {
         ArrayList<ListItem> selectedListItems = new ArrayList<>();
         for (ListItem listItem : this.data) {
             if (listItem.selected) {
-                listItem.selected = false; // Deselect the item
+                listItem.selected = false; // Deselect the item about to be abstracted
                 selectedListItems.add(listItem);
             }
             if (selectedListItems.size() == 0) {
@@ -1040,8 +1125,8 @@ public class CustomListView extends ListView {
             }
         }
 
-        // Return if there are no selected items
-        if (selectedListItems.size() == 0) {
+        // Return if there are fewer than two selected items
+        if (selectedListItems.size() < 2) {
             return;
         }
 
@@ -1113,18 +1198,54 @@ public class CustomListView extends ListView {
             }
         }
 
-        if (i < data.size()) {
-            ListItem item = (ListItem) data.get(i);
-            item.selected = true;
-            updateViewFromData();
-        }
-        Log.v ("Gesture_Log", "index = " + i);
-
         return mDownView;
     }
 
-    public ListItem getItemByView (View view) {
-        int position = this.getPositionForView(view);
-        return (ListItem) data.get(position);
+    public int getViewIndexByPosition (int xPosition, int yPosition) {
+        View mDownView = null;
+        // Find the child view that was touched (perform a hit test)
+        Rect rect = new Rect();
+        int childCount = this.getChildCount();
+        int[] listViewCoords = new int[2];
+        this.getLocationOnScreen(listViewCoords);
+        int x = (int) xPosition - listViewCoords[0];
+        int y = (int) yPosition - listViewCoords[1];
+        View child;
+        int i = 0;
+        for ( ; i < childCount; i++) {
+            child = this.getChildAt(i);
+            child.getHitRect(rect);
+            if (rect.contains(x, y)) {
+                mDownView = child; // This is your down view
+                break;
+            }
+        }
+
+        // Check if the specified position is within the bounds of a view in the ListView.
+        // If so, select the item.
+        if (mDownView != null) {
+            int itemIndex = this.getFirstVisiblePosition() + i;
+            return itemIndex;
+        }
+
+        return -1;
     }
+
+    public void selectItemByIndex (int index) {
+        // Check if the specified position is within the bounds of a view in the ListView.
+        // If so, select the item.
+//        if (mDownView != null) {
+//            int itemIndex = this.getFirstVisiblePosition() + i;
+            if (index < data.size()) {
+                ListItem item = (ListItem) data.get(index);
+                selectListItem(item);
+                updateViewFromData();
+            }
+//        }
+    }
+
+//    public ListItem getItemByView (View view) {
+//        int position = this.getPositionForView(view);
+//        return (ListItem) data.get(position);
+//    }
 }
