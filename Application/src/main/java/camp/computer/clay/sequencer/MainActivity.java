@@ -32,10 +32,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     CustomViewPager mViewPager;
 
     // Configure the interface settings
-    private boolean hideTitle = true;
-    private boolean hideActionBar = false;
-    private boolean hideActionBarOnScroll = false;
-    private boolean fullscreen = true;
+    private static final boolean HIDE_TITLE = true;
+    private static final boolean HIDE_ACTION_BAR = true;
+    private static final boolean HIDE_ACTION_BAR_ON_SCROLL = false;
+    private static final boolean FULLSCREEN = true;
 
     /**
      * Create the activity. Sets up an {@link android.app.ActionBar} with tabs, and then configures the
@@ -61,20 +61,20 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         // BEGIN_INCLUDE (set_navigation_mode)
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        if (hideActionBar) {
+        if (HIDE_ACTION_BAR) {
             actionBar.hide();
         }
 
-        if (hideTitle) {
+        if (HIDE_TITLE) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        if (hideActionBarOnScroll) {
+        if (HIDE_ACTION_BAR_ON_SCROLL) {
             actionBar.setHideOnContentScrollEnabled(true);
         }
         // END_INCLUDE (set_navigation_mode)
 
-        if (fullscreen) {
+        if (FULLSCREEN) {
             // Remove notification bar
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
@@ -96,7 +96,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                if (!hideActionBar) {
+                if (!HIDE_ACTION_BAR) {
                     actionBar.setSelectedNavigationItem(position);
                 }
             }
@@ -189,7 +189,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 100;
+            return 50;
         }
         // END_INCLUDE (fragment_pager_adapter_getcount)
 
@@ -212,7 +212,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 //                    return getString(R.string.title_section3).toUpperCase(l);
 //            }
 //            return null;
-            return "OBJECT " + (position + 1);
+            return "LINE " + (position + 1);
         }
         // END_INCLUDE (fragment_pager_adapter_getpagetitle)
     }

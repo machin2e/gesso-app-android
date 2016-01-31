@@ -7,7 +7,6 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -49,10 +48,7 @@ public class CustomViewPager extends ViewPager {
 
         int currentViewTag = 1; // TODO: Get the tag for the active page in the ViewPager
         CustomListView currentListView = (CustomListView) findViewWithTag(currentViewTag);
-        if (currentListView.itemHasFocus) {
-            Log.v ("Gesture_Log_2", "itemHasFocus!!");
-            return false;
-        }
+
 
         // If onInterceptTouch event returned true, then touch events will be directed here.
         // Check for that condition.
@@ -128,7 +124,7 @@ public class CustomViewPager extends ViewPager {
                 // Update gesture classification
                 currentListView = (CustomListView) findViewWithTag(1);
                 currentListView.abstractSelectedItems();
-                currentListView.updateViewFromData();
+                currentListView.refreshListViewFromData();
 
                 Log.v("Gesture_Log", "ACTION_UP (touch)");
 
@@ -175,10 +171,7 @@ public class CustomViewPager extends ViewPager {
         // Check if interacting with a list item
         int currentViewTag = 1; // TODO: Get the tag for the active page in the ViewPager
         CustomListView currentListView = (CustomListView) findViewWithTag(currentViewTag);
-        if (currentListView != null && currentListView.itemHasFocus) {
-            Log.v ("Gesture_Log_2", "itemHasFocus!");
-            return false;
-        }
+
 
         // Handle touch event based on the number of touches detected and the current state
         // of the gesture recognition logic.

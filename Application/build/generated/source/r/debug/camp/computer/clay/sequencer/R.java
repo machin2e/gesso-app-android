@@ -261,12 +261,14 @@ containing a value of this type.
         public static final int cardview_default_elevation=0x7f040005;
         public static final int cardview_default_radius=0x7f040006;
         public static final int default_gap=0x7f040007;
+        public static final int event_title_text_size=0x7f040008;
         public static final int horizontal_page_margin=0x7f040000;
-        public static final int margin_huge=0x7f040008;
-        public static final int margin_large=0x7f040009;
-        public static final int margin_medium=0x7f04000a;
-        public static final int margin_small=0x7f04000b;
-        public static final int margin_tiny=0x7f04000c;
+        public static final int light_preview_column_width=0x7f040009;
+        public static final int margin_huge=0x7f04000a;
+        public static final int margin_large=0x7f04000b;
+        public static final int margin_medium=0x7f04000c;
+        public static final int margin_small=0x7f04000d;
+        public static final int margin_tiny=0x7f04000e;
         public static final int vertical_page_margin=0x7f040001;
     }
     public static final class drawable {
@@ -274,54 +276,58 @@ containing a value of this type.
         public static final int tile=0x7f020001;
     }
     public static final class id {
-        public static final int alignBounds=0x7f080002;
-        public static final int alignMargins=0x7f080003;
-        public static final int bottom=0x7f080004;
-        public static final int center=0x7f080005;
-        public static final int center_horizontal=0x7f080006;
-        public static final int center_vertical=0x7f080007;
-        public static final int clip_horizontal=0x7f080008;
-        public static final int clip_vertical=0x7f080009;
-        public static final int end=0x7f08000a;
-        public static final int fill=0x7f08000b;
-        public static final int fill_horizontal=0x7f08000c;
-        public static final int fill_vertical=0x7f08000d;
-        public static final int horizontal=0x7f080000;
-        public static final int icon=0x7f080014;
-        public static final int label=0x7f080015;
-        public static final int left=0x7f08000e;
-        public static final int listview_timeline=0x7f080013;
-        public static final int pager=0x7f080012;
-        public static final int preview_1=0x7f080018;
-        public static final int preview_10=0x7f08002a;
-        public static final int preview_10_label=0x7f08002b;
-        public static final int preview_11=0x7f08002c;
-        public static final int preview_11_label=0x7f08002d;
-        public static final int preview_12=0x7f08002e;
-        public static final int preview_12_label=0x7f08002f;
-        public static final int preview_1_label=0x7f080019;
-        public static final int preview_2=0x7f08001a;
-        public static final int preview_2_label=0x7f08001b;
-        public static final int preview_3=0x7f08001c;
-        public static final int preview_3_label=0x7f08001d;
-        public static final int preview_4=0x7f08001e;
-        public static final int preview_4_label=0x7f08001f;
-        public static final int preview_5=0x7f080020;
-        public static final int preview_5_label=0x7f080021;
-        public static final int preview_6=0x7f080022;
-        public static final int preview_6_label=0x7f080023;
-        public static final int preview_7=0x7f080024;
-        public static final int preview_7_label=0x7f080025;
-        public static final int preview_8=0x7f080026;
-        public static final int preview_8_label=0x7f080027;
-        public static final int preview_9=0x7f080028;
-        public static final int preview_9_label=0x7f080029;
-        public static final int preview_layout=0x7f080017;
-        public static final int right=0x7f08000f;
-        public static final int start=0x7f080010;
-        public static final int text=0x7f080016;
-        public static final int top=0x7f080011;
-        public static final int vertical=0x7f080001;
+        public static final int alignBounds=0x7f090002;
+        public static final int alignMargins=0x7f090003;
+        public static final int bottom=0x7f090004;
+        public static final int center=0x7f090005;
+        public static final int center_horizontal=0x7f090006;
+        public static final int center_vertical=0x7f090007;
+        public static final int clip_horizontal=0x7f090008;
+        public static final int clip_vertical=0x7f090009;
+        public static final int content=0x7f090015;
+        public static final int end=0x7f09000a;
+        public static final int fill=0x7f09000b;
+        public static final int fill_horizontal=0x7f09000c;
+        public static final int fill_vertical=0x7f09000d;
+        public static final int horizontal=0x7f090000;
+        public static final int icon=0x7f090014;
+        public static final int label=0x7f090016;
+        public static final int left=0x7f09000e;
+        public static final int listview_timeline=0x7f090013;
+        public static final int pager=0x7f090012;
+        public static final int preview_1=0x7f090019;
+        public static final int preview_10=0x7f09002b;
+        public static final int preview_10_label=0x7f09002c;
+        public static final int preview_11=0x7f09002d;
+        public static final int preview_11_label=0x7f09002e;
+        public static final int preview_12=0x7f09002f;
+        public static final int preview_12_label=0x7f090030;
+        public static final int preview_1_label=0x7f09001a;
+        public static final int preview_2=0x7f09001b;
+        public static final int preview_2_label=0x7f09001c;
+        public static final int preview_3=0x7f09001d;
+        public static final int preview_3_label=0x7f09001e;
+        public static final int preview_4=0x7f09001f;
+        public static final int preview_4_label=0x7f090020;
+        public static final int preview_5=0x7f090021;
+        public static final int preview_5_label=0x7f090022;
+        public static final int preview_6=0x7f090023;
+        public static final int preview_6_label=0x7f090024;
+        public static final int preview_7=0x7f090025;
+        public static final int preview_7_label=0x7f090026;
+        public static final int preview_8=0x7f090027;
+        public static final int preview_8_label=0x7f090028;
+        public static final int preview_9=0x7f090029;
+        public static final int preview_9_label=0x7f09002a;
+        public static final int preview_layout=0x7f090018;
+        public static final int right=0x7f09000f;
+        public static final int start=0x7f090010;
+        public static final int text=0x7f090017;
+        public static final int top=0x7f090011;
+        public static final int vertical=0x7f090001;
+    }
+    public static final class integer {
+        public static final int event_timeline_segment_length=0x7f070000;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -336,12 +342,12 @@ containing a value of this type.
         public static final int list_item_type_wait=0x7f030009;
     }
     public static final class string {
-        public static final int action_settings=0x7f070000;
-        public static final int app_name=0x7f070001;
-        public static final int intro_message=0x7f070002;
-        public static final int title_section1=0x7f070003;
-        public static final int title_section2=0x7f070004;
-        public static final int title_section3=0x7f070005;
+        public static final int action_settings=0x7f080000;
+        public static final int app_name=0x7f080001;
+        public static final int intro_message=0x7f080002;
+        public static final int title_section1=0x7f080003;
+        public static final int title_section2=0x7f080004;
+        public static final int title_section3=0x7f080005;
     }
     public static final class style {
         public static final int AppTheme=0x7f050002;

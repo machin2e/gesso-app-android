@@ -16,6 +16,9 @@ public class ListItem {
 
     private UUID uuid;
 
+    // TODO: Store the managed Behavior's UUID.
+    // TODO: Store reference to the managed Behavior (retrieved via the local cache).
+
     public String title;
 
     // for Lights behavior
@@ -47,8 +50,6 @@ public class ListItem {
     public boolean hasFocus = false;
 
     public boolean repeat = false;
-
-    public boolean moving = false;
 
     // default constructor
     public ListItem() {

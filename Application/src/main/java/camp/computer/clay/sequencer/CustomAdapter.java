@@ -5,25 +5,35 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class CustomAdapter extends BaseAdapter {
+
     // store the context (as an inflated layout)
     LayoutInflater inflater;
+
     // store the resource (typically list_item.xml)
     private int resource;
+
     // store (a reference to) the data
     private ArrayList<ListItem> data;
 
@@ -80,7 +90,7 @@ public class CustomAdapter extends BaseAdapter {
     /**
      * Return a generated view for a position.
      */
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         // reuse a given view, or inflate a new one from the xml
         View view;
 
@@ -112,6 +122,9 @@ public class CustomAdapter extends BaseAdapter {
         convertView = null;
         // </HACK>
 
+        // Get the data corresponding to the view
+        final ListItem listItem = data.get(position);
+
         if (convertView == null) {
             //view = this.inflater.inflate(resource, parent, false);
             view = this.inflater.inflate(resourceForType, parent, false);
@@ -119,11 +132,54 @@ public class CustomAdapter extends BaseAdapter {
             view = convertView;
         }
 
-        // Get the data corresponding to the view
-        ListItem listItem = data.get(position);
+        /*
+        // Set up an observer so the geometry of the layout can be accessed.
+        final View ref = view;
+        view.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                ref.removeOnLayoutChangeListener(this);
+                Log.d("Dimensions", "onLayoutChange(" + position + "): height " + (bottom - top));
+                //ArrayList<Integer> mHeights = new ArrayList<Integer>();
+                //mHeights.set(position, (bottom - top));
+                int height = bottom - top;
+
+                drawTimelineSegment(v, data.get(position), height);
+
+
+                if (listItem.type == CustomAdapter.WAIT_CONTROL_LAYOUT) {
+
+                    RelativeLayout.LayoutParams layoutParams;
+
+                    // Center the label
+                    TextView tv = (TextView) v.findViewById(R.id.label);
+                    layoutParams = (RelativeLayout.LayoutParams) tv.getLayoutParams();
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                    tv.setLayoutParams(layoutParams);
+
+                    // Center the time in milliseconds
+                    TextView time = (TextView) v.findViewById(R.id.text);
+                    layoutParams = (RelativeLayout.LayoutParams) time.getLayoutParams();
+                    layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                    time.setLayoutParams(layoutParams);
+                }
+
+                //ArrayList<Integer> mDistances = new ArrayList<Integer>();
+                int mDistances;
+                if(position > 0) {
+//                    mDistances.set(position, bottom - top + mDistances.get(position-1) + ((CustomListView)parent).getDividerHeight());
+//                    mDistances = bottom - top + mDistances.get(position-1) + ((CustomListView)parent).getDividerHeight();
+                }
+                //holderRef.distanceFromTop = mDistances.get(position);
+//                int distanceFromTop = mDistances.get(position);
+//                Log.d("Dimensions", "New height for " + position + " is " + mHeights.get(position) + " Distance: " + mDistances.get(position));
+            }
+        });
+        */
 
         // Update the list item's view according to the type
         updateViewForType(view, listItem);
+//        view.invalidate();
 
         // bind the data to the view object
         return this.bindData(view, position);
@@ -143,7 +199,7 @@ public class CustomAdapter extends BaseAdapter {
             // Update layout based on state
             if (listItem.selected == false) {
                 // Update left padding
-                view.setPadding(20, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
+                view.setPadding(0, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
             } else {
                 // Update left padding to indent the item
                 view.setPadding(120, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
@@ -157,6 +213,11 @@ public class CustomAdapter extends BaseAdapter {
         } else {
             view.setBackgroundColor(Color.TRANSPARENT);
         }
+
+        int segmentLength = view.getContext().getResources().getInteger(R.integer.event_timeline_segment_length);
+        drawTimelineSegment (view, listItem, segmentLength); //drawTimelineSegment (view, listItem, 192);
+
+        view.invalidate();
 
         if (listItem.type == LIGHT_CONTROL_LAYOUT) {
 
@@ -326,15 +387,17 @@ public class CustomAdapter extends BaseAdapter {
     }
 
     /**
-     * Draws the timeline segment for the specified view
-     * @param icon
+     * Draws the timeline segment of the specified length (in pixels) for specified view and item.
+     * @param view
+     * @param listItem
+     * @param heightInPixels
      */
-    private void drawTimelineSegment(View view, ListItem listItem) {
+    private void drawTimelineSegment (View view, ListItem listItem, int heightInPixels) {
 
         ImageView imageView = (ImageView) view.findViewById(R.id.icon);
 
         int w = (int) convertDpToPixel((float) 22.0, view.getContext());
-        int h = (int) convertDpToPixel((float) 22.0, view.getContext());
+        int h = heightInPixels; // (int) convertDpToPixel((float) 22.0, view.getContext());
 
         Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
         Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
@@ -342,7 +405,32 @@ public class CustomAdapter extends BaseAdapter {
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.rgb(61, 61, 61));
-        paint.setStrokeWidth(3.0f);
+        paint.setStyle(Paint.Style.STROKE);
+
+        if (listItem.type == COMPLEX_LAYOUT) {
+            paint.setStrokeWidth(10.0f);
+        } else {
+            paint.setStrokeWidth(3.0f);
+        }
+
+        // Set path effect
+        // Reference: http://developer.android.com/reference/android/graphics/PathEffect.html
+        if (listItem.type == CustomAdapter.WAIT_CONTROL_LAYOUT) {
+            paint.setPathEffect(new DashPathEffect(new float[]{10, 20}, 0));
+        } else {
+            paint.setPathEffect(null);
+        }
+
+        /*
+        if (listItem == data.get(data.size() - 2)) {
+            // Draw final segment
+            canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) (h / 2.0), paint);
+            canvas.drawRect((float) ((w / 2.0) - 10.0), (float) (h / 2.0), (float) ((w / 2.0) + 10.0), (float) ((h / 2.0) + 20), paint);
+        } else {
+            // Draw line
+            canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) h, paint);
+        }
+        */
 
         canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) h, paint);
 
@@ -351,59 +439,64 @@ public class CustomAdapter extends BaseAdapter {
     }
 
     /**
+     * Draws the timeline segment for the specified view
+     */
+    private void drawTimelineSegment (View view, ListItem listItem) {
+
+        int defaultHeight = (int) convertDpToPixel((float) 22.0, view.getContext());
+        drawTimelineSegment(view, listItem, defaultHeight);
+
+    }
+
+    /**
      * Bind the provided data to the view.
      * This is the only method not required by base adapter.
      */
     public View bindData(View view, int position) {
-        // make sure it's worth drawing the view
+
+        // Make sure it's worth drawing the view
         if (this.data.get(position) == null) {
             return view;
         }
 
-        // pull out the object
+        // Pull out the data object represented by the view
         ListItem item = this.data.get(position);
 
-        // extract the view object
+        // Update the event label
+        // Extract the view object to update, cast it to the correct type, and update the value.
         View viewElement = view.findViewById(R.id.label);
-//        View viewElement = view.findViewById(R.id.title);
-        // cast to the correct type
         TextView tv = (TextView)viewElement;
-        // set the value
         tv.setText(item.title);
 
-//        viewElement = view.findViewById(R.id.message);
-//        tv = (TextView)viewElement;
-//        tv.setText(item.message);
-
+        // Update the remainder of the view based on the type of data it represents.
         if (item.type == SYSTEM_CONTROL_LAYOUT) {
+
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageResource(R.drawable.tile);
 //            drawTimelineSegment (view, item);
-        }
 
-        // Update the icon in the item's layout
-        if (item.type == LIGHT_CONTROL_LAYOUT) {
+        } else if (item.type == LIGHT_CONTROL_LAYOUT) {
 
 //            ImageView icon = (ImageView) view.findViewById(R.id.icon);
 //            icon.setImageResource(R.drawable.tile);
 
-            drawTimelineSegment (view, item);
+//            drawTimelineSegment (view, item);
 
             // Set states of I/O visualization
             // Get layout containing light state visualizations
             LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
 
             int[] previews = new int[12];
-            previews[0] = R.id.preview_1;
-            previews[1] = R.id.preview_2;
-            previews[2] = R.id.preview_3;
-            previews[3] = R.id.preview_4;
-            previews[4] = R.id.preview_5;
-            previews[5] = R.id.preview_6;
-            previews[6] = R.id.preview_7;
-            previews[7] = R.id.preview_8;
-            previews[8] = R.id.preview_9;
-            previews[9] = R.id.preview_10;
+            previews[0]  = R.id.preview_1;
+            previews[1]  = R.id.preview_2;
+            previews[2]  = R.id.preview_3;
+            previews[3]  = R.id.preview_4;
+            previews[4]  = R.id.preview_5;
+            previews[5]  = R.id.preview_6;
+            previews[6]  = R.id.preview_7;
+            previews[7]  = R.id.preview_8;
+            previews[8]  = R.id.preview_9;
+            previews[9]  = R.id.preview_10;
             previews[10] = R.id.preview_11;
             previews[11] = R.id.preview_12;
 
@@ -444,7 +537,7 @@ public class CustomAdapter extends BaseAdapter {
 
         } else if (item.type == IO_CONTROL_LAYOUT) {
 
-            drawTimelineSegment (view, item);
+//            drawTimelineSegment (view, item);
 
             // Set states of I/O visualization
             // Get layout containing light state visualizations
@@ -501,7 +594,7 @@ public class CustomAdapter extends BaseAdapter {
 
         } else if (item.type == MESSAGE_CONTROL_LAYOUT) {
 
-            drawTimelineSegment (view, item);
+//            drawTimelineSegment (view, item);
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
@@ -509,7 +602,7 @@ public class CustomAdapter extends BaseAdapter {
             }
         } else if (item.type == WAIT_CONTROL_LAYOUT) {
 
-            drawTimelineSegment (view, item);
+//            drawTimelineSegment (view, item);
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
@@ -517,7 +610,7 @@ public class CustomAdapter extends BaseAdapter {
             }
         } else if (item.type == SAY_CONTROL_LAYOUT) {
 
-            drawTimelineSegment (view, item);
+//            drawTimelineSegment (view, item);
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
@@ -525,7 +618,7 @@ public class CustomAdapter extends BaseAdapter {
             }
         } else if (item.type == COMPLEX_LAYOUT) {
 
-            drawTimelineSegment (view, item);
+//            drawTimelineSegment (view, item);
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
