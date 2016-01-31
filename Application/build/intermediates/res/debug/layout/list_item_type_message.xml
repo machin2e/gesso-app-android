@@ -5,8 +5,7 @@
     android:orientation="horizontal"
     android:padding="0dp"
     android:layout_margin="0dp"
-    android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight">
+    android:gravity="center_vertical">
 
     <ImageView
         android:id="@+id/icon"
@@ -18,23 +17,33 @@
         android:src="@drawable/ic_launcher" >
     </ImageView>
 
-    <TextView
-        android:id="@+id/label"
+    <LinearLayout
+        android:id="@+id/content"
         android:layout_toRightOf="@+id/icon"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="15dp"
-        android:textStyle="bold">
-    </TextView>
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_below="@+id/label"
-        android:layout_alignLeft="@+id/label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15dp"
-        android:textStyle="normal">
-    </TextView>
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="bold">
+        </TextView>
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_below="@+id/label"
+            android:layout_alignLeft="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:textStyle="normal">
+        </TextView>
+
+    </LinearLayout>
 
 </RelativeLayout><!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/layout/list_item_type_message.xml -->

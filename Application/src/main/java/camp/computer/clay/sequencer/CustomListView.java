@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Rect;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
@@ -31,14 +32,9 @@ public class CustomListView extends ListView {
     private CustomAdapter adapter;
     private ArrayList<ListItem> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
 
-    boolean itemHasFocus = false;
-    ListItem itemWithFocus = null;
-    private ListItem movingItem = null;
-//    private int movingItemFrom = -1;
-
     public CustomListView(Context context) {
         super(context);
-        init ();
+        init();
     }
 
     public CustomListView(Context context, AttributeSet attrs) {
@@ -60,24 +56,12 @@ public class CustomListView extends ListView {
 
         initData();
 
-        // Set up data adapter
-//        adapter = new ArrayAdapter<String>(getContext(),R.layout.list_item_type_light, R.id.label, data);
-        // setup the data adaptor
+        // Set up the data adaptor
         this.adapter = new CustomAdapter(getContext(), R.layout.list_item_type_light, this.data);
         setAdapter(adapter);
 
         // Set up gesture recognition
-        setOnTouchListener(new ListTouchListener());
-        setOnItemClickListener(new ListSelection());
-        setOnItemLongClickListener(new ListLongSelection());
-        setOnDragListener(new ListDrag());
-    }
-
-    private void initLayout() {
-        if (CustomListView.HIDE_LIST_ITEM_SEPARATOR) {
-            setDivider(null);
-            setDividerHeight(0);
-        }
+        initTouchListeners();
     }
 
     /**
@@ -95,13 +79,27 @@ public class CustomListView extends ListView {
         }
 
         // Basic behaviors
-        this.data.add(new ListItem("lights", "Subtitle", CustomAdapter.LIGHT_CONTROL_LAYOUT));
-        this.data.add(new ListItem("io", "Subtitle", CustomAdapter.IO_CONTROL_LAYOUT));
+        this.data.add(new ListItem("lights", "", CustomAdapter.LIGHT_CONTROL_LAYOUT));
+        this.data.add(new ListItem("io", "", CustomAdapter.IO_CONTROL_LAYOUT));
         this.data.add(new ListItem("message", "turn lights on", CustomAdapter.MESSAGE_CONTROL_LAYOUT));
         this.data.add(new ListItem("wait", "500 ms", CustomAdapter.WAIT_CONTROL_LAYOUT));
         this.data.add(new ListItem("say", "oh, that's great", CustomAdapter.SAY_CONTROL_LAYOUT));
 
-        this.data.add(new ListItem("create", "Subtitle", CustomAdapter.SYSTEM_CONTROL_LAYOUT));
+        this.data.add(new ListItem("create", "", CustomAdapter.SYSTEM_CONTROL_LAYOUT));
+    }
+
+    private void initLayout() {
+        if (CustomListView.HIDE_LIST_ITEM_SEPARATOR) {
+            setDivider(null);
+            setDividerHeight(0);
+        }
+    }
+
+    private void initTouchListeners() {
+        setOnTouchListener(new ListTouchListener());
+        setOnItemClickListener(new ListSelection());
+        setOnItemLongClickListener(new ListLongSelection());
+        setOnDragListener(new ListDrag());
     }
 
     /**
@@ -112,28 +110,30 @@ public class CustomListView extends ListView {
     private void addData (ListItem item) {
         if (adapter != null) {
             data.add(data.size() - 1, item);
-            updateViewFromData();
+            refreshListViewFromData();
         }
     }
 
-    public void updateViewFromData () {
+    /**
+     * Refresh the entire ListView from the data.
+     */
+    public void refreshListViewFromData() {
         // TODO: Perform callbacks into data model to propagate changes based on view state and data item state.
         adapter.notifyDataSetChanged();
     }
 
     private void displayListItemOptions(final ListItem item) {
-        int basicBehaviorCount = 7;
+        int basicBehaviorCount = 3;
         final String[] behaviorOptions = new String[basicBehaviorCount];
         // loop, condition, branch
-        behaviorOptions[0] = "delete";
-        behaviorOptions[1] = "configure";
-        behaviorOptions[2] = "change type";
-        behaviorOptions[3] = (item.selected ? "deselect" : "select");
-        behaviorOptions[4] = (item.repeat ? "do once" : "repeat");
-        behaviorOptions[5] = "add condition";
-        behaviorOptions[6] = "move";
-        // cause/effect (i.e., condition)
-        // HTTP API interface (general wrapper, with authentication options)
+        behaviorOptions[0] = "update";
+        behaviorOptions[1] = "delete";
+        behaviorOptions[2] = "replace";
+        // TODO: behaviorOptions[3] = (item.selected ? "deselect" : "select");
+        // TODO: behaviorOptions[4] = (item.repeat ? "do once" : "repeat");
+        // TODO: behaviorOptions[5] = "add condition";
+        // TODO: cause/effect (i.e., condition)
+        // TODO: HTTP API interface (general wrapper, with authentication options)
 
         // Show the list of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -145,11 +145,11 @@ public class CustomListView extends ListView {
 
                     deleteListItem (item);
 
-                } else if (behaviorOptions[itemIndex].toString().equals("configure")) {
+                } else if (behaviorOptions[itemIndex].toString().equals("update")) {
 
-                    displayConfigureController (item);
+                    displayUpdateOptions(item);
 
-                } else if (behaviorOptions[itemIndex].toString().equals("change type")) {
+                } else if (behaviorOptions[itemIndex].toString().equals("replace")) {
 
                     selectBehaviorType(item);
 
@@ -169,56 +169,32 @@ public class CustomListView extends ListView {
                         stepListItem(item);
                     }
 
-                } else if (behaviorOptions[itemIndex].toString().equals("move")) {
-
-                    startMoveListItem (item);
-
                 }
 
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
     }
 
-    private void startMoveListItem(ListItem item) {
-        movingItem = item;
-        item.moving = true;
-    }
-
-    private void moveListItem (int toIndex) {
-
-        // Remove the item from the old position...
-        data.remove(movingItem);
-        updateViewFromData();
-
-        // ...and move the data to the new position...
-        data.add(toIndex, movingItem);
-        updateViewFromData();
-
-        // ...then reset the state that denotes that a move is being performed.
-        movingItem.moving = false;
-        movingItem = null;
-    }
-
-    public void displayConfigureController (final ListItem item) {
+    public void displayUpdateOptions(final ListItem item) {
 
         if (item.type == CustomAdapter.LIGHT_CONTROL_LAYOUT) {
-            displayConfigureLights (item);
+            displayUpdateLightsOptions(item);
         } else if (item.type == CustomAdapter.IO_CONTROL_LAYOUT) {
-            displayConfigureIO (item);
+            displayUpdateIOOptions(item);
         } else if (item.type == CustomAdapter.MESSAGE_CONTROL_LAYOUT) {
-            displayConfigureMessage(item);
+            displayUpdateMessageOptions(item);
         } else if (item.type == CustomAdapter.WAIT_CONTROL_LAYOUT) {
-            displayConfigureWait(item);
+            displayUpdateWaitOptions(item);
         } else if (item.type == CustomAdapter.SAY_CONTROL_LAYOUT) {
-            displayConfigureSay(item);
+            displayUpdateSayOptions(item);
         }
 
     }
 
-    public void displayConfigureLights (final ListItem item) {
+    public void displayUpdateLightsOptions(final ListItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Change the channel.");
         builder.setMessage ("What do you want to do?");
@@ -235,7 +211,6 @@ public class CustomListView extends ListView {
 
         LinearLayout lightLayout = new LinearLayout (getContext());
         lightLayout.setOrientation(LinearLayout.HORIZONTAL);
-//        channelLayout.setLayoutParams (new LinearLayout.LayoutParams (MATCH_PARENT));
         final ArrayList<ToggleButton> lightToggleButtons = new ArrayList<> ();
         for (int i = 0; i < 12; i++) {
             final String channelLabel = Integer.toString(i + 1);
@@ -261,16 +236,8 @@ public class CustomListView extends ListView {
         builder.setPositiveButton ("DONE", new DialogInterface.OnClickListener () {
             @Override
             public void onClick (DialogInterface dialog, int which) {
-//                Hack_behaviorTitle = input.getText ().toString ();
+
                 String transformString = "apply ";
-                // Add the LED state
-//                for (int i = 0; i < 12; i++) {
-//                    if (lightToggleButtons.get(i).isChecked()) {
-//                        transformString = transformString.concat(" 1");
-//                    } else {
-//                        transformString = transformString.concat(" 0");
-//                    }
-//                }
 
                 for (int i = 0; i < 12; i++) {
 
@@ -295,18 +262,10 @@ public class CustomListView extends ListView {
                     }
                 }
 
-                // Add wait
-//                Hack_BehaviorTransformTitle = transformString;
-//                Behavior behavior = new Behavior ("transform");
-//                behavior.setTransform(Hack_BehaviorTransformTitle);
-//                BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective);
-//                behaviorConstruct.setBehavior(behavior);
-//                perspective.addBehaviorConstruct(behaviorConstruct);
-
                 // TODO: Store the state of the lights in the object associated with the ListItem
 
                 // Refresh the timeline view
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {
@@ -319,17 +278,12 @@ public class CustomListView extends ListView {
         builder.show ();
     }
 
-    public void displayConfigureIO (final ListItem item) {
+    public void displayUpdateIOOptions(final ListItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Change the channel.");
         builder.setMessage ("What do you want to do?");
 
         // TODO: Populate with the current transform values (if any).
-//        if (behaviorConstruct.getBehavior().getTransform() != null) {
-//            Log.v("Behavior_Transform", behaviorConstruct.getBehavior().getTransform());
-//            // TODO: Store the previous values so they can be used to initialize the interface.
-//        }
-
         // TODO: Specify the units to receive the change.
 
         // Declare transformation layout
@@ -602,18 +556,10 @@ public class CustomListView extends ListView {
 
         // Set up the buttons
         builder.setPositiveButton ("DONE", new DialogInterface.OnClickListener () {
+
             @Override
             public void onClick (DialogInterface dialog, int which) {
-//                Hack_behaviorTitle = input.getText ().toString ();
                 String transformString = "apply ";
-                // Add the LED state
-//                for (int i = 0; i < 12; i++) {
-//                    if (lightToggleButtons.get(i).isChecked()) {
-//                        transformString = transformString.concat(" 1");
-//                    } else {
-//                        transformString = transformString.concat(" 0");
-//                    }
-//                }
 
                 for (int i = 0; i < 12; i++) {
 
@@ -668,18 +614,8 @@ public class CustomListView extends ListView {
                     }
                 }
 
-                // Add wait
-//                Hack_BehaviorTransformTitle = transformString;
-//                Behavior behavior = new Behavior ("transform");
-//                behavior.setTransform(Hack_BehaviorTransformTitle);
-//                BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective);
-//                behaviorConstruct.setBehavior(behavior);
-//                perspective.addBehaviorConstruct(behaviorConstruct);
-
-                // TODO: Store the state of the lights in the object associated with the ListItem
-
                 // Refresh the timeline view
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {
@@ -692,7 +628,7 @@ public class CustomListView extends ListView {
         builder.show ();
     }
 
-    public void displayConfigureMessage (final ListItem item) {
+    public void displayUpdateMessageOptions(final ListItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("what's the message?");
 
@@ -706,17 +642,12 @@ public class CustomListView extends ListView {
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//                Hack_PromptForSpeechTitle = input.getText().toString();
-//                Behavior behavior = new Behavior("say");
-//                behavior.setTransform(Hack_PromptForSpeechTitle);
-//                BehaviorConstruct behaviorConstruct = new BehaviorConstruct(perspective);
-//                behaviorConstruct.setBehavior(behavior);
-//                perspective.addBehaviorConstruct(behaviorConstruct);
 
+                // Update the state of the behavior
                 item.message = input.getText().toString();
 
                 // Refresh the timeline view
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -729,7 +660,7 @@ public class CustomListView extends ListView {
         builder.show ();
     }
 
-    public void displayConfigureSay (final ListItem item) {
+    public void displayUpdateSayOptions(final ListItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("tell me the behavior");
 
@@ -753,7 +684,7 @@ public class CustomListView extends ListView {
                 item.phrase = input.getText().toString();
 
                 // Refresh the timeline view
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -766,7 +697,7 @@ public class CustomListView extends ListView {
         builder.show ();
     }
 
-    public void displayConfigureWait (final ListItem item) {
+    public void displayUpdateWaitOptions(final ListItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Time Transform");
         builder.setMessage ("How do you want to change time?");
@@ -774,8 +705,6 @@ public class CustomListView extends ListView {
         // Declare transformation layout
         LinearLayout transformLayout = new LinearLayout (getContext());
         transformLayout.setOrientation (LinearLayout.VERTICAL);
-
-        // Wait (until next behavior)
 
         // Set up the label
         final TextView waitLabel = new TextView (getContext());
@@ -826,7 +755,7 @@ public class CustomListView extends ListView {
                 item.time = waitVal.getProgress ();
 
                 // Refresh the timeline view
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {
@@ -883,7 +812,7 @@ public class CustomListView extends ListView {
         data.remove(item);
 
         // Update the view after removing the specified list item
-        updateViewFromData();
+        refreshListViewFromData();
 
     }
 
@@ -906,86 +835,75 @@ public class CustomListView extends ListView {
             public void onClick(DialogInterface dialog, int itemIndex) {
 
                 if (basicBehaviors[itemIndex].toString().equals("lights")) {
-//                            Hack_PromptForBehaviorTransform(perspective);
 
-                    // <HACK>
-                    // This removes the specified item from the list and replaces it with an item of a specific type.
-                    // TODO: Replace view, not data! (i.e., item.type = CustomAdapter.LIGHT_CONTROL_LAYOUT;)
-                    int index = data.indexOf(item);
-                    data.remove(index);
-                    updateViewFromData();
-                    // Add the new item.
-                    ListItem replacementItem = new ListItem("lights", "", CustomAdapter.LIGHT_CONTROL_LAYOUT);
-                    data.add(index, replacementItem);
-                    // </HACK>
+                    changeItemType(item, CustomAdapter.LIGHT_CONTROL_LAYOUT);
 
                 } else if (basicBehaviors[itemIndex].toString().equals("io")) {
 
-//                            Hack_PromptForBehaviorTransform(perspective);
-
-                    // <HACK>
-                    // This removes the specified item from the list and replaces it with an item of a specific type.
-                    // TODO: Replace view, not data! (i.e., item.type = CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT;)
-                    int index = data.indexOf(item);
-                    data.remove(index);
-                    updateViewFromData();
-                    // Add the new item.
-                    ListItem replacementItem = new ListItem("io", "", CustomAdapter.IO_CONTROL_LAYOUT);
-                    data.add(index, replacementItem);
-                    // </HACK>
+                    changeItemType(item, CustomAdapter.IO_CONTROL_LAYOUT);
 
                 } else if (basicBehaviors[itemIndex].toString().equals("wait")) {
 
-//                            Hack_PromptForTimeTransform(perspective);
-
-                    // <HACK>
-                    // This removes the specified item from the list and replaces it with an item of a specific type.
-                    // TODO: Replace view, not data! (i.e., item.type = CustomAdapter.WAIT_CONTROL_LAYOUT;)
-                    int index = data.indexOf(item);
-                    data.remove(index);
-                    updateViewFromData();
-                    // Add the new item.
-                    ListItem replacementItem = new ListItem("wait", "500 ms", CustomAdapter.WAIT_CONTROL_LAYOUT);
-                    data.add(index, replacementItem);
-                    // </HACK>
+                    changeItemType (item, CustomAdapter.WAIT_CONTROL_LAYOUT);
 
                 } else if (basicBehaviors[itemIndex].toString().equals("message")) {
 
-//                            Hack_PromptForMessage(perspective);
-
-                    // <HACK>
-                    // This removes the specified item from the list and replaces it with an item of a specific type.
-                    // TODO: Replace view, not data! (i.e., item.type = CustomAdapter.MESSAGE_CONTROL_LAYOUT;)
-                    int index = data.indexOf(item);
-                    data.remove(index);
-                    updateViewFromData();
-                    // Add the new item.
-                    ListItem replacementItem = new ListItem("message", "turn lights off", CustomAdapter.MESSAGE_CONTROL_LAYOUT);
-                    data.add(index, replacementItem);
-                    // </HACK>
+                    changeItemType(item, CustomAdapter.MESSAGE_CONTROL_LAYOUT);
 
                 } else if (basicBehaviors[itemIndex].toString().equals("say")) {
 
-//                            Hack_PromptForSpeech(perspective);
-
-                    // <HACK>
-                    // This removes the specified item from the list and replaces it with an item of a specific type.
-                    // TODO: Replace view, not data! (i.e., item.type = CustomAdapter.MESSAGE_CONTROL_LAYOUT;)
-                    int index = data.indexOf(item);
-                    data.remove(index);
-                    updateViewFromData();
-                    // Add the new item.
-                    ListItem replacementItem = new ListItem("say", "what do you think?", CustomAdapter.SAY_CONTROL_LAYOUT);
-                    data.add(index, replacementItem);
-                    // </HACK>
+                    changeItemType (item, CustomAdapter.SAY_CONTROL_LAYOUT);
 
                 }
 
-                updateViewFromData();
+                refreshListViewFromData();
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    /**
+     * Changes the specified item's type to the specified type.
+     * @param item
+     * @param layoutType
+     */
+    private void changeItemType (final ListItem item, int layoutType) {
+
+        // <HACK>
+        // This removes the specified item from the list and replaces it with an item of a specific type.
+        // TODO: Update the behavior object referenced by data, and update the view accordingly (i.e., item.behavior = <new behavior> then retrieve view for that behavior type).
+        int index = data.indexOf(item);
+        data.remove(index);
+        refreshListViewFromData();
+
+        // Get the title for the new item
+        String title = "";
+        switch (layoutType) {
+            case CustomAdapter.LIGHT_CONTROL_LAYOUT:
+                title = "lights";
+                break;
+            case CustomAdapter.IO_CONTROL_LAYOUT:
+                title = "io";
+                break;
+            case CustomAdapter.WAIT_CONTROL_LAYOUT:
+                title = "wait";
+                break;
+            case CustomAdapter.MESSAGE_CONTROL_LAYOUT:
+                title = "message";
+                break;
+            case CustomAdapter.SAY_CONTROL_LAYOUT:
+                title = "say";
+                break;
+            default:
+                title = "";
+                break;
+        }
+
+        // Create and add the new item
+        ListItem replacementItem = new ListItem(title, "", layoutType);
+        data.add(index, replacementItem);
+        // </HACK>
     }
 
     private class ListDrag implements OnDragListener {
@@ -1003,61 +921,8 @@ public class CustomListView extends ListView {
         public boolean onTouch(View v, MotionEvent event) {
             Log.v ("Gesture_Log", "OnTouchListener from CustomListView");
 
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                // Move the item being moved, if any
-                if (movingItem != null) {
-
-//                    ListItem item = getListItemAtPosition ((int) event.getRawX(), (int) event.getRawY());
-//                    int newPosition = getPositionForView(v);
-                    int newPosition = getViewIndexByPosition ((int) event.getRawX(), (int) event.getRawY());
-                    moveListItem (newPosition);
-
-//                    movingItem = null;
-                }
-
-                if (itemHasFocus) {
-                    Log.v ("Gesture_Log_2", "itemHasFocus (CustomListView.onTouch) = " + itemHasFocus);
-
-                    // TODO: Set to itemHasFocus to false if the touch was not in its bounding rect!
-
-                    // Get the list item corresponding to the specified touch point
-                    ListItem item = getListItemAtPosition ((int) event.getRawX(), (int) event.getRawY());
-
-                    // Remove focus from the item with focus (if any) if it was not touched
-                    if (item == null || itemWithFocus != item) {
-                        Log.v ("Gesture_Log_2", "Removing focus");
-
-                        // Remove focus from the item that has it.
-                        if (itemWithFocus != null) {
-                            itemWithFocus.hasFocus = false;
-                            updateViewFromData();
-                        }
-
-                        // If touching the item that has focus, remove it from focus.
-                        itemHasFocus = false;
-                        itemWithFocus = null;
-                    }
-                    Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
-                }
-
-            }
-
             return false;
         }
-    }
-
-    /**
-     * Returns the list item corresponding to the specified position.
-     * @param x
-     * @param y
-     * @return
-     */
-    public ListItem getListItemAtPosition(int x, int y) {
-        // Get the list item corresponding to the specified touch point
-        int position = getViewIndexByPosition(x, y);
-        ListItem item = (ListItem) getItemAtPosition(position);
-        return item;
     }
 
     private class ListLongSelection implements OnItemLongClickListener
@@ -1071,11 +936,7 @@ public class CustomListView extends ListView {
             // Check if the list item was a constructor
             if (item.type == CustomAdapter.SYSTEM_CONTROL_LAYOUT) {
                 if (item.title == "create") {
-                    String title = "";
-                    String subtitle = "";
-                    int type = CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT;
-
-                    addData (new ListItem (title, subtitle, type));
+                    // Nothing?
                 }
                 // TODO: (?)
 
@@ -1101,7 +962,7 @@ public class CustomListView extends ListView {
 
                 // Request the ListView to be redrawn so the views in it will be displayed
                 // according to their updated state information.
-                updateViewFromData();
+//                refreshListViewFromData();
             }
 
             return false;
@@ -1119,56 +980,47 @@ public class CustomListView extends ListView {
 
             // Check if the list item was a constructor
             if (item.type == CustomAdapter.SYSTEM_CONTROL_LAYOUT) {
-                if (item.title == "create") {
-                    String title = "";
-                    String subtitle = "";
-                    int type = CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT;
 
-                    addData (new ListItem (title, subtitle, type));
+                if (item.title == "create") {
+                    // Add a placeholder if one doesn't already exist
+                    if (!hasPlaceholder ()) {
+                        String title = "touch to select";
+                        String subtitle = "";
+                        int type = CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT;
+
+                        addData(new ListItem(title, subtitle, type));
+                    }
                 } else if (item.title == "abstract") {
 
                     abstractSelectedItems ();
 
                 }
-                // TODO: (?)
-            } else if (item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
-                // Show options
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                builder.setTitle("Select a behavior");
-//                builder.setMessage("You pressed item #" + (position + 1));
-//                builder.setPositiveButton("OK", null);
-//                builder.show();
+            } else if (item.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
                 selectBehaviorType (item);
 
             } else {
 
-                Log.v ("Gesture_Log_2", "itemWithFocus = " + itemWithFocus);
-                Log.v ("Gesture_Log_2", "         item = " + item);
-
-                Log.v ("Gesture_Log_2", "itemHasFocus (before) = " + itemHasFocus);
-                if (itemWithFocus == null) {
-                    // If there is no item with focus, focus on the touched item.
-                    itemHasFocus = true;
-                    itemWithFocus = item;
-                    item.hasFocus = true;
-                    updateViewFromData();
-                }
-
-                else if (itemWithFocus != item) {
-                    // If touching the item that has focus, remove it from focus.
-                    itemHasFocus = false;
-                    itemWithFocus = null;
-                    item.hasFocus = false;
-                    updateViewFromData();
-                }
-                Log.v ("Gesture_Log_2", "itemHasFocus (after) = " + itemHasFocus);
+                displayUpdateOptions (item);
 
             }
 
         }
 
+    }
+
+    /**
+     * Returns true if a placeholder event is found in the sequence.
+     * @return
+     */
+    private boolean hasPlaceholder() {
+        for (ListItem existingItem : data) {
+            if (existingItem.type == CustomAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void abstractSelectedItems() {
@@ -1177,10 +1029,12 @@ public class CustomListView extends ListView {
 
         // Get list of the selected items
         ArrayList<ListItem> selectedListItems = new ArrayList<>();
+        ArrayList<String> selectedListItemLabels = new ArrayList<>();
         for (ListItem listItem : this.data) {
             if (listItem.selected) {
                 listItem.selected = false; // Deselect the item about to be abstracted
                 selectedListItems.add(listItem);
+                selectedListItemLabels.add(listItem.title);
             }
             if (selectedListItems.size() == 0) {
                 index++;
@@ -1199,7 +1053,7 @@ public class CustomListView extends ListView {
         for (ListItem listItem : selectedListItems) {
             data.remove(listItem);
         }
-        updateViewFromData(); // Update view after removing items from the list
+        refreshListViewFromData(); // Update view after removing items from the list
 
         // Create a new abstract item in the list that represents the selected item sequence at the position of the first item in the sequence
 
@@ -1209,9 +1063,10 @@ public class CustomListView extends ListView {
 //        int index = data.indexOf(item);
 //        data.remove(index);
         // Add the new item.
+        String behaviorListString = TextUtils.join(", ", selectedListItemLabels);
         ListItem replacementItem = new ListItem("complex", "", CustomAdapter.COMPLEX_LAYOUT);
         replacementItem.listItems.addAll(selectedListItems); // Add the selected items to the list
-        replacementItem.summary = "" + selectedListItems.size() + " behaviors";
+        replacementItem.summary = behaviorListString + " (" + selectedListItems.size() + ")";
         data.add(index, replacementItem);
         // </HACK>
 
@@ -1234,15 +1089,28 @@ public class CustomListView extends ListView {
 
         // Remove the selected item from the list (it will be replaced by the abstracted behviors)
         data.remove (index);
-        updateViewFromData(); // Update view after removing items from the list
+        refreshListViewFromData(); // Update view after removing items from the list
 
         // Add the abstracted items back to the list
         for (ListItem listItem : abstractedListItems) {
             data.add (index, listItem);
             index++; // Increment the index of the insertion position
         }
-        updateViewFromData(); // Update view after removing items from the list
+        refreshListViewFromData(); // Update view after removing items from the list
 
+    }
+
+    /**
+     * Returns the list item corresponding to the specified position.
+     * @param x
+     * @param y
+     * @return
+     */
+    public ListItem getListItemAtPosition(int x, int y) {
+        // Get the list item corresponding to the specified touch point
+        int position = getViewIndexByPosition(x, y);
+        ListItem item = (ListItem) getItemAtPosition(position);
+        return item;
     }
 
     public View getViewByPosition (int xPosition, int yPosition) {
@@ -1299,20 +1167,49 @@ public class CustomListView extends ListView {
     }
 
     public void selectItemByIndex (int index) {
+
+        int firstSelectedIndex = -1;
+        for (int i = 0; i < data.size(); i++) {
+            ListItem item = data.get(i);
+            if (item.selected) {
+                firstSelectedIndex = i;
+                break;
+            }
+        }
+
         // Check if the specified position is within the bounds of a view in the ListView.
         // If so, select the item.
-//        if (mDownView != null) {
-//            int itemIndex = this.getFirstVisiblePosition() + i;
+
+        if (firstSelectedIndex == -1) {
+
+            // The item is the first one selected
             if (index < data.size()) {
                 ListItem item = (ListItem) data.get(index);
                 selectListItem(item);
-                updateViewFromData();
+                refreshListViewFromData();
             }
-//        }
-    }
 
-//    public ListItem getItemByView (View view) {
-//        int position = this.getPositionForView(view);
-//        return (ListItem) data.get(position);
-//    }
+        } else {
+
+            // The selected item is subsequent to the first selected, so select it.
+            if (firstSelectedIndex <= index) {
+
+                // Select all items between the first and current selection
+                for (int i = firstSelectedIndex; i <= index; i++) {
+                    ListItem item = data.get(i);
+                    selectListItem(item);
+                }
+                // Deselect all items after the current selection
+                for (int i = index + 1; i < data.size(); i++) {
+                    ListItem item = data.get(i);
+                    deselectListItem(item);
+                }
+                refreshListViewFromData();
+
+            }
+
+            // TODO: Handle upward selection case here!
+
+        }
+    }
 }

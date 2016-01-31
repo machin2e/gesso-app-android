@@ -21,15 +21,26 @@
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/build/intermediates/exploded-aar/com.android.support/gridlayout-v7/23.1.0/res/values/values.xml -->
     <eat-comment/>
     <dimen name="default_gap">8dip</dimen>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="event_title_text_size">15dp</dimen>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/template-dimens.xml -->
     <eat-comment/>
     <dimen name="horizontal_page_margin">@dimen/margin_medium</dimen>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="light_preview_column_width">20dp</dimen>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/template-dimens.xml -->
+    <eat-comment/>
     <dimen name="margin_huge">64dp</dimen>
     <dimen name="margin_large">32dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_tiny">4dp</dimen>
     <dimen name="vertical_page_margin">@dimen/margin_medium</dimen>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <integer name="event_timeline_segment_length">177</integer>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_settings">Settings</string>
