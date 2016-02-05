@@ -4,14 +4,14 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-public class BehaviorManager {
+public class BehaviorCacheManager {
 
     private Clay clay;
 
     private ArrayList<String> repositoryUris = new ArrayList<String>();
     private ArrayList<Behavior> cachedBehaviors = new ArrayList<Behavior>();
 
-    BehaviorManager(Clay clay) {
+    BehaviorCacheManager(Clay clay) {
 
         // Associate this behavior repository with Clay.
         this.clay = clay;

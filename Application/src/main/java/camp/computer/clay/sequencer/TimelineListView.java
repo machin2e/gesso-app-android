@@ -65,11 +65,47 @@ public class TimelineListView extends ListView {
         initTouchListeners();
     }
 
+    public void setData (ArrayList<BehaviorProfile> behaviorProfiles) {
+        this.data.clear();
+        this.adapter.notifyDataSetChanged();
+
+        // create some objects... and add them into the array list
+        if (!TimelineListView.HIDE_ABSTRACT_OPTION) {
+            this.data.add(new BehaviorProfile("abstract", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+        }
+
+//        this.data.addAll(behaviorProfiles);
+        for (BehaviorProfile behaviorProfile : behaviorProfiles) {
+            switch (behaviorProfile.type) {
+                case TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT:
+                    this.data.add(new BehaviorProfile("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
+                    break;
+                case TimelineUnitAdapter.IO_CONTROL_LAYOUT:
+                    this.data.add(new BehaviorProfile("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
+                    break;
+                case TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT:
+                    this.data.add(new BehaviorProfile("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
+                    break;
+                case TimelineUnitAdapter.WAIT_CONTROL_LAYOUT:
+                    this.data.add(new BehaviorProfile("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
+                    break;
+                case TimelineUnitAdapter.SAY_CONTROL_LAYOUT:
+                    this.data.add(new BehaviorProfile("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT));
+                    break;
+            }
+        }
+
+        this.data.add(new BehaviorProfile("create", "", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+
+        this.adapter.notifyDataSetChanged();
+    }
+
     /**
      * Set up the data source and populate the list of data to show in this ListView.
      */
     public void initData () {
         // TODO: Initialize data from cache or from remote source in this function. Do this because the ViewPager will destroy this object when moving between pages.
+        // TODO: Observe remote data source and update cached source and notify ListView when data set changes.
 
         // setup the data source
         this.data = new ArrayList<BehaviorProfile>();
@@ -79,12 +115,14 @@ public class TimelineListView extends ListView {
             this.data.add(new BehaviorProfile("abstract", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
         }
 
+        // this.data.add(new BehaviorProfile("view", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+
         // Basic behaviors
-        this.data.add(new BehaviorProfile("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
-        this.data.add(new BehaviorProfile("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
-        this.data.add(new BehaviorProfile("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
-        this.data.add(new BehaviorProfile("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
-        this.data.add(new BehaviorProfile("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT));
+//        this.data.add(new BehaviorProfile("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
+//        this.data.add(new BehaviorProfile("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
+//        this.data.add(new BehaviorProfile("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
+//        this.data.add(new BehaviorProfile("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
+//        this.data.add(new BehaviorProfile("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT));
 
         this.data.add(new BehaviorProfile("create", "", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
     }
@@ -191,6 +229,8 @@ public class TimelineListView extends ListView {
             displayUpdateWaitOptions(item);
         } else if (item.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
             displayUpdateSayOptions(item);
+        } else if (item.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
+            displayUpdateTagOptions(item);
         }
 
     }
@@ -420,11 +460,11 @@ public class TimelineListView extends ListView {
         final TextView signalLabel = new TextView (getContext());
         signalLabel.setText("Set channel direction, mode, and value"); // INPUT: Discrete/Digital, Continuous/Analog; OUTPUT: Discrete, Continuous/PWM
         signalLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView (signalLabel);
+        transformLayout.addView(signalLabel);
 
         // Show I/O options
         final LinearLayout ioLayout = new LinearLayout (getContext());
-        ioLayout.setOrientation (LinearLayout.HORIZONTAL);
+        ioLayout.setOrientation(LinearLayout.HORIZONTAL);
         for (int i = 0; i < 12; i++) {
             final String channelLabel = Integer.toString (i + 1);
             final Button toggleButton = new Button (getContext());
@@ -458,7 +498,7 @@ public class TimelineListView extends ListView {
 
         // Show I/O selection mode (Discrete or Continuous)
         LinearLayout channelModeLayout = new LinearLayout (getContext());
-        channelModeLayout.setOrientation (LinearLayout.HORIZONTAL);
+        channelModeLayout.setOrientation(LinearLayout.HORIZONTAL);
         for (int i = 0; i < 12; i++) {
             final Button toggleButton = new Button (getContext());
             toggleButton.setPadding (0, 0, 0, 0);
@@ -479,11 +519,11 @@ public class TimelineListView extends ListView {
             channelModeButtons.add(toggleButton); // Add the button to the list.
             channelModeLayout.addView(toggleButton);
         }
-        transformLayout.addView (channelModeLayout);
+        transformLayout.addView(channelModeLayout);
 
         // Value. Show channel value.
         LinearLayout channelValueLayout = new LinearLayout (getContext());
-        channelValueLayout.setOrientation (LinearLayout.HORIZONTAL);
+        channelValueLayout.setOrientation(LinearLayout.HORIZONTAL);
 //        channelLayout.setLayoutParams (new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT));
         for (int i = 0; i < 12; i++) {
             // final String buttonLabel = Integer.toString (i + 1);
@@ -516,7 +556,7 @@ public class TimelineListView extends ListView {
                 toggleButton.setChecked(false);
             }
         }
-        transformLayout.addView (channelValueLayout);
+        transformLayout.addView(channelValueLayout);
 
         // Set up interactivity for channel enable buttons.
         for (int i = 0; i < 12; i++) {
@@ -795,6 +835,42 @@ public class TimelineListView extends ListView {
             @Override
             public void onClick (DialogInterface dialog, int which) {
                 dialog.cancel ();
+            }
+        });
+
+        builder.show ();
+    }
+
+    public void displayUpdateTagOptions(final BehaviorProfile item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle ("Tag 'em.");
+
+        // Set up the input
+        final EditText input = new EditText(getContext());
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT); //input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        // Recover values
+        input.setText(item.title);
+        input.setSelection(input.getText().length());
+
+        // Set up the buttons
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Update the state of the behavior
+                item.title = input.getText().toString();
+
+                // Refresh the timeline view
+                refreshListViewFromData();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
             }
         });
 
@@ -1249,6 +1325,8 @@ public class TimelineListView extends ListView {
         replacementItem.summary = behaviorListString + " (" + selectedBehaviorProfiles.size() + ")";
         data.add(index, replacementItem);
         // </HACK>
+
+        displayUpdateTagOptions (replacementItem);
 
     }
 

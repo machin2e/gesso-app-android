@@ -10,11 +10,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
+
+import camp.computer.clay.system.Behavior;
 import camp.computer.clay.system.ViewManagerInterface;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
@@ -36,7 +40,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
      * intensive, it may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private UnitViewPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -65,7 +69,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
      * Create the activity. Sets up an {@link android.app.ActionBar} with tabs, and then configures the
      * {@link ViewPager} contained inside R.layout.activity_main.
      *
-     * <p>A {@link SectionsPagerAdapter} will be instantiated to hold the different pages of
+     * <p>A {@link UnitViewPagerAdapter} will be instantiated to hold the different pages of
      * fragments that are to be displayed. A
      * {@link android.support.v4.view.ViewPager.SimpleOnPageChangeListener} will also be configured
      * to receive callbacks when the user swipes between pages in the ViewPager.
@@ -109,7 +113,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // BEGIN_INCLUDE (setup_view_pager)
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new UnitViewPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (UnitViewPager) findViewById(R.id.pager);
@@ -132,9 +136,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         // BEGIN_INCLUDE (add_tabs)
         // For each of the sections in the app, add a tab to the action bar.
-        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-            addUnitView(null);
-        }
+//        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+//            addUnitView(null);
+//        }
         // END_INCLUDE (add_tabs)
 
         Clay.setContext(getApplicationContext());
@@ -155,6 +159,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     public void addUnitView(Unit unit) {
 
+        // Increment the number of pages to be the same as the number of discovered units.
+        mSectionsPagerAdapter.count++;
+        mSectionsPagerAdapter.notifyDataSetChanged();
+
         // Create a tab with text corresponding to the page title defined by the adapter. Also
         // specify this Activity object, which implements the TabListener interface, as the
         // callback (listener) for when this tab is selected.
@@ -164,6 +172,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                             .setText("Unit") // .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
         }
+
     }
 
     /**
@@ -211,10 +220,12 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages. This provides the data for the {@link ViewPager}.
      */
-    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    public class UnitViewPagerAdapter extends FragmentStatePagerAdapter {
     // END_INCLUDE (fragment_pager_adapter)
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public int count = 0;
+
+        public UnitViewPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -233,6 +244,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             Unit unit = null;
             if (position < getClay().getUnits().size()) {
                 unit = getClay().getUnits().get(position);
+                Log.v("Behavior_Count", "unit not null");
             }
 
             // getItem is called to instantiate the fragment for the given page.
@@ -242,7 +254,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             Bundle args = new Bundle();
             args.putInt(UnitViewFragment.ARG_SECTION_NUMBER, position + 1);
             fragment.setArguments(args);
-            fragment.setUnit (unit);
+            fragment.setUnit(unit);
             return (Fragment) fragment;
         }
         // END_INCLUDE (fragment_pager_adapter_getitem)
@@ -256,7 +268,12 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 1;
+//            if (getClay() != null) {
+//                return getClay().getUnits().size();
+//            } else {
+//                return 1;
+//            }
+            return count;
         }
         // END_INCLUDE (fragment_pager_adapter_getcount)
 
@@ -285,13 +302,15 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     }
 
     /**
-     * A dummy fragment representing a section of the app, but that simply displays dummy text.
-     * This would be replaced with your application's content.
+     * A fragment representing a section of the app. Each fragment represents a single unit. It
+     * shows the timeline of unit behavior and controls for changing the timeline.
      */
     public static class UnitViewFragment extends Fragment {
 
         // The Clay unit associated with this fragment.
         private Unit unit;
+
+        private ArrayList<BehaviorProfile> behaviorProfiles;
 
         private TimelineListView listView;
 
@@ -312,6 +331,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // TODO: UnitViewFragment(Unit unit)
         public UnitViewFragment() {
 
+            behaviorProfiles = new ArrayList<BehaviorProfile>();
+
 //            behaviorEvents.add("hello a");
 //            behaviorEvents.add("hello b");
 //            behaviorEvents.add("hello c");
@@ -323,10 +344,25 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         public void setUnit (Unit unit) {
             this.unit = unit;
+
+            // Create behavior profiles for the timeline
+            createBehaviorProfiles();
         }
 
         public Unit getUnit () {
             return this.unit;
+        }
+
+        private void createBehaviorProfiles () {
+            behaviorProfiles.clear();
+
+            // Create a behavior profile for each of the unit's behaviors
+            for (Behavior behavior : this.unit.getTimeline().getBehaviors()) {
+                BehaviorProfile behaviorProfile = new BehaviorProfile(behavior);
+                behaviorProfiles.add(behaviorProfile);
+            }
+
+            Log.v ("Behavior_Count", "profile count: " + this.behaviorProfiles.size());
         }
 
         @Override
@@ -348,6 +384,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             listView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
             listView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
 //            listView.setAdapter(listAdapter);
+            // TODO: Create new TimelineUnitAdapter with the data for this tab's unit! (or reuse and repopulate with new data)
+
+            // Create behavior profiles for the unit's behaviors and assign the data to the ListView
+            listView.setData(behaviorProfiles);
 
             if (disableScrollbarFading) {
                 listView.setScrollbarFadingEnabled(false);
