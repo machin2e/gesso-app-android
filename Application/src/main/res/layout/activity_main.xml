@@ -1,5 +1,5 @@
 <!-- BEGIN_INCLUDE (view_pager_layout) -->
-<camp.computer.clay.sequencer.CustomViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+<camp.computer.clay.sequencer.UnitViewPager xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pager"
     android:layout_width="match_parent"

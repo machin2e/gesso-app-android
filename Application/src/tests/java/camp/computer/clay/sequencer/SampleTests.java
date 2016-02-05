@@ -17,17 +17,15 @@ package camp.computer.clay.sequencer;
 
 import android.test.ActivityInstrumentationTestCase2;
 
-import camp.computer.clay.sequencer.MainActivity;
-
 /**
 * Tests for HorizontalPaging sample.
 */
-public class SampleTests extends ActivityInstrumentationTestCase2<MainActivity> {
+public class SampleTests extends ActivityInstrumentationTestCase2<ApplicationView> {
 
-    private MainActivity mTestActivity;
+    private ApplicationView mTestActivity;
 
     public SampleTests() {
-        super(MainActivity.class);
+        super(ApplicationView.class);
     }
 
     @Override
