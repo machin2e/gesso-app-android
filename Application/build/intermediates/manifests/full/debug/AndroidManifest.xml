@@ -24,19 +24,26 @@
         android:targetSdkVersion="23" />
 
     <!--
-     While ViewPager will work on API 4 or above, tabs require an ActionBar. ActionBar is only
+         While ViewPager will work on API 4 or above, tabs require an ActionBar. ActionBar is only
          available in API 11 or above.
     -->
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!-- This is a standard Activity invocation for MainActivity. -->
+        <!-- This is a standard Activity invocation for ApplicationView. -->
         <activity
-            android:name="camp.computer.clay.sequencer.MainActivity"
+            android:name="camp.computer.clay.sequencer.ApplicationView"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
