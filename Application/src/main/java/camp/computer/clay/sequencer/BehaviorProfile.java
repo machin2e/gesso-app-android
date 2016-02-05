@@ -12,12 +12,14 @@ import android.graphics.Color;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import camp.computer.clay.system.Behavior;
+
 public class BehaviorProfile {
 
     private UUID uuid;
 
     // The UUID of the behavior represented by this object.
-    private UUID behaviorUuid;
+    public UUID behaviorUuid;
 
     // TODO: Store the managed Behavior's UUID.
     // TODO: Store reference to the managed Behavior (retrieved via the local cache).
@@ -60,6 +62,25 @@ public class BehaviorProfile {
     // default constructor
     public BehaviorProfile() {
         this("Title", "Subtitle", DEFAULT_TYPE);
+    }
+
+    public BehaviorProfile(Behavior behavior) {
+
+        // Get behavior type
+        if (behavior.getTitle().equals("lights")) {
+            this.type = TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT;
+        } else if (behavior.getTitle().equals("io")) {
+            this.type = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
+        } else if (behavior.getTitle().equals("message")) {
+            this.type = TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT;
+        } else if (behavior.getTitle().equals("wait")) {
+            this.type = TimelineUnitAdapter.WAIT_CONTROL_LAYOUT;
+        } else if (behavior.getTitle().equals("say")) {
+            this.type = TimelineUnitAdapter.SAY_CONTROL_LAYOUT;
+        }
+
+        // Get behavior UUID
+        this.behaviorUuid = behavior.getUuid();
     }
 
     // main constructor

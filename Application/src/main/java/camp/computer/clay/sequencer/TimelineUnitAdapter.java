@@ -88,26 +88,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
         // Select the layout for the view based on the type of object being displayed in the view
         int type = getItemType (position);
-        int resourceForType; // Default resource
-        if (type == SYSTEM_CONTROL_LAYOUT) {
-            resourceForType = R.layout.list_item_type_system;
-        } else if (type == CONTROL_PLACEHOLDER_LAYOUT) {
-            resourceForType = R.layout.list_item_type_placeholder;
-        } else if (type == LIGHT_CONTROL_LAYOUT) {
-            resourceForType = R.layout.list_item_type_light;
-        } else if (type == IO_CONTROL_LAYOUT) {
-            resourceForType = R.layout.list_item_type_io;
-        } else if (type == MESSAGE_CONTROL_LAYOUT) {
-            resourceForType = R.layout.list_item_type_message;
-        } else if (type == WAIT_CONTROL_LAYOUT) {
-            resourceForType = R.layout.list_item_type_wait;
-        } else if (type == SAY_CONTROL_LAYOUT) {
-            resourceForType = R.layout.list_item_type_say;
-        } else if (type == COMPLEX_LAYOUT) {
-            resourceForType = R.layout.list_item_type_complex;
-        } else {
-            resourceForType = R.layout.list_item_type_light;
-        }
+        int layoutResource = getLayoutByType(type); // Default resource
 
         // <HACK>
         // This prevents view recycling.
@@ -119,7 +100,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
         if (convertView == null) {
             //view = this.inflater.inflate(resource, parent, false);
-            view = this.inflater.inflate(resourceForType, parent, false);
+            view = this.inflater.inflate(layoutResource, parent, false);
         } else {
             view = convertView;
         }
@@ -175,6 +156,30 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
         // bind the data to the view object
         return this.bindData(view, position);
+    }
+
+    private int getLayoutByType(int type) {
+        int resourceForType;
+        if (type == SYSTEM_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_system;
+        } else if (type == CONTROL_PLACEHOLDER_LAYOUT) {
+            resourceForType = R.layout.list_item_type_placeholder;
+        } else if (type == LIGHT_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_light;
+        } else if (type == IO_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_io;
+        } else if (type == MESSAGE_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_message;
+        } else if (type == WAIT_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_wait;
+        } else if (type == SAY_CONTROL_LAYOUT) {
+            resourceForType = R.layout.list_item_type_say;
+        } else if (type == COMPLEX_LAYOUT) {
+            resourceForType = R.layout.list_item_type_complex;
+        } else {
+            resourceForType = R.layout.list_item_type_light;
+        }
+        return resourceForType;
     }
 
     /**

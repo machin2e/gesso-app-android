@@ -3,9 +3,11 @@ package camp.computer.clay.system;
 import android.content.Context;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -24,9 +26,7 @@ public class Clay {
 
     private ArrayList<Unit> units = new ArrayList<Unit>();
 
-    private BehaviorManager behaviorRepository = null;
-
-    private System system = new System (this);
+    private BehaviorCacheManager behaviorRepository = null;
 
     // Physical systems
     private ContentManager database = null;
@@ -50,7 +50,7 @@ public class Clay {
         this.database = new ContentManager(this);
 
         // Set up behavior repository
-        this.behaviorRepository = new BehaviorManager(this);
+        this.behaviorRepository = new BehaviorCacheManager(this);
 
         // TODO: Discover units!
     }
@@ -76,7 +76,7 @@ public class Clay {
         return Clay.context;
     }
 
-    public BehaviorManager getBehaviorRepository () {
+    public BehaviorCacheManager getBehaviorRepository () {
         return this.behaviorRepository;
     }
 
@@ -93,9 +93,9 @@ public class Clay {
         return this.database;
     }
 
-    public System getSystem () {
-        return this.system;
-    }
+//    public System getSystem () {
+//        return this.system;
+//    }
 
 //    public Perspective getPerspective () {
 //        return this.perspective;
@@ -124,8 +124,36 @@ public class Clay {
             // Add unit to present (i.e., local cache).
             this.units.add(unit);
 
+            // <TEST>
+            // Add a random number of random behaviors to the unit.
+            // This will be replaced with the actual behaviors on the device's timeline.
+            Random r = new Random ();
+            int behaviorCount = r.nextInt(20);
+            for (int i = 0; i < behaviorCount; i++) {
+
+                // Get list of the available behavior types
+                ArrayList<String> behaviorTypes = new ArrayList<String>();
+                behaviorTypes.add ("lights");
+                behaviorTypes.add ("io");
+                behaviorTypes.add ("message");
+                behaviorTypes.add ("wait");
+                behaviorTypes.add ("say");
+
+                // Select random behavior type
+                int behaviorSelection = r.nextInt(behaviorTypes.size());
+
+                // Generate a behavior of the selected type
+                unit.getTimeline().addBehavior(new Behavior(behaviorTypes.get(behaviorSelection)));
+            }
+            // </TEST>
+
+            Log.v("Behavior_Count", "unit behavior count: " + unit.getTimeline().getBehaviors().size());
+
             // Add timelines to attached views
             for (ViewManagerInterface view : this.views) {
+                // TODO: (1) add a page to the ViewPager
+
+                // (2) Add a tab to the action bar to support navigation to the specified page.
                 view.addUnitView(unit);
             }
 
