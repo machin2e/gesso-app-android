@@ -20,6 +20,7 @@ public class BehaviorProfile {
 
     // The UUID of the behavior represented by this object.
     public UUID behaviorUuid;
+    private Behavior behavior;
 
     // TODO: Store the managed Behavior's UUID.
     // TODO: Store reference to the managed Behavior (retrieved via the local cache).
@@ -81,6 +82,10 @@ public class BehaviorProfile {
 
         // Get behavior UUID
         this.behaviorUuid = behavior.getUuid();
+
+        // <HACK>
+        this.behavior = behavior;
+        // </HACK>
     }
 
     // main constructor
@@ -100,6 +105,10 @@ public class BehaviorProfile {
 
         // Initialize type
         initializeType();
+    }
+
+    public Behavior getBehavior () {
+        return this.behavior;
     }
 
     private void initializeType() {

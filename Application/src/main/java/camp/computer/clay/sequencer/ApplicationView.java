@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +19,7 @@ import android.view.WindowManager;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.Behavior;
 import camp.computer.clay.system.ViewManagerInterface;
 import camp.computer.clay.system.Clay;
@@ -26,9 +28,12 @@ import camp.computer.clay.system.Unit;
 
 public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
 
+    private static final long MESSAGE_SEND_FREQUENCY = 100;
     private static Context context;
 
     private DatagramManager datagramServer;
+
+    private NetworkResource networkResource;
 
     private Clay clay;
 
@@ -151,7 +156,34 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         }
 //        datagramServer.startDatagramServer();
         clay.addMessageManager(this.datagramServer);
+
+        if (networkResource == null) {
+            networkResource = new NetworkResource();
+        }
+
+        clay.addNetworkResource(this.networkResource);
+
+        // Start worker process
+        // Start the initial runnable task by posting through the handler
+        handler.post(runnableCode);
     }
+
+    // Create the Handler object (on the main thread by default)
+    Handler handler = new Handler();
+    // Define the code block to be executed
+    private Runnable runnableCode = new Runnable() {
+        @Override
+        public void run() {
+            // Do something here on the main thread
+//            Log.d("Handlers", "Called on main thread");
+            // <HACK>
+            // Process the outgoing messages
+            clay.cycle();
+            // </HACK>
+            // Repeat this the same runnable code block again another 2 seconds
+            handler.postDelayed(runnableCode, MESSAGE_SEND_FREQUENCY);
+        }
+    };
 
     public static Context getContext() {
         return ApplicationView.context;
@@ -388,6 +420,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
             // Create behavior profiles for the unit's behaviors and assign the data to the ListView
             listView.setData(behaviorProfiles);
+
+            // <HACK>
+            listView.unit = unit;
+            // </HACK>
 
             if (disableScrollbarFading) {
                 listView.setScrollbarFadingEnabled(false);
