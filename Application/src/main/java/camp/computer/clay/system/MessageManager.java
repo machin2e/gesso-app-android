@@ -25,10 +25,10 @@ public class MessageManager {
         this.clay = clay;
     }
 
-    public void addMessageManager(MessageManagerInterface messageManager) {
+    public void addManager(MessageManagerInterface messageManager) {
         if (!this.messageManagers.contains(messageManager)) {
             this.messageManagers.add(messageManager);
-            messageManager.addMessageManager(this);
+            messageManager.engage(this);
         }
     }
 
@@ -77,9 +77,6 @@ public class MessageManager {
             if (incomingMessages.size () > 0) {
                 Log.v("Clay Datagram Server", "myKey = " + incomingMessages.get(incomingMessages.size() - 1));
             }
-
-            // TODO: Move this to a periodic call
-            processIncomingMessages();
 
             //            // Dequeue and process the next message on the incoming message queue.
 //            Log.v ("Clay_Time", "Checking for incoming messages");
@@ -259,7 +256,8 @@ public class MessageManager {
 
     Date timeLastSentMessage = new Date(0);
     long outgoingMessagePeriod = 500;
-    private void processOutgoingMessages () {
+    public void processOutgoingMessages () {
+//        Log.v ("Handlers", "processOutgoingMessage (count: " + outgoingMessages.size() + ")");
 
         if (hasOutgoingMessages ()) {
 
@@ -271,22 +269,22 @@ public class MessageManager {
             // Get the next outgoing message.
             Message outgoingMessage = peekOutgoingMessage ();
 
-            Log.v("Verbose_Clay_Messaging", "                 Message: " + outgoingMessage.getContent());
-            Log.v("Verbose_Clay_Messaging", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-            Log.v("Verbose_Clay_Messaging", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
-            Log.v("Verbose_Clay_Messaging", "                 Retries: " + outgoingMessage.getRetryCount());
-            Log.v("Verbose_Clay_Messaging", "-----");
+            Log.v("Handlers", "                 Message: " + outgoingMessage.getContent());
+            Log.v("Handlers", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+            Log.v("Handlers", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+            Log.v("Handlers", "                 Retries: " + outgoingMessage.getRetryCount());
+            Log.v("Handlers", "-----");
 
 //            if ((currentTime.getTime () - timeLastSentMessage.getTime ()) > outgoingMessagePeriod) {
             long currentTimeMillis = currentTime.getTime ();
 
             if (((currentTimeMillis - timeLastSentMessage.getTime ()) > outgoingMessagePeriod) && ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD)) {
 
-                Log.v("Clay_Messaging", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
+                Log.v("Handlers", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
                 for (Message queuedOutgoingMessage : outgoingMessages) {
-                    Log.v("Clay_Messaging", "\t\t" + queuedOutgoingMessage.getContent());
+                    Log.v("Handlers", "\t\t" + queuedOutgoingMessage.getContent());
                 }
-                Log.v("Clay_Messaging", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
+                Log.v("Handlers", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
 
                 outgoingMessage.setTimeLastSent(currentCalendar.getTime ());
                 outgoingMessage.increaseRetryCount();

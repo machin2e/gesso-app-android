@@ -3,7 +3,6 @@ package camp.computer.clay.system;
 import android.content.Context;
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,6 +30,7 @@ public class Clay {
     // Physical systems
     private ContentManager database = null;
     private MessageManager messageManager = null;
+    private NetworkManager networkManager = null;
 
     static private Context context;
 
@@ -45,6 +45,9 @@ public class Clay {
 
         // Start the communications systems
         this.messageManager = new MessageManager (this);
+
+        // Start the networking systems
+        this.networkManager = new NetworkManager(this);
 
         // Start the database system
         this.database = new ContentManager(this);
@@ -223,7 +226,39 @@ public class Clay {
     }
 
     public void addMessageManager(MessageManagerInterface messageManager) {
-        this.messageManager.addMessageManager(messageManager);
+        this.messageManager.addManager(messageManager);
+    }
+
+    public void addNetworkResource(NetworkResourceInterface networkResource) {
+        this.networkManager.addResource(networkResource);
+    }
+
+    public void sendMessage (Unit unit, String content) {
+
+        // Prepare message
+        String source = this.networkManager.getInternetAddress ();
+        String destination = DatagramManager.BROADCAST_ADDRESS; // unit.getInternetAddress();
+        Message message = new Message("udp", source, destination, content);
+
+        // Queue message
+        messageManager.queueOutgoingMessage(message);
+
+//        // <HACK>
+//        // Process the outgoing messages
+//        messageManager.processOutgoingMessages();
+//        // </HACK>
+    }
+
+    /**
+     * Cycle through routine operations.
+     */
+    public void cycle () {
+
+        // Process incoming messages
+        messageManager.processIncomingMessages();
+
+        // Process outgoing messages
+        messageManager.processOutgoingMessages();
     }
 
     // TODO: discoverUnits() : Discover devices via UDP (maybe TCP).

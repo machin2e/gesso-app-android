@@ -16,11 +16,11 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
 
     private static final int MAX_UDP_DATAGRAM_LEN = 1500;
 
-    private static final String BROADCAST_ADDRESS = "255.255.255.255";
+    public static final String BROADCAST_ADDRESS = "255.255.255.255";
 
-    private static final int DISCOVERY_BROADCAST_PORT = 4445;
-    private static final int BROADCAST_PORT = 4446;
-    private static final int MESSAGE_PORT = BROADCAST_PORT; // or 4446
+    public static final int DISCOVERY_BROADCAST_PORT = 4445;
+    public static final int BROADCAST_PORT = 4446;
+    public static final int MESSAGE_PORT = BROADCAST_PORT; // or 4446
 
     // UDP server
     private WifiManager.MulticastLock multicastLock = null;
@@ -35,7 +35,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
         this.type = type;
     }
 
-    public void addMessageManager (MessageManager messageManager) {
+    public void engage(MessageManager messageManager) {
         this.messageManager = messageManager;
     }
 
@@ -43,7 +43,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
         return this.messageManager;
     }
 
-    public void removeMessageManager (MessageManager messageManager) {
+    public void disengage(MessageManager messageManager) {
         if (this.messageManager == messageManager) {
             this.messageManager = null;
         }
@@ -102,6 +102,9 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
                 String content = new String(messageBytes, 0, packet.getLength());
                 String source = getIpAsString(packet.getAddress ());
                 String destination = null;
+
+//                Message ackMessage = new Message("udp", null, BROADCAST_ADDRESS, "ground control to major tom");
+//                sendMessageAsync (ackMessage);
 
                 // ...and create a serialized object...
                 //Message incomingMessage = new Message(fromAddress, toAddress, packetData);
@@ -223,7 +226,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
     }
 
     private void sendMessageAsync (Message message) {
-        Log.v("Clay", "sendMessageAsync");
+        Log.v("Clay_Ack", "sendMessageAsync");
         UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
         udpDatagramTask.execute(message);
     }

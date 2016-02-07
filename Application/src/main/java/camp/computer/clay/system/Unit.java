@@ -83,4 +83,8 @@ public class Unit {
     public Timeline getTimeline() {
         return this.timeline;
     }
+
+    public void send(String content) {
+        getClay().sendMessage(this, content);
+    }
 }

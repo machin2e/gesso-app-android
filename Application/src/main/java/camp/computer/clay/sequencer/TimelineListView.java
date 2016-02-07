@@ -25,6 +25,8 @@ import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.system.Unit;
+
 public class TimelineListView extends ListView {
 
     private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
@@ -32,6 +34,7 @@ public class TimelineListView extends ListView {
 
     private TimelineUnitAdapter adapter;
     private ArrayList<BehaviorProfile> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
+    public Unit unit;
 
     public TimelineListView(Context context) {
         super(context);
@@ -841,9 +844,13 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
+    /**
+     * Update's the tag (or label) of a timeline view.
+     * @param item
+     */
     public void displayUpdateTagOptions(final BehaviorProfile item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle ("Tag 'em.");
+        builder.setTitle ("Tag the view.");
 
         // Set up the input
         final EditText input = new EditText(getContext());
@@ -862,6 +869,13 @@ public class TimelineListView extends ListView {
 
                 // Update the state of the behavior
                 item.title = input.getText().toString();
+
+                // TODO: Update the corresponding behavior state... this should propagate back through the object model... and cloud...
+//                item.getBehavior().setTitle(input.getText().toString())
+//                item.getBehavior().setTitle(input.getText().toString());
+
+                // Send changes to unit
+                unit.send (input.getText().toString());
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -896,7 +910,7 @@ public class TimelineListView extends ListView {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                // Update the state of the behavior
+                // Update the behavior profile state
                 item.message = input.getText().toString();
 
                 // Refresh the timeline view
