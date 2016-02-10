@@ -214,7 +214,7 @@ public class MessageManager {
                     Unit unit = new Unit(clay, UUID.fromString(unitUuid));
                     unit.setInternetAddress(unitAddress);
                     getClay().addUnit(unit);
-//                    getClay ().getDatabase().addEvent (unit, "discovered");
+//                    getClay ().getContentManager().addEvent (unit, "discovered");
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
@@ -239,13 +239,22 @@ public class MessageManager {
         return outgoingMessages.size() > 0;
     }
 
+    /**
+     * Adds a message to the message manager.
+     *
+     * Searches for a message with duplicate UUID. If such a message is found, then the new message
+     * will not be added.
+     */
     public void queueOutgoingMessage (Message message) {
-        // TODO: Search outgoing queue for message with duplicate UUID, in which case, compare the content, to verify that it's not a duplicate before sending! (Or just drop it.)
         if (!outgoingMessages.contains(message)) {
             outgoingMessages.add(message);
         }
     }
 
+    /**
+     * Returns the next outgoing message but does not remove it.
+     * @return The next outgoing message.
+     */
     public Message peekOutgoingMessage () {
         return outgoingMessages.get (0);
     }

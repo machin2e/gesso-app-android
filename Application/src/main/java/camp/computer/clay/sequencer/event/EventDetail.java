@@ -17,7 +17,7 @@
 //import java.util.ArrayList;
 //
 //import camp.computer.clay.sequencer.TimelineUnitAdapter;
-//import camp.computer.clay.sequencer.BehaviorProfile;
+//import camp.computer.clay.sequencer.EventManager;
 //
 //public class EventDetail {
 //
@@ -25,7 +25,7 @@
 //
 //    }
 //
-//    private void displayListItemOptions(final BehaviorProfile item) {
+//    private void displayListItemOptions(final EventManager item) {
 //        int basicBehaviorCount = 3;
 //        final String[] behaviorOptions = new String[basicBehaviorCount];
 //        // loop, condition, branch
@@ -40,7 +40,7 @@
 //
 //        // Show the list of behaviors
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle("Behavior options");
+//        builder.setTag("Behavior options");
 //        builder.setItems(behaviorOptions, new DialogInterface.OnClickListener() {
 //            public void onClick(DialogInterface dialog, int itemIndex) {
 //
@@ -81,7 +81,7 @@
 //        alert.show();
 //    }
 //
-//    public void displayUpdateOptions(final BehaviorProfile item) {
+//    public void displayUpdateOptions(final EventManager item) {
 //
 //        if (item.type == TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT) {
 //            displayUpdateLightsOptions(item);
@@ -97,9 +97,9 @@
 //
 //    }
 //
-//    public void displayUpdateLightsOptions(final BehaviorProfile item) {
+//    public void displayUpdateLightsOptions(final EventManager item) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle ("Change the channel.");
+//        builder.setTag ("Change the channel.");
 //        builder.setMessage ("What do you want to do?");
 //
 //        // Declare transformation layout
@@ -173,7 +173,7 @@
 //                    }
 //                }
 //
-//                // TODO: Store the state of the lights in the object associated with the BehaviorProfile
+//                // TODO: Store the state of the lights in the object associated with the EventManager
 //
 //                // Refresh the timeline view
 //                refreshListViewFromData();
@@ -189,9 +189,9 @@
 //        builder.show ();
 //    }
 //
-//    public void displayUpdateIOOptions2 (final BehaviorProfile item) {
+//    public void displayUpdateIOOptions2 (final EventManager item) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle ("I/O");
+//        builder.setTag ("I/O");
 //
 //        LinearLayout layout = new LinearLayout(getContext());
 //
@@ -266,9 +266,9 @@
 //        builder.show ();
 //    }
 //
-//    public void displayUpdateIOOptions (final BehaviorProfile item) {
+//    public void displayUpdateIOOptions (final EventManager item) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle ("Change the channel.");
+//        builder.setTag ("Change the channel.");
 //        builder.setMessage ("What do you want to do?");
 //
 //        // TODO: Populate with the current transform values (if any).
@@ -703,9 +703,9 @@
 //        builder.show ();
 //    }
 //
-//    public void displayUpdateMessageOptions(final BehaviorProfile item) {
+//    public void displayUpdateMessageOptions(final EventManager item) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle ("what's the message?");
+//        builder.setTag ("what's the message?");
 //
 //        // Set up the input
 //        final EditText input = new EditText(getContext());
@@ -739,9 +739,9 @@
 //        builder.show ();
 //    }
 //
-//    public void displayUpdateSayOptions(final BehaviorProfile item) {
+//    public void displayUpdateSayOptions(final EventManager item) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle ("tell me the behavior");
+//        builder.setTag ("tell me the behavior");
 //
 //        // Set up the input
 //        final EditText input = new EditText(getContext());
@@ -775,9 +775,9 @@
 //        builder.show ();
 //    }
 //
-//    public void displayUpdateWaitOptions(final BehaviorProfile item) {
+//    public void displayUpdateWaitOptions(final EventManager item) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//        builder.setTitle ("Time Transform");
+//        builder.setTag ("Time Transform");
 //        builder.setMessage("How do you want to change time?");
 //
 //        // Declare transformation layout
@@ -830,7 +830,7 @@
 ////                transformString = transformString.concat (Integer.toString (waitVal.getProgress ()));
 ////                Hack_TimeTransformTitle = transformString;
 ////                Behavior behavior = new Behavior ("time");
-////                behavior.setTransform(Hack_TimeTransformTitle);
+////                behavior.setDefaultState(Hack_TimeTransformTitle);
 ////                BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective);
 ////                behaviorConstruct.setBehavior(behavior);
 ////                perspective.addBehaviorConstruct(behaviorConstruct);

@@ -87,4 +87,9 @@ public class Unit {
     public void send(String content) {
         getClay().sendMessage(this, content);
     }
+
+    public void addBehavior(String behaviorUuid) {
+        Behavior behavior = getClay().getBehavior(behaviorUuid);
+        this.getTimeline().addBehavior(behavior);
+    }
 }

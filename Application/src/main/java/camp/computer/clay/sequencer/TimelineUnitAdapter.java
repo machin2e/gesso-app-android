@@ -27,7 +27,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
     private int resource;
 
     // store (a reference to) the data
-    private ArrayList<BehaviorProfile> data;
+    private ArrayList<EventManager> data;
 
     // Layout types
     public static final int SYSTEM_CONTROL_LAYOUT = 0; // This controls the programming interface, not the modules. It's a different category of behavior for managing other behavior controls.
@@ -46,7 +46,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
      * @param resource
      * @param data
      */
-    public TimelineUnitAdapter(Context context, int resource, ArrayList<BehaviorProfile> data) {
+    public TimelineUnitAdapter(Context context, int resource, ArrayList<EventManager> data) {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.resource = resource;
         this.data = data;
@@ -75,8 +75,8 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
     public int getItemType(int position){
         // Your if else code and return type ( TYPE_1 to TYPE_5 )
-        BehaviorProfile behaviorProfile = (BehaviorProfile) getItem (position);
-        return behaviorProfile.type;
+        EventManager eventManager = (EventManager) getItem (position);
+        return eventManager.type;
     }
 
     /**
@@ -96,7 +96,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
         // </HACK>
 
         // Get the data corresponding to the view
-        final BehaviorProfile behaviorProfile = data.get(position);
+        final EventManager eventManager = data.get(position);
 
         if (convertView == null) {
             //view = this.inflater.inflate(resource, parent, false);
@@ -120,7 +120,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
                 drawTimelineSegment(v, data.get(position), height);
 
 
-                if (behaviorProfile.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
+                if (eventManager.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
 
                     RelativeLayout.LayoutParams layoutParams;
 
@@ -151,7 +151,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
         */
 
         // Update the list item's view according to the type
-        updateViewForType(view, behaviorProfile);
+        updateViewForType(view, eventManager);
 //        view.invalidate();
 
         // bind the data to the view object
@@ -186,15 +186,15 @@ public class TimelineUnitAdapter extends BaseAdapter {
      * Updates the view layout specifically for the type of data that is displayed in it.
      *
      * @param view
-     * @param behaviorProfile
+     * @param eventManager
      */
-    private void updateViewForType (View view, BehaviorProfile behaviorProfile) {
+    private void updateViewForType (View view, EventManager eventManager) {
         // Update layout of a behavior control
-        if (behaviorProfile.type != SYSTEM_CONTROL_LAYOUT
-                && behaviorProfile.type != CONTROL_PLACEHOLDER_LAYOUT) {
+        if (eventManager.type != SYSTEM_CONTROL_LAYOUT
+                && eventManager.type != CONTROL_PLACEHOLDER_LAYOUT) {
 
             // Update layout based on state
-            if (behaviorProfile.selected == false) {
+            if (eventManager.selected == false) {
                 // Update left padding
                 view.setPadding(0, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
             } else {
@@ -205,21 +205,21 @@ public class TimelineUnitAdapter extends BaseAdapter {
         }
 
         // Set the background color
-        if (behaviorProfile.hasFocus) {
+        if (eventManager.hasFocus) {
             view.setBackgroundColor(Color.LTGRAY);
         } else {
             view.setBackgroundColor(Color.TRANSPARENT);
         }
 
         int segmentLength = view.getContext().getResources().getInteger(R.integer.event_timeline_segment_length);
-        drawTimelineSegment (view, behaviorProfile, segmentLength); //drawTimelineSegment (view, behaviorProfile, 192);
+        drawTimelineSegment (view, eventManager, segmentLength); //drawTimelineSegment (view, eventManager, 192);
 
         view.invalidate();
 
-        if (behaviorProfile.type == LIGHT_CONTROL_LAYOUT) {
+        if (eventManager.type == LIGHT_CONTROL_LAYOUT) {
 
             // Update image
-//            drawTimelineSegment (view, behaviorProfile);
+//            drawTimelineSegment (view, eventManager);
 
             // Get layout containing light state visualizations
             LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
@@ -248,7 +248,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
                     //int w = WIDTH_PX, h = HEIGHT_PX;
                     int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
                     int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
-                    //            if (behaviorProfile.selected) {
+                    //            if (eventManager.selected) {
                     //                w2 = 300;
                     //            }
 
@@ -275,10 +275,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
                 preview_layout.setX(label.getX());
             }
 
-        } else if (behaviorProfile.type == IO_CONTROL_LAYOUT) {
+        } else if (eventManager.type == IO_CONTROL_LAYOUT) {
 
             // Update image
-//            drawTimelineSegment (view, behaviorProfile);
+//            drawTimelineSegment (view, eventManager);
 
 
             // Get layout containing light state visualizations
@@ -308,7 +308,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
                     //int w = WIDTH_PX, h = HEIGHT_PX;
                     int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
                     int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
-                    //            if (behaviorProfile.selected) {
+                    //            if (eventManager.selected) {
                     //                w2 = 300;
                     //            }
 
@@ -332,25 +332,25 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
                 preview_layout.setX(label.getX());
             }
-        } else if (behaviorProfile.type == TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT) {
+        } else if (eventManager.type == TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT) {
 
             // Update image
-//            drawTimelineSegment (view, behaviorProfile);
+//            drawTimelineSegment (view, eventManager);
 
-        } else if (behaviorProfile.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
-
-            // Update image
-//            drawTimelineSegment (view, behaviorProfile);
-
-        } else if (behaviorProfile.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
+        } else if (eventManager.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
 
             // Update image
-//            drawTimelineSegment (view, behaviorProfile);
+//            drawTimelineSegment (view, eventManager);
 
-        } else if (behaviorProfile.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
+        } else if (eventManager.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
 
             // Update image
-//            drawTimelineSegment (view, behaviorProfile);
+//            drawTimelineSegment (view, eventManager);
+
+        } else if (eventManager.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
+
+            // Update image
+//            drawTimelineSegment (view, eventManager);
 
         }
     }
@@ -386,10 +386,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
     /**
      * Draws the timeline segment of the specified length (in pixels) for specified view and item.
      * @param view
-     * @param behaviorProfile
+     * @param eventManager
      * @param heightInPixels
      */
-    private void drawTimelineSegment (View view, BehaviorProfile behaviorProfile, int heightInPixels) {
+    private void drawTimelineSegment (View view, EventManager eventManager, int heightInPixels) {
 
         ImageView imageView = (ImageView) view.findViewById(R.id.icon);
 
@@ -404,7 +404,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
         paint.setColor(Color.rgb(61, 61, 61));
         paint.setStyle(Paint.Style.STROKE);
 
-        if (behaviorProfile.type == COMPLEX_LAYOUT) {
+        if (eventManager.type == COMPLEX_LAYOUT) {
             paint.setStrokeWidth(convertDpToPixel(10.0f, view.getContext()));
         } else {
             paint.setStrokeWidth(3.0f);
@@ -412,14 +412,14 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
         // Set path effect
         // Reference: http://developer.android.com/reference/android/graphics/PathEffect.html
-        if (behaviorProfile.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
+        if (eventManager.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
             paint.setPathEffect(new DashPathEffect(new float[]{10, 20}, 0));
         } else {
             paint.setPathEffect(null);
         }
 
         /*
-        if (behaviorProfile == data.get(data.size() - 2)) {
+        if (eventManager == data.get(data.size() - 2)) {
             // Draw final segment
             canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) (h / 2.0), paint);
             canvas.drawRect((float) ((w / 2.0) - 10.0), (float) (h / 2.0), (float) ((w / 2.0) + 10.0), (float) ((h / 2.0) + 20), paint);
@@ -438,10 +438,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
     /**
      * Draws the timeline segment for the specified view
      */
-    private void drawTimelineSegment (View view, BehaviorProfile behaviorProfile) {
+    private void drawTimelineSegment (View view, EventManager eventManager) {
 
         int defaultHeight = (int) convertDpToPixel((float) 22.0, view.getContext());
-        drawTimelineSegment(view, behaviorProfile, defaultHeight);
+        drawTimelineSegment(view, eventManager, defaultHeight);
 
     }
 
@@ -457,13 +457,19 @@ public class TimelineUnitAdapter extends BaseAdapter {
         }
 
         // Pull out the data object represented by the view
-        BehaviorProfile item = this.data.get(position);
+        EventManager item = this.data.get(position);
 
         // Update the event label
         // Extract the view object to update, cast it to the correct type, and update the value.
         View viewElement = view.findViewById(R.id.label);
         TextView tv = (TextView)viewElement;
-        tv.setText(item.title);
+
+        if (item.type == SYSTEM_CONTROL_LAYOUT || item.type == CONTROL_PLACEHOLDER_LAYOUT) {
+            // TODO: Consider making a behavior for system controls, too.
+            tv.setText(item.title);
+        } else {
+            tv.setText(item.getBehavior().getTag());
+        }
 
         // Update the remainder of the view based on the type of data it represents.
         if (item.type == SYSTEM_CONTROL_LAYOUT) {
@@ -514,8 +520,14 @@ public class TimelineUnitAdapter extends BaseAdapter {
                         Canvas canvas2 = new Canvas(bmp2);
 
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
-                        if (item.lightStates.get(i) == true) {
-                            paint2.setColor(item.lightColors.get(i));
+
+                        // Get behavior state
+                        String lightStateString = item.getBehavior().getState().getState();
+                        String[] lightStates = lightStateString.split(" ");
+
+                        // Update the view
+                        if (lightStates[i].equals("T")) {
+                            paint2.setColor(Color.rgb(0, 0, 255));
                         } else {
                             paint2.setColor(Color.rgb(100, 100, 100));
                         }
@@ -569,9 +581,19 @@ public class TimelineUnitAdapter extends BaseAdapter {
                         Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
                         Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
                         Canvas canvas2 = new Canvas(bmp2);
-
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
-                        if (item.ioStates.get(i) == true) {
+
+                        // Get behavior state
+                        String ioStateString = item.getBehavior().getState().getState();
+                        String[] ioStates = ioStateString.split(" ");
+
+                        char ioState = ioStates[i].charAt(0);
+                        char ioDirectionState = ioStates[i].charAt(1);
+                        char ioSignalTypeState = ioStates[i].charAt(2);
+                        char ioSignalValueState = ioStates[i].charAt(3);
+
+                        // Update the view
+                        if (ioState == 'T') {
                             paint2.setColor(Color.rgb(61, 255, 61));
                         } else {
                             paint2.setColor(Color.rgb(255, 61, 61));
@@ -595,7 +617,12 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + item.message + "\"");
+
+                // Get behavior state
+                String message = item.getBehavior().getState().getState();
+
+                // Update the view
+                textView.setText("\"" + message + "\"");
             }
         } else if (item.type == WAIT_CONTROL_LAYOUT) {
 
@@ -603,7 +630,12 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText(item.time + " ms");
+
+                // Get behavior state
+                int time = Integer.parseInt(item.getBehavior().getState().getState());
+
+                // Update the view
+                textView.setText(time + " ms");
             }
         } else if (item.type == SAY_CONTROL_LAYOUT) {
 
@@ -611,7 +643,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + item.phrase + "\"");
+                textView.setText("\"" + item.getBehavior().getState().getState() + "\"");
             }
         } else if (item.type == COMPLEX_LAYOUT) {
 

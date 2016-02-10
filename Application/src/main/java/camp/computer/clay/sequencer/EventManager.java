@@ -14,9 +14,13 @@ import java.util.UUID;
 
 import camp.computer.clay.system.Behavior;
 
-public class BehaviorProfile {
+public class EventManager {
 
     private UUID uuid;
+
+    public UUID getUuid () {
+        return this.uuid;
+    }
 
     // The UUID of the behavior represented by this object.
     public UUID behaviorUuid;
@@ -28,27 +32,27 @@ public class BehaviorProfile {
     public String title;
 
     // for Lights behavior
-    public ArrayList<Boolean> lightStates;
-    public ArrayList<Integer> lightColors;
+//    public ArrayList<Boolean> lightStates;
+//    public ArrayList<Integer> lightColors;
 
     // for I/O behavior
-    public ArrayList<Boolean> ioStates;
-    public ArrayList<Character> ioDirection;
-    public ArrayList<Character> ioSignalType;
-    public ArrayList<Character> ioSignalValue;
+//    public ArrayList<Boolean> ioStates; // T or F
+//    public ArrayList<Character> ioDirection; // I or O
+//    public ArrayList<Character> ioSignalType; // T or P or W
+//    public ArrayList<Character> ioSignalValue; // (type T:) T or F
 
     // for Message
-    public String message;
+//    public String message;
 
     // for Wait behavior
-    public int time;
+//    public int time;
 
     // for Say
-    public String phrase;
+//    public String phrase;
 
     // for Complex
     public String summary;
-    public ArrayList<BehaviorProfile> behaviorProfiles;
+    public ArrayList<EventManager> eventManagers;
 
     public static int DEFAULT_TYPE = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
 
@@ -59,26 +63,28 @@ public class BehaviorProfile {
     public boolean hasFocus = false;
 
     public boolean repeat = false;
+    public String transform;
 
     // default constructor
-    public BehaviorProfile() {
+    public EventManager() {
         this("Title", "Subtitle", DEFAULT_TYPE);
     }
 
-    public BehaviorProfile(Behavior behavior) {
+    public EventManager(Behavior behavior) {
 
         // Get behavior type
-        if (behavior.getTitle().equals("lights")) {
+        if (behavior.getTag().equals("lights")) {
             this.type = TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT;
-        } else if (behavior.getTitle().equals("io")) {
+        } else if (behavior.getTag().equals("io")) {
             this.type = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
-        } else if (behavior.getTitle().equals("message")) {
+        } else if (behavior.getTag().equals("message")) {
             this.type = TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT;
-        } else if (behavior.getTitle().equals("wait")) {
+        } else if (behavior.getTag().equals("wait")) {
             this.type = TimelineUnitAdapter.WAIT_CONTROL_LAYOUT;
-        } else if (behavior.getTitle().equals("say")) {
+        } else if (behavior.getTag().equals("say")) {
             this.type = TimelineUnitAdapter.SAY_CONTROL_LAYOUT;
         }
+        initializeType();
 
         // Get behavior UUID
         this.behaviorUuid = behavior.getUuid();
@@ -89,7 +95,7 @@ public class BehaviorProfile {
     }
 
     // main constructor
-    public BehaviorProfile(String title, String subTitle, int type) {
+    public EventManager(String title, String subTitle, int type) {
         super();
 
         // Assign instance UUID to the list item
@@ -97,8 +103,29 @@ public class BehaviorProfile {
 
         // Set parameters
         this.title = title;
-        this.message = subTitle;
+//        this.message = subTitle;
         this.type = type;
+
+        // Initialize
+        this.selected = false;
+
+        // Initialize type
+        initializeType();
+    }
+
+    // main constructor
+    public EventManager(Behavior behavior, int layoutType) {
+        super();
+
+        // Assign instance UUID to the list item
+        this.uuid = UUID.randomUUID();
+
+        this.behaviorUuid = behavior.getUuid();
+        this.behavior = behavior;
+
+        // Set parameters
+        this.title = behavior.getTag();
+        this.type = layoutType;
 
         // Initialize
         this.selected = false;
@@ -112,49 +139,50 @@ public class BehaviorProfile {
     }
 
     private void initializeType() {
+
         if (this.type == TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT) {
 
-            // Initialize light states to false (off)
-            lightStates = new ArrayList<>();
-            for (int i = 0; i < 12; i++) {
-                lightStates.add(false);
-            }
+//            // Initialize light states to false (off)
+//            lightStates = new ArrayList<>();
+//            for (int i = 0; i < 12; i++) {
+//                lightStates.add(false);
+//            }
 
-            // Initialize light color to blue
-            lightColors = new ArrayList<>();
-            for (int i = 0; i < 12; i++) {
-                lightColors.add(Color.rgb(0, 0, 255));
-            }
+//            // Initialize light color to blue
+//            lightColors = new ArrayList<>();
+//            for (int i = 0; i < 12; i++) {
+//                lightColors.add(Color.rgb(0, 0, 255));
+//            }
 
         } else if (this.type == TimelineUnitAdapter.IO_CONTROL_LAYOUT) {
 
-            // Initialize I/O states to false (off)
-            ioStates = new ArrayList<>();
-            ioDirection = new ArrayList<>();
-            ioSignalType = new ArrayList<>();
-            ioSignalValue = new ArrayList<>();
-            for (int i = 0; i < 12; i++) {
-                ioStates.add(false);
-                ioDirection.add('I');
-                ioSignalType.add('T');
-                ioSignalValue.add('L');
-            }
+//            // Initialize I/O states to false (off)
+//            ioStates = new ArrayList<>();
+//            ioDirection = new ArrayList<>();
+//            ioSignalType = new ArrayList<>();
+//            ioSignalValue = new ArrayList<>();
+//            for (int i = 0; i < 12; i++) {
+//                ioStates.add(false);
+//                ioDirection.add('I');
+//                ioSignalType.add('T');
+//                ioSignalValue.add('L');
+//            }
 
         } else if (this.type == TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT) {
 
-            message = "hello";
+//            message = "hello";
 
         } else if (this.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
 
-            this.time = 250;
+//            this.time = 250;
 
         } else if (this.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
 
-            phrase = "oh, that's great";
+//            phrase = "oh, that's great";
 
         } else if (this.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
 
-            behaviorProfiles = new ArrayList<>();
+            eventManagers = new ArrayList<>();
             summary = "invalid complex layout";
 
         }
@@ -162,6 +190,6 @@ public class BehaviorProfile {
 
     // String representation
     public String toString() {
-        return this.title + " : " + this.message;
+        return this.title;
     }
 }
