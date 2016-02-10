@@ -25,6 +25,9 @@ import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.system.Behavior;
+import camp.computer.clay.system.BehaviorState;
+import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.Unit;
 
 public class TimelineListView extends ListView {
@@ -33,7 +36,7 @@ public class TimelineListView extends ListView {
     private static final boolean HIDE_ABSTRACT_OPTION = true;
 
     private TimelineUnitAdapter adapter;
-    private ArrayList<BehaviorProfile> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
+    private ArrayList<EventManager> data; // The data to display in _this_ ListView. This has to be repopulated on initialization.
     public Unit unit;
 
     public TimelineListView(Context context) {
@@ -68,37 +71,39 @@ public class TimelineListView extends ListView {
         initTouchListeners();
     }
 
-    public void setData (ArrayList<BehaviorProfile> behaviorProfiles) {
+    public void setData (ArrayList<EventManager> eventManagers) {
         this.data.clear();
         this.adapter.notifyDataSetChanged();
 
         // create some objects... and add them into the array list
         if (!TimelineListView.HIDE_ABSTRACT_OPTION) {
-            this.data.add(new BehaviorProfile("abstract", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+            this.data.add(new EventManager("abstract", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
         }
 
-//        this.data.addAll(behaviorProfiles);
-        for (BehaviorProfile behaviorProfile : behaviorProfiles) {
-            switch (behaviorProfile.type) {
-                case TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT:
-                    this.data.add(new BehaviorProfile("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
-                    break;
-                case TimelineUnitAdapter.IO_CONTROL_LAYOUT:
-                    this.data.add(new BehaviorProfile("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
-                    break;
-                case TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT:
-                    this.data.add(new BehaviorProfile("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
-                    break;
-                case TimelineUnitAdapter.WAIT_CONTROL_LAYOUT:
-                    this.data.add(new BehaviorProfile("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
-                    break;
-                case TimelineUnitAdapter.SAY_CONTROL_LAYOUT:
-                    this.data.add(new BehaviorProfile("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT));
-                    break;
-            }
+//        this.data.addAll(eventManagers);
+        for (EventManager eventManager : eventManagers) {
+            this.data.add(new EventManager(eventManager.getBehavior()));
+//            switch (eventManager.type) {
+//                case TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT:
+//                    this.data.add(new EventManager("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
+//                    break;
+//                case TimelineUnitAdapter.IO_CONTROL_LAYOUT:
+//                    this.data.add(new EventManager("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
+//                    break;
+//                case TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT:
+//                    this.data.add(new EventManager("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
+//                    break;
+//                case TimelineUnitAdapter.WAIT_CONTROL_LAYOUT:
+//                    this.data.add(new EventManager("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
+//                    break;
+//                case TimelineUnitAdapter.SAY_CONTROL_LAYOUT:
+////                    EventManager behaviorEventManager = new EventManager("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT);
+//                    this.data.add(new EventManager(eventManager.getBehavior()));
+//                    break;
+//            }
         }
 
-        this.data.add(new BehaviorProfile("create", "", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+        this.data.add(new EventManager("create", "", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
 
         this.adapter.notifyDataSetChanged();
     }
@@ -111,23 +116,23 @@ public class TimelineListView extends ListView {
         // TODO: Observe remote data source and update cached source and notify ListView when data set changes.
 
         // setup the data source
-        this.data = new ArrayList<BehaviorProfile>();
+        this.data = new ArrayList<EventManager>();
 
         // create some objects... and add them into the array list
         if (!TimelineListView.HIDE_ABSTRACT_OPTION) {
-            this.data.add(new BehaviorProfile("abstract", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+            this.data.add(new EventManager("abstract", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
         }
 
-        // this.data.add(new BehaviorProfile("view", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+        // this.data.add(new EventManager("view", "Subtitle", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
 
         // Basic behaviors
-//        this.data.add(new BehaviorProfile("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
-//        this.data.add(new BehaviorProfile("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
-//        this.data.add(new BehaviorProfile("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
-//        this.data.add(new BehaviorProfile("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
-//        this.data.add(new BehaviorProfile("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT));
+//        this.data.add(new EventManager("lights", "", TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT));
+//        this.data.add(new EventManager("io", "", TimelineUnitAdapter.IO_CONTROL_LAYOUT));
+//        this.data.add(new EventManager("message", "turn lights on", TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT));
+//        this.data.add(new EventManager("wait", "500 ms", TimelineUnitAdapter.WAIT_CONTROL_LAYOUT));
+//        this.data.add(new EventManager("say", "oh, that's great", TimelineUnitAdapter.SAY_CONTROL_LAYOUT));
 
-        this.data.add(new BehaviorProfile("create", "", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
+        this.data.add(new EventManager("create", "", TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT));
     }
 
     private void initLayout() {
@@ -149,7 +154,7 @@ public class TimelineListView extends ListView {
      *
      * @param item
      */
-    private void addData (BehaviorProfile item) {
+    private void addData (EventManager item) {
         if (adapter != null) {
             data.add(data.size() - 1, item);
             refreshListViewFromData();
@@ -164,7 +169,7 @@ public class TimelineListView extends ListView {
         adapter.notifyDataSetChanged();
     }
 
-    private void displayListItemOptions(final BehaviorProfile item) {
+    private void displayListItemOptions(final EventManager item) {
         int basicBehaviorCount = 3;
         final String[] behaviorOptions = new String[basicBehaviorCount];
         // loop, condition, branch
@@ -220,7 +225,7 @@ public class TimelineListView extends ListView {
         alert.show();
     }
 
-    public void displayUpdateOptions(final BehaviorProfile item) {
+    public void displayUpdateOptions(final EventManager item) {
 
         if (item.type == TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT) {
             displayUpdateLightsOptions(item);
@@ -238,7 +243,7 @@ public class TimelineListView extends ListView {
 
     }
 
-    public void displayUpdateLightsOptions(final BehaviorProfile item) {
+    public void displayUpdateLightsOptions(final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Change the channel.");
         builder.setMessage ("What do you want to do?");
@@ -264,8 +269,13 @@ public class TimelineListView extends ListView {
             toggleButton.setTextOn(channelLabel);
             toggleButton.setTextOff(channelLabel);
 
+            // Get the behavior state
+            String lightStateString = item.getBehavior().getState().getState();
+
+            String[] lightStates = lightStateString.split(" ");
+
             // Recover configuration options for event
-            if (item.lightStates.get(i) == true) {
+            if (lightStates[i].equals("T")) {
                 toggleButton.setChecked(true);
             } else {
                 toggleButton.setChecked(false);
@@ -289,7 +299,9 @@ public class TimelineListView extends ListView {
             @Override
             public void onClick (DialogInterface dialog, int which) {
 
-                String transformString = "apply ";
+                String transformString = "";
+
+//                String[] lightStates = new String[12];
 
                 for (int i = 0; i < 12; i++) {
 
@@ -299,10 +311,12 @@ public class TimelineListView extends ListView {
 
                     if (lightEnableButton.isChecked ()) {
                         transformString = transformString.concat ("T");
-                        item.lightStates.set(i, true);
+//                        item.lightStates.set(i, true);
+//                        lightStates[i] = "T";
                     } else {
                         transformString = transformString.concat ("F");
-                        item.lightStates.set(i, false);
+//                        item.lightStates.set(i, false);
+//                        lightStates[i] = "F";
                     }
                     // transformString = transformString.concat (","); // Add comma
 
@@ -314,7 +328,28 @@ public class TimelineListView extends ListView {
                     }
                 }
 
-                // TODO: Store the state of the lights in the object associated with the BehaviorProfile
+                // Notify the behavior manager of the change (add it to the transform queue)
+//                item.transform = transformString;
+                //item.getBehaviorManager().getBehavior().applyTransform(transformString);
+                // item.getBehaviorManager().applyTransform(transformString);
+
+                // Update the behavior state
+                BehaviorState behaviorState = new BehaviorState(item.getBehavior(), item.getBehavior().getTag(), transformString);
+                item.getBehavior().setState(behaviorState);
+
+                // TODO: Store the state of the lights in the object associated with the EventManager
+                // Create a new behavior and get the UUID for the behavior...
+//                String behaviorConstructUuid = UUID.randomUUID().toString()
+////                String commandString = item.transform;
+//                String messageString = "create behavior " + behaviorConstructUuid + " \"" + transformString + "\"";
+//                unit.send (messageString);
+
+                // TODO: (1) item.updateBehavior() : item is a TimelineEventManager that updates the managed behavior
+                // TODO: (2) after updating the behavior, the manager sends update as a message to the corresponding unit (via TimelineManager?)
+
+                // ...then add it to the device.
+                String behaviorUuid = item.getBehavior().toString();
+                unit.send ("update behavior " + behaviorUuid + " \"" + item.transform + "\"");
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -330,7 +365,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    public void displayUpdateIOOptions2 (final BehaviorProfile item) {
+    public void displayUpdateIOOptions2 (final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("I/O");
 
@@ -407,7 +442,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    public void displayUpdateIOOptions (final BehaviorProfile item) {
+    public void displayUpdateIOOptions (final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Change the channel.");
         builder.setMessage ("What do you want to do?");
@@ -432,6 +467,10 @@ public class TimelineListView extends ListView {
         channelEnabledLabel.setPadding(70, 20, 70, 20);
         transformLayout.addView(channelEnabledLabel);
 
+        // Get behavior state
+        String stateString = item.getBehavior().getState().getState();
+        final String[] ioStates = stateString.split(" ");
+
         LinearLayout channelEnabledLayout = new LinearLayout (getContext());
         channelEnabledLayout.setOrientation(LinearLayout.HORIZONTAL);
         for (int i = 0; i < 12; i++) {
@@ -443,8 +482,11 @@ public class TimelineListView extends ListView {
             toggleButton.setTextOn(channelLabel);
             toggleButton.setTextOff (channelLabel);
 
-            // Recover configuration options from event
-            if (item.ioStates.get(i) == true) {
+            // Get behavior state for channel
+            char ioState = ioStates[i].charAt(0);
+
+            // Update view
+            if (ioState == 'T') {
                 toggleButton.setChecked(true);
             } else {
                 toggleButton.setChecked(false);
@@ -474,9 +516,15 @@ public class TimelineListView extends ListView {
             toggleButton.setPadding(0, 0, 0, 0);
 //            toggleButton.setBackgroundColor(Color.TRANSPARENT);
 
-            // Recover configuration options from event
-            if (item.ioStates.get(i) == true) {
-                toggleButton.setText("" + item.ioDirection.get(i));
+            // Get behavior state for channel
+            char ioState = ioStates[i].charAt(0);
+            char ioDirectionState = ioStates[i].charAt(1);
+            char ioSignalTypeState = ioStates[i].charAt(2);
+            char ioSignalValueState = ioStates[i].charAt(3);
+
+            // Update view
+            if (ioState == 'T') {
+                toggleButton.setText("" + ioDirectionState);
                 toggleButton.setEnabled(true);
             } else {
                 toggleButton.setText(" ");
@@ -507,9 +555,15 @@ public class TimelineListView extends ListView {
             toggleButton.setPadding (0, 0, 0, 0);
 //            toggleButton.setBackgroundColor(Color.TRANSPARENT);
 
+            // Get behavior state for channel
+            char ioState = ioStates[i].charAt(0);
+            char ioDirectionState = ioStates[i].charAt(1);
+            char ioSignalTypeState = ioStates[i].charAt(2);
+            char ioSignalValueState = ioStates[i].charAt(3);
+
             // Recover configuration options from event
-            if (item.ioStates.get(i) == true) {
-                toggleButton.setText("" + item.ioSignalType.get(i));
+            if (ioState == 'I') {
+                toggleButton.setText("" + ioSignalTypeState);
                 toggleButton.setEnabled(true);
             } else {
                 toggleButton.setText(" ");
@@ -544,9 +598,15 @@ public class TimelineListView extends ListView {
             channelValueToggleButtons.add(toggleButton); // Add the button to the list.
             channelValueLayout.addView(toggleButton);
 
+            // Get behavior state for channel
+            char ioState = ioStates[i].charAt(0);
+            char ioDirectionState = ioStates[i].charAt(1);
+            char ioSignalTypeState = ioStates[i].charAt(2);
+            char ioSignalValueState = ioStates[i].charAt(3);
+
             // Recover configuration options from event
-            if (item.ioStates.get(i) == true && item.ioSignalType.get(i) == 'T') {
-                if (item.ioSignalValue.get(i) == 'H') {
+            if (ioState == 'T' && ioSignalTypeState == 'T') {
+                if (ioSignalValueState == 'H') {
                     toggleButton.setEnabled(true);
                     toggleButton.setChecked(true);
                 } else {
@@ -766,7 +826,7 @@ public class TimelineListView extends ListView {
 
             @Override
             public void onClick (DialogInterface dialog, int which) {
-                String transformString = "apply ";
+                String transformString = "";
 
                 for (int i = 0; i < 12; i++) {
 
@@ -777,12 +837,19 @@ public class TimelineListView extends ListView {
 
                     // Channel enable. Is the channel enabled?
 
+                    // Get behavior state for channel
+                    char ioState = ioStates[i].charAt(0);
+                    char ioDirectionState = ioStates[i].charAt(1);
+                    char ioSignalTypeState = ioStates[i].charAt(2);
+                    char ioSignalValueState = ioStates[i].charAt(3);
+
+                    // Update the view
                     if (channelEnableButton.isChecked ()) {
                         transformString = transformString.concat ("T");
-                        item.ioStates.set(i, true);
+//                        item.ioStates.set(i, true);
                     } else {
                         transformString = transformString.concat ("F");
-                        item.ioStates.set(i, false);
+//                        item.ioStates.set(i, false);
                     }
                     // transformString = transformString.concat (","); // Add comma
 
@@ -791,11 +858,11 @@ public class TimelineListView extends ListView {
                     if (channelDirectionButton.isEnabled ()) {
                         String channelDirectionString = channelDirectionButton.getText ().toString ();
                         transformString = transformString.concat (channelDirectionString);
-                        item.ioDirection.set(i, channelDirectionString.charAt(0));
+//                        item.ioDirection.set(i, channelDirectionString.charAt(0));
                     } else {
                         String channelDirectionString = channelDirectionButton.getText ().toString ();
                         transformString = transformString.concat ("-");
-                        item.ioDirection.set(i, channelDirectionString.charAt(0));
+//                        item.ioDirection.set(i, channelDirectionString.charAt(0));
                     }
                     // transformString = transformString.concat (","); // Add comma
 
@@ -804,11 +871,11 @@ public class TimelineListView extends ListView {
                     if (channelModeButton.isEnabled ()) {
                         String channelModeString = channelModeButton.getText ().toString ();
                         transformString = transformString.concat (channelModeString);
-                        item.ioSignalType.set(i, channelModeString.charAt(0));
+//                        item.ioSignalType.set(i, channelModeString.charAt(0));
                     } else {
                         String channelModeString = channelModeButton.getText ().toString ();
                         transformString = transformString.concat ("-");
-                        item.ioSignalType.set(i, channelModeString.charAt(0));
+//                        item.ioSignalType.set(i, channelModeString.charAt(0));
                     }
 
                     // Channel value.
@@ -817,11 +884,11 @@ public class TimelineListView extends ListView {
                     if (channelValueToggleButton.isEnabled ()) {
                         String channelValueString = channelValueToggleButton.getText ().toString ();
                         transformString = transformString.concat (channelValueString);
-                        item.ioSignalValue.set(i, channelValueString.charAt(0));
+//                        item.ioSignalValue.set(i, channelValueString.charAt(0));
                     } else {
                         String channelValueString = channelValueToggleButton.getText ().toString ();
                         transformString = transformString.concat ("-");
-                        item.ioSignalValue.set(i, channelValueString.charAt(0));
+//                        item.ioSignalValue.set(i, channelValueString.charAt(0));
                     }
 
                     // Add space between channel states.
@@ -829,6 +896,14 @@ public class TimelineListView extends ListView {
                         transformString = transformString.concat (" ");
                     }
                 }
+
+                // Update the behavior state
+                BehaviorState behaviorState = new BehaviorState(item.getBehavior(), item.getBehavior().getTag(), transformString);
+                item.getBehavior().setState(behaviorState);
+
+                // ...then add it to the device.
+                String behaviorUuid = item.getBehavior().toString();
+                unit.send("update behavior " + behaviorUuid + " \"" + item.getBehavior().getState().getState() + "\"");
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -848,7 +923,7 @@ public class TimelineListView extends ListView {
      * Update's the tag (or label) of a timeline view.
      * @param item
      */
-    public void displayUpdateTagOptions(final BehaviorProfile item) {
+    public void displayUpdateTagOptions(final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Tag the view.");
 
@@ -871,11 +946,15 @@ public class TimelineListView extends ListView {
                 item.title = input.getText().toString();
 
                 // TODO: Update the corresponding behavior state... this should propagate back through the object model... and cloud...
-//                item.getBehavior().setTitle(input.getText().toString())
-//                item.getBehavior().setTitle(input.getText().toString());
+//                item.getBehavior().setTag(input.getText().toString())
+//                item.getBehavior().setTag(input.getText().toString());
 
                 // Send changes to unit
+                // TODO: "create behavior (...)"
                 unit.send (input.getText().toString());
+
+                // Transformations:
+                // "apply TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL"
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -891,7 +970,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    public void displayUpdateMessageOptions(final BehaviorProfile item) {
+    public void displayUpdateMessageOptions(final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("what's the message?");
 
@@ -901,8 +980,11 @@ public class TimelineListView extends ListView {
         input.setInputType(InputType.TYPE_CLASS_TEXT);//input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);
 
-        // Recover values
-        input.setText(item.message);
+        // Get the behavior state
+        String message = item.getBehavior().getState().getState();
+
+        // Update the view
+        input.setText(message);
         input.setSelection(input.getText().length());
 
         // Set up the buttons
@@ -911,7 +993,11 @@ public class TimelineListView extends ListView {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Update the behavior profile state
-                item.message = input.getText().toString();
+                String stateString = input.getText().toString();
+
+                // Update the behavior state
+                BehaviorState behaviorState = new BehaviorState(item.getBehavior(), item.getBehavior().getTag(), stateString);
+                item.getBehavior().setState(behaviorState);
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -927,7 +1013,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    public void displayUpdateSayOptions(final BehaviorProfile item) {
+    public void displayUpdateSayOptions(final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("tell me the behavior");
 
@@ -937,8 +1023,11 @@ public class TimelineListView extends ListView {
         input.setInputType(InputType.TYPE_CLASS_TEXT);//input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         builder.setView(input);
 
-        // Recover configuration options from stored object
-        input.setText(item.phrase);
+        // Get behavior state
+        String phrase = item.getBehavior().getState().getState();
+
+        // Update the view
+        input.setText(phrase);
         input.setSelection(input.getText().length());
 
         // Set up the buttons
@@ -947,7 +1036,12 @@ public class TimelineListView extends ListView {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Save configuration options to object
-                item.phrase = input.getText().toString();
+//                item.phrase = input.getText().toString();
+
+                String stateString = input.getText().toString();
+
+                BehaviorState behaviorState = new BehaviorState(item.getBehavior(), item.getBehavior().getTag(), stateString);
+                item.getBehavior().setState(behaviorState);
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -963,7 +1057,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    public void displayUpdateWaitOptions(final BehaviorProfile item) {
+    public void displayUpdateWaitOptions(final EventManager item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Time Transform");
         builder.setMessage("How do you want to change time?");
@@ -981,30 +1075,33 @@ public class TimelineListView extends ListView {
         waitVal.setMax(1000);
         waitVal.setHapticFeedbackEnabled(true); // TODO: Emulate this in the custom interface
 
-        // Recover configuration for event
-        waitLabel.setText ("Wait (" + item.time + " ms)");
-        waitVal.setProgress(item.time);
+        // Get the behavior state
+        int time = Integer.parseInt(item.getBehavior().getState().getState());
 
-        waitVal.setOnSeekBarChangeListener (new SeekBar.OnSeekBarChangeListener () {
+        // Update the view
+        waitLabel.setText ("Wait (" + time + " ms)");
+        waitVal.setProgress(time);
+
+        waitVal.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
-                waitLabel.setText ("Wait (" + progress + " ms)");
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                waitLabel.setText("Wait (" + progress + " ms)");
             }
 
             @Override
-            public void onStartTrackingTouch (SeekBar seekBar) {
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
 
             @Override
-            public void onStopTrackingTouch (SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
         });
-        transformLayout.addView (waitVal);
+        transformLayout.addView(waitVal);
 
         // Assign the layout to the alert dialog.
-        builder.setView (transformLayout);
+        builder.setView(transformLayout);
 
         // Set up the buttons
         builder.setPositiveButton ("DONE", new DialogInterface.OnClickListener () {
@@ -1018,11 +1115,12 @@ public class TimelineListView extends ListView {
 //                transformString = transformString.concat (Integer.toString (waitVal.getProgress ()));
 //                Hack_TimeTransformTitle = transformString;
 //                Behavior behavior = new Behavior ("time");
-//                behavior.setTransform(Hack_TimeTransformTitle);
+//                behavior.setDefaultState(Hack_TimeTransformTitle);
 //                BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective);
 //                behaviorConstruct.setBehavior(behavior);
 //                perspective.addBehaviorConstruct(behaviorConstruct);
-                item.time = waitVal.getProgress ();
+                BehaviorState behaviorState = new BehaviorState (item.getBehavior(), item.getBehavior().getTag(), "" + waitVal.getProgress());
+                item.getBehavior().setState(behaviorState);
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -1038,7 +1136,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    private void selectListItem (final BehaviorProfile item) {
+    private void selectListItem (final EventManager item) {
 
         // Do not select system controllers
         if (item.type == TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT || item.type == TimelineUnitAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
@@ -1053,7 +1151,7 @@ public class TimelineListView extends ListView {
 
     }
 
-    private void deselectListItem (final BehaviorProfile item) {
+    private void deselectListItem (final EventManager item) {
 
         // Update state of the object associated with the selected view.
         if (item.selected == true) {
@@ -1062,21 +1160,21 @@ public class TimelineListView extends ListView {
 
     }
 
-    private void stepListItem(BehaviorProfile item) {
+    private void stepListItem(EventManager item) {
 
         if (item.repeat == true) {
             item.repeat = false;
         }
     }
 
-    private void repeatListItem(BehaviorProfile item) {
+    private void repeatListItem(EventManager item) {
 
         if (item.repeat == false) {
             item.repeat = true;
         }
     }
 
-    private void deleteListItem (final BehaviorProfile item) {
+    private void deleteListItem (final EventManager item) {
 
         // Update state of the object associated with the selected view.
         data.remove(item);
@@ -1086,17 +1184,25 @@ public class TimelineListView extends ListView {
 
     }
 
-    private void selectBehaviorType (final BehaviorProfile item) {
-        int basicBehaviorCount = 5;
-        final String[] basicBehaviors = new String[basicBehaviorCount];
+    private void selectBehaviorType (final EventManager item) {
+
         // loop, condition, branch
-        basicBehaviors[0] = "lights";
-        basicBehaviors[1] = "io";
-        basicBehaviors[2] = "message"; // send, look for, wait for
-        basicBehaviors[3] = "wait"; // time
-        basicBehaviors[4] = "say";
+//        basicBehaviors[0] = "lights";
+//        basicBehaviors[1] = "io";
+//        basicBehaviors[2] = "message"; // send, look for, wait for
+//        basicBehaviors[3] = "wait"; // time
+//        basicBehaviors[4] = "say";
         // cause/effect (i.e., condition)
         // HTTP API interface (general wrapper, with authentication options)
+
+        // Display the behaviors available for selection, starting with basic, cached, public.
+        int basicBehaviorCount = unit.getClay().getBehaviorCacheManager().getCachedBehaviors().size();
+        final String[] basicBehaviors = new String[basicBehaviorCount];
+
+        for (int i = 0; i < basicBehaviorCount; i++) {
+            Behavior cachedBehavior = unit.getClay().getBehaviorCacheManager().getCachedBehaviors().get(i);
+            basicBehaviors[i] = cachedBehavior.getTag();
+        }
 
         // Show the list of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -1104,6 +1210,18 @@ public class TimelineListView extends ListView {
         builder.setItems(basicBehaviors, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int itemIndex) {
 
+//                String selectedBehaviorType = basicBehaviors[itemIndex].toString();
+//                changeItemType(item, selectedBehaviorType);
+                Behavior selectedBehavior = getClay().getBehaviorCacheManager().getCachedBehaviors().get(itemIndex);
+                Log.v("Change_Behavior", "to " + selectedBehavior.getUuid());
+                Log.v("Change_Behavior", "from:");
+                for (Behavior cb : getClay().getBehaviorCacheManager().getCachedBehaviors()) {
+                    Log.v("Change_Behavior", "\t" + cb.getUuid().toString());
+                }
+
+                changeItemType (item, selectedBehavior.getUuid().toString());
+
+                /*
                 if (basicBehaviors[itemIndex].toString().equals("lights")) {
 
                     changeItemType(item, TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT);
@@ -1125,6 +1243,7 @@ public class TimelineListView extends ListView {
                     changeItemType (item, TimelineUnitAdapter.SAY_CONTROL_LAYOUT);
 
                 }
+                */
 
                 refreshListViewFromData();
             }
@@ -1133,12 +1252,90 @@ public class TimelineListView extends ListView {
         alert.show();
     }
 
+    private Clay getClay () {
+        return unit.getClay();
+    }
+
     /**
      * Changes the specified item's type to the specified type.
      * @param item
      * @param layoutType
      */
-    private void changeItemType (final BehaviorProfile item, int layoutType) {
+    private void changeItemType (final EventManager item, String behaviorUuid) {
+
+        // <HACK>
+        // This removes the specified item from the list and replaces it with an item of a specific type.
+        // TODO: Update the behavior object referenced by data, and update the view accordingly (i.e., item.behavior = <new behavior> then retrieve view for that behavior type).
+        int index = data.indexOf(item);
+        data.remove(index);
+        refreshListViewFromData();
+
+        // TODO: Remove the current item from the unit by UUID: unit.removeBehavior(oldUuid);
+
+        // Get the behavior from the behavior repository
+        Behavior behavior = getClay().getBehavior(behaviorUuid);
+
+        // TODO: Automatically generate or retrieve layouts dynamically based on UUID here based on behavior data model, rather than referencing them as stored in XML.
+        int layoutType = -1;
+        if (behavior.getTag().equals("lights")) {
+            layoutType = TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT;
+        } else if (behavior.getTag().equals("io")) {
+            layoutType = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
+        } else if (behavior.getTag().equals("wait")) {
+            layoutType = TimelineUnitAdapter.WAIT_CONTROL_LAYOUT;
+        } else if (behavior.getTag().equals("message")) {
+            layoutType = TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT;
+        } else if (behavior.getTag().equals("say")) {
+            layoutType = TimelineUnitAdapter.SAY_CONTROL_LAYOUT;
+        }
+
+//        // Get the title for the new item
+//        String title = "";
+//        switch (layoutType) {
+//            case TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT:
+//                title = "lights";
+//                break;
+//            case TimelineUnitAdapter.IO_CONTROL_LAYOUT:
+//                title = "io";
+//                break;
+//            case TimelineUnitAdapter.WAIT_CONTROL_LAYOUT:
+//                title = "wait";
+//                break;
+//            case TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT:
+//                title = "message";
+//                break;
+//            case TimelineUnitAdapter.SAY_CONTROL_LAYOUT:
+//                title = "say";
+//                break;
+//            default:
+//                title = "";
+//                break;
+//        }
+
+        // Create and add the new item to the timeline
+        EventManager replacementItem = new EventManager (behavior, layoutType);
+
+//        // Create or request behavior and cache it for likely use in the near future
+//        // TODO: Move this to Clay object model so it's architecture agnostic
+////        String behaviorUuid = replacementItem.behaviorUuid.toString();
+//        String defaultTransform = "lights F F F F F F F F F F F F";
+//        String messageString = "create behavior " + behaviorUuid + " \"" + defaultTransform + "\"";
+//        unit.send(messageString);
+//        unit.send("add behavior " + behaviorUuid);
+//        unit.createBehavior (behavior);
+//        unit.addBeahvior (behavior);
+
+        data.add(index, replacementItem);
+
+        // </HACK>
+    }
+
+    /**
+     * Changes the specified item's type to the specified type.
+     * @param item
+     * @param layoutType
+     */
+    private void changeItemType (final EventManager item, int layoutType) {
 
         // <HACK>
         // This removes the specified item from the list and replaces it with an item of a specific type.
@@ -1170,9 +1367,19 @@ public class TimelineListView extends ListView {
                 break;
         }
 
-        // Create and add the new item
-        BehaviorProfile replacementItem = new BehaviorProfile(title, "", layoutType);
+        // Create and add the new item to the timeline
+        EventManager replacementItem = new EventManager(title, "", layoutType);
+
+        // Create or request behavior and cache it for likely use in the near future
+        // TODO: Move this to Clay object model so it's architecture agnostic
+        String behaviorUuid = replacementItem.behaviorUuid.toString();
+        String defaultTransform = "lights F F F F F F F F F F F F";
+        String messageString = "create behavior " + behaviorUuid + " \"" + defaultTransform + "\"";
+        unit.send(messageString);
+        unit.send ("add behavior " + behaviorUuid);
+
         data.add(index, replacementItem);
+
         // </HACK>
     }
 
@@ -1201,7 +1408,7 @@ public class TimelineListView extends ListView {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-            final BehaviorProfile item = (BehaviorProfile) data.get (position);
+            final EventManager item = (EventManager) data.get (position);
 
             // Check if the list item was a constructor
             if (item.type == TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT) {
@@ -1215,10 +1422,12 @@ public class TimelineListView extends ListView {
                 if (item.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
 
                     unabstractSelectedItem (item);
+                    return true;
 
                 } else {
 
                     displayListItemOptions (item);
+                    return true;
 
                 }
 
@@ -1246,7 +1455,7 @@ public class TimelineListView extends ListView {
         {
             Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
 
-            final BehaviorProfile item = (BehaviorProfile) data.get (position);
+            final EventManager item = (EventManager) data.get (position);
 
             // Check if the list item was a constructor
             if (item.type == TimelineUnitAdapter.SYSTEM_CONTROL_LAYOUT) {
@@ -1258,7 +1467,10 @@ public class TimelineListView extends ListView {
                         String subtitle = "";
                         int type = TimelineUnitAdapter.CONTROL_PLACEHOLDER_LAYOUT;
 
-                        addData(new BehaviorProfile(title, subtitle, type));
+                        // Add the behavior to the timeline
+                        addData(new EventManager(title, subtitle, type));
+
+                        // TODO: (?) Create a behavior?
                     }
                 } else if (item.title == "abstract") {
 
@@ -1272,7 +1484,9 @@ public class TimelineListView extends ListView {
 
             } else {
 
-                displayUpdateOptions (item);
+                if (!hasSelectedItems()) {
+                    displayUpdateOptions(item);
+                }
 
             }
 
@@ -1285,7 +1499,7 @@ public class TimelineListView extends ListView {
      * @return
      */
     private boolean hasPlaceholder() {
-        for (BehaviorProfile existingItem : data) {
+        for (EventManager existingItem : data) {
             if (existingItem.type == TimelineUnitAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
                 return true;
             }
@@ -1293,35 +1507,51 @@ public class TimelineListView extends ListView {
         return false;
     }
 
+    /**
+     * Checks if there are any selected items on the timeline.
+     * @return True if there are any selected items. Otherwise, returns false.
+     */
+    public boolean hasSelectedItems() {
+        for (EventManager eventManager : this.data) {
+            if (eventManager.selected) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Creates a behavior composition from multiple selected behaviors.
+     */
     public void abstractSelectedItems() {
 
         int index = 0;
 
         // Get list of the selected items
-        ArrayList<BehaviorProfile> selectedBehaviorProfiles = new ArrayList<>();
+        ArrayList<EventManager> selectedEventManagers = new ArrayList<>();
         ArrayList<String> selectedListItemLabels = new ArrayList<>();
-        for (BehaviorProfile behaviorProfile : this.data) {
-            if (behaviorProfile.selected) {
-                behaviorProfile.selected = false; // Deselect the item about to be abstracted
-                selectedBehaviorProfiles.add(behaviorProfile);
-                selectedListItemLabels.add(behaviorProfile.title);
+        for (EventManager eventManager : this.data) {
+            if (eventManager.selected) {
+                eventManager.selected = false; // Deselect the item about to be abstracted
+                selectedEventManagers.add(eventManager);
+                selectedListItemLabels.add(eventManager.title);
             }
-            if (selectedBehaviorProfiles.size() == 0) {
+            if (selectedEventManagers.size() == 0) {
                 index++;
             }
         }
 
         // Return if there are fewer than two selected items
-        if (selectedBehaviorProfiles.size() < 2) {
+        if (selectedEventManagers.size() < 2) {
             return;
         }
 
         // Get the first item in the sequence
-        BehaviorProfile item = selectedBehaviorProfiles.get(0);
+        EventManager item = selectedEventManagers.get(0);
 
         // Remove the selected items from the list
-        for (BehaviorProfile behaviorProfile : selectedBehaviorProfiles) {
-            data.remove(behaviorProfile);
+        for (EventManager eventManager : selectedEventManagers) {
+            data.remove(eventManager);
         }
         refreshListViewFromData(); // Update view after removing items from the list
 
@@ -1334,9 +1564,9 @@ public class TimelineListView extends ListView {
 //        data.remove(index);
         // Add the new item.
         String behaviorListString = TextUtils.join(", ", selectedListItemLabels);
-        BehaviorProfile replacementItem = new BehaviorProfile("complex", "", TimelineUnitAdapter.COMPLEX_LAYOUT);
-        replacementItem.behaviorProfiles.addAll(selectedBehaviorProfiles); // Add the selected items to the list
-        replacementItem.summary = behaviorListString + " (" + selectedBehaviorProfiles.size() + ")";
+        EventManager replacementItem = new EventManager(behaviorListString, "", TimelineUnitAdapter.COMPLEX_LAYOUT);
+        replacementItem.eventManagers.addAll(selectedEventManagers); // Add the selected items to the list
+        replacementItem.summary = "group of " + selectedEventManagers.size();
         data.add(index, replacementItem);
         // </HACK>
 
@@ -1344,7 +1574,7 @@ public class TimelineListView extends ListView {
 
     }
 
-    private void unabstractSelectedItem (BehaviorProfile item) {
+    private void unabstractSelectedItem (EventManager item) {
 
         // Return if the item is not a complex item.
         if (item.type != TimelineUnitAdapter.COMPLEX_LAYOUT) {
@@ -1354,7 +1584,7 @@ public class TimelineListView extends ListView {
         int index = 0;
 
         // Get list of the abstracted items
-        ArrayList<BehaviorProfile> abstractedBehaviorProfiles = item.behaviorProfiles;
+        ArrayList<EventManager> abstractedEventManagers = item.eventManagers;
 
         // Get position of the selected item
         index = data.indexOf(item);
@@ -1364,8 +1594,8 @@ public class TimelineListView extends ListView {
         refreshListViewFromData(); // Update view after removing items from the list
 
         // Add the abstracted items back to the list
-        for (BehaviorProfile behaviorProfile : abstractedBehaviorProfiles) {
-            data.add (index, behaviorProfile);
+        for (EventManager eventManager : abstractedEventManagers) {
+            data.add (index, eventManager);
             index++; // Increment the index of the insertion position
         }
         refreshListViewFromData(); // Update view after removing items from the list
@@ -1378,10 +1608,10 @@ public class TimelineListView extends ListView {
      * @param y
      * @return
      */
-    public BehaviorProfile getListItemAtPosition(int x, int y) {
+    public EventManager getListItemAtPosition(int x, int y) {
         // Get the list item corresponding to the specified touch point
         int position = getViewIndexByPosition(x, y);
-        BehaviorProfile item = (BehaviorProfile) getItemAtPosition(position);
+        EventManager item = (EventManager) getItemAtPosition(position);
         return item;
     }
 
@@ -1442,7 +1672,7 @@ public class TimelineListView extends ListView {
 
         int firstSelectedIndex = -1;
         for (int i = 0; i < data.size(); i++) {
-            BehaviorProfile item = data.get(i);
+            EventManager item = data.get(i);
             if (item.selected) {
                 firstSelectedIndex = i;
                 break;
@@ -1456,7 +1686,7 @@ public class TimelineListView extends ListView {
 
             // The item is the first one selected
             if (index < data.size()) {
-                BehaviorProfile item = (BehaviorProfile) data.get(index);
+                EventManager item = (EventManager) data.get(index);
                 selectListItem(item);
                 refreshListViewFromData();
             }
@@ -1468,12 +1698,12 @@ public class TimelineListView extends ListView {
 
                 // Select all items between the first and current selection
                 for (int i = firstSelectedIndex; i <= index; i++) {
-                    BehaviorProfile item = data.get(i);
+                    EventManager item = data.get(i);
                     selectListItem(item);
                 }
                 // Deselect all items after the current selection
                 for (int i = index + 1; i < data.size(); i++) {
-                    BehaviorProfile item = data.get(i);
+                    EventManager item = data.get(i);
                     deselectListItem(item);
                 }
                 refreshListViewFromData();

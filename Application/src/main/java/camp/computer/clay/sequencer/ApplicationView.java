@@ -149,19 +149,23 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         Clay.setContext(getApplicationContext());
 
         clay = new Clay();
+
+        // Add the view provided by the host device.
         clay.addView(this);
+
+        // TODO: Set up a server to listen for other views.
 
         if (datagramServer == null) {
             datagramServer = new DatagramManager("udp");
         }
 //        datagramServer.startDatagramServer();
-        clay.addMessageManager(this.datagramServer);
+
+        clay.addManager(this.datagramServer);
 
         if (networkResource == null) {
             networkResource = new NetworkResource();
+            clay.addResource(this.networkResource);
         }
-
-        clay.addNetworkResource(this.networkResource);
 
         // Start worker process
         // Start the initial runnable task by posting through the handler
@@ -342,7 +346,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // The Clay unit associated with this fragment.
         private Unit unit;
 
-        private ArrayList<BehaviorProfile> behaviorProfiles;
+        private ArrayList<EventManager> eventManagers;
 
         private TimelineListView listView;
 
@@ -363,7 +367,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // TODO: UnitViewFragment(Unit unit)
         public UnitViewFragment() {
 
-            behaviorProfiles = new ArrayList<BehaviorProfile>();
+            eventManagers = new ArrayList<EventManager>();
 
 //            behaviorEvents.add("hello a");
 //            behaviorEvents.add("hello b");
@@ -386,15 +390,15 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         }
 
         private void createBehaviorProfiles () {
-            behaviorProfiles.clear();
+            eventManagers.clear();
 
             // Create a behavior profile for each of the unit's behaviors
             for (Behavior behavior : this.unit.getTimeline().getBehaviors()) {
-                BehaviorProfile behaviorProfile = new BehaviorProfile(behavior);
-                behaviorProfiles.add(behaviorProfile);
+                EventManager eventManager = new EventManager(behavior);
+                eventManagers.add(eventManager);
             }
 
-            Log.v ("Behavior_Count", "profile count: " + this.behaviorProfiles.size());
+            Log.v ("Behavior_Count", "profile count: " + this.eventManagers.size());
         }
 
         @Override
@@ -419,7 +423,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             // TODO: Create new TimelineUnitAdapter with the data for this tab's unit! (or reuse and repopulate with new data)
 
             // Create behavior profiles for the unit's behaviors and assign the data to the ListView
-            listView.setData(behaviorProfiles);
+            listView.setData(eventManagers);
 
             // <HACK>
             listView.unit = unit;

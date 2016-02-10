@@ -2,7 +2,7 @@ package camp.computer.clay.system;
 
 public interface MessageManagerInterface {
 
-    public void engage (MessageManager messageManager); // formerly, addMessageManager
+    public void engage (MessageManager messageManager); // formerly, addManager
     public MessageManager getMessageManager ();
     public void disengage (MessageManager messageManager); // formerly, removeMessageManager
 

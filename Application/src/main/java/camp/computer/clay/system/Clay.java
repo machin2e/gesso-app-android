@@ -12,101 +12,116 @@ import java.util.UUID;
 
 public class Clay {
 
-    // List of touchscreen viewing devices
-    private ArrayList<ViewManagerInterface> views;
+    // <HACK>
+    // TODO: Move this out of the Clay object model.
+    static private Context context;
+    // </HACK>
 
-    public void addView (ViewManagerInterface view) {
-        this.views.add (view);
-    }
-
-    public ViewManagerInterface getView (int i) {
-        return this.views.get (i);
-    }
-
-    private ArrayList<Unit> units = new ArrayList<Unit>();
-
-    private BehaviorCacheManager behaviorRepository = null;
-
-    // Physical systems
-    private ContentManager database = null;
+    // Resource management systems (e.g., networking, messaging, content)
+    private ContentManager contentManager = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
 
-    static private Context context;
+    // List of discovered touchscreen devices
+    private ArrayList<ViewManagerInterface> views;
 
+    // List of discovered units
+    private ArrayList<Unit> units = new ArrayList<Unit>();
+
+    // List of behaviors cached on this device
+    private BehaviorCacheManager behaviorCacheManager = null;
+
+    // The calendar used by Clay
     private Calendar calendar = Calendar.getInstance (TimeZone.getTimeZone("GMT"));
 
     public Clay() {
 
-        // Create list to store views.
-        this.views = new ArrayList<ViewManagerInterface>();
+        this.views = new ArrayList<ViewManagerInterface>(); // Create list to store views.
+        this.messageManager = new MessageManager (this); // Start the communications systems
+        this.networkManager = new NetworkManager (this); // Start the networking systems
+        this.contentManager = new ContentManager (this); // Start the content management system
 
-        // TODO: throw exception if context is not defined!
-
-        // Start the communications systems
-        this.messageManager = new MessageManager (this);
-
-        // Start the networking systems
-        this.networkManager = new NetworkManager(this);
-
-        // Start the database system
-        this.database = new ContentManager(this);
-
-        // Set up behavior repository
-        this.behaviorRepository = new BehaviorCacheManager(this);
-
-        // TODO: Discover units!
+        this.behaviorCacheManager = new BehaviorCacheManager(this); // Set up behavior repository
     }
 
+    // <HACK>
     // TODO: Move this into Clay, then just reference Clay's platform context.
     public static void setContext (Context context) {
         Clay.context = context;
     }
+    // </HACK>
 
-    private Calendar getCalendar () {
-        return this.calendar;
-    }
-
-    public Date getDate () {
-        return this.calendar.getTime();
-    }
-
-    public long getTime () {
-        return this.calendar.getTimeInMillis();
-    }
-
+    // <HACK>
+    // TODO: Returns the context.
     public static Context getContext() {
         return Clay.context;
     }
+    // </HACK>
 
-    public BehaviorCacheManager getBehaviorRepository () {
-        return this.behaviorRepository;
+    /*
+     * Clay's essential operating system functions.
+     */
+
+    public void addManager (MessageManagerInterface messageManager) {
+        this.messageManager.addManager(messageManager);
     }
 
-//    public Communication getCommunication () {
-//
-//        if (this.communication == null) {
-//            this.communication = new Communication(this);
-//        }
-//
-//        return this.communication;
-//    }
-
-    public ContentManager getDatabase() {
-        return this.database;
+    public void addResource (NetworkResourceInterface networkResource) {
+        this.networkManager.addResource(networkResource);
     }
 
-//    public System getSystem () {
-//        return this.system;
-//    }
+    /*
+     * Clay's infrastructure management functions.
+     */
 
-//    public Perspective getPerspective () {
-//        return this.perspective;
-//    }
+    /**
+     * Sends a message to the specified unit.
+     * @param unit
+     * @param content
+     */
+    public void sendMessage (Unit unit, String content) {
 
-//    public Person getPerson () {
-//        return this.person;
-//    }
+        // Prepare message
+        String source = this.networkManager.getInternetAddress ();
+        String destination = unit.getInternetAddress();
+        Message message = new Message("udp", source, destination, content);
+
+        // Queue message
+        messageManager.queueOutgoingMessage(message);
+
+//        // <HACK>
+//        // The destination should be the unit's address, not the broadcast address.
+//        destination = DatagramManager.BROADCAST_ADDRESS; // unit.getInternetAddress();
+//        Log.v ("UDP_Destination", "destination: " + unit.getInternetAddress());
+//        Message broadcast = new Message("udp", source, destination, content);
+//        messageManager.queueOutgoingMessage(broadcast);
+//        // </HACK>
+    }
+
+    /**
+     * Adds a view to Clay. This makes the view available for use in systems built with Clay.
+     * @param view The view to make available to Clay.
+     */
+    public void addView (ViewManagerInterface view) {
+        this.views.add (view);
+    }
+
+    /**
+     * Returns the view manager the specified index.
+     * @param i The index of the view to return.
+     * @return The view at the specified index.
+     */
+    public ViewManagerInterface getView (int i) {
+        return this.views.get (i);
+    }
+
+    public BehaviorCacheManager getBehaviorCacheManager() {
+        return this.behaviorCacheManager;
+    }
+
+    public ContentManager getContentManager() {
+        return this.contentManager;
+    }
 
     public ArrayList<Unit> getUnits () {
         return this.units;
@@ -126,6 +141,8 @@ public class Clay {
 
             // Add unit to present (i.e., local cache).
             this.units.add(unit);
+            // TODO: Move this into a unit manager?
+//            this.getContentManager().addUnit(unit);
 
             // <TEST>
             // Add a random number of random behaviors to the unit.
@@ -135,18 +152,21 @@ public class Clay {
             for (int i = 0; i < behaviorCount; i++) {
 
                 // Get list of the available behavior types
-                ArrayList<String> behaviorTypes = new ArrayList<String>();
-                behaviorTypes.add ("lights");
-                behaviorTypes.add ("io");
-                behaviorTypes.add ("message");
-                behaviorTypes.add ("wait");
-                behaviorTypes.add ("say");
+//                ArrayList<String> behaviorTypes = new ArrayList<String>();
+//                behaviorTypes.add ("lights");
+//                behaviorTypes.add ("io");
+//                behaviorTypes.add ("message");
+//                behaviorTypes.add ("wait");
+//                behaviorTypes.add ("say");
+
+                ArrayList<Behavior> behaviors = getBehaviorCacheManager().getCachedBehaviors();
 
                 // Select random behavior type
-                int behaviorSelection = r.nextInt(behaviorTypes.size());
+                int behaviorSelection = r.nextInt(behaviors.size());
+                UUID behaviorUuid = behaviors.get(behaviorSelection).getUuid();
 
                 // Generate a behavior of the selected type
-                unit.getTimeline().addBehavior(new Behavior(behaviorTypes.get(behaviorSelection)));
+                unit.addBehavior (behaviorUuid.toString());
             }
             // </TEST>
 
@@ -162,9 +182,9 @@ public class Clay {
 
             Log.v ("Add_Unit", "Adding unit");
 
-            // Retrieve unit from memory (i.e., database).
-            //getDatabase().addUnit(unit);
-            //getDatabase ().getUnit (unit.getUuid ());
+            // Retrieve unit from memory (i.e., contentManager).
+            //getContentManager().addUnit(unit);
+            //getContentManager ().getUnit (unit.getUuid ());
         }
     }
 
@@ -221,32 +241,8 @@ public class Clay {
         }
     }
 
-    public void discoverUnits () {
-
-    }
-
-    public void addMessageManager(MessageManagerInterface messageManager) {
-        this.messageManager.addManager(messageManager);
-    }
-
-    public void addNetworkResource(NetworkResourceInterface networkResource) {
-        this.networkManager.addResource(networkResource);
-    }
-
-    public void sendMessage (Unit unit, String content) {
-
-        // Prepare message
-        String source = this.networkManager.getInternetAddress ();
-        String destination = DatagramManager.BROADCAST_ADDRESS; // unit.getInternetAddress();
-        Message message = new Message("udp", source, destination, content);
-
-        // Queue message
-        messageManager.queueOutgoingMessage(message);
-
-//        // <HACK>
-//        // Process the outgoing messages
-//        messageManager.processOutgoingMessages();
-//        // </HACK>
+    public Behavior getBehavior (String behaviorUuid) {
+        return getBehaviorCacheManager().getBehavior(behaviorUuid);
     }
 
     /**
@@ -259,6 +255,18 @@ public class Clay {
 
         // Process outgoing messages
         messageManager.processOutgoingMessages();
+    }
+
+    private Calendar getCalendar () {
+        return this.calendar;
+    }
+
+    public Date getDate () {
+        return this.calendar.getTime();
+    }
+
+    public long getTime () {
+        return this.calendar.getTimeInMillis();
     }
 
     // TODO: discoverUnits() : Discover devices via UDP (maybe TCP).

@@ -28,51 +28,63 @@ public class BehaviorCacheManager {
     }
 
     private void initializeRepository () {
-        getClay ().getDatabase ().getBehaviors ();
+        // TODO: First check if a content manager exists that can access the remote repository URI. If so, use it.
+        getClay ().getContentManager().getBehaviors ();
     }
 
     public void addBehavior (Behavior behavior) {
-        this.cachedBehaviors.add (behavior);
         Log.v("Clay_Behavior_Repo", "Adding behavior to repository.");
+        this.cachedBehaviors.add(behavior);
     }
 
     public void verifyBasicBehaviors () {
 
         Behavior behavior = null;
 
-        if (!hasBehaviorByTitle ("control")) {
-            Log.v("Clay_Behavior_Repo", "\"control\" behavior not found in the repository. Adding it.");
-            behavior = new Behavior("control");
-            this.cachedBehaviors.add(behavior);
-            getClay().getDatabase().addBehavior(behavior);
+//        if (!hasBehaviorByTitle ("control")) {
+//            Log.v("Clay_Behavior_Repo", "\"control\" behavior not found in the repository. Adding it.");
+//            behavior = new Behavior("control");
+//            this.cachedBehaviors.add(behavior);
+//            getClay().getContentManager().addBehavior(behavior);
+//        }
+//
+//        if (!hasBehaviorByTitle ("time")) {
+//            Log.v("Clay_Behavior_Repo", "\"time\" behavior not found in the repository. Adding it.");
+//            behavior = new Behavior("time");
+//            this.cachedBehaviors.add(behavior);
+//            getClay().getContentManager().addBehavior(behavior);
+//        }
+//
+//        if (!hasBehaviorByTitle ("cause/effect")) {
+//            Log.v("Clay_Behavior_Repo", "\"cause/effect\" behavior not found in the repository. Adding it.");
+//            behavior = new Behavior("cause/effect");
+//            this.cachedBehaviors.add(behavior);
+//            getClay().getContentManager().addBehavior(behavior);
+//        }
+
+        if (!hasBehaviorByTitle ("lights")) {
+            Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
+            createBehavior("lights", "F F F F F F F F F F F F");
         }
 
-        if (!hasBehaviorByTitle ("time")) {
-            Log.v("Clay_Behavior_Repo", "\"time\" behavior not found in the repository. Adding it.");
-            behavior = new Behavior("time");
-            this.cachedBehaviors.add(behavior);
-            getClay().getDatabase().addBehavior(behavior);
-        }
-
-        if (!hasBehaviorByTitle ("cause/effect")) {
-            Log.v("Clay_Behavior_Repo", "\"cause/effect\" behavior not found in the repository. Adding it.");
-            behavior = new Behavior("cause/effect");
-            this.cachedBehaviors.add(behavior);
-            getClay().getDatabase().addBehavior(behavior);
+        if (!hasBehaviorByTitle ("io")) {
+            Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
+            createBehavior("io", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
         }
 
         if (!hasBehaviorByTitle ("message")) {
             Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-            behavior = new Behavior("message");
-            this.cachedBehaviors.add(behavior);
-            getClay().getDatabase().addBehavior(behavior);
+            createBehavior("message", "hello");
+        }
+
+        if (!hasBehaviorByTitle ("wait")) {
+            Log.v("Clay_Behavior_Repo", "\"wait\" behavior not found in the repository. Adding it.");
+            createBehavior("wait", "250");
         }
 
         if (!hasBehaviorByTitle ("say")) {
             Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
-            behavior = new Behavior("say");
-            this.cachedBehaviors.add(behavior);
-            getClay().getDatabase().addBehavior(behavior);
+            createBehavior("say", "oh, that's great");
         }
 
         // TODO:
@@ -98,9 +110,22 @@ public class BehaviorCacheManager {
 //        this.cachedBehaviors.add(serviceBehavior);
     }
 
+    private void createBehavior (String tag, String state) {
+
+        // Create behavior
+        Behavior behavior = new Behavior(tag, state);
+
+        // Cache the behavior locally
+        this.addBehavior(behavior);
+
+        // Store the behavior remotely
+        getClay().getContentManager().addBehaviorState(behavior.getState());
+        getClay().getContentManager().addBehavior(behavior);
+    }
+
     private boolean hasBehaviorByTitle (String title) {
         for (Behavior cachedBehavior : this.cachedBehaviors) {
-            if (cachedBehavior.getTitle().equals(title)) {
+            if (cachedBehavior.getTag().equals(title)) {
                 return true;
             }
         }
@@ -129,7 +154,7 @@ public class BehaviorCacheManager {
 
         // Search cached behaviors.
         for (Behavior cachedBehavior : this.cachedBehaviors) {
-            if (cachedBehavior.getUuid().equals(behaviorUuid)) {
+            if (cachedBehavior.getUuid().toString().equals(behaviorUuid)) {
                 return cachedBehavior;
             }
         }
