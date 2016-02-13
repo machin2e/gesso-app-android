@@ -15,6 +15,24 @@ public class UnitViewPager extends ViewPager {
 
     private static boolean ENABLE_TOUCH = true;
 
+    Calendar calendar = Calendar.getInstance();
+
+    Point startTouch = new Point ();
+    Date startTime;
+    Point previousTouch = new Point ();
+    Date previousTime;
+    Point currentTouch = new Point ();
+    Date currentTime;
+    Point stopTouch = new Point ();
+    Date stopTime;
+
+    int dragThreshold = 40;
+
+    int touchDistance = 0;
+
+    boolean interceptTouches = false;
+    // boolean itemHasFocus = false; // NOTE: This is located in CustomListView.java
+
     public UnitViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -139,24 +157,6 @@ public class UnitViewPager extends ViewPager {
 
         return false;
     }
-
-    Calendar calendar = Calendar.getInstance();
-
-    Point startTouch = new Point ();
-    Date startTime;
-    Point previousTouch = new Point ();
-    Date previousTime;
-    Point currentTouch = new Point ();
-    Date currentTime;
-    Point stopTouch = new Point ();
-    Date stopTime;
-
-    int dragThreshold = 40;
-
-    int touchDistance = 0;
-
-    boolean interceptTouches = false;
-    // boolean itemHasFocus = false; // NOTE: This is located in CustomListView.java
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {

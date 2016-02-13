@@ -1,5 +1,7 @@
 package camp.computer.clay.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.UUID;
 
 public class BehaviorState {
@@ -21,6 +23,7 @@ public class BehaviorState {
 
     public BehaviorState(Behavior behavior, String tag, String state) {
         this.uuid = UUID.randomUUID();
+        this.behaviorUuid = behavior.getUuid();
 
         this.tag = tag;
         this.state = state;
@@ -30,6 +33,8 @@ public class BehaviorState {
     public UUID getUuid () {
         return this.uuid;
     }
+
+    public UUID getBehaviorUuid () { return this.behaviorUuid; }
 
     public void setTag(String tag) {
         this.tag = tag;

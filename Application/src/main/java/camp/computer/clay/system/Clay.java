@@ -136,14 +136,32 @@ public class Clay {
         return null;
     }
 
-    public void addUnit (Unit unit) {
+//    public void addOrUpdateUnit (Unit unit) {
+//        if (hasUnitByUuid (unit.getUuid())) {
+//            Unit existingUnit = getUnitByUuid(unit.getUuid());
+//
+//            // Update unit
+//            existingUnit.setTimelineUuid(unit.getTimelineUuid());
+//        } else {
+//            addUnit (unit);
+//        }
+//    }
+
+    /**
+     * Adds the specified unit to Clay's operating environment.
+     * @param unit
+     */
+    public void addUnit (UUID unitUuid, String internetAddress) {
+
+        Unit unit = new Unit(this, unitUuid);
+        unit.setInternetAddress(internetAddress);
+
         if (!this.units.contains (unit)) {
 
             // Add unit to present (i.e., local cache).
             this.units.add(unit);
-            // TODO: Move this into a unit manager?
-//            this.getContentManager().addUnit(unit);
 
+            /*
             // <TEST>
             // Add a random number of random behaviors to the unit.
             // This will be replaced with the actual behaviors on the device's timeline.
@@ -152,39 +170,51 @@ public class Clay {
             for (int i = 0; i < behaviorCount; i++) {
 
                 // Get list of the available behavior types
-//                ArrayList<String> behaviorTypes = new ArrayList<String>();
-//                behaviorTypes.add ("lights");
-//                behaviorTypes.add ("io");
-//                behaviorTypes.add ("message");
-//                behaviorTypes.add ("wait");
-//                behaviorTypes.add ("say");
-
                 ArrayList<Behavior> behaviors = getBehaviorCacheManager().getCachedBehaviors();
 
-                // Select random behavior type
-                int behaviorSelection = r.nextInt(behaviors.size());
-                UUID behaviorUuid = behaviors.get(behaviorSelection).getUuid();
 
-                // Generate a behavior of the selected type
-                unit.addBehavior (behaviorUuid.toString());
+                // Generate a random behavior
+                if (behaviors.size() > 0) {
+
+                    // Select random behavior type
+                    int behaviorSelection = r.nextInt(behaviors.size());
+                    UUID behaviorUuid = behaviors.get(behaviorSelection).getUuid();
+
+                    Log.v("Behavior_DB", "BEFORE unit.storeBehavior:");
+                    getContentManager().restoreBehavior(behaviorUuid.toString());
+
+                    // Generate a behavior of the selected type
+                    unit.addBehavior (behaviorUuid.toString());
+
+                    Log.v("Behavior_DB", "AFTER unit.storeBehavior:");
+                    getContentManager().restoreBehavior(behaviorUuid.toString());
+                }
             }
             // </TEST>
+            */
 
-            Log.v("Behavior_Count", "unit behavior count: " + unit.getTimeline().getBehaviors().size());
+//            Log.v("Behavior_Count", "Unit behavior count: " + unit.getTimeline().getEvents().size());
+//
+//            // Add timelines to attached views
+//            for (ViewManagerInterface view : this.views) {
+//                // TODO: (1) add a page to the ViewPager
+//
+//                // (2) Add a tab to the action bar to support navigation to the specified page.
+//                view.addUnitView(unit);
+//            }
 
-            // Add timelines to attached views
-            for (ViewManagerInterface view : this.views) {
-                // TODO: (1) add a page to the ViewPager
+            // Restore the unit in Clay's object model
+            // Request unit profile from history (i.e., the remote store).
+            // TODO: Move this into a unit manager?
+            this.getContentManager().storeOrRestoreUnit(unitUuid);
 
-                // (2) Add a tab to the action bar to support navigation to the specified page.
-                view.addUnitView(unit);
-            }
+            // TODO: Send request to unit to send its behavior state (or timeline state)
 
             Log.v ("Add_Unit", "Adding unit");
 
             // Retrieve unit from memory (i.e., contentManager).
-            //getContentManager().addUnit(unit);
-            //getContentManager ().getUnit (unit.getUuid ());
+            //getContentManager().storeUnit(unit);
+            //getContentManager ().storeOrRestoreUnit (unit.getUuid ());
         }
     }
 
@@ -236,13 +266,51 @@ public class Clay {
     }
 
     public void removeUnit (Unit unit) {
-        if (hasUnit (unit)) {
+        if (hasUnit(unit)) {
             this.units.remove (unit);
         }
     }
 
+    /**
+     * Creates a new behavior with the specified tag and state, caches it, and stores it.
+     * @param tag
+     * @param state
+     */
+    public void createBehavior (String tag, String state) {
+
+        // Create behavior
+        Behavior behavior = new Behavior (tag, state);
+
+        // Cache the behavior locally
+        this.cacheBehavior(behavior);
+
+        // Store the behavior remotely
+        if (hasContentManager()) {
+            getContentManager().storeBehaviorState(behavior.getState());
+            getContentManager().storeBehavior(behavior);
+        }
+    }
+
+    /**
+     * Returns true if Clay has a content manager.
+     * @return True if Clay has a content manager. False otherwise.
+     */
+    private boolean hasContentManager() {
+        return this.contentManager != null;
+    }
+
     public Behavior getBehavior (String behaviorUuid) {
-        return getBehaviorCacheManager().getBehavior(behaviorUuid);
+        if (hasBehaviorCacheManager()) {
+            return getBehaviorCacheManager().getBehavior(behaviorUuid);
+        }
+        return null;
+    }
+
+    private boolean hasBehaviorCacheManager() {
+        if (getBehaviorCacheManager() != null) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -250,11 +318,8 @@ public class Clay {
      */
     public void cycle () {
 
-        // Process incoming messages
-        messageManager.processIncomingMessages();
-
-        // Process outgoing messages
-        messageManager.processOutgoingMessages();
+        // Process messages
+        messageManager.processMessage();
     }
 
     private Calendar getCalendar () {
@@ -267,6 +332,24 @@ public class Clay {
 
     public long getTime () {
         return this.calendar.getTimeInMillis();
+    }
+
+    public void cacheBehavior(Behavior behavior) {
+        this.getBehaviorCacheManager().cacheBehavior(behavior);
+    }
+
+    public void addUnit(Unit unit) {
+        this.units.add(unit);
+    }
+
+    public void addUnitView(Unit unit) {
+        // Add timelines to attached views
+        for (ViewManagerInterface view : this.views) {
+            // TODO: (1) add a page to the ViewPager
+
+            // (2) Add a tab to the action bar to support navigation to the specified page.
+            view.addUnitView(unit);
+        }
     }
 
     // TODO: discoverUnits() : Discover devices via UDP (maybe TCP).

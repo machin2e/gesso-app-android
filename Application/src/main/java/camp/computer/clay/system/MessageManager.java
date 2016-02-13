@@ -211,10 +211,7 @@ public class MessageManager {
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
                     Log.v("Clay_Time", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    Unit unit = new Unit(clay, UUID.fromString(unitUuid));
-                    unit.setInternetAddress(unitAddress);
-                    getClay().addUnit(unit);
-//                    getClay ().getContentManager().addEvent (unit, "discovered");
+                    getClay().addUnit(UUID.fromString(unitUuid), unitAddress);
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
@@ -338,5 +335,14 @@ public class MessageManager {
         Message message = new Message ("udp", null, address, content);
         message.setDeliveryGuaranteed(true);
         queueOutgoingMessage (message);
+    }
+
+    public void processMessage() {
+
+        // Process incoming messages
+        processIncomingMessages();
+
+        // Process outgoing messages
+        processOutgoingMessages();
     }
 }

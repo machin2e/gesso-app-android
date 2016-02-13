@@ -2,6 +2,8 @@ package camp.computer.clay.system;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -16,8 +18,11 @@ public class Unit {
 
     private String meshAddress = null; // The unit's IP address
 
+    private UUID timelineUuid;
     // TODO: Replace timeline with timelineUuid so it can be easily moved between multiple devices or simulators.
     private Timeline timeline = null;
+
+    private Date timeOfLastContact = null;
 
     // TODO: Cache/model the unit's state and behavior
 
@@ -31,14 +36,23 @@ public class Unit {
         this.uuid = uuid;
 
         this.timeline = new Timeline(this);
+        this.timelineUuid = this.timeline.getUuid();
     }
 
+    @JsonIgnore
     public Clay getClay () {
         return this.clay;
     }
 
-    private Date timeOfLastContact = null;
+    public UUID getTimelineUuid () {
+        return timelineUuid;
+    }
 
+    public void setTimelineUuid (UUID uuid) {
+        this.timelineUuid = uuid;
+    }
+
+    @JsonIgnore
     public long getTimeSinceLastMessage () {
 //        Log.v ("Clay_Time", "Time since last message: " + this.timeOfLastContact);
         Date currentTime = Calendar.getInstance().getTime ();
@@ -68,6 +82,7 @@ public class Unit {
         this.internetAddress = address;
     }
 
+    @JsonIgnore
     public String getInternetAddress () {
         return this.internetAddress;
     }
@@ -76,12 +91,19 @@ public class Unit {
         this.meshAddress = address;
     }
 
+    @JsonIgnore
     public String getMeshAddress () {
         return this.meshAddress;
     }
 
+    @JsonIgnore
     public Timeline getTimeline() {
         return this.timeline;
+    }
+
+    @JsonIgnore
+    public void setTimeline(Timeline timeline) {
+        this.timeline = timeline;
     }
 
     public void send(String content) {
@@ -89,7 +111,15 @@ public class Unit {
     }
 
     public void addBehavior(String behaviorUuid) {
+
+        // Get the behavior with the specified UUID
         Behavior behavior = getClay().getBehavior(behaviorUuid);
-        this.getTimeline().addBehavior(behavior);
+
+        // Create an event for the behavior so it can be added to the timeline
+        // TODO: Select the behavior state based on user specification
+        Event event = new Event(behavior, behavior.getState());
+
+        // Add the event to the timeline
+        this.getTimeline().addEvent(event);
     }
 }

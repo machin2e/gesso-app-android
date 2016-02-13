@@ -1,7 +1,6 @@
 package camp.computer.clay.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.UUID;
 
@@ -12,7 +11,10 @@ public class Behavior {
 
     private UUID uuid;
 
-    // The current state of the behavior.
+    // Behavior Profile
+    private UUID stateUuid;
+
+    // Behavior State
     private BehaviorState state;
 
     public Behavior() {
@@ -25,10 +27,17 @@ public class Behavior {
         // Create the default state of this behavior
         BehaviorState behaviorState = new BehaviorState (this, tag, defaultState);
         this.state = behaviorState;
+        this.stateUuid = behaviorState.getUuid();
     }
 
     public UUID getUuid () {
         return this.uuid;
+    }
+
+    public UUID getStateUuid() { return this.stateUuid; }
+
+    public void setStateUuid (UUID stateUuid) {
+        this.stateUuid = stateUuid;
     }
 
     @JsonIgnore
@@ -62,10 +71,12 @@ public class Behavior {
 //        this.state = behaviorState;
 //    }
 
+    @JsonIgnore
     public void setState (BehaviorState state) {
         this.state = state;
     }
 
+    @JsonIgnore
     public BehaviorState getState() {
         return this.state;
     }

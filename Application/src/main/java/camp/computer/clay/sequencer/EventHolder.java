@@ -7,14 +7,13 @@ package camp.computer.clay.sequencer;
 * object model.
 */
 
-import android.graphics.Color;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
 import camp.computer.clay.system.Behavior;
+import camp.computer.clay.system.Event;
 
-public class EventManager {
+public class EventHolder {
 
     private UUID uuid;
 
@@ -23,36 +22,17 @@ public class EventManager {
     }
 
     // The UUID of the behavior represented by this object.
-    public UUID behaviorUuid;
-    private Behavior behavior;
+    public UUID eventUuid;
+    private Event event;
 
     // TODO: Store the managed Behavior's UUID.
     // TODO: Store reference to the managed Behavior (retrieved via the local cache).
 
     public String title;
 
-    // for Lights behavior
-//    public ArrayList<Boolean> lightStates;
-//    public ArrayList<Integer> lightColors;
-
-    // for I/O behavior
-//    public ArrayList<Boolean> ioStates; // T or F
-//    public ArrayList<Character> ioDirection; // I or O
-//    public ArrayList<Character> ioSignalType; // T or P or W
-//    public ArrayList<Character> ioSignalValue; // (type T:) T or F
-
-    // for Message
-//    public String message;
-
-    // for Wait behavior
-//    public int time;
-
-    // for Say
-//    public String phrase;
-
     // for Complex
     public String summary;
-    public ArrayList<EventManager> eventManagers;
+    public ArrayList<EventHolder> eventHolders;
 
     public static int DEFAULT_TYPE = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
 
@@ -63,14 +43,16 @@ public class EventManager {
     public boolean hasFocus = false;
 
     public boolean repeat = false;
-    public String transform;
+//    public String transform;
 
     // default constructor
-    public EventManager() {
+    public EventHolder() {
         this("Title", "Subtitle", DEFAULT_TYPE);
     }
 
-    public EventManager(Behavior behavior) {
+    public EventHolder(Event event) {
+
+        Behavior behavior = event.getBehavior();
 
         // Get behavior type
         if (behavior.getTag().equals("lights")) {
@@ -87,15 +69,15 @@ public class EventManager {
         initializeType();
 
         // Get behavior UUID
-        this.behaviorUuid = behavior.getUuid();
+        this.eventUuid = event.getUuid();
 
         // <HACK>
-        this.behavior = behavior;
+        this.event = event;
         // </HACK>
     }
 
     // main constructor
-    public EventManager(String title, String subTitle, int type) {
+    public EventHolder(String title, String subTitle, int type) {
         super();
 
         // Assign instance UUID to the list item
@@ -114,16 +96,17 @@ public class EventManager {
     }
 
     // main constructor
-    public EventManager(Behavior behavior, int layoutType) {
+    public EventHolder(Event event, int layoutType) {
         super();
 
         // Assign instance UUID to the list item
         this.uuid = UUID.randomUUID();
 
-        this.behaviorUuid = behavior.getUuid();
-        this.behavior = behavior;
+        this.eventUuid = event.getUuid();
+        this.event = event;
 
         // Set parameters
+        Behavior behavior = event.getBehavior();
         this.title = behavior.getTag();
         this.type = layoutType;
 
@@ -134,8 +117,8 @@ public class EventManager {
         initializeType();
     }
 
-    public Behavior getBehavior () {
-        return this.behavior;
+    public Event getEvent() {
+        return this.event;
     }
 
     private void initializeType() {
@@ -182,7 +165,7 @@ public class EventManager {
 
         } else if (this.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
 
-            eventManagers = new ArrayList<>();
+            eventHolders = new ArrayList<>();
             summary = "invalid complex layout";
 
         }

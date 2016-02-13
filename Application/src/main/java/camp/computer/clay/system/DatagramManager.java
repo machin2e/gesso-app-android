@@ -188,6 +188,10 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
         // bKeepRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP send message (on a different thread as well) is run! It's something related to that, apparently.
     }
 
+    public boolean isActive () {
+        return bKeepRunning;
+    }
+
     public void processMessage (Message outgoingMessage) {
 
         // Send the message.

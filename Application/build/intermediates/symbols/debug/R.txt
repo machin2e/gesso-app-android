@@ -33,7 +33,7 @@ int dimen cardview_compat_inset_shadow 0x7f050004
 int dimen cardview_default_elevation 0x7f050005
 int dimen cardview_default_radius 0x7f050006
 int dimen default_gap 0x7f050007
-int dimen event_title_text_size 0x7f050008
+int dimen event_tag_text_size 0x7f050008
 int dimen horizontal_page_margin 0x7f050000
 int dimen light_preview_column_width 0x7f050009
 int dimen margin_huge 0x7f05000a

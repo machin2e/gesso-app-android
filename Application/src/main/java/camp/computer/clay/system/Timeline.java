@@ -1,61 +1,77 @@
 package camp.computer.clay.system;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Timeline {
 
-    private ArrayList<Behavior> behaviors = new ArrayList<Behavior>();
+    private UUID uuid;
+
+    private ArrayList<Event> events = new ArrayList<Event>();
 
     private Unit unit = null;
+
+    Timeline () {
+
+    }
 
     public Timeline(Unit unit) {
         super();
 
+        this.uuid = UUID.randomUUID();
+
         this.unit = unit;
     }
 
+    public UUID getUuid () {
+        return this.uuid;
+    }
+
+    @JsonIgnore
     public Unit getUnit () {
         return this.unit;
     }
 
-    public void addBehavior (Behavior behavior) {
+    public void addEvent (Event event) {
 
         // Add behavior to the list of behaviors in the loop sequence
-        if (!this.behaviors.contains(behavior)) {
-            this.behaviors.add(behavior);
+        if (!this.events.contains(event)) {
+            this.events.add(event);
+
+            // TODO: Store in remote repository
         }
 
-        // Re-order the behaviors based on their position along the loop
-//        this.reorderBehaviors();
-
     }
 
-    public boolean hasBehaviors () {
-        return (this.behaviors.size () > 0);
+    public boolean hasEvents () {
+        return (this.events.size () > 0);
     }
 
-    public boolean hasBehavior (Behavior behavior) {
-        return this.behaviors.contains (behavior);
+    public boolean hasEvent (Event event) {
+        return this.events.contains (event);
     }
 
     /**
      * Remove the specified behavior from the loop (if it is present)
      */
-    public void removeBehavior (Behavior behavior) {
-        if (behavior != null) {
-            if (this.behaviors.contains (behavior)) {
-                this.behaviors.remove(behavior);
+    public void removeEvent (Event event) {
+        if (event != null) {
+            if (this.events.contains (event)) {
+                this.events.remove(event);
             }
         }
     }
 
-    public ArrayList<Behavior> getBehaviors () {
-        return this.behaviors;
+    public ArrayList<Event> getEvents () {
+        return this.events;
     }
 
-    public Behavior getBehavior (int index) {
-        if (0 < index && index < this.behaviors.size()) {
-            return this.behaviors.get(index);
+    @JsonIgnore
+    public Event getEvent (int index) {
+        if (0 < index && index < this.events.size()) {
+            return this.events.get(index);
         } else {
             return null;
         }

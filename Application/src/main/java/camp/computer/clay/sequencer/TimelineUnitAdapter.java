@@ -26,8 +26,8 @@ public class TimelineUnitAdapter extends BaseAdapter {
     // store the resource (typically list_item.xml)
     private int resource;
 
-    // store (a reference to) the data
-    private ArrayList<EventManager> data;
+    // Reference to the events
+    private ArrayList<EventHolder> events;
 
     // Layout types
     public static final int SYSTEM_CONTROL_LAYOUT = 0; // This controls the programming interface, not the modules. It's a different category of behavior for managing other behavior controls.
@@ -41,29 +41,29 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
     /**
      * Default constructor. Creates the new Adaptor object to
-     * provide a ListView with data.
+     * provide a ListView with events.
      * @param context
      * @param resource
-     * @param data
+     * @param events
      */
-    public TimelineUnitAdapter(Context context, int resource, ArrayList<EventManager> data) {
+    public TimelineUnitAdapter(Context context, int resource, ArrayList<EventHolder> events) {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.resource = resource;
-        this.data = data;
+        this.events = events;
     }
 
     /**
-     * Return the size of the data set.
+     * Return the size of the events set.
      */
     public int getCount() {
-        return this.data.size();
+        return this.events.size();
     }
 
     /**
-     * Return an object in the data set.
+     * Return an object in the events set.
      */
     public Object getItem(int position) {
-        return this.data.get(position);
+        return this.events.get(position);
     }
 
     /**
@@ -75,8 +75,8 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
     public int getItemType(int position){
         // Your if else code and return type ( TYPE_1 to TYPE_5 )
-        EventManager eventManager = (EventManager) getItem (position);
-        return eventManager.type;
+        EventHolder eventHolder = (EventHolder) getItem (position);
+        return eventHolder.type;
     }
 
     /**
@@ -95,11 +95,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
         convertView = null;
         // </HACK>
 
-        // Get the data corresponding to the view
-        final EventManager eventManager = data.get(position);
+        // Get the events corresponding to the view
+        final EventHolder eventHolder = events.get(position);
 
         if (convertView == null) {
-            //view = this.inflater.inflate(resource, parent, false);
             view = this.inflater.inflate(layoutResource, parent, false);
         } else {
             view = convertView;
@@ -117,10 +116,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
                 //mHeights.set(position, (bottom - top));
                 int height = bottom - top;
 
-                drawTimelineSegment(v, data.get(position), height);
+                drawTimelineSegment(v, events.get(position), height);
 
 
-                if (eventManager.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
+                if (eventHolder.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
 
                     RelativeLayout.LayoutParams layoutParams;
 
@@ -151,10 +150,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
         */
 
         // Update the list item's view according to the type
-        updateViewForType(view, eventManager);
+        updateViewForType(view, eventHolder);
 //        view.invalidate();
 
-        // bind the data to the view object
+        // bind the events to the view object
         return this.bindData(view, position);
     }
 
@@ -183,18 +182,18 @@ public class TimelineUnitAdapter extends BaseAdapter {
     }
 
     /**
-     * Updates the view layout specifically for the type of data that is displayed in it.
+     * Updates the view layout specifically for the type of events that is displayed in it.
      *
      * @param view
-     * @param eventManager
+     * @param eventHolder
      */
-    private void updateViewForType (View view, EventManager eventManager) {
+    private void updateViewForType (View view, EventHolder eventHolder) {
         // Update layout of a behavior control
-        if (eventManager.type != SYSTEM_CONTROL_LAYOUT
-                && eventManager.type != CONTROL_PLACEHOLDER_LAYOUT) {
+        if (eventHolder.type != SYSTEM_CONTROL_LAYOUT
+                && eventHolder.type != CONTROL_PLACEHOLDER_LAYOUT) {
 
             // Update layout based on state
-            if (eventManager.selected == false) {
+            if (eventHolder.selected == false) {
                 // Update left padding
                 view.setPadding(0, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
             } else {
@@ -205,21 +204,18 @@ public class TimelineUnitAdapter extends BaseAdapter {
         }
 
         // Set the background color
-        if (eventManager.hasFocus) {
+        if (eventHolder.hasFocus) {
             view.setBackgroundColor(Color.LTGRAY);
         } else {
             view.setBackgroundColor(Color.TRANSPARENT);
         }
 
-        int segmentLength = view.getContext().getResources().getInteger(R.integer.event_timeline_segment_length);
-        drawTimelineSegment (view, eventManager, segmentLength); //drawTimelineSegment (view, eventManager, 192);
+        int segmentLength = 165;
+        drawTimelineSegment (view, eventHolder, segmentLength);
 
         view.invalidate();
 
-        if (eventManager.type == LIGHT_CONTROL_LAYOUT) {
-
-            // Update image
-//            drawTimelineSegment (view, eventManager);
+        if (eventHolder.type == LIGHT_CONTROL_LAYOUT) {
 
             // Get layout containing light state visualizations
             LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
@@ -245,44 +241,34 @@ public class TimelineUnitAdapter extends BaseAdapter {
                     // Update image preview
                     ImageView preview = (ImageView) view.findViewById(previews[i]);
 
-                    //int w = WIDTH_PX, h = HEIGHT_PX;
-                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
-                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
-                    //            if (eventManager.selected) {
-                    //                w2 = 300;
-                    //            }
+                    // Set the width and height of the visualization
+                    int w = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
+                    int h = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
 
                     if (preview != null) {
 
-                        Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
-                        Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
-                        Canvas canvas2 = new Canvas(bmp2);
+                        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                        Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+                        Canvas canvas = new Canvas(bmp);
 
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
                         paint2.setColor(Color.rgb(255, 61, 61));
-                        //canvas2.drawRect(0, 0, w2, h2, paint2);
-                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+                        canvas.drawRect(0, 0, bmp.getWidth(), bmp.getHeight(), paint2);
 
-                        preview.setImageBitmap(bmp2);
+                        preview.setImageBitmap(bmp);
 
                     }
                 }
 
+                // Update position
                 TextView label = (TextView) view.findViewById(R.id.label);
-//            preview.setX (label.getX());
-//            preview.setX(0);
-
                 preview_layout.setX(label.getX());
             }
 
-        } else if (eventManager.type == IO_CONTROL_LAYOUT) {
-
-            // Update image
-//            drawTimelineSegment (view, eventManager);
-
+        } else if (eventHolder.type == IO_CONTROL_LAYOUT) {
 
             // Get layout containing light state visualizations
-            LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
+            LinearLayout previewLayout = (LinearLayout) view.findViewById(R.id.preview_layout);
 
             int[] previews = new int[12];
             previews[0] = R.id.preview_1;
@@ -298,59 +284,50 @@ public class TimelineUnitAdapter extends BaseAdapter {
             previews[10] = R.id.preview_11;
             previews[11] = R.id.preview_12;
 
-            if (preview_layout != null) {
+            if (previewLayout != null) {
 
                 for (int i = 0; i < previews.length; i++) {
 
                     // Update image preview
                     ImageView preview = (ImageView) view.findViewById(previews[i]);
 
-                    //int w = WIDTH_PX, h = HEIGHT_PX;
-                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
-                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
-                    //            if (eventManager.selected) {
-                    //                w2 = 300;
-                    //            }
+                    int w = (previewLayout.getWidth() > 0 ? previewLayout.getWidth() : 20);
+                    int h = (previewLayout.getHeight() > 0 ? previewLayout.getHeight() : 20);
 
                     if (preview != null) {
 
-                        Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
-                        Bitmap bmp2 = Bitmap.createBitmap(w2, h2, conf2); // this creates a MUTABLE bitmap
-                        Canvas canvas2 = new Canvas(bmp2);
+                        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                        Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+                        Canvas canvas = new Canvas(bmp);
 
-                        Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
-                        paint2.setColor(Color.rgb(255, 61, 61));
-                        //canvas2.drawRect(0, 0, w2, h2, paint2);
-                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+                        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                        paint.setColor(Color.rgb(255, 61, 61));
+                        canvas.drawRect(0, 0, bmp.getWidth(), bmp.getHeight(), paint);
 
-                        preview.setImageBitmap(bmp2);
+                        preview.setImageBitmap(bmp);
 
                     }
                 }
 
+                // Update the position
                 TextView label = (TextView) view.findViewById(R.id.label);
-
-                preview_layout.setX(label.getX());
+                previewLayout.setX(label.getX());
             }
-        } else if (eventManager.type == TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT) {
+        } else if (eventHolder.type == TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT) {
 
-            // Update image
-//            drawTimelineSegment (view, eventManager);
+            // TODO:
 
-        } else if (eventManager.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
+        } else if (eventHolder.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
 
-            // Update image
-//            drawTimelineSegment (view, eventManager);
+            // TODO:
 
-        } else if (eventManager.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
+        } else if (eventHolder.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
 
-            // Update image
-//            drawTimelineSegment (view, eventManager);
+            // TODO:
 
-        } else if (eventManager.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
+        } else if (eventHolder.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
 
-            // Update image
-//            drawTimelineSegment (view, eventManager);
+            // TODO:
 
         }
     }
@@ -386,10 +363,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
     /**
      * Draws the timeline segment of the specified length (in pixels) for specified view and item.
      * @param view
-     * @param eventManager
+     * @param eventHolder
      * @param heightInPixels
      */
-    private void drawTimelineSegment (View view, EventManager eventManager, int heightInPixels) {
+    private void drawTimelineSegment (View view, EventHolder eventHolder, int heightInPixels) {
 
         ImageView imageView = (ImageView) view.findViewById(R.id.icon);
 
@@ -404,7 +381,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
         paint.setColor(Color.rgb(61, 61, 61));
         paint.setStyle(Paint.Style.STROKE);
 
-        if (eventManager.type == COMPLEX_LAYOUT) {
+        if (eventHolder.type == COMPLEX_LAYOUT) {
             paint.setStrokeWidth(convertDpToPixel(10.0f, view.getContext()));
         } else {
             paint.setStrokeWidth(3.0f);
@@ -412,82 +389,64 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
         // Set path effect
         // Reference: http://developer.android.com/reference/android/graphics/PathEffect.html
-        if (eventManager.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
+        if (eventHolder.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
             paint.setPathEffect(new DashPathEffect(new float[]{10, 20}, 0));
         } else {
             paint.setPathEffect(null);
         }
 
-        /*
-        if (eventManager == data.get(data.size() - 2)) {
-            // Draw final segment
-            canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) (h / 2.0), paint);
-            canvas.drawRect((float) ((w / 2.0) - 10.0), (float) (h / 2.0), (float) ((w / 2.0) + 10.0), (float) ((h / 2.0) + 20), paint);
-        } else {
-            // Draw line
-            canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) h, paint);
-        }
-        */
-
+        // Draw the line representing the timeline segment
         canvas.drawLine((float) (w / 2.0), (float) 0, (float) (w / 2.0), (float) h, paint);
 
+        // Draw prompts to person
+        if (eventHolder.type == TimelineUnitAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            paint.setColor(Color.CYAN);
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawCircle((float) (w / 2.0), (float) (h / 2.0), 20, paint);
+        }
+
+        // Update the view with the bitmap
         imageView.setImageBitmap(bmp);
 
     }
 
     /**
-     * Draws the timeline segment for the specified view
-     */
-    private void drawTimelineSegment (View view, EventManager eventManager) {
-
-        int defaultHeight = (int) convertDpToPixel((float) 22.0, view.getContext());
-        drawTimelineSegment(view, eventManager, defaultHeight);
-
-    }
-
-    /**
-     * Bind the provided data to the view.
+     * Bind the provided events to the view.
      * This is the only method not required by base adapter.
      */
     public View bindData(View view, int position) {
 
         // Make sure it's worth drawing the view
-        if (this.data.get(position) == null) {
+        if (this.events.get(position) == null) {
             return view;
         }
 
-        // Pull out the data object represented by the view
-        EventManager item = this.data.get(position);
+        // Pull out the events object represented by the view
+        EventHolder item = this.events.get(position);
 
         // Update the event label
         // Extract the view object to update, cast it to the correct type, and update the value.
         View viewElement = view.findViewById(R.id.label);
         TextView tv = (TextView)viewElement;
 
-        if (item.type == SYSTEM_CONTROL_LAYOUT || item.type == CONTROL_PLACEHOLDER_LAYOUT) {
+        if (item.type == SYSTEM_CONTROL_LAYOUT || item.type == CONTROL_PLACEHOLDER_LAYOUT || item.type == COMPLEX_LAYOUT) {
             // TODO: Consider making a behavior for system controls, too.
             tv.setText(item.title);
         } else {
-            tv.setText(item.getBehavior().getTag());
+            tv.setText(item.getEvent().getBehavior().getTag());
         }
 
-        // Update the remainder of the view based on the type of data it represents.
+        // Update the remainder of the view based on the type of events it represents.
         if (item.type == SYSTEM_CONTROL_LAYOUT) {
 
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageResource(R.drawable.tile);
-//            drawTimelineSegment (view, item);
 
         } else if (item.type == LIGHT_CONTROL_LAYOUT) {
 
-//            ImageView icon = (ImageView) view.findViewById(R.id.icon);
-//            icon.setImageResource(R.drawable.tile);
-
-//            drawTimelineSegment (view, item);
-
             // Set states of I/O visualization
             // Get layout containing light state visualizations
-            LinearLayout preview_layout = (LinearLayout) view.findViewById(R.id.preview_layout);
+            LinearLayout previewLayout = (LinearLayout) view.findViewById(R.id.preview_layout);
 
             int[] previews = new int[12];
             previews[0]  = R.id.preview_1;
@@ -503,15 +462,15 @@ public class TimelineUnitAdapter extends BaseAdapter {
             previews[10] = R.id.preview_11;
             previews[11] = R.id.preview_12;
 
-            if (preview_layout != null) {
+            if (previewLayout != null) {
 
                 for (int i = 0; i < previews.length; i++) {
 
                     // Update image preview
                     ImageView preview = (ImageView) view.findViewById(previews[i]);
 
-                    int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
-                    int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
+                    int w2 = (previewLayout.getWidth() > 0 ? previewLayout.getWidth() : 20);
+                    int h2 = (previewLayout.getHeight() > 0 ? previewLayout.getHeight() : 20);
 
                     if (preview != null) {
 
@@ -522,7 +481,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        String lightStateString = item.getBehavior().getState().getState();
+                        String lightStateString = item.getEvent().getBehavior().getState().getState();
                         String[] lightStates = lightStateString.split(" ");
 
                         // Update the view
@@ -541,12 +500,10 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
                 TextView label = (TextView) view.findViewById(R.id.label);
 
-                preview_layout.setX(label.getX());
+                previewLayout.setX(label.getX());
             }
 
         } else if (item.type == IO_CONTROL_LAYOUT) {
-
-//            drawTimelineSegment (view, item);
 
             // Set states of I/O visualization
             // Get layout containing light state visualizations
@@ -584,7 +541,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        String ioStateString = item.getBehavior().getState().getState();
+                        String ioStateString = item.getEvent().getBehavior().getState().getState();
                         String[] ioStates = ioStateString.split(" ");
 
                         char ioState = ioStates[i].charAt(0);
@@ -613,41 +570,33 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
         } else if (item.type == MESSAGE_CONTROL_LAYOUT) {
 
-//            drawTimelineSegment (view, item);
-
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
 
                 // Get behavior state
-                String message = item.getBehavior().getState().getState();
+                String message = item.getEvent().getBehavior().getState().getState();
 
                 // Update the view
                 textView.setText("\"" + message + "\"");
             }
         } else if (item.type == WAIT_CONTROL_LAYOUT) {
 
-//            drawTimelineSegment (view, item);
-
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
 
                 // Get behavior state
-                int time = Integer.parseInt(item.getBehavior().getState().getState());
+                int time = Integer.parseInt(item.getEvent().getBehavior().getState().getState());
 
                 // Update the view
                 textView.setText(time + " ms");
             }
         } else if (item.type == SAY_CONTROL_LAYOUT) {
 
-//            drawTimelineSegment (view, item);
-
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + item.getBehavior().getState().getState() + "\"");
+                textView.setText("\"" + item.getEvent().getBehavior().getState().getState() + "\"");
             }
         } else if (item.type == COMPLEX_LAYOUT) {
-
-//            drawTimelineSegment (view, item);
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {

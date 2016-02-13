@@ -17,10 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import java.util.ArrayList;
-
 import camp.computer.clay.resource.NetworkResource;
-import camp.computer.clay.system.Behavior;
 import camp.computer.clay.system.ViewManagerInterface;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
@@ -31,11 +28,17 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     private static final long MESSAGE_SEND_FREQUENCY = 100;
     private static Context context;
 
+    // <CLAY>
+
+    private Clay clay;
+
     private DatagramManager datagramServer;
 
     private NetworkResource networkResource;
 
-    private Clay clay;
+    // </CLAY>
+
+    // <VIEW>
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -60,6 +63,18 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = false;
     private static final boolean FULLSCREEN = true;
 
+    // <VIEW>
+
+    @Override
+    public void setClay(Clay clay) {
+        this.clay = clay;
+    }
+
+    @Override
+    public Clay getClay() {
+        return this.clay;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -67,7 +82,21 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         if (datagramServer == null) {
             datagramServer = new DatagramManager("udp");
         }
-        datagramServer.startServer();
+        if (!datagramServer.isActive()) {
+            datagramServer.startServer();
+        }
+    }
+
+    public void refreshListViewFromData(Unit unit) {
+//        Log.v("CM_Log", "refreshListViewFromData");
+//        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+//            UnitViewFragment unitViewFragment = (UnitViewFragment) mSectionsPagerAdapter.getItem(i);
+//            Log.v("CM_Log", "\tunitViewFragment = " + unitViewFragment);
+//            Log.v("CM_Log", "\tunitViewFragment.unit = " + unitViewFragment.getUnit());
+//            if (unitViewFragment.getUnit() == unit) {
+//                unitViewFragment.refreshView();
+//            }
+//        }
     }
 
     /**
@@ -86,6 +115,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         super.onCreate(savedInstanceState);
 
         ApplicationView.context = getApplicationContext();
+
+        Clay.setContext(getApplicationContext());
+
+        clay = new Clay();
 
         // Load the UI from res/layout/activity_main.xml
         setContentView(R.layout.activity_main);
@@ -119,6 +152,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
         mSectionsPagerAdapter = new UnitViewPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter.setClay(getClay());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (UnitViewPager) findViewById(R.id.pager);
@@ -146,10 +180,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 //        }
         // END_INCLUDE (add_tabs)
 
-        Clay.setContext(getApplicationContext());
-
-        clay = new Clay();
-
         // Add the view provided by the host device.
         clay.addView(this);
 
@@ -157,10 +187,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         if (datagramServer == null) {
             datagramServer = new DatagramManager("udp");
+            clay.addManager(this.datagramServer);
+            datagramServer.startServer();
         }
-//        datagramServer.startDatagramServer();
-
-        clay.addManager(this.datagramServer);
 
         if (networkResource == null) {
             networkResource = new NetworkResource();
@@ -240,212 +269,4 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
-
-    @Override
-    public void setClay(Clay clay) {
-        this.clay = clay;
-    }
-
-    @Override
-    public Clay getClay() {
-        return this.clay;
-    }
-
-    // BEGIN_INCLUDE (fragment_pager_adapter)
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages. This provides the data for the {@link ViewPager}.
-     */
-    public class UnitViewPagerAdapter extends FragmentStatePagerAdapter {
-    // END_INCLUDE (fragment_pager_adapter)
-
-        public int count = 0;
-
-        public UnitViewPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        // BEGIN_INCLUDE (fragment_pager_adapter_getitem)
-        /**
-         * Get fragment corresponding to a specific position. This will be used to populate the
-         * contents of the {@link ViewPager}.
-         *
-         * @param position Position to fetch fragment for.
-         * @return Fragment for specified position.
-         */
-        @Override
-        public Fragment getItem(int position) {
-
-            // Get the unit in the specified position
-            Unit unit = null;
-            if (position < getClay().getUnits().size()) {
-                unit = getClay().getUnits().get(position);
-                Log.v("Behavior_Count", "unit not null");
-            }
-
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a UnitViewFragment (defined as a static inner class
-            // below) with the page number as its lone argument.
-            UnitViewFragment fragment = new UnitViewFragment();
-            Bundle args = new Bundle();
-            args.putInt(UnitViewFragment.ARG_SECTION_NUMBER, position + 1);
-            fragment.setArguments(args);
-            fragment.setUnit(unit);
-            return (Fragment) fragment;
-        }
-        // END_INCLUDE (fragment_pager_adapter_getitem)
-
-        // BEGIN_INCLUDE (fragment_pager_adapter_getcount)
-        /**
-         * Get number of pages the {@link ViewPager} should render.
-         *
-         * @return Number of fragments to be rendered as pages.
-         */
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-//            if (getClay() != null) {
-//                return getClay().getUnits().size();
-//            } else {
-//                return 1;
-//            }
-            return count;
-        }
-        // END_INCLUDE (fragment_pager_adapter_getcount)
-
-        // BEGIN_INCLUDE (fragment_pager_adapter_getpagetitle)
-        /**
-         * Get title for each of the pages. This will be displayed on each of the tabs.
-         *
-         * @param position Page to fetch title for.
-         * @return Title for specified page.
-         */
-        @Override
-        public CharSequence getPageTitle(int position) {
-//            Locale l = Locale.getDefault();
-//            switch (position) {
-//                case 0:
-//                    return getString(R.string.title_section1).toUpperCase(l);
-//                case 1:
-//                    return getString(R.string.title_section2).toUpperCase(l);
-//                case 2:
-//                    return getString(R.string.title_section3).toUpperCase(l);
-//            }
-//            return null;
-            return "UNIT " + (position + 1);
-        }
-        // END_INCLUDE (fragment_pager_adapter_getpagetitle)
-    }
-
-    /**
-     * A fragment representing a section of the app. Each fragment represents a single unit. It
-     * shows the timeline of unit behavior and controls for changing the timeline.
-     */
-    public static class UnitViewFragment extends Fragment {
-
-        // The Clay unit associated with this fragment.
-        private Unit unit;
-
-        private ArrayList<EventManager> eventManagers;
-
-        private TimelineListView listView;
-
-        // Configure the interface settings
-        boolean disableScrollbarFading = true;
-        boolean disableScrollbars = true;
-        boolean disableOverscrollEffect = true;
-
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        public static final String ARG_SECTION_NUMBER = "section_number";
-
-//        private ArrayList<String> behaviorEvents = new ArrayList<String>();
-//        ArrayAdapter<String> listAdapter;
-
-        // TODO: UnitViewFragment(Unit unit)
-        public UnitViewFragment() {
-
-            eventManagers = new ArrayList<EventManager>();
-
-//            behaviorEvents.add("hello a");
-//            behaviorEvents.add("hello b");
-//            behaviorEvents.add("hello c");
-//            behaviorEvents.add("hello d");
-//            behaviorEvents.add("hello e");
-//            behaviorEvents.add("hello f");
-//            behaviorEvents.add("hello g");
-        }
-
-        public void setUnit (Unit unit) {
-            this.unit = unit;
-
-            // Create behavior profiles for the timeline
-            createBehaviorProfiles();
-        }
-
-        public Unit getUnit () {
-            return this.unit;
-        }
-
-        private void createBehaviorProfiles () {
-            eventManagers.clear();
-
-            // Create a behavior profile for each of the unit's behaviors
-            for (Behavior behavior : this.unit.getTimeline().getBehaviors()) {
-                EventManager eventManager = new EventManager(behavior);
-                eventManagers.add(eventManager);
-            }
-
-            Log.v ("Behavior_Count", "profile count: " + this.eventManagers.size());
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_listview, container, false);
-//            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-//            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-
-            // Define the adapter (adapts the data to the actual rendered view)
-//            listAdapter = new ArrayAdapter<String>(
-//                    getActivity(), // The current context (this fragment's parent activity).
-//                    R.layout.list_item_behavior_event, // ID of list item layout
-//                    R.id.list_item_behavior_event_label, // ID of textview to populate (using the specified list item layout)
-//                    behaviorEvents // The list containing the behaviors to show on the timeline.
-//            );
-
-            // Define the view (get a reference to it and pass it an adapter)
-            listView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
-            listView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
-//            listView.setAdapter(listAdapter);
-            // TODO: Create new TimelineUnitAdapter with the data for this tab's unit! (or reuse and repopulate with new data)
-
-            // Create behavior profiles for the unit's behaviors and assign the data to the ListView
-            listView.setData(eventManagers);
-
-            // <HACK>
-            listView.unit = unit;
-            // </HACK>
-
-            if (disableScrollbarFading) {
-                listView.setScrollbarFadingEnabled(false);
-            }
-
-            // Disable the scrollbars.
-            if (disableScrollbars) {
-                listView.setVerticalScrollBarEnabled(false);
-                listView.setHorizontalScrollBarEnabled(false);
-            }
-
-            // Disable overscroll effect.
-            if (disableOverscrollEffect) {
-                listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-            }
-
-            return rootView;
-        }
-    }
-
 }
