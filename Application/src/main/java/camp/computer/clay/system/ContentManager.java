@@ -253,18 +253,22 @@ public class ContentManager implements ContentManagerInterface {
                     for (Event event : timeline.getEvents()) {
 
                         // Reconstruct Clay object model
-                        Behavior behavior = getClay().getBehavior(event.getBehaviorUuid().toString());
+//                        Behavior behavior = getClay().getBehavior(event.getBehaviorUuid().toString());
 
                         // <HACK>
                         // TODO: Reconstruct behavior state
-                        BehaviorState behaviorState = behavior.getState();
+//                        BehaviorState behaviorState = event.getBehaviorState(); // behavior.getState();
+                        Log.v("CM_Log", "\t\t" + i + ": ^behaviorState: " + event.getBehaviorStateUuid());
+//                        Log.v("CM_Log", "\t\t" + i + ": *behaviorState: " + event.getBehaviorState().getUuid());
+//                        BehaviorState behaviorState = behavior.getState();
                         // </HACK>
 
-                        Log.v("CM_Log", "\t\t" + i + ": behavior: " + event.getBehavior());
-                        Log.v("CM_Log", "\t\t" + i + ": behaviorState" + event.getBehaviorState());
-                        i++;
+                        restoreEventState(unit, event);
+//                        event.setBehavior(behavior, behaviorState);
 
-                        event.setBehavior(behavior, behaviorState);
+//                        Log.v("CM_Log", "\t\t" + i + ": behavior: " + event.getBehavior().getUuid());
+//                        Log.v("CM_Log", "\t\t" + i + ": behaviorState: " + event.getBehaviorState().getUuid());
+                        i++;
                     }
 
                     // <HACK>
@@ -276,7 +280,7 @@ public class ContentManager implements ContentManagerInterface {
 //                    getClay().getUnits().add(unit);
                     // </HACK>
 
-                    getClay().addUnitView(unit);
+//                    getClay().addUnitView(unit);
 
 
 //                    timeline.setState(behaviorState);
@@ -343,6 +347,78 @@ public class ContentManager implements ContentManagerInterface {
                                     Log.v("CM_Log", "\t\tData could not be saved. " + firebaseError.getMessage());
                                 } else {
                                     Log.v("CM_Log", "\t\tData saved successfully (behavior " + behaviorUuid + ")");
+                                    System.out.println("");
+                                }
+                            }
+                        });
+
+
+//                        // Create behavior object from database.
+//                        Behavior retrievedBehavior = behaviorSnapshot.getValue(Behavior.class);
+//                        Log.v("CM_Log", "Retrieved unit (UUID: " + retrievedBehavior.getUuid() + ").");
+//
+//                        // Update cached unit from database.
+//                        if (!getClay().getBehaviorCacheManager().hasBehavior(retrievedBehavior.getUuid().toString())) {
+//
+//                            getClay().getBehaviorCacheManager().cacheBehavior(retrievedBehavior);
+//                            Log.v("CM_Log", "Cached the behavior.");
+//
+//                        } else {
+//
+//                            // TODO: Updated the cached unit with information from the unit retrieved from the database.
+//                            Log.v("CM_Log", "Updated cached behavior.");
+//
+//                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.v("CM_Log", "\tThe read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    public void updateBehaviorState(final BehaviorState behaviorState) {
+        Log.v("CM_Log", "updateBehaviorState");
+
+        final String behaviorStateUuid = behaviorState.getUuid().toString();
+
+        Firebase behaviorStatesRef = rootRef.child("behaviorStates");
+        Query behaviorStateQueryRef = behaviorStatesRef.orderByChild ("uuid").equalTo(behaviorStateUuid).limitToFirst(1);
+
+        behaviorStateQueryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.getChildrenCount() == 0) {
+                    Log.v("CM_Log", "\tThere is no behavior state with UUID equal to " + behaviorStateUuid + ".");
+                } else if (dataSnapshot.getChildrenCount() > 0) {
+
+                    // Store unit in the local cache.
+                    for (DataSnapshot behaviorStateSnapshot : dataSnapshot.getChildren()) {
+
+                        // Update values.
+                        // First, get a reference to the behavior's state. Then create a map object
+                        // with the updated values. Then commit the update to the database.
+                        Firebase ref = behaviorStateSnapshot.getRef();
+                        //Firebase ref = behaviorSnapshot.child("state").getRef();
+
+                        Map<String, Object> updatedValues = new HashMap<String, Object>();
+                        updatedValues.put("stateUuid", behaviorState.getBehaviorUuid());
+                        updatedValues.put("tag", behaviorState.getTag());
+                        updatedValues.put("state", behaviorState.getState());
+                        updatedValues.put("description", behaviorState.getDescription());
+
+                        ref.updateChildren(updatedValues, new Firebase.CompletionListener() {
+                            @Override
+                            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                                if (firebaseError != null) {
+                                    Log.v("CM_Log", "\t\tData could not be saved. " + firebaseError.getMessage());
+                                } else {
+                                    Log.v("CM_Log", "\t\tData saved successfully (behavior " + behaviorStateUuid + ")");
                                     System.out.println("");
                                 }
                             }
@@ -560,6 +636,61 @@ public class ContentManager implements ContentManagerInterface {
 
 //                    Log.v("Clay_Behavior_Repo", "Adding behavior " + behavior.getTag() + " (UUID: " + behavior.getUuid() + ")");
 //                    getClay ().getBehaviorCacheManager().storeBehavior (behavior);
+                }
+
+//                // Add the basic behaviors if they do not exist.
+//                getClay().getBehaviorCacheManager().setupRepository();
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.v("CM_Log", "\tThe read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    public void restoreEventState (final Unit unit, final Event event) {
+
+        Log.v ("CM_Log", "restoreEventState");
+
+        Firebase behaviorStateRef = rootRef.child ("behaviorStates");
+        Query queryRef = behaviorStateRef.orderByChild("uuid").equalTo(event.getBehaviorStateUuid().toString()).limitToFirst(1);
+
+        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                // Store behaviors in the local cache.
+                for (DataSnapshot behaviorSnapshot : dataSnapshot.getChildren()) {
+
+                    // Reconstruct Clay object model
+                    Behavior behavior = getClay().getBehavior(event.getBehaviorUuid().toString());
+
+                    // Create behavior object from database.
+                    BehaviorState behaviorState = behaviorSnapshot.getValue(BehaviorState.class);
+                    Log.v("CM_Log", "\tgot behavior state " + behaviorState);
+                    event.setBehavior(behavior, behaviorState);
+
+                    Log.v("CM_Log", "\t\tbehavior.getState = " + behaviorState);
+                    Log.v("CM_Log", "\t\tbehavior.getState.getTag = " + behaviorState.getTag());
+                    Log.v("CM_Log", "\t\tbehavior.getState.getState = " + behaviorState.getState());
+
+//                    Log.v("Clay_Behavior_Repo", "Adding behavior " + behavior.getTag() + " (UUID: " + behavior.getUuid() + ")");
+//                    getClay ().getBehaviorCacheManager().storeBehavior (behavior);
+
+                    // <HACK>
+                    // Make sure no units are in an invalid state (null reference)
+                    boolean addView = true;
+                    for (Event e : unit.getTimeline().getEvents()) {
+                        if (e.getBehavior() == null || e.getBehaviorState() == null) {
+                            addView = false;
+                        }
+                    }
+                    if (addView) {
+                        getClay().addUnitView(unit);
+                    }
+                    // </HACK>
                 }
 
 //                // Add the basic behaviors if they do not exist.

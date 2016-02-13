@@ -481,7 +481,9 @@ public class TimelineUnitAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        String lightStateString = item.getEvent().getBehavior().getState().getState();
+                        //String lightStateString = item.getEvent().getBehavior().getState().getState();
+                        // TODO: ^ The above line doesn't get the most recent or correct state from the behavior... is the reference out of date or not updated somewhere? That's bad, man.
+                        String lightStateString = item.getEvent().getBehaviorState().getState();
                         String[] lightStates = lightStateString.split(" ");
 
                         // Update the view
@@ -541,7 +543,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        String ioStateString = item.getEvent().getBehavior().getState().getState();
+                        String ioStateString = item.getEvent().getBehaviorState().getState();
                         String[] ioStates = ioStateString.split(" ");
 
                         char ioState = ioStates[i].charAt(0);
@@ -574,7 +576,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
             if (textView != null) {
 
                 // Get behavior state
-                String message = item.getEvent().getBehavior().getState().getState();
+                String message = item.getEvent().getBehaviorState().getState();
 
                 // Update the view
                 textView.setText("\"" + message + "\"");
@@ -585,7 +587,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
             if (textView != null) {
 
                 // Get behavior state
-                int time = Integer.parseInt(item.getEvent().getBehavior().getState().getState());
+                int time = Integer.parseInt(item.getEvent().getBehaviorState().getState());
 
                 // Update the view
                 textView.setText(time + " ms");
@@ -594,7 +596,7 @@ public class TimelineUnitAdapter extends BaseAdapter {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + item.getEvent().getBehavior().getState().getState() + "\"");
+                textView.setText("\"" + item.getEvent().getBehaviorState().getState() + "\"");
             }
         } else if (item.type == COMPLEX_LAYOUT) {
 

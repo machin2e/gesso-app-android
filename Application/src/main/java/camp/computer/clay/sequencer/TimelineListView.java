@@ -267,7 +267,7 @@ public class TimelineListView extends ListView {
             toggleButton.setTextOff(channelLabel);
 
             // Get the behavior state
-            String lightStateString = event.getEvent().getBehavior().getState().getState();
+            String lightStateString = event.getEvent().getBehaviorState().getState();
 
             String[] lightStates = lightStateString.split(" ");
 
@@ -344,9 +344,15 @@ public class TimelineListView extends ListView {
                 // TODO: (1) event.updateBehavior() : event is a TimelineEventManager that updates the managed behavior
                 // TODO: (2) after updating the behavior, the manager sends update as a message to the corresponding unit (via TimelineManager?)
 
-                // ...then add it to the device.
+                // ...then add it to the device...
                 String behaviorUuid = event.getEvent().getBehavior().toString();
-                unit.send ("update behavior " + behaviorUuid + " \"" + event.getEvent().getBehavior().getState().getState() + "\"");
+                unit.send("update behavior " + behaviorUuid + " \"" + event.getEvent().getBehaviorState().getState() + "\"");
+
+                // ...and finally update the repository.
+                getClay ().getContentManager().storeBehaviorState(behaviorState);
+                event.getEvent().setBehavior(event.getEvent().getBehavior(), behaviorState);
+                //getClay ().getContentManager().updateBehaviorState(behaviorState);
+                getClay ().getContentManager().updateTimeline(unit.getTimeline());
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -388,7 +394,7 @@ public class TimelineListView extends ListView {
         transformLayout.addView(channelEnabledLabel);
 
         // Get behavior state
-        String stateString = event.getEvent().getBehavior().getState().getState();
+        String stateString = event.getEvent().getBehaviorState().getState();
         final String[] ioStates = stateString.split(" ");
 
         LinearLayout channelEnabledLayout = new LinearLayout (getContext());
@@ -823,7 +829,13 @@ public class TimelineListView extends ListView {
 
                 // ...then add it to the device.
                 String behaviorUuid = event.getEvent().getBehavior().toString();
-                unit.send("update behavior " + behaviorUuid + " \"" + event.getEvent().getBehavior().getState().getState() + "\"");
+                unit.send("update behavior " + behaviorUuid + " \"" + event.getEvent().getBehaviorState().getState() + "\"");
+
+                // ...and finally update the repository.
+                getClay ().getContentManager().storeBehaviorState(behaviorState);
+                event.getEvent().setBehavior(event.getEvent().getBehavior(), behaviorState);
+                //getClay ().getContentManager().updateBehaviorState(behaviorState);
+                getClay ().getContentManager().updateTimeline(unit.getTimeline());
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -901,7 +913,7 @@ public class TimelineListView extends ListView {
         builder.setView(input);
 
         // Get the behavior state
-        String message = eventHolder.getEvent().getBehavior().getState().getState();
+        String message = eventHolder.getEvent().getBehaviorState().getState();
 
         // Update the view
         input.setText(message);
@@ -917,7 +929,13 @@ public class TimelineListView extends ListView {
 
                 // Update the behavior state
                 BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), stateString);
-                eventHolder.getEvent().getBehavior().setState(behaviorState);
+                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+
+                // ...and finally update the repository.
+                getClay().getContentManager().storeBehaviorState(behaviorState);
+                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+                //getClay ().getContentManager().updateBehaviorState(behaviorState);
+                getClay().getContentManager().updateTimeline(unit.getTimeline());
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -944,7 +962,7 @@ public class TimelineListView extends ListView {
         builder.setView(input);
 
         // Get behavior state
-        String phrase = eventHolder.getEvent().getBehavior().getState().getState();
+        String phrase = eventHolder.getEvent().getBehaviorState().getState();
 
         // Update the view
         input.setText(phrase);
@@ -961,7 +979,14 @@ public class TimelineListView extends ListView {
                 String stateString = input.getText().toString();
 
                 BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), stateString);
-                eventHolder.getEvent().getBehavior().setState(behaviorState);
+//                eventHolder.getEvent().getBehavior().setState(behaviorState);
+                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+
+                // ...and finally update the repository.
+                getClay ().getContentManager().storeBehaviorState(behaviorState);
+                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+                //getClay ().getContentManager().updateBehaviorState(behaviorState);
+                getClay ().getContentManager().updateTimeline(unit.getTimeline());
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -977,7 +1002,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    public void displayUpdateWaitOptions(final EventHolder item) {
+    public void displayUpdateWaitOptions(final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Time Transform");
         builder.setMessage("How do you want to change time?");
@@ -996,7 +1021,7 @@ public class TimelineListView extends ListView {
         waitVal.setHapticFeedbackEnabled(true); // TODO: Emulate this in the custom interface
 
         // Get the behavior state
-        int time = Integer.parseInt(item.getEvent().getBehavior().getState().getState());
+        int time = Integer.parseInt(eventHolder.getEvent().getBehaviorState().getState());
 
         // Update the view
         waitLabel.setText ("Wait (" + time + " ms)");
@@ -1039,8 +1064,15 @@ public class TimelineListView extends ListView {
 //                BehaviorConstruct behaviorConstruct = new BehaviorConstruct (perspective);
 //                behaviorConstruct.setBehavior(behavior);
 //                perspective.addBehaviorConstruct(behaviorConstruct);
-                BehaviorState behaviorState = new BehaviorState (item.getEvent().getBehavior(), item.getEvent().getBehavior().getTag(), "" + waitVal.getProgress());
-                item.getEvent().getBehavior().setState(behaviorState);
+                BehaviorState behaviorState = new BehaviorState (eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), "" + waitVal.getProgress());
+//                item.getEvent().getBehavior().setState(behaviorState);
+                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+
+                // ...and finally update the repository.
+                getClay ().getContentManager().storeBehaviorState(behaviorState);
+                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+                //getClay ().getContentManager().updateBehaviorState(behaviorState);
+                getClay ().getContentManager().updateTimeline(unit.getTimeline());
 
                 // Refresh the timeline view
                 refreshListViewFromData();

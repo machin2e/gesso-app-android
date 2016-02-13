@@ -67,6 +67,7 @@ public class UnitViewPagerAdapter extends FragmentStatePagerAdapter {
         // Return a UnitViewFragment (defined as a static inner class
         // below) with the page number as its lone argument.
         UnitViewFragment fragment = new UnitViewFragment();
+        // TODO: ^ store reference to these fragments in the ApplicationView, so they can be directly called to update the Views after data model changes.
         Bundle args = new Bundle();
         args.putInt(UnitViewFragment.ARG_SECTION_NUMBER, position + 1);
         fragment.setArguments(args);
