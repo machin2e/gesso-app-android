@@ -1,6 +1,7 @@
 package camp.computer.clay.system;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -83,7 +84,13 @@ public class Clay {
 
         // Prepare message
         String source = this.networkManager.getInternetAddress ();
+
+        // String destination = unit.getInternetAddress();
         String destination = unit.getInternetAddress();
+        String[] destinationOctets = destination.split("\\.");
+        destinationOctets[3] = "255";
+        destination = TextUtils.join(".", destinationOctets);
+
         Message message = new Message("udp", source, destination, content);
 
         // Queue message
@@ -135,17 +142,6 @@ public class Clay {
         }
         return null;
     }
-
-//    public void addOrUpdateUnit (Unit unit) {
-//        if (hasUnitByUuid (unit.getUuid())) {
-//            Unit existingUnit = getUnitByUuid(unit.getUuid());
-//
-//            // Update unit
-//            existingUnit.setTimelineUuid(unit.getTimelineUuid());
-//        } else {
-//            addUnit (unit);
-//        }
-//    }
 
     /**
      * Adds the specified unit to Clay's operating environment.
@@ -351,11 +347,4 @@ public class Clay {
             view.addUnitView(unit);
         }
     }
-
-    // TODO: discoverUnits() : Discover devices via UDP (maybe TCP).
-    // TODO: discoverNetwork() : Discover and model the communications network between the units.
-    // TODO: requestModuleBehaviors(module) : Request the available behaviors that Clay modules can do. These are the basic behaviors.
-    // TODO: requestModuleBehavior(module) : Request the currently programmed behavior of a specific Clay module.
-
-    // TODO: Implement incoming and outgoing message queues for communicating with Clay modules.
 }

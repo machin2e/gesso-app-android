@@ -258,6 +258,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
 
         private void sendDatagram (String ipAddress, int port, String message) {
             Log.v("Clay_Messaging", "\tSending datagram to " + ipAddress + ": " + message);
+            Log.v("foo", "\tSending datagram to " + ipAddress + ": " + message);
             try {
                 // Send UDP packet to the specified address.
                 DatagramSocket socket = new DatagramSocket(port);

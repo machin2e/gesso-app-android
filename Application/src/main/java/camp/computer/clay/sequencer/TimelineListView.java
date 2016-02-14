@@ -345,7 +345,7 @@ public class TimelineListView extends ListView {
                 // TODO: (2) after updating the behavior, the manager sends update as a message to the corresponding unit (via TimelineManager?)
 
                 // ...then add it to the device...
-                String behaviorUuid = event.getEvent().getBehavior().toString();
+                String behaviorUuid = event.getEvent().getBehavior().getUuid().toString();
                 unit.send("update behavior " + behaviorUuid + " \"" + event.getEvent().getBehaviorState().getState() + "\"");
 
                 // ...and finally update the repository.
@@ -828,7 +828,7 @@ public class TimelineListView extends ListView {
                 event.getEvent().getBehavior().setState(behaviorState);
 
                 // ...then add it to the device.
-                String behaviorUuid = event.getEvent().getBehavior().toString();
+                String behaviorUuid = event.getEvent().getBehavior().getUuid().toString();
                 unit.send("update behavior " + behaviorUuid + " \"" + event.getEvent().getBehaviorState().getState() + "\"");
 
                 // ...and finally update the repository.
@@ -931,6 +931,10 @@ public class TimelineListView extends ListView {
                 BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), stateString);
                 eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
 
+                // ...then add it to the device...
+                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
+                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
+
                 // ...and finally update the repository.
                 getClay().getContentManager().storeBehaviorState(behaviorState);
                 eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
@@ -981,6 +985,10 @@ public class TimelineListView extends ListView {
                 BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), stateString);
 //                eventHolder.getEvent().getBehavior().setState(behaviorState);
                 eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+
+                // ...then add it to the device...
+                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
+                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
 
                 // ...and finally update the repository.
                 getClay ().getContentManager().storeBehaviorState(behaviorState);
@@ -1067,6 +1075,10 @@ public class TimelineListView extends ListView {
                 BehaviorState behaviorState = new BehaviorState (eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), "" + waitVal.getProgress());
 //                item.getEvent().getBehavior().setState(behaviorState);
                 eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+
+                // ...then add it to the device...
+                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
+                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
 
                 // ...and finally update the repository.
                 getClay ().getContentManager().storeBehaviorState(behaviorState);
