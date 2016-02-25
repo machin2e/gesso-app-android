@@ -7,7 +7,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -82,27 +81,21 @@ public class Clay {
      */
     public void sendMessage (Unit unit, String content) {
 
-        // Prepare message
+        // Get source address
         String source = this.networkManager.getInternetAddress ();
 
+        // Get destination address
         // String destination = unit.getInternetAddress();
         String destination = unit.getInternetAddress();
         String[] destinationOctets = destination.split("\\.");
         destinationOctets[3] = "255";
         destination = TextUtils.join(".", destinationOctets);
 
+        // Create message
         Message message = new Message("udp", source, destination, content);
 
-        // Queue message
+        // Queue message for sending
         messageManager.queueOutgoingMessage(message);
-
-//        // <HACK>
-//        // The destination should be the unit's address, not the broadcast address.
-//        destination = DatagramManager.BROADCAST_ADDRESS; // unit.getInternetAddress();
-//        Log.v ("UDP_Destination", "destination: " + unit.getInternetAddress());
-//        Message broadcast = new Message("udp", source, destination, content);
-//        messageManager.queueOutgoingMessage(broadcast);
-//        // </HACK>
     }
 
     /**
@@ -145,7 +138,6 @@ public class Clay {
 
     /**
      * Adds the specified unit to Clay's operating environment.
-     * @param unit
      */
     public void addUnit (UUID unitUuid, String internetAddress) {
 
@@ -201,16 +193,7 @@ public class Clay {
 
             // Restore the unit in Clay's object model
             // Request unit profile from history (i.e., the remote store).
-            // TODO: Move this into a unit manager?
-            this.getContentManager().storeOrRestoreUnit(unitUuid);
-
-            // TODO: Send request to unit to send its behavior state (or timeline state)
-
-            Log.v ("Add_Unit", "Adding unit");
-
-            // Retrieve unit from memory (i.e., contentManager).
-            //getContentManager().storeUnit(unit);
-            //getContentManager ().storeOrRestoreUnit (unit.getUuid ());
+            getContentManager().restoreUnit(unitUuid);
         }
     }
 
@@ -223,66 +206,55 @@ public class Clay {
     }
 
     public boolean hasUnitByUuid (UUID unitUuid) {
-        Log.v("Clay_Time", "Looking for unit (in set of " + getUnits().size() + ") with UUID " + unitUuid + "...");
         for (Unit unit : getUnits ()) {
-            Log.v("Clay_Time", "\t...checking address " + unit.getInternetAddress());
             if (unit.getUuid().compareTo(unitUuid) == 0) {
-                Log.v("Clay_Time", "Found matching address " + unit.getInternetAddress());
                 return true;
             }
         }
-        Log.v("Clay_Time", "Didn't find a matching address");
         return false;
     }
 
     public Unit getUnitByUuid (UUID unitUuid) {
-        Log.v("Clay_Time", "Looking for unit (in set of " + getUnits().size() + ") with UUID " + unitUuid + "...");
         for (Unit unit : getUnits ()) {
-            Log.v("Clay_Time", "\t...checking address " + unit.getInternetAddress());
             if (unit.getUuid().compareTo(unitUuid) == 0) {
-                Log.v("Clay_Time", "Found matching address " + unit.getInternetAddress());
                 return unit;
             }
         }
-        Log.v("Clay_Time", "Didn't find a matching address");
         return null;
     }
 
     public boolean hasUnitByAddress (String address) {
-        Log.v("Clay_Time", "Looking for unit (in set of " + getUnits().size() + ") with address " + address + "...");
-        for (Unit unit : getUnits ()) {
-            Log.v("Clay_Time", "\t...checking address " + unit.getInternetAddress());
-            if (unit.getInternetAddress().compareTo (address) == 0) {
-                Log.v("Clay_Time", "Found matching address " + unit.getInternetAddress());
+        for (Unit unit : getUnits()) {
+            if (unit.getInternetAddress().equals(address)) {
                 return true;
             }
         }
-        Log.v("Clay_Time", "Didn't find a matching address");
         return false;
     }
 
-    public void removeUnit (Unit unit) {
-        if (hasUnit(unit)) {
-            this.units.remove (unit);
-        }
-    }
+//    public void removeUnit (Unit unit) {
+//        if (hasUnit(unit)) {
+//            this.units.remove (unit);
+//        }
+//    }
 
     /**
      * Creates a new behavior with the specified tag and state, caches it, and stores it.
      * @param tag
-     * @param state
+     * @param defaultStateString
      */
-    public void createBehavior (String tag, String state) {
+    public void createBehavior (String tag, String defaultStateString) {
 
-        // Create behavior
-        Behavior behavior = new Behavior (tag, state);
+        // Create behavior and behavior state
+        Behavior behavior = new Behavior (tag, defaultStateString);
+        BehaviorState behaviorState = new BehaviorState(behavior, defaultStateString);
 
         // Cache the behavior locally
         this.cacheBehavior(behavior);
 
         // Store the behavior remotely
         if (hasContentManager()) {
-            getContentManager().storeBehaviorState(behavior.getState());
+            getContentManager().storeBehaviorState(behaviorState);
             getContentManager().storeBehavior(behavior);
         }
     }
@@ -295,7 +267,7 @@ public class Clay {
         return this.contentManager != null;
     }
 
-    public Behavior getBehavior (String behaviorUuid) {
+    public Behavior getBehavior (UUID behaviorUuid) {
         if (hasBehaviorCacheManager()) {
             return getBehaviorCacheManager().getBehavior(behaviorUuid);
         }
@@ -338,12 +310,41 @@ public class Clay {
         this.units.add(unit);
     }
 
-    public void addUnitView(Unit unit) {
+    public void updateUnitView (Unit unit) {
+//        todo
+    }
+
+    /**
+     * Requests a view for a unit.
+     * @param unit The unit for which a view is requested.
+     */
+    public void addUnitView (Unit unit) {
+
+        // TODO: (?) Add UnitViewFragment to a list here?
+
+        // <HACK>
+        // Make sure no units are in an invalid state (null reference)
+        boolean addView = true;
+        for (Event event : unit.getTimeline().getEvents()) {
+            if (event.getBehavior() == null || event.getBehaviorState() == null) {
+                addView = false;
+            }
+        }
+        if (addView) {
+            addUnitView2(unit);
+        }
+        // </HACK>
+    }
+
+    private void addUnitView2(Unit unit) {
         // Add timelines to attached views
         for (ViewManagerInterface view : this.views) {
             // TODO: (1) add a page to the ViewPager
 
             // (2) Add a tab to the action bar to support navigation to the specified page.
+            Log.v ("CM_Log", "addUnitView2");
+            Log.v ("CM_Log", "\tunit: " + unit);
+            Log.v ("CM_Log", "\tunit/timeline: " + unit.getTimeline());
             view.addUnitView(unit);
         }
     }

@@ -215,6 +215,12 @@ public class MessageManager {
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
+
+                    // TODO: Update communications table
+                    /*
+                    Unit unit = getClay().getUnitByUuid(UUID.fromString(unitUuid));
+                    unit.setTimeOfLastContact();
+                    */
                 }
             }
 

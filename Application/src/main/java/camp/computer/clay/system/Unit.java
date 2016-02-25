@@ -104,20 +104,33 @@ public class Unit {
     @JsonIgnore
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
+
+        this.timeline.setUnit(this);
     }
 
     public void send(String content) {
         getClay().sendMessage(this, content);
     }
 
-    public void addBehavior(String behaviorUuid) {
+//    public void addBehavior(UUID behaviorUuid) {
+//
+//        // Get the behavior with the specified UUID
+//        Behavior behavior = getClay().getBehavior(behaviorUuid);
+//
+//        // Generate the behavior's initial state
+//        BehaviorState behaviorState = new BehaviorState(behavior, behavior.getDefaultState());
+//
+//        // Create an event for the behavior so it can be added to the timeline
+//        Event event = new Event(timeline, behavior, behaviorState);
+//
+//        // Add the event to the timeline
+//        this.getTimeline().addEvent(event);
+//    }
 
-        // Get the behavior with the specified UUID
-        Behavior behavior = getClay().getBehavior(behaviorUuid);
+    public void addBehavior(Behavior behavior, BehaviorState behaviorState) {
 
         // Create an event for the behavior so it can be added to the timeline
-        // TODO: Select the behavior state based on user specification
-        Event event = new Event(behavior, behavior.getState());
+        Event event = new Event(timeline, behavior, behaviorState);
 
         // Add the event to the timeline
         this.getTimeline().addEvent(event);

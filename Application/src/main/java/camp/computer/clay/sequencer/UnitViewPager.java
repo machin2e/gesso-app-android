@@ -141,7 +141,7 @@ public class UnitViewPager extends ViewPager {
 
                 // Update gesture classification
                 currentListView = (TimelineListView) findViewWithTag(1);
-                currentListView.abstractSelectedItems();
+                currentListView.packSelectedEvents();
                 currentListView.refreshListViewFromData();
 
                 Log.v("Gesture_Log", "ACTION_UP (touch)");

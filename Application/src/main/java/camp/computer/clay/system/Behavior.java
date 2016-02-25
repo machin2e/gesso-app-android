@@ -2,6 +2,7 @@ package camp.computer.clay.system;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 // How to exclude certain fields:
@@ -11,58 +12,111 @@ public class Behavior {
 
     private UUID uuid;
 
+    private String tag;
+
+    private String description;
+
+    /**
+     * The behavior's default state string. This is used to generate the initial state for the
+     * behavior. It is also used to recover from emergency situations in which no state is
+     * available for the behavior (e.g., Internet connection lost).
+     */
+    private String defaultState;
+
     // Behavior Profile
-    private UUID stateUuid;
+//    private UUID stateUuid;
 
     // Behavior State
-    private BehaviorState state;
+//    private BehaviorState state;
 
-    public Behavior() {
+    /** The list of behaviors in the behavior package, if this behavior is packaged behavior. */
+    ArrayList<Behavior> behaviors;
+
+    Behavior() {
         // This empty default constructor is necessary for Firebase to be able to deserialize objects.
     }
 
-    Behavior(String tag, String defaultState) {
+    public Behavior(String tag, String defaultState) {
         this.uuid = UUID.randomUUID();
 
+        this.tag = tag;
+        this.description = "";
+
+        this.defaultState = defaultState;
+
+        behaviors = new ArrayList<Behavior>();
+
         // Create the default state of this behavior
-        BehaviorState behaviorState = new BehaviorState (this, tag, defaultState);
-        this.state = behaviorState;
-        this.stateUuid = behaviorState.getUuid();
+//        BehaviorState behaviorState = new BehaviorState (this, tag, defaultState);
+//        this.state = behaviorState;
+//        this.stateUuid = behaviorState.getUuid();
     }
 
     public UUID getUuid () {
         return this.uuid;
     }
 
-    public UUID getStateUuid() { return this.stateUuid; }
-
-    public void setStateUuid (UUID stateUuid) {
-        this.stateUuid = stateUuid;
-    }
-
-    @JsonIgnore
     public void setTag(String tag) {
-        BehaviorState behaviorState = new BehaviorState (this, tag, getState().getState());
-        behaviorState.setDescription(getDescription());
-        this.state = behaviorState;
+        this.tag = tag;
     }
 
-    @JsonIgnore
     public String getTag() {
-        return this.state.getTag();
+        return this.tag;
     }
 
-    @JsonIgnore
     public void setDescription (String description) {
-        BehaviorState behaviorState = new BehaviorState (this, getTag(), getState().getState());
-        behaviorState.setDescription(description);
-        this.state = behaviorState;
+        this.description = description;
     }
 
-    @JsonIgnore
     public String getDescription () {
-        return this.state.getDescription();
+        return this.description;
     }
+
+    public String getDefaultState() {
+        return this.defaultState;
+    }
+
+    public ArrayList<Behavior> getBehaviors() {
+        return this.behaviors;
+    }
+
+    public void addBehavior (Behavior behavior) {
+        this.behaviors.add(behavior);
+    }
+
+    public void addBehaviors (ArrayList<Behavior> behaviors) {
+        this.behaviors.addAll(behaviors);
+    }
+
+//    public UUID getStateUuid() { return this.stateUuid; }
+
+//    public void setStateUuid (UUID stateUuid) {
+//        this.stateUuid = stateUuid;
+//    }
+
+//    @JsonIgnore
+//    public void setTag(String tag) {
+//        BehaviorState behaviorState = new BehaviorState (this, tag, getState().getState());
+//        behaviorState.setDescription(getDescription());
+//        this.state = behaviorState;
+//    }
+
+//    @JsonIgnore
+//    public String getTag() {
+//        return this.state.getTag();
+//    }
+
+//    @JsonIgnore
+//    public void setDescription (String description) {
+//        BehaviorState behaviorState = new BehaviorState (this, getTag(), getState().getState());
+//        behaviorState.setDescription(description);
+//        this.state = behaviorState;
+//    }
+
+//    @JsonIgnore
+//    public String getDescription () {
+//        return this.state.getDescription();
+//    }
 
 //    @JsonIgnore
 //    public void setState(String state) {
@@ -71,15 +125,15 @@ public class Behavior {
 //        this.state = behaviorState;
 //    }
 
-    @JsonIgnore
-    public void setState (BehaviorState state) {
-        this.state = state;
-    }
+//    @JsonIgnore
+//    public void setState (BehaviorState state) {
+//        this.state = state;
+//    }
 
-    @JsonIgnore
-    public BehaviorState getState() {
-        return this.state;
-    }
+//    @JsonIgnore
+//    public BehaviorState getState() {
+//        return this.state;
+//    }
 
 //    /**
 //     * Sets the current state of the behavior to the existing state with the specified UUID.

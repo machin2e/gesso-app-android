@@ -2,7 +2,6 @@ package camp.computer.clay.system;
 
 import android.util.Log;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -41,9 +40,26 @@ public class ContentManager implements ContentManagerInterface {
         return this.clay;
     }
 
-    public void storeUnit (Unit unit) {
+    public void storeUnit (final Unit unit) {
+
+        /* Query */
+
         Firebase unitRef = rootRef.child("units");
-        unitRef.push().setValue(unit);
+
+        /* Callback */
+
+        unitRef.push().setValue(unit, new Firebase.CompletionListener() {
+
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.v("CM_Log", "\t\tUnit could not be saved. " + firebaseError.getMessage());
+                } else {
+                    Log.v("CM_Log", "\t\tUnit saved successfully (UUID" + unit.getUuid() + ")");
+                    restoreUnitTimeline(unit, unit.getTimelineUuid());
+                }
+            }
+        });
     }
 
     /**
@@ -51,7 +67,7 @@ public class ContentManager implements ContentManagerInterface {
      * updates the locally cached object corresponding to the unit.
      * @param unitUuid
      */
-    public void storeOrRestoreUnit(final UUID unitUuid) {
+    public void restoreUnit(final UUID unitUuid) {
 
         final String unitUuidString = unitUuid.toString();
 
@@ -60,7 +76,7 @@ public class ContentManager implements ContentManagerInterface {
         Query unitQueryRef = unitsRef.orderByChild ("uuid").equalTo(unitUuidString).limitToFirst(1);
 
         // Create query response handler. Integrates the received data into the local cache.
-        unitQueryRef.addValueEventListener(new ValueEventListener() {
+        unitQueryRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -74,9 +90,11 @@ public class ContentManager implements ContentManagerInterface {
                     // below gets the object in the local cache corresponding to the unit with the
                     // specified UUID, then stores the object in the remote repository.
                     if (getClay().hasUnitByUuid(unitUuid)) {
+
                         Unit unit = getClay().getUnitByUuid(unitUuid);
                         storeUnit(unit);
-                        storeOrRestoreTimeline(unit.getTimeline());
+//                        restoreTimeline(unit.getTimeline());
+
                         Log.v("Restore_Unit_DB", "Saved unit to database.");
                     } else {
                         Log.v("Restore_Unit_DB", "No unit was found with the specified UUID in the " +
@@ -92,13 +110,14 @@ public class ContentManager implements ContentManagerInterface {
 
                         // Create behavior object from database.
                         Unit restoredUnit = unitSnapshot.getValue(Unit.class);
-                        Log.v("Restore_Unit_DB", "Restored unit (UUID: " + restoredUnit.getUuid() + ").");
+                        Log.v("Restore_Unit_DB", "\tRestored unit (UUID: " + restoredUnit.getUuid() + ").");
 
 //                        // Add unit to present (i.e., local cache).
 //                        getClay().addUnit(restoredUnit);
 
                         // Update cached unit from database.
                         Unit unit = getClay().getUnitByUuid(unitUuid);
+                        Log.v("Restore_Unit_DB", "\tCached unit (UUID: " + unit.getUuid() + ").");
                         if (unit != null) {
 
                             // TODO: Update the locally cached unit with information from the unit retrieved from the database.
@@ -122,11 +141,24 @@ public class ContentManager implements ContentManagerInterface {
 
     }
 
-    public void storeTimeline (Timeline timeline) {
+    public void storeTimeline (final Timeline timeline) {
         Firebase timelinesRef = rootRef.child("timelines");
 
         Firebase timelineRef = timelinesRef.push().getRef();
-        timelineRef.setValue(timeline);
+        timelineRef.setValue(timeline, new Firebase.CompletionListener() {
+
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    Log.v("CM_Log", "\t\tTimeline could not be saved. " + firebaseError.getMessage());
+                } else {
+                    Log.v("CM_Log", "\t\tTimeline saved successfully (UUID" + timeline.getUuid() + ")");
+                    Log.v("CM_Log", "\t\t-->Timeline.Unit: " + timeline.getUnit());
+                    Log.v("CM_Log", "\t\t-->Timeline.Unit.Timeline: " + timeline.getUnit().getTimeline());
+                    restoreEvents(timeline);
+                }
+            }
+        });
 
         /*
         // Add event behaviors and behavior states
@@ -139,83 +171,83 @@ public class ContentManager implements ContentManagerInterface {
 
     // TODO: updateTimeline (Timeline timeline)
 
-    /**
-     * Retrieves the timeline with the specified UUID, if any, from the remote database and
-     * updates the locally cached object corresponding to the timeline.
-     * @param timeline
-     */
-    public void storeOrRestoreTimeline(final Timeline timeline) {
-
-        Log.v("CM_Log", "storeOrRestoreTimeline");
-
-        final String timelineUuidString = timeline.getUuid().toString();
-
-        // Create query to database
-        Firebase timelinesRef = rootRef.child("timelines");
-        Query timelineQueryRef = timelinesRef.orderByChild ("uuid").equalTo(timelineUuidString).limitToFirst(1);
-
-        // Create query response handler. Integrates the received data into the local cache.
-        timelineQueryRef.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.getChildrenCount() == 0) {
-
-                    Log.v("CM_Log", "\tThere is no timeline with UUID equal to " + timelineUuidString + ".");
-
-                    // There was no unit object found in the remote repository with the specified
-                    // UUID. Since no such unit object was found, one is created here. The code
-                    // below gets the object in the local cache corresponding to the unit with the
-                    // specified UUID, then stores the object in the remote repository.
-//                    if (getClay().hasUnitByUuid(unitUuid)) {
-//                        Unit unit = getClay().getUnitByUuid(unitUuid);
-//                        storeUnit(unit);
-                    storeTimeline(timeline);
-                    Log.v("CM_Log", "\tSaved timeline to database.");
-//                    } else {
-//                        Log.v("Restore_Unit_DB", "No unit was found with the specified UUID in the " +
-//                                "local cache, so it was not stored in the remote repository.");
+//    /**
+//     * Retrieves the timeline with the specified UUID, if any, from the remote database and
+//     * updates the locally cached object corresponding to the timeline.
+//     * @param timeline
+//     */
+//    public void restoreTimeline(final Timeline timeline) {
+//
+//        Log.v("CM_Log", "restoreTimeline");
+//
+//        final String timelineUuidString = timeline.getUuid().toString();
+//
+//        // Create query to database
+//        Firebase timelinesRef = rootRef.child("timelines");
+//        Query timelineQueryRef = timelinesRef.orderByChild ("uuid").equalTo(timelineUuidString).limitToFirst(1);
+//
+//        // Create query response handler. Integrates the received data into the local cache.
+//        timelineQueryRef.addValueEventListener(new ValueEventListener() {
+//
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                if (dataSnapshot.getChildrenCount() == 0) {
+//
+//                    Log.v("CM_Log", "\tThere is no timeline with UUID equal to " + timelineUuidString + ".");
+//
+//                    // There was no unit object found in the remote repository with the specified
+//                    // UUID. Since no such unit object was found, one is created here. The code
+//                    // below gets the object in the local cache corresponding to the unit with the
+//                    // specified UUID, then stores the object in the remote repository.
+////                    if (getClay().hasUnitByUuid(unitUuid)) {
+////                        Unit unit = getClay().getUnitByUuid(unitUuid);
+////                        storeUnit(unit);
+//                    storeTimeline(timeline);
+//                    Log.v("CM_Log", "\tSaved timeline to database.");
+////                    } else {
+////                        Log.v("Restore_Unit_DB", "No unit was found with the specified UUID in the " +
+////                                "local cache, so it was not stored in the remote repository.");
+////                    }
+//
+//                } else if (dataSnapshot.getChildrenCount() > 0) {
+//
+//                    // The query returned a unit object with the specified UUID from the remote
+//                    // repository.
+//                    // Store unit in the local cache.
+//                    for (DataSnapshot timelineSnapshot : dataSnapshot.getChildren()) {
+//
+//                        // Create behavior object from database.
+//                        Timeline restoredTimeline = timelineSnapshot.getValue(Timeline.class);
+//                        Log.v("CM_Log", "\tRestored timeline (UUID: " + restoredTimeline.getUuid() + ").");
+//
+//                        // Update cached unit from database.
+//                        // TODO: Find the timeline (search through units?) and update it
+//
+////                        Unit unit = getClay().getUnitByUuid(unitUuid);
+////                        if (unit != null) {
+////
+////                            // TODO: Update the locally cached unit with information from the unit retrieved from the database.
+////
+////                            // TODO: Restore the unit's timeline (and in turn, the timeline's behaviors)
+////
+////                            Log.v("Restore_Unit_DB", "Updating unit in local cache.");
+////                        } else {
+////                            Log.v("Restore_Unit_DB", "Failed to save unit to database. This entails undefined problems.");
+////                        }
 //                    }
-
-                } else if (dataSnapshot.getChildrenCount() > 0) {
-
-                    // The query returned a unit object with the specified UUID from the remote
-                    // repository.
-                    // Store unit in the local cache.
-                    for (DataSnapshot timelineSnapshot : dataSnapshot.getChildren()) {
-
-                        // Create behavior object from database.
-                        Timeline restoredTimeline = timelineSnapshot.getValue(Timeline.class);
-                        Log.v("CM_Log", "\tRestored timeline (UUID: " + restoredTimeline.getUuid() + ").");
-
-                        // Update cached unit from database.
-                        // TODO: Find the timeline (search through units?) and update it
-
-//                        Unit unit = getClay().getUnitByUuid(unitUuid);
-//                        if (unit != null) {
+//                }
+//            }
 //
-//                            // TODO: Update the locally cached unit with information from the unit retrieved from the database.
+//            @Override
+//            public void onCancelled(FirebaseError firebaseError) {
+//                Log.v("Restore_Unit_DB", "The read failed: " + firebaseError.getMessage());
+//            }
+//        });
 //
-//                            // TODO: Restore the unit's timeline (and in turn, the timeline's behaviors)
-//
-//                            Log.v("Restore_Unit_DB", "Updating unit in local cache.");
-//                        } else {
-//                            Log.v("Restore_Unit_DB", "Failed to save unit to database. This entails undefined problems.");
-//                        }
-                    }
-                }
-            }
+//    }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.v("Restore_Unit_DB", "The read failed: " + firebaseError.getMessage());
-            }
-        });
-
-    }
-
-    public void restoreUnitTimeline (final Unit unit, UUID timelineUuid) {
+    public void restoreUnitTimeline (final Unit unit, final UUID timelineUuid) {
 
         Log.v ("CM_Log", "restoreUnitTimeline");
 
@@ -230,55 +262,46 @@ public class ContentManager implements ContentManagerInterface {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // Store behaviors in the local cache.
-                for (DataSnapshot timelineSnapshot : dataSnapshot.getChildren()) {
-                    // Create behavior object from database.
-                    Timeline timeline = timelineSnapshot.getValue(Timeline.class);
-                    Log.v("CM_Log", "\tRestored unit timeline (UUID: " + timeline.getUuid() + ")");
+                if (dataSnapshot.getChildrenCount() == 0) {
 
-                    unit.setTimeline(timeline);
+                    // There was no unit object found in the remote repository with the specified
+                    // UUID. Since no such unit object was found, one is created here. The code
+                    // below gets the object in the local cache corresponding to the unit with the
+                    // specified UUID, then stores the object in the remote repository.
 
-//                    // <HACK>
-//                    getClay().getView(0).refreshListViewFromData(unit);
-//                    // </HACK>
+                    Timeline timeline = unit.getTimeline();
+                    storeTimeline(timeline);
 
-                    // Get reference to the events on the unit's timeline.
-                    // TODO: restoreTimelineBehaviors (or BehaviorEvents)
-//                    Firebase eventsRef = timelineSnapshot.getRef();
-                    // TODO: Iterate through events and reconstruct objects (if store as separate entity in the data store).
+                } else {
 
-                    Log.v("CM_Log", "\t\tNumber of events: " + timeline.getEvents().size());
-
-                    int i = 0;
-                    for (Event event : timeline.getEvents()) {
-
-                        // Reconstruct Clay object model
-//                        Behavior behavior = getClay().getBehavior(event.getBehaviorUuid().toString());
+                    // Store behaviors in the local cache.
+                    for (DataSnapshot timelineSnapshot : dataSnapshot.getChildren()) {
+                        // Create behavior object from database.
+                        Timeline timeline = timelineSnapshot.getValue(Timeline.class);
+                        Log.v("CM_Log", "\tRestored unit timeline (UUID: " + timeline.getUuid() + ")");
 
                         // <HACK>
-                        // TODO: Reconstruct behavior state
-//                        BehaviorState behaviorState = event.getBehaviorState(); // behavior.getState();
-                        Log.v("CM_Log", "\t\t" + i + ": ^behaviorState: " + event.getBehaviorStateUuid());
-//                        Log.v("CM_Log", "\t\t" + i + ": *behaviorState: " + event.getBehaviorState().getUuid());
-//                        BehaviorState behaviorState = behavior.getState();
+                        // TODO: Replace this with non-dangerous method. This is dangerous because it can produce stale Timeline references.
+                        unit.setTimeline(timeline);
                         // </HACK>
 
-                        restoreEventState(unit, event);
-//                        event.setBehavior(behavior, behaviorState);
+                        // Get reference to the events on the unit's timeline.
+                        // TODO: restoreTimelineBehaviors (or BehaviorEvents)
+//                    Firebase eventsRef = timelineSnapshot.getRef();
+                        // TODO: Iterate through events and reconstruct objects (if store as separate entity in the data store).
 
-//                        Log.v("CM_Log", "\t\t" + i + ": behavior: " + event.getBehavior().getUuid());
-//                        Log.v("CM_Log", "\t\t" + i + ": behaviorState: " + event.getBehaviorState().getUuid());
-                        i++;
-                    }
+                        Log.v("CM_Log", "\t\tNumber of events: " + timeline.getEvents().size());
 
-                    // <HACK>
+                        restoreEvents(timeline);
+
+                        // <HACK>
 //                    getClay().getView(0).refreshListViewFromData(unit);
-                    // </HACK>
+                        // </HACK>
 
-                    // <HACK>
-                    // Must be called after setting the timeline?
+                        // <HACK>
+                        // Must be called after setting the timeline?
 //                    getClay().getUnits().add(unit);
-                    // </HACK>
+                        // </HACK>
 
 //                    getClay().addUnitView(unit);
 
@@ -291,10 +314,11 @@ public class ContentManager implements ContentManagerInterface {
 
 //                    Log.v("Clay_Behavior_Repo", "Adding behavior " + behavior.getTag() + " (UUID: " + behavior.getUuid() + ")");
 //                    getClay ().getBehaviorCacheManager().storeBehavior (behavior);
-                }
+                    }
 
 //                // Add the basic behaviors if they do not exist.
 //                getClay().getBehaviorCacheManager().setupRepository();
+                }
             }
 
             @Override
@@ -302,6 +326,37 @@ public class ContentManager implements ContentManagerInterface {
                 Log.v("CM_Log", "\tThe read failed: " + firebaseError.getMessage());
             }
         });
+    }
+
+    public void restoreEvents (final Timeline timeline) {
+
+        final int eventCount = timeline.getEvents().size();
+
+        if (eventCount == 0) {
+
+            // <HACK>
+            // TODO: This should be able to be added anywhere. Added here to stop crashing.
+            Unit unit = timeline.getUnit(); // <HACK />
+            Log.v ("CM_Log", "\t\t-->timeline: " + timeline);
+            Log.v ("CM_Log", "\t\t-->unit: " + unit);
+            getClay().addUnitView(unit);
+            // </HACK>
+
+        } else if (eventCount > 0) {
+
+            // TODO: Remove the Unit argument. It's only used for a hack. Use a callback or event or observer.
+
+            for (Event event : timeline.getEvents()) {
+                // <HACK>
+                Unit unit = timeline.getUnit();
+                // </HACK>
+
+                // <HACK>
+                unit.setTimeline(timeline);
+                // </HACK>
+                restoreEventState(unit, event);
+            }
+        }
     }
 
     public void storeBehavior(Behavior behavior) {
@@ -338,7 +393,8 @@ public class ContentManager implements ContentManagerInterface {
                         //Firebase ref = behaviorSnapshot.child("state").getRef();
 
                         Map<String, Object> updatedValues = new HashMap<String, Object>();
-                        updatedValues.put("stateUuid", behavior.getStateUuid());
+                        updatedValues.put("tag", behavior.getTag());
+                        updatedValues.put("description", behavior.getDescription());
 
                         ref.updateChildren(updatedValues, new Firebase.CompletionListener() {
                             @Override
@@ -408,9 +464,9 @@ public class ContentManager implements ContentManagerInterface {
 
                         Map<String, Object> updatedValues = new HashMap<String, Object>();
                         updatedValues.put("stateUuid", behaviorState.getBehaviorUuid());
-                        updatedValues.put("tag", behaviorState.getTag());
                         updatedValues.put("state", behaviorState.getState());
-                        updatedValues.put("description", behaviorState.getDescription());
+                        // updatedValues.put("tag", behaviorState.getTag());
+                        // updatedValues.put("description", behaviorState.getDescription());
 
                         ref.updateChildren(updatedValues, new Firebase.CompletionListener() {
                             @Override
@@ -479,29 +535,40 @@ public class ContentManager implements ContentManagerInterface {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.v("CM_Log", "\tbehaviorRef.addListenerForSingleValueEvent onDataChange");
 
-                // onDataChange returns all of the behaviors. Every time a new behavior is added,
-                // the listener function will return all of the behaviors.
 
-                // Store behaviors in the local cache.
-                // Iterate through all available behaviors and cache some of them.
-                for (DataSnapshot behaviorSnapshot : dataSnapshot.getChildren()) {
+                // <HACK>
+                // Populate the repository if it is empty.
+                if (dataSnapshot.getChildrenCount() == 0) {
+                    // TODO: Consider moving this into a backend control panel accessible only by Computer Camp. The same backend where we specify and manage basic behaviors and curate other behaviors.
+                    getClay().getBehaviorCacheManager().setupRepository();
+                }
+                // </HACK>
 
-                    // Create behavior object
-                    Behavior behavior = behaviorSnapshot.getValue(Behavior.class);
+                else {
+                    // onDataChange returns all of the behaviors. Every time a new behavior is added,
+                    // the listener function will return all of the behaviors.
 
-                    // Place the object into the local cache
-                    getClay().cacheBehavior(behavior);
-                    Log.v("CM_Log", "\t\tAdding behavior (UUID: " + behavior.getUuid() + ")");
+                    // Store behaviors in the local cache.
+                    // Iterate through all available behaviors and cache some of them.
+                    for (DataSnapshot behaviorSnapshot : dataSnapshot.getChildren()) {
+
+                        // Create behavior object
+                        Behavior behavior = behaviorSnapshot.getValue(Behavior.class);
+
+                        // Place the object into the local cache
+                        getClay().cacheBehavior(behavior);
+                        Log.v("CM_Log", "\t\tAdding behavior (UUID: " + behavior.getUuid() + ")");
 //                    Log.v("CM_Log", "\t\tAdding behavior state " + behavior.getState().getState() + " (UUID: " + behavior.getState().getUuid() + ")");
 
-                    // Restore behavior's state.
-                    restoreBehaviorState (behavior, behavior.getStateUuid());
+                        // Restore behavior's state.
+//                    restoreBehaviorState (behavior, behavior.getStateUuid());
 
 //                    getClay().getContentManager().getBehaviorState(behavior, behavior.);
-                }
+                    }
 
-                // Add the basic behaviors if they do not exist.
+                    // Add the basic behaviors if they do not exist.
 //                getClay().getBehaviorCacheManager().setupRepository();
+                }
             }
 
             @Override
@@ -611,50 +678,71 @@ public class ContentManager implements ContentManagerInterface {
 
     }
 
-    public void restoreBehaviorState (final Behavior behavior, UUID stateUuid) {
+//    public void restoreBehaviorState (final Behavior behavior, UUID stateUuid) {
+//
+//        Log.v ("CM_Log", "restoreBehaviorState");
+//
+//        /* Query */
+//
+//        Firebase behaviorStateRef = rootRef.child ("behaviorStates");
+//        Query queryRef = behaviorStateRef.orderByChild("uuid").equalTo(stateUuid.toString()).limitToFirst(1);
+//
+//        /* Callback (for single event) */
+//
+//        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                // Store behaviors in the local cache.
+//                for (DataSnapshot behaviorSnapshot : dataSnapshot.getChildren()) {
+//                    // Create behavior object from database.
+//                    BehaviorState behaviorState = behaviorSnapshot.getValue(BehaviorState.class);
+//                    Log.v("CM_Log", "\tgot behavior state " + behaviorState);
+//                    behavior.setState(behaviorState);
+//
+//                    Log.v("CM_Log", "\t\tbehavior.getState = " + behavior.getState());
+//                    Log.v("CM_Log", "\t\tbehavior.getState.getTag = " + behavior.getState().getTag());
+//                    Log.v("CM_Log", "\t\tbehavior.getState.getState = " + behavior.getState().getState());
+//
+////                    Log.v("Clay_Behavior_Repo", "Adding behavior " + behavior.getTag() + " (UUID: " + behavior.getUuid() + ")");
+////                    getClay ().getBehaviorCacheManager().storeBehavior (behavior);
+//                }
+//
+////                // Add the basic behaviors if they do not exist.
+////                getClay().getBehaviorCacheManager().setupRepository();
+//            }
+//
+//            @Override
+//            public void onCancelled(FirebaseError firebaseError) {
+//                Log.v("CM_Log", "\tThe read failed: " + firebaseError.getMessage());
+//            }
+//        });
+//    }
 
-        Log.v ("CM_Log", "restoreBehaviorState");
-
-        Firebase behaviorStateRef = rootRef.child ("behaviorStates");
-        Query queryRef = behaviorStateRef.orderByChild("uuid").equalTo(stateUuid.toString()).limitToFirst(1);
-
-        queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                // Store behaviors in the local cache.
-                for (DataSnapshot behaviorSnapshot : dataSnapshot.getChildren()) {
-                    // Create behavior object from database.
-                    BehaviorState behaviorState = behaviorSnapshot.getValue(BehaviorState.class);
-                    Log.v("CM_Log", "\tgot behavior state " + behaviorState);
-                    behavior.setState(behaviorState);
-
-                    Log.v("CM_Log", "\t\tbehavior.getState = " + behavior.getState());
-                    Log.v("CM_Log", "\t\tbehavior.getState.getTag = " + behavior.getState().getTag());
-                    Log.v("CM_Log", "\t\tbehavior.getState.getState = " + behavior.getState().getState());
-
-//                    Log.v("Clay_Behavior_Repo", "Adding behavior " + behavior.getTag() + " (UUID: " + behavior.getUuid() + ")");
-//                    getClay ().getBehaviorCacheManager().storeBehavior (behavior);
-                }
-
-//                // Add the basic behaviors if they do not exist.
-//                getClay().getBehaviorCacheManager().setupRepository();
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.v("CM_Log", "\tThe read failed: " + firebaseError.getMessage());
-            }
-        });
-    }
-
+    /**
+     * Restores an event on a unit's timeline.
+     * @param unit The unit with the timeline with the event.
+     * @param event The event to update.
+     */
     public void restoreEventState (final Unit unit, final Event event) {
 
+        // TODO: Remove the Unit argument. It's only used for a hack. Use a callback or event or observer.
+
         Log.v ("CM_Log", "restoreEventState");
+        Log.v ("CM_Log", "\tunit: " + unit);
+        Log.v ("CM_Log", "\tunit UUID: " + unit.getUuid());
+        Log.v ("CM_Log", "\tevent: " + event);
+        Log.v ("CM_Log", "\tevent UUID: " + event.getUuid());
+        Log.v ("CM_Log", "\tevent behavior: " + event.getBehaviorUuid());
+        Log.v ("CM_Log", "\tevent behaviorState: " + event.getBehaviorStateUuid());
+
+        /* Query */
 
         Firebase behaviorStateRef = rootRef.child ("behaviorStates");
         Query queryRef = behaviorStateRef.orderByChild("uuid").equalTo(event.getBehaviorStateUuid().toString()).limitToFirst(1);
+
+        /* Callback (for single event) */
 
         queryRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -665,36 +753,31 @@ public class ContentManager implements ContentManagerInterface {
                 for (DataSnapshot behaviorSnapshot : dataSnapshot.getChildren()) {
 
                     // Reconstruct Clay object model
-                    Behavior behavior = getClay().getBehavior(event.getBehaviorUuid().toString());
+                    Behavior behavior = getClay().getBehavior(event.getBehaviorUuid());
+
+                    Log.v ("CM_Log", "\tbehavior: " + behavior);
+                    Log.v ("CM_Log", "\tbehavior UUID: " + behavior.getUuid());
+                    Log.v ("CM_Log", "\tbehavior defaultState: " + behavior.getDefaultState());
+                    Log.v ("CM_Log", "\tbehavior description: " + behavior.getDescription());
+                    Log.v ("CM_Log", "\tbehavior tag: " + behavior.getTag());
 
                     // Create behavior object from database.
                     BehaviorState behaviorState = behaviorSnapshot.getValue(BehaviorState.class);
-                    Log.v("CM_Log", "\tgot behavior state " + behaviorState);
                     event.setBehavior(behavior, behaviorState);
-
-                    Log.v("CM_Log", "\t\tbehavior.getState = " + behaviorState);
-                    Log.v("CM_Log", "\t\tbehavior.getState.getTag = " + behaviorState.getTag());
-                    Log.v("CM_Log", "\t\tbehavior.getState.getState = " + behaviorState.getState());
-
-//                    Log.v("Clay_Behavior_Repo", "Adding behavior " + behavior.getTag() + " (UUID: " + behavior.getUuid() + ")");
-//                    getClay ().getBehaviorCacheManager().storeBehavior (behavior);
+//                    event.setBehaviorState2(behaviorState);
 
                     // <HACK>
-                    // Make sure no units are in an invalid state (null reference)
-                    boolean addView = true;
-                    for (Event e : unit.getTimeline().getEvents()) {
-                        if (e.getBehavior() == null || e.getBehaviorState() == null) {
-                            addView = false;
-                        }
-                    }
-                    if (addView) {
-                        getClay().addUnitView(unit);
-                    }
+                    // TODO: This should be able to be added anywhere. Added here to stop crashing.
+                    getClay().addUnitView (unit);
+                    // </HACK>
+
+                    // <HACK>
+                    // Tell the unit to create the behavior, add it to the timeline, and update the state.
+//                    unit.send("create behavior " + event.getUuid() + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
+//                    unit.send("add behavior " + event.getUuid());
+                    //getTimeline().getUnit().send("update behavior " + eventUuid + " \"" + behavior.getTag() + " " + getBehaviorState().getState() + "\"");
                     // </HACK>
                 }
-
-//                // Add the basic behaviors if they do not exist.
-//                getClay().getBehaviorCacheManager().setupRepository();
             }
 
             @Override

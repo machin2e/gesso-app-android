@@ -7,10 +7,13 @@ package camp.computer.clay.sequencer;
 * object model.
 */
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
 import camp.computer.clay.system.Behavior;
+import camp.computer.clay.system.BehaviorState;
 import camp.computer.clay.system.Event;
 
 public class EventHolder {
@@ -51,10 +54,25 @@ public class EventHolder {
     }
 
     public EventHolder(Event event) {
+        super();
 
+        // Assign instance UUID to the list item
+        this.uuid = UUID.randomUUID();
+
+        this.eventUuid = event.getUuid();
+        this.event = event;
+
+        // Set parameters
         Behavior behavior = event.getBehavior();
 
-        // Get behavior type
+        // <HACK>
+        // TODO: Update getTitle so it retrieves the value from the associated Event (e.g., from an Event's Behavior.getTag() method).
+        this.title = behavior.getTag();
+        // <HACK>
+
+        // <HACK>
+        // Get the layout type to prepare for view generation
+        // TODO: Automatically generate or retrieve layouts dynamically based on UUID here based on behavior events model, rather than referencing them as stored in XML.
         if (behavior.getTag().equals("lights")) {
             this.type = TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("io")) {
@@ -66,17 +84,16 @@ public class EventHolder {
         } else if (behavior.getTag().equals("say")) {
             this.type = TimelineUnitAdapter.SAY_CONTROL_LAYOUT;
         }
-        initializeType();
-
-        // Get behavior UUID
-        this.eventUuid = event.getUuid();
-
-        // <HACK>
-        this.event = event;
         // </HACK>
+
+        // Initialize
+        this.selected = false;
+
+        // Initialize type
+        initializeType();
     }
 
-    // main constructor
+    // TODO: Remove this constructor!
     public EventHolder(String title, String subTitle, int type) {
         super();
 
@@ -95,27 +112,27 @@ public class EventHolder {
         initializeType();
     }
 
-    // main constructor
-    public EventHolder(Event event, int layoutType) {
-        super();
-
-        // Assign instance UUID to the list item
-        this.uuid = UUID.randomUUID();
-
-        this.eventUuid = event.getUuid();
-        this.event = event;
-
-        // Set parameters
-        Behavior behavior = event.getBehavior();
-        this.title = behavior.getTag();
-        this.type = layoutType;
-
-        // Initialize
-        this.selected = false;
-
-        // Initialize type
-        initializeType();
-    }
+//    // main constructor
+//    public EventHolder(Event event, int layoutType) {
+//        super();
+//
+//        // Assign instance UUID to the list item
+//        this.uuid = UUID.randomUUID();
+//
+//        this.eventUuid = event.getUuid();
+//        this.event = event;
+//
+//        // Set parameters
+//        Behavior behavior = event.getBehavior();
+//        this.title = behavior.getTag();
+//        this.type = layoutType;
+//
+//        // Initialize
+//        this.selected = false;
+//
+//        // Initialize type
+//        initializeType();
+//    }
 
     public Event getEvent() {
         return this.event;
@@ -174,5 +191,20 @@ public class EventHolder {
     // String representation
     public String toString() {
         return this.title;
+    }
+
+    /**
+     * Updates the state of the event's behavior. Creates a new BehaviorState object and associates
+     * it to the Behavior for this Event.
+     * @param stateString The new state to assign to this event's behavior.
+     */
+    public void updateState(String stateString) {
+        Log.v("CM_Log2", "updateState");
+        Log.v("CM_Log2", "\tstateString: " + stateString);
+        Log.v("CM_Log2", "\tevent: " + getEvent());
+        Log.v("CM_Log2", "\tbehavior: " + getEvent().getBehavior());
+        BehaviorState behaviorState = new BehaviorState(getEvent().getBehavior(), stateString);
+        Log.v("CM_Log2", "\tbehaviorState: " + behaviorState);
+        getEvent().setBehaviorState(behaviorState);
     }
 }

@@ -3,6 +3,7 @@ package camp.computer.clay.system;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class BehaviorCacheManager {
 
@@ -28,6 +29,7 @@ public class BehaviorCacheManager {
     }
 
     private void populateCache() {
+        Log.v("CM_Log", "populateCache");
         // TODO: First check if a content manager exists that can access the remote repository URI. If so, use it.
         getClay ().getContentManager().restoreBehaviors();
     }
@@ -110,11 +112,11 @@ public class BehaviorCacheManager {
         return false;
     }
 
-    public Behavior getBehavior (String behaviorUuid) {
+    public Behavior getBehavior (UUID behaviorUuid) {
 
         // Search cached behaviors.
         for (Behavior cachedBehavior : this.cachedBehaviors) {
-            if (cachedBehavior.getUuid().toString().equals(behaviorUuid)) {
+            if (cachedBehavior.getUuid().equals(behaviorUuid)) {
                 return cachedBehavior;
             }
         }

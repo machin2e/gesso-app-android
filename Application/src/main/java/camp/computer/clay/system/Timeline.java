@@ -34,6 +34,12 @@ public class Timeline {
         return this.unit;
     }
 
+    // <HACK>
+    public void setUnit (Unit unit) {
+        this.unit = unit;
+    }
+    // </HACK>
+
     public void addEvent (Event event) {
 
         // Add behavior to the list of behaviors in the loop sequence

@@ -6,15 +6,18 @@ import java.util.UUID;
 
 public class Event {
 
+    private UUID uuid;
+
+    /** The UUID for the timeline on which this event was scheduled. */
+    private UUID timelineUuid;
+
     /** The timeline on which this event was scheduled. */
     private Timeline timeline;
 
-    private UUID uuid;
-
-    private Behavior behavior;
-
     /** The behavior represented by this event. This can change. */
     private UUID behaviorUuid;
+
+    private Behavior behavior;
 
     private BehaviorState behaviorState;
 
@@ -25,7 +28,12 @@ public class Event {
 
     }
 
-    public Event(Behavior behavior, BehaviorState behaviorState) {
+    public Event(Timeline timeline, Behavior behavior, BehaviorState behaviorState) {
+        this.uuid = UUID.randomUUID();
+
+        this.timeline = timeline;
+        this.timelineUuid = timeline.getUuid();
+
         this.behavior = behavior;
         this.behaviorUuid = behavior.getUuid();
 
@@ -43,6 +51,46 @@ public class Event {
     }
 
     @JsonIgnore
+    public void setTimeline (Timeline timeline) {
+        this.timeline = timeline;
+        this.timelineUuid = timeline.getUuid();
+    }
+
+    @JsonIgnore
+    public void setBehaviorState (BehaviorState behaviorState) {
+        this.behaviorState = behaviorState;
+        this.behaviorStateUuid = behaviorState.getUuid();
+
+        /* Notify the the unit of the update */
+
+        // ...then add it to the device...
+        String eventUuid = this.getUuid().toString();
+        getTimeline().getUnit().send("update behavior " + eventUuid + " \"" + behavior.getTag() + " " + getBehaviorState().getState() + "\"");
+        /*
+        String behaviorUuid = getBehavior().getUuid().toString();
+        getTimeline().getUnit().send("update behavior " + behaviorUuid + " \"" + behavior.getTag() + " " + getBehaviorState().getState() + "\"");
+        */
+
+        /* Notify Clay of the update */
+
+        // ...and finally update the repository.
+        getTimeline().getUnit().getClay ().getContentManager().storeBehaviorState(behaviorState);
+//        setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+        //getClay ().getContentManager().updateBehaviorState(behaviorState);
+        getTimeline().getUnit().getClay ().getContentManager().updateTimeline(getTimeline());
+    }
+
+//    @JsonIgnore
+//    public void updateBehaviorState (String stateString) {
+//
+//        BehaviorState behaviorState = new BehaviorState(getBehavior(), stateString);
+////        getBehavior().setState(behaviorState);
+//
+//        this.behaviorState = behaviorState;
+//        this.behaviorStateUuid = behaviorState.getUuid();
+//    }
+
+    @JsonIgnore
     public Behavior getBehavior() { return this.behavior; }
 
     public UUID getBehaviorUuid () {
@@ -53,10 +101,19 @@ public class Event {
     public BehaviorState getBehaviorState() { return this.behaviorState; }
 
     public UUID getBehaviorStateUuid () {
-        return this.behaviorStateUuid;
+        return behaviorStateUuid;
     }
 
     public UUID getUuid() {
-        return this.uuid;
+        return uuid;
+    }
+
+    @JsonIgnore
+    public Timeline getTimeline() {
+        return timeline;
+    }
+
+    public UUID getTimelineUuid() {
+        return timelineUuid;
     }
 }

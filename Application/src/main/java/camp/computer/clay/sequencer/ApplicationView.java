@@ -25,7 +25,7 @@ import camp.computer.clay.system.Unit;
 
 public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
 
-    private static final long MESSAGE_SEND_FREQUENCY = 100;
+    private static final long MESSAGE_SEND_FREQUENCY = 250;
     private static Context context;
 
     // <CLAY>
@@ -223,6 +223,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     }
 
     public void addUnitView(Unit unit) {
+
+        // TODO: (?) Add UnitViewFragment to list here?
 
         // Increment the number of pages to be the same as the number of discovered units.
         mSectionsPagerAdapter.count++;

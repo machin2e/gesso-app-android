@@ -84,6 +84,9 @@ public class UnitViewFragment extends Fragment {
         // TODO: Create new TimelineUnitAdapter with the data for this tab's unit! (or reuse and repopulate with new data)
 
         // Create behavior profiles for the unit's behaviors and assign the data to the ListView
+        Log.v ("CM_Log", "onCreateView");
+        Log.v ("CM_Log", "\tunit: " + this.unit);
+        Log.v ("CM_Log", "\tunit.getTimeline: " + this.unit.getTimeline());
         listView.setEvents(this.unit.getTimeline());
 
         // <HACK>
