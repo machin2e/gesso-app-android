@@ -39,7 +39,6 @@ public class Clay {
         this.views = new ArrayList<ViewManagerInterface>(); // Create list to store views.
         this.messageManager = new MessageManager (this); // Start the communications systems
         this.networkManager = new NetworkManager (this); // Start the networking systems
-        this.contentManager = new ContentManager (this); // Start the content management system
 
         this.behaviorCacheManager = new BehaviorCacheManager(this); // Set up behavior repository
     }
@@ -68,6 +67,10 @@ public class Clay {
 
     public void addResource (NetworkResourceInterface networkResource) {
         this.networkManager.addResource(networkResource);
+    }
+
+    public void addContentManager () {
+        this.contentManager = new ContentManager (this, "file"); // Start the content management system
     }
 
     /*
@@ -183,17 +186,17 @@ public class Clay {
 
 //            Log.v("Behavior_Count", "Unit behavior count: " + unit.getTimeline().getEvents().size());
 //
-//            // Add timelines to attached views
-//            for (ViewManagerInterface view : this.views) {
-//                // TODO: (1) add a page to the ViewPager
-//
-//                // (2) Add a tab to the action bar to support navigation to the specified page.
-//                view.addUnitView(unit);
-//            }
+            // Add timelines to attached views
+            for (ViewManagerInterface view : this.views) {
+                // TODO: (1) add a page to the ViewPager
+
+                // (2) Add a tab to the action bar to support navigation to the specified page.
+                view.addUnitView(unit);
+            }
 
             // Restore the unit in Clay's object model
             // Request unit profile from history (i.e., the remote store).
-            getContentManager().restoreUnit(unitUuid);
+//            getContentManager().restoreUnit(unitUuid);
         }
     }
 
@@ -253,19 +256,41 @@ public class Clay {
         this.cacheBehavior(behavior);
 
         // Store the behavior remotely
-        if (hasContentManager()) {
-            getContentManager().storeBehaviorState(behaviorState);
-            getContentManager().storeBehavior(behavior);
-        }
+//        if (hasContentManager()) {
+//            getContentManager().storeBehaviorState(behaviorState);
+//            getContentManager().storeBehavior(behavior);
+//        }
+    }
+
+    /**
+     * Creates a new behavior with the specified tag and state, caches it, and stores it.
+     * @param tag
+     * @param defaultStateString
+     */
+    public void createBehavior (String uuid, String tag, String defaultStateString) {
+
+        // Create behavior and behavior state
+        Behavior behavior = new Behavior (tag, defaultStateString);
+
+        BehaviorState behaviorState = new BehaviorState(behavior, defaultStateString);
+
+        // Cache the behavior locally
+        this.cacheBehavior(behavior);
+
+        // Store the behavior remotely
+//        if (hasContentManager()) {
+//            getContentManager().storeBehaviorState(behaviorState);
+//            getContentManager().storeBehavior(behavior);
+//        }
     }
 
     /**
      * Returns true if Clay has a content manager.
      * @return True if Clay has a content manager. False otherwise.
      */
-    private boolean hasContentManager() {
-        return this.contentManager != null;
-    }
+//    private boolean hasContentManager() {
+//        return this.contentManager != null;
+//    }
 
     public Behavior getBehavior (UUID behaviorUuid) {
         if (hasBehaviorCacheManager()) {

@@ -1,6 +1,6 @@
 package camp.computer.clay.system;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.UUID;
 
@@ -41,7 +41,6 @@ public class Event {
         this.behaviorStateUuid = behaviorState.getUuid();
     }
 
-    @JsonIgnore
     public void setBehavior (Behavior behavior, BehaviorState behaviorState) {
         this.behavior = behavior;
         this.behaviorUuid = behavior.getUuid();
@@ -50,13 +49,11 @@ public class Event {
         this.behaviorStateUuid = behaviorState.getUuid();
     }
 
-    @JsonIgnore
     public void setTimeline (Timeline timeline) {
         this.timeline = timeline;
         this.timelineUuid = timeline.getUuid();
     }
 
-    @JsonIgnore
     public void setBehaviorState (BehaviorState behaviorState) {
         this.behaviorState = behaviorState;
         this.behaviorStateUuid = behaviorState.getUuid();
@@ -74,10 +71,12 @@ public class Event {
         /* Notify Clay of the update */
 
         // ...and finally update the repository.
+        /*
         getTimeline().getUnit().getClay ().getContentManager().storeBehaviorState(behaviorState);
 //        setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
         //getClay ().getContentManager().updateBehaviorState(behaviorState);
         getTimeline().getUnit().getClay ().getContentManager().updateTimeline(getTimeline());
+        */
     }
 
 //    @JsonIgnore
@@ -90,14 +89,12 @@ public class Event {
 //        this.behaviorStateUuid = behaviorState.getUuid();
 //    }
 
-    @JsonIgnore
     public Behavior getBehavior() { return this.behavior; }
 
     public UUID getBehaviorUuid () {
         return this.behaviorUuid;
     }
 
-    @JsonIgnore
     public BehaviorState getBehaviorState() { return this.behaviorState; }
 
     public UUID getBehaviorStateUuid () {
@@ -108,7 +105,6 @@ public class Event {
         return uuid;
     }
 
-    @JsonIgnore
     public Timeline getTimeline() {
         return timeline;
     }

@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import camp.computer.clay.resource.NetworkResource;
+import camp.computer.clay.system.ContentManager;
 import camp.computer.clay.system.ViewManagerInterface;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
@@ -26,7 +27,10 @@ import camp.computer.clay.system.Unit;
 public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
 
     private static final long MESSAGE_SEND_FREQUENCY = 250;
+
     private static Context context;
+
+    private static ApplicationView applicationView;
 
     // <CLAY>
 
@@ -116,6 +120,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         ApplicationView.context = getApplicationContext();
 
+        ApplicationView.applicationView = this;
+
         Clay.setContext(getApplicationContext());
 
         clay = new Clay();
@@ -196,6 +202,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             clay.addResource(this.networkResource);
         }
 
+        getClay().addContentManager();
+
         // Start worker process
         // Start the initial runnable task by posting through the handler
         handler.post(runnableCode);
@@ -221,6 +229,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     public static Context getContext() {
         return ApplicationView.context;
     }
+
+    public static ApplicationView getApplicationView () { return ApplicationView.applicationView; }
 
     public void addUnitView(Unit unit) {
 

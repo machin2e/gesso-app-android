@@ -2,7 +2,7 @@ package camp.computer.clay.system;
 
 import android.util.Log;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +39,6 @@ public class Unit {
         this.timelineUuid = this.timeline.getUuid();
     }
 
-    @JsonIgnore
     public Clay getClay () {
         return this.clay;
     }
@@ -52,7 +51,6 @@ public class Unit {
         this.timelineUuid = uuid;
     }
 
-    @JsonIgnore
     public long getTimeSinceLastMessage () {
 //        Log.v ("Clay_Time", "Time since last message: " + this.timeOfLastContact);
         Date currentTime = Calendar.getInstance().getTime ();
@@ -82,7 +80,6 @@ public class Unit {
         this.internetAddress = address;
     }
 
-    @JsonIgnore
     public String getInternetAddress () {
         return this.internetAddress;
     }
@@ -91,17 +88,14 @@ public class Unit {
         this.meshAddress = address;
     }
 
-    @JsonIgnore
     public String getMeshAddress () {
         return this.meshAddress;
     }
 
-    @JsonIgnore
     public Timeline getTimeline() {
         return this.timeline;
     }
 
-    @JsonIgnore
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
 

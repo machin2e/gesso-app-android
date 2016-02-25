@@ -1,6 +1,6 @@
 package camp.computer.clay.system;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -29,7 +29,6 @@ public class Timeline {
         return this.uuid;
     }
 
-    @JsonIgnore
     public Unit getUnit () {
         return this.unit;
     }
@@ -74,7 +73,6 @@ public class Timeline {
         return this.events;
     }
 
-    @JsonIgnore
     public Event getEvent (int index) {
         if (0 < index && index < this.events.size()) {
             return this.events.get(index);

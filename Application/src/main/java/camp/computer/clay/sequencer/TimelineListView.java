@@ -894,7 +894,7 @@ public class TimelineListView extends ListView {
 
                 // Post the behavior package to the repository
 //                unit.addBehavior(behaviorPackage, defaultState);
-                getClay().getBehaviorCacheManager().sdf
+//                getClay().getBehaviorCacheManager().sdf
 
                 // Transformations:
                 // "apply TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL"
@@ -1183,9 +1183,11 @@ public class TimelineListView extends ListView {
         // Update the view after removing the specified list item
         refreshListViewFromData();
 
+        /*
         // <HACK>
         getClay().getContentManager().updateTimeline(this.unit.getTimeline());
         // </HACK>
+        */
 
     }
 

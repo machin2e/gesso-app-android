@@ -31,7 +31,7 @@ public class BehaviorCacheManager {
     private void populateCache() {
         Log.v("CM_Log", "populateCache");
         // TODO: First check if a content manager exists that can access the remote repository URI. If so, use it.
-        getClay ().getContentManager().restoreBehaviors();
+//        getClay ().getContentManager().restoreBehaviors();
     }
 
     // TODO: populate: initial get all behaviors and cache a select subset

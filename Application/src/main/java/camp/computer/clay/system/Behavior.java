@@ -1,6 +1,6 @@
 package camp.computer.clay.system;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -38,6 +38,22 @@ public class Behavior {
 
     public Behavior(String tag, String defaultState) {
         this.uuid = UUID.randomUUID();
+
+        this.tag = tag;
+        this.description = "";
+
+        this.defaultState = defaultState;
+
+        behaviors = new ArrayList<Behavior>();
+
+        // Create the default state of this behavior
+//        BehaviorState behaviorState = new BehaviorState (this, tag, defaultState);
+//        this.state = behaviorState;
+//        this.stateUuid = behaviorState.getUuid();
+    }
+
+    public Behavior(UUID uuid, String tag, String defaultState) {
+        this.uuid = uuid;
 
         this.tag = tag;
         this.description = "";
