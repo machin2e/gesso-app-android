@@ -49,6 +49,7 @@ public class Unit {
 
     public void setTimelineUuid (UUID uuid) {
         this.timelineUuid = uuid;
+        this.timeline = null;
     }
 
     public long getTimeSinceLastMessage () {
@@ -98,6 +99,7 @@ public class Unit {
 
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
+        this.timelineUuid = timeline.getUuid();
 
         this.timeline.setUnit(this);
     }

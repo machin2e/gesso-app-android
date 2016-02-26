@@ -4,10 +4,10 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- Timeline -->
-    <integer name="event_timeline_segment_length">177</integer>
+    <integer name="event_timeline_segment_length">179</integer>
 
     <!-- Events -->
-    <dimen name="event_tag_text_size">12dp</dimen>
+    <dimen name="event_tag_text_size">15dp</dimen>
     <dimen name="light_preview_column_width">20dp</dimen>
 
 </resources>

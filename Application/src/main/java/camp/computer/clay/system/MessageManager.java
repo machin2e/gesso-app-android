@@ -211,7 +211,7 @@ public class MessageManager {
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
                     Log.v("Clay_Time", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    getClay().addUnit(UUID.fromString(unitUuid), unitAddress);
+                    getClay().add(UUID.fromString(unitUuid), unitAddress);
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
@@ -234,7 +234,7 @@ public class MessageManager {
 
         } else {
             Log.v("Clay", "Error: Unrecognized message.");
-            // TODO: Add the unrecognized message the ContentManager in a category for unrecognized messages, and allow it to be defined.
+            // TODO: Add the unrecognized message the FileContentManager in a category for unrecognized messages, and allow it to be defined.
         }
     }
 

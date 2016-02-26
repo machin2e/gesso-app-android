@@ -18,7 +18,7 @@ public class Clay {
     // </HACK>
 
     // Resource management systems (e.g., networking, messaging, content)
-    private ContentManager contentManager = null;
+    private ContentManagerInterface contentManager = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
 
@@ -29,7 +29,7 @@ public class Clay {
     private ArrayList<Unit> units = new ArrayList<Unit>();
 
     // List of behaviors cached on this device
-    private BehaviorCacheManager behaviorCacheManager = null;
+    private CacheManager cacheManager = null;
 
     // The calendar used by Clay
     private Calendar calendar = Calendar.getInstance (TimeZone.getTimeZone("GMT"));
@@ -40,7 +40,7 @@ public class Clay {
         this.messageManager = new MessageManager (this); // Start the communications systems
         this.networkManager = new NetworkManager (this); // Start the networking systems
 
-        this.behaviorCacheManager = new BehaviorCacheManager(this); // Set up behavior repository
+        this.cacheManager = new CacheManager(this); // Set up behavior repository
     }
 
     // <HACK>
@@ -69,8 +69,19 @@ public class Clay {
         this.networkManager.addResource(networkResource);
     }
 
-    public void addContentManager () {
-        this.contentManager = new ContentManager (this, "file"); // Start the content management system
+    /**
+     * Adds a content manager for use by Clay. Retrieves the basic behaviors provided by the
+     * content manager and makes them available in Clay.
+     */
+    public void addContentManager (ContentManagerInterface contentManager) {
+        // <HACK>
+        // this.contentManager = new FileContentManager(this, "file"); // Start the content management system
+        this.contentManager = contentManager;
+
+        // Retrieve the basic behaviors from repository and add them to the cache
+//         this.getCacheManager().setupRepository();
+        this.contentManager.restoreBehaviors();
+        // </HACK>
     }
 
     /*
@@ -118,11 +129,11 @@ public class Clay {
         return this.views.get (i);
     }
 
-    public BehaviorCacheManager getBehaviorCacheManager() {
-        return this.behaviorCacheManager;
+    public CacheManager getCacheManager() {
+        return this.cacheManager;
     }
 
-    public ContentManager getContentManager() {
+    public ContentManagerInterface getContentManager() {
         return this.contentManager;
     }
 
@@ -139,18 +150,134 @@ public class Clay {
         return null;
     }
 
+    private Clay getClay () {
+        return this;
+    }
+
     /**
      * Adds the specified unit to Clay's operating environment.
      */
-    public void addUnit (UUID unitUuid, String internetAddress) {
+    public void add(final UUID unitUuid, final String internetAddress) {
 
-        Unit unit = new Unit(this, unitUuid);
-        unit.setInternetAddress(internetAddress);
+//        final Unit newUnit = new Unit(this, unitUuid);
+//        newUnit.setInternetAddress(internetAddress);
+
+        Log.v("Content_Manager", "Clay is searching for the unit (UUID: " + unitUuid + ").");
+
+        if (hasUnitByUuid(unitUuid)) {
+            Log.v("Content_Manager", "Clay already has the unit (UUID: " + unitUuid + ").");
+            return;
+        }
+
+        Log.v("Content_Manager", "Clay couldn't find the unit (UUID: " + unitUuid + ").");
+
+        // Restore the unit in Clay's object model
+        // Request unit profile from history (i.e., the remote store).
+
+//            getCacheManager().setupRepository();
+//            getContentManager().storeUnit(unit);
+        getContentManager().restoreUnit(unitUuid, new ContentManagerInterface.CallbackInterface() {
+            @Override
+            public void onSuccess(Object object) {
+
+                final Unit restoredUnit = (Unit) object;
+                Log.v("Content_Manager", "Successfully restored unit (UUID: " + restoredUnit.getUuid() + ").");
+
+                // Update restored unit with information from device
+                restoredUnit.setInternetAddress(internetAddress);
+
+                Log.v("Content_Manager", "Clay is searching for the timeline (UUID: " + restoredUnit.getTimelineUuid() + ").");
+
+                // Restore timeline
+                getContentManager().restoreTimeline(restoredUnit, restoredUnit.getTimelineUuid(), new ContentManagerInterface.CallbackInterface() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        Log.v("Content_Manager", "Successfully restored timeline.");
+                        Timeline timeline = (Timeline) object;
+                        restoredUnit.setTimeline(timeline);
+
+                        // Restore events
+                        getContentManager().restoreEvents(timeline);
+
+                        // Add unit to cache
+                        addUnit2(restoredUnit);
+
+//                        // Update view
+//                        updateUnitView(restoredUnit);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.v("Content_Manager", "Failed to restore timeline.");
+
+                        // Graph timeline locally since it was not found
+                        Timeline newTimeline = new Timeline (restoredUnit.getTimelineUuid());
+                        newTimeline.setUnit(restoredUnit);
+                        restoredUnit.setTimeline(newTimeline);
+                        Log.v("Content_Manager", "Cached new timeline (UUID: " + newTimeline.getUuid() + ").");
+
+                        // Store timeline
+                        getContentManager().storeTimeline(restoredUnit.getTimeline());
+                        Log.v("Content_Manager", "Saved new timeline (UUID: " + newTimeline.getUuid() + ").");
+
+                        // Add unit to cache
+                        addUnit2(restoredUnit);
+                    }
+                });
+
+                // Restore events
+//                    getContentManager().restoreEvents(timeline);
+
+                // Update view
+//                    updateUnitView(newUnit);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.v("Content_Manager", "Failed to restore unit.");
+
+                // Create unit in graph
+                Unit newUnit = new Unit(getClay(), unitUuid);
+                newUnit.setInternetAddress(internetAddress);
+                Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid() + ").");
+
+                // Cache the unit
+                addUnit2(newUnit);
+                Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
+
+                // Store the unit
+                getContentManager().storeUnit(newUnit);
+                Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
+
+                getContentManager().storeTimeline(newUnit.getTimeline());
+                Log.v("Content_Manager", "Stored new timeline (UUID: " + newUnit.getTimeline().getUuid() + ").");
+
+                // Archive the unit
+                // TODO:
+            }
+        });
+//            getContentManager().storeTimeline(unit.getTimeline());
+
+//            // Add events if they don't already exist
+//            for (Event event : unit.getTimeline().getEvents()) {
+//                if (!getContentManager().hasEvent(event)) {
+//                    getContentManager().restoreEvents(unit.getTimeline());
+//                }
+//            }
+
+
+
+
+    }
+
+    private void addUnit2 (Unit unit) {
+        Log.v ("Content_Manager", "addUnit2");
 
         if (!this.units.contains (unit)) {
 
             // Add unit to present (i.e., local cache).
             this.units.add(unit);
+            Log.v("Content_Manager", "Successfully added timeline.");
 
             /*
             // <TEST>
@@ -161,7 +288,7 @@ public class Clay {
             for (int i = 0; i < behaviorCount; i++) {
 
                 // Get list of the available behavior types
-                ArrayList<Behavior> behaviors = getBehaviorCacheManager().getCachedBehaviors();
+                ArrayList<Behavior> behaviors = getCacheManager().getCachedBehaviors();
 
 
                 // Generate a random behavior
@@ -189,14 +316,9 @@ public class Clay {
             // Add timelines to attached views
             for (ViewManagerInterface view : this.views) {
                 // TODO: (1) add a page to the ViewPager
-
-                // (2) Add a tab to the action bar to support navigation to the specified page.
+                // TODO: (2) Add a tab to the action bar to support navigation to the specified page.
                 view.addUnitView(unit);
             }
-
-            // Restore the unit in Clay's object model
-            // Request unit profile from history (i.e., the remote store).
-//            getContentManager().restoreUnit(unitUuid);
         }
     }
 
@@ -253,13 +375,14 @@ public class Clay {
         BehaviorState behaviorState = new BehaviorState(behavior, defaultStateString);
 
         // Cache the behavior locally
-        this.cacheBehavior(behavior);
+        this.cache(behavior);
 
         // Store the behavior remotely
-//        if (hasContentManager()) {
+        if (hasContentManager()) {
 //            getContentManager().storeBehaviorState(behaviorState);
-//            getContentManager().storeBehavior(behavior);
-//        }
+            getContentManager().storeBehavior(behavior);
+        }
+
     }
 
     /**
@@ -270,12 +393,12 @@ public class Clay {
     public void createBehavior (String uuid, String tag, String defaultStateString) {
 
         // Create behavior and behavior state
-        Behavior behavior = new Behavior (tag, defaultStateString);
-
-        BehaviorState behaviorState = new BehaviorState(behavior, defaultStateString);
+        Behavior behavior = new Behavior (UUID.fromString(uuid), tag, defaultStateString);
+        BehaviorState behaviorState = new BehaviorState (behavior, defaultStateString);
 
         // Cache the behavior locally
-        this.cacheBehavior(behavior);
+        this.cache (behavior);
+        // TODO: Cache the BehaviorState
 
         // Store the behavior remotely
 //        if (hasContentManager()) {
@@ -288,19 +411,24 @@ public class Clay {
      * Returns true if Clay has a content manager.
      * @return True if Clay has a content manager. False otherwise.
      */
-//    private boolean hasContentManager() {
-//        return this.contentManager != null;
-//    }
+    private boolean hasContentManager() {
+        return this.contentManager != null;
+    }
 
     public Behavior getBehavior (UUID behaviorUuid) {
         if (hasBehaviorCacheManager()) {
-            return getBehaviorCacheManager().getBehavior(behaviorUuid);
+            if (getCacheManager().hasBehavior(behaviorUuid.toString())) {
+                return getCacheManager().getBehavior(behaviorUuid);
+            } else {
+                // TODO: Cache the behavior and callback to the object requesting the behavior.
+            }
         }
+        // TODO: throw NoCacheManagerException
         return null;
     }
 
     private boolean hasBehaviorCacheManager() {
-        if (getBehaviorCacheManager() != null) {
+        if (getCacheManager() != null) {
             return true;
         }
         return false;
@@ -327,16 +455,31 @@ public class Clay {
         return this.calendar.getTimeInMillis();
     }
 
-    public void cacheBehavior(Behavior behavior) {
-        this.getBehaviorCacheManager().cacheBehavior(behavior);
+    /**
+     * Caches a Behavior in memory.
+     * @param behavior The Behavior to cache.
+     */
+    public void cache (Behavior behavior) {
+        this.getCacheManager().cacheBehavior(behavior);
     }
 
-    public void addUnit(Unit unit) {
+    /**
+     * Adds a Unit to Clay's object model.
+     * @param unit The Unit to add to Clay's object model.
+     */
+    public void add (Unit unit) {
         this.units.add(unit);
     }
 
+    /**
+     * Push updated unit object to views so they can show the updated information
+     * @param unit
+     */
     public void updateUnitView (Unit unit) {
-//        todo
+
+        for (ViewManagerInterface view : this.views) {
+            view.refreshListViewFromData(unit);
+        }
     }
 
     /**
@@ -371,6 +514,34 @@ public class Clay {
             Log.v ("CM_Log", "\tunit: " + unit);
             Log.v ("CM_Log", "\tunit/timeline: " + unit.getTimeline());
             view.addUnitView(unit);
+        }
+    }
+
+    /**
+     * Notify Clay of a change to an Event in the object model. Clay will propagate the change
+     * to the cache, store, and repository.
+     * @param event
+     */
+    public void notifyChange(Event event) {
+
+        if (hasContentManager()) {
+
+            // Select the content manager to use
+            ContentManagerInterface contentManager = getClay().getContentManager();
+
+            // Add events if they don't already exist
+//            if (!contentManager.hasEvent(event)) {
+
+                // Store event
+                contentManager.storeEvent(event);
+
+                // Store behavior for event
+                contentManager.storeBehavior(event.getBehavior());
+
+                // Store behavior state for behavior
+                contentManager.storeBehaviorState(event.getBehaviorState());
+
+//            }
         }
     }
 }

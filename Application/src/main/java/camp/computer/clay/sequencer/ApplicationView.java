@@ -5,20 +5,12 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import camp.computer.clay.resource.NetworkResource;
-import camp.computer.clay.system.ContentManager;
+import camp.computer.clay.system.SQLiteContentManager;
 import camp.computer.clay.system.ViewManagerInterface;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
@@ -202,7 +194,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             clay.addResource(this.networkResource);
         }
 
-        getClay().addContentManager();
+        // <HACK>
+        SQLiteContentManager sqliteContentManager = new SQLiteContentManager(getClay(), "sqlite");
+        getClay().addContentManager(sqliteContentManager);
+        // </HACK>
 
         // Start worker process
         // Start the initial runnable task by posting through the handler

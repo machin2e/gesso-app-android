@@ -20,6 +20,13 @@ public class BehaviorState {
         // This empty default constructor is necessary for Firebase to be able to deserialize objects.
     }
 
+    public BehaviorState (UUID uuid, Behavior behavior, String state) {
+        this.uuid = uuid;
+        this.behaviorUuid = behaviorUuid;
+
+        this.state = state;
+    }
+
     public BehaviorState(Behavior behavior, String state) {
         this.uuid = UUID.randomUUID();
         this.behaviorUuid = behavior.getUuid();

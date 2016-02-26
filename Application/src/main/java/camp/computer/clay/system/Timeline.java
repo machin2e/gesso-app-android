@@ -2,6 +2,8 @@ package camp.computer.clay.system;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -15,6 +17,10 @@ public class Timeline {
 
     Timeline () {
 
+    }
+
+    public Timeline (UUID uuid) {
+        this.uuid = uuid;
     }
 
     public Timeline(Unit unit) {
@@ -66,6 +72,23 @@ public class Timeline {
             if (this.events.contains (event)) {
                 this.events.remove(event);
             }
+        }
+
+        if (event != null) {
+            getUnit().getClay().getContentManager().removeEvent(event, new ContentManagerInterface.CallbackInterface() {
+                @Override
+                public void onSuccess(Object object) {
+                    Log.v("Content_Manager", "Deleted event from database.");
+
+                    // TODO: Remove from cache.
+                }
+
+                @Override
+                public void onFailure() {
+                    // TODO: Remove from object model and cache, even if it couldn't be removed from the store.
+                    // TODO: Log failure here in text file for final logging of error. This should help debugging.
+                }
+            });
         }
     }
 

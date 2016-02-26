@@ -172,7 +172,7 @@ public class TimelineListView extends ListView {
         adapter.notifyDataSetChanged();
     }
 
-    private void displayListItemOptions(final EventHolder event) {
+    private void displayEventOptions (final EventHolder event) {
         int basicBehaviorCount = 3;
         final String[] behaviorOptions = new String[basicBehaviorCount];
         // loop, condition, branch
@@ -193,7 +193,7 @@ public class TimelineListView extends ListView {
 
                 if (behaviorOptions[itemIndex].toString().equals("delete")) {
 
-                    deleteListItem (event);
+                    deleteEventHolder(event);
 
                 } else if (behaviorOptions[itemIndex].toString().equals("update")) {
 
@@ -214,7 +214,7 @@ public class TimelineListView extends ListView {
                 } else if (behaviorOptions[itemIndex].toString().equals("repeat") || behaviorOptions[itemIndex].toString().equals("do once")) {
 
                     if (behaviorOptions[itemIndex].toString().equals("repeat")) {
-                        repeatListItem(event);
+//                        repeatListItem(event);
                     } else if (behaviorOptions[itemIndex].toString().equals("do once")) {
                         stepListItem(event);
                     }
@@ -894,7 +894,7 @@ public class TimelineListView extends ListView {
 
                 // Post the behavior package to the repository
 //                unit.addBehavior(behaviorPackage, defaultState);
-//                getClay().getBehaviorCacheManager().sdf
+//                getClay().getCacheManager().sdf
 
                 // Transformations:
                 // "apply TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL TTITH FFOTL"
@@ -1099,7 +1099,7 @@ public class TimelineListView extends ListView {
                 // <HACK>
                 eventHolder.getEvent().setTimeline(unit.getTimeline());
                 // </HACK>
-                eventHolder.updateState (updatedStateString);
+                eventHolder.updateState(updatedStateString);
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
@@ -1163,22 +1163,15 @@ public class TimelineListView extends ListView {
         }
     }
 
-    private void repeatListItem(EventHolder item) {
-
-        if (item.repeat == false) {
-            item.repeat = true;
-        }
-    }
-
-    private void deleteListItem (final EventHolder item) {
+    private void deleteEventHolder(final EventHolder eventHolder) {
 
         // <HACK>
         // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
-        unit.getTimeline().removeEvent(item.getEvent());
+        unit.getTimeline().removeEvent(eventHolder.getEvent());
         // </HACK>
 
         // Update state of the object associated with the selected view.
-        events.remove(item);
+        events.remove(eventHolder);
 
         // Update the view after removing the specified list item
         refreshListViewFromData();
@@ -1203,11 +1196,11 @@ public class TimelineListView extends ListView {
         // HTTP API interface (general wrapper, with authentication options)
 
         // Display the behaviors available for selection, starting with basic, cached, public.
-        int basicBehaviorCount = unit.getClay().getBehaviorCacheManager().getCachedBehaviors().size();
+        int basicBehaviorCount = unit.getClay().getCacheManager().getCachedBehaviors().size();
         final String[] basicBehaviors = new String[basicBehaviorCount];
 
         for (int i = 0; i < basicBehaviorCount; i++) {
-            Behavior cachedBehavior = unit.getClay().getBehaviorCacheManager().getCachedBehaviors().get(i);
+            Behavior cachedBehavior = unit.getClay().getCacheManager().getCachedBehaviors().get(i);
             basicBehaviors[i] = cachedBehavior.getTag();
         }
 
@@ -1219,10 +1212,10 @@ public class TimelineListView extends ListView {
 
 //                String selectedBehaviorType = basicBehaviors[itemIndex].toString();
 //                changeEvent(event, selectedBehaviorType);
-                Behavior selectedBehavior = getClay().getBehaviorCacheManager().getCachedBehaviors().get(itemIndex);
+                Behavior selectedBehavior = getClay().getCacheManager().getCachedBehaviors().get(itemIndex);
                 Log.v("Change_Behavior", "to " + selectedBehavior.getUuid());
                 Log.v("Change_Behavior", "from:");
-                for (Behavior cb : getClay().getBehaviorCacheManager().getCachedBehaviors()) {
+                for (Behavior cb : getClay().getCacheManager().getCachedBehaviors()) {
                     Log.v("Change_Behavior", "\t" + cb.getUuid().toString());
                 }
 
@@ -1326,6 +1319,21 @@ public class TimelineListView extends ListView {
             // Update the behavior on the timeline
             event.setBehavior(behavior, behaviorState);
 
+            getClay().notifyChange (event);
+
+//            // Add events if they don't already exist
+//            if (!getClay().getContentManager().hasEvent(event)) {
+//
+//                // Store event
+//                getClay().getContentManager().storeEvent(event);
+//
+//                // Store behavior for event
+//                getClay().getContentManager().storeBehavior(event.getBehavior());
+//
+//                // Store behavior state for behavior
+//                getClay().getContentManager().storeBehaviorState(event.getBehaviorState());
+//            }
+
             // Tell the unit to create the behavior, add it to the timeline, and update the state.
             unit.send("create behavior " + event.getUuid() + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
             unit.send("add behavior " + event.getUuid());
@@ -1339,10 +1347,16 @@ public class TimelineListView extends ListView {
             event.setBehaviorState(behaviorState);
             // </HACK>
         } else {
+
+            // Create event in memory
             Timeline timeline = this.unit.getTimeline();
             event = new Event(timeline, behavior, behaviorState);
 
-            // Tell the unit to create the behavior, add it to the timeline, and update the state.
+            // Notify Clay of the change to the event
+            getClay().notifyChange (event);
+
+            // Send the event to the device
+            // i.e., Tell the unit to create the behavior, add it to the timeline, and update the state.
             unit.send("create behavior " + event.getUuid() + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
             unit.send("add behavior " + event.getUuid());
             // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
@@ -1478,7 +1492,7 @@ public class TimelineListView extends ListView {
 
                 } else {
 
-                    displayListItemOptions (item);
+                    displayEventOptions(item);
                     return true;
 
                 }
@@ -1615,6 +1629,7 @@ public class TimelineListView extends ListView {
         refreshListViewFromData(); // Update view after removing items from the list
 
         // Create a new abstract event in the list that represents the selected event sequence at the position of the first event in the sequence
+//        getClay().createBehavior();
 
         // <HACK>
         // This removes the specified event from the list and replaces it with an event of a specific type.

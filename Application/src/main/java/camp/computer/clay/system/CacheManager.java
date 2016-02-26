@@ -5,14 +5,14 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class BehaviorCacheManager {
+public class CacheManager {
 
     private Clay clay;
 
     private ArrayList<String> repositoryUris = new ArrayList<String>();
     private ArrayList<Behavior> cachedBehaviors = new ArrayList<Behavior>();
 
-    BehaviorCacheManager(Clay clay) {
+    CacheManager(Clay clay) {
 
         // Associate this behavior repository with Clay.
         this.clay = clay;
@@ -31,7 +31,7 @@ public class BehaviorCacheManager {
     private void populateCache() {
         Log.v("CM_Log", "populateCache");
         // TODO: First check if a content manager exists that can access the remote repository URI. If so, use it.
-//        getClay ().getContentManager().restoreBehaviors();
+//        getClay ().getContentManager().loadBehaviors();
     }
 
     // TODO: populate: initial get all behaviors and cache a select subset

@@ -24,8 +24,17 @@ public class Event {
     /** The state of the behavior */
     private UUID behaviorStateUuid;
 
-    Event() {
+    public Event(UUID uuid, Timeline timeline, Behavior behavior, BehaviorState behaviorState) {
+        this.uuid = uuid;
 
+        this.timeline = timeline;
+        this.timelineUuid = timeline.getUuid();
+
+        this.behavior = behavior;
+        this.behaviorUuid = behavior.getUuid();
+
+        this.behaviorState = behaviorState;
+        this.behaviorStateUuid = behaviorState.getUuid();
     }
 
     public Event(Timeline timeline, Behavior behavior, BehaviorState behaviorState) {
@@ -39,6 +48,10 @@ public class Event {
 
         this.behaviorState = behaviorState;
         this.behaviorStateUuid = behaviorState.getUuid();
+    }
+
+    public Clay getClay() {
+        return getTimeline().getUnit().getClay();
     }
 
     public void setBehavior (Behavior behavior, BehaviorState behaviorState) {
@@ -55,8 +68,16 @@ public class Event {
     }
 
     public void setBehaviorState (BehaviorState behaviorState) {
+
+        // Update the object model
         this.behaviorState = behaviorState;
         this.behaviorStateUuid = behaviorState.getUuid();
+
+        // Cache the state
+        // TODO:
+
+        // Store the updated event and behavior state
+        getClay().notifyChange (this);
 
         /* Notify the the unit of the update */
 
