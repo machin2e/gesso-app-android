@@ -17,14 +17,14 @@ import camp.computer.clay.system.Unit;
  * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
  * one of the sections/tabs/pages. This provides the data for the {@link ViewPager}.
  */
-public class UnitViewPagerAdapter extends FragmentStatePagerAdapter {
+public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
     // END_INCLUDE (fragment_pager_adapter)
 
     public int count = 0;
 
     private Clay clay;
 
-    public UnitViewPagerAdapter(FragmentManager fm) {
+    public DeviceViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -64,12 +64,12 @@ public class UnitViewPagerAdapter extends FragmentStatePagerAdapter {
         }
 
         // getItem is called to instantiate the fragment for the given page.
-        // Return a UnitViewFragment (defined as a static inner class
+        // Return a DeviceViewFragment (defined as a static inner class
         // below) with the page number as its lone argument.
-        UnitViewFragment fragment = new UnitViewFragment();
+        DeviceViewFragment fragment = new DeviceViewFragment();
         // TODO: ^ store reference to these fragments in the ApplicationView, so they can be directly called to update the Views after data model changes.
         Bundle args = new Bundle();
-        args.putInt(UnitViewFragment.ARG_SECTION_NUMBER, position + 1);
+        args.putInt(DeviceViewFragment.ARG_SECTION_NUMBER, position + 1);
         fragment.setArguments(args);
         fragment.setUnit(unit);
         return (Fragment) fragment;

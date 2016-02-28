@@ -1,8 +1,5 @@
 package camp.computer.clay.system;
 
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class BehaviorState {
@@ -10,39 +7,36 @@ public class BehaviorState {
     /** The UUID that uniquely identifies this behavior state, making it addressable. */
     private UUID uuid;
 
-    /** The UUID of the behavior for which this is a state. */
-    private UUID behaviorUuid;
+    /** The behavior for which this is a state. */
+    // TODO: Remove this from the class so it is patterned like BehaviorScript
+    private Behavior behavior;
 
     // Together, these are the state of the complete behavior
     private String state;
 
-    BehaviorState() {
-        // This empty default constructor is necessary for Firebase to be able to deserialize objects.
-    }
+    private String description;
 
     public BehaviorState (UUID uuid, Behavior behavior, String state) {
+
         this.uuid = uuid;
-        this.behaviorUuid = behaviorUuid;
+
+        this.behavior = behavior;
 
         this.state = state;
+
+        this.description = "";
     }
 
-    public BehaviorState(Behavior behavior, String state) {
-        this.uuid = UUID.randomUUID();
-        this.behaviorUuid = behavior.getUuid();
+    public BehaviorState (Behavior behavior, String state) {
 
-        this.state = state;
+        this (UUID.randomUUID(), behavior, state);
     }
 
     public UUID getUuid () {
         return this.uuid;
     }
 
-    public UUID getBehaviorUuid () { return this.behaviorUuid; }
-
-    public void setState(String state) {
-        this.state = state;
-    }
+    public Behavior getBehavior () { return this.behavior; }
 
     public String getState() {
         return this.state;

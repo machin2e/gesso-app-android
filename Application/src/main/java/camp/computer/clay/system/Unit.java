@@ -104,7 +104,24 @@ public class Unit {
         this.timeline.setUnit(this);
     }
 
-    public void send(String content) {
+    public void notifyChange (Event event) {
+        getClay().notifyChange (event);
+
+        this.send("create behavior " + event.getUuid() + " \"" + event.getBehavior().getTag() + " " + event.getBehavior().getState().getState() + "\"");
+        this.send("add behavior " + event.getUuid());
+    }
+
+    /*
+    // TODO:
+    public void notifyRemove (Event event) {
+        getClay().notifyChange (event);
+
+        // Remove the previous behavior from the timeline
+        this.send("remove behavior " + event.getBehavior().getUuid());
+    }
+    */
+
+    private void send(String content) {
         getClay().sendMessage(this, content);
     }
 
@@ -123,10 +140,10 @@ public class Unit {
 //        this.getTimeline().addEvent(event);
 //    }
 
-    public void addBehavior(Behavior behavior, BehaviorState behaviorState) {
+    public void addBehavior(Behavior behavior) {
 
         // Create an event for the behavior so it can be added to the timeline
-        Event event = new Event(timeline, behavior, behaviorState);
+        Event event = new Event(timeline, behavior);
 
         // Add the event to the timeline
         this.getTimeline().addEvent(event);

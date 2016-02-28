@@ -58,27 +58,27 @@ public class CacheManager {
 
         if (!hasBehaviorByTitle ("lights")) {
             Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
-            getClay().createBehavior("lights", "F F F F F F F F F F F F");
+            getClay().createBasicBehavior("lights", "F F F F F F F F F F F F");
         }
 
         if (!hasBehaviorByTitle ("io")) {
             Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
-            getClay().createBehavior("io", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+            getClay().createBasicBehavior("io", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
         }
 
         if (!hasBehaviorByTitle ("message")) {
             Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-            getClay().createBehavior("message", "hello");
+            getClay().createBasicBehavior("message", "hello");
         }
 
         if (!hasBehaviorByTitle ("wait")) {
             Log.v("Clay_Behavior_Repo", "\"wait\" behavior not found in the repository. Adding it.");
-            getClay().createBehavior("wait", "250");
+            getClay().createBasicBehavior("wait", "250");
         }
 
         if (!hasBehaviorByTitle ("say")) {
             Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
-            getClay().createBehavior("say", "oh, that's great");
+            getClay().createBasicBehavior("say", "oh, that's great");
         }
     }
 

@@ -103,4 +103,8 @@ public class Timeline {
             return null;
         }
     }
+
+    public void addEvent(int index, Event event) {
+        this.events.add(index, event);
+    }
 }

@@ -11,7 +11,7 @@ import android.view.MotionEvent;
 import java.util.Calendar;
 import java.util.Date;
 
-public class UnitViewPager extends ViewPager {
+public class DeviceViewPager extends ViewPager {
 
     private static boolean ENABLE_TOUCH = true;
 
@@ -33,7 +33,7 @@ public class UnitViewPager extends ViewPager {
     boolean interceptTouches = false;
     // boolean itemHasFocus = false; // NOTE: This is located in CustomListView.java
 
-    public UnitViewPager(Context context, AttributeSet attrs) {
+    public DeviceViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

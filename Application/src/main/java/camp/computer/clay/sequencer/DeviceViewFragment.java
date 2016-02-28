@@ -13,7 +13,7 @@ import camp.computer.clay.system.Unit;
  * A fragment representing a section of the app. Each fragment represents a single unit. It
  * shows the timeline of unit behavior and controls for changing the timeline.
  */
-public class UnitViewFragment extends Fragment {
+public class DeviceViewFragment extends Fragment {
 
     // The Clay unit associated with this fragment.
     private Unit unit;
@@ -36,8 +36,8 @@ public class UnitViewFragment extends Fragment {
 //        private ArrayList<String> behaviorEvents = new ArrayList<String>();
 //        ArrayAdapter<String> listAdapter;
 
-    // TODO: UnitViewFragment(Unit unit)
-    public UnitViewFragment() {
+    // TODO: DeviceViewFragment(Unit unit)
+    public DeviceViewFragment() {
 
 //            eventHolders = new ArrayList<EventHolder>();
 
@@ -81,13 +81,13 @@ public class UnitViewFragment extends Fragment {
         // Define the view (get a reference to it and pass it an adapter)
         listView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
         listView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
-        // TODO: Create new TimelineUnitAdapter with the data for this tab's unit! (or reuse and repopulate with new data)
+        // TODO: Create new TimelineDeviceAdapter with the data for this tab's unit! (or reuse and repopulate with new data)
 
         // Create behavior profiles for the unit's behaviors and assign the data to the ListView
         Log.v ("CM_Log", "onCreateView");
         Log.v ("CM_Log", "\tunit: " + this.unit);
         Log.v ("CM_Log", "\tunit.getTimeline: " + this.unit.getTimeline());
-        listView.setEvents(this.unit.getTimeline());
+        listView.setEventHolders(this.unit.getTimeline());
 
         // <HACK>
         listView.setUnit (unit);
@@ -114,7 +114,7 @@ public class UnitViewFragment extends Fragment {
     public void refreshView () {
         Log.v("CM_Log", "refreshView");
 //        Log.v("CM_Log", "\tlistView = " + this.listView);
-//        listView.setEvents(this.unit.getTimeline());
+//        listView.setEventHolders(this.unit.getTimeline());
 //        if (this.listView != null) {
 //            this.listView.refreshListViewFromData();
 //        }

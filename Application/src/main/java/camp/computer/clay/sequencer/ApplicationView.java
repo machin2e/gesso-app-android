@@ -44,12 +44,12 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
      * intensive, it may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private UnitViewPagerAdapter mSectionsPagerAdapter;
+    private DeviceViewPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    UnitViewPager mViewPager;
+    DeviceViewPager mViewPager;
 
     private ActionBar actionBar;
 
@@ -86,7 +86,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     public void refreshListViewFromData(Unit unit) {
 //        Log.v("CM_Log", "refreshListViewFromData");
 //        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-//            UnitViewFragment unitViewFragment = (UnitViewFragment) mSectionsPagerAdapter.getItem(i);
+//            DeviceViewFragment unitViewFragment = (DeviceViewFragment) mSectionsPagerAdapter.getItem(i);
 //            Log.v("CM_Log", "\tunitViewFragment = " + unitViewFragment);
 //            Log.v("CM_Log", "\tunitViewFragment.unit = " + unitViewFragment.getUnit());
 //            if (unitViewFragment.getUnit() == unit) {
@@ -99,7 +99,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
      * Create the activity. Sets up an {@link android.app.ActionBar} with tabs, and then configures the
      * {@link ViewPager} contained inside R.layout.activity_main.
      *
-     * <p>A {@link UnitViewPagerAdapter} will be instantiated to hold the different pages of
+     * <p>A {@link DeviceViewPagerAdapter} will be instantiated to hold the different pages of
      * fragments that are to be displayed. A
      * {@link android.support.v4.view.ViewPager.SimpleOnPageChangeListener} will also be configured
      * to receive callbacks when the user swipes between pages in the ViewPager.
@@ -149,11 +149,11 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // BEGIN_INCLUDE (setup_view_pager)
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
-        mSectionsPagerAdapter = new UnitViewPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new DeviceViewPagerAdapter(getSupportFragmentManager());
         mSectionsPagerAdapter.setClay(getClay());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (UnitViewPager) findViewById(R.id.pager);
+        mViewPager = (DeviceViewPager) findViewById(R.id.pager);
         mViewPager.setPagingEnabled(true); // Disable horizontal paging by swiping left and right
         mViewPager.setAdapter(mSectionsPagerAdapter);
         // END_INCLUDE (setup_view_pager)
@@ -229,7 +229,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     public void addUnitView(Unit unit) {
 
-        // TODO: (?) Add UnitViewFragment to list here?
+        // TODO: (?) Add DeviceViewFragment to list here?
 
         // Increment the number of pages to be the same as the number of discovered units.
         mSectionsPagerAdapter.count++;

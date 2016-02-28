@@ -37,7 +37,7 @@ public class EventHolder {
     public String summary;
     public ArrayList<EventHolder> eventHolders;
 
-    public static int DEFAULT_TYPE = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
+    public static int DEFAULT_TYPE = TimelineDeviceAdapter.IO_CONTROL_LAYOUT;
 
     public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_light.
 
@@ -74,15 +74,17 @@ public class EventHolder {
         // Get the layout type to prepare for view generation
         // TODO: Automatically generate or retrieve layouts dynamically based on UUID here based on behavior events model, rather than referencing them as stored in XML.
         if (behavior.getTag().equals("lights")) {
-            this.type = TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT;
+            this.type = TimelineDeviceAdapter.LIGHT_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("io")) {
-            this.type = TimelineUnitAdapter.IO_CONTROL_LAYOUT;
+            this.type = TimelineDeviceAdapter.IO_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("message")) {
-            this.type = TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT;
+            this.type = TimelineDeviceAdapter.MESSAGE_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("wait")) {
-            this.type = TimelineUnitAdapter.WAIT_CONTROL_LAYOUT;
+            this.type = TimelineDeviceAdapter.WAIT_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("say")) {
-            this.type = TimelineUnitAdapter.SAY_CONTROL_LAYOUT;
+            this.type = TimelineDeviceAdapter.SAY_CONTROL_LAYOUT;
+        } else {
+            this.type = TimelineDeviceAdapter.COMPLEX_LAYOUT;
         }
         // </HACK>
 
@@ -140,7 +142,7 @@ public class EventHolder {
 
     private void initializeType() {
 
-        if (this.type == TimelineUnitAdapter.LIGHT_CONTROL_LAYOUT) {
+        if (this.type == TimelineDeviceAdapter.LIGHT_CONTROL_LAYOUT) {
 
 //            // Initialize light states to false (off)
 //            lightStates = new ArrayList<>();
@@ -154,7 +156,7 @@ public class EventHolder {
 //                lightColors.add(Color.rgb(0, 0, 255));
 //            }
 
-        } else if (this.type == TimelineUnitAdapter.IO_CONTROL_LAYOUT) {
+        } else if (this.type == TimelineDeviceAdapter.IO_CONTROL_LAYOUT) {
 
 //            // Initialize I/O states to false (off)
 //            ioStates = new ArrayList<>();
@@ -168,19 +170,19 @@ public class EventHolder {
 //                ioSignalValue.add('L');
 //            }
 
-        } else if (this.type == TimelineUnitAdapter.MESSAGE_CONTROL_LAYOUT) {
+        } else if (this.type == TimelineDeviceAdapter.MESSAGE_CONTROL_LAYOUT) {
 
 //            message = "hello";
 
-        } else if (this.type == TimelineUnitAdapter.WAIT_CONTROL_LAYOUT) {
+        } else if (this.type == TimelineDeviceAdapter.WAIT_CONTROL_LAYOUT) {
 
 //            this.time = 250;
 
-        } else if (this.type == TimelineUnitAdapter.SAY_CONTROL_LAYOUT) {
+        } else if (this.type == TimelineDeviceAdapter.SAY_CONTROL_LAYOUT) {
 
 //            phrase = "oh, that's great";
 
-        } else if (this.type == TimelineUnitAdapter.COMPLEX_LAYOUT) {
+        } else if (this.type == TimelineDeviceAdapter.COMPLEX_LAYOUT) {
 
             eventHolders = new ArrayList<>();
             summary = "invalid complex layout";
@@ -205,6 +207,6 @@ public class EventHolder {
         Log.v("CM_Log2", "\tbehavior: " + getEvent().getBehavior());
         BehaviorState behaviorState = new BehaviorState(getEvent().getBehavior(), stateString);
         Log.v("CM_Log2", "\tbehaviorState: " + behaviorState);
-        getEvent().setBehaviorState(behaviorState);
+        getEvent().getBehavior().setState(behaviorState);
     }
 }

@@ -79,7 +79,7 @@ public class Clay {
         this.contentManager = contentManager;
 
         // Retrieve the basic behaviors from repository and add them to the cache
-//         this.getCacheManager().setupRepository();
+        // this.getCacheManager().setupRepository();
         this.contentManager.restoreBehaviors();
         // </HACK>
     }
@@ -366,45 +366,46 @@ public class Clay {
     /**
      * Creates a new behavior with the specified tag and state, caches it, and stores it.
      * @param tag
-     * @param defaultStateString
+     * @param defaultState
      */
-    public void createBehavior (String tag, String defaultStateString) {
+    public void createBasicBehavior (String tag, String defaultState) {
 
-        // Create behavior and behavior state
-        Behavior behavior = new Behavior (tag, defaultStateString);
-        BehaviorState behaviorState = new BehaviorState(behavior, defaultStateString);
+        Log.v ("Content_Manager", "Creating basic behavior.");
 
-        // Cache the behavior locally
+        // Create behavior (and state) for the behavior script
+        BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
+        Behavior behavior = new Behavior (behaviorScript);
+
+        Log.v ("Content_Manager", "script: " + behavior.getScript());
+        Log.v ("Content_Manager", "state: " + behavior.getState());
+
+        // Cache the behavior
         this.cache(behavior);
 
-        // Store the behavior remotely
+        // Store the behavior
         if (hasContentManager()) {
-//            getContentManager().storeBehaviorState(behaviorState);
             getContentManager().storeBehavior(behavior);
         }
 
     }
 
     /**
-     * Creates a new behavior with the specified tag and state, caches it, and stores it.
-     * @param tag
-     * @param defaultStateString
+     * Adds the behavior, caches it, and stores it.
      */
-    public void createBehavior (String uuid, String tag, String defaultStateString) {
+    public void addBehavior (Behavior behavior) {
 
-        // Create behavior and behavior state
-        Behavior behavior = new Behavior (UUID.fromString(uuid), tag, defaultStateString);
-        BehaviorState behaviorState = new BehaviorState (behavior, defaultStateString);
+        // Create behavior (and state) for the behavior script
+//        BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
+//        Behavior behavior = new Behavior (behaviorScript);
 
-        // Cache the behavior locally
-        this.cache (behavior);
-        // TODO: Cache the BehaviorState
+        // Cache the behavior
+        this.cache(behavior);
 
-        // Store the behavior remotely
-//        if (hasContentManager()) {
-//            getContentManager().storeBehaviorState(behaviorState);
-//            getContentManager().storeBehavior(behavior);
-//        }
+        // Store the behavior
+        if (hasContentManager()) {
+            getContentManager().storeBehavior(behavior);
+        }
+
     }
 
     /**
@@ -488,13 +489,13 @@ public class Clay {
      */
     public void addUnitView (Unit unit) {
 
-        // TODO: (?) Add UnitViewFragment to a list here?
+        // TODO: (?) Add DeviceViewFragment to a list here?
 
         // <HACK>
         // Make sure no units are in an invalid state (null reference)
         boolean addView = true;
         for (Event event : unit.getTimeline().getEvents()) {
-            if (event.getBehavior() == null || event.getBehaviorState() == null) {
+            if (event.getBehavior() == null) {
                 addView = false;
             }
         }
@@ -539,9 +540,10 @@ public class Clay {
                 contentManager.storeBehavior(event.getBehavior());
 
                 // Store behavior state for behavior
-                contentManager.storeBehaviorState(event.getBehaviorState());
+                contentManager.storeBehaviorState(event.getBehavior().getState());
 
 //            }
         }
+
     }
 }
