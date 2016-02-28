@@ -1,88 +1,189 @@
 package camp.computer.clay.system;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import java.util.ArrayList;
 import java.util.UUID;
-
-// How to exclude certain fields:
-// http://stackoverflow.com/questions/32108969/why-do-i-get-failed-to-bounce-to-type-when-i-turn-json-from-firebase-into-java
 
 public class Behavior {
 
     private UUID uuid;
 
-    // The current state of the behavior.
-    private BehaviorState state;
+    private String tag;
 
-    public Behavior() {
-        // This empty default constructor is necessary for Firebase to be able to deserialize objects.
+    private String description;
+
+    /**
+     * The script represented by this behavior (if any). Only basic behaviors are associated with
+     * a behavior script.
+     */
+    private BehaviorScript behaviorScript;
+
+    /**
+     * The state to apply to the behavior script (if any).
+     */
+    private BehaviorState behaviorState;
+
+    /**
+     * The list of behaviors that constitute this behavior, if any. This list is empty for basic
+     * behaviors. Behaviors for which this list is not empty are compositions of basic behaviors
+     * and other behavior compositions (ultimately, of basic behaviors).
+     */
+    ArrayList<Behavior> behaviors;
+
+
+    public Behavior(UUID uuid, String tag, BehaviorScript behaviorScript, BehaviorState behaviorState) {
+
+        this.uuid = uuid;
+
+        this.tag = tag;
+
+        this.description = "";
+
+        this.behaviorScript = behaviorScript;
+
+        this.behaviorState = behaviorState;
+
+        this.behaviors = null;
     }
 
-    Behavior(String tag, String defaultState) {
+    public Behavior(BehaviorScript behaviorScript, BehaviorState behaviorState) {
+
         this.uuid = UUID.randomUUID();
 
-        // Create the default state of this behavior
-        BehaviorState behaviorState = new BehaviorState (this, tag, defaultState);
-        this.state = behaviorState;
+        this.tag = behaviorScript.getTag();
+
+        this.description = "";
+
+        this.behaviorScript = behaviorScript;
+
+        this.behaviorState = behaviorState;
+
+        this.behaviors = null;
+    }
+
+    /**
+     * Constructor for a basic behavior initialized with the default tag and state of the
+     * behavior script.
+     * @param behaviorScript A script associated with a basic behavior.
+     */
+    public Behavior(UUID uuid, BehaviorScript behaviorScript) {
+
+        this.uuid = uuid;
+
+        this.tag = behaviorScript.getTag();
+
+        this.description = "";
+
+        this.behaviorScript = behaviorScript;
+
+        this.behaviorState = new BehaviorState(this, behaviorScript.getDefaultState());
+
+        this.behaviors = null;
+    }
+
+    /**
+     * Convenience constructor that generates a random UUID for the behavior.
+     * @param behaviorScript A script associated with a basic behavior.
+     */
+    public Behavior (BehaviorScript behaviorScript) {
+
+        this(UUID.randomUUID(), behaviorScript);
+    }
+
+    /**
+     * Constructor for behavior composition (non-leaf in the behavior tree graph).
+     * @param uuid UUID to associate with the behavior.
+     * @param tag Tag to associate with the behavior.
+     */
+    public Behavior (UUID uuid, String tag) {
+
+        this.uuid = uuid;
+
+        this.tag = tag;
+
+        this.description = "";
+
+        this.behaviorScript = null;
+
+        this.behaviorState = null;
+
+        this.behaviors = new ArrayList<Behavior>();
+    }
+
+    /**
+     * Convenience that generates a random UUID for a behavior.
+     * @param tag Tag to associate with the behavior.
+     */
+    public Behavior (String tag) {
+        this(UUID.randomUUID(), tag);
     }
 
     public UUID getUuid () {
         return this.uuid;
     }
 
-    @JsonIgnore
     public void setTag(String tag) {
-        BehaviorState behaviorState = new BehaviorState (this, tag, getState().getState());
-        behaviorState.setDescription(getDescription());
-        this.state = behaviorState;
+        this.tag = tag;
     }
 
-    @JsonIgnore
     public String getTag() {
-        return this.state.getTag();
+        return this.tag;
     }
 
-    @JsonIgnore
     public void setDescription (String description) {
-        BehaviorState behaviorState = new BehaviorState (this, getTag(), getState().getState());
-        behaviorState.setDescription(description);
-        this.state = behaviorState;
+        this.description = description;
     }
 
-    @JsonIgnore
     public String getDescription () {
-        return this.state.getDescription();
+        return this.description;
     }
 
-//    @JsonIgnore
-//    public void setState(String state) {
-//        BehaviorState behaviorState = new BehaviorState (this, getTag(), state);
-//        behaviorState.setDescription(getDescription());
-//        this.state = behaviorState;
-//    }
-
-    public void setState (BehaviorState state) {
-        this.state = state;
+    public BehaviorScript getScript () {
+        return this.behaviorScript;
     }
 
-    public BehaviorState getState() {
-        return this.state;
+    public void setScript (BehaviorScript behaviorScript, BehaviorState behaviorState) {
+        this.behaviorScript = behaviorScript;
+        this.behaviorState = behaviorState;
     }
 
-//    /**
-//     * Sets the current state of the behavior to the existing state with the specified UUID.
-//     * @param uuid The UUID of the behavior state to set as the current one.
-//     */
-//    public void setState(UUID uuid) {
-//        // TODO: Look up the behavior state with the specified UUID in the behavior's state cache.
-//    }
-
-    /*
-    public void perform () {
-        // TODO: Perform the action, whatever it is!
-
-        Log.v("Clay", "Performing behavior " + this.getTag() + ".");
+    public BehaviorState getState () {
+        return this.behaviorState;
     }
-    */
+
+    public void setState (BehaviorState behaviorState) {
+        this.behaviorState = behaviorState;
+    }
+
+    public ArrayList<Behavior> getBehaviors() {
+        return this.behaviors;
+    }
+
+    public void addBehavior (Behavior behavior) {
+
+        // Add behaviors. This changes the behavior so it is no longer a basic behavior.
+        this.behaviors.add(behavior);
+
+        // Remove the script and state since this behavior is no longer a basic behavior.
+        this.behaviorScript = null;
+        this.behaviorState = null;
+    }
+
+    public void addBehaviors (ArrayList<Behavior> behaviors) {
+
+        // Add behaviors. This changes the behavior so it is no longer a basic behavior.
+        this.behaviors.addAll(behaviors);
+
+        // Remove the script and state since this behavior is no longer a basic behavior.
+        this.behaviorScript = null;
+        this.behaviorState = null;
+    }
+
+    /**
+     * Returns true if the behavior is associated with a behavior script. This will only return
+     * true for basic behaviors. This will return false for behavior compositions.
+     * @return True if the behavior has a script. Only true for basic behaviors.
+     */
+    public boolean hasScript() {
+        return (this.behaviorScript != null);
+    }
 }

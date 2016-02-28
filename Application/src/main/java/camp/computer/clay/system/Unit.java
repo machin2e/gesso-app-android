@@ -2,6 +2,8 @@ package camp.computer.clay.system;
 
 import android.util.Log;
 
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -16,8 +18,11 @@ public class Unit {
 
     private String meshAddress = null; // The unit's IP address
 
+    private UUID timelineUuid;
     // TODO: Replace timeline with timelineUuid so it can be easily moved between multiple devices or simulators.
     private Timeline timeline = null;
+
+    private Date timeOfLastContact = null;
 
     // TODO: Cache/model the unit's state and behavior
 
@@ -31,13 +36,21 @@ public class Unit {
         this.uuid = uuid;
 
         this.timeline = new Timeline(this);
+        this.timelineUuid = this.timeline.getUuid();
     }
 
     public Clay getClay () {
         return this.clay;
     }
 
-    private Date timeOfLastContact = null;
+    public UUID getTimelineUuid () {
+        return timelineUuid;
+    }
+
+    public void setTimelineUuid (UUID uuid) {
+        this.timelineUuid = uuid;
+        this.timeline = null;
+    }
 
     public long getTimeSinceLastMessage () {
 //        Log.v ("Clay_Time", "Time since last message: " + this.timeOfLastContact);
@@ -84,12 +97,55 @@ public class Unit {
         return this.timeline;
     }
 
-    public void send(String content) {
+    public void setTimeline(Timeline timeline) {
+        this.timeline = timeline;
+        this.timelineUuid = timeline.getUuid();
+
+        this.timeline.setUnit(this);
+    }
+
+    public void notifyChange (Event event) {
+        getClay().notifyChange (event);
+
+        this.send("create behavior " + event.getUuid() + " \"" + event.getBehavior().getTag() + " " + event.getBehavior().getState().getState() + "\"");
+        this.send("add behavior " + event.getUuid());
+    }
+
+    /*
+    // TODO:
+    public void notifyRemove (Event event) {
+        getClay().notifyChange (event);
+
+        // Remove the previous behavior from the timeline
+        this.send("remove behavior " + event.getBehavior().getUuid());
+    }
+    */
+
+    private void send(String content) {
         getClay().sendMessage(this, content);
     }
 
-    public void addBehavior(String behaviorUuid) {
-        Behavior behavior = getClay().getBehavior(behaviorUuid);
-        this.getTimeline().addBehavior(behavior);
+//    public void addBehavior(UUID behaviorUuid) {
+//
+//        // Get the behavior with the specified UUID
+//        Behavior behavior = getClay().getBehavior(behaviorUuid);
+//
+//        // Generate the behavior's initial state
+//        BehaviorState behaviorState = new BehaviorState(behavior, behavior.getDefaultState());
+//
+//        // Create an event for the behavior so it can be added to the timeline
+//        Event event = new Event(timeline, behavior, behaviorState);
+//
+//        // Add the event to the timeline
+//        this.getTimeline().addEvent(event);
+//    }
+
+    public void addBehavior(Behavior behavior) {
+
+        // Create an event for the behavior so it can be added to the timeline
+        Event event = new Event(timeline, behavior);
+
+        // Add the event to the timeline
+        this.getTimeline().addEvent(event);
     }
 }

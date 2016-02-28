@@ -11,7 +11,9 @@ public interface ViewManagerInterface {
      * @param unit
      */
     public void addUnitView(Unit unit);
-    // TODO: refreshTimelineView (Unit unit);
+
+    public void refreshListViewFromData(Unit unit);
+
     // TODO: removeTimelineView (Unit unit);
     // TODO: hideTimelineView (Unit unit);
 }

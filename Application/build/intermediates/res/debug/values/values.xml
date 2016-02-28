@@ -23,7 +23,7 @@
     <dimen name="default_gap">8dip</dimen>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/dimens.xml -->
     <eat-comment/>
-    <dimen name="event_title_text_size">15dp</dimen>
+    <dimen name="event_tag_text_size">15dp</dimen>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/template-dimens.xml -->
     <eat-comment/>
     <dimen name="horizontal_page_margin">@dimen/margin_medium</dimen>
@@ -40,7 +40,7 @@
     <dimen name="vertical_page_margin">@dimen/margin_medium</dimen>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/dimens.xml -->
     <eat-comment/>
-    <integer name="event_timeline_segment_length">177</integer>
+    <integer name="event_timeline_segment_length">179</integer>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Application/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_settings">Settings</string>

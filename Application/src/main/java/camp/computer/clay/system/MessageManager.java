@@ -211,13 +211,16 @@ public class MessageManager {
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
                     Log.v("Clay_Time", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    Unit unit = new Unit(clay, UUID.fromString(unitUuid));
-                    unit.setInternetAddress(unitAddress);
-                    getClay().addUnit(unit);
-//                    getClay ().getContentManager().addEvent (unit, "discovered");
+                    getClay().add(UUID.fromString(unitUuid), unitAddress);
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
+
+                    // TODO: Update communications table
+                    /*
+                    Unit unit = getClay().getUnitByUuid(UUID.fromString(unitUuid));
+                    unit.setTimeOfLastContact();
+                    */
                 }
             }
 
@@ -231,7 +234,7 @@ public class MessageManager {
 
         } else {
             Log.v("Clay", "Error: Unrecognized message.");
-            // TODO: Add the unrecognized message the ContentManager in a category for unrecognized messages, and allow it to be defined.
+            // TODO: Add the unrecognized message the FileContentManager in a category for unrecognized messages, and allow it to be defined.
         }
     }
 
@@ -338,5 +341,14 @@ public class MessageManager {
         Message message = new Message ("udp", null, address, content);
         message.setDeliveryGuaranteed(true);
         queueOutgoingMessage (message);
+    }
+
+    public void processMessage() {
+
+        // Process incoming messages
+        processIncomingMessages();
+
+        // Process outgoing messages
+        processOutgoingMessages();
     }
 }

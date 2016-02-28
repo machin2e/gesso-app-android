@@ -1,12 +1,12 @@
 package camp.computer.clay.system;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public class Clay {
     // </HACK>
 
     // Resource management systems (e.g., networking, messaging, content)
-    private ContentManager contentManager = null;
+    private ContentManagerInterface contentManager = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
 
@@ -29,7 +29,7 @@ public class Clay {
     private ArrayList<Unit> units = new ArrayList<Unit>();
 
     // List of behaviors cached on this device
-    private BehaviorCacheManager behaviorCacheManager = null;
+    private CacheManager cacheManager = null;
 
     // The calendar used by Clay
     private Calendar calendar = Calendar.getInstance (TimeZone.getTimeZone("GMT"));
@@ -39,9 +39,8 @@ public class Clay {
         this.views = new ArrayList<ViewManagerInterface>(); // Create list to store views.
         this.messageManager = new MessageManager (this); // Start the communications systems
         this.networkManager = new NetworkManager (this); // Start the networking systems
-        this.contentManager = new ContentManager (this); // Start the content management system
 
-        this.behaviorCacheManager = new BehaviorCacheManager(this); // Set up behavior repository
+        this.cacheManager = new CacheManager(this); // Set up behavior repository
     }
 
     // <HACK>
@@ -70,6 +69,21 @@ public class Clay {
         this.networkManager.addResource(networkResource);
     }
 
+    /**
+     * Adds a content manager for use by Clay. Retrieves the basic behaviors provided by the
+     * content manager and makes them available in Clay.
+     */
+    public void addContentManager (ContentManagerInterface contentManager) {
+        // <HACK>
+        // this.contentManager = new FileContentManager(this, "file"); // Start the content management system
+        this.contentManager = contentManager;
+
+        // Retrieve the basic behaviors from repository and add them to the cache
+        // this.getCacheManager().setupRepository();
+        this.contentManager.restoreBehaviors();
+        // </HACK>
+    }
+
     /*
      * Clay's infrastructure management functions.
      */
@@ -81,21 +95,21 @@ public class Clay {
      */
     public void sendMessage (Unit unit, String content) {
 
-        // Prepare message
+        // Get source address
         String source = this.networkManager.getInternetAddress ();
+
+        // Get destination address
+        // String destination = unit.getInternetAddress();
         String destination = unit.getInternetAddress();
+        String[] destinationOctets = destination.split("\\.");
+        destinationOctets[3] = "255";
+        destination = TextUtils.join(".", destinationOctets);
+
+        // Create message
         Message message = new Message("udp", source, destination, content);
 
-        // Queue message
+        // Queue message for sending
         messageManager.queueOutgoingMessage(message);
-
-//        // <HACK>
-//        // The destination should be the unit's address, not the broadcast address.
-//        destination = DatagramManager.BROADCAST_ADDRESS; // unit.getInternetAddress();
-//        Log.v ("UDP_Destination", "destination: " + unit.getInternetAddress());
-//        Message broadcast = new Message("udp", source, destination, content);
-//        messageManager.queueOutgoingMessage(broadcast);
-//        // </HACK>
     }
 
     /**
@@ -115,11 +129,11 @@ public class Clay {
         return this.views.get (i);
     }
 
-    public BehaviorCacheManager getBehaviorCacheManager() {
-        return this.behaviorCacheManager;
+    public CacheManager getCacheManager() {
+        return this.cacheManager;
     }
 
-    public ContentManager getContentManager() {
+    public ContentManagerInterface getContentManager() {
         return this.contentManager;
     }
 
@@ -136,14 +150,136 @@ public class Clay {
         return null;
     }
 
-    public void addUnit (Unit unit) {
+    private Clay getClay () {
+        return this;
+    }
+
+    /**
+     * Adds the specified unit to Clay's operating environment.
+     */
+    public void add(final UUID unitUuid, final String internetAddress) {
+
+//        final Unit newUnit = new Unit(this, unitUuid);
+//        newUnit.setInternetAddress(internetAddress);
+
+        Log.v("Content_Manager", "Clay is searching for the unit (UUID: " + unitUuid + ").");
+
+        if (hasUnitByUuid(unitUuid)) {
+            Log.v("Content_Manager", "Clay already has the unit (UUID: " + unitUuid + ").");
+            return;
+        }
+
+        Log.v("Content_Manager", "Clay couldn't find the unit (UUID: " + unitUuid + ").");
+
+        // Restore the unit in Clay's object model
+        // Request unit profile from history (i.e., the remote store).
+
+//            getCacheManager().setupRepository();
+//            getContentManager().storeUnit(unit);
+        getContentManager().restoreUnit(unitUuid, new ContentManagerInterface.CallbackInterface() {
+            @Override
+            public void onSuccess(Object object) {
+
+                final Unit restoredUnit = (Unit) object;
+                Log.v("Content_Manager", "Successfully restored unit (UUID: " + restoredUnit.getUuid() + ").");
+
+                // Update restored unit with information from device
+                restoredUnit.setInternetAddress(internetAddress);
+
+                Log.v("Content_Manager", "Clay is searching for the timeline (UUID: " + restoredUnit.getTimelineUuid() + ").");
+
+                // Restore timeline
+                getContentManager().restoreTimeline(restoredUnit, restoredUnit.getTimelineUuid(), new ContentManagerInterface.CallbackInterface() {
+                    @Override
+                    public void onSuccess(Object object) {
+                        Log.v("Content_Manager", "Successfully restored timeline.");
+                        Timeline timeline = (Timeline) object;
+                        restoredUnit.setTimeline(timeline);
+
+                        // Restore events
+                        getContentManager().restoreEvents(timeline);
+
+                        // Add unit to cache
+                        addUnit2(restoredUnit);
+
+//                        // Update view
+//                        updateUnitView(restoredUnit);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.v("Content_Manager", "Failed to restore timeline.");
+
+                        // Graph timeline locally since it was not found
+                        Timeline newTimeline = new Timeline (restoredUnit.getTimelineUuid());
+                        newTimeline.setUnit(restoredUnit);
+                        restoredUnit.setTimeline(newTimeline);
+                        Log.v("Content_Manager", "Cached new timeline (UUID: " + newTimeline.getUuid() + ").");
+
+                        // Store timeline
+                        getContentManager().storeTimeline(restoredUnit.getTimeline());
+                        Log.v("Content_Manager", "Saved new timeline (UUID: " + newTimeline.getUuid() + ").");
+
+                        // Add unit to cache
+                        addUnit2(restoredUnit);
+                    }
+                });
+
+                // Restore events
+//                    getContentManager().restoreEvents(timeline);
+
+                // Update view
+//                    updateUnitView(newUnit);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.v("Content_Manager", "Failed to restore unit.");
+
+                // Create unit in graph
+                Unit newUnit = new Unit(getClay(), unitUuid);
+                newUnit.setInternetAddress(internetAddress);
+                Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid() + ").");
+
+                // Cache the unit
+                addUnit2(newUnit);
+                Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
+
+                // Store the unit
+                getContentManager().storeUnit(newUnit);
+                Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
+
+                getContentManager().storeTimeline(newUnit.getTimeline());
+                Log.v("Content_Manager", "Stored new timeline (UUID: " + newUnit.getTimeline().getUuid() + ").");
+
+                // Archive the unit
+                // TODO:
+            }
+        });
+//            getContentManager().storeTimeline(unit.getTimeline());
+
+//            // Add events if they don't already exist
+//            for (Event event : unit.getTimeline().getEvents()) {
+//                if (!getContentManager().hasEvent(event)) {
+//                    getContentManager().restoreEvents(unit.getTimeline());
+//                }
+//            }
+
+
+
+
+    }
+
+    private void addUnit2 (Unit unit) {
+        Log.v ("Content_Manager", "addUnit2");
+
         if (!this.units.contains (unit)) {
 
             // Add unit to present (i.e., local cache).
             this.units.add(unit);
-            // TODO: Move this into a unit manager?
-//            this.getContentManager().addUnit(unit);
+            Log.v("Content_Manager", "Successfully added timeline.");
 
+            /*
             // <TEST>
             // Add a random number of random behaviors to the unit.
             // This will be replaced with the actual behaviors on the device's timeline.
@@ -152,39 +288,37 @@ public class Clay {
             for (int i = 0; i < behaviorCount; i++) {
 
                 // Get list of the available behavior types
-//                ArrayList<String> behaviorTypes = new ArrayList<String>();
-//                behaviorTypes.add ("lights");
-//                behaviorTypes.add ("io");
-//                behaviorTypes.add ("message");
-//                behaviorTypes.add ("wait");
-//                behaviorTypes.add ("say");
+                ArrayList<Behavior> behaviors = getCacheManager().getCachedBehaviors();
 
-                ArrayList<Behavior> behaviors = getBehaviorCacheManager().getCachedBehaviors();
 
-                // Select random behavior type
-                int behaviorSelection = r.nextInt(behaviors.size());
-                UUID behaviorUuid = behaviors.get(behaviorSelection).getUuid();
+                // Generate a random behavior
+                if (behaviors.size() > 0) {
 
-                // Generate a behavior of the selected type
-                unit.addBehavior (behaviorUuid.toString());
+                    // Select random behavior type
+                    int behaviorSelection = r.nextInt(behaviors.size());
+                    UUID behaviorUuid = behaviors.get(behaviorSelection).getUuid();
+
+                    Log.v("Behavior_DB", "BEFORE unit.storeBehavior:");
+                    getContentManager().restoreBehavior(behaviorUuid.toString());
+
+                    // Generate a behavior of the selected type
+                    unit.addBehavior (behaviorUuid.toString());
+
+                    Log.v("Behavior_DB", "AFTER unit.storeBehavior:");
+                    getContentManager().restoreBehavior(behaviorUuid.toString());
+                }
             }
             // </TEST>
+            */
 
-            Log.v("Behavior_Count", "unit behavior count: " + unit.getTimeline().getBehaviors().size());
-
+//            Log.v("Behavior_Count", "Unit behavior count: " + unit.getTimeline().getEvents().size());
+//
             // Add timelines to attached views
             for (ViewManagerInterface view : this.views) {
                 // TODO: (1) add a page to the ViewPager
-
-                // (2) Add a tab to the action bar to support navigation to the specified page.
+                // TODO: (2) Add a tab to the action bar to support navigation to the specified page.
                 view.addUnitView(unit);
             }
-
-            Log.v ("Add_Unit", "Adding unit");
-
-            // Retrieve unit from memory (i.e., contentManager).
-            //getContentManager().addUnit(unit);
-            //getContentManager ().getUnit (unit.getUuid ());
         }
     }
 
@@ -197,52 +331,108 @@ public class Clay {
     }
 
     public boolean hasUnitByUuid (UUID unitUuid) {
-        Log.v("Clay_Time", "Looking for unit (in set of " + getUnits().size() + ") with UUID " + unitUuid + "...");
         for (Unit unit : getUnits ()) {
-            Log.v("Clay_Time", "\t...checking address " + unit.getInternetAddress());
             if (unit.getUuid().compareTo(unitUuid) == 0) {
-                Log.v("Clay_Time", "Found matching address " + unit.getInternetAddress());
                 return true;
             }
         }
-        Log.v("Clay_Time", "Didn't find a matching address");
         return false;
     }
 
     public Unit getUnitByUuid (UUID unitUuid) {
-        Log.v("Clay_Time", "Looking for unit (in set of " + getUnits().size() + ") with UUID " + unitUuid + "...");
         for (Unit unit : getUnits ()) {
-            Log.v("Clay_Time", "\t...checking address " + unit.getInternetAddress());
             if (unit.getUuid().compareTo(unitUuid) == 0) {
-                Log.v("Clay_Time", "Found matching address " + unit.getInternetAddress());
                 return unit;
             }
         }
-        Log.v("Clay_Time", "Didn't find a matching address");
         return null;
     }
 
     public boolean hasUnitByAddress (String address) {
-        Log.v("Clay_Time", "Looking for unit (in set of " + getUnits().size() + ") with address " + address + "...");
-        for (Unit unit : getUnits ()) {
-            Log.v("Clay_Time", "\t...checking address " + unit.getInternetAddress());
-            if (unit.getInternetAddress().compareTo (address) == 0) {
-                Log.v("Clay_Time", "Found matching address " + unit.getInternetAddress());
+        for (Unit unit : getUnits()) {
+            if (unit.getInternetAddress().equals(address)) {
                 return true;
             }
         }
-        Log.v("Clay_Time", "Didn't find a matching address");
         return false;
     }
 
-    public void removeUnit (Unit unit) {
-        if (hasUnit (unit)) {
-            this.units.remove (unit);
+//    public void removeUnit (Unit unit) {
+//        if (hasUnit(unit)) {
+//            this.units.remove (unit);
+//        }
+//    }
+
+    /**
+     * Creates a new behavior with the specified tag and state, caches it, and stores it.
+     * @param tag
+     * @param defaultState
+     */
+    public void createBasicBehavior (String tag, String defaultState) {
+
+        Log.v ("Content_Manager", "Creating basic behavior.");
+
+        // Create behavior (and state) for the behavior script
+        BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
+        Behavior behavior = new Behavior (behaviorScript);
+
+        Log.v ("Content_Manager", "script: " + behavior.getScript());
+        Log.v ("Content_Manager", "state: " + behavior.getState());
+
+        // Cache the behavior
+        this.cache(behavior);
+
+        // Store the behavior
+        if (hasContentManager()) {
+            getContentManager().storeBehavior(behavior);
         }
+
     }
 
-    public Behavior getBehavior (String behaviorUuid) {
-        return getBehaviorCacheManager().getBehavior(behaviorUuid);
+    /**
+     * Adds the behavior, caches it, and stores it.
+     */
+    public void addBehavior (Behavior behavior) {
+
+        // Create behavior (and state) for the behavior script
+//        BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
+//        Behavior behavior = new Behavior (behaviorScript);
+
+        // Cache the behavior
+        this.cache(behavior);
+
+        // Store the behavior
+        if (hasContentManager()) {
+            getContentManager().storeBehavior(behavior);
+        }
+
+    }
+
+    /**
+     * Returns true if Clay has a content manager.
+     * @return True if Clay has a content manager. False otherwise.
+     */
+    private boolean hasContentManager() {
+        return this.contentManager != null;
+    }
+
+    public Behavior getBehavior (UUID behaviorUuid) {
+        if (hasBehaviorCacheManager()) {
+            if (getCacheManager().hasBehavior(behaviorUuid.toString())) {
+                return getCacheManager().getBehavior(behaviorUuid);
+            } else {
+                // TODO: Cache the behavior and callback to the object requesting the behavior.
+            }
+        }
+        // TODO: throw NoCacheManagerException
+        return null;
+    }
+
+    private boolean hasBehaviorCacheManager() {
+        if (getCacheManager() != null) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -250,11 +440,8 @@ public class Clay {
      */
     public void cycle () {
 
-        // Process incoming messages
-        messageManager.processIncomingMessages();
-
-        // Process outgoing messages
-        messageManager.processOutgoingMessages();
+        // Process messages
+        messageManager.processMessage();
     }
 
     private Calendar getCalendar () {
@@ -269,10 +456,94 @@ public class Clay {
         return this.calendar.getTimeInMillis();
     }
 
-    // TODO: discoverUnits() : Discover devices via UDP (maybe TCP).
-    // TODO: discoverNetwork() : Discover and model the communications network between the units.
-    // TODO: requestModuleBehaviors(module) : Request the available behaviors that Clay modules can do. These are the basic behaviors.
-    // TODO: requestModuleBehavior(module) : Request the currently programmed behavior of a specific Clay module.
+    /**
+     * Caches a Behavior in memory.
+     * @param behavior The Behavior to cache.
+     */
+    public void cache (Behavior behavior) {
+        this.getCacheManager().cacheBehavior(behavior);
+    }
 
-    // TODO: Implement incoming and outgoing message queues for communicating with Clay modules.
+    /**
+     * Adds a Unit to Clay's object model.
+     * @param unit The Unit to add to Clay's object model.
+     */
+    public void add (Unit unit) {
+        this.units.add(unit);
+    }
+
+    /**
+     * Push updated unit object to views so they can show the updated information
+     * @param unit
+     */
+    public void updateUnitView (Unit unit) {
+
+        for (ViewManagerInterface view : this.views) {
+            view.refreshListViewFromData(unit);
+        }
+    }
+
+    /**
+     * Requests a view for a unit.
+     * @param unit The unit for which a view is requested.
+     */
+    public void addUnitView (Unit unit) {
+
+        // TODO: (?) Add DeviceViewFragment to a list here?
+
+        // <HACK>
+        // Make sure no units are in an invalid state (null reference)
+        boolean addView = true;
+        for (Event event : unit.getTimeline().getEvents()) {
+            if (event.getBehavior() == null) {
+                addView = false;
+            }
+        }
+        if (addView) {
+            addUnitView2(unit);
+        }
+        // </HACK>
+    }
+
+    private void addUnitView2(Unit unit) {
+        // Add timelines to attached views
+        for (ViewManagerInterface view : this.views) {
+            // TODO: (1) add a page to the ViewPager
+
+            // (2) Add a tab to the action bar to support navigation to the specified page.
+            Log.v ("CM_Log", "addUnitView2");
+            Log.v ("CM_Log", "\tunit: " + unit);
+            Log.v ("CM_Log", "\tunit/timeline: " + unit.getTimeline());
+            view.addUnitView(unit);
+        }
+    }
+
+    /**
+     * Notify Clay of a change to an Event in the object model. Clay will propagate the change
+     * to the cache, store, and repository.
+     * @param event
+     */
+    public void notifyChange(Event event) {
+
+        if (hasContentManager()) {
+
+            // Select the content manager to use
+            ContentManagerInterface contentManager = getClay().getContentManager();
+
+            // Add events if they don't already exist
+//            if (!contentManager.hasEvent(event)) {
+
+                // Store event
+                contentManager.storeEvent(event);
+
+                // Store behavior for event
+                contentManager.storeBehavior(event.getBehavior());
+
+                // Store behavior state for behavior
+                contentManager.storeBehaviorState(event.getBehavior().getState());
+
+//            }
+        }
+
+    }
 }

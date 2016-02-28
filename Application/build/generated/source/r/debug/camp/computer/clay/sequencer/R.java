@@ -261,7 +261,7 @@ containing a value of this type.
         public static final int cardview_default_elevation=0x7f050005;
         public static final int cardview_default_radius=0x7f050006;
         public static final int default_gap=0x7f050007;
-        public static final int event_title_text_size=0x7f050008;
+        public static final int event_tag_text_size=0x7f050008;
         public static final int horizontal_page_margin=0x7f050000;
         public static final int light_preview_column_width=0x7f050009;
         public static final int margin_huge=0x7f05000a;
