@@ -172,7 +172,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // END_INCLUDE (page_change_listener)
 
         // BEGIN_INCLUDE (add_tabs)
-        // For each of the sections in the app, add a tab to the action bar.
+        // For each of the sections in the app, addUnit a tab to the action bar.
 //        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 //            addUnitView(null);
 //        }
@@ -197,6 +197,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // <HACK>
         SQLiteContentManager sqliteContentManager = new SQLiteContentManager(getClay(), "sqlite");
         getClay().addContentManager(sqliteContentManager);
+        getClay().populateCache();
         // </HACK>
 
         // Start worker process

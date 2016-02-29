@@ -9,6 +9,10 @@ public interface ContentManagerInterface {
         void onFailure();
     }
 
+    void resetDatabase();
+
+    void storeBehaviorScript (BehaviorScript behaviorScript);
+    void restoreBehaviorScripts();
     void restoreBehaviors(); // TODO: Restore cache
 
     boolean hasBehavior(Behavior behavior);

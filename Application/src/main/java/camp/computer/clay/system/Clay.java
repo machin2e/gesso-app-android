@@ -77,10 +77,6 @@ public class Clay {
         // <HACK>
         // this.contentManager = new FileContentManager(this, "file"); // Start the content management system
         this.contentManager = contentManager;
-
-        // Retrieve the basic behaviors from repository and add them to the cache
-        // this.getCacheManager().setupRepository();
-        this.contentManager.restoreBehaviors();
         // </HACK>
     }
 
@@ -129,11 +125,11 @@ public class Clay {
         return this.views.get (i);
     }
 
-    public CacheManager getCacheManager() {
+    public CacheManager getCache() {
         return this.cacheManager;
     }
 
-    public ContentManagerInterface getContentManager() {
+    public ContentManagerInterface getStore() {
         return this.contentManager;
     }
 
@@ -157,7 +153,7 @@ public class Clay {
     /**
      * Adds the specified unit to Clay's operating environment.
      */
-    public void add(final UUID unitUuid, final String internetAddress) {
+    public void addUnit(final UUID unitUuid, final String internetAddress) {
 
 //        final Unit newUnit = new Unit(this, unitUuid);
 //        newUnit.setInternetAddress(internetAddress);
@@ -174,9 +170,9 @@ public class Clay {
         // Restore the unit in Clay's object model
         // Request unit profile from history (i.e., the remote store).
 
-//            getCacheManager().setupRepository();
-//            getContentManager().storeUnit(unit);
-        getContentManager().restoreUnit(unitUuid, new ContentManagerInterface.CallbackInterface() {
+//            getCache().setupRepository();
+//            getStore().storeUnit(unit);
+        getStore().restoreUnit(unitUuid, new ContentManagerInterface.CallbackInterface() {
             @Override
             public void onSuccess(Object object) {
 
@@ -189,7 +185,7 @@ public class Clay {
                 Log.v("Content_Manager", "Clay is searching for the timeline (UUID: " + restoredUnit.getTimelineUuid() + ").");
 
                 // Restore timeline
-                getContentManager().restoreTimeline(restoredUnit, restoredUnit.getTimelineUuid(), new ContentManagerInterface.CallbackInterface() {
+                getStore().restoreTimeline(restoredUnit, restoredUnit.getTimelineUuid(), new ContentManagerInterface.CallbackInterface() {
                     @Override
                     public void onSuccess(Object object) {
                         Log.v("Content_Manager", "Successfully restored timeline.");
@@ -197,7 +193,7 @@ public class Clay {
                         restoredUnit.setTimeline(timeline);
 
                         // Restore events
-                        getContentManager().restoreEvents(timeline);
+                        getStore().restoreEvents(timeline);
 
                         // Add unit to cache
                         addUnit2(restoredUnit);
@@ -217,7 +213,7 @@ public class Clay {
                         Log.v("Content_Manager", "Cached new timeline (UUID: " + newTimeline.getUuid() + ").");
 
                         // Store timeline
-                        getContentManager().storeTimeline(restoredUnit.getTimeline());
+                        getStore().storeTimeline(restoredUnit.getTimeline());
                         Log.v("Content_Manager", "Saved new timeline (UUID: " + newTimeline.getUuid() + ").");
 
                         // Add unit to cache
@@ -226,7 +222,7 @@ public class Clay {
                 });
 
                 // Restore events
-//                    getContentManager().restoreEvents(timeline);
+//                    getStore().restoreEvents(timeline);
 
                 // Update view
 //                    updateUnitView(newUnit);
@@ -246,22 +242,22 @@ public class Clay {
                 Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
 
                 // Store the unit
-                getContentManager().storeUnit(newUnit);
+                getStore().storeUnit(newUnit);
                 Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
 
-                getContentManager().storeTimeline(newUnit.getTimeline());
+                getStore().storeTimeline(newUnit.getTimeline());
                 Log.v("Content_Manager", "Stored new timeline (UUID: " + newUnit.getTimeline().getUuid() + ").");
 
                 // Archive the unit
                 // TODO:
             }
         });
-//            getContentManager().storeTimeline(unit.getTimeline());
+//            getStore().storeTimeline(unit.getTimeline());
 
 //            // Add events if they don't already exist
 //            for (Event event : unit.getTimeline().getEvents()) {
-//                if (!getContentManager().hasEvent(event)) {
-//                    getContentManager().restoreEvents(unit.getTimeline());
+//                if (!getStore().hasEvent(event)) {
+//                    getStore().restoreEvents(unit.getTimeline());
 //                }
 //            }
 
@@ -288,7 +284,7 @@ public class Clay {
             for (int i = 0; i < behaviorCount; i++) {
 
                 // Get list of the available behavior types
-                ArrayList<Behavior> behaviors = getCacheManager().getCachedBehaviors();
+                ArrayList<Behavior> behaviors = getCache().getBehaviors();
 
 
                 // Generate a random behavior
@@ -299,13 +295,13 @@ public class Clay {
                     UUID behaviorUuid = behaviors.get(behaviorSelection).getUuid();
 
                     Log.v("Behavior_DB", "BEFORE unit.storeBehavior:");
-                    getContentManager().restoreBehavior(behaviorUuid.toString());
+                    getStore().restoreBehavior(behaviorUuid.toString());
 
                     // Generate a behavior of the selected type
                     unit.addBehavior (behaviorUuid.toString());
 
                     Log.v("Behavior_DB", "AFTER unit.storeBehavior:");
-                    getContentManager().restoreBehavior(behaviorUuid.toString());
+                    getStore().restoreBehavior(behaviorUuid.toString());
                 }
             }
             // </TEST>
@@ -315,7 +311,7 @@ public class Clay {
 //
             // Add timelines to attached views
             for (ViewManagerInterface view : this.views) {
-                // TODO: (1) add a page to the ViewPager
+                // TODO: (1) addUnit a page to the ViewPager
                 // TODO: (2) Add a tab to the action bar to support navigation to the specified page.
                 view.addUnitView(unit);
             }
@@ -363,30 +359,82 @@ public class Clay {
 //        }
 //    }
 
+    public void generateStore () {
+
+        if (hasStore()) {
+            if (!getCache().hasBehaviorScript ("lights")) {
+                Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("lights", "F F F F F F F F F F F F");
+            }
+
+            if (!getCache().hasBehaviorScript ("io")) {
+                Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("io", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+            }
+
+            if (!getCache().hasBehaviorScript ("message")) {
+                Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("message", "hello");
+            }
+
+            if (!getCache().hasBehaviorScript ("wait")) {
+                Log.v("Clay_Behavior_Repo", "\"wait\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("wait", "250");
+            }
+
+            if (!getCache().hasBehaviorScript ("say")) {
+                Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("say", "oh, that's great");
+            }
+        }
+    }
+
     /**
-     * Creates a new behavior with the specified tag and state, caches it, and stores it.
+     * Creates a new behavior with the specified tag and state and stores it.
      * @param tag
      * @param defaultState
      */
-    public void createBasicBehavior (String tag, String defaultState) {
+    private void generateBehaviorScript (String tag, String defaultState) {
 
         Log.v ("Content_Manager", "Creating basic behavior.");
 
         // Create behavior (and state) for the behavior script
         BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
-        Behavior behavior = new Behavior (behaviorScript);
-
-        Log.v ("Content_Manager", "script: " + behavior.getScript());
-        Log.v ("Content_Manager", "state: " + behavior.getState());
 
         // Cache the behavior
-        this.cache(behavior);
+//        this.cache(behaviorScript);
 
         // Store the behavior
-        if (hasContentManager()) {
-            getContentManager().storeBehavior(behavior);
+        if (hasStore()) {
+            getStore().storeBehaviorScript(behaviorScript);
         }
 
+    }
+
+    /**
+     * Populates cache with all behavior scripts and behaviors from the available content managers.
+     */
+    public void populateCache () {
+
+//        getStore().resetDatabase();
+//        generateStore();
+
+        if (hasStore()) {
+
+            // Restore behavior scripts and addUnit them to the cache
+            getStore().restoreBehaviorScripts();
+            Log.v("Content_Manager", "Restored behavior scripts:");
+            for (BehaviorScript behaviorScript : getCache().getBehaviorScripts()) {
+                Log.v("Content_Manager", "\t" + behaviorScript.getUuid());
+            }
+
+            // Restore behaviors and addUnit them to the cache
+            getStore().restoreBehaviors();
+            Log.v("Content_Manager", "Restored behaviors:");
+            for (Behavior behavior : getCache().getBehaviors()) {
+                Log.v("Content_Manager", "\t" + behavior.getUuid());
+            }
+        }
     }
 
     /**
@@ -402,8 +450,16 @@ public class Clay {
         this.cache(behavior);
 
         // Store the behavior
-        if (hasContentManager()) {
-            getContentManager().storeBehavior(behavior);
+        if (hasStore()) {
+            getStore().storeBehavior(behavior);
+        }
+
+    }
+
+    public void addBehaviorScript(BehaviorScript behaviorScript) {
+
+        if (hasCache ()) {
+            this.cache (behaviorScript);
         }
 
     }
@@ -412,14 +468,14 @@ public class Clay {
      * Returns true if Clay has a content manager.
      * @return True if Clay has a content manager. False otherwise.
      */
-    private boolean hasContentManager() {
+    private boolean hasStore() {
         return this.contentManager != null;
     }
 
     public Behavior getBehavior (UUID behaviorUuid) {
-        if (hasBehaviorCacheManager()) {
-            if (getCacheManager().hasBehavior(behaviorUuid.toString())) {
-                return getCacheManager().getBehavior(behaviorUuid);
+        if (hasCache()) {
+            if (getCache().hasBehavior(behaviorUuid.toString())) {
+                return getCache().getBehavior(behaviorUuid);
             } else {
                 // TODO: Cache the behavior and callback to the object requesting the behavior.
             }
@@ -428,8 +484,8 @@ public class Clay {
         return null;
     }
 
-    private boolean hasBehaviorCacheManager() {
-        if (getCacheManager() != null) {
+    private boolean hasCache() {
+        if (getCache() != null) {
             return true;
         }
         return false;
@@ -461,14 +517,22 @@ public class Clay {
      * @param behavior The Behavior to cache.
      */
     public void cache (Behavior behavior) {
-        this.getCacheManager().cacheBehavior(behavior);
+        this.getCache().cache(behavior);
+    }
+
+    /**
+     * Caches a behavior interface to the cache.
+     * @param behaviorScript The behavior interface to cache.
+     */
+    public void cache (BehaviorScript behaviorScript) {
+        this.getCache().cache (behaviorScript);
     }
 
     /**
      * Adds a Unit to Clay's object model.
-     * @param unit The Unit to add to Clay's object model.
+     * @param unit The Unit to addUnit to Clay's object model.
      */
-    public void add (Unit unit) {
+    public void addUnit(Unit unit) {
         this.units.add(unit);
     }
 
@@ -508,7 +572,7 @@ public class Clay {
     private void addUnitView2(Unit unit) {
         // Add timelines to attached views
         for (ViewManagerInterface view : this.views) {
-            // TODO: (1) add a page to the ViewPager
+            // TODO: (1) addUnit a page to the ViewPager
 
             // (2) Add a tab to the action bar to support navigation to the specified page.
             Log.v ("CM_Log", "addUnitView2");
@@ -525,22 +589,19 @@ public class Clay {
      */
     public void notifyChange(Event event) {
 
-        if (hasContentManager()) {
-
-            // Select the content manager to use
-            ContentManagerInterface contentManager = getClay().getContentManager();
+        if (hasStore()) {
 
             // Add events if they don't already exist
 //            if (!contentManager.hasEvent(event)) {
 
                 // Store event
-                contentManager.storeEvent(event);
+                getStore().storeEvent(event);
 
                 // Store behavior for event
-                contentManager.storeBehavior(event.getBehavior());
+                getStore().storeBehavior(event.getBehavior());
 
                 // Store behavior state for behavior
-                contentManager.storeBehaviorState(event.getBehavior().getState());
+                getStore().storeBehaviorState(event.getBehavior().getState());
 
 //            }
         }

@@ -41,13 +41,13 @@ public class DeviceViewFragment extends Fragment {
 
 //            eventHolders = new ArrayList<EventHolder>();
 
-//            behaviorEvents.add("hello a");
-//            behaviorEvents.add("hello b");
-//            behaviorEvents.add("hello c");
-//            behaviorEvents.add("hello d");
-//            behaviorEvents.add("hello e");
-//            behaviorEvents.add("hello f");
-//            behaviorEvents.add("hello g");
+//            behaviorEvents.addUnit("hello a");
+//            behaviorEvents.addUnit("hello b");
+//            behaviorEvents.addUnit("hello c");
+//            behaviorEvents.addUnit("hello d");
+//            behaviorEvents.addUnit("hello e");
+//            behaviorEvents.addUnit("hello f");
+//            behaviorEvents.addUnit("hello g");
     }
 
     public void setUnit (Unit unit) {
@@ -67,7 +67,7 @@ public class DeviceViewFragment extends Fragment {
 //            // Create a behavior profile for each of the unit's behaviors
 //            for (Behavior behavior : this.unit.getTimeline().restoreBehaviors()) {
 //                EventHolder timelineEvent = new EventHolder(behavior);
-//                eventHolders.add(timelineEvent);
+//                eventHolders.addUnit(timelineEvent);
 //            }
 //
 //            Log.v ("Behavior_Count", "profile count: " + this.eventHolders.size());
