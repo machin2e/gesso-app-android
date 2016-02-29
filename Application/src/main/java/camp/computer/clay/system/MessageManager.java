@@ -38,7 +38,7 @@ public class MessageManager {
     Handler handler = new Handler() {
         @Override
         public void handleMessage (android.os.Message msg) {
-            Log.v("Clay_Time", "add called");
+            Log.v("Clay_Time", "addUnit called");
 
             // Process the incoming message's data.
             Bundle bundle = msg.getData();
@@ -198,7 +198,7 @@ public class MessageManager {
 
         } else if (message.getContent().startsWith("set unit ")) {
 
-            Log.v ("Add_Unit", "Trying to add a unit.");
+            Log.v ("Add_Unit", "Trying to addUnit a unit.");
 
             // e.g., "set unit <uuid> address to <ip-address>"
 
@@ -211,7 +211,7 @@ public class MessageManager {
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
                     Log.v("Clay_Time", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    getClay().add(UUID.fromString(unitUuid), unitAddress);
+                    getClay().addUnit(UUID.fromString(unitUuid), unitAddress);
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);

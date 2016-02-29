@@ -147,13 +147,13 @@ public class EventHolder {
 //            // Initialize light states to false (off)
 //            lightStates = new ArrayList<>();
 //            for (int i = 0; i < 12; i++) {
-//                lightStates.add(false);
+//                lightStates.addUnit(false);
 //            }
 
 //            // Initialize light color to blue
 //            lightColors = new ArrayList<>();
 //            for (int i = 0; i < 12; i++) {
-//                lightColors.add(Color.rgb(0, 0, 255));
+//                lightColors.addUnit(Color.rgb(0, 0, 255));
 //            }
 
         } else if (this.type == TimelineDeviceAdapter.IO_CONTROL_LAYOUT) {
@@ -164,10 +164,10 @@ public class EventHolder {
 //            ioSignalType = new ArrayList<>();
 //            ioSignalValue = new ArrayList<>();
 //            for (int i = 0; i < 12; i++) {
-//                ioStates.add(false);
-//                ioDirection.add('I');
-//                ioSignalType.add('T');
-//                ioSignalValue.add('L');
+//                ioStates.addUnit(false);
+//                ioDirection.addUnit('I');
+//                ioSignalType.addUnit('T');
+//                ioSignalValue.addUnit('L');
 //            }
 
         } else if (this.type == TimelineDeviceAdapter.MESSAGE_CONTROL_LAYOUT) {

@@ -5,9 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
+import android.os.Environment;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.UUID;
 
 import camp.computer.clay.sequencer.ApplicationView;
@@ -29,142 +36,93 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
     /* Tables */
 
-    private static final String BEHAVIOR_TABLE_NAME = "behavior";
-    private static final String BEHAVIOR_SCRIPT_TABLE_NAME = "behavior_script";
-    private static final String BEHAVIOR_STATE_TABLE_NAME = "behavior_state";
-    private static final String UNIT_TABLE_NAME = "unit";
-    private static final String TIMELINE_TABLE_NAME = "timeline";
-    private static final String EVENT_TABLE_NAME = "event";
+    private static final String UNIT_TABLE_NAME            = "unit";
+    private static final String TIMELINE_TABLE_NAME        = "timeline";
+    private static final String EVENT_TABLE_NAME           = "event";
+    private static final String BEHAVIOR_TABLE_NAME        = "behavior";
+    private static final String BEHAVIOR_SCRIPT_TABLE_NAME = "behaviorScript";
+    private static final String BEHAVIOR_STATE_TABLE_NAME  = "behaviorState";
 
     /* Table schemas (these inner classes define the table schemas) */
 
-    public static abstract class BehaviorEntry implements BaseColumns {
-        public static final String TABLE_NAME = BEHAVIOR_TABLE_NAME;
-        public static final String COLUMN_NAME_ENTRY_ID = "id";
-        public static final String COLUMN_NAME_UUID = "uuid";
-        public static final String COLUMN_NAME_TAG = "tag";
-        public static final String COLUMN_NAME_BEHAVIOR_SCRIPT_UUID = "behaviorScriptUuid";
-        public static final String COLUMN_NAME_BEHAVIOR_STATE_UUID = "behaviorStateUuid";
-        public static final String COLUMN_NAME_PARENT_BEHAVIOR_UUID = "parentBehaviorIndex";
-        public static final String COLUMN_NAME_BEHAVIOR_INDEX = "behaviorIndex"; // i.e., Index in parent behavior's list of children.
-
-        public static final String COLUMN_NAME_TIME_CREATED = "timeCreated";
-        public static final String COLUMN_NAME_DISABLED = "disabled";
-        public static final String COLUMN_NAME_AVAILABLE = "available";
-    }
-
-    public static abstract class BehaviorScriptEntry implements BaseColumns {
-        public static final String TABLE_NAME = BEHAVIOR_SCRIPT_TABLE_NAME;
-        public static final String COLUMN_NAME_ENTRY_ID = "id";
-        public static final String COLUMN_NAME_UUID = "uuid";
-        public static final String COLUMN_NAME_TAG = "tag";
-        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState";
-
-        public static final String COLUMN_NAME_TIME_CREATED = "timeCreated";
-        public static final String COLUMN_NAME_DISABLED = "disabled";
-        public static final String COLUMN_NAME_AVAILABLE = "available";
-    }
-
-    public static abstract class BehaviorStateEntry implements BaseColumns {
-        public static final String TABLE_NAME = BEHAVIOR_STATE_TABLE_NAME;
-        public static final String COLUMN_NAME_ENTRY_ID = "id";
-        public static final String COLUMN_NAME_UUID = "uuid";
-        public static final String COLUMN_NAME_BEHAVIOR_UUID = "behaviorUuid";
-        public static final String COLUMN_NAME_STATE = "state";
-
-        public static final String COLUMN_NAME_TIME_CREATED = "timeCreated";
-        public static final String COLUMN_NAME_DISABLED = "disabled";
-        public static final String COLUMN_NAME_AVAILABLE = "available";
-    }
-
     public static abstract class UnitEntry implements BaseColumns {
-        public static final String TABLE_NAME = UNIT_TABLE_NAME;
-        public static final String COLUMN_NAME_ENTRY_ID = "id";
-        public static final String COLUMN_NAME_UUID = "uuid";
+        public static final String TABLE_NAME                = UNIT_TABLE_NAME;
+        public static final String COLUMN_NAME_UUID          = "uuid";
         public static final String COLUMN_NAME_TIMELINE_UUID = "timelineUuid";
 
-        public static final String COLUMN_NAME_TIME_CREATED = "timeCreated";
-        public static final String COLUMN_NAME_DISABLED = "disabled";
-        public static final String COLUMN_NAME_AVAILABLE = "available";
+        public static final String COLUMN_NAME_TIME_CREATED  = "timeCreated";
+        public static final String COLUMN_NAME_DISABLED      = "disabled";
+        public static final String COLUMN_NAME_AVAILABLE     = "available";
     }
 
     public static abstract class TimelineEntry implements BaseColumns {
-        public static final String TABLE_NAME = TIMELINE_TABLE_NAME;
-        public static final String COLUMN_NAME_ENTRY_ID = "id";
-        public static final String COLUMN_NAME_UUID = "uuid";
+        public static final String TABLE_NAME               = TIMELINE_TABLE_NAME;
+        public static final String COLUMN_NAME_UUID         = "uuid";
 
         public static final String COLUMN_NAME_TIME_CREATED = "timeCreated";
-        public static final String COLUMN_NAME_DISABLED = "disabled";
-        public static final String COLUMN_NAME_AVAILABLE = "available";
+        public static final String COLUMN_NAME_DISABLED     = "disabled";
+        public static final String COLUMN_NAME_AVAILABLE    = "available";
     }
 
     public static abstract class EventEntry implements BaseColumns {
-        public static final String TABLE_NAME = EVENT_TABLE_NAME;
-        public static final String COLUMN_NAME_ENTRY_ID = "id";
-        public static final String COLUMN_NAME_UUID = "uuid";
-        public static final String COLUMN_NAME_TIMELINE_UUID = "timelineUuid";
-        public static final String COLUMN_NAME_BEHAVIOR_UUID = "behaviorUuid";
+        public static final String TABLE_NAME                       = EVENT_TABLE_NAME;
+        public static final String COLUMN_NAME_UUID                 = "uuid";
+        public static final String COLUMN_NAME_TIMELINE_UUID        = "timelineUuid";
+        public static final String COLUMN_NAME_BEHAVIOR_UUID        = "behaviorUuid";
+        public static final String COLUMN_NAME_BEHAVIOR_STATE_UUID  = "behaviorStateUuid";
 
-        public static final String COLUMN_NAME_TIME_CREATED = "timeCreated";
-        public static final String COLUMN_NAME_DISABLED = "disabled";
-        public static final String COLUMN_NAME_AVAILABLE = "available";
+        public static final String COLUMN_NAME_TIME_CREATED         = "timeCreated";
+        public static final String COLUMN_NAME_HIDDEN = "disabled";
+        public static final String COLUMN_NAME_AVAILABLE            = "available";
     }
 
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String INTEGER_TYPE = " INTEGER";
-    private static final String INTEGER_DEFAULT_1 = " DEFAULT 1";
-    private static final String INTEGER_DEFAULT_0 = " DEFAULT 0";
+    public static abstract class BehaviorEntry implements BaseColumns {
+        public static final String TABLE_NAME                       = BEHAVIOR_TABLE_NAME;
+        public static final String COLUMN_NAME_UUID                 = "uuid";
+        public static final String COLUMN_NAME_TAG                  = "tag";
+        public static final String COLUMN_NAME_PARENT_UUID = "parentBehaviorUuid";
+        public static final String COLUMN_NAME_SIBLING_INDEX = "siblingIndex"; // i.e., Index in parent behavior's list of children.
+
+        public static final String COLUMN_NAME_TIME_CREATED         = "timeCreated";
+        public static final String COLUMN_NAME_HIDDEN = "disabled";
+        public static final String COLUMN_NAME_AVAILABLE            = "available";
+    }
+
+    public static abstract class BehaviorScriptEntry implements BaseColumns {
+        public static final String TABLE_NAME                = BEHAVIOR_SCRIPT_TABLE_NAME;
+        public static final String COLUMN_NAME_UUID          = "uuid";
+        public static final String COLUMN_NAME_TAG           = "tag"; // Used by interpretter on devices
+        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize BehaviorState for a (Event, Behavior) pair
+
+        public static final String COLUMN_NAME_TIME_CREATED  = "timeCreated";
+        public static final String COLUMN_NAME_HIDDEN = "disabled";
+        public static final String COLUMN_NAME_AVAILABLE     = "available";
+    }
+
+    public static abstract class BehaviorStateEntry implements BaseColumns {
+        public static final String TABLE_NAME                       = BEHAVIOR_STATE_TABLE_NAME;
+        public static final String COLUMN_NAME_UUID                 = "uuid";
+        public static final String COLUMN_NAME_STATE                = "state";
+        public static final String COLUMN_NAME_BEHAVIOR_UUID        = "behaviorUuid";
+        public static final String COLUMN_NAME_BEHAVIOR_SCRIPT_UUID = "behaviorScriptUuid";
+
+        public static final String COLUMN_NAME_TIME_CREATED         = "timeCreated";
+        public static final String COLUMN_NAME_HIDDEN = "disabled";
+        public static final String COLUMN_NAME_AVAILABLE            = "available";
+    }
+
+    private static final String TEXT_TYPE                  = " TEXT";
+    private static final String INTEGER_TYPE               = " INTEGER";
+    private static final String INTEGER_DEFAULT_1          = " DEFAULT 1";
+    private static final String INTEGER_DEFAULT_0          = " DEFAULT 0";
     private static final String INTEGER_DEFAULT_NEGATIVE_1 = " DEFAULT -1";
-    private static final String DATETIME_TYPE = " DATETIME";
-    private static final String DATETIME_DEFAULT_NOW = " DEFAULT CURRENT_TIMESTAMP";
-    private static final String COMMA_SEP = ",";
-
-    private static final String SQL_CREATE_BEHAVIOR_ENTRIES =
-            "CREATE TABLE IF NOT EXISTS " + BehaviorEntry.TABLE_NAME + " (" +
-                    BehaviorEntry._ID + " INTEGER PRIMARY KEY," +
-                    BehaviorEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_TAG + TEXT_TYPE + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX + INTEGER_TYPE + INTEGER_DEFAULT_NEGATIVE_1 + COMMA_SEP +
-
-                    BehaviorEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_DISABLED + INTEGER_TYPE + INTEGER_DEFAULT_0 + COMMA_SEP +
-                    BehaviorEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 +
-                    " )";
-
-    private static final String SQL_CREATE_BEHAVIOR_SCRIPT_ENTRIES =
-            "CREATE TABLE IF NOT EXISTS " + BehaviorScriptEntry.TABLE_NAME + " (" +
-                    BehaviorScriptEntry._ID + " INTEGER PRIMARY KEY," +
-                    BehaviorScriptEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorScriptEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorScriptEntry.COLUMN_NAME_TAG + TEXT_TYPE + COMMA_SEP +
-                    BehaviorScriptEntry.COLUMN_NAME_DEFAULT_STATE + TEXT_TYPE + COMMA_SEP +
-
-                    BehaviorScriptEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
-                    BehaviorScriptEntry.COLUMN_NAME_DISABLED + INTEGER_TYPE + INTEGER_DEFAULT_0 + COMMA_SEP +
-                    BehaviorScriptEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 +
-                    " )";
-
-    private static final String SQL_CREATE_BEHAVIOR_STATE_ENTRIES =
-            "CREATE TABLE IF NOT EXISTS " + BehaviorStateEntry.TABLE_NAME + " (" +
-                    BehaviorStateEntry._ID + " INTEGER PRIMARY KEY," +
-                    BehaviorStateEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorStateEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID + TEXT_TYPE + COMMA_SEP +
-                    BehaviorStateEntry.COLUMN_NAME_STATE + TEXT_TYPE + COMMA_SEP +
-
-                    BehaviorStateEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
-                    BehaviorStateEntry.COLUMN_NAME_DISABLED + INTEGER_TYPE + INTEGER_DEFAULT_0 + COMMA_SEP +
-                    BehaviorStateEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 +
-                    " )";
+    private static final String DATETIME_TYPE              = " DATETIME";
+    private static final String DATETIME_DEFAULT_NOW       = " DEFAULT CURRENT_TIMESTAMP";
+    private static final String COMMA_SEP                  = ",";
 
     private static final String SQL_CREATE_UNIT_ENTRIES =
             "CREATE TABLE IF NOT EXISTS " + UnitEntry.TABLE_NAME + " (" +
                     UnitEntry._ID + " INTEGER PRIMARY KEY," +
-                    UnitEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     UnitEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
                     UnitEntry.COLUMN_NAME_TIMELINE_UUID + TEXT_TYPE + COMMA_SEP +
 
@@ -176,7 +134,6 @@ public class SQLiteContentManager implements ContentManagerInterface {
     private static final String SQL_CREATE_TIMELINE_ENTRIES =
             "CREATE TABLE IF NOT EXISTS " + TimelineEntry.TABLE_NAME + " (" +
                     TimelineEntry._ID + " INTEGER PRIMARY KEY," +
-                    TimelineEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     TimelineEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
 
                     TimelineEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
@@ -187,14 +144,52 @@ public class SQLiteContentManager implements ContentManagerInterface {
     private static final String SQL_CREATE_EVENT_ENTRIES =
             "CREATE TABLE IF NOT EXISTS " + EventEntry.TABLE_NAME + " (" +
                     EventEntry._ID + " INTEGER PRIMARY KEY," +
-                    EventEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     EventEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
                     EventEntry.COLUMN_NAME_TIMELINE_UUID + TEXT_TYPE + COMMA_SEP +
                     EventEntry.COLUMN_NAME_BEHAVIOR_UUID + TEXT_TYPE + COMMA_SEP +
+                    EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID + TEXT_TYPE + COMMA_SEP +
 
                     EventEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
-                    EventEntry.COLUMN_NAME_DISABLED + INTEGER_TYPE + INTEGER_DEFAULT_0 + COMMA_SEP +
+                    EventEntry.COLUMN_NAME_HIDDEN + INTEGER_TYPE + INTEGER_DEFAULT_0 + COMMA_SEP +
                     EventEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 +
+                    " )";
+
+    private static final String SQL_CREATE_BEHAVIOR_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BehaviorEntry.TABLE_NAME + " (" +
+                    BehaviorEntry._ID + " INTEGER PRIMARY KEY," +
+                    BehaviorEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
+                    BehaviorEntry.COLUMN_NAME_TAG + TEXT_TYPE + COMMA_SEP +
+                    BehaviorEntry.COLUMN_NAME_PARENT_UUID + TEXT_TYPE + COMMA_SEP +
+                    BehaviorEntry.COLUMN_NAME_SIBLING_INDEX + INTEGER_TYPE + INTEGER_DEFAULT_0 + COMMA_SEP +
+
+                    BehaviorEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
+                    BehaviorEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 + COMMA_SEP +
+                    BehaviorEntry.COLUMN_NAME_HIDDEN + INTEGER_TYPE + INTEGER_DEFAULT_0 +
+                    " )";
+
+    private static final String SQL_CREATE_BEHAVIOR_SCRIPT_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BehaviorScriptEntry.TABLE_NAME + " (" +
+                    BehaviorScriptEntry._ID + " INTEGER PRIMARY KEY," +
+                    BehaviorScriptEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
+                    BehaviorScriptEntry.COLUMN_NAME_TAG + TEXT_TYPE + COMMA_SEP +
+                    BehaviorScriptEntry.COLUMN_NAME_DEFAULT_STATE + TEXT_TYPE + COMMA_SEP +
+
+                    BehaviorScriptEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
+                    BehaviorScriptEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 + COMMA_SEP +
+                    BehaviorScriptEntry.COLUMN_NAME_HIDDEN + INTEGER_TYPE + INTEGER_DEFAULT_0 +
+                    " )";
+
+    private static final String SQL_CREATE_BEHAVIOR_STATE_ENTRIES =
+            "CREATE TABLE IF NOT EXISTS " + BehaviorStateEntry.TABLE_NAME + " (" +
+                    BehaviorStateEntry._ID + " INTEGER PRIMARY KEY," +
+                    BehaviorStateEntry.COLUMN_NAME_UUID + TEXT_TYPE + COMMA_SEP +
+                    BehaviorStateEntry.COLUMN_NAME_STATE + TEXT_TYPE + COMMA_SEP +
+                    BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID + TEXT_TYPE + COMMA_SEP +
+                    BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID + TEXT_TYPE + COMMA_SEP +
+
+                    BehaviorStateEntry.COLUMN_NAME_TIME_CREATED + DATETIME_TYPE + DATETIME_DEFAULT_NOW + COMMA_SEP +
+                    BehaviorStateEntry.COLUMN_NAME_AVAILABLE + INTEGER_TYPE + INTEGER_DEFAULT_1 + COMMA_SEP +
+                    BehaviorStateEntry.COLUMN_NAME_HIDDEN + INTEGER_TYPE + INTEGER_DEFAULT_0 +
                     " )";
 
     private static final String SQL_DELETE_BEHAVIOR_ENTRIES =
@@ -219,6 +214,12 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
         public SQLiteDatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+            try {
+                writeDatabaseToSD(DATABASE_NAME);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -253,6 +254,44 @@ public class SQLiteContentManager implements ContentManagerInterface {
             db.execSQL(SQL_DELETE_EVENT_ENTRIES);
         }
 
+        private void writeDatabaseToSD(String dbName) throws IOException {
+
+            Log.v("Content_Manager", "");
+            Log.v("Content_Manager", "writeDatabaseToSD:");
+            File sd = Environment.getExternalStorageDirectory();
+
+            String DB_PATH;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                DB_PATH = ApplicationView.getContext().getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
+            }
+            else {
+                DB_PATH = ApplicationView.getContext().getFilesDir().getPath() + ApplicationView.getContext().getPackageName() + "/databases/";
+            }
+
+            Log.v("Content_Manager", "Trying to write...");
+            if (sd.canWrite()) {;
+                String currentDBPath = dbName;
+                String backupDBPath = "clay.db";
+                File currentDB = new File(DB_PATH, currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                Log.v("Content_Manager", "Writing...");
+                if (currentDB.exists()) {
+                    Log.v("Content_Manager", "Found database...");
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileOutputStream dstFileStream = new FileOutputStream(backupDB);
+                    FileChannel dst = dstFileStream.getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    src.close();
+                    dst.close();
+
+                    Log.v("Content_Manager", "Success! Wrote to " + backupDB.getAbsolutePath());
+                } else {
+                    Log.v("Content_Manager", "Failed!");
+                }
+            }
+        }
+
         public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             onUpgrade(db, oldVersion, newVersion);
         }
@@ -266,232 +305,125 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             db.execSQL(SQL_CREATE_BEHAVIOR_ENTRIES);
 
-            // Create a new map of values, where column names are the keys
+            // Create a new map of values, where column names are the keys...
             ContentValues values = new ContentValues();
             values.put(BehaviorEntry.COLUMN_NAME_UUID, behavior.getUuid().toString());
             values.put(BehaviorEntry.COLUMN_NAME_TAG, behavior.getTag());
-            values.put(BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID, (behavior.getScript() != null ? behavior.getScript().getUuid().toString() : ""));
-            values.put(BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID, (behavior.getState() != null ? behavior.getState().getUuid().toString() : ""));
 
-            // There is no parent, so store empty string "".
-            if (parentBehavior == null) {
-                values.put(BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID, "");
-            } else {
-                values.put(BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID, parentBehavior.getUuid().toString());
-
-                // Store the behavior index
-                int behaviorIndex = parentBehavior.getBehaviors().indexOf(behavior);
-                values.put(BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX, behaviorIndex);
+            // ...and if the behavior node has a parent, store the parent and sibling index.
+            if (parentBehavior != null) {
+                values.put(BehaviorEntry.COLUMN_NAME_PARENT_UUID, parentBehavior.getUuid().toString());
+                values.put(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX, parentBehavior.getBehaviors().indexOf(behavior));
             }
 
             // Insert the new row, returning the primary key value of the new row
-            long newRowId = db.insert(BehaviorEntry.TABLE_NAME, null, values);
-            Log.v("Content_Manager", "Inserted behavior into database " + newRowId + " (UUID: " + behavior.getUuid() + ")");
+            long entryId = db.insert(BehaviorEntry.TABLE_NAME, null, values);
+            Log.v("Content_Manager", "Inserted behavior into database " + entryId + " (UUID: " + behavior.getUuid() + ")");
 
+            /*
+            // TODO?: Move this to storeEvent.
             // Also insert the behavior script and state
             insertBehaviorScript(behavior.getScript());
             if (!hasBehaviorState(behavior.getState ())) {
                 insertBehaviorState(behavior.getState());
             }
+            */
 
         }
 
-        public void updateBehavior (Behavior behavior) {
+        // TODO: This is not needed because entries in "behavior" are never updated once created.
+        // TODO: ... When a behavior event is modified on the timeline, the event is updated.
+        // TODO: ... When a sequence of behaviors is chunked, new behavior entries are added,
+        // TODO: ... a new event is created, the events associated with the chunked behaviors
+        // TODO: ... are flagged as hidden/chunked (so they won't be on the timeline), and the
+        // TODO: ... newly created event (for the newly created behavior) is added to the timeline,
+        // TODO: ... then all the events' position index on the timeline are updated.
+//        public void updateBehavior (Behavior behavior, Behavior parentBehavior) {
+//
+//            // Gets the data repository in write mode
+//            SQLiteDatabase db = SQLiteContentManager.this.db.getWritableDatabase();
+//
+//            // Create a new map of values, where column names are the keys
+//            ContentValues values = new ContentValues();
+//            values.put(BehaviorEntry.COLUMN_NAME_UUID, behavior.getUuid().toString());
+//
+//            if (parentBehavior != null) {
+//
+//                Log.v ("Content_Manager", "UPDATING CHILD");
+//
+//                // TODO: values.put(BehaviorEntry.COLUMN_NAME_PARENT_UUID, ???);
+//                values.put(BehaviorEntry.COLUMN_NAME_PARENT_UUID, parentBehavior.getUuid().toString());
+//
+//                // TODO: values.put(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX, ???);
+//                values.put(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX, parentBehavior.getBehaviors().indexOf(behavior));
+//            }
+//
+//            // Insert the new row, returning the primary key value of the new row
+//            long newRowId = db.update(
+//                    BehaviorEntry.TABLE_NAME,
+//                    values,
+//                    BehaviorEntry.COLUMN_NAME_UUID + " LIKE \"" + behavior.getUuid().toString() + "\"", null);
+//
+//            Log.v("Content_Manager", "Updated behavior " + newRowId);
+//
+//        }
 
-            // Gets the data repository in write mode
-            SQLiteDatabase db = SQLiteContentManager.this.db.getWritableDatabase();
-
-            // Create a new map of values, where column names are the keys
-            ContentValues values = new ContentValues();
-            values.put(BehaviorEntry.COLUMN_NAME_UUID, behavior.getUuid().toString());
-            values.put(BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID, (behavior.getScript() != null ? behavior.getScript().getUuid().toString() : ""));
-            values.put(BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID, (behavior.getState() != null ? behavior.getState().getUuid().toString() : ""));
-            // TODO: values.put(BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID, ???);
-            // TODO: values.put(BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX, ???);
-
-            // Insert the new row, returning the primary key value of the new row
-            long newRowId = db.update(
-                    BehaviorEntry.TABLE_NAME,
-                    values,
-                    BehaviorEntry.COLUMN_NAME_UUID + " LIKE \"" + behavior.getUuid().toString() + "\"", null);
-
-            Log.v("Content_Manager", "Updated behavior " + newRowId);
-
-        }
-
-        public Behavior queryBehavior(UUID uuid) {
-            Log.v("Content_Manager", "queryBehavior");
-            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
-
-            db.execSQL(SQL_CREATE_BEHAVIOR_ENTRIES);
-
-            // Define a projection that specifies which columns from the database
-            // you will actually use after this query.
-            String[] projection = {
-                    BehaviorEntry._ID,
-                    BehaviorEntry.COLUMN_NAME_UUID,
-                    BehaviorEntry.COLUMN_NAME_TAG,
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID,
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID,
-                    BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID,
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX
-            };
-
-            // How you want the results sorted in the resulting Cursor
-            String sortOrder = null;
-
-            String selection = BehaviorEntry.COLUMN_NAME_UUID + " LIKE ?";
-            String[] selectionArgs = { uuid.toString() };
-            Cursor cursor = db.query(
-                    BehaviorEntry.TABLE_NAME,  // The table to query
-                    projection,                               // The columns to return
-                    selection,                                // The columns for the WHERE clause
-                    selectionArgs,                            // The values for the WHERE clause
-                    null,                                     // don't group the rows
-                    null,                                     // don't filter by row groups
-                    sortOrder                                 // The sort order
-            );
-
-            Log.v("Content_Manager", "cursor.getCount = " + cursor.getCount());
-
-            // Iterate over the results
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                long itemId = cursor.getLong(
-                        cursor.getColumnIndexOrThrow(UnitEntry._ID)
-                );
-
-                // Read the entry
-                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_UUID));
-                String tag = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_TAG));
-                String behaviorScriptUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID));
-                String behaviorStateUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID));
-                String parentBehaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID));
-                int behaviorIndex = cursor.getInt(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX));
-
-                // TODO: Get BehaviorScript
-                // Get behavior script object by UUID.
-                BehaviorScript behaviorScript = null;
-                Log.v ("Content_Manager", "behaviorScriptUuid: " + behaviorScriptUuid);
-                if (!behaviorScriptUuid.equals("")) {
-                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
-                    behaviorScript = queryBehaviorScript (UUID.fromString(behaviorScriptUuid));
-                }
-
-                // Get behavior state object by UUID.
-                BehaviorState behaviorState = null;
-                if (!behaviorStateUuid.equals("")) {
-                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
-                    behaviorState = queryBehaviorState (UUID.fromString(behaviorStateUuid));
-                }
-
-                // Get parent behavior object by UUID. First check cache. If not cached, get from store.
-                Behavior parentBehavior = null;
-                if (!parentBehaviorUuid.equals("")) {
-                    parentBehavior = getClay().getBehavior(UUID.fromString(parentBehaviorUuid));
-                    if (parentBehavior == null) {
-                        parentBehavior = queryBehavior(UUID.fromString(parentBehaviorUuid));
-                    }
-                }
-
-                // TODO: if has parent: Get behavior index if it exists in the database and add it to the parent's list of behaviors in the correct order...
-
-                // TODO: if has parent: parent should already be in database, so ask Clay for it
-
-                // Create the behavior
-                Behavior behavior = null;
-//                Behavior behavior = new Behavior(UUID.fromString(uuidString), tag, defaultState);
-                if (parentBehavior == null) {
-                    // Create basic behavior
-                } else {
-                    // Create non-basic behavior composition
-                }
-
-                return behavior;
-            }
-
-            return null;
-        }
-
-        public void queryBehaviors () {
-            Log.v("Content_Manager", "queryBehaviors");
-            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
-
-            db.execSQL(SQL_CREATE_BEHAVIOR_ENTRIES);
-
-            // Define a projection that specifies which columns from the database
-            // you will actually use after this query.
-            String[] projection = {
-                    BehaviorEntry._ID,
-                    BehaviorEntry.COLUMN_NAME_UUID,
-                    BehaviorEntry.COLUMN_NAME_TAG,
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID,
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID,
-                    BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID,
-                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX
-            };
-
-            // How you want the results sorted in the resulting Cursor
-            String sortOrder = BehaviorEntry.COLUMN_NAME_TAG + " ASC";
-
-            String selection = null;
-            String[] selectionArgs = null;
-            Cursor cursor = db.query(
-                    BehaviorEntry.TABLE_NAME,  // The table to query
-                    projection,                               // The columns to return
-                    selection,                                // The columns for the WHERE clause
-                    selectionArgs,                            // The values for the WHERE clause
-                    null,                                     // don't group the rows
-                    null,                                     // don't filter by row groups
-                    sortOrder                                 // The sort order
-            );
-
-            Log.v("Content_Manager", "cursor.getCount = " + cursor.getCount());
-
-            // Iterate over the results
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-
-                // Read the entry
-                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_UUID));
-                String tag = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_TAG));
-                String behaviorScriptUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID));
-                String behaviorStateUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID));
-                String parentBehaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_PARENT_BEHAVIOR_UUID));
-                int behaviorIndex = cursor.getInt(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_INDEX));
-
-                // Create the object dependencies required to create the behavior object
-//                BehaviorScript behaviorScript = queryBehaviorScript(UUID.fromString(behaviorScriptUuid));
-//                BehaviorState behaviorState = queryBehaviorState(UUID.fromString(behaviorStateUuid));
-
-                // TODO: Get BehaviorScript
-                // Get behavior script object by UUID.
-                BehaviorScript behaviorScript = null;
-//                Log.v ("Content_Manager", "behaviorScriptUuid__: " + behaviorScriptUuid);
-                if (!behaviorScriptUuid.equals("")) {
-                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
-                    behaviorScript = queryBehaviorScript (UUID.fromString(behaviorScriptUuid));
-                }
-//                Log.v ("Content_Manager", "behaviorScript__: " + behaviorScript);
-
-                Log.v ("Content_Manager", "PARENT: " + parentBehaviorUuid);
-
-                // Get behavior state object by UUID.
-                BehaviorState behaviorState = null;
-                if (!behaviorStateUuid.equals("")) {
-                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
-                    behaviorState = queryBehaviorState (UUID.fromString(behaviorStateUuid));
-                }
-
-                // Get parent behavior object by UUID. First check cache. If not cached, get from store.
-                Behavior parentBehavior = null;
-                if (!parentBehaviorUuid.equals("")) {
-                    parentBehavior = getClay().getBehavior(UUID.fromString(parentBehaviorUuid));
-                    if (parentBehavior == null) {
-                        parentBehavior = queryBehavior(UUID.fromString(parentBehaviorUuid));
-                    }
-                }
-
+//        public Behavior queryBehavior (UUID uuid) {
+//            Log.v("Content_Manager", "queryBehavior");
+//            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
+//
+////            db.execSQL(SQL_CREATE_BEHAVIOR_ENTRIES);
+//
+//            // Define a projection that specifies which columns from the database
+//            // you will actually use after this query.
+//            String[] projection = {
+//                    BehaviorEntry._ID,
+//                    BehaviorEntry.COLUMN_NAME_UUID,
+//                    BehaviorEntry.COLUMN_NAME_TAG,
+//                    BehaviorEntry.COLUMN_NAME_PARENT_UUID,
+//                    BehaviorEntry.COLUMN_NAME_SIBLING_INDEX
+//            };
+//
+//            // How you want the results sorted in the resulting Cursor
+//            String sortOrder = null;
+//
+//            String selection = BehaviorEntry.COLUMN_NAME_UUID + " LIKE ?";
+//            String[] selectionArgs = { uuid.toString() };
+//            Cursor cursor = db.query(
+//                    BehaviorEntry.TABLE_NAME,  // The table to query
+//                    projection,                               // The columns to return
+//                    selection,                                // The columns for the WHERE clause
+//                    selectionArgs,                            // The values for the WHERE clause
+//                    null,                                     // don't group the rows
+//                    null,                                     // don't filter by row groups
+//                    sortOrder                                 // The sort order
+//            );
+//
+//            Log.v("Content_Manager", "cursor.getCount = " + cursor.getCount());
+//
+//            // Iterate over the results
+//            cursor.moveToFirst();
+//            while (!cursor.isAfterLast()) {
+//                long itemId = cursor.getLong(
+//                        cursor.getColumnIndexOrThrow(UnitEntry._ID)
+//                );
+//
+//                // Read the entry
+//                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_UUID));
+//                String tag = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_TAG));
+//                String parentBehaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_PARENT_UUID));
+//                int siblingIndex = cursor.getInt(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX));
+//
+////                // Get BehaviorScript
+////                // Get behavior script object by UUID.
+////                BehaviorScript behaviorScript = null;
+////                Log.v ("Content_Manager", "behaviorScriptUuid: " + behaviorScriptUuid);
+////                if (!behaviorScriptUuid.equals("")) {
+////                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
+////                    behaviorScript = queryBehaviorScript (UUID.fromString(behaviorScriptUuid));
+////                }
+//
+//                // Get parent behavior object by UUID. First check cache. If not cached, get from store.
 //                Behavior parentBehavior = null;
 //                if (!parentBehaviorUuid.equals("")) {
 //                    parentBehavior = getClay().getBehavior(UUID.fromString(parentBehaviorUuid));
@@ -499,36 +431,248 @@ public class SQLiteContentManager implements ContentManagerInterface {
 //                        parentBehavior = queryBehavior(UUID.fromString(parentBehaviorUuid));
 //                    }
 //                }
+//
+//                // TODO: if has parent: Get behavior index if it exists in the database and addUnit it to the parent's list of behaviors in the correct order...
+//
+//                // TODO: if has parent: parent should already be in database, so ask Clay for it
+//
+//                // Create the behavior
+//                Behavior behavior = null;
+////                Behavior behavior = new Behavior(UUID.fromString(uuidString), tag, defaultState);
+//                if (parentBehavior == null) {
+//                    // Create basic behavior
+//                } else {
+//                    // Create non-basic behavior composition
+//                }
+//
+//                return behavior;
+//            }
+//
+//            return null;
+//        }
 
-//                Log.v ("Content_Manager", "behaviorScriptUuid: " + behaviorScriptUuid);
-//                Log.v ("Content_Manager", "behaviorScript: " + behaviorScript);
-//                Log.v ("Content_Manager", "behaviorState: " + behaviorState);
+        // * Query for timeline
+        // * Query for events on the timeline (available and not hidden/disabled)
+        // ... (below)
+        // * Query for behavior state associated with the event.
+
+        // - Get root behavior UUIDs, unique only (from table of tree edges)
+        // - For each root, get behaviors with parent with root UUID, addUnit to parent's list of
+        //   children, to reconstruct the graph. Do this recursively until the query for
+        //   children returns no results (leaf nodes).
+        // - For children, query for the associated behavior script.
+
+//        public void queryRootBehaviors () {
+//            Log.v("Content_Manager", "queryBasicBehaviors");
+//            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
+//
+//            db.execSQL(SQL_CREATE_BEHAVIOR_ENTRIES);
+//
+//            // Define a projection that specifies which columns from the database
+//            // you will actually use after this query.
+//            String[] projection = {
+//                    BehaviorEntry._ID,
+//                    BehaviorEntry.COLUMN_NAME_UUID,
+//                    BehaviorEntry.COLUMN_NAME_TAG,
+//                    BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID,
+//                    BehaviorEntry.COLUMN_NAME_PARENT_UUID,
+//                    BehaviorEntry.COLUMN_NAME_SIBLING_INDEX,
+//
+//                    BehaviorEntry.COLUMN_NAME_TIME_CREATED
+//            };
+//
+//            // How you want the results sorted in the resulting Cursor
+//            // String sortOrder = BehaviorEntry.COLUMN_NAME_TAG + " ASC";
+//            String sortOrder = BehaviorEntry.COLUMN_NAME_TIME_CREATED + " DESC";
+//
+//            String selection = null;
+//            String[] selectionArgs = null;
+//            Cursor cursor = db.query(
+//                    BehaviorEntry.TABLE_NAME,  // The table to query
+//                    projection,                               // The columns to return
+//                    selection,                                // The columns for the WHERE clause
+//                    selectionArgs,                            // The values for the WHERE clause
+//                    null,                                     // don't group the rows
+//                    null,                                     // don't filter by row groups
+//                    sortOrder                                 // The sort order
+//            );
+//
+//            Log.v("Content_Manager", "cursor.getCount = " + cursor.getCount());
+//
+//            // Iterate over the results
+//            cursor.moveToFirst();
+//            while (!cursor.isAfterLast()) {
+//
+//                // Read the entry
+//                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_UUID));
+//                String tag = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_TAG));
+//                String behaviorScriptUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID));
+//                String parentBehaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_PARENT_UUID));
+//                int siblingIndex = cursor.getInt(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX));
+//
+//                // Create the object dependencies required to create the behavior object
+////                BehaviorScript behaviorScript = queryBehaviorScript(UUID.fromString(behaviorScriptUuid));
+////                BehaviorState behaviorState = queryBehaviorState(UUID.fromString(behaviorStateUuid));
+//
+//                // TODO: Get BehaviorScript
+//                // Get behavior script object by UUID.
+//                BehaviorScript behaviorScript = null;
+////                Log.v ("Content_Manager", "behaviorScriptUuid__: " + behaviorScriptUuid);
+//                if (!behaviorScriptUuid.equals("")) {
+//                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
+//                    behaviorScript = queryBehaviorScript (UUID.fromString(behaviorScriptUuid));
+//                }
+//
+//                Log.v ("Content_Manager", "PARENT: " + parentBehaviorUuid);
+//
+//                // Get parent behavior object by UUID. First check cache. If not cached, get from store.
+//                Behavior parentBehavior = null;
+//                if (!parentBehaviorUuid.equals("")) {
+//                    parentBehavior = getClay().getBehavior(UUID.fromString(parentBehaviorUuid));
+//                    Log.v ("Content_Manager", "-PARENT: " + parentBehavior);
+//                    if (parentBehavior == null) {
+//                        parentBehavior = queryBehavior(UUID.fromString(parentBehaviorUuid));
+//                        Log.v ("Content_Manager", "--PARENT: " + parentBehavior);
+//                    }
+//                }
+//
+//                // Create the behavior object
+//                Behavior behavior = null;
+//                if (behaviorScript != null) {
+//                    // Basic behavior
+//                    behavior = new Behavior(UUID.fromString(uuidString), tag, behaviorScript, behaviorState);
+//                    Log.v("Content_Manager", "\tADDING BASIC BEHAVIOR");
+//
+//                    if (parentBehavior != null) {
+////                        while (parentBehavior.getBehaviors().size() < behaviorIndex) {
+////                            parentBehavior.getBehaviors().addUnit(null);
+////                        }
+////                        parentBehavior.getBehaviors().addUnit(behaviorIndex, behavior);
+//                        parentBehavior.addBehavior(behavior);
+//                        Log.v("Content_Manager", "\t\tADDING BEHAVIOR TO PARENT: " + parentBehavior.getBehaviors().size());
+//
+//                        getClay().addBehavior(parentBehavior);
+//                    }
+//
+//                    getClay().addBehavior(behavior);
+//                } else {
+//                    // Non-basic behavior
+//                    behavior = new Behavior(UUID.fromString(uuidString), tag);
+//                    Log.v("Content_Manager", "\tADDING COMPLEX BEHAVIOR");
+//
+//                    if (parentBehavior != null) {
+////                        while (parentBehavior.getBehaviors().size() < behaviorIndex) {
+////                            parentBehavior.getBehaviors().addUnit(null);
+////                        }
+////                        parentBehavior.getBehaviors().addUnit(behaviorIndex, behavior);
+//                        parentBehavior.addBehavior(behavior);
+//                        Log.v("Content_Manager", "\t\tADDING BEHAVIOR TO PARENT: " + parentBehavior.getBehaviors().size());
+//
+//                        getClay().addBehavior(parentBehavior);
+//                    }
+//
+//                    getClay().addBehavior(behavior);
+//                }
+//
+//                cursor.moveToNext();
+//            }
+//        }
+
+        public void queryBehaviors () {
+            queryBehaviors (null);
+        }
+
+        // TODO: Replace this will a function that starts with root nodes and recursively...
+        // TODO: ...constructs the behavior trees.
+        public void queryBehaviors (Behavior parentBehavior) {
+
+            Log.v("Content_Manager", "queryBehaviors");
+            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
+
+            // Define a projection that specifies which columns from the database
+            // you will actually use after this query.
+            String[] projection = {
+                    BehaviorEntry._ID,
+                    BehaviorEntry.COLUMN_NAME_UUID,
+                    BehaviorEntry.COLUMN_NAME_TAG,
+                    BehaviorEntry.COLUMN_NAME_PARENT_UUID,
+                    BehaviorEntry.COLUMN_NAME_SIBLING_INDEX,
+
+                    BehaviorEntry.COLUMN_NAME_TIME_CREATED
+            };
+
+            // Sort the behaviors by their sibling index so they will be added to the parent,
+            // if any, in the correct order.
+            String sortOrder = BehaviorEntry.COLUMN_NAME_SIBLING_INDEX + " ASC";
+
+            // Only get the behaviors with no parent (the root behaviors).
+            String selection = null;
+            String[] selectionArgs = null; // { timeline.getUuid().toString() };
+            if (parentBehavior == null) {
+                selection = BehaviorEntry.COLUMN_NAME_PARENT_UUID + " = \"\" AND " + BehaviorEntry.COLUMN_NAME_HIDDEN + " = 0";
+                selectionArgs = null;
+            } else {
+                selection = BehaviorEntry.COLUMN_NAME_PARENT_UUID + " LIKE ? AND " + BehaviorEntry.COLUMN_NAME_HIDDEN + " = 0";
+                selectionArgs = new String[] { parentBehavior.getUuid().toString() };
+            }
+
+            Cursor cursor = db.query(
+                    BehaviorEntry.TABLE_NAME,  // The table to query
+                    projection,                // The columns to return
+                    selection,                 // The columns for the WHERE clause
+                    selectionArgs,             // The values for the WHERE clause
+                    null,                      // don't group the rows
+                    null,                      // don't filter by row groups
+                    sortOrder                  // The sort order
+            );
+
+            Log.v("Content_Manager", "\tCount: " + cursor.getCount());
+
+            // Iterate over the results
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+
+                // Read the entry
+                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_UUID));
+                String tag = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_TAG));
+                /*
+                String parentBehaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_PARENT_UUID));
+                int siblingIndex = cursor.getInt(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX));
+                */
 
                 // Create the behavior object
-                Behavior behavior = null;
-                if (behaviorScript != null && behaviorState != null) {
-                    // Basic behavior
-                    behavior = new Behavior(UUID.fromString(uuidString), tag, behaviorScript, behaviorState);
-                    getClay().addBehavior(behavior);
-                } else {
-                    // Non-basic behavior
-                    behavior = new Behavior(UUID.fromString(uuidString), tag);
-                    Log.v("Content_Manager", "\tADDING COMPLEX BEHAVIOR");
+                Behavior behavior = new Behavior (UUID.fromString (uuidString), tag);
 
-                    if (parentBehavior != null) {
-                        parentBehavior.getBehaviors();
-                        parentBehavior.getBehaviors().add(behaviorIndex, behavior);
-                        Log.v("Content_Manager", "\t\tADDING BEHAVIOR TO PARENT");
-
-                        getClay().addBehavior(parentBehavior);
-                    }
-
-                    getClay().addBehavior(behavior);
+                // Add behavior as a child behavior to the parent behavior
+                if (parentBehavior != null) {
+                    parentBehavior.addBehavior(behavior);
+                    Log.v("Content_Manager", "\tAdding behavior to parent (UUID: " + behavior.getUuid() + ")");
+                    Log.v("Content_Manager", "\t\tParent UUID: " + parentBehavior.getUuid());
                 }
 
+                /*
+                // Add the behavior to Clay
+                getClay().addBehavior(behavior);
+                */
+
+                // Recursive call to reconstruct the behavior's children
+                if (isParentBehavior (behavior.getUuid())) {
+                    // Recursive query to get the children of the behavior just created.
+                    queryBehaviors(behavior);
+                } else {
+                    // TODO: (?) Query to get the behavior script associated with the behavior.
+                }
+
+                // Add the behavior to Clay
+                // TODO: Only add root behaviors to Clay? Maybe only those should be available for selection.
+                getClay().addBehavior(behavior);
+
+                // Move to the next entry returned by the query
                 cursor.moveToNext();
             }
         }
+
+        // TODO: queryBehaviorScripts () // Get all behaviors, for use to create the first behaviors in the database.
 
         /** Behavior Script */
 
@@ -548,7 +692,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
             Log.v("Content_Manager", "tag: " + behaviorScript.getTag());
             Log.v("Content_Manager", "defaultState: " + behaviorScript.getDefaultState());
 
-            db.execSQL(SQL_CREATE_BEHAVIOR_SCRIPT_ENTRIES);
+//            db.execSQL(SQL_CREATE_BEHAVIOR_SCRIPT_ENTRIES);
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
@@ -557,10 +701,58 @@ public class SQLiteContentManager implements ContentManagerInterface {
             values.put(BehaviorScriptEntry.COLUMN_NAME_DEFAULT_STATE, behaviorScript.getDefaultState());
 
             // Insert the new row, returning the primary key value of the new row
-            long newRowId = db.insert(BehaviorScriptEntry.TABLE_NAME, null, values);
+            long entryId = db.insert (BehaviorScriptEntry.TABLE_NAME, null, values);
 
-            Log.v("Content_Manager", "Inserted behavior script into database (_id: " + newRowId + ")");
+            Log.v("Content_Manager", "Inserted behavior script into database (_id: " + entryId + ")");
 
+        }
+
+        public void queryBehaviorScripts () {
+
+            Log.v("Content_Manager", "queryBehaviorScripts");
+            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
+
+            // Define a projection that specifies which columns from the database
+            // you will actually use after this query.
+            String[] projection = {
+                    BehaviorScriptEntry._ID,
+                    BehaviorScriptEntry.COLUMN_NAME_UUID,
+                    BehaviorScriptEntry.COLUMN_NAME_TAG,
+                    BehaviorScriptEntry.COLUMN_NAME_DEFAULT_STATE
+            };
+
+            // How you want the results sorted in the resulting Cursor
+            String sortOrder = null;
+
+            String selection = null;
+            String[] selectionArgs = null;
+            Cursor cursor = db.query(
+                    BehaviorScriptEntry.TABLE_NAME,  // The table to query
+                    projection,                      // The columns to return
+                    selection,                       // The columns for the WHERE clause
+                    selectionArgs,                   // The values for the WHERE clause
+                    null,                            // don't group the rows
+                    null,                            // don't filter by row groups
+                    sortOrder                        // The sort order
+            );
+
+            Log.v("Content_Manager", "\tCount: " + cursor.getCount());
+
+            // Iterate over the results
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+
+                // Read the entry
+                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorScriptEntry.COLUMN_NAME_UUID));
+                String tag = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorScriptEntry.COLUMN_NAME_TAG));
+                String defaultState = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorScriptEntry.COLUMN_NAME_DEFAULT_STATE));
+
+                // Create the object
+                BehaviorScript behaviorScript = new BehaviorScript (UUID.fromString(uuidString), tag, defaultState);
+
+                // Cache the behavior script
+                getClay ().addBehaviorScript(behaviorScript);
+            }
         }
 
         public BehaviorScript queryBehaviorScript (UUID uuid) {
@@ -618,7 +810,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
         /** Behavior States */
 
-        public void insertBehaviorState (BehaviorState behaviorState) {
+        public void insertBehaviorState (Event event, BehaviorState behaviorState) {
 
             Log.v("Content_Manager", "insertBehaviorState");
 
@@ -626,48 +818,51 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 return;
             }
 
-            Log.v("Content_Manager", "\tbehaviorState: " + behaviorState);
-            Log.v("Content_Manager", "\tbehaviorState.behavior: " + behaviorState.getBehavior());
-            Log.v("Content_Manager", "\tbehaviorState.behavior.uuid: " + behaviorState.getBehavior().getUuid());
-
             // Gets the data repository in write mode
             SQLiteDatabase db = SQLiteContentManager.this.db.getWritableDatabase();
-
-            db.execSQL(SQL_CREATE_BEHAVIOR_STATE_ENTRIES);
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
             values.put(BehaviorStateEntry.COLUMN_NAME_UUID, behaviorState.getUuid().toString());
-            values.put(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID, behaviorState.getBehavior().getUuid().toString());
             values.put(BehaviorStateEntry.COLUMN_NAME_STATE, behaviorState.getState());
+            values.put(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getBehavior().getUuid().toString());
+            values.put(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID, event.getBehavior().getScript().getUuid().toString());
 
             // Insert the new row, returning the primary key value of the new row
-            long newRowId = db.insert(BehaviorStateEntry.TABLE_NAME, null, values);
+            long entryId = db.insert (BehaviorStateEntry.TABLE_NAME, null, values);
 
-            Log.v("Content_Manager", "Inserted behavior state into database (_id: " + newRowId + ")");
+            Log.v("Content_Manager", "Inserted behavior state into database (_id: " + entryId + ")");
 
         }
 
-        public BehaviorState queryBehaviorState (UUID uuid) {
+        /**
+         *
+         * @param event
+         * @param behaviorStateUuid
+         * @return
+         */
+        public BehaviorState queryBehaviorState (Event event, UUID behaviorStateUuid) {
+
             Log.v("Content_Manager", "queryBehaviorState");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
 
-            db.execSQL(SQL_CREATE_BEHAVIOR_STATE_ENTRIES);
+//            db.execSQL(SQL_CREATE_BEHAVIOR_STATE_ENTRIES);
 
             // Define a projection that specifies which columns from the database
             // you will actually use after this query.
             String[] projection = {
                     BehaviorStateEntry._ID,
                     BehaviorStateEntry.COLUMN_NAME_UUID,
+                    BehaviorStateEntry.COLUMN_NAME_STATE,
                     BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID,
-                    BehaviorStateEntry.COLUMN_NAME_STATE
+                    BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID,
             };
 
             // How you want the results sorted in the resulting Cursor
             String sortOrder = null;
 
             String selection = BehaviorStateEntry.COLUMN_NAME_UUID + " LIKE ?";
-            String[] selectionArgs = { uuid.toString() };
+            String[] selectionArgs = { behaviorStateUuid.toString() };
             Cursor cursor = db.query(
                     BehaviorStateEntry.TABLE_NAME,  // The table to query
                     projection,                               // The columns to return
@@ -686,15 +881,26 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
                 // Read the entry
                 String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_UUID));
-                String behaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID));
                 String state = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_STATE));
+                String behaviorUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID));
+                String behaviorScriptUuid = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID));
 
                 // Get the behavior from the graph (or other location)
-                Behavior behavior = getClay().getBehavior(UUID.fromString(behaviorUuid));
+                Behavior behavior = getClay ().getBehavior (UUID.fromString (behaviorUuid));
+                event.setBehavior (behavior);
+
+                // Update the event
 
                 // Create the behavior
                 //Behavior behavior = new Behavior(UUID.fromString(uuidString), tag, defaultState);
-                BehaviorState behaviorState = new BehaviorState(UUID.fromString(uuidString), behavior, state);
+                BehaviorState behaviorState = new BehaviorState (UUID.fromString (uuidString), state);
+                event.getBehavior ().setState (behaviorState);
+
+//                BehaviorScript behaviorScript = getClay().getBehaviorScript(UUID.fromString(behaviorScriptUuid));
+//                event.setBehaviorScript(behaviorScript);
+
+//                queryBehaviorScript (event, behaviorState, UUID.fromString(behaviorScriptUuid));
+                queryBehaviorScript (event, UUID.fromString (behaviorScriptUuid));
 
                 return behaviorState;
             }
@@ -816,9 +1022,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
             };
 
             // How you want the results sorted in the resulting Cursor
-            String sortOrder =
-                    TimelineEntry.COLUMN_NAME_UUID + " DESC";
-            // UnitEntry.COLUMN_NAME_UPDATED + " DESC";
+            String sortOrder = null; // TODO: Sort by index!
 
             String selection = TimelineEntry.COLUMN_NAME_UUID + " LIKE ?";
             String[] selectionArgs = { uuid.toString() };
@@ -837,9 +1041,6 @@ public class SQLiteContentManager implements ContentManagerInterface {
             // Iterate over the results
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
-                long itemId = cursor.getLong(
-                        cursor.getColumnIndexOrThrow(TimelineEntry._ID)
-                );
 
                 // Read the entry
                 String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(TimelineEntry.COLUMN_NAME_UUID));
@@ -874,6 +1075,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
             values.put(EventEntry.COLUMN_NAME_UUID, event.getUuid().toString());
             values.put(EventEntry.COLUMN_NAME_TIMELINE_UUID, event.getTimeline().getUuid().toString());
             values.put(EventEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getBehavior().getUuid().toString());
+            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID, (event.getBehavior().getState() != null ? event.getBehavior().getState().getUuid().toString() : ""));
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId;
@@ -883,6 +1085,43 @@ public class SQLiteContentManager implements ContentManagerInterface {
                     values);
 
             Log.v("Content_Manager", "Inserted event into database (_id: " + newRowId + ")");
+        }
+
+        public boolean isParentBehavior (UUID behaviorUuid) {
+
+            Log.v("Content_Manager", "selectBehaviorsWithParent");
+            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
+
+            // Define a projection that specifies which columns from the database
+            // you will actually use after this query.
+            String[] projection = {
+                    BehaviorEntry._ID,
+                    BehaviorEntry.COLUMN_NAME_UUID
+            };
+
+            // How you want the results sorted in the resulting Cursor
+            String sortOrder = null;
+
+            String selection = BehaviorEntry.COLUMN_NAME_PARENT_UUID + " LIKE ?";
+            String[] selectionArgs = { behaviorUuid.toString() };
+            Cursor cursor = db.query(
+                    BehaviorEntry.TABLE_NAME,  // The table to query
+                    projection,                // The columns to return
+                    selection,                 // The columns for the WHERE clause
+                    selectionArgs,             // The values for the WHERE clause
+                    null,                      // don't group the rows
+                    null,                      // don't filter by row groups
+                    sortOrder                  // The sort order
+            );
+
+            Log.v("Content_Manager", "\tcursor.getCount = " + cursor.getCount());
+
+            // Return whether or not an entry exists with the UUID
+            if (cursor.getCount () > 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         public boolean queryBehaviorExists (UUID uuid) {
@@ -1005,64 +1244,67 @@ public class SQLiteContentManager implements ContentManagerInterface {
             }
         }
 
-        public Event queryEvent(UUID uuid) {
-
-            Log.v("Content_Manager", "queryEvent");
-            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
-
-            // Create the table if it doesn't exist
-            db.execSQL(SQL_CREATE_EVENT_ENTRIES);
-
-            // Define a projection that specifies which columns from the database
-            // you will actually use after this query.
-            String[] projection = {
-                    EventEntry._ID,
-                    EventEntry.COLUMN_NAME_UUID,
-                    EventEntry.COLUMN_NAME_TIMELINE_UUID,
-                    EventEntry.COLUMN_NAME_BEHAVIOR_UUID
-            };
-
-            // How you want the results sorted in the resulting Cursor
-            String sortOrder = null;
-
-            String selection = EventEntry.COLUMN_NAME_UUID + " LIKE ? AND "
-                             + EventEntry.COLUMN_NAME_DISABLED + " = 0";
-            String[] selectionArgs = { uuid.toString() };
-            Cursor cursor = db.query(
-                    EventEntry.TABLE_NAME,  // The table to query
-                    projection,             // The columns to return
-                    selection,              // The columns for the WHERE clause
-                    selectionArgs,          // The values for the WHERE clause
-                    null,                   // don't group the rows
-                    null,                   // don't filter by row groups
-                    sortOrder               // The sort order
-            );
-
-            Log.v("Content_Manager", "cursor.getCount = " + cursor.getCount());
-
-            // Iterate over the results
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-
-                // Read the entry
-                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_UUID));
-                String timelineUuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_TIMELINE_UUID));
-                String behaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_BEHAVIOR_UUID));
-
-                // TODO: Query timeline, behavior, behavior state if they're not cached...
-                // TODO: ...then only draw events for which all fields are instantiated.
-                // TODO:    i.e., Use the event sort of as a filter, and only propagate use
-                // TODO:          of the event when it's populated. Or show it as "loading."
-
-                // Create the event
-                // TODO: Event event = new Event(UUID.fromString(uuidString));
-                // TODO: return event;
-
-//                cursor.moveToNext();
-            }
-
-            return null;
-        }
+        // TODO:
+//        public Event queryEvent(UUID uuid) {
+//
+//            Log.v("Content_Manager", "queryEvent");
+//            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
+//
+//            // Create the table if it doesn't exist
+//            db.execSQL(SQL_CREATE_EVENT_ENTRIES);
+//
+//            // Define a projection that specifies which columns from the database
+//            // you will actually use after this query.
+//            String[] projection = {
+//                    EventEntry._ID,
+//                    EventEntry.COLUMN_NAME_UUID,
+//                    EventEntry.COLUMN_NAME_TIMELINE_UUID,
+//                    EventEntry.COLUMN_NAME_BEHAVIOR_UUID,
+//                    EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID
+//            };
+//
+//            // How you want the results sorted in the resulting Cursor
+//            String sortOrder = null;
+//
+//            String selection = EventEntry.COLUMN_NAME_UUID + " LIKE ? AND "
+//                             + EventEntry.COLUMN_NAME_HIDDEN + " = 0";
+//            String[] selectionArgs = { uuid.toString() };
+//            Cursor cursor = db.query(
+//                    EventEntry.TABLE_NAME,  // The table to query
+//                    projection,             // The columns to return
+//                    selection,              // The columns for the WHERE clause
+//                    selectionArgs,          // The values for the WHERE clause
+//                    null,                   // don't group the rows
+//                    null,                   // don't filter by row groups
+//                    sortOrder               // The sort order
+//            );
+//
+//            Log.v("Content_Manager", "cursor.getCount = " + cursor.getCount());
+//
+//            // Iterate over the results
+//            cursor.moveToFirst();
+//            while (!cursor.isAfterLast()) {
+//
+//                // Read the entry
+//                String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_UUID));
+//                String timelineUuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_TIMELINE_UUID));
+//                String behaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_BEHAVIOR_UUID));
+//                String behaviorStateUuid = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID));
+//
+//                // TODO: Query timeline, behavior, behavior state if they're not cached...
+//                // TODO: ...then only draw events for which all fields are instantiated.
+//                // TODO:    i.e., Use the event sort of as a filter, and only propagate use
+//                // TODO:          of the event when it's populated. Or show it as "loading."
+//
+//                // Create the event
+//                // TODO: Event event = new Event(UUID.fromString(uuidString));
+//                // TODO: return event;
+//
+////                cursor.moveToNext();
+//            }
+//
+//            return null;
+//        }
 
         public void queryEvents (Timeline timeline) {
 
@@ -1078,14 +1320,15 @@ public class SQLiteContentManager implements ContentManagerInterface {
                     EventEntry._ID,
                     EventEntry.COLUMN_NAME_UUID,
                     EventEntry.COLUMN_NAME_TIMELINE_UUID,
-                    EventEntry.COLUMN_NAME_BEHAVIOR_UUID
+                    EventEntry.COLUMN_NAME_BEHAVIOR_UUID,
+                    EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID
             };
 
             // How you want the results sorted in the resulting Cursor
             String sortOrder = null;
 
             String selection = EventEntry.COLUMN_NAME_TIMELINE_UUID + " LIKE ? AND "
-                    + EventEntry.COLUMN_NAME_DISABLED + " = 0";
+                    + EventEntry.COLUMN_NAME_HIDDEN + " = 0";
 //            String selection = EventEntry.COLUMN_NAME_TIMELINE_UUID + " LIKE ?";
             String[] selectionArgs = { timeline.getUuid().toString() };
             Cursor cursor = db.query(
@@ -1108,6 +1351,14 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_UUID));
                 String timelineUuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_TIMELINE_UUID));
                 String behaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_BEHAVIOR_UUID));
+                String behaviorStateUuid = cursor.getString(cursor.getColumnIndexOrThrow(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID));
+
+                // Get behavior state object by UUID.
+                BehaviorState behaviorState = null;
+                if (!behaviorStateUuid.equals("")) {
+                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
+                    behaviorState = queryBehaviorState (UUID.fromString(behaviorStateUuid));
+                }
 
                 // TODO: Query timeline, behavior, behavior state if they're not cached...
                 // TODO: ...then only draw events for which all fields are instantiated.
@@ -1123,10 +1374,13 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 */
 
                 Behavior behavior = getClay().getBehavior(UUID.fromString(behaviorUuidString));
+                Log.v ("Content_Manager2", "\tbehavior (cache): " + behavior.getUuid());
+                Log.v ("Content_Manager2", "\t\tchildren: " + behavior.getBehaviors());
                 if (behavior == null) {
                     behavior = queryBehavior(UUID.fromString(behaviorUuidString));
+                    Log.v ("Content_Manager2", "\tbehavior (query): " + behavior.getUuid());
                 }
-                Log.v ("Content_Manager", "\tbehavior: " + behavior.getUuid());
+
 
                 // If no behavior state was found in the store, then assign the default state
 //                if (behaviorState == null) {
@@ -1135,7 +1389,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
                 // Create the event
                 Log.v ("Content_Manager", "Adding event to the timeline.");
-                Event event = new Event(UUID.fromString(uuidString), timeline, behavior);
+                Event event = new Event(UUID.fromString(uuidString), timeline, behavior, behaviorState);
                 timeline.addEvent(event);
 
                 cursor.moveToNext();
@@ -1152,6 +1406,10 @@ public class SQLiteContentManager implements ContentManagerInterface {
             values.put(EventEntry.COLUMN_NAME_UUID, event.getUuid().toString());
             values.put(EventEntry.COLUMN_NAME_TIMELINE_UUID, event.getTimeline().getUuid().toString());
             values.put(EventEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getBehavior().getUuid().toString());
+            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID,
+                    (event.getBehavior().getState() != null
+                            ? event.getBehavior().getState().getUuid().toString()
+                            : ""));
 
             Log.v ("Content_Manager", "event.timeline: " + event.getTimeline());
             Log.v ("Content_Manager", "event.timeline.uuid: " + event.getTimeline().getUuid());
@@ -1176,8 +1434,8 @@ public class SQLiteContentManager implements ContentManagerInterface {
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
             values.put(EventEntry.COLUMN_NAME_UUID, event.getUuid().toString());
-            values.put(EventEntry.COLUMN_NAME_AVAILABLE, event.getTimeline().getUuid().toString());
-            values.put(EventEntry.COLUMN_NAME_DISABLED, 1);
+            values.put(EventEntry.COLUMN_NAME_AVAILABLE, 1);
+            values.put(EventEntry.COLUMN_NAME_HIDDEN, 1); // This is the flag indicating removal, if true.
 
             Log.v ("Content_Manager", "event.timeline: " + event.getTimeline());
             Log.v ("Content_Manager", "event.timeline.uuid: " + event.getTimeline().getUuid());
@@ -1262,7 +1520,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 db.insertBehavior(behavior, null);
             } else {
                 Log.v ("Content_Manager", "Updating basic behavior.");
-                db.updateBehavior(behavior);
+                db.updateBehavior(behavior, null);
             }
         } else {
             Log.v("Content_Manager", "Saving non-basic behavior.");
@@ -1279,17 +1537,19 @@ public class SQLiteContentManager implements ContentManagerInterface {
         // created. The parent must be in the database before children can store a relation to
         // their parent.
 
+        Log.v ("Content_Manager", "\t\t\t\t\tBEHAVIOR SCRIPT: " + behavior.getScript());
+
         // Store this node with a relation to its parent (if any)
         // TODO: Only store if the tree STRUCTURE hasn't already been stored. When storing a...
         // TODO: ...behavior, this means the database must be queried for the tree structure...
         // TODO: ...before saving a behavior tree, not just the behavior node UUID.
         if (!hasBehavior(behavior)) {
 
-            // TODO: Update the basic behavior that has a script, add a parent! Yes, the behavior can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic behavior that has a script, addUnit a parent! Yes, the behavior can have both a parent and a script! (leaf node!)
 
             db.insertBehavior(behavior, parentBehavior);
         } else {
-            db.updateBehavior(behavior);
+            db.updateBehavior(behavior, parentBehavior);
         }
 
         // Store children (if any)
@@ -1325,8 +1585,8 @@ public class SQLiteContentManager implements ContentManagerInterface {
     }
 
     @Override
-    public void storeBehaviorState(BehaviorState behaviorState) {
-        db.insertBehaviorState(behaviorState);
+    public void storeBehaviorState(Event event, BehaviorState behaviorState) {
+        db.insertBehaviorState(event, behaviorState);
     }
 
     @Override
@@ -1390,9 +1650,26 @@ public class SQLiteContentManager implements ContentManagerInterface {
         }
     }
 
+    @Override
+    public void resetDatabase() {
+        Log.v("Content_Manager", "resetDatabase");
+        db.resetDatabase(db.getWritableDatabase());
+    }
+
+    @Override
+    public void storeBehaviorScript(BehaviorScript behaviorScript) {
+        Log.v ("Content_Manager", "storeBehaviorScript");
+        db.insertBehaviorScript(behaviorScript);
+    }
+
+    @Override
+    public void restoreBehaviorScripts() {
+        db.queryBehaviorScripts();
+    }
+
     public void restoreBehaviors () {
         Log.v ("Content_Manager", "restoreBehaviors");
-        db.queryBehaviors();
+        db.queryBehaviors ();
     }
 
     @Override

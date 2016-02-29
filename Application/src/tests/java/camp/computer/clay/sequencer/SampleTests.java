@@ -43,7 +43,7 @@ public class SampleTests extends ActivityInstrumentationTestCase2<ApplicationVie
     * Test if the test fixture has been set up correctly.
     */
     public void testPreconditions() {
-        //Try to add a message to add context to your assertions. These messages will be shown if
+        //Try to addUnit a message to addUnit context to your assertions. These messages will be shown if
         //a tests fails and make it easy to understand why a test failed
         assertNotNull("mTestActivity is null", mTestActivity);
     }

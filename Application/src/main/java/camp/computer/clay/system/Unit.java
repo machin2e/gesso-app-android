@@ -108,7 +108,7 @@ public class Unit {
         getClay().notifyChange (event);
 
         this.send("create behavior " + event.getUuid() + " \"" + event.getBehavior().getTag() + " " + event.getBehavior().getState().getState() + "\"");
-        this.send("add behavior " + event.getUuid());
+        this.send("addUnit behavior " + event.getUuid());
     }
 
     /*
