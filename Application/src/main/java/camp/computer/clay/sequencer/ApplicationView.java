@@ -197,7 +197,11 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // <HACK>
         SQLiteContentManager sqliteContentManager = new SQLiteContentManager(getClay(), "sqlite");
         getClay().addContentManager(sqliteContentManager);
+
+//        getClay().getStore().resetDatabase();
+//        getClay().generateStore();
         getClay().populateCache();
+        getClay().simulateSession(false, 4, false);
         // </HACK>
 
         // Start worker process

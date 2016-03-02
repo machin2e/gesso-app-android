@@ -10,6 +10,13 @@ public class Event {
 
     private Behavior behavior;
 
+    public Event (UUID uuid, Timeline timeline) {
+
+        this.uuid = uuid;
+
+        this.timeline = timeline;
+    }
+
     public Event (UUID uuid, Timeline timeline, Behavior behavior) {
 
         this.uuid = uuid;
@@ -17,6 +24,13 @@ public class Event {
         this.timeline = timeline;
 
         this.behavior = behavior;
+    }
+
+    public Event (Timeline timeline) {
+
+        this.uuid = UUID.randomUUID();
+
+        this.timeline = timeline;
     }
 
     public Event (Timeline timeline, Behavior behavior) {

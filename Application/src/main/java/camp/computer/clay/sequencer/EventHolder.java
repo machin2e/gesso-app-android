@@ -205,7 +205,7 @@ public class EventHolder {
         Log.v("CM_Log2", "\tstateString: " + stateString);
         Log.v("CM_Log2", "\tevent: " + getEvent());
         Log.v("CM_Log2", "\tbehavior: " + getEvent().getBehavior());
-        BehaviorState behaviorState = new BehaviorState(getEvent().getBehavior(), stateString);
+        BehaviorState behaviorState = new BehaviorState(stateString);
         Log.v("CM_Log2", "\tbehaviorState: " + behaviorState);
         getEvent().getBehavior().setState(behaviorState);
     }
