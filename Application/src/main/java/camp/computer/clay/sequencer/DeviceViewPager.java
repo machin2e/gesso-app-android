@@ -141,7 +141,7 @@ public class DeviceViewPager extends ViewPager {
 
                 // Update gesture classification
                 currentListView = (TimelineListView) findViewWithTag(1);
-                currentListView.packSelectedEvents();
+                currentListView.composeEventHolderSelection();
                 currentListView.refreshListViewFromData();
 
                 Log.v("Gesture_Log", "ACTION_UP (touch)");

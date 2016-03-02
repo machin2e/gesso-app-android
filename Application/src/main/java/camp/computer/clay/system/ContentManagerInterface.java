@@ -4,35 +4,36 @@ import java.util.UUID;
 
 public interface ContentManagerInterface {
 
-    interface CallbackInterface {
+    interface Callback {
         void onSuccess(Object object);
         void onFailure();
     }
 
     void resetDatabase();
 
-    void storeBehaviorScript (BehaviorScript behaviorScript);
-    void restoreBehaviorScripts();
-    void restoreBehaviors(); // TODO: Restore cache
-
-    boolean hasBehavior(Behavior behavior);
-    void storeBehavior(Behavior behavior);
-    void restoreBehavior (UUID uuid, CallbackInterface callback);
-
-    boolean hasBehaviorState (BehaviorState behaviorState);
-    void storeBehaviorState (BehaviorState behaviorState);
-    void restoreBehaviorState (Behavior behavior, UUID uuid, CallbackInterface callback);
-
     void storeUnit (Unit unit);
-    void restoreUnit (UUID uuid, CallbackInterface callback);
+    void restoreUnit (UUID uuid, Callback callback);
 
     void storeTimeline (Timeline timeline);
-    void restoreTimeline (Unit unit, UUID uuid, CallbackInterface callback);
+    void restoreTimeline (Unit unit, UUID uuid, Callback callback);
 
     boolean hasEvent (Event event);
     void storeEvent (Event event);
-    void restoreEvent (Timeline timeline, UUID uuid);
-    void restoreEvents(Timeline timeline);
-    void removeEvent (Event event, CallbackInterface callback);
+//    void restoreEvents (Timeline timeline);
+//    void restoreEvent (Timeline timeline, UUID uuid);
+    void removeEvent (Event event, Callback callback);
+
+    void restoreBehaviors ();
+//    boolean hasBehavior (Behavior behavior);
+    void storeBehavior (Behavior behavior);
+//    void restoreBehavior (UUID uuid, Callback callback);
+
+    void restoreBehaviorScripts ();
+    void storeBehaviorScript (BehaviorScript behaviorScript);
+
+    // TODO: Remove these! Handle them in restoreEvent and restoreBehavior
+//    boolean hasBehaviorState (BehaviorState behaviorState);
+//    void storeBehaviorState (BehaviorState behaviorState); // This is handled in both storeEvent and storeBehavior
+    void restoreBehaviorState (Behavior behavior);
 
 }

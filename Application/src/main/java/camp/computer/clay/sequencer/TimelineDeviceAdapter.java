@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -485,6 +486,8 @@ public class TimelineDeviceAdapter extends BaseAdapter {
                         // Get behavior state
                         //String lightStateString = item.getEvent().getBehavior().getState().getState();
                         // TODO: ^ The above line doesn't get the most recent or correct state from the behavior... is the reference out of date or not updated somewhere? That's bad, man.
+                        Log.v("Content_Manager", ">>> " + eventHolder.getEvent().getBehavior().getState());
+                        Log.v("Content_Manager", ">>>> " + eventHolder.getEvent().getBehavior().getState().getState());
                         String lightStateString = eventHolder.getEvent().getBehavior().getState().getState();
                         String[] lightStates = lightStateString.split(" ");
 

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import camp.computer.clay.system.Behavior;
-import camp.computer.clay.system.BehaviorState;
+import camp.computer.clay.system.BehaviorScript;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.Event;
 import camp.computer.clay.system.Timeline;
@@ -35,6 +35,7 @@ import camp.computer.clay.system.Unit;
 public class TimelineListView extends ListView {
 
     private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
+
     private static final boolean HIDE_ABSTRACT_OPTION = true;
 
     private Unit unit;
@@ -83,8 +84,6 @@ public class TimelineListView extends ListView {
             EventHolder eventHolder = new EventHolder(event);
             eventHolders.add(eventHolder);
         }
-
-        Log.v("Behavior_Count", "profile count: " + this.eventHolders.size());
     }
 
     public void setEventHolders(Timeline timeline) {
@@ -120,22 +119,6 @@ public class TimelineListView extends ListView {
 
         // setup the eventHolders source
         this.eventHolders = new ArrayList<EventHolder>();
-
-//        // create some objects... and addUnit them into the array list
-//        if (!TimelineListView.HIDE_ABSTRACT_OPTION) {
-//            this.eventHolders.addUnit(new EventHolder("abstract", "Subtitle", TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT));
-//        }
-
-        // this.eventHolders.addUnit(new EventHolder("view", "Subtitle", TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT));
-
-        // Basic behaviors
-//        this.eventHolders.addUnit(new EventHolder("lights", "", TimelineDeviceAdapter.LIGHT_CONTROL_LAYOUT));
-//        this.eventHolders.addUnit(new EventHolder("io", "", TimelineDeviceAdapter.IO_CONTROL_LAYOUT));
-//        this.eventHolders.addUnit(new EventHolder("message", "turn lights on", TimelineDeviceAdapter.MESSAGE_CONTROL_LAYOUT));
-//        this.eventHolders.addUnit(new EventHolder("wait", "500 ms", TimelineDeviceAdapter.WAIT_CONTROL_LAYOUT));
-//        this.eventHolders.addUnit(new EventHolder("say", "oh, that's great", TimelineDeviceAdapter.SAY_CONTROL_LAYOUT));
-
-//        this.eventHolders.addUnit(new EventHolder("create", "", TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT));
     }
 
     private void initLayout() {
@@ -146,10 +129,10 @@ public class TimelineListView extends ListView {
     }
 
     private void initTouchListeners() {
-        setOnTouchListener(new ListTouchListener());
-        setOnItemClickListener(new ListSelection());
-        setOnItemLongClickListener(new ListLongSelection());
-        setOnDragListener(new ListDrag());
+        setOnTouchListener(new EventHolderTouchListener());
+        setOnItemClickListener(new EventHolderTouchReleaseListener());
+        setOnItemLongClickListener(new EventHolderLongTouchListener());
+        setOnDragListener(new EventHolderTouchDragListener());
     }
 
     /**
@@ -172,18 +155,14 @@ public class TimelineListView extends ListView {
         adapter.notifyDataSetChanged();
     }
 
-    private void displayEventOptions (final EventHolder event) {
+    private void displayEventDesigner(final EventHolder event) {
         int basicBehaviorCount = 3;
         final String[] behaviorOptions = new String[basicBehaviorCount];
-        // loop, condition, branch
+
+        // TODO: loop, condition, branch
         behaviorOptions[0] = "update";
         behaviorOptions[1] = "delete";
         behaviorOptions[2] = "replace";
-        // TODO: behaviorOptions[3] = (event.selected ? "deselect" : "select");
-        // TODO: behaviorOptions[4] = (event.repeat ? "do once" : "repeat");
-        // TODO: behaviorOptions[5] = "addUnit condition";
-        // TODO: cause/effect (i.e., condition)
-        // TODO: HTTP API interface (general wrapper, with authentication options)
 
         // Show the list of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -193,22 +172,22 @@ public class TimelineListView extends ListView {
 
                 if (behaviorOptions[itemIndex].toString().equals("delete")) {
 
-                    deleteEventHolder(event);
+                    removeEventHolder (event);
 
                 } else if (behaviorOptions[itemIndex].toString().equals("update")) {
 
-                    displayUpdateOptions(event);
+                    displayUpdateOptions (event);
 
                 } else if (behaviorOptions[itemIndex].toString().equals("replace")) {
 
-                    selectBehaviorType(event);
+                    displayBehaviorFinder(event);
 
                 } else if (behaviorOptions[itemIndex].toString().equals("select") || behaviorOptions[itemIndex].toString().equals("deselect")) {
 
                     if (behaviorOptions[itemIndex].toString().equals("select")) {
-                        selectListItem(event);
+                        selectEventHolder (event);
                     } else if (behaviorOptions[itemIndex].toString().equals("deselect")) {
-                        deselectListItem(event);
+                        deselectEventHolder (event);
                     }
 
                 } else if (behaviorOptions[itemIndex].toString().equals("repeat") || behaviorOptions[itemIndex].toString().equals("do once")) {
@@ -1122,7 +1101,7 @@ public class TimelineListView extends ListView {
         builder.show ();
     }
 
-    private void selectListItem (final EventHolder item) {
+    private void selectEventHolder(final EventHolder item) {
 
         // Do not select system controllers
         if (item.type == TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT || item.type == TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
@@ -1137,7 +1116,7 @@ public class TimelineListView extends ListView {
 
     }
 
-    private void deselectListItem (final EventHolder item) {
+    private void deselectEventHolder(final EventHolder item) {
 
         // Update state of the object associated with the selected view.
         if (item.selected == true) {
@@ -1153,11 +1132,12 @@ public class TimelineListView extends ListView {
         }
     }
 
-    private void deleteEventHolder(final EventHolder eventHolder) {
+    private void removeEventHolder(final EventHolder eventHolder) {
 
         // <HACK>
         // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
-        unit.getTimeline().removeEvent(eventHolder.getEvent());
+        getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+        getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
         // </HACK>
 
         // Update state of the object associated with the selected view.
@@ -1174,33 +1154,35 @@ public class TimelineListView extends ListView {
 
     }
 
-    private void selectBehaviorType (final EventHolder event) {
+    /**
+     * Display the behaviors available for selection, starting with basic, cached, public.
+     */
+    private void displayBehaviorFinder (final EventHolder eventHolder) {
 
-        // Display the behaviors available for selection, starting with basic, cached, public.
-        int basicBehaviorCount = unit.getClay().getCache().getBehaviors().size();
-        final String[] basicBehaviors = new String[basicBehaviorCount];
-
-        for (int i = 0; i < basicBehaviorCount; i++) {
-            Behavior cachedBehavior = unit.getClay().getCache().getBehaviors().get(i);
-            basicBehaviors[i] = cachedBehavior.getTag();
+        // Get list of behaviors available for selection
+        int behaviorScriptCount = getClay().getCache().getBehaviorScripts().size();
+        final String[] behaviorScripts = new String[behaviorScriptCount];
+        for (int i = 0; i < behaviorScriptCount; i++) {
+            BehaviorScript cachedBehaviorScript = unit.getClay().getCache().getBehaviorScripts().get(i);
+            behaviorScripts[i] = cachedBehaviorScript.getTag();
         }
 
         // Show the list of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Select a behavior");
-        builder.setItems(basicBehaviors, new DialogInterface.OnClickListener() {
+        builder.setTitle("Choose");
+        builder.setItems(behaviorScripts, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int itemIndex) {
 
                 // <HACK>
-                Behavior selectedBehavior = getClay().getCache().getBehaviors().get(itemIndex);
+                BehaviorScript selectedBehaviorScript = getClay().getCache().getBehaviorScripts().get(itemIndex);
                 // </HACK>
-                Log.v("Content_Manager", "to " + selectedBehavior.getUuid());
+                Log.v("Content_Manager", "to " + selectedBehaviorScript.getUuid());
 //                Log.v("Content_Manager", "from:");
 //                for (Behavior cb : getClay().getCache().getBehaviors()) {
 //                    Log.v("Change_Behavior", "\t" + cb.getUuid().toString());
 //                }
 
-                changeEvent(event, selectedBehavior.getUuid());
+                replaceEventHolder(eventHolder, selectedBehaviorScript);
 
                 refreshListViewFromData();
             }
@@ -1216,21 +1198,15 @@ public class TimelineListView extends ListView {
     /**
      * Changes the specified eventHolder's type to the specified type.
      */
-    private void changeEvent(final EventHolder eventHolder, UUID behaviorUuid) {
+    private void replaceEventHolder (final EventHolder eventHolder, BehaviorScript behaviorScript) {
 
         // TODO: Refactor this method so it _reuses_ Clay's Event object. (Only the Behavior object needs to changed.)
 
-        Log.v ("CM_Log", "changeEvent");
-        Log.v ("CM_Log", "\teventHolder = " + eventHolder);
-        Log.v ("CM_Log", "\tbehaviorUuid = " + behaviorUuid);
+        UUID behaviorScriptUuid = behaviorScript.getUuid();
+
+        Log.v ("CM_Log", "replaceEventHolder");
 
         /* Update data model */
-
-//        // <HACK>
-//        // TODO: Make calls to update data model. From those calls, callback to update the views corresponding to the data model updates.
-//        getUnit().getTimeline().removeEvent(eventHolder.getEvent());
-//        // </HACK>
-
         /* Update view */
 
         // <HACK>
@@ -1240,109 +1216,63 @@ public class TimelineListView extends ListView {
         eventHolders.remove(index);
         refreshListViewFromData();
 
-        // TODO: Remove the current eventHolder from the unit by UUID: unit.removeBehavior(oldUuid);
-
-        // Get the behavior from the behavior repository
-        Behavior behavior = getClay().getBehavior(behaviorUuid);
-
-//        // Check if the type of behavior for the event's has changed. If so, set a flag to send an
-//        // "create behavior" message and an "addUnit behavior" message. If not, leave the flag alone,
-//        // indicating that an "update" message should be sent to update the event.
-//        boolean sendCreateBehaiorMessage = false;
-//        if (eventHolder.getEvent() == null || behavior.getUuid() != eventHolder.getEvent().getBehavior().getUuid()) {
-//            sendCreateBehaiorMessage = true;
-//        }
-//
-//        boolean firstEventBehavior = false;
-//        if (eventHolder.type == TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
-//            firstEventBehavior = true;
-//        }
-
         // Assign the behavior state
-        BehaviorState behaviorState = null;
-        if (behavior.hasScript()) {
-            // TODO: Assign a behavior state selected from a behavior selection (search and browse) interface. Or assign the default state.
-             //behaviorState = new BehaviorState(behavior, behavior.getState().getState());
-            behaviorState = new BehaviorState(behavior.getState().getState());
-        }
+        Behavior behavior = new Behavior (behaviorScript);
+        getClay().getStore().storeBehavior(behavior);
 
         // Update the event with the new behavior and state
         Event event = eventHolder.getEvent();
         if (event != null) {
 
-            Log.v ("Content_Manager", "Changing behavior...");
-            Log.v ("Content_Manager", "\tbehavior: " + behavior);
-            Log.v("Content_Manager", "\tbehavior.state: " + behavior.getState());
             // <HACK>
-            Timeline timeline = getUnit().getTimeline();
-            event.setTimeline(timeline);
+            // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
+            getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+            getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
             // </HACK>
 
-            // TODO: getUnit().notifyRemove(event);
-
-            // Update the behavior on the timeline
-            behavior.setState(behaviorState);
-            event.setBehavior(behavior);
-
-            // Notify Clay of the change
-            //getClay().notifyChange (event);
-            getUnit().notifyChange(event);
-
-            // Tell the unit to create the behavior, addUnit it to the timeline, and update the state.
-//            getUnit().send("create behavior " + event.getUuid() + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
-//            getUnit().send("addUnit behavior " + event.getUuid());
-            /*
-            unit.send("create behavior " + behaviorUuid + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
-            unit.send("addUnit behavior " + behaviorUuid);
-            // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
-            */
-
-            // <HACK>
-//            event.getBehavior().setState(behaviorState);
-            // </HACK>
-        } else {
-
-            Log.v("Content_Manager", "changeEvent");
-            Log.v("Content_Manager", "\tbehavior: " + behavior);
-            Log.v("Content_Manager", "\tbehavior.uuid: " + behavior.getUuid());
-            Log.v("Content_Manager", "\tbehavior.state: " + behavior.getState());
-
-            // Create event object
-            Timeline timeline = this.getUnit().getTimeline();
-            event = new Event(timeline, behavior);
-            event.getBehavior().setState(behaviorState);
-
-            // Notify Clay of the change to the event
-//            getClay().notifyChange(event);
-            getUnit().notifyChange(event);
-
-            // Send the event to the device
-            // i.e., Tell the unit to create the behavior, addUnit it to the timeline, and update the state.
-
-            // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
-            /*
-            unit.send("create behavior " + behaviorUuid + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
-            unit.send("addUnit behavior " + behaviorUuid);
-            // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
-            */
-
-            // ...then addUnit it to the device...
-//            String behaviorUuid = behavior.getUuid().toString();
-            // <HACK>
-//            event.getBehavior().setState(behaviorState);
-            // </HACK>
+            // Update state of the object associated with the selected view.
+            eventHolders.remove(eventHolder);
         }
+
+        // Create event object
+        Timeline timeline = this.getUnit().getTimeline();
+        event = new Event(timeline, behavior);
+//        event.getBehavior().setState(behaviorState);
+
+        // Object: Add event to timeline
+        getUnit().getTimeline().getEvents().add(index, event); // if store event was successful
+
+        // Store: Store the event
+        getClay().getStore().storeEvent(event);
+
+        // Store: Update timeline indices
+        getClay().getStore().storeTimeline(getUnit().getTimeline());
+
+        // Notify Clay of the change to the event
+//        getClay().notifyChange(event);
+//        getUnit().notifyChange(event);
+
+        // Send the event to the device
+        // i.e., Tell the unit to create the behavior, addUnit it to the timeline, and update the state.
+
+        // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
+        /*
+        unit.send("create behavior " + behaviorUuid + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
+        unit.send("addUnit behavior " + behaviorUuid);
+        // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
+        */
 
         // Create and addUnit the new eventHolder to the timeline
         // TODO: DO NOT create a new event, just update the existing one!
-        EventHolder replacementEvent = new EventHolder(event);
+        EventHolder replacementEventHolder = new EventHolder(event);
 
         // Add the replacement item to the timeline view
-        eventHolders.add(index, replacementEvent);
+        eventHolders.add(index, replacementEventHolder);
 
         // Finally, addUnit the behavior to the unit
 //        unit.addBehavior(behaviorUuid);
-        getUnit().addBehavior(behavior);
+//        getUnit().addBehavior(behavior);
+//        getUnit().getTimeline().addEvent(event);
 
         // </HACK>
 
@@ -1360,60 +1290,7 @@ public class TimelineListView extends ListView {
         this.unit = unit;
     }
 
-//    /**
-//     * Changes the specified item's type to the specified type.
-//     * @param item
-//     * @param layoutType
-//     */
-//    private void changeEvent(final EventHolder item, int layoutType) {
-//
-//        // <HACK>
-//        // This removes the specified item from the list and replaces it with an item of a specific type.
-//        // TODO: Update the behavior object referenced by eventHolders, and update the view accordingly (i.e., item.behavior = <new behavior> then retrieve view for that behavior type).
-//        int index = eventHolders.indexOf(item);
-//        eventHolders.remove(index);
-//        refreshListViewFromData();
-//
-//        // Get the title for the new item
-//        String title = "";
-//        switch (layoutType) {
-//            case TimelineDeviceAdapter.LIGHT_CONTROL_LAYOUT:
-//                title = "lights";
-//                break;
-//            case TimelineDeviceAdapter.IO_CONTROL_LAYOUT:
-//                title = "io";
-//                break;
-//            case TimelineDeviceAdapter.WAIT_CONTROL_LAYOUT:
-//                title = "wait";
-//                break;
-//            case TimelineDeviceAdapter.MESSAGE_CONTROL_LAYOUT:
-//                title = "message";
-//                break;
-//            case TimelineDeviceAdapter.SAY_CONTROL_LAYOUT:
-//                title = "say";
-//                break;
-//            default:
-//                title = "";
-//                break;
-//        }
-//
-//        // Create and addUnit the new item to the timeline
-//        EventHolder replacementItem = new EventHolder(title, "", layoutType);
-//
-//        // Create or request behavior and cache it for likely use in the near future
-//        // TODO: Move this to Clay object model so it's architecture agnostic
-//        String behaviorUuid = replacementItem.behaviorUuid.toString();
-//        String defaultTransform = "lights F F F F F F F F F F F F";
-//        String messageString = "create behavior " + behaviorUuid + " \"" + defaultTransform + "\"";
-//        unit.send(messageString);
-//        unit.send ("addUnit behavior " + behaviorUuid);
-//
-//        eventHolders.addUnit(index, replacementItem);
-//
-//        // </HACK>
-//    }
-
-    private class ListDrag implements OnDragListener {
+    private class EventHolderTouchDragListener implements OnDragListener {
 
         @Override
         public boolean onDrag(View v, DragEvent event) {
@@ -1422,7 +1299,7 @@ public class TimelineListView extends ListView {
         }
     }
 
-    private class ListTouchListener implements OnTouchListener {
+    private class EventHolderTouchListener implements OnTouchListener {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -1432,42 +1309,34 @@ public class TimelineListView extends ListView {
         }
     }
 
-    private class ListLongSelection implements OnItemLongClickListener
+    private class EventHolderLongTouchListener implements OnItemLongClickListener
     {
 
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-            final EventHolder item = (EventHolder) eventHolders.get (position);
+            final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
 
             // Check if the list item was a constructor
-            if (item.type == TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT) {
-                if (item.title == "create") {
+            if (eventHolder.type == TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT) {
+                if (eventHolder.title == "create") {
                     // Nothing?
                 }
                 // TODO: (?)
 
-            } else if (item.type != TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT && item.type != TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (eventHolder.type != TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT && eventHolder.type != TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
-                if (item.type == TimelineDeviceAdapter.COMPLEX_LAYOUT) {
+                if (eventHolder.type == TimelineDeviceAdapter.COMPLEX_LAYOUT) {
 
-                    unpackSelectedEvents(item);
+                    decomposeEventHolder(eventHolder);
                     return true;
 
                 } else {
 
-                    displayEventOptions(item);
+                    displayEventDesigner (eventHolder);
                     return true;
 
                 }
-
-                /*
-                // Show options
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setMessage("You pressed item #" + (position + 1));
-                builder.setPositiveButton("OK", null);
-                builder.show();
-                */
 
                 // Request the ListView to be redrawn so the views in it will be displayed
                 // according to their updated state information.
@@ -1478,19 +1347,19 @@ public class TimelineListView extends ListView {
         }
     }
 
-    private class ListSelection implements OnItemClickListener
+    private class EventHolderTouchReleaseListener implements OnItemClickListener
     {
         @Override
         public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
         {
             Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
 
-            final EventHolder item = (EventHolder) eventHolders.get (position);
+            final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
 
             // Check if the list item was a constructor
-            if (item.type == TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT) {
+            if (eventHolder.type == TimelineDeviceAdapter.SYSTEM_CONTROL_LAYOUT) {
 
-                if (item.title == "create") {
+                if (eventHolder.title == "create") {
                     // Add a placeholder if one doesn't already exist
                     if (!hasPlaceholder ()) {
 
@@ -1508,20 +1377,21 @@ public class TimelineListView extends ListView {
 
                         // TODO: (?) Create a behavior?
                     }
-                } else if (item.title == "abstract") {
-
-                    packSelectedEvents();
-
                 }
+//                else if (eventHolder.title == "abstract") {
+//
+//                    composeEventHolderSelection();
+//
+//                }
 
-            } else if (item.type == TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (eventHolder.type == TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
 
-                selectBehaviorType (item);
+                displayBehaviorFinder(eventHolder);
 
             } else {
 
-                if (!hasSelectedItems()) {
-                    displayUpdateOptions(item);
+                if (!hasSelectedEventHolders()) {
+                    displayUpdateOptions(eventHolder);
                 }
 
             }
@@ -1535,8 +1405,8 @@ public class TimelineListView extends ListView {
      * @return
      */
     private boolean hasPlaceholder() {
-        for (EventHolder existingItem : eventHolders) {
-            if (existingItem.type == TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+        for (EventHolder eventHolder : eventHolders) {
+            if (eventHolder.type == TimelineDeviceAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
                 return true;
             }
         }
@@ -1547,7 +1417,7 @@ public class TimelineListView extends ListView {
      * Checks if there are any selected items on the timeline.
      * @return True if there are any selected items. Otherwise, returns false.
      */
-    public boolean hasSelectedItems() {
+    public boolean hasSelectedEventHolders() {
         for (EventHolder eventHolder : this.eventHolders) {
             if (eventHolder.selected) {
                 return true;
@@ -1566,7 +1436,7 @@ public class TimelineListView extends ListView {
         return selectedEventHolders;
     }
 
-    private int getFirstSelectedEventIndex () {
+    private int getFirstSelectedEventHolderIndex() {
         int index = 0;
         for (EventHolder eventHolder : this.eventHolders) {
             if (eventHolder.selected) {
@@ -1597,27 +1467,13 @@ public class TimelineListView extends ListView {
     /**
      * Creates a behavior composition from multiple selected behaviors.
      */
-    public void packSelectedEvents() {
-        Log.v ("Content_Manager", "packSelectedEvents");
-
-//        int index = 0;
+    public void composeEventHolderSelection () {
+        Log.v ("Content_Manager", "composeEventHolderSelection");
 
         // Get list of the selected items
         ArrayList<EventHolder> selectedEventHolders = getSelectedEventHolders();
         ArrayList<String> selectedEventTags = getSelectedEventTags();
-        int index = getFirstSelectedEventIndex();
-
-//        for (EventHolder eventHolder : this.eventHolders) {
-//            if (eventHolder.selected) {
-//                eventHolder.selected = false; // Deselect the event about to be abstracted
-//                selectedEventHolders.addUnit(eventHolder);
-//                String tag = eventHolder.getEvent().getBehavior().getTag();
-//                selectedEventTags.addUnit(tag);
-//            }
-//            if (selectedEventHolders.size() == 0) {
-//                index++;
-//            }
-//        }
+        int index = getFirstSelectedEventHolderIndex();
 
         // Return if there are fewer than two selected items
         if (selectedEventHolders.size() < 2) {
@@ -1625,37 +1481,43 @@ public class TimelineListView extends ListView {
         }
 
         // Get the first event in the sequence
-        EventHolder firstEvent = selectedEventHolders.get(0);
+        EventHolder firstEvent = selectedEventHolders.get (0);
 
         // Create new behavior. Add behaviors to it.
         String behaviorListString = TextUtils.join(", ", selectedEventTags);
         Behavior newBehavior = new Behavior(behaviorListString);
-        for (EventHolder event : selectedEventHolders) {
-            Behavior b = event.getEvent().getBehavior();
-            newBehavior.addBehavior(b);
-            Log.v("Content_Manager", "\tCHILDREN: " + b.getUuid());
-        }
-        getClay().addBehavior(newBehavior);
-
-        // Update timeline
         for (EventHolder eventHolder : selectedEventHolders) {
-            getUnit().getTimeline().removeEvent(eventHolder.getEvent());
+            Behavior b = eventHolder.getEvent().getBehavior();
+            newBehavior.addBehavior(b);
         }
+        // Store the new behavior
+        getClay().getStore().storeBehavior(newBehavior);
+        //getClay().addBehavior(newBehavior);
+
+        // Remove old behaviors from timeline in store
+        for (EventHolder eventHolder : selectedEventHolders) {
+            getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+        }
+
+        // Remove old behaviors from the timeline
+        for (EventHolder eventHolder : selectedEventHolders) {
+            getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
+        }
+
+        // Create event for the behavior and add it to the unit's timeline
         Event e = new Event(getUnit().getTimeline(), newBehavior);
         getUnit().getTimeline().addEvent(index, e);
-        getClay().notifyChange(e);
+        getClay().getStore().storeEvent(e);
+        //getClay().notifyChange(e);
 
-        // Remove the selected items from the list
+        // Store: Reindex the timeline events
+        getClay().getStore().storeTimeline(getUnit().getTimeline());
+
+        // View: Remove the selected items from the list
         for (EventHolder eventHolder : selectedEventHolders) {
             eventHolders.remove(eventHolder);
         }
         refreshListViewFromData(); // Update view after removing items from the list
-
-        // Create a new abstract event in the list that represents the selected event sequence at the position of the first event in the sequence
-//        getClay().createBehavior();
-//        asdf;
-
-
 
         // <HACK>
         // This removes the specified event from the list and replaces it with an event of a specific type.
@@ -1663,76 +1525,65 @@ public class TimelineListView extends ListView {
 //        int index = eventHolders.indexOf(event);
 //        eventHolders.remove(index);
         // Add the new event.
-        EventHolder packedEventHolder = new EventHolder(behaviorListString, "", TimelineDeviceAdapter.COMPLEX_LAYOUT);
-        packedEventHolder.eventHolders.addAll(selectedEventHolders); // Add the selected items to the list
-        packedEventHolder.summary = "" + selectedEventHolders.size() + " pack";
-        eventHolders.add(index, packedEventHolder);
+        EventHolder composedEventHolder = new EventHolder(behaviorListString, "", TimelineDeviceAdapter.COMPLEX_LAYOUT);
+//        packedEventHolder.eventHolders.addAll(selectedEventHolders); // Add the selected items to the list
+        composedEventHolder.summary = "" + selectedEventHolders.size() + " pack";
+        eventHolders.add(index, composedEventHolder);
         // </HACK>
 
-        displayUpdateTagOptions (packedEventHolder);
+        displayUpdateTagOptions (composedEventHolder);
 
     }
 
     /**
      * Unpacks the behaviors in a behavior package containing multiple behaviors.
      */
-    private void unpackSelectedEvents(EventHolder eventHolder) {
+    private void decomposeEventHolder (EventHolder eventHolder) {
 
-        Log.v ("Content_Manager", "unpackSelectedEvents");
+        Log.v ("Content_Manager", "decomposeEventHolder");
 
         // Return if the item is not a complex item.
         if (eventHolder.type != TimelineDeviceAdapter.COMPLEX_LAYOUT) {
             return;
         }
 
-        int index = 0;
-
-        // Get the list of behaviors in the behavior composition
-//        ArrayList<EventHolder> abstractedEventHolders = eventHolder.eventHolders;
-
         // Get the list of behaviors in the behavior composition
         ArrayList<Behavior> behaviors = eventHolder.getEvent().getBehavior().getBehaviors();
-
         Log.v ("Content_Manager", "\tbehaviors.size: " + behaviors.size());
 
         // Get position of the selected item
-        index = eventHolders.indexOf(eventHolder);
+        int index = eventHolders.indexOf(eventHolder);
+        Log.v("Content_Manager", "\tindex: " + index);
 
-        Log.v ("Content_Manager", "\tindex: " + index);
+        // Remove the event from the timeline
+        getUnit().getTimeline().removeEvent(eventHolder.getEvent());
+
+        // Remove the event from the database
+        getClay().getStore().removeEvent(eventHolder.getEvent(), null);
 
         // Remove the selected item from the list (it will be replaced by the abstracted behviors)
         eventHolders.remove(index);
         refreshListViewFromData(); // Update view after removing items from the list
 
-//        // Add the abstracted items back to the list
-//        for (EventHolder eventHolder2 : abstractedEventHolders) {
-//            eventHolders.addUnit(index, eventHolder2);
-//            index++; // Increment the index of the insertion position
-//        }
-
-
         // <HACK>
         // This removes the specified event from the list and replaces it with an event of a specific type.
         // TODO: Replace view, not eventHolders! (i.e., event.type = TimelineDeviceAdapter.LIGHT_CONTROL_LAYOUT;)
-//        int index = eventHolders.indexOf(event);
-//        eventHolders.remove(index);
         // Add the new event.
         for (Behavior behavior : behaviors) {
-            Event e = new Event(getUnit().getTimeline(), behavior);
-            EventHolder eh = new EventHolder(e);
-//            eventHolders.addUnit(eh);
-            eventHolders.add(index, eh);
+            // TODO: Restore the behavior's state...
+            if (behavior.getBehaviors().size() == 0) {
+                getClay().getStore().restoreBehaviorState(behavior);
+            }
+            Event decomposedEvent = new Event (getUnit ().getTimeline (), behavior);
+            getUnit().getTimeline().addEvent(index, decomposedEvent);
+            getClay ().getStore ().storeEvent (decomposedEvent);
+            EventHolder decomposedEventHolder = new EventHolder (decomposedEvent);
+            eventHolders.add (index, decomposedEventHolder);
             index++; // Increment the index of the insertion position
         }
 
-        refreshListViewFromData();
-//        EventHolder packedEventHolder = new EventHolder(behaviorListString, "", TimelineDeviceAdapter.COMPLEX_LAYOUT);
-//        packedEventHolder.eventHolders.addAll(selectedEventHolders); // Add the selected items to the list
-//        packedEventHolder.summary = "" + selectedEventHolders.size() + " pack";
-//        eventHolders.addUnit(index, packedEventHolder);
+        getClay().getStore().storeTimeline(getUnit().getTimeline());
         // </HACK>
-
-
 
         refreshListViewFromData(); // Update view after removing items from the list
 
@@ -1823,7 +1674,7 @@ public class TimelineListView extends ListView {
             // The item is the first one selected
             if (index < eventHolders.size()) {
                 EventHolder item = (EventHolder) eventHolders.get(index);
-                selectListItem(item);
+                selectEventHolder(item);
                 refreshListViewFromData();
             }
 
@@ -1835,12 +1686,12 @@ public class TimelineListView extends ListView {
                 // Select all items between the first and current selection
                 for (int i = firstSelectedIndex; i <= index; i++) {
                     EventHolder item = eventHolders.get(i);
-                    selectListItem(item);
+                    selectEventHolder(item);
                 }
                 // Deselect all items after the current selection
                 for (int i = index + 1; i < eventHolders.size(); i++) {
                     EventHolder item = eventHolders.get(i);
-                    deselectListItem(item);
+                    deselectEventHolder(item);
                 }
                 refreshListViewFromData();
 

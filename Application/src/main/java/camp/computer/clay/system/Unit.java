@@ -140,12 +140,12 @@ public class Unit {
 //        this.getTimeline().addEvent(event);
 //    }
 
-    public void addBehavior(Behavior behavior) {
-
-        // Create an event for the behavior so it can be added to the timeline
-        Event event = new Event(timeline, behavior);
-
-        // Add the event to the timeline
-        this.getTimeline().addEvent(event);
-    }
+//    public void addBehavior(Behavior behavior) {
+//
+//        // Create an event for the behavior so it can be added to the timeline
+//        Event event = new Event(timeline, behavior);
+//
+//        // Add the event to the timeline
+//        this.getTimeline().addEvent(event);
+//    }
 }

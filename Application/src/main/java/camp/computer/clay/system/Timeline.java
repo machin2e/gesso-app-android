@@ -75,7 +75,7 @@ public class Timeline {
         }
 
         if (event != null) {
-            getUnit().getClay().getStore().removeEvent(event, new ContentManagerInterface.CallbackInterface() {
+            getUnit().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
                 @Override
                 public void onSuccess(Object object) {
                     Log.v("Content_Manager", "Deleted event from database.");

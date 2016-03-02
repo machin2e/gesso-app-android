@@ -75,7 +75,7 @@ public class Behavior {
 
         this.behaviorScript = behaviorScript;
 
-        this.behaviorState = new BehaviorState(this, behaviorScript.getDefaultState());
+        this.behaviorState = new BehaviorState(behaviorScript.getDefaultState());
 
         this.behaviors = null;
     }
@@ -141,10 +141,14 @@ public class Behavior {
         return this.behaviorScript;
     }
 
-    public void setScript (BehaviorScript behaviorScript, BehaviorState behaviorState) {
+    public void setScript (BehaviorScript behaviorScript) {
         this.behaviorScript = behaviorScript;
-        this.behaviorState = behaviorState;
     }
+
+//    public void setScript (BehaviorScript behaviorScript, BehaviorState behaviorState) {
+//        this.behaviorScript = behaviorScript;
+//        this.behaviorState = behaviorState;
+//    }
 
     public BehaviorState getState () {
         return this.behaviorState;
