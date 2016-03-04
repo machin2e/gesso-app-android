@@ -200,13 +200,13 @@ public class EventHolder {
      * it to the Behavior for this Event.
      * @param stateString The new state to assign to this event's behavior.
      */
-    public void updateState(String stateString) {
+    public void updateState (String stateString) {
         Log.v("CM_Log2", "updateState");
         Log.v("CM_Log2", "\tstateString: " + stateString);
         Log.v("CM_Log2", "\tevent: " + getEvent());
         Log.v("CM_Log2", "\tbehavior: " + getEvent().getBehavior());
         BehaviorState behaviorState = new BehaviorState(stateString);
         Log.v("CM_Log2", "\tbehaviorState: " + behaviorState);
-        getEvent().getBehavior().setState(behaviorState);
+        getEvent().getBehavior().setState (behaviorState);
     }
 }

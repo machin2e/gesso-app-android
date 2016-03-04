@@ -31,6 +31,7 @@ public interface ContentManagerInterface {
     void restoreBehaviorScripts ();
     void storeBehaviorScript (BehaviorScript behaviorScript);
 
+    void storeBehaviorState (Behavior behavior, BehaviorState behaviorState);
     // TODO: Remove these! Handle them in restoreEvent and restoreBehavior
 //    boolean hasBehaviorState (BehaviorState behaviorState);
 //    void storeBehaviorState (BehaviorState behaviorState); // This is handled in both storeEvent and storeBehavior

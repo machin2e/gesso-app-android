@@ -641,10 +641,11 @@ public class SQLiteContentManager implements ContentManagerInterface {
                     BehaviorStateEntry.COLUMN_NAME_STATE,
                     BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID,
                     BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID,
+                    BehaviorStateEntry.COLUMN_NAME_TIME_CREATED
             };
 
             // How you want the results sorted in the resulting Cursor
-            String sortOrder = null;
+            String sortOrder = BehaviorStateEntry.COLUMN_NAME_TIME_CREATED + " DESC";
 
             String selection = BehaviorStateEntry.COLUMN_NAME_UUID + " LIKE ?";
             String[] selectionArgs = { behaviorStateUuid.toString() };
@@ -669,19 +670,21 @@ public class SQLiteContentManager implements ContentManagerInterface {
             String behaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_UUID));
             String behaviorScriptUuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorStateEntry.COLUMN_NAME_BEHAVIOR_SCRIPT_UUID));
 
-            Log.v ("Content_Manager", "> behaviorUuidString: " + behaviorUuidString);
-
             // Get the behavior and behavior script from the cache. Here, these are assumed to
             // be available in the cache, since it is assumed they are loaded and cached when
             // Clay is first opened.
             BehaviorScript behaviorScript = getClay ().getCache ().getBehaviorScript(UUID.fromString(behaviorScriptUuidString));
             Behavior behavior = getClay().getCache().getBehavior(UUID.fromString(behaviorUuidString));
-            Log.v ("Content_Manager", "> behavior: " + behavior.getUuid());
             behavior.setScript(behaviorScript);
 
             // Reconstruct behavior state object
+            Log.v ("Query_Behavior_State", "state: " + state);
+            Log.v("Query_Behavior_State", "uuid: " + UUID.fromString(uuidString));
             BehaviorState behaviorState = new BehaviorState (UUID.fromString (uuidString), state);
             behavior.setState(behaviorState); // event.getBehavior ().setState (behaviorState);
+            Log.v("Query_Behavior_State", "behavior.state: " + behavior.getState().getState());
+            Log.v("Query_Behavior_State", "behavior.state.uuid: " + behavior.getState().getUuid());
+            Log.v("Query_Behavior_State", "---");
 
             // Add the behavior object to the event object
             if (event != null) {
@@ -1289,11 +1292,12 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             if (!db.queryBehaviorExists(behavior.getUuid())) {
                 Log.v ("Content_Manager", "Saving basic behavior.");
-                db.insertBehavior(behavior, null);
+                db.insertBehavior (behavior, null);
             } else {
+                // This is called when a basic behavior's state is updated.
                 Log.v ("Content_Manager", "Updating basic behavior.");
                 Log.v("Content_Manager", "NULL!!!!!!!!!!!!!!!!! SHOULD NEVER GET HERE!!!!!!!!!!");
-                //db.updateBehavior(behavior, null);
+//                db.updateBehavior (behavior, null);
             }
         } else {
             Log.v("Content_Manager", "Saving non-basic behavior.");
@@ -1418,6 +1422,12 @@ public class SQLiteContentManager implements ContentManagerInterface {
     public void restoreBehaviors () {
         Log.v ("Content_Manager", "restoreBehaviors");
         db.queryBehaviors();
+    }
+
+    @Override
+    public void storeBehaviorState (Behavior behavior, BehaviorState behaviorState) {
+        Log.v ("Content_Manager", "storeBehaviorState");
+        db.insertBehaviorState (behavior, behaviorState);
     }
 
     @Override

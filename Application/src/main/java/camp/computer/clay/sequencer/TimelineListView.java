@@ -316,6 +316,10 @@ public class TimelineListView extends ListView {
                 // </HACK>
                 eventHolder.updateState (updatedStateString);
 
+                // Store: Store the new behavior state and update the event.
+                getClay().getStore().storeBehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
+                getClay().getStore().storeEvent(eventHolder.getEvent());
+
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
                 refreshListViewFromData();
@@ -792,6 +796,10 @@ public class TimelineListView extends ListView {
                 // </HACK>
                 eventHolder.updateState (updatedStateString);
 
+                // Store: Store the new behavior state and update the event.
+                getClay().getStore().storeBehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
+                getClay().getStore().storeEvent(eventHolder.getEvent());
+
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
                 refreshListViewFromData();
@@ -826,9 +834,9 @@ public class TimelineListView extends ListView {
 
     /**
      * Update's the tag (or label) of a timeline view.
-     * @param item
+     * @param eventHolder
      */
-    public void displayUpdateTagOptions(final EventHolder item) {
+    public void displayUpdateTagOptions(final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Tag the view.");
 
@@ -839,7 +847,7 @@ public class TimelineListView extends ListView {
         builder.setView(input);
 
         // Recover values
-        input.setText(item.title);
+        input.setText(eventHolder.title);
         input.setSelection(input.getText().length());
 
         // Set up the buttons
@@ -848,7 +856,7 @@ public class TimelineListView extends ListView {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Update the state of the behavior
-                item.title = input.getText().toString();
+                eventHolder.title = input.getText().toString();
 
                 // TODO: Update the corresponding behavior state... this should propagate back through the object model... and cloud...
 //                item.restoreBehavior().setTag(input.getText().toString())
@@ -863,10 +871,14 @@ public class TimelineListView extends ListView {
                 Behavior behavior = new Behavior(tagString);
 
                 // Extract behaviors from the selected event holders and addUnit them to the behavior package.
-                for (EventHolder selectedEventHolder : item.eventHolders) {
+                for (EventHolder selectedEventHolder : eventHolder.eventHolders) {
                     Behavior selectedBehavior = selectedEventHolder.getEvent().getBehavior();
                     behavior.addBehavior(selectedBehavior);
                 }
+
+                // Store: Store the new behavior state and update the event.
+                getClay().getStore().storeBehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
+                getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
                 refreshListViewFromData();
@@ -911,7 +923,11 @@ public class TimelineListView extends ListView {
                 // <HACK>
                 eventHolder.getEvent().setTimeline(unit.getTimeline());
                 // </HACK>
-                eventHolder.updateState (updatedStateString);
+                eventHolder.updateState(updatedStateString);
+
+                // Store: Store the new behavior state and update the event.
+                getClay().getStore().storeBehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
+                getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
@@ -977,6 +993,10 @@ public class TimelineListView extends ListView {
                 eventHolder.getEvent().setTimeline(unit.getTimeline());
                 // </HACK>
                 eventHolder.updateState (updatedStateString);
+
+                // Store: Store the new behavior state and update the event.
+                getClay().getStore().storeBehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
+                getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
@@ -1069,6 +1089,10 @@ public class TimelineListView extends ListView {
                 eventHolder.getEvent().setTimeline(unit.getTimeline());
                 // </HACK>
                 eventHolder.updateState(updatedStateString);
+
+                // Store: Store the new behavior state and update the event.
+                getClay().getStore().storeBehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
+                getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
