@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="23.1.0"><source path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/res"/></dataSet><dataSet config="unspecified"><source path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/Sequencer 2/library/unspecified/res"><file path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/Sequencer 2/library/unspecified/res/values/values.xml" qualifiers=""><declare-styleable name="DragSortListView"><attr format="dimension" name="collapsed_height"/><attr format="float" name="drag_scroll_start"/><attr format="float" name="max_drag_scroll_speed"/><attr format="color" name="float_background_color"/><attr name="remove_mode"><enum name="clickRemove" value="0"/><enum name="flingRemove" value="1"/></attr><attr format="boolean" name="track_drag_sort"/><attr format="float" name="float_alpha"/><attr format="float" name="slide_shuffle_speed"/><attr format="integer" name="remove_animation_duration"/><attr format="integer" name="drop_animation_duration"/><attr format="boolean" name="drag_enabled"/><attr format="boolean" name="sort_enabled"/><attr format="boolean" name="remove_enabled"/><attr name="drag_start_mode"><enum name="onDown" value="0"/><enum name="onMove" value="1"/><enum name="onLongPress" value="2"/></attr><attr format="integer" name="drag_handle_id"/><attr format="integer" name="fling_handle_id"/><attr format="integer" name="click_remove_id"/><attr format="boolean" name="use_default_controller"/></declare-styleable></file></source></dataSet><dataSet config="main"><source path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res"><file name="bg_handle" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/bg_handle.xml" qualifiers="" type="drawable"/><file name="bg_handle_section1" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/bg_handle_section1.xml" qualifiers="" type="drawable"/><file name="bg_handle_section1_selector" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/bg_handle_section1_selector.xml" qualifiers="" type="drawable"/><file name="bg_handle_section2" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/bg_handle_section2.xml" qualifiers="" type="drawable"/><file name="bg_handle_section2_selector" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/bg_handle_section2_selector.xml" qualifiers="" type="drawable"/><file name="drag" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/drag.png" qualifiers="" type="drawable"/><file name="section_div" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable/section_div.xml" qualifiers="" type="drawable"/><file name="delete_x" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-hdpi/delete_x.png" qualifiers="hdpi" type="drawable"/><file name="drag" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-hdpi/drag.png" qualifiers="hdpi" type="drawable"/><file name="dslv_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-hdpi/dslv_launcher.png" qualifiers="hdpi" type="drawable"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-hdpi/ic_launcher.png" qualifiers="hdpi" type="drawable"/><file name="tile" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-hdpi/tile.9.png" qualifiers="hdpi" type="drawable"/><file name="dslv_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-ldpi/dslv_launcher.png" qualifiers="ldpi" type="drawable"/><file name="drag" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-mdpi/drag.png" qualifiers="mdpi" type="drawable"/><file name="dslv_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-mdpi/dslv_launcher.png" qualifiers="mdpi" type="drawable"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-mdpi/ic_launcher.png" qualifiers="mdpi" type="drawable"/><file name="dslv_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-xhdpi/dslv_launcher.png" qualifiers="xhdpi" type="drawable"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-xhdpi/ic_launcher.png" qualifiers="xhdpi" type="drawable"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/drawable-xxhdpi/ic_launcher.png" qualifiers="xxhdpi" type="drawable"/><file name="activity_main" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/activity_main.xml" qualifiers="" type="layout"/><file name="checkable_main" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/checkable_main.xml" qualifiers="" type="layout"/><file name="fragment_listview" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/fragment_listview.xml" qualifiers="" type="layout"/><file name="hetero_main" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/hetero_main.xml" qualifiers="" type="layout"/><file name="list_item_bg_handle" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_bg_handle.xml" qualifiers="" type="layout"/><file name="list_item_checkable" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_checkable.xml" qualifiers="" type="layout"/><file name="list_item_click_remove" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_click_remove.xml" qualifiers="" type="layout"/><file name="list_item_handle_left" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_handle_left.xml" qualifiers="" type="layout"/><file name="list_item_handle_right" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_handle_right.xml" qualifiers="" type="layout"/><file name="list_item_handle_right_original" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_handle_right_original.xml" qualifiers="" type="layout"/><file name="list_item_no_handle" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_no_handle.xml" qualifiers="" type="layout"/><file name="list_item_radio" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_radio.xml" qualifiers="" type="layout"/><file name="list_item_type_complex" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_complex.xml" qualifiers="" type="layout"/><file name="list_item_type_io" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_io.xml" qualifiers="" type="layout"/><file name="list_item_type_light" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_light.xml" qualifiers="" type="layout"/><file name="list_item_type_message" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_message.xml" qualifiers="" type="layout"/><file name="list_item_type_placeholder" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_placeholder.xml" qualifiers="" type="layout"/><file name="list_item_type_say" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_say.xml" qualifiers="" type="layout"/><file name="list_item_type_system" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_system.xml" qualifiers="" type="layout"/><file name="list_item_type_wait" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/layout/list_item_type_wait.xml" qualifiers="" type="layout"/><file name="mode_menu" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/menu/mode_menu.xml" qualifiers="" type="menu"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-hdpi/ic_launcher.png" qualifiers="hdpi" type="mipmap"/><file name="ic_launcher_001" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-hdpi/ic_launcher_001.png" qualifiers="hdpi" type="mipmap"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-mdpi/ic_launcher.png" qualifiers="mdpi" type="mipmap"/><file name="ic_launcher_001" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-mdpi/ic_launcher_001.png" qualifiers="mdpi" type="mipmap"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-xhdpi/ic_launcher.png" qualifiers="xhdpi" type="mipmap"/><file name="ic_launcher_001" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-xhdpi/ic_launcher_001.png" qualifiers="xhdpi" type="mipmap"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-xxhdpi/ic_launcher.png" qualifiers="xxhdpi" type="mipmap"/><file name="ic_launcher_001" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-xxhdpi/ic_launcher_001.png" qualifiers="xxhdpi" type="mipmap"/><file name="ic_launcher" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-xxxhdpi/ic_launcher.png" qualifiers="xxxhdpi" type="mipmap"/><file name="ic_launcher_001" path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/mipmap-xxxhdpi/ic_launcher_001.png" qualifiers="xxxhdpi" type="mipmap"/><file path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/values/colors.xml" qualifiers=""><color name="grayStart">#adadad</color><color name="grayEnd">#ffffff</color><color name="blue">#33b5e5</color><color name="red">#ff4444</color><color name="darkblue">#0099cc</color><color name="black">#000000</color><color name="bg_handle_pressed">#a0a0a0</color></file><file path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/values/dimens.xml" qualifiers=""><dimen name="activity_vertical_margin">16dp</dimen><dimen name="light_preview_column_width">20dp</dimen><dimen name="item_height">40dp</dimen><dimen name="activity_horizontal_margin">16dp</dimen><integer name="event_timeline_segment_length">179</integer><dimen name="event_tag_text_size">15dp</dimen><dimen name="section_div_height">20dp</dimen></file><file path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/values/ids.xml" qualifiers=""><item name="click_remove" type="id"/><item name="drag_handle" type="id"/></file><file path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/res/values/strings.xml" qualifiers=""><string name="select_drag_init_mode">Start-drag modes</string><string-array name="remove_mode_labels">
+      <item>Click remove</item>
+      <item>Fling remove</item>
+    </string-array><string-array name="jazz_artist_names">
+      <item>Brad Mehldau</item>
+      <item>Joshua Redman</item>
+      <item>Chick Corea</item>
+      <item>Kurt Rosenwinkel</item>
+      <item>Miles Davis</item>
+      <item>Wayne Shorter</item>
+      <item>Michael Brecker</item>
+      <item>Herbie Hancock</item>
+      <item>Joe Zawinul</item>
+      <item>Brian Blade</item>
+      <item>Jeff Ballard</item>
+      <item>Larry Grenadier</item>
+      <item>Keith Jarrett</item>
+      <item>McCoy Tyner</item>
+      <item>Stephon Harris</item>
+      <item>Mark Turner</item>
+    </string-array><string name="app_name">Clay</string><string name="add_header">Add header</string><string-array name="enables_labels">
+      <item>Enable drag</item>
+      <item>Enable sort</item>
+      <item>Enable remove</item>
+    </string-array><string-array name="activity_titles">
+        <item>Basic usage playground</item>
+        <item>Heteroheight</item>
+        <item>Warp</item>
+        <item>Background handle</item>
+        <item>Sections</item>
+        <item>CursorAdapter</item>
+        <item>Multiple-choice mode</item>
+        <item>Single-choice mode</item>
+    </string-array><string name="cancel">Cancel</string><string name="ok">OK</string><string-array name="jazz_artist_albums">
+      <item>Largo, Art of the Trio 1-4, Highway Rider, Songs</item>
+      <item>Elastic, Momentum, Mood Swing, Back East</item>
+      <item>Light as a Feather, Akoustic Band, My Spanish Heart</item>
+      <item>Deep Song, Heartcore, Our Secret World, Reflections, The Remedy: Live at the Village Vanguard, The Enemies of Energy, The Next Step</item>
+    </string-array><string name="select_remove_mode">Remove modes</string><string name="select_enables">Enable/Disable</string><string-array name="drag_init_mode_labels">
+      <item>On down</item>
+      <item>On drag</item>
+      <item>On long press</item>
+    </string-array><string-array name="activity_descs">
+        <item>
+            Use the menu to adjust settings related to item
+            removal and drag initiation. These options are
+            provided by the DragSortController class.
+        </item>
+        <item>
+            Demonstrates (tests) drag-sorting when list items
+            have varying heights.
+        </item>
+        <item>
+            Demonstrates drag-scroll customization; long lists
+            need fast scrolling.
+        </item>
+        <item>
+            Simple DragSortController customization. In this example,
+            the drag handle is a background drawable; therefore, the
+            drag handle hit detection mechanism needs modification. 
+            Also, the floating View is given some flavor.
+        </item>
+        <item>
+            Demonstrates floating View control from a custom
+            FloatViewManager. Restrict item drags to list sections.
+        </item>
+        <item>
+            Demonstrates usage of the DragSortCursorAdapter class,
+            which abstracts drag-sorts with a remapping of Cursor
+            positions to ListView positions.
+        </item>
+        <item>
+            Uses Checkable list items in multiple-choice mode.
+        </item>
+        <item>
+            Uses Checkable list items to allow for selectable radio
+            buttons in single-choice mode.
+        </item>
+    </string-array><string name="add_footer">Add footer</string><string-array name="countries">
+      <item>Afghanistan</item>
+      <item>Albania</item>
+      <item>Algeria</item>
+      <item>American Samoa</item>
+      <item>Andorra</item>
+      <item>Angola</item>
+      <item>Anguilla</item>
+      <item>Antigua and Barbuda</item>
+      <item>Argentina</item>
+      <item>Armenia</item>
+      <item>Australia</item>
+      <item>Austria</item>
+      <item>Azerbajan</item>
+      <item>Bahamas</item>
+      <item>Bahrain</item>
+      <item>Bangladesh</item>
+      <item>Barbados</item>
+      <item>Belarus</item>
+      <item>Belgium</item>
+      <item>Belize</item>
+      <item>Benin</item>
+      <item>Bermuda</item>
+      <item>Bhutan</item>
+      <item>Bolivia</item>
+      <item>Bosnia and Herzegovina</item>
+      <item>Botswana</item>
+      <item>Brazil</item>
+      <item>Brunei Darussalam</item>
+      <item>Bulgaria</item>
+      <item>Burkina Faso</item>
+      <item>Burundi</item>
+      <item>Cambodia</item>
+      <item>Cameroon</item>
+      <item>Canada</item>
+      <item>Chile</item>
+      <item>China</item>
+      <item>Colombia</item>
+      <item>Costa Rica</item>
+      <item>Cuba</item>
+      <item>Cyprus</item>
+      <item>Czech Republic</item>
+      <item>Democratic Republic Congo</item>
+      <item>Denmark</item>
+      <item>Djibouti</item>
+      <item>Dominican Republic</item>
+      <item>East Timor</item>
+      <item>Ecuador</item>
+      <item>Egypt</item>
+      <item>El Salvador</item>
+      <item>England</item>
+      <item>Eritrea</item>
+      <item>Estonia</item>
+      <item>Ethiopia</item>
+      <item>Faroe Islands</item>
+      <item>Fiji</item>
+      <item>Finland</item>
+      <item>France</item>
+      <item>French Polynesia</item>
+      <item>Gambia</item>
+      <item>Georgia (Sakartvelo)</item>
+      <item>Germany</item>
+      <item>Gabon</item>
+      <item>Ghana</item>
+      <item>Greece</item>
+      <item>Greenland - Kalaallit Nunaat</item>
+      <item>Grenada</item>
+      <item>Gouadeloupe</item>
+      <item>Guam</item>
+      <item>Guatemala</item>
+      <item>Guernsey</item>
+      <item>Guyana</item>
+      <item>Guyane</item>
+      <item>Haiti</item>
+      <item>Honduras</item>
+      <item>Hong Kong</item>
+      <item>Hrvatska (Croatia)</item>
+      <item>Hungary</item>
+      <item>Iceland</item>
+      <item>India</item>
+      <item>Indonesia</item>
+      <item>Iran</item>
+      <item>Iraq</item>
+      <item>Ireland</item>
+      <item>Israel</item>
+      <item>Italy</item>
+      <item>Jamaica</item>
+      <item>Japan</item>
+      <item>Jordan</item>
+      <item>Kazakhstan</item>
+      <item>Kenya</item>
+      <item>Korea Republic</item>
+      <item>Kosovo</item>
+      <item>Kurdistan</item>
+      <item>Kuwait</item>
+      <item>Kyrgyzstan</item>
+      <item>Laos</item>
+      <item>Latvia</item>
+      <item>Lebanon</item>
+      <item>Lesotho</item>
+      <item>Liberia</item>
+      <item>Libyan Arab Jamahiriya</item>
+      <item>Liechtenstein</item>
+      <item>Lithuania</item>
+      <item>Luxembourg</item>
+      <item>Macau</item>
+      <item>Macedonia</item>
+      <item>Malawi</item>
+      <item>Malaysia</item>
+      <item>Mali</item>
+      <item>Malta</item>
+      <item>Marshall Islands</item>
+      <item>Mauritania</item>
+      <item>Martinique</item>
+      <item>Mauritius</item>
+      <item>Mexico</item>
+      <item>Micronesia</item>
+      <item>Moldova</item>
+      <item>Monaco</item>
+      <item>Mongolia</item>
+      <item>Morocco</item>
+      <item>Mozambique</item>
+      <item>Namibia</item>
+      <item>Nepal</item>
+      <item>Netherlands</item>
+      <item>Netherlands Antilles</item>
+      <item>New Caledonia</item>
+      <item>New Zealand (Aotearoa)</item>
+      <item>Nicaragua</item>
+      <item>Nigeria</item>
+      <item>Niue</item>
+      <item>Norfolk Island</item>
+      <item>Northern Ireland</item>
+      <item>Northern Mariana Islands</item>
+      <item>Norway</item>
+      <item>Oman</item>
+      <item>Pakistan</item>
+      <item>Palau</item>
+      <item>Palestina</item>
+      <item>Panama</item>
+      <item>Papua New Guinea</item>
+      <item>Paraguay</item>
+      <item>Peru</item>
+      <item>Philippines</item>
+      <item>Portugal</item>
+      <item>Puerto Rico</item>
+      <item>Qatar</item>
+      <item>Reunion</item>
+      <item>Romania</item>
+      <item>Russian Federation (AsianPart)</item>
+      <item>Russian Federation (European Part)</item>
+      <item>Rwanda</item>
+      <item>Saint Kitts and Nevis</item>
+      <item>Saint Vincent and the Grenadines</item>
+      <item>Samoa (American Samoa)</item>
+      <item>Samoa (Western Samoa)</item>
+      <item>San Marino</item>
+      <item>Saudi Arabia</item>
+      <item>Scotland</item>
+      <item>Senegal</item>
+      <item>Seychelles</item>
+      <item>Sierra Leone</item>
+      <item>Singapore</item>
+      <item>Slovakia</item>
+      <item>Slovenia</item>
+      <item>Solomon Islands</item>
+      <item>Somalia</item>
+      <item>Somaliland</item>
+      <item>South Africa</item>
+      <item>Spain</item>
+      <item>Sri Lanka</item>
+      <item>Sudan</item>
+      <item>Suriname</item>
+      <item>Svalbard and Jan Mayen</item>
+      <item>Swaziland</item>
+      <item>Sweden</item>
+      <item>Switzerland</item>
+      <item>Syrian Arab Republic</item>
+      <item>Taiwan</item>
+      <item>Tanzania</item>
+      <item>Thailand</item>
+      <item>Tibet</item>
+      <item>Togo</item>
+      <item>Tonga</item>
+      <item>Trinidad and Tobago</item>
+      <item>Tunisia</item>
+      <item>Turkey</item>
+      <item>Turkmenistan</item>
+      <item>Turks and Caicos Islands</item>
+      <item>Uganda</item>
+      <item>Ukraine</item>
+      <item>United Arab Emirates</item>
+      <item>United Kingdom</item>
+      <item>Uruguay</item>
+      <item>USA</item>
+      <item>Uzbekistan</item>
+      <item>Vatican City State - Holy See</item>
+      <item>Venezuela</item>
+      <item>Viet Nam</item>
+      <item>Virgin Islands (British)</item>
+      <item>Virgin Islands (U.S.)</item>
+      <item>Wales</item>
+      <item>Yemen</item>
+      <item>Yugoslavia</item>
+      <item>Zambia</item>
+      <item>Zimbabwe</item>
+    </string-array></file></source><source path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/generated/res/rs/debug"/><source path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/generated/res/resValues/debug"/></dataSet><dataSet config="debug"><source path="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/debug/res"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="DragSortListView"><attr format="dimension" name="collapsed_height"/><attr format="float" name="drag_scroll_start"/><attr format="float" name="max_drag_scroll_speed"/><attr format="color" name="float_background_color"/><attr name="remove_mode"><enum name="clickRemove" value="0"/><enum name="flingRemove" value="1"/></attr><attr format="boolean" name="track_drag_sort"/><attr format="float" name="float_alpha"/><attr format="float" name="slide_shuffle_speed"/><attr format="integer" name="remove_animation_duration"/><attr format="integer" name="drop_animation_duration"/><attr format="boolean" name="drag_enabled"/><attr format="boolean" name="sort_enabled"/><attr format="boolean" name="remove_enabled"/><attr name="drag_start_mode"><enum name="onDown" value="0"/><enum name="onMove" value="1"/><enum name="onLongPress" value="2"/></attr><attr format="integer" name="drag_handle_id"/><attr format="integer" name="fling_handle_id"/><attr format="integer" name="click_remove_id"/><attr format="boolean" name="use_default_controller"/></declare-styleable></configuration></mergedItems></merger>
