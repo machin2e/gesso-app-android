@@ -20,7 +20,7 @@ public class Behavior {
     /**
      * The state to apply to the behavior script (if any).
      */
-    private BehaviorState behaviorState;
+//    private BehaviorState behaviorState;
 
     /**
      * The list of behaviors that constitute this behavior, if any. This list is empty for basic
@@ -40,25 +40,25 @@ public class Behavior {
 
         this.behaviorScript = behaviorScript;
 
-        this.behaviorState = behaviorState;
+//        this.behaviorState = behaviorState;
 
         this.behaviors = null;
     }
 
-    public Behavior(BehaviorScript behaviorScript, BehaviorState behaviorState) {
-
-        this.uuid = UUID.randomUUID();
-
-        this.tag = behaviorScript.getTag();
-
-        this.description = "";
-
-        this.behaviorScript = behaviorScript;
-
-        this.behaviorState = behaviorState;
-
-        this.behaviors = null;
-    }
+//    public Behavior(BehaviorScript behaviorScript, BehaviorState behaviorState) {
+//
+//        this.uuid = UUID.randomUUID();
+//
+//        this.tag = behaviorScript.getTag();
+//
+//        this.description = "";
+//
+//        this.behaviorScript = behaviorScript;
+//
+////        this.behaviorState = behaviorState;
+//
+//        this.behaviors = null;
+//    }
 
     /**
      * Constructor for a basic behavior initialized with the default tag and state of the
@@ -75,7 +75,7 @@ public class Behavior {
 
         this.behaviorScript = behaviorScript;
 
-        this.behaviorState = new BehaviorState(behaviorScript.getDefaultState());
+//        this.behaviorState = new BehaviorState(behaviorScript.getDefaultState());
 
         this.behaviors = null;
     }
@@ -104,7 +104,7 @@ public class Behavior {
 
         this.behaviorScript = null;
 
-        this.behaviorState = null;
+//        this.behaviorState = null;
 
         this.behaviors = new ArrayList<Behavior>();
     }
@@ -115,6 +115,10 @@ public class Behavior {
      */
     public Behavior (String tag) {
         this(UUID.randomUUID(), tag);
+    }
+
+    public void setUuid (UUID uuid) {
+        this.uuid = uuid;
     }
 
     public UUID getUuid () {
@@ -150,13 +154,13 @@ public class Behavior {
 //        this.behaviorState = behaviorState;
 //    }
 
-    public BehaviorState getState () {
-        return this.behaviorState;
-    }
-
-    public void setState (BehaviorState behaviorState) {
-        this.behaviorState = behaviorState;
-    }
+//    public BehaviorState getState () {
+//        return this.behaviorState;
+//    }
+//
+//    public void setState (BehaviorState behaviorState) {
+//        this.behaviorState = behaviorState;
+//    }
 
     public ArrayList<Behavior> getBehaviors() {
         return this.behaviors;
@@ -169,7 +173,7 @@ public class Behavior {
 
         // Remove the script and state since this behavior is no longer a basic behavior.
         this.behaviorScript = null;
-        this.behaviorState = null;
+//        this.behaviorState = null;
     }
 
     public void addBehaviors (ArrayList<Behavior> behaviors) {
@@ -179,7 +183,7 @@ public class Behavior {
 
         // Remove the script and state since this behavior is no longer a basic behavior.
         this.behaviorScript = null;
-        this.behaviorState = null;
+//        this.behaviorState = null;
     }
 
     /**
@@ -189,5 +193,32 @@ public class Behavior {
      */
     public boolean hasScript() {
         return (this.behaviorScript != null);
+    }
+
+    public int getLeafCount () {
+
+        int count = 0;
+
+        if (hasScript()) {
+            count = 1;
+        }
+
+        return count + getLeafCount(this);
+    }
+
+    private int getLeafCount (Behavior behavior) {
+
+        int count = 0;
+
+        for (Behavior childBehavior : behavior.getBehaviors()) {
+
+            if (childBehavior.hasScript()) {
+                count++;
+            } else {
+                count += getLeafCount(childBehavior);
+            }
+        }
+
+        return count;
     }
 }

@@ -9,9 +9,6 @@ import android.view.ViewGroup;
 
 import com.mobeta.android.sequencer.R;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import camp.computer.clay.system.Unit;
 
 public class DeviceViewFragment extends Fragment {
@@ -19,16 +16,13 @@ public class DeviceViewFragment extends Fragment {
     // The Clay unit associated with this fragment.
     private Unit unit;
 
+    // The timeline view used to draw the timeline.
     TimelineListView listView;
 
     // Configure the interface settings
-    boolean disableScrollbarFading = true;
-    boolean disableScrollbars = true;
-    boolean disableOverscrollEffect = true;
-
-//    private EventHolderAdapter adapter;
-
-//    private ArrayList<EventHolder> eventHolders;
+    private boolean DISABLE_SCROLLBAR_FADING = true;
+    private boolean DISABLE_SCROLLBARS = true;
+    private boolean DISABLE_OVERSCROLL_EFFECT = true;
 
     public static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -83,18 +77,18 @@ public class DeviceViewFragment extends Fragment {
         listView.setUnit (unit);
         // </HACK>
 
-        if (disableScrollbarFading) {
+        if (DISABLE_SCROLLBAR_FADING) {
             listView.setScrollbarFadingEnabled(false);
         }
 
         // Disable the scrollbars.
-        if (disableScrollbars) {
+        if (DISABLE_SCROLLBARS) {
             listView.setVerticalScrollBarEnabled(false);
             listView.setHorizontalScrollBarEnabled(false);
         }
 
         // Disable overscroll effect.
-        if (disableOverscrollEffect) {
+        if (DISABLE_OVERSCROLL_EFFECT) {
             listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
 

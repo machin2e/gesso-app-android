@@ -55,9 +55,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = false;
     private static final boolean FULLSCREEN = true;
 
-    //private ArrayAdapter<String> adapter;
-//    private EventHolderAdapter adapter;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,8 +63,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         ApplicationView.context = getApplicationContext();
 
         ApplicationView.applicationView = this;
-
-        Clay.setContext(getApplicationContext());
 
         clay = new Clay();
 
@@ -120,19 +115,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 }
             }
         });
-
-//        addUnitView();
-//        addUnitView();
-//        addUnitView();
-
         // END_INCLUDE (page_change_listener)
-
-        // BEGIN_INCLUDE (add_tabs)
-        // For each of the sections in the app, addUnit a tab to the action bar.
-//        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-//            addUnitView(null);
-//        }
-        // END_INCLUDE (add_tabs)
 
         // Add the view provided by the host device.
         clay.addView(this);
@@ -153,38 +136,16 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // <HACK>
         SQLiteContentManager sqliteContentManager = new SQLiteContentManager(getClay(), "sqlite");
         getClay().addContentManager(sqliteContentManager);
+        // </HACK>
 
 //        getClay().getStore().resetDatabase();
 //        getClay().generateStore();
         getClay().populateCache();
         getClay().simulateSession(false, 10, false);
-        // </HACK>
 
         // Start worker process
         // Start the initial runnable task by posting through the handler
         handler.post(runnableCode);
-
-
-
-//        //DragSortListView listView = (DragSortListView) getListView();
-//        DragSortListView listView = (DragSortListView) findViewById(R.id.list);
-//
-//        listView.setDropListener(onDrop);
-//        listView.setRemoveListener(onRemove);
-//        listView.setDragScrollProfile(ssProfile);
-//
-//        array = getResources().getStringArray(R.array.countries);
-//        //list = new ArrayList<String>(Arrays.asList(array));
-//        list= new ArrayList<String>();
-//        list.add("hey");
-//        list.add("you");
-//        list.add("there");
-//
-//
-////        adapter = new ArrayAdapter<String>(this, R.layout.list_item_handle_right, R.id.text, list);
-////        setListAdapter(adapter);
-//        adapter = new EventHolderAdapter(getApplicationContext(), R.layout.list_item_handle_right, list);
-//        listView.setAdapter(adapter);
     }
 
     @Override

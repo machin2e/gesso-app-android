@@ -1,6 +1,7 @@
 package camp.computer.clay.sequencer;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
@@ -14,6 +15,8 @@ import java.util.Date;
 public class DeviceViewPager extends ViewPager {
 
     private static boolean ENABLE_TOUCH = true;
+
+    private static int BACKGROUND_COLOR = Color.BLACK;
 
     Calendar calendar = Calendar.getInstance();
 
@@ -32,8 +35,32 @@ public class DeviceViewPager extends ViewPager {
 
     boolean interceptTouches = false;
 
+    int currentViewTag = 0;
+    TimelineListView currentListView = null;
+
     public DeviceViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setBackgroundColor(BACKGROUND_COLOR);
+
+        this.addOnPageChangeListener(new OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.v("Device", "setting position to " + position);
+                // Select the page at the specified position
+                currentViewTag = position;
+                currentListView = (TimelineListView) findViewWithTag(currentViewTag);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     /**
@@ -58,16 +85,13 @@ public class DeviceViewPager extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.v("Gesture_Log", "onTouchEvent from CustomViewPager");
+
+        if (currentListView == null) {
+            currentListView = (TimelineListView) findViewWithTag (currentViewTag);
+        }
 
         final int action = event.getAction() & MotionEventCompat.ACTION_MASK;
         int counter = event.getPointerCount();
-
-        // <HACK>
-        int currentViewTag = 1; // TODO: Get the tag for the active page in the ViewPager
-        // </HACK>
-        TimelineListView currentListView = (TimelineListView) findViewWithTag(currentViewTag);
-
 
         // If onInterceptTouch event returned true, then touch events will be directed here.
         // Check for that condition.
@@ -110,43 +134,15 @@ public class DeviceViewPager extends ViewPager {
                 // TODO: Update the gesture classification
                 // TODO: Selected any additional list items covered by the drag
 
+                // Calculate distance
                 int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow (currentTouch.y - previousTouch.y, 2));
                 touchDistance += distance;
-                Log.v ("Gesture_Log", "distance = " + touchDistance);
 
                 // Get current view
-                currentViewTag = 1; // TODO: Get the tag for the active page in the ViewPager
-                //currentListView = (TimelineListView) findViewWithTag(currentViewTag);
-                currentListView = (TimelineListView) findViewWithTag(currentViewTag);
-                Log.v ("foo", "currentListView: " + currentListView);
                 int index = currentListView.getViewIndexByPosition((int) event.getRawX(), (int) event.getRawY());
                 if (index != -1) {
-                    Log.v("Select_Entry", "");
-//                    Log.v("Select_Entry", "view selected? " + currentListView);
                     currentListView.selectItemByIndex(index);
-                    Log.v("Select_Entry", "view selected? " + currentListView.isSelected());
-                    Log.v("Select_Entry", "selected view " + currentListView);
-                    Log.v("Select_Entry", "selected index " + index);
                 }
-
-//                View view = this.inflater.inflate (layoutResource, parent, false);
-//                View view = currentListView
-//                TextView text = (TextView) view.findViewById(R.id.text);
-//                EventHolder eventHolder = this.eventHolders.get(position);
-//                text.setText(eventHolder.getEvent().getTitle());
-//
-//                Log.v("Is_Selected", "is selected? " + eventHolder.selected);
-//
-//                // Update layout based on state
-//                if (eventHolder.selected == false) {
-//                    // Update left padding
-//                    text.setPadding(0, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
-//                } else {
-//                    // Update left padding to indent the item
-//                    text.setPadding(120, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
-//                }
-
-//                currentListView.refreshListViewFromData();
 
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
@@ -164,16 +160,9 @@ public class DeviceViewPager extends ViewPager {
 
                 int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow (currentTouch.y - previousTouch.y, 2));
                 touchDistance += distance;
-                Log.v ("Gesture_Log", "distance = " + touchDistance);
-                Log.v ("Select_Entry", "distance = " + touchDistance);
 
                 // Update gesture classification
-                currentListView = (TimelineListView) findViewWithTag(1);
                 currentListView.composeEventHolderSelection();
-                currentListView.refreshListViewFromData();
-
-                Log.v("Gesture_Log", "ACTION_UP (touch)");
-                Log.v ("Select_Entry", "ACTION_UP (touch): " + touchDistance);
 
             }
 
@@ -188,25 +177,23 @@ public class DeviceViewPager extends ViewPager {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent event) {
-        Log.v("Gesture_Log", "onInterceptTouchEvent from CustomViewPager");
-        String touchLocation = "" + event.getX() + ", " + event.getY();
-        Log.v("Gesture_Log", "\tat " + touchLocation);
+    public boolean onInterceptTouchEvent (MotionEvent event) {
+        String touchLocation = "" + event.getX () + ", " + event.getY ();
 
         // Get the number of touch points
         int touchPointCount = event.getPointerCount();
-        Log.v ("Gesture_Log", "Touch points detected: " + touchPointCount);
 
         // Check if interacting with a list item
-        int currentViewTag = 1; // TODO: Get the tag for the active page in the ViewPager
-        TimelineListView currentListView = (TimelineListView) findViewWithTag(currentViewTag);
+        if (currentListView == null) {
+            currentListView = (TimelineListView) findViewWithTag (currentViewTag);
+        }
 
 
         // Handle touch event based on the number of touches detected and the current state
         // of the gesture recognition logic.
         if (touchPointCount == 1) {
 
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (event.getAction () == MotionEvent.ACTION_DOWN) {
 
                 // Save the start point and time of the gesture...
                 startTouch.set((int) event.getX(), (int) event.getY());
@@ -232,35 +219,6 @@ public class DeviceViewPager extends ViewPager {
 
             }
 
-            /*
-            else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-
-                // Update the previous touch...
-                previousTouch.set(currentTouch.x, currentTouch.y);
-                previousTime = currentTime;
-
-                // ...and update the current point and time of the gesture.
-                currentTouch.set((int) event.getX(), (int) event.getY());
-                currentTime = calendar.getTime();
-
-                // Update the gesture classification
-                // TODO:
-
-                int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow(currentTouch.y - previousTouch.y, 2));
-                touchDistance += distance;
-                Log.v("Gesture_Log", "distance = " + touchDistance);
-
-            } else if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                Log.v("Gesture_Log", "ACTION_UP (intercept)");
-
-                // Save the stop point and time of the gesture
-                stopTouch.set((int) event.getX(), (int) event.getY());
-                stopTime = calendar.getTime();
-
-            }
-            */
-
         } else if (touchPointCount == 2) {
 
             // TODO: If there's a single touch, then wait for a second touch for some small amount of time (less than 500 ms) to detect a second touch, to account for timing difference between pointer touches.
@@ -282,7 +240,7 @@ public class DeviceViewPager extends ViewPager {
 //        return false;
     }
 
-    public void setPagingEnabled(boolean enabled) {
+    public void setPagingEnabled (boolean enabled) {
         this.ENABLE_TOUCH = enabled;
     }
 }
