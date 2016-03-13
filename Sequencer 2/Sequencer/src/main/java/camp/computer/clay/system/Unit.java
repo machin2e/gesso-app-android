@@ -104,12 +104,12 @@ public class Unit {
         this.timeline.setUnit(this);
     }
 
-    public void notifyChange (Event event) {
-        getClay().notifyChange (event);
-
-        this.send("create behavior " + event.getUuid() + " \"" + event.getBehavior().getTag() + " " + event.getBehavior().getState().getState() + "\"");
-        this.send("addUnit behavior " + event.getUuid());
-    }
+//    public void notifyChange (Event event) {
+//        getClay().notifyChange (event);
+//
+//        this.send("create behavior " + event.getUuid() + " \"" + event.getBehavior().getTag() + " " + event.getBehavior().getState().getState() + "\"");
+//        this.send("addUnit behavior " + event.getUuid());
+//    }
 
     /*
     // TODO:
@@ -125,7 +125,7 @@ public class Unit {
         getClay().sendMessage(this, content);
     }
 
-//    public void addBehavior(UUID behaviorUuid) {
+//    public void cacheBehavior(UUID behaviorUuid) {
 //
 //        // Get the behavior with the specified UUID
 //        Behavior behavior = getClay().getBehavior(behaviorUuid);
@@ -140,7 +140,7 @@ public class Unit {
 //        this.getTimeline().addEvent(event);
 //    }
 
-//    public void addBehavior(Behavior behavior) {
+//    public void cacheBehavior(Behavior behavior) {
 //
 //        // Create an event for the behavior so it can be added to the timeline
 //        Event event = new Event(timeline, behavior);

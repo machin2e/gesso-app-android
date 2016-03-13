@@ -1,8 +1,14 @@
 package camp.computer.clay.system;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public interface ContentManagerInterface {
+
+    /** Retrieve or create basic behavior */
+    Behavior getBasicBehavior (BehaviorScript behaviorScript);
+
+    void removeState(BehaviorState behaviorState);
 
     interface Callback {
         void onSuccess(Object object);
@@ -10,31 +16,27 @@ public interface ContentManagerInterface {
     }
 
     void resetDatabase();
+    void writeDatabase();
 
-    void storeUnit (Unit unit);
-    void restoreUnit(UUID uuid, Callback callback);
+    void storeDevice(Unit unit);
+    void restoreDevice(UUID uuid, Callback callback);
 
     void storeTimeline (Timeline timeline);
     void restoreTimeline (Unit unit, UUID uuid, Callback callback);
 
-    boolean hasEvent (Event event);
     void storeEvent (Event event);
-//    void restoreEvents (Timeline timeline);
-//    void restoreEvent (Timeline timeline, UUID uuid);
+    boolean hasEvent (Event event);
     void removeEvent (Event event, Callback callback);
 
-    void restoreBehaviors();
-//    boolean hasBehavior (Behavior behavior);
     void storeBehavior (Behavior behavior);
-//    void restoreBehavior (UUID uuid, Callback callback);
+    void restoreBehaviors();
 
-    void restoreBehaviorScripts();
-    void storeBehaviorScript (BehaviorScript behaviorScript);
+    void storeScript(BehaviorScript behaviorScript);
+    void restoreScripts();
 
-    void storeBehaviorState (Behavior behavior, BehaviorState behaviorState);
-    // TODO: Remove these! Handle them in restoreEvent and restoreBehavior
-//    boolean hasBehaviorState (BehaviorState behaviorState);
-//    void storeBehaviorState (BehaviorState behaviorState); // This is handled in both storeEvent and storeBehavior
-    void restoreBehaviorState (Behavior behavior);
+    void storeState(Event event, BehaviorState behaviorState);
+    void restoreState(Event event);
+
+    Behavior getBehaviorComposition(ArrayList<Behavior> childBehaviors);
 
 }

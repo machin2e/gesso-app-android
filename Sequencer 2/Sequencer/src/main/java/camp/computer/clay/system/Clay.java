@@ -1,6 +1,5 @@
 package camp.computer.clay.system;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -12,11 +11,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 public class Clay {
-
-    // <HACK>
-    // TODO: Move this out of the Clay object model.
-    static private Context context;
-    // </HACK>
 
     // Resource management systems (e.g., networking, messaging, content)
     private ContentManagerInterface contentManager = null;
@@ -43,20 +37,6 @@ public class Clay {
 
         this.cacheManager = new CacheManager(this); // Set up behavior repository
     }
-
-    // <HACK>
-    // TODO: Move this into Clay, then just reference Clay's platform context.
-    public static void setContext (Context context) {
-        Clay.context = context;
-    }
-    // </HACK>
-
-    // <HACK>
-    // TODO: Returns the context.
-    public static Context getContext() {
-        return Clay.context;
-    }
-    // </HACK>
 
     /*
      * Clay's essential operating system functions.
@@ -172,8 +152,8 @@ public class Clay {
         // Request unit profile from history (i.e., the remote store).
 
 //            getCache().setupRepository();
-//            getStore().storeUnit(unit);
-        getStore().restoreUnit(unitUuid, new ContentManagerInterface.Callback() {
+//            getStore().storeDevice(unit);
+        getStore().restoreDevice(unitUuid, new ContentManagerInterface.Callback() {
             @Override
             public void onSuccess(Object object) {
 
@@ -247,7 +227,7 @@ public class Clay {
                 Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
 
                 // Store the unit
-                getStore().storeUnit(newUnit);
+                getStore().storeDevice(newUnit);
                 Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
 
                 getStore().storeTimeline(newUnit.getTimeline());
@@ -303,7 +283,7 @@ public class Clay {
                     getStore().restoreBehavior(behaviorUuid.toString());
 
                     // Generate a behavior of the selected type
-                    unit.addBehavior (behaviorUuid.toString());
+                    unit.cacheBehavior (behaviorUuid.toString());
 
                     Log.v("Behavior_DB", "AFTER unit.storeBehavior:");
                     getStore().restoreBehavior(behaviorUuid.toString());
@@ -401,7 +381,7 @@ public class Clay {
      */
     private void generateBehaviorScript (String tag, String defaultState) {
 
-        Log.v ("Content_Manager", "Creating basic behavior.");
+        Log.v ("Content_Manager", "Creating script.");
 
         // Create behavior (and state) for the behavior script
         BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
@@ -411,9 +391,20 @@ public class Clay {
 
         // Store the behavior
         if (hasStore()) {
-            getStore().storeBehaviorScript(behaviorScript);
+            getStore().storeScript(behaviorScript);
         }
 
+        generateBasicBehavior(behaviorScript);
+
+    }
+
+    private void generateBasicBehavior (BehaviorScript behaviorScript) {
+
+        Log.v ("Content_Manager", "Generating basic behavior for script.");
+
+        // Generate basic behaviors for all behavior scripts
+        Behavior basicBehavior = new Behavior (behaviorScript);
+        getStore ().storeBehavior(basicBehavior);
     }
 
     /**
@@ -422,14 +413,11 @@ public class Clay {
     public void populateCache () {
         Log.v("Content_Manager", "populateCache");
 
-         //getStore().resetDatabase();
-         //generateStore();
-
         if (hasStore()) {
             Log.v ("Content_Manager", "populateCache");
 
             // Restore behavior scripts and addUnit them to the cache
-            getStore().restoreBehaviorScripts();
+            getStore().restoreScripts();
             Log.v("Content_Manager", "Restored behavior scripts:");
             for (BehaviorScript behaviorScript : getCache().getBehaviorScripts()) {
                 Log.v("Content_Manager", "\t" + behaviorScript.getUuid());
@@ -464,25 +452,30 @@ public class Clay {
     public void simulateSession (boolean addBehaviorToTimeline, int behaviorCount, boolean addAbstractBehaviorToTimeline) {
         Log.v("Content_Manager", "simulateSession");
 
-        // Discover unit
-//        UUID unitUuid = UUID.randomUUID();
-        UUID unitUuid = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
-        getClay().addUnit(unitUuid, "192.168.1.122");
-        Unit foundUnit = getUnitByUuid(unitUuid);
+        // Discover first device
+        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
+        getClay().addUnit(unitUuidA, "192.168.1.122");
+        Unit foundUnit = getUnitByUuid(unitUuidA);
+
+        // Discover second device
+        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
+        getClay().addUnit(unitUuidB, "192.168.1.123");
 
         if (addBehaviorToTimeline) {
             for (int i = 0; i < behaviorCount; i++) {
                 // Create behavior based on behavior script
                 Log.v("Content_Manager", "> Creating behavior");
                 Random r = new Random();
-                BehaviorScript selectedBehaviorScript = getClay().getCache().getBehaviorScripts().get(r.nextInt(getClay().getCache().getBehaviorScripts().size()));
-                Behavior behavior = new Behavior(selectedBehaviorScript);
+                int selectedBehaviorIndex = r.nextInt(getClay().getCache().getBehaviors().size());
+//                BehaviorScript selectedBehaviorScript = getClay().getCache().getBehaviorScripts().get(selectedBehaviorIndex);
+//                Behavior behavior = new Behavior(selectedBehaviorScript);
+                Behavior behavior = getClay().getCache().getBehaviors().get(selectedBehaviorIndex);
                 getClay().getStore().storeBehavior(behavior);
 
                 // Create event for the behavior and add it to the unit's timeline
                 Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
                 Event event = new Event(foundUnit.getTimeline(), behavior);
-                getClay().getUnitByUuid(unitUuid).getTimeline().addEvent(event);
+                getClay().getUnitByUuid(unitUuidA).getTimeline().addEvent(event);
                 getClay().getStore().storeEvent(event);
                 // TODO: Update unit
             }
@@ -491,11 +484,19 @@ public class Clay {
         if (addAbstractBehaviorToTimeline) {
             // Create behavior based on behavior script
             Log.v("Content_Manager", "> Creating behavior");
-            Behavior behavior = new Behavior("so high");
-            behavior.setDescription("oh yeah!");
-            behavior.addBehavior(foundUnit.getTimeline().getEvents().get(0).getBehavior());
-            behavior.addBehavior(foundUnit.getTimeline().getEvents().get(1).getBehavior());
-            getClay().getStore().storeBehavior(behavior);
+//            Behavior behavior = new Behavior("so high");
+//            behavior.setDescription("oh yeah!");
+//            behavior.addBehavior(foundUnit.getTimeline().getEvents().get(0).getBehavior());
+//            behavior.addBehavior(foundUnit.getTimeline().getEvents().get(1).getBehavior());
+//            getClay().getStore().storeBehavior(behavior);
+            ArrayList<Behavior> children = new ArrayList<Behavior>();
+            ArrayList<BehaviorState> states = new ArrayList<BehaviorState>();
+            children.add(foundUnit.getTimeline().getEvents().get(0).getBehavior());
+            states.addAll(foundUnit.getTimeline().getEvents().get(0).getBehaviorState());
+            children.add(foundUnit.getTimeline().getEvents().get(1).getBehavior());
+            states.addAll(foundUnit.getTimeline().getEvents().get(1).getBehaviorState());
+            Behavior behavior = getClay().getStore().getBehaviorComposition(children);
+
             // remove events for abstracted behaviors
             getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
             foundUnit.getTimeline().getEvents().remove(0); // if store behavior successful
@@ -507,37 +508,44 @@ public class Clay {
             Event event = new Event(foundUnit.getTimeline(), behavior);
             // insert new event for abstract behavior
             //            foundUnit.getTimeline().addEvent(event);
+            event.getBehaviorState().clear();
+            event.getBehaviorState().addAll(states);
+            Log.v("New_Behavior_Parent", "Added " + states.size() + " states to new event.");
+            for (BehaviorState behaviorState : event.getBehaviorState()) {
+                Log.v("New_Behavior_Parent", "\t" + behaviorState.getState());
+            }
             foundUnit.getTimeline().getEvents().add(0, event); // if store event was successful
             getClay().getStore().storeEvent(event);
             // TODO: Update unit
         }
 
-        if (addAbstractBehaviorToTimeline) {
-            // Create behavior based on behavior script
-            Log.v("Content_Manager", "> Creating behavior");
-            Behavior behavior = new Behavior("so so high");
-            behavior.setDescription("oh yeah!");
-            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
-            behavior.addBehavior(foundUnit.getTimeline().getEvents().get(0).getBehavior());
-            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
-            behavior.addBehavior(foundUnit.getTimeline().getEvents().get(1).getBehavior());
-            getClay().getStore().storeBehavior(behavior);
-            // remove events for abstracted behaviors
-            foundUnit.getTimeline().getEvents().remove(0); // if store behavior successful
-            foundUnit.getTimeline().getEvents().remove(1); // if store behavior successful
-
-            // Create event for the behavior and add it to the unit's timeline
-            Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
-            Event event = new Event(foundUnit.getTimeline(), behavior);
-            // insert new event for abstract behavior
-            //            foundUnit.getTimeline().addEvent(event);
-            foundUnit.getTimeline().getEvents().add(0, event); // if store event was successful
-            getClay().getStore().storeEvent(event);
-            // TODO: Update unit
-        }
+//        if (addAbstractBehaviorToTimeline) {
+//            // Create behavior based on behavior script
+//            Log.v("Content_Manager", "> Creating behavior");
+//            Behavior behavior = new Behavior("so so high");
+//            behavior.setDescription("oh yeah!");
+//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
+//            behavior.cacheBehavior(foundUnit.getTimeline().getEvents().get(0).getBehavior());
+//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
+//            behavior.cacheBehavior(foundUnit.getTimeline().getEvents().get(1).getBehavior());
+//            getClay().getStore().storeBehavior(behavior);
+//            // remove events for abstracted behaviors
+//            foundUnit.getTimeline().getEvents().remove(0); // if store behavior successful
+//            foundUnit.getTimeline().getEvents().remove(1); // if store behavior successful
+//
+//            // Create event for the behavior and add it to the unit's timeline
+//            Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
+//            Event event = new Event(foundUnit.getTimeline(), behavior);
+//            // insert new event for abstract behavior
+//            //            foundUnit.getTimeline().addEvent(event);
+//            foundUnit.getTimeline().getEvents().add(0, event); // if store event was successful
+//            getClay().getStore().storeEvent(event);
+//            // TODO: Update unit
+//        }
 
 //        getClay().notifyChange(event);
 
+        getClay().getStore().writeDatabase();
 
         for (Unit unit : getClay().getUnits()) {
             Log.v ("Content_Manager", "Unit (UUID: " + unit.getUuid() + ")");
@@ -564,14 +572,14 @@ public class Clay {
             }
         } else {
             Log.v("Content_Manager", tabString + "\tScript (UUID: " + behavior.getScript().getUuid() + ")");
-            Log.v("Content_Manager", tabString + "\tState (UUID: " + behavior.getState().getUuid() + ")");
+//            Log.v("Content_Manager", tabString + "\tState (UUID: " + behavior.getState().getUuid() + ")");
         }
     }
 
     /**
      * Adds the behavior, caches it, and stores it.
      */
-    public void addBehavior (Behavior behavior) {
+    public void cacheBehavior(Behavior behavior) {
 
         // Create behavior (and state) for the behavior script
 //        BehaviorScript behaviorScript = new BehaviorScript (UUID.randomUUID(), tag, defaultState);
@@ -587,7 +595,7 @@ public class Clay {
 
     }
 
-    public void addBehaviorScript(BehaviorScript behaviorScript) {
+    public void cacheScript (BehaviorScript behaviorScript) {
 
         if (hasCache ()) {
             this.cache (behaviorScript);
@@ -648,7 +656,7 @@ public class Clay {
      * @param behavior The Behavior to cache.
      */
     public void cache (Behavior behavior) {
-        this.getCache().cache(behavior);
+        this.getCache().cache (behavior);
     }
 
     /**
@@ -732,7 +740,7 @@ public class Clay {
                 getStore().storeBehavior(event.getBehavior());
 
                 // Store behavior state for behavior
-//                getStore().storeBehaviorState(event.getBehavior().getState());
+//                getStore().storeState(event.getBehavior().getState());
 
 //            }
         }

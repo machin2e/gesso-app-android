@@ -43,14 +43,12 @@ public class EventHolderAdapter extends BaseAdapter {
     public static final int COMPLEX_LAYOUT = 7;
 
     /**
-     * Default constructor. Creates the new Adaptor object to
-     * provide a ListView with eventHolders.
+     * Default constructor. Creates the new Adaptor object to provide a ListView with eventHolders.
      * @param context
      * @param resource
      * @param eventHolders
      */
     public EventHolderAdapter(Context context, int resource, ArrayList<EventHolder> eventHolders) {
-//    public EventHolderAdapter(Context context, int resource, ArrayList<String> events) {
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //        this.resource = resource;
         this.eventHolders = eventHolders;
@@ -62,7 +60,7 @@ public class EventHolderAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public EventHolder getItem(int position) {
         return this.eventHolders.get(position);
     }
 
@@ -73,7 +71,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
     public int getItemType(int position){
         // Your if else code and return type ( TYPE_1 to TYPE_5 )
-        EventHolder eventHolder = (EventHolder) getItem (position);
+        EventHolder eventHolder = getItem (position);
         return eventHolder.type;
     }
 
@@ -120,12 +118,12 @@ public class EventHolderAdapter extends BaseAdapter {
         return this.bindData(view, position);
     }
 
-    public void remove (Object item) {
-        this.eventHolders.remove(item);
+    public void remove (EventHolder eventHolder) {
+        this.eventHolders.remove(eventHolder);
     }
 
-    public void insert (Object item, int position) {
-        this.eventHolders.add(position, (EventHolder) item);
+    public void insert (EventHolder eventHolder, int position) {
+        this.eventHolders.add(position, eventHolder);
     }
 
     private int getLayoutByType(int type) {
@@ -164,7 +162,7 @@ public class EventHolderAdapter extends BaseAdapter {
                 && eventHolder.type != CONTROL_PLACEHOLDER_LAYOUT) {
 
             // Update layout based on state
-            if (eventHolder.selected == false) {
+            if (!eventHolder.isSelected()) {
                 // Update left padding
                 view.setPadding(0, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
             } else {
@@ -174,14 +172,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
         }
 
-        // Set the background color
-        if (eventHolder.hasFocus) {
-            view.setBackgroundColor(Color.LTGRAY);
-        } else {
-            view.setBackgroundColor(Color.TRANSPARENT);
-        }
-
-        int segmentLength = 165;
+        int segmentLength = 179;
         drawTimelineSegment (view, eventHolder, segmentLength);
 
         view.invalidate();
@@ -349,7 +340,7 @@ public class EventHolderAdapter extends BaseAdapter {
         Canvas canvas = new Canvas(bmp);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.rgb(61, 61, 61));
+        paint.setColor(Color.rgb(255, 255, 255));
         paint.setStyle(Paint.Style.STROKE);
 
         if (eventHolder.type == COMPLEX_LAYOUT) {
@@ -456,9 +447,7 @@ public class EventHolderAdapter extends BaseAdapter {
                         // Get behavior state
                         //String lightStateString = item.getEvent().getBehavior().getState().getState();
                         // TODO: ^ The above line doesn't get the most recent or correct state from the behavior... is the reference out of date or not updated somewhere? That's bad, man.
-                        Log.v("Content_Manager", ">>> " + eventHolder.getEvent().getBehavior().getState());
-                        Log.v("Content_Manager", ">>>> " + eventHolder.getEvent().getBehavior().getState().getState());
-                        String lightStateString = eventHolder.getEvent().getBehavior().getState().getState();
+                        String lightStateString = eventHolder.getEvent().getBehaviorState().get(0).getState();
                         String[] lightStates = lightStateString.split(" ");
 
                         // Update the view
@@ -518,7 +507,7 @@ public class EventHolderAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        String ioStateString = eventHolder.getEvent().getBehavior().getState().getState();
+                        String ioStateString = eventHolder.getEvent().getBehaviorState().get(0).getState();
                         String[] ioStates = ioStateString.split(" ");
 
                         char ioState = ioStates[i].charAt(0);
@@ -551,7 +540,7 @@ public class EventHolderAdapter extends BaseAdapter {
             if (textView != null) {
 
                 // Get behavior state
-                String message = eventHolder.getEvent().getBehavior().getState().getState();
+                String message = eventHolder.getEvent().getBehaviorState().get(0).getState();
 
                 // Update the view
                 textView.setText("\"" + message + "\"");
@@ -562,7 +551,7 @@ public class EventHolderAdapter extends BaseAdapter {
             if (textView != null) {
 
                 // Get behavior state
-                int time = Integer.parseInt(eventHolder.getEvent().getBehavior().getState().getState());
+                int time = Integer.parseInt(eventHolder.getEvent().getBehaviorState().get(0).getState());
 
                 // Update the view
                 textView.setText(time + " ms");
@@ -571,7 +560,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + eventHolder.getEvent().getBehavior().getState().getState() + "\"");
+                textView.setText("\"" + eventHolder.getEvent().getBehaviorState().get(0).getState() + "\"");
             }
         } else if (eventHolder.type == COMPLEX_LAYOUT) {
 

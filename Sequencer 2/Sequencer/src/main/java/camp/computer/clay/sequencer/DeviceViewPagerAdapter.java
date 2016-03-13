@@ -34,7 +34,6 @@ public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
         Unit unit = null;
         if (position < getClay().getUnits().size()) {
             unit = getClay().getUnits().get(position);
-            Log.v("Behavior_Count", "unit not null");
         }
 
         // getItem is called to instantiate the fragment for the given page.
@@ -43,7 +42,7 @@ public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
         DeviceViewFragment fragment = new DeviceViewFragment();
         // TODO: ^ store reference to these fragments in the ApplicationView, so they can be directly called to update the Views after data model changes.
         Bundle args = new Bundle();
-        args.putInt(DeviceViewFragment.ARG_SECTION_NUMBER, position + 1);
+        args.putInt(DeviceViewFragment.ARG_SECTION_NUMBER, position + 0); // was "position + 1"
         fragment.setArguments(args);
         fragment.setUnit(unit);
         return (Fragment) fragment;

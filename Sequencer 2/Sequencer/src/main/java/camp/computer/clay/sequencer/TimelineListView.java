@@ -25,11 +25,12 @@ public class TimelineListView extends DragSortListView {
 
     private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
 
-    private static final boolean HIDE_ABSTRACT_OPTION = true;
-
     private Unit unit;
 
-    // The eventHolders to display in _this_ ListView. This has to be repopulated on initialization.
+    /**
+     * List of event holders that hold events on the timeline. This has to be repopulated on
+     * initialization.
+     */
     private ArrayList<EventHolder> eventHolders;
 
     private EventHolderAdapter adapter;
@@ -51,8 +52,8 @@ public class TimelineListView extends DragSortListView {
         initData();
 
         // Set up the eventHolders adaptor
-        this.adapter = new EventHolderAdapter(getContext(), R.layout.list_item_handle_right, this.eventHolders);
-//        this.adapter = new EventHolderAdapter(getContext(), R.layout.list_item_type_light, this.eventHolders);
+//        this.adapter = new EventHolderAdapter(getContext(), R.layout.list_item_handle_right, this.eventHolders);
+        this.adapter = new EventHolderAdapter(getContext(), R.layout.list_item_type_light, this.eventHolders);
         setAdapter(adapter);
 
         // Set up gesture recognition
@@ -113,7 +114,11 @@ public class TimelineListView extends DragSortListView {
             new DragSortListView.RemoveListener() {
                 @Override
                 public void remove(int which) {
-                    adapter.remove(adapter.getItem(which));
+                    EventHolder eventHolder = (EventHolder) adapter.getItem (which);
+
+                    adapter.remove(eventHolder);
+
+                    removeEventHolder(eventHolder);
                 }
             };
 
@@ -141,17 +146,11 @@ public class TimelineListView extends DragSortListView {
         }
     }
 
-//    public void setEventHolders(ArrayList<EventHolder> eventHolders) {
     public void setEventHolders(Timeline timeline) {
+
+        // Clear the timeline view
         this.eventHolders.clear();
         this.adapter.notifyDataSetChanged();
-
-//        this.eventHolders.addUnit(new EventHolder("view", "", EventHolderAdapter.SYSTEM_CONTROL_LAYOUT));
-
-        // create some objects... and addUnit them into the array list
-        if (!TimelineListView.HIDE_ABSTRACT_OPTION) {
-            this.eventHolders.add(new EventHolder("abstract", "", EventHolderAdapter.SYSTEM_CONTROL_LAYOUT));
-        }
 
         // Create and addUnit eventHolders for each behavior
         createTimelineEvents (timeline);
@@ -167,20 +166,23 @@ public class TimelineListView extends DragSortListView {
     }
 
     private void initTouchListeners() {
-//        setOnTouchListener(new EventHolderTouchListener());
+        // Note: Using the following prevents the drag-and-drop functionality of the ListView.
+        // setOnTouchListener(new EventHolderTouchListener());
         setOnItemClickListener(new EventHolderTouchReleaseListener());
         setOnItemLongClickListener(new EventHolderLongTouchListener());
-//        setOnDragListener(new EventHolderTouchDragListener());
+        // setOnDragListener(new EventHolderTouchDragListener());
     }
 
     /**
      * Set up the eventHolders source and populate the list of eventHolders to show in this ListView.
+     *
+     * TODO: Initialize eventHolders from cache or from remote source in this function.
+     * TODO:    Do this because ViewPager will destroy this object when moving between pages.
+     * TODO: Observe remote eventHolders source and update cached source and notify ListView...
+     * TODO: ...when eventHolders set changes.
      */
     public void initData () {
-        // TODO: Initialize eventHolders from cache or from remote source in this function. Do this because the ViewPager will destroy this object when moving between pages.
-        // TODO: Observe remote eventHolders source and update cached source and notify ListView when eventHolders set changes.
 
-        // setup the eventHolders source
         this.eventHolders = new ArrayList<EventHolder>();
     }
 
@@ -188,12 +190,9 @@ public class TimelineListView extends DragSortListView {
         if (TimelineListView.HIDE_LIST_ITEM_SEPARATOR) {
             setDivider(null);
             setDividerHeight(0);
+            // setBackgroundColor(Color.BLACK);
         }
     }
-
-
-
-
 
     /**
      * Returns the list item corresponding to the specified position.
@@ -262,52 +261,42 @@ public class TimelineListView extends DragSortListView {
     }
 
     public void selectItemByIndex (int index) {
-        Log.v("Select_Entry", "selectItemByIndex");
 
         int firstSelectedIndex = -1;
         for (int i = 0; i < eventHolders.size(); i++) {
-            EventHolder item = eventHolders.get(i);
-            if (item.selected) {
+            EventHolder eventHolder = eventHolders.get(i);
+            if (eventHolder.isSelected()) {
                 firstSelectedIndex = i;
                 break;
             }
         }
-
-        Log.v("Select_Entry", "not selected, so selecting");
 
         // Check if the specified position is within the bounds of a view in the ListView.
         // If so, select the item.
 
         if (firstSelectedIndex == -1) {
 
-            Log.v("Select_Entry", "selecting first item");
-
-            Log.v("Select_Entry", "\tindex: " + index);
-            Log.v("Select_Entry", "\teventHolders.size(): " + eventHolders.size());
-
             // The item is the first one selected
             if (index < eventHolders.size()) {
-                EventHolder item = (EventHolder) eventHolders.get(index);
-                selectEventHolder(item);
+                EventHolder eventHolder = (EventHolder) eventHolders.get(index);
+                selectEventHolder(eventHolder);
                 refreshListViewFromData();
             }
 
         } else {
-
-            Log.v("Select_Entry", "selecting additional item");
 
             // The selected item is subsequent to the first selected, so select it.
             if (firstSelectedIndex <= index) {
 
                 // Select all items between the first and current selection
                 for (int i = firstSelectedIndex; i <= index; i++) {
-                    EventHolder item = eventHolders.get(i);
-                    selectEventHolder(item);
+                    EventHolder eventHolder = eventHolders.get(i);
+                    selectEventHolder(eventHolder);
                 }
                 // Deselect all items after the current selection
                 for (int i = index + 1; i < eventHolders.size(); i++) {
-                    EventHolder item = eventHolders.get(i);
-                    deselectEventHolder(item);
+                    EventHolder eventHolder = eventHolders.get(i);
+                    deselectEventHolder(eventHolder);
                 }
                 refreshListViewFromData();
 
@@ -318,7 +307,7 @@ public class TimelineListView extends DragSortListView {
         }
     }
 
-    private void selectEventHolder(final EventHolder item) {
+    private void selectEventHolder(final EventHolder eventHolder) {
 
         // Do not select system controllers
 //        if (item.type == EventHolderAdapter.SYSTEM_CONTROL_LAYOUT || item.type == EventHolderAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
@@ -326,21 +315,18 @@ public class TimelineListView extends DragSortListView {
 //            return;
 //        }
 
-        Log.v("Select_Entry", "selectEventHolder");
-
         // Update state of the object associated with the selected view.
-        if (item.selected == false) {
-            Log.v("Select_Entry", "selecting!");
-            item.selected = true;
+        if (eventHolder.isSelected() == false) {
+            eventHolder.setSelected(true);
         }
 
     }
 
-    private void deselectEventHolder(final EventHolder item) {
+    private void deselectEventHolder(final EventHolder eventHolder) {
 
         // Update state of the object associated with the selected view.
-        if (item.selected == true) {
-            item.selected = false;
+        if (eventHolder.isSelected() == true) {
+            eventHolder.setSelected(false);
         }
 
     }
@@ -391,22 +377,6 @@ public class TimelineListView extends DragSortListView {
                 } else if (behaviorOptions[itemIndex].toString().equals("replace")) {
 
                     displayBehaviorFinder(event);
-
-                } else if (behaviorOptions[itemIndex].toString().equals("select") || behaviorOptions[itemIndex].toString().equals("deselect")) {
-
-                    if (behaviorOptions[itemIndex].toString().equals("select")) {
-                        selectEventHolder(event);
-                    } else if (behaviorOptions[itemIndex].toString().equals("deselect")) {
-                        deselectEventHolder(event);
-                    }
-
-                } else if (behaviorOptions[itemIndex].toString().equals("repeat") || behaviorOptions[itemIndex].toString().equals("do once")) {
-
-                    if (behaviorOptions[itemIndex].toString().equals("repeat")) {
-//                        repeatListItem(event);
-                    } else if (behaviorOptions[itemIndex].toString().equals("do once")) {
-                        stepListItem(event);
-                    }
 
                 }
 
@@ -520,11 +490,13 @@ public class TimelineListView extends DragSortListView {
         refreshListViewFromData();
 
         // Assign the behavior state
-        Behavior behavior = new Behavior (behaviorScript);
-        getClay().getStore().storeBehavior(behavior);
+        Behavior behavior = getClay().getStore().getBasicBehavior(behaviorScript);
+//        Behavior behavior = new Behavior (behaviorScript);
+//        getClay().getStore().storeBehavior(behavior);
+        Log.v("New_Behavior", "woo");
 
         // Update the event with the new behavior and state
-        camp.computer.clay.system.Event event = eventHolder.getEvent();
+        Event event = eventHolder.getEvent();
         if (event != null) {
 
             // <HACK>
@@ -573,8 +545,8 @@ public class TimelineListView extends DragSortListView {
         eventHolders.add(index, replacementEventHolder);
 
         // Finally, addUnit the behavior to the unit
-//        unit.addBehavior(behaviorUuid);
-//        getUnit().addBehavior(behavior);
+//        unit.cacheBehavior(behaviorUuid);
+//        getUnit().cacheBehavior(behavior);
 //        getUnit().getTimeline().addEvent(event);
 
         // </HACK>
@@ -642,7 +614,7 @@ public class TimelineListView extends DragSortListView {
 
                 } else {
 
-                    displayEventDesigner (eventHolder);
+                    displayEventDesigner(eventHolder);
                     return true;
 
                 }
@@ -726,7 +698,7 @@ public class TimelineListView extends DragSortListView {
      */
     public boolean hasSelectedEventHolders() {
         for (EventHolder eventHolder : this.eventHolders) {
-            if (eventHolder.selected) {
+            if (eventHolder.isSelected()) {
                 return true;
             }
         }
@@ -736,7 +708,7 @@ public class TimelineListView extends DragSortListView {
     private ArrayList<EventHolder> getSelectedEventHolders () {
         ArrayList<EventHolder> selectedEventHolders = new ArrayList<>();
         for (EventHolder eventHolder : this.eventHolders) {
-            if (eventHolder.selected) {
+            if (eventHolder.isSelected()) {
                 selectedEventHolders.add(eventHolder);
             }
         }
@@ -746,7 +718,7 @@ public class TimelineListView extends DragSortListView {
     private int getFirstSelectedEventHolderIndex() {
         int index = 0;
         for (EventHolder eventHolder : this.eventHolders) {
-            if (eventHolder.selected) {
+            if (eventHolder.isSelected()) {
                 break;
             }
             index++;
@@ -756,21 +728,14 @@ public class TimelineListView extends DragSortListView {
 
     private void deselectEventHolders () {
         for (EventHolder eventHolder : this.eventHolders) {
-            eventHolder.selected = false;
-        }
-    }
-
-    private void stepListItem(EventHolder item) {
-
-        if (item.repeat == true) {
-            item.repeat = false;
+            eventHolder.setSelected(false);
         }
     }
 
     private ArrayList<String> getSelectedEventTags () {
         ArrayList<String> selectedListItemLabels = new ArrayList<>();
         for (EventHolder eventHolder : this.eventHolders) {
-            if (eventHolder.selected) {
+            if (eventHolder.isSelected()) {
                 String tag = eventHolder.getEvent().getBehavior().getTag();
                 selectedListItemLabels.add(tag);
             }
@@ -782,7 +747,6 @@ public class TimelineListView extends DragSortListView {
      * Creates a behavior composition from multiple selected behaviors.
      */
     public void composeEventHolderSelection () {
-        Log.v ("Content_Manager", "composeEventHolderSelection");
 
         // Get list of the selected items
         ArrayList<EventHolder> selectedEventHolders = getSelectedEventHolders();
@@ -791,22 +755,47 @@ public class TimelineListView extends DragSortListView {
 
         // Return if there are fewer than two selected items
         if (selectedEventHolders.size() < 2) {
+            deselectEventHolders();
             return;
         }
 
         // Get the first event in the sequence
-        EventHolder firstEvent = selectedEventHolders.get (0);
+        EventHolder firstEvent = selectedEventHolders.get(0);
 
         // Create new behavior. Add behaviors to it.
         String behaviorListString = TextUtils.join(", ", selectedEventTags);
-        Behavior newBehavior = new Behavior(behaviorListString);
+//        Behavior newBehavior = new Behavior(behaviorListString);
+        ArrayList<Behavior> children = new ArrayList<Behavior>();
+        ArrayList<BehaviorState> states = new ArrayList<BehaviorState>();
         for (EventHolder eventHolder : selectedEventHolders) {
+            // TODO: Copy the behaviors
             Behavior b = eventHolder.getEvent().getBehavior();
-            newBehavior.addBehavior(b);
+//            newBehavior.addBehavior (b);
+            children.add(b);
+            //states.addAll(eventHolder.getEvent().getBehaviorState());
+            for (BehaviorState behaviorState : eventHolder.getEvent().getBehaviorState()) {
+                getClay().getStore().removeState (behaviorState);
+                BehaviorState newBehaviorState = new BehaviorState(behaviorState.getState());
+                states.add(newBehaviorState);
+            }
         }
+        //Get_Verified_Behavior(children)
+//        Behavior pBehavior = getClay().getStore().getBehaviorComposition(children);
+//        Log.v ("New_Behavior_Parent", "pBehavior = " + pBehavior);
         // Store the new behavior
-        getClay().getStore().storeBehavior(newBehavior);
-        //getClay().addBehavior(newBehavior);
+        // TODO: First look in the database to make sure that duplicate behavior tree structures...
+        // TODO: ...instead, if exists, get reference to it and reuse the structure!
+        // TODO:    Do this by checking if the actions appear with the same sibling indices and a common parent behavior UUID.
+        // TODO: hasBehaviorStructure (newBehavior)
+//        getClay().getStore().storeBehavior(newBehavior);
+//        getClay().cacheBehavior(newBehavior);
+
+        Behavior behavior = getClay().getStore().getBehaviorComposition(children);
+        behavior.setTag(behaviorListString);
+        Log.v ("Compose_Behavior", "Composed behavior: " + behavior);
+        Log.v("Compose_Behavior", "\tUUID: " + behavior);
+        getClay().getStore().storeBehavior(behavior);
+        getClay().getCache().getBehaviors().add(behavior);
 
         // Remove old behaviors from timeline in store
         for (EventHolder eventHolder : selectedEventHolders) {
@@ -819,10 +808,21 @@ public class TimelineListView extends DragSortListView {
         }
 
         // Create event for the behavior and add it to the unit's timeline
-        Event e = new Event(getUnit().getTimeline(), newBehavior);
-        getUnit().getTimeline().addEvent(index, e);
-        getClay().getStore().storeEvent(e);
-        //getClay().notifyChange(e);
+//        Event compositionEvent = new Event(getUnit().getTimeline(), newBehavior);
+//        getUnit().getTimeline().addEvent(index, compositionEvent);
+//        getClay().getStore().storeEvent(compositionEvent);
+        Event compositionEvent = new Event(getUnit().getTimeline(), behavior);
+        // insert new event for abstract behavior
+        //            foundUnit.getTimeline().addEvent(event);
+        compositionEvent.getBehaviorState().clear();
+        compositionEvent.getBehaviorState().addAll(states);
+        Log.v("New_Behavior_Parent", "Added " + states.size() + " states to new event (composition).");
+        Log.v ("New_Behavior_Parent", "Leaf count: " + behavior.getLeafCount());
+        for (BehaviorState behaviorState : compositionEvent.getBehaviorState()) {
+            Log.v("New_Behavior_Parent", "\t" + behaviorState.getState());
+        }
+        getUnit().getTimeline().addEvent(index, compositionEvent);
+        getClay().getStore().storeEvent(compositionEvent);
 
         // Store: Reindex the timeline events
         getClay().getStore().storeTimeline(getUnit().getTimeline());
@@ -831,24 +831,20 @@ public class TimelineListView extends DragSortListView {
         for (EventHolder eventHolder : selectedEventHolders) {
             eventHolders.remove(eventHolder);
         }
-        refreshListViewFromData(); // Update view after removing items from the list
 
-        // <HACK>
-        // This removes the specified event from the list and replaces it with an event of a specific type.
-        // TODO: Replace view, not eventHolders! (i.e., event.type = EventHolderAdapter.LIGHT_CONTROL_LAYOUT;)
-//        int index = eventHolders.indexOf(event);
-//        eventHolders.remove(index);
-        // Add the new event.
-        EventHolder composedEventHolder = new EventHolder (e);
-//        EventHolder composedEventHolder = new EventHolder(behaviorListString, "", EventHolderAdapter.COMPLEX_LAYOUT);
-//        packedEventHolder.eventHolders.addAll(selectedEventHolders); // Add the selected items to the list
-        composedEventHolder.title = behaviorListString;
-        composedEventHolder.summary = "" + selectedEventHolders.size() + " pack";
-        eventHolders.add(index, composedEventHolder);
-        // </HACK>
+        // Add a new event holder to hold the new event that was made for the composed behavior
+        EventHolder compositionEventHolder = new EventHolder (compositionEvent);
+//        compositionEventHolder.title = behaviorListString;
+//        compositionEventHolder.summary = "" + selectedEventHolders.size() + " actions";
+        eventHolders.add(index, compositionEventHolder);
 
-        displayDesignerView(composedEventHolder);
-        eventDesignerView.displayUpdateTagOptions(composedEventHolder);
+        // Display designer
+        // NOTE: This causes the states to be stored wrong! Title isn't state. It's a tag/title.
+//        displayDesignerView(compositionEventHolder);
+//        eventDesignerView.displayUpdateTagOptions(compositionEventHolder);
+
+        // Update timeline view after modifying the list
+        refreshListViewFromData();
 
     }
 
@@ -857,8 +853,6 @@ public class TimelineListView extends DragSortListView {
      */
     private void decomposeEventHolder (EventHolder eventHolder) {
 
-        Log.v ("Content_Manager", "decomposeEventHolder");
-
         // Return if the item is not a complex item.
         if (eventHolder.type != EventHolderAdapter.COMPLEX_LAYOUT) {
             return;
@@ -866,11 +860,9 @@ public class TimelineListView extends DragSortListView {
 
         // Get the list of behaviors in the behavior composition
         ArrayList<Behavior> behaviors = eventHolder.getEvent().getBehavior().getBehaviors();
-        Log.v ("Content_Manager", "\tbehaviors.size: " + behaviors.size());
 
         // Get position of the selected item
         int index = eventHolders.indexOf(eventHolder);
-        Log.v("Content_Manager", "\tindex: " + index);
 
         // Remove the event from the timeline
         getUnit().getTimeline().removeEvent(eventHolder.getEvent());
@@ -878,25 +870,63 @@ public class TimelineListView extends DragSortListView {
         // Remove the event from the database
         getClay().getStore().removeEvent(eventHolder.getEvent(), null);
 
-        // Remove the selected item from the list (it will be replaced by the abstracted behviors)
-        eventHolders.remove(index);
-        refreshListViewFromData(); // Update view after removing items from the list
+        // Remove the selected item from the list (it will be replaced by the abstracted behaviors)
+        eventHolders.remove (index);
 
-        // <HACK>
-        // This removes the specified event from the list and replaces it with an event of a specific type.
-        // TODO: Replace view, not eventHolders! (i.e., event.type = EventHolderAdapter.LIGHT_CONTROL_LAYOUT;)
-        // Add the new event.
+        // Create event for each of the behaviors in the composition, create an event holder for
+        // each one, and add the event holder to the timeline.
+        int stateIndex = 0;
         for (Behavior behavior : behaviors) {
-            // TODO: Restore the behavior's state...
-            if (behavior.getBehaviors().size() == 0) {
-                getClay().getStore().restoreBehaviorState(behavior);
-            }
+
+            //!!!!!!!!!!!!!!!!
+            // Restore the behavior's state
+            // TODO: BUG? This doesn't seem to restore the state!
+//            if (behavior.getBehaviors().size() == 0) {
+//                getClay().getStore().restoreState(eventHolder.getEvent());
+//            }
+            //!!!!!!!!!!!!!!!!
+
+            // Create event for the behavior and add it to the timeline
             Event decomposedEvent = new Event (getUnit ().getTimeline (), behavior);
+
+            // Reassign states to events based on their number of children
+            decomposedEvent.getBehaviorState().clear();
+            if (behavior.hasScript()) {
+                // Leaf node (one state for the leaf behavior node)
+                BehaviorState behaviorState = eventHolder.getEvent().getBehaviorState().get(stateIndex);
+                getClay().getStore().removeState (behaviorState);
+                BehaviorState newBehaviorState = new BehaviorState(behaviorState.getState());
+                decomposedEvent.getBehaviorState().add(newBehaviorState);
+                stateIndex++;
+            } else {
+                // Non-leaf node (multiple states per behavior node)
+                Log.v ("New_Behavior_Parent", "getLeafCount(): " + behavior.getLeafCount());
+                for (int i = 0; i < behavior.getLeafCount(); i++) {
+                //for (int i = 0; i < behavior.getBehaviors().size(); i++) {
+                    BehaviorState behaviorState = eventHolder.getEvent().getBehaviorState().get(stateIndex);
+                    getClay().getStore().removeState (behaviorState);
+                    BehaviorState newBehaviorState = new BehaviorState(behaviorState.getState());
+                    decomposedEvent.getBehaviorState().add(newBehaviorState);
+                    stateIndex++;
+                }
+            }
+            Log.v ("New_Behavior_Parent", "Decomposed into event with " + decomposedEvent.getBehaviorState().size() + " states.");
+            for (BehaviorState behaviorState : decomposedEvent.getBehaviorState()) {
+                Log.v("New_Behavior_Parent", "\t" + behaviorState.getState());
+            }
+
+            // Add the new event to the timeline
             getUnit().getTimeline().addEvent(index, decomposedEvent);
+
+            // Store the new event
             getClay ().getStore ().storeEvent (decomposedEvent);
+
+            // Create event holder for the event and add it to the timeline visualization
             EventHolder decomposedEventHolder = new EventHolder (decomposedEvent);
-            eventHolders.add (index, decomposedEventHolder);
-            index++; // Increment the index of the insertion position
+            eventHolders.add(index, decomposedEventHolder);
+
+            // Increment the index of the insertion position
+            index++;
         }
 
         getClay().getStore().storeTimeline(getUnit().getTimeline());

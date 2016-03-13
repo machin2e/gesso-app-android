@@ -23,24 +23,23 @@ public class EventHolder {
 
     public String title;
 
-    // for Complex
+    // for composition
     public String summary;
 
     public static int DEFAULT_TYPE = EventHolderAdapter.IO_CONTROL_LAYOUT;
 
     public int type; // Used by the custom BaseAdapter to select the layout for the list_item_type_light.
 
-    public boolean selected = false;
+    private boolean isSelected = false;
 
-    public boolean hasFocus = false;
+//    public boolean hasFocus = false;
 
-    public boolean repeat = false;
-//    public String transform;
+//    public boolean repeat = false;
 
     // default constructor
-    public EventHolder() {
-        this("Title", "Subtitle", DEFAULT_TYPE);
-    }
+//    public EventHolder() {
+//        this("Title", "Subtitle", DEFAULT_TYPE);
+//    }
 
     public EventHolder(Event event) {
         super();
@@ -74,7 +73,7 @@ public class EventHolder {
         // </HACK>
 
         // Initialize
-        this.selected = false;
+        this.isSelected = false;
 
         // Initialize type
 //        initializeType();
@@ -90,91 +89,19 @@ public class EventHolder {
         this.type = type;
 
         // Initialize
-        this.selected = false;
-
-        // Initialize type
-//        initializeType();
+        this.isSelected = false;
     }
-
-//    // main constructor
-//    public EventHolder(Event event, int layoutType) {
-//        super();
-//
-//        // Assign instance UUID to the list item
-//        this.uuid = UUID.randomUUID();
-//
-//        this.eventUuid = event.getUuid();
-//        this.event = event;
-//
-//        // Set parameters
-//        Behavior behavior = event.getBehavior();
-//        this.title = behavior.getTag();
-//        this.type = layoutType;
-//
-//        // Initialize
-//        this.selected = false;
-//
-//        // Initialize type
-//        initializeType();
-//    }
 
     public Event getEvent() {
         return this.event;
     }
 
-//    private void initializeType() {
-//
-//        if (this.type == EventHolderAdapter.LIGHT_CONTROL_LAYOUT) {
-//
-////            // Initialize light states to false (off)
-////            lightStates = new ArrayList<>();
-////            for (int i = 0; i < 12; i++) {
-////                lightStates.addUnit(false);
-////            }
-//
-////            // Initialize light color to blue
-////            lightColors = new ArrayList<>();
-////            for (int i = 0; i < 12; i++) {
-////                lightColors.addUnit(Color.rgb(0, 0, 255));
-////            }
-//
-//        } else if (this.type == EventHolderAdapter.IO_CONTROL_LAYOUT) {
-//
-////            // Initialize I/O states to false (off)
-////            ioStates = new ArrayList<>();
-////            ioDirection = new ArrayList<>();
-////            ioSignalType = new ArrayList<>();
-////            ioSignalValue = new ArrayList<>();
-////            for (int i = 0; i < 12; i++) {
-////                ioStates.addUnit(false);
-////                ioDirection.addUnit('I');
-////                ioSignalType.addUnit('T');
-////                ioSignalValue.addUnit('L');
-////            }
-//
-//        } else if (this.type == EventHolderAdapter.MESSAGE_CONTROL_LAYOUT) {
-//
-////            message = "hello";
-//
-//        } else if (this.type == EventHolderAdapter.WAIT_CONTROL_LAYOUT) {
-//
-////            this.time = 250;
-//
-//        } else if (this.type == EventHolderAdapter.SAY_CONTROL_LAYOUT) {
-//
-////            phrase = "oh, that's great";
-//
-//        } else if (this.type == EventHolderAdapter.COMPLEX_LAYOUT) {
-//
-//            eventHolders = new ArrayList<>();
-//            summary = "invalid complex layout";
-//
-//        }
-//    }
+    public boolean isSelected () {
+        return this.isSelected;
+    }
 
-    // String representation
-    public String toString() {
-        return this.title;
+    public void setSelected (boolean isSelected) {
+        this.isSelected = isSelected;
     }
 
     /**
@@ -183,12 +110,12 @@ public class EventHolder {
      * @param stateString The new state to assign to this event's behavior.
      */
     public void updateState (String stateString) {
-        Log.v("CM_Log2", "updateState");
-        Log.v("CM_Log2", "\tstateString: " + stateString);
-        Log.v("CM_Log2", "\tevent: " + getEvent());
-        Log.v("CM_Log2", "\tbehavior: " + getEvent().getBehavior());
         BehaviorState behaviorState = new BehaviorState(stateString);
-        Log.v("CM_Log2", "\tbehaviorState: " + behaviorState);
-        getEvent().getBehavior().setState (behaviorState);
+        //getEvent().getBehavior().setState (behaviorState);
+//        getEvent().setBehaviorState (behaviorState);
+        getEvent().getClay().getStore().removeState (getEvent().getBehaviorState().get(0));
+        this.getEvent().getBehaviorState().set(0, behaviorState);
+
+        // TODO: Update state for the associated event! Do this by searching the leaf nodes!
     }
 }
