@@ -123,9 +123,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // TODO: Set up a server to listen for other views.
 
         if (datagramServer == null) {
-            datagramServer = new DatagramManager("udp");
-            clay.addManager(this.datagramServer);
-            datagramServer.startServer();
+            datagramServer = new DatagramManager ("udp");
+            clay.addManager (this.datagramServer);
+            datagramServer.startServer ();
         }
 
         if (networkResource == null) {

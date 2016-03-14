@@ -57,13 +57,13 @@ public class EventHolder {
         // <HACK>
         // Get the layout type to prepare for view generation
         // TODO: Automatically generate or retrieve layouts dynamically based on UUID here based on behavior events model, rather than referencing them as stored in XML.
-        if (behavior.getTag().equals("lights")) {
+        if (behavior.getTag().equals("light")) {
             this.type = EventHolderAdapter.LIGHT_CONTROL_LAYOUT;
-        } else if (behavior.getTag().equals("io")) {
+        } else if (behavior.getTag().equals("signal")) {
             this.type = EventHolderAdapter.IO_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("message")) {
             this.type = EventHolderAdapter.MESSAGE_CONTROL_LAYOUT;
-        } else if (behavior.getTag().equals("wait")) {
+        } else if (behavior.getTag().equals("pause")) {
             this.type = EventHolderAdapter.WAIT_CONTROL_LAYOUT;
         } else if (behavior.getTag().equals("say")) {
             this.type = EventHolderAdapter.SAY_CONTROL_LAYOUT;

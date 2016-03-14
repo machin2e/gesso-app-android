@@ -84,6 +84,9 @@ public class Clay {
 
         // Create message
         Message message = new Message("udp", source, destination, content);
+        Log.v ("Messagez", message.getFromAddress());
+        Log.v ("Messagez", message.getToAddress());
+        Log.v ("Messagez", message.getContent());
 
         // Queue message for sending
         messageManager.queueOutgoingMessage(message);
@@ -347,14 +350,14 @@ public class Clay {
     public void generateStore () {
 
         if (hasStore()) {
-            if (!getCache().hasBehaviorScript ("lights")) {
-                Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript("lights", "F F F F F F F F F F F F");
+            if (!getCache().hasBehaviorScript ("light")) {
+                Log.v("Clay_Behavior_Repo", "\"light\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("light", "F F F F F F F F F F F F");
             }
 
-            if (!getCache().hasBehaviorScript ("io")) {
-                Log.v("Clay_Behavior_Repo", "\"lights\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript("io", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+            if (!getCache().hasBehaviorScript ("signal")) {
+                Log.v("Clay_Behavior_Repo", "\"signal\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("signal", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
             }
 
             if (!getCache().hasBehaviorScript ("message")) {
@@ -362,9 +365,9 @@ public class Clay {
                 getClay().generateBehaviorScript("message", "hello");
             }
 
-            if (!getCache().hasBehaviorScript ("wait")) {
-                Log.v("Clay_Behavior_Repo", "\"wait\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript("wait", "250");
+            if (!getCache().hasBehaviorScript ("pause")) {
+                Log.v("Clay_Behavior_Repo", "\"pause\" behavior not found in the repository. Adding it.");
+                getClay().generateBehaviorScript("pause", "250");
             }
 
             if (!getCache().hasBehaviorScript ("say")) {

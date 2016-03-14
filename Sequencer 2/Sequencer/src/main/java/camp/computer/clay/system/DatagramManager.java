@@ -251,6 +251,10 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
             // Send the datagram.
             //sendDatagram (DatagramManager.getIpAsString(message.getToAddress()), MESSAGE_PORT, message.getContent());
             sendDatagram (message.getToAddress(), MESSAGE_PORT, message.getContent());
+            Log.v("Messagez", "from: " + message.getFromAddress());
+            Log.v("Messagez", "to: " + message.getToAddress());
+            Log.v("Messagez", "port: " + MESSAGE_PORT);
+            Log.v("Messagez", "message: " + message.getContent());
 
             // This only happens if there was an error getting or parsing the forecast.
             return null;
@@ -260,6 +264,11 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
             Log.v("Clay_Messaging", "\tSending datagram to " + ipAddress + ": " + message);
             Log.v("foo", "\tSending datagram to " + ipAddress + ": " + message);
             try {
+
+                Log.v ("Send_UDP", "ipAddress: " + ipAddress);
+                Log.v ("Send_UDP", "port: " + port);
+                Log.v ("Send_UDP", "message: " + message);
+                message += "\n";
                 // Send UDP packet to the specified address.
                 DatagramSocket socket = new DatagramSocket(port);
                 DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port);
