@@ -133,7 +133,6 @@ public class MessageManager {
 
     public void processIncomingMessages () {
         // Dequeue and process the next message on the incoming message queue.
-//        Log.v ("Clay_Time", "Checking for incoming messages");
         if (hasIncomingMessages()) {
             Log.v("Clay_Time", "Processing incoming message");
             while (hasIncomingMessages ()) {
@@ -141,7 +140,6 @@ public class MessageManager {
                 processIncomingMessage (dequeuedMessage);
             }
         }
-//        Log.v ("Clay_Time", "Done processing messages");
     }
 
     private void processIncomingMessage (Message message) {

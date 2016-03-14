@@ -121,7 +121,7 @@ public class Unit {
     }
     */
 
-    private void send(String content) {
+    public void send(String content) {
         getClay().sendMessage(this, content);
     }
 

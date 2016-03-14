@@ -1,6 +1,8 @@
 -- Merging decision tree log ---
 manifest
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:2:1-41:12
+	xmlns:android
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:2:11-69
 	package
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:3:7-45
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
@@ -11,8 +13,6 @@ ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/s
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:4:7-30
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
-	xmlns:android
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:2:11-69
 uses-sdk
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:6:5-7:39
 MERGED from [Sequencer 2:library:unspecified] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/Sequencer 2/library/unspecified/AndroidManifest.xml:7:5-9:41

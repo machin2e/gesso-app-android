@@ -531,11 +531,14 @@ public class TimelineListView extends DragSortListView {
         // i.e., Tell the unit to create the behavior, addUnit it to the timeline, and update the state.
 
         // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
-        /*
-        unit.send("create behavior " + behaviorUuid + " \"" + behavior.getTag() + " " + behaviorState.getState() + "\"");
-        unit.send("addUnit behavior " + behaviorUuid);
+
+        // <HACK>
+        // NOTE: This only works for basic behaviors. Should change it so it also supports complex behaviors.
+        getUnit().send("create behavior " + behavior.getUuid() + " \"" + behavior.getTag() + " " + event.getBehaviorState().get(0).getState() + "\"");
+        getUnit().send("add behavior " + behavior.getUuid());
         // unit.send("update behavior " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
-        */
+        // </HACK>
+
 
         // Create and addUnit the new eventHolder to the timeline
         // TODO: DO NOT create a new event, just update the existing one!
