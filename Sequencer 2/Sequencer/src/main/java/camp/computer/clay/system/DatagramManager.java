@@ -72,7 +72,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
     public void run() {
         byte[] messageBytes = new byte[MAX_UDP_DATAGRAM_LEN];
         DatagramSocket serverSocket = null;
-        DatagramPacket packet = new DatagramPacket(messageBytes, messageBytes.length);
+        DatagramPacket packet = new DatagramPacket (messageBytes, messageBytes.length);
 
         try {
 
@@ -86,13 +86,6 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
             }
 
             while(bKeepRunning) {
-//                Log.v("Clay_Traffic", "Looking for incoming messages");
-
-//                if (serverSocket.isBound()) {
-////                        Log.v("Clay", "Bound socket to local port " + serverSocket.getLocalPort() + ".");
-//                } else {
-//                    Log.v("Clay_Datagram_Server", "Error: Could not bind to local port " + serverSocket.getLocalPort() + ".");
-//                }
 
                 // Block the thread until a packet is received or a timeout period has expired.
                 // Note: "This method blocks until a packet is received or a timeout has expired."
@@ -103,16 +96,8 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
                 String source = getIpAsString(packet.getAddress ());
                 String destination = null;
 
-//                Message ackMessage = new Message("udp", null, BROADCAST_ADDRESS, "ground control to major tom");
-//                sendMessageAsync (ackMessage);
-
                 // ...and create a serialized object...
-                //Message incomingMessage = new Message(fromAddress, toAddress, packetData);
                 Message incomingMessage = new Message("udp", source, destination, content);
-
-//                Log.v("Clay_Datagram_Server", "Received packet data \"" + packetData + "\" from " + packet.getAddress().getHostAddress());
-
-//                    Log.v ("Clay Datagram Server", "Received packet data: " + packetData);
 
                 // ...then pass the message to the message manager running in the main thread.
                 if (messageManager != null) {
@@ -185,7 +170,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
 
     private void _kill() {
         Log.v("Clay_Messaging", "Killing datagram server.");
-        // bKeepRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP send message (on a different thread as well) is run! It's something related to that, apparently.
+        // bKeepRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP sendMessage message (on a different thread as well) is run! It's something related to that, apparently.
     }
 
     public boolean isActive () {
@@ -215,7 +200,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
 //        }
 //        */
 //
-//        // If the message doesn't need to be verified... dequeue it and send it.
+//        // If the message doesn't need to be verified... dequeue it and sendMessage it.
 //        else if (outgoingMessage.isDeliveryGuaranteed() == false) {
 //
 //            // Dequeue the message
@@ -230,7 +215,6 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
     }
 
     private void sendMessageAsync (Message message) {
-        Log.v("Clay_Ack", "sendMessageAsync");
         UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
         udpDatagramTask.execute(message);
     }
@@ -245,30 +229,33 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
                 return null;
             }
 
-            // Get the message to send.
+            // Get the message to sendMessage.
             Message message = (Message) params[0];
 
             // Send the datagram.
             //sendDatagram (DatagramManager.getIpAsString(message.getToAddress()), MESSAGE_PORT, message.getContent());
             sendDatagram (message.getToAddress(), MESSAGE_PORT, message.getContent());
-            Log.v("Messagez", "from: " + message.getFromAddress());
-            Log.v("Messagez", "to: " + message.getToAddress());
-            Log.v("Messagez", "port: " + MESSAGE_PORT);
-            Log.v("Messagez", "message: " + message.getContent());
+            Log.v("UDP", "from: " + message.getFromAddress());
+            Log.v("UDP", "to: " + message.getToAddress());
+            Log.v("UDP", "port: " + MESSAGE_PORT);
+            Log.v("UDP", "message: " + message.getContent());
+            Log.v("UDP", "---");
 
             // This only happens if there was an error getting or parsing the forecast.
             return null;
         }
 
         private void sendDatagram (String ipAddress, int port, String message) {
-            Log.v("Clay_Messaging", "\tSending datagram to " + ipAddress + ": " + message);
-            Log.v("foo", "\tSending datagram to " + ipAddress + ": " + message);
+
             try {
 
-                Log.v ("Send_UDP", "ipAddress: " + ipAddress);
-                Log.v ("Send_UDP", "port: " + port);
-                Log.v ("Send_UDP", "message: " + message);
+                Log.v ("UDP", "ipAddress: " + ipAddress);
+                Log.v ("UDP", "port: " + port);
+                Log.v ("UDP", "message: " + message);
+                Log.v ("UDP", "---");
+
                 message += "\n";
+
                 // Send UDP packet to the specified address.
                 DatagramSocket socket = new DatagramSocket(port);
                 DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), InetAddress.getByName(ipAddress), port);

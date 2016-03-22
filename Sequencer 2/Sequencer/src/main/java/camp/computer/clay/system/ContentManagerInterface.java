@@ -6,9 +6,9 @@ import java.util.UUID;
 public interface ContentManagerInterface {
 
     /** Retrieve or create basic behavior */
-    Behavior getBasicBehavior (BehaviorScript behaviorScript);
+    Action getBasicBehavior (Script script);
 
-    void removeState(BehaviorState behaviorState);
+    void removeState(State state);
 
     interface Callback {
         void onSuccess(Object object);
@@ -28,15 +28,15 @@ public interface ContentManagerInterface {
     boolean hasEvent (Event event);
     void removeEvent (Event event, Callback callback);
 
-    void storeBehavior (Behavior behavior);
+    void storeBehavior (Action action);
     void restoreBehaviors();
 
-    void storeScript(BehaviorScript behaviorScript);
+    void storeScript(Script script);
     void restoreScripts();
 
-    void storeState(Event event, BehaviorState behaviorState);
+    void storeState(Event event, State state);
     void restoreState(Event event);
 
-    Behavior getBehaviorComposition(ArrayList<Behavior> childBehaviors);
+    Action getBehaviorComposition(ArrayList<Action> childActions);
 
 }

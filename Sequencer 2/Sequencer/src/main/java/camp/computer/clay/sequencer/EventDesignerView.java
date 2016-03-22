@@ -72,7 +72,7 @@ public class EventDesignerView {
             toggleButton.setTextOff(channelLabel);
 
             // Get the behavior state
-            String lightStateString = eventHolder.getEvent().getBehaviorState().get(0).getState();
+            String lightStateString = eventHolder.getEvent().getState().get(0).getState();
 
             String[] lightStates = lightStateString.split(" ");
 
@@ -137,9 +137,29 @@ public class EventDesignerView {
                 eventHolder.updateState (updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState().get(0));
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // <HACK>
+                // NOTE: This only works for basic behaviors. Should change it so it also supports complex behaviors.
+                // (action, regex, state)
+                // ON START:
+                // i.e., "cache action <action-uuid> <action-regex>"
+                // ON ADD ACTION EVENT TO TIMELINE:
+                // i.e., "start event <event-uuid> [at <index> [on <timeline-uuid>]]" (creates event for the action at index i... adds the event to the timeline, but ignores it until it has an action and state)
+                // i.e., "set event <event-uuid> action <action-uuid>"
+                // i.e., "set event <event-uuid> state "<state>"" (assigns the state string the specified event)
+                // ON UPDATE ACTION STATE:
+                // i.e., "set event <event-uuid> state "<state>"" (assigns the state string the specified event)
+                // ON REMOVE ACTION FROM TIMELINE:
+                // i.e., "stop event <action-uuid>" (removes event for action with the uuid)
+//        getUnit().sendMessage ("cache action " + action.getUuid() + " \"" + action.getTag() + " " + event.getState().get(0).getState() + "\"");
+//                getUnit().sendMessage ("start event " + eventHolder.getEvent().getUuid());
+//                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " action " + eventHolder.getEvent().getAction().getUuid());
+                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
+                // unit.sendMessage("update action " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
+                // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
@@ -182,8 +202,8 @@ public class EventDesignerView {
         transformLayout.addView(channelEnabledLabel);
 
         // Get behavior state
-//        String stateString = eventHolder.getEvent().getBehavior().getState().getState();
-        String stateString = eventHolder.getEvent().getBehaviorState().get(0).getState();
+//        String stateString = eventHolder.getEvent().getAction().getState().getState();
+        String stateString = eventHolder.getEvent().getState().get(0).getState();
         final String[] ioStates = stateString.split(" ");
 
         LinearLayout channelEnabledLayout = new LinearLayout (getContext());
@@ -619,9 +639,9 @@ public class EventDesignerView {
                 eventHolder.updateState (updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
-                //getClay().getStore().storeState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState().get(0));
+                //getClay().getStore().storeState(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getState());
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
@@ -629,16 +649,16 @@ public class EventDesignerView {
                 timelineListView.refreshListViewFromData();
 
 //                // Update the behavior state
-//                BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), updatedStateString);
-//                eventHolder.getEvent().getBehavior().setState(behaviorState);
+//                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), updatedStateString);
+//                eventHolder.getEvent().getAction().setState(behaviorState);
 //
 //                // ...then addUnit it to the device.
-//                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
-//                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay ().getStore().storeState(behaviorState);
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
 //                getClay ().getStore().updateTimeline(unit.getTimeline());
 //
@@ -689,25 +709,25 @@ public class EventDesignerView {
                 // Send changes to unit
                 // TODO: "create behavior (...)"
                 String tagString = input.getText().toString();
-//                unit.send (tagString);
+//                unit.sendMessage (tagString);
 
                 // Create the behavior
-//                Behavior behavior = new Behavior(tagString);
+//                Action behavior = new Action(tagString);
                 Log.v("move", "event: " + eventHolder.getEvent());
-                Log.v("move", "event.behavior: " + eventHolder.getEvent().getBehavior());
-                eventHolder.getEvent().getBehavior().setTag(tagString);
+                Log.v("move", "event.behavior: " + eventHolder.getEvent().getAction());
+                eventHolder.getEvent().getAction().setTag(tagString);
 
 //                // Extract behaviors from the selected event holders and addUnit them to the behavior package.
 //                for (EventHolder selectedEventHolder : eventHolder.event) {
-//                    Behavior selectedBehavior = selectedEventHolder.getEvent().getBehavior();
+//                    Action selectedBehavior = selectedEventHolder.getEvent().getAction();
 //                    behavior.cacheBehavior(selectedBehavior);
 //                }
 
                 // Store: Store the new behavior state and update the event.
-//                getClay().getStore().storeState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getState());
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState().get(0));
-                getClay().getStore().storeBehavior(eventHolder.getEvent().getBehavior());
+//                getClay().getStore().storeState(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getState());
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+                getClay().getStore().storeBehavior(eventHolder.getEvent().getAction());
 //                getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
@@ -735,7 +755,7 @@ public class EventDesignerView {
         builder.setView(input);
 
         // Get the behavior state
-        String message = eventHolder.getEvent().getBehaviorState().get(0).getState();
+        String message = eventHolder.getEvent().getState().get(0).getState();
 
         // Update the view
         input.setText(message);
@@ -756,8 +776,8 @@ public class EventDesignerView {
                 eventHolder.updateState(updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState().get(0));
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
@@ -765,16 +785,16 @@ public class EventDesignerView {
                 timelineListView.refreshListViewFromData();
 
 //                // Update the behavior state
-//                BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), stateString);
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
 //                // ...then addUnit it to the device...
-//                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
-//                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay().getStore().storeState(behaviorState);
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
 //                getClay().getStore().updateTimeline(unit.getTimeline());
 //
@@ -803,7 +823,7 @@ public class EventDesignerView {
         builder.setView(input);
 
         // Get behavior state
-        String phrase = eventHolder.getEvent().getBehaviorState().get(0).getState();
+        String phrase = eventHolder.getEvent().getState().get(0).getState();
 
         // Update the view
         input.setText(phrase);
@@ -826,25 +846,25 @@ public class EventDesignerView {
                 eventHolder.updateState (updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState().get(0));
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
                 timelineListView.refreshListViewFromData();
 
-//                BehaviorState behaviorState = new BehaviorState(eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), stateString);
-////                eventHolder.getEvent().getBehavior().setState(behaviorState);
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
+////                eventHolder.getEvent().getAction().setState(behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
 //                // ...then addUnit it to the device...
-//                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
-//                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay ().getStore().storeState(behaviorState);
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
 //                getClay ().getStore().updateTimeline(unit.getTimeline());
 //
@@ -881,7 +901,7 @@ public class EventDesignerView {
         waitVal.setHapticFeedbackEnabled(true); // TODO: Emulate this in the custom interface
 
         // Get the behavior state
-        int time = Integer.parseInt(eventHolder.getEvent().getBehaviorState().get(0).getState());
+        int time = Integer.parseInt(eventHolder.getEvent().getState().get(0).getState());
 
         // Update the view
         waitLabel.setText ("Wait (" + time + " ms)");
@@ -923,8 +943,8 @@ public class EventDesignerView {
                 eventHolder.updateState(updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getBehaviorState().get(0));
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
 
                 // Refresh the timeline view
@@ -932,16 +952,16 @@ public class EventDesignerView {
                 timelineListView.refreshListViewFromData();
 
 //                // Add wait
-//                BehaviorState behaviorState = new BehaviorState (eventHolder.getEvent().getBehavior(), eventHolder.getEvent().getBehavior().getTag(), "" + waitVal.getProgress());
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                State behaviorState = new State (eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), "" + waitVal.getProgress());
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
 //                // ...then addUnit it to the device...
-//                String behaviorUuid = eventHolder.getEvent().getBehavior().getUuid().toString();
-//                unit.send("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getBehaviorState().getState() + "\"");
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay ().getStore().storeState(behaviorState);
-//                eventHolder.getEvent().setBehavior(eventHolder.getEvent().getBehavior(), behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                getClay ().getStore().updateTimeline(unit.getTimeline());
 //
 //                // Refresh the timeline view

@@ -107,8 +107,8 @@ public class Unit {
 //    public void notifyChange (Event event) {
 //        getClay().notifyChange (event);
 //
-//        this.send("create behavior " + event.getUuid() + " \"" + event.getBehavior().getTag() + " " + event.getBehavior().getState().getState() + "\"");
-//        this.send("addUnit behavior " + event.getUuid());
+//        this.sendMessage("create behavior " + event.getUuid() + " \"" + event.getAction().getTag() + " " + event.getAction().getState().getState() + "\"");
+//        this.sendMessage("addUnit behavior " + event.getUuid());
 //    }
 
     /*
@@ -117,21 +117,21 @@ public class Unit {
         getClay().notifyChange (event);
 
         // Remove the previous behavior from the timeline
-        this.send("remove behavior " + event.getBehavior().getUuid());
+        this.sendMessage("remove behavior " + event.getAction().getUuid());
     }
     */
 
-    public void send(String content) {
+    public void sendMessage(String content) {
         getClay().sendMessage(this, content);
     }
 
 //    public void cacheBehavior(UUID behaviorUuid) {
 //
 //        // Get the behavior with the specified UUID
-//        Behavior behavior = getClay().getBehavior(behaviorUuid);
+//        Action behavior = getClay().getAction(behaviorUuid);
 //
 //        // Generate the behavior's initial state
-//        BehaviorState behaviorState = new BehaviorState(behavior, behavior.getDefaultState());
+//        State behaviorState = new State(behavior, behavior.getDefaultState());
 //
 //        // Create an event for the behavior so it can be added to the timeline
 //        Event event = new Event(timeline, behavior, behaviorState);
@@ -140,7 +140,7 @@ public class Unit {
 //        this.getTimeline().addEvent(event);
 //    }
 
-//    public void cacheBehavior(Behavior behavior) {
+//    public void cacheBehavior(Action behavior) {
 //
 //        // Create an event for the behavior so it can be added to the timeline
 //        Event event = new Event(timeline, behavior);

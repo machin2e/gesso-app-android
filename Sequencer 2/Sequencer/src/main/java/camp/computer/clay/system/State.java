@@ -2,7 +2,7 @@ package camp.computer.clay.system;
 
 import java.util.UUID;
 
-public class BehaviorState {
+public class State {
 
     /** The UUID that uniquely identifies this behavior state, making it addressable. */
     private UUID uuid;
@@ -12,7 +12,7 @@ public class BehaviorState {
 
     private String description;
 
-    public BehaviorState (UUID uuid, String state) {
+    public State(UUID uuid, String state) {
 
         this.uuid = uuid;
 
@@ -21,7 +21,7 @@ public class BehaviorState {
         this.description = "";
     }
 
-    public BehaviorState (String state) {
+    public State(String state) {
 
         this (UUID.randomUUID(), state);
     }

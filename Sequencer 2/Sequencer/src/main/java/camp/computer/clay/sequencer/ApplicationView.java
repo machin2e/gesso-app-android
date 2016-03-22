@@ -20,7 +20,7 @@ import camp.computer.clay.system.ViewManagerInterface;
 
 public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
 
-    private static final long MESSAGE_SEND_FREQUENCY = 250;
+    private static final long MESSAGE_SEND_FREQUENCY = 10;
 
     private static Context context;
 
@@ -141,7 +141,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 //        getClay().getStore().resetDatabase();
 //        getClay().generateStore();
         getClay().populateCache();
-        getClay().simulateSession(false, 10, false);
+//        getClay().simulateSession(true, 10, false);
 
         // Start worker process
         // Start the initial runnable task by posting through the handler

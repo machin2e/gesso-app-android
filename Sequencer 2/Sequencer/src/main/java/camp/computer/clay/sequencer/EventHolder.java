@@ -7,13 +7,8 @@ package camp.computer.clay.sequencer;
 * object model.
 */
 
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.UUID;
-
-import camp.computer.clay.system.Behavior;
-import camp.computer.clay.system.BehaviorState;
+import camp.computer.clay.system.Action;
+import camp.computer.clay.system.State;
 import camp.computer.clay.system.Event;
 
 public class EventHolder {
@@ -47,25 +42,25 @@ public class EventHolder {
         this.event = event;
 
         // Set parameters
-        Behavior behavior = event.getBehavior();
+        Action action = event.getAction();
 
         // <HACK>
-        // TODO: Update getTitle so it retrieves the value from the associated Event (e.g., from an Event's Behavior.getTag() method).
-        this.title = behavior.getTag();
+        // TODO: Update getTitle so it retrieves the value from the associated Event (e.g., from an Event's Action.getTag() method).
+        this.title = action.getTag();
         // <HACK>
 
         // <HACK>
         // Get the layout type to prepare for view generation
-        // TODO: Automatically generate or retrieve layouts dynamically based on UUID here based on behavior events model, rather than referencing them as stored in XML.
-        if (behavior.getTag().equals("light")) {
+        // TODO: Automatically generate or retrieve layouts dynamically based on UUID here based on action events model, rather than referencing them as stored in XML.
+        if (action.getTag().equals("light")) {
             this.type = EventHolderAdapter.LIGHT_CONTROL_LAYOUT;
-        } else if (behavior.getTag().equals("signal")) {
+        } else if (action.getTag().equals("signal")) {
             this.type = EventHolderAdapter.IO_CONTROL_LAYOUT;
-        } else if (behavior.getTag().equals("message")) {
+        } else if (action.getTag().equals("message")) {
             this.type = EventHolderAdapter.MESSAGE_CONTROL_LAYOUT;
-        } else if (behavior.getTag().equals("pause")) {
+        } else if (action.getTag().equals("pause")) {
             this.type = EventHolderAdapter.WAIT_CONTROL_LAYOUT;
-        } else if (behavior.getTag().equals("say")) {
+        } else if (action.getTag().equals("say")) {
             this.type = EventHolderAdapter.SAY_CONTROL_LAYOUT;
         } else {
             this.type = EventHolderAdapter.COMPLEX_LAYOUT;
@@ -105,16 +100,16 @@ public class EventHolder {
     }
 
     /**
-     * Updates the state of the event's behavior. Creates a new BehaviorState object and associates
-     * it to the Behavior for this Event.
+     * Updates the state of the event's behavior. Creates a new State object and associates
+     * it to the Action for this Event.
      * @param stateString The new state to assign to this event's behavior.
      */
     public void updateState (String stateString) {
-        BehaviorState behaviorState = new BehaviorState(stateString);
-        //getEvent().getBehavior().setState (behaviorState);
-//        getEvent().setBehaviorState (behaviorState);
-        getEvent().getClay().getStore().removeState (getEvent().getBehaviorState().get(0));
-        this.getEvent().getBehaviorState().set(0, behaviorState);
+        State state = new State(stateString);
+        //getEvent().getAction().setState (state);
+//        getEvent().setBehaviorState (state);
+        getEvent().getClay().getStore().removeState (getEvent().getState().get(0));
+        this.getEvent().getState().set(0, state);
 
         // TODO: Update state for the associated event! Do this by searching the leaf nodes!
     }

@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -397,7 +396,7 @@ public class EventHolderAdapter extends BaseAdapter {
             // TODO: Consider making a behavior for system controls, too.
             tv.setText(eventHolder.title);
         } else {
-            tv.setText(eventHolder.getEvent().getBehavior().getTag());
+            tv.setText(eventHolder.getEvent().getAction().getTag());
         }
 
         // Update the remainder of the view based on the type of eventHolders it represents.
@@ -445,9 +444,9 @@ public class EventHolderAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        //String lightStateString = item.getEvent().getBehavior().getState().getState();
+                        //String lightStateString = item.getEvent().getAction().getState().getState();
                         // TODO: ^ The above line doesn't get the most recent or correct state from the behavior... is the reference out of date or not updated somewhere? That's bad, man.
-                        String lightStateString = eventHolder.getEvent().getBehaviorState().get(0).getState();
+                        String lightStateString = eventHolder.getEvent().getState().get(0).getState();
                         String[] lightStates = lightStateString.split(" ");
 
                         // Update the view
@@ -507,7 +506,7 @@ public class EventHolderAdapter extends BaseAdapter {
                         Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
                         // Get behavior state
-                        String ioStateString = eventHolder.getEvent().getBehaviorState().get(0).getState();
+                        String ioStateString = eventHolder.getEvent().getState().get(0).getState();
                         String[] ioStates = ioStateString.split(" ");
 
                         char ioState = ioStates[i].charAt(0);
@@ -540,7 +539,7 @@ public class EventHolderAdapter extends BaseAdapter {
             if (textView != null) {
 
                 // Get behavior state
-                String message = eventHolder.getEvent().getBehaviorState().get(0).getState();
+                String message = eventHolder.getEvent().getState().get(0).getState();
 
                 // Update the view
                 textView.setText("\"" + message + "\"");
@@ -551,7 +550,7 @@ public class EventHolderAdapter extends BaseAdapter {
             if (textView != null) {
 
                 // Get behavior state
-                int time = Integer.parseInt(eventHolder.getEvent().getBehaviorState().get(0).getState());
+                int time = Integer.parseInt(eventHolder.getEvent().getState().get(0).getState());
 
                 // Update the view
                 textView.setText(time + " ms");
@@ -560,7 +559,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
             if (textView != null) {
-                textView.setText("\"" + eventHolder.getEvent().getBehaviorState().get(0).getState() + "\"");
+                textView.setText("\"" + eventHolder.getEvent().getState().get(0).getState() + "\"");
             }
         } else if (eventHolder.type == COMPLEX_LAYOUT) {
 
