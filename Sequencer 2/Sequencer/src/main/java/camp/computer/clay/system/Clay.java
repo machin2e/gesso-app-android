@@ -391,7 +391,7 @@ public class Clay {
             if (!getCache().hasBehaviorScript ("light")) {
                 Log.v("Clay_Behavior_Repo", "\"light\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("1470f5c4-eaf1-43fb-8fb3-d96dc4e2bee4");
-                getClay().generateBehaviorScript(uuid, "light", "((T|F) ){11}(T|F)", "F F F F F F F F F F F F");
+                getClay().generateBehaviorScript(uuid, "light", "((T|F) ){11}(T|F)", "000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000");
             }
 
             if (!getCache().hasBehaviorScript ("signal")) {

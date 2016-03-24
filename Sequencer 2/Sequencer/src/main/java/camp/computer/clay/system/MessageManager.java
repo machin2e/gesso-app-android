@@ -196,12 +196,14 @@ public class MessageManager {
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
                     Log.v("UDP", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    getClay().addUnit(UUID.fromString(unitUuid), unitAddress);
+                    UUID deviceUuid = UUID.fromString(unitUuid);
+                    getClay().addUnit(deviceUuid, unitAddress);
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
 
-                    Unit unit = getClay().getUnitByUuid(UUID.fromString(unitUuid));
+                    UUID deviceUuid = UUID.fromString(unitUuid);
+                    Unit unit = getClay().getUnitByUuid(deviceUuid);
                 }
             }
 
@@ -282,7 +284,7 @@ public class MessageManager {
             Log.v("UDP", "-----");
 
 //            if ((currentTime.getTime () - timeLastSentMessage.getTime ()) > outgoingMessagePeriod) {
-            long currentTimeMillis = currentTime.getTime ();
+            long currentTimeMillis = currentTime.getTime();
 
 //            Log.v ("UDP_Time", "Try count: " + outgoingMessage.getRetryCount());
 //            Log.v ("UDP_Time", "Time since retry (must be > " + Message.RETRY_SEND_PERIOD + " ms): " + (currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()));
@@ -302,7 +304,7 @@ public class MessageManager {
                 }
                 Log.v("UDP", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
 
-                outgoingMessage.setTimeLastSent(currentCalendar.getTime ());
+                outgoingMessage.setTimeLastSent(currentCalendar.getTime());
                 outgoingMessage.increaseRetryCount();
 //                timeLastSentMessage = outgoingMessage.getTimeLastSent();
 

@@ -3,6 +3,9 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +18,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.azeesoft.lib.colorpicker.ColorPickerDialog;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import camp.computer.clay.system.Clay;
@@ -47,16 +54,20 @@ public class EventDesignerView {
 
     public void displayUpdateLightsOptions(final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle ("Change the channel.");
-        builder.setMessage ("What do you want to do?");
 
-        // Declare transformation layout
+        // Title
+        builder.setTitle ("light");
+
+        // Instructions
+        // builder.setMessage ("What do you want to do?");
+
+        // Layout
         LinearLayout transformLayout = new LinearLayout (getContext());
         transformLayout.setOrientation (LinearLayout.VERTICAL);
 
-        // Set up the LED label
+        // Enable or disable lights
         final TextView lightLabel = new TextView (getContext());
-        lightLabel.setText("Enable LED feedback");
+        lightLabel.setText("Choose some lights");
         lightLabel.setPadding(70, 20, 70, 20);
         transformLayout.addView(lightLabel);
 
@@ -90,8 +101,85 @@ public class EventDesignerView {
             lightToggleButtons.add(toggleButton); // Add the button to the list.
             lightLayout.addView(toggleButton);
         }
+        transformLayout.addView(lightLayout);
 
-        transformLayout.addView (lightLayout);
+        // Select light color
+        final TextView lightColorLabel = new TextView (getContext());
+        lightColorLabel.setText("Choose light colors");
+        lightColorLabel.setPadding(70, 20, 70, 20);
+        transformLayout.addView(lightColorLabel);
+
+        LinearLayout lightColorLayout = new LinearLayout (getContext());
+        lightColorLayout.setOrientation(LinearLayout.HORIZONTAL);
+        final ArrayList<Button> lightColorButtons = new ArrayList<Button> ();
+        final ArrayList<Integer> lightColor = new ArrayList<Integer> ();
+        final ArrayList<String> lightHexColor = new ArrayList<String> ();
+        for (int i = 0; i < 12; i++) {
+            final String channelLabel = Integer.toString(i + 1);
+            final Button colorButton = new Button (getContext());
+            colorButton.setPadding(0, 0, 0, 0);
+            colorButton.setText(Integer.toString(i));
+
+            lightColor.add(0);
+            lightHexColor.add ("#ff000000");
+
+            colorButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //        // Show color picker
+//        ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog(getContext(), R.style.CustomColorPicker);
+//        colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
+//            @Override
+//            public void onColorPicked(int color, String hexVal) {
+//                System.out.println("Got color: " + color);
+//                System.out.println("Got color in hex form: " + hexVal);
+//
+//                // Make use of the picked color here
+//            }
+//        });
+//        colorPickerDialog.show();
+
+                    ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog (getContext(), ColorPickerDialog.DARK_THEME);
+                    colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
+                        @Override
+                        public void onColorPicked(int color, String hexVal) {
+                            colorButton.setBackgroundColor(color);
+                            lightColor.set(Integer.valueOf(String.valueOf(colorButton.getText())), color);
+                            lightHexColor.set (Integer.valueOf(String.valueOf(colorButton.getText())), hexVal);
+
+                            // edited to support big numbers bigger than 0x80000000
+                            // int color = (int)Long.parseLong(myColorString, 16);
+//                            int r = (color >> 16) & 0xFF;
+//                            int g = (color >> 8) & 0xFF;
+//                            int b = (color >> 0) & 0xFF;
+                        }
+                    });
+                    colorPickerDialog.show();
+                }
+            });
+
+            /*
+            // Get the behavior state
+            String lightStateString = eventHolder.getEvent().getState().get(0).getState();
+
+            String[] lightStates = lightStateString.split(" ");
+
+            // Recover configuration options for event
+            if (lightStates[i].equals("T")) {
+                colorButton.setChecked(true);
+            } else {
+                colorButton.setChecked(false);
+            }
+            */
+
+            // e.g., LinearLayout.LayoutParams param = new LinearLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(10, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+            params.setMargins(0, 0, 0, 0);
+            colorButton.setLayoutParams(params);
+            lightColorButtons.add(colorButton); // Add the button to the list.
+            lightColorLayout.addView(colorButton);
+        }
+        transformLayout.addView (lightColorLayout);
 
         // Assign the layout to the alert dialog.
         builder.setView (transformLayout);
@@ -102,12 +190,11 @@ public class EventDesignerView {
             public void onClick (DialogInterface dialog, int which) {
 
                 String updatedStateString = "";
-
-//                String[] lightStates = new String[12];
-
+                Byte[] colorBytesString = new Byte[12 * 3]; // i.e., 12 lights, each with 3 color bytes
                 for (int i = 0; i < 12; i++) {
 
                     final ToggleButton lightEnableButton = lightToggleButtons.get (i);
+                    final Button lightColorButton = lightColorButtons.get (i);
 
                     // LED enable. Is the LED on or off?
 
@@ -122,13 +209,40 @@ public class EventDesignerView {
                     }
                     // transformString = transformString.concat (","); // Add comma
 
-                    // TODO: Set LED color.
+                    // Get LED color
+                    int color = lightColor.get(i);
+                    int r = (color & 0x00FF0000) >> 16; // ((color >> 16) & 0xFF);
+                    int g = (color & 0x0000FF00) >> 8;
+                    int b = (color & 0x000000FF) >> 0;
+//                    Log.v ("Color", Integer.toBinaryString(color));
+//                    Log.v ("Color", Integer.toBinaryString((color & 0x00FF0000) >> 16));
+//                    Log.v ("Color", Integer.toBinaryString((color & 0x0000FF00) >> 8));
+//                    Log.v ("Color", Integer.toBinaryString((color & 0x000000FF) >> 0));
+                    colorBytesString[3 * i + 0] = (byte) r;
+                    colorBytesString[3 * i + 1] = (byte) g;
+                    colorBytesString[3 * i + 2] = (byte) b;
 
                     // Add space between channel states.
                     if (i < (12 - 1)) {
                         updatedStateString = updatedStateString.concat (" ");
                     }
                 }
+
+                String colorHexString = "";
+                byte[] colorBytes = new byte[12 * 3];
+                for (int i = 0; i < 12 * 3; i++) {
+                    colorBytes[i] = colorBytesString[i];
+                    String s1 = String.format("%8s", Integer.toBinaryString(colorBytesString[i] & 0xFF)).replace(' ', '0');
+                    colorHexString += s1 + " "; // Integer.toString((int) colorHexBytes[i]) + " ";
+                }
+                Log.v("Color", "color hex: " + colorHexString);
+
+
+                String lightHexColorString = "";
+                for (int i = 0; i < lightHexColor.size(); i++) {
+                    lightHexColorString += " " + lightHexColor.get(i).substring(3).toUpperCase();
+                }
+                updatedStateString = lightHexColorString.trim();
 
                 // Update the behavior state
                 // <HACK>
@@ -157,7 +271,18 @@ public class EventDesignerView {
 //        getUnit().sendMessage ("cache action " + action.getUuid() + " \"" + action.getTag() + " " + event.getState().get(0).getState() + "\"");
 //                getUnit().sendMessage ("start event " + eventHolder.getEvent().getUuid());
 //                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " action " + eventHolder.getEvent().getAction().getUuid());
-                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
+//                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"light" + lightHexColorString + "\"";
+                Log.v ("Color", content);
+                getUnit().sendMessage (content); // <HACK />
+                /*
+                String packedBytes = new String(colorBytes, Charset.forName("UTF-8")); // "US-ASCII"
+                String msg2 = "set event " + eventHolder.getEvent().getUuid() + " state \"color " + packedBytes + "\"";
+                getUnit().sendMessage (msg2); // <HACK />
+                for (int i = 0; i < msg2.length(); i++) {
+                    Log.v ("Color", String.valueOf(Integer.valueOf(msg2.getBytes()[i])));
+                }
+                */
                 // unit.sendMessage("update action " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
                 // </HACK>
 

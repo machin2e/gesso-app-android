@@ -8,34 +8,34 @@ package com.mobeta.android.dslv;
 
 public final class R {
 	public static final class attr {
-		public static final int click_remove_id = 0x7f010010;
-		public static final int collapsed_height = 0x7f010000;
-		public static final int drag_enabled = 0x7f01000a;
-		public static final int drag_handle_id = 0x7f01000e;
-		public static final int drag_scroll_start = 0x7f010001;
-		public static final int drag_start_mode = 0x7f01000d;
-		public static final int drop_animation_duration = 0x7f010009;
-		public static final int fling_handle_id = 0x7f01000f;
-		public static final int float_alpha = 0x7f010006;
-		public static final int float_background_color = 0x7f010003;
-		public static final int max_drag_scroll_speed = 0x7f010002;
-		public static final int remove_animation_duration = 0x7f010008;
-		public static final int remove_enabled = 0x7f01000c;
-		public static final int remove_mode = 0x7f010004;
-		public static final int slide_shuffle_speed = 0x7f010007;
-		public static final int sort_enabled = 0x7f01000b;
-		public static final int track_drag_sort = 0x7f010005;
-		public static final int use_default_controller = 0x7f010011;
+		public static final int click_remove_id = 0x7f01005a;
+		public static final int collapsed_height = 0x7f01004a;
+		public static final int drag_enabled = 0x7f010054;
+		public static final int drag_handle_id = 0x7f010058;
+		public static final int drag_scroll_start = 0x7f01004b;
+		public static final int drag_start_mode = 0x7f010057;
+		public static final int drop_animation_duration = 0x7f010053;
+		public static final int fling_handle_id = 0x7f010059;
+		public static final int float_alpha = 0x7f010050;
+		public static final int float_background_color = 0x7f01004d;
+		public static final int max_drag_scroll_speed = 0x7f01004c;
+		public static final int remove_animation_duration = 0x7f010052;
+		public static final int remove_enabled = 0x7f010056;
+		public static final int remove_mode = 0x7f01004e;
+		public static final int slide_shuffle_speed = 0x7f010051;
+		public static final int sort_enabled = 0x7f010055;
+		public static final int track_drag_sort = 0x7f01004f;
+		public static final int use_default_controller = 0x7f01005b;
 	}
 	public static final class id {
-		public static final int clickRemove = 0x7f080002;
-		public static final int flingRemove = 0x7f080003;
-		public static final int onDown = 0x7f080004;
-		public static final int onLongPress = 0x7f080005;
-		public static final int onMove = 0x7f080006;
+		public static final int clickRemove = 0x7f0d0031;
+		public static final int flingRemove = 0x7f0d0032;
+		public static final int onDown = 0x7f0d0033;
+		public static final int onLongPress = 0x7f0d0034;
+		public static final int onMove = 0x7f0d0035;
 	}
 	public static final class styleable {
-		public static final int[] DragSortListView = { 0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003, 0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007, 0x7f010008, 0x7f010009, 0x7f01000a, 0x7f01000b, 0x7f01000c, 0x7f01000d, 0x7f01000e, 0x7f01000f, 0x7f010010, 0x7f010011 };
+		public static final int[] DragSortListView = { 0x7f01004a, 0x7f01004b, 0x7f01004c, 0x7f01004d, 0x7f01004e, 0x7f01004f, 0x7f010050, 0x7f010051, 0x7f010052, 0x7f010053, 0x7f010054, 0x7f010055, 0x7f010056, 0x7f010057, 0x7f010058, 0x7f010059, 0x7f01005a, 0x7f01005b };
 		public static final int DragSortListView_click_remove_id = 16;
 		public static final int DragSortListView_collapsed_height = 0;
 		public static final int DragSortListView_drag_enabled = 10;

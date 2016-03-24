@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -450,8 +451,18 @@ public class EventHolderAdapter extends BaseAdapter {
                         String[] lightStates = lightStateString.split(" ");
 
                         // Update the view
-                        if (lightStates[i].equals("T")) {
-                            paint2.setColor(Color.rgb(0, 0, 255));
+//                        if (lightStates[i].equals("T")) {
+//                            paint2.setColor(Color.rgb(0, 0, 255));
+//                        } else {
+//                            paint2.setColor(Color.rgb(100, 100, 100));
+//                        }
+
+//                        String[] colors = eventHolder.getEvent().getState().get(0).getState().split(" ");
+
+                        if (!lightStates[i].equals("000000")) {
+                            String colorString = "#" + lightStates[i];
+                            int color = Color.parseColor(colorString);
+                            paint2.setColor(color);
                         } else {
                             paint2.setColor(Color.rgb(100, 100, 100));
                         }

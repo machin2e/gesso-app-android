@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.WindowManager;
 
+import com.azeesoft.lib.colorpicker.ColorPickerDialog;
 import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.resource.NetworkResource;
