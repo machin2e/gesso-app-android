@@ -44,27 +44,21 @@ public class MessageManager {
             Bundle bundle = msg.getData();
             String serializedMessageObject = bundle.getString("serializedMessageObject");
 
-            Log.v("Clay", "dequeuedMessage = " + serializedMessageObject);
-
             String[] tokens = serializedMessageObject.split (":");
-//            InetAddress senderAddress = null;
             String senderAddress = null;
-//            Message message = null;
             senderAddress = tokens[0]; // InetAddress.getByName(tokens[0]);
 
+            Log.v("Clay_Queue", "dequeuedMessage = " + serializedMessageObject);
+            Log.v("Clay_Queue", "IP = " + senderAddress);
+
             // Create the message
-            Message message = new Message("udp", senderAddress, null, tokens[1]);
+            Message message = new Message ("udp", senderAddress, null, tokens[1]);
 
             // Update the unit construct associated with the message
-//                Log.v ("Clay_Messaging", "Looking for unit with address " + tokens[0]);
             if (getClay ().hasUnitByAddress (tokens[0])) {
-
-                Log.v("Clay_Time", "Found unit.");
 
                 // Get the unit associated with the received message
                 Unit unit = getClay ().getUnitByAddress (tokens[0]);
-
-                Log.v("Clay_Time", "The unit is " + unit);
 
                 // Set time that this message was added to the message queue.
                 // NOTE: This is NOT the time that the message was received! It is probably shortly thereafter, though!
@@ -77,20 +71,6 @@ public class MessageManager {
             if (incomingMessages.size () > 0) {
                 Log.v("Clay Datagram Server", "myKey = " + incomingMessages.get(incomingMessages.size() - 1));
             }
-
-            //            // Dequeue and process the next message on the incoming message queue.
-//            Log.v ("Clay_Time", "Checking for incoming messages");
-//            if (hasIncomingMessages()) {
-//                Log.v ("Clay_Time", "Processing incoming message");
-//                while (hasIncomingMessages ()) {
-//                    Message dequeuedMessage = dequeueIncomingMessage();
-//                    processIncomingMessage (dequeuedMessage);
-//                }
-//            }
-//            Log.v ("Clay_Time", "Done processing messages");
-
-
-            // TODO: Periodically check for last received update from Clay units that are known, to verify that they are still active in the network. If they're not, heal the network.
         }
     };
 
@@ -107,15 +87,15 @@ public class MessageManager {
 
         // Serialize the message so it can be passed to the main thread...
         //String serializedMessage = getIpAsString (message.getFromAddress()) + ":" + message.getContent();
-        String serializedMessage = message.getFromAddress() + ":" + message.getContent();
+        String serializedMessage = message.getFromAddress () + ":" + message.getContent ();
 
         // ...prepare the serialized message to be passed to the main thread...
         android.os.Message msg = handler.obtainMessage ();
-        Bundle bundle = new Bundle();
+        Bundle bundle = new Bundle ();
         bundle.putString ("serializedMessageObject", serializedMessage);
         msg.setData (bundle);
 
-        // ...and finally, send the message to the main thread.
+        // ...and finally, sendMessage the message to the main thread.
         handler.sendMessage (msg);
     }
 
@@ -132,6 +112,7 @@ public class MessageManager {
     }
 
     public void processIncomingMessages () {
+        Log.v ("UDP_Processing", "<<< processIncomingQueue");
         // Dequeue and process the next message on the incoming message queue.
         if (hasIncomingMessages()) {
             Log.v("Clay_Time", "Processing incoming message");
@@ -144,19 +125,22 @@ public class MessageManager {
 
     private void processIncomingMessage (Message message) {
 
-        Log.v("Clay_Messaging", "Processing message \"" + message.getContent() + "\"");
+        Log.v("UDP", "Processing message \"" + message.getContent() + "\"");
+
+        Log.v ("UDP_Time", "Processing incoming message: " + message.getContent());
 
         if (message.getContent().startsWith(Message.VERIFY_PREFIX)) {
 
-            Log.v("Clay_Messaging", "\tReceived verification message \"" + message.getContent() + "\"");
+            Log.v("UDP", "\tReceived verification message \"" + message.getContent() + "\"");
 
             if (hasOutgoingMessages ()) {
                 Message outgoingMessage = peekOutgoingMessage ();
 
-                Log.v("Clay_Messaging", "\tHas outgoing message");
+                Log.v("UDP", "\tHas outgoing message");
 
                 // Check if the outgoing message at the front of the queue should be verified.
-                if (outgoingMessage.isDelivered() == true) {
+                //if (outgoingMessage.isDelivered() == true) {
+                if (outgoingMessage.isDeliveryGuaranteed() == true) {
 
                     // Compute the checksum for the incoming message.
                     // Note that this incoming message does not INCLUDE the checksum in the received content.
@@ -166,9 +150,10 @@ public class MessageManager {
                     // TODO: Get the behaviorConstruct by UUID which sent this message originally.
                     // TODO: behaviorConstruct.setSynchronized (true);
 
-                    Log.v("Clay_Messaging", "\t----");
-                    Log.v ("Clay_Messaging", "\tChecksum expected: " + outgoingMessage.getChecksum() + "\t" + Message.VERIFY_PREFIX + outgoingMessage.getContent());
-                    Log.v("Clay_Messaging", "\tChecksum received: " + message.getChecksum() + "\t" + message.getContent());
+                    Log.v ("UDP", "\t----");
+                    Log.v ("UDP", "\tChecksum expected: " + outgoingMessage.getChecksum() + "\t" + Message.VERIFY_PREFIX + outgoingMessage.getContent());
+                    Log.v ("UDP", "\tChecksum received: " + message.getChecksum() + "\t" + message.getContent());
+                    Log.v ("UDP", "---");
 
                     try {
                         byte[] outgoingBytes = outgoingMessage.getContent().getBytes("UTF-8");
@@ -179,6 +164,8 @@ public class MessageManager {
 
                     // Check if the checksum matches the expected one for the outgoing message at the front of the queue.
                     if (message.getChecksum().compareTo(outgoingMessage.getChecksum()) == 0) {
+
+                        Log.v ("UDP_Time", "Got ack for front message.");
 
                         // Flag the outgoing message as verified
                         outgoingMessage.setDelivered(true);
@@ -194,33 +181,33 @@ public class MessageManager {
 
             }
 
-        } else if (message.getContent().startsWith("set unit ")) {
+        } else if (message.getContent().startsWith("announce device ")) {
 
-            Log.v ("Add_Unit", "Trying to addUnit a unit.");
+            Log.v ("UDP", "Trying to add a device.");
 
-            // e.g., "set unit <uuid> address to <ip-address>"
+            // e.g., "announce device <uuid>"
 
             String[] messageTokens = message.getContent().split(" ");
 
-            if (messageTokens.length > 5) {
+            if (messageTokens.length == 3) {
                 String unitUuid = messageTokens[2];
-                String unitAddress = messageTokens[5];
+                String unitAddress = message.getFromAddress(); // messageTokens[5];
 
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
-                    Log.v("Clay_Time", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    getClay().addUnit(UUID.fromString(unitUuid), unitAddress);
+                    Log.v("UDP", "Adding Clay " + unitUuid + " with address " + unitAddress);
+                    UUID deviceUuid = UUID.fromString(unitUuid);
+                    getClay().addUnit(deviceUuid, unitAddress);
 
                 } else {
                     Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
 
-                    // TODO: Update communications table
-                    /*
-                    Unit unit = getClay().getUnitByUuid(UUID.fromString(unitUuid));
-                    unit.setTimeOfLastContact();
-                    */
+                    UUID deviceUuid = UUID.fromString(unitUuid);
+                    Unit unit = getClay().getUnitByUuid(deviceUuid);
                 }
             }
+
+            Log.v ("UDP", "---");
 
         } else if (message.getContent().startsWith("say ")) {
 
@@ -234,6 +221,8 @@ public class MessageManager {
             Log.v("Clay", "Error: Unrecognized message.");
             // TODO: Add the unrecognized message the FileContentManager in a category for unrecognized messages, and allow it to be defined.
         }
+
+        Log.v ("UDP", "---");
     }
 
     public boolean hasOutgoingMessages () {
@@ -264,10 +253,12 @@ public class MessageManager {
         return outgoingMessages.remove (0);
     }
 
+//    Calendar currentCalendar = Calendar.getInstance();
+//    Date currentTime = currentCalendar.getTime ();
     Date timeLastSentMessage = new Date(0);
-    long outgoingMessagePeriod = 500;
+    long outgoingMessagePeriod = 200;
     public void processOutgoingMessages () {
-//        Log.v ("Handlers", "processOutgoingMessage (count: " + outgoingMessages.size() + ")");
+        Log.v ("UDP_Processing", "processOutgoingMessage (count: " + outgoingMessages.size() + ")");
 
         if (hasOutgoingMessages ()) {
 
@@ -276,33 +267,52 @@ public class MessageManager {
 
 //            Log.v ("Clay_Messaging", "Monitoring outgoing message queue.");
 
+            // Dequeue any messages that have been delivered
+            for (Message queuedOutgoingMessage : outgoingMessages) {
+                if (queuedOutgoingMessage.isDelivered()) {
+                    outgoingMessages.remove(queuedOutgoingMessage);
+                }
+            }
+
             // Get the next outgoing message.
             Message outgoingMessage = peekOutgoingMessage ();
 
-            Log.v("Handlers", "                 Message: " + outgoingMessage.getContent());
-            Log.v("Handlers", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-            Log.v("Handlers", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
-            Log.v("Handlers", "                 Retries: " + outgoingMessage.getRetryCount());
-            Log.v("Handlers", "-----");
+            Log.v("UDP", "                 Message: " + outgoingMessage.getContent());
+            Log.v("UDP", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+            Log.v("UDP", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
+            Log.v("UDP", "-----");
 
 //            if ((currentTime.getTime () - timeLastSentMessage.getTime ()) > outgoingMessagePeriod) {
-            long currentTimeMillis = currentTime.getTime ();
+            long currentTimeMillis = currentTime.getTime();
 
-            if (((currentTimeMillis - timeLastSentMessage.getTime ()) > outgoingMessagePeriod) && ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD)) {
+//            Log.v ("UDP_Time", "Try count: " + outgoingMessage.getRetryCount());
+//            Log.v ("UDP_Time", "Time since retry (must be > " + Message.RETRY_SEND_PERIOD + " ms): " + (currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()));
+//            Log.v ("UDP_Time", "retry time (must be > 5 s): " + ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD));
 
-                Log.v("Handlers", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
+            //if (((currentTimeMillis - timeLastSentMessage.getTime ()) > outgoingMessagePeriod && outgoingMessage.getRetryCount() == 0) || (outgoingMessage.getRetryCount() == 0 || (outgoingMessage.getRetryCount() > 0 && ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD)))) {
+//            if (outgoingMessage.getRetryCount() == 0 || (outgoingMessage.getRetryCount() > 0 && ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD))) {
+            if (((currentTimeMillis - timeLastSentMessage.getTime ()) > outgoingMessagePeriod)) {
+
+                Log.v ("UDP_Time", "Sending message (of " + outgoingMessages.size() + ")");
+
+                Log.v ("UDP_Processing", ">>> processOutgoingQueue");
+
+                Log.v("UDP", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
                 for (Message queuedOutgoingMessage : outgoingMessages) {
-                    Log.v("Handlers", "\t\t" + queuedOutgoingMessage.getContent());
+                    Log.v("UDP", "\t\t" + queuedOutgoingMessage.getContent());
                 }
-                Log.v("Handlers", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
+                Log.v("UDP", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
 
-                outgoingMessage.setTimeLastSent(currentCalendar.getTime ());
+                outgoingMessage.setTimeLastSent(currentCalendar.getTime());
                 outgoingMessage.increaseRetryCount();
-                timeLastSentMessage = outgoingMessage.getTimeLastSent();
+//                timeLastSentMessage = outgoingMessage.getTimeLastSent();
 
                 processOutgoingMessage (outgoingMessage);
 
             }
+
+            timeLastSentMessage = outgoingMessage.getTimeLastSent();
 //            }
 
         }
@@ -310,9 +320,6 @@ public class MessageManager {
     }
 
     private void processOutgoingMessage (Message message) {
-
-        Log.v("Clay_Messaging", "\t\t    verify = " + message.isDeliveryGuaranteed());
-        Log.v("Clay_Messaging", "\t\tisVerified = " + message.isDelivered());
 
         for (MessageManagerInterface messageManager : messageManagers) {
             if (messageManager.getType().equals(message.getType())) {
@@ -323,7 +330,7 @@ public class MessageManager {
                 }
 
                 // Process the message
-                messageManager.process(message);
+                messageManager.process (message);
             }
         }
 

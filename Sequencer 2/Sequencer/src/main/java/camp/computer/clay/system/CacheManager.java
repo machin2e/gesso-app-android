@@ -7,9 +7,9 @@ public class CacheManager {
 
     private Clay clay;
 
-    private ArrayList<Behavior> behaviors = new ArrayList<Behavior>();
+    private ArrayList<Action> actions = new ArrayList<Action>();
 
-    private ArrayList<BehaviorScript> behaviorScripts = new ArrayList<BehaviorScript>();
+    private ArrayList<Script> scripts = new ArrayList<Script>();
 
     CacheManager(Clay clay) {
         this.clay = clay;
@@ -20,20 +20,20 @@ public class CacheManager {
     }
 
     /**
-     * Caches the specified behavior.
-     * @param behavior The behavior to cache.
+     * Caches the specified action.
+     * @param action The action to cache.
      */
-    public void cache (Behavior behavior) {
-        this.behaviors.add(behavior);
+    public void cache (Action action) {
+        this.actions.add(action);
     }
 
-    public void cache (BehaviorScript behaviorScript) {
-        this.behaviorScripts.add(behaviorScript);
+    public void cache (Script script) {
+        this.scripts.add(script);
     }
 
     public boolean hasBehavior (String tag) {
-        for (Behavior cachedBehavior : this.behaviors) {
-            if (cachedBehavior.getTag().equals(tag)) {
+        for (Action cachedAction : this.actions) {
+            if (cachedAction.getTag().equals(tag)) {
                 return true;
             }
         }
@@ -47,46 +47,46 @@ public class CacheManager {
      * @return True if a behavior with the specified UUID was found. Otherwise, false.
      */
     public boolean hasBehavior (UUID behaviorUuid) {
-        for (Behavior cachedBehavior : this.behaviors) {
-            if (cachedBehavior.getUuid().equals(behaviorUuid)) {
+        for (Action cachedAction : this.actions) {
+            if (cachedAction.getUuid().equals(behaviorUuid)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Behavior getBehavior (UUID behaviorUuid) {
-        for (Behavior cachedBehavior : this.behaviors) {
-            if (cachedBehavior.getUuid().equals(behaviorUuid)) {
-                return cachedBehavior;
+    public Action getBehavior (UUID behaviorUuid) {
+        for (Action cachedAction : this.actions) {
+            if (cachedAction.getUuid().equals(behaviorUuid)) {
+                return cachedAction;
             }
         }
         return null;
     }
 
-    public ArrayList<Behavior> getBehaviors() {
-        return this.behaviors;
+    public ArrayList<Action> getActions() {
+        return this.actions;
     }
 
     public boolean hasBehaviorScript (String tag) {
-        for (BehaviorScript cachedBehaviorScript : this.behaviorScripts) {
-            if (cachedBehaviorScript.getTag().equals(tag)) {
+        for (Script cachedScript : this.scripts) {
+            if (cachedScript.getTag().equals(tag)) {
                 return true;
             }
         }
         return false;
     }
 
-    public BehaviorScript getBehaviorScript (UUID behaviorScriptUuid) {
-        for (BehaviorScript cachedBehaviorScript : this.behaviorScripts) {
-            if (cachedBehaviorScript.getUuid().equals(behaviorScriptUuid)) {
-                return cachedBehaviorScript;
+    public Script getBehaviorScript (UUID behaviorScriptUuid) {
+        for (Script cachedScript : this.scripts) {
+            if (cachedScript.getUuid().equals(behaviorScriptUuid)) {
+                return cachedScript;
             }
         }
         return null;
     }
 
-    public ArrayList<BehaviorScript> getBehaviorScripts() {
-        return this.behaviorScripts;
+    public ArrayList<Script> getScripts() {
+        return this.scripts;
     }
 }

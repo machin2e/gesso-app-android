@@ -2,32 +2,53 @@
 <items version="2" >
 
     <item
-        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/jars/classes.jar"
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/jars/classes.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="ddde541c289c8b816a8f8fd6c325d80788c522a6">
-        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-7d887d44e05ed22aadfb121a7705e3509702166e.jar" />
+        sha1="6cbc7773921fcfedbe55657578f0cbfe614778dc">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-cf4256193ddfad20b820c4861bfb1c6d589e4af3.jar" />
     </item>
     <item
-        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/jars/libs/internal_impl-23.1.0.jar"
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/jars/classes.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="8716243bf04bae8d6c9ca94d27b9a9be7236f0a3">
-        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/internal_impl-23.1.0-b32f95ee7d441e2fb535f5ba6d592f7bcce09943.jar" />
+        sha1="6d492cff37317204a595f471c5db65e91535fdf0">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-12e95ffc8bed2e0296c5a6c64d1452920b1e0bf5.jar" />
     </item>
     <item
-        jar="/Users/mokogobo/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.0/support-annotations-23.1.0.jar"
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/jars/classes.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="92e3fc113ec3ee36b64603a38857b95700025633">
-        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/support-annotations-23.1.0-9018ac38ac202ef1b9536b0944b44007b02eefd8.jar" />
+        sha1="5c5699834e9722f1c288fea2de82725d078ba127">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-59fe01cf50459b09d57c6098b1e6137ec4bd016a.jar" />
     </item>
     <item
-        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/Sequencer 2/library/unspecified/jars/classes.jar"
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/jars/libs/internal_impl-23.1.1.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="afaef9cc30e88a6320791443624aa0f54505fae4">
-        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-dcec18edfef5f31cf4eafcf6d0f466e20701eab7.jar" />
+        sha1="a4de9c81ae239414e1ed0f86441b02abaf29bca9">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/internal_impl-23.1.1-c15aa1a4e27d7cb5162ec6eac85bccd04e6b3a24.jar" />
+    </item>
+    <item
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="09c5e804bc67fc0580360043dff067df574a60d4">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-619448bfddfa5299c0be1e8404bb2cc111d15429.jar" />
+    </item>
+    <item
+        jar="/Users/mokogobo/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.1.1/support-annotations-23.1.1.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="8d680ba5a623724d1fb0e81c36a790f023a6cede">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/support-annotations-23.1.1-2b5b202d450bf98ab9169ef4025943bca98bb0c5.jar" />
+    </item>
+    <item
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/design/23.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="379471b2bd17d9737c050345c08e8c7d16589784">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/pre-dexed/debug/classes-88d86bfa1010dd931568deb99551a6de044a942b.jar" />
     </item>
 
 </items>

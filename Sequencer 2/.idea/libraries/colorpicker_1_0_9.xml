@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="colorpicker-1.0.9">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/7ef0e679661443b72709df75f53fea26837a8841/colorpicker-1.0.9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -9,10 +9,10 @@ public class Event {
 
     private Timeline timeline;
 
-    private Behavior behavior;
+    private Action action;
 
-//    private BehaviorState behaviorState;
-    private ArrayList<BehaviorState> behaviorState;
+//    private State state;
+    private ArrayList<State> state;
 
     public Event (UUID uuid, Timeline timeline) {
 
@@ -20,47 +20,47 @@ public class Event {
 
         this.timeline = timeline;
 
-        this.behaviorState = new ArrayList<BehaviorState>();
+        this.state = new ArrayList<State>();
     }
 
-    public Event (UUID uuid, Timeline timeline, Behavior behavior) {
+    public Event (UUID uuid, Timeline timeline, Action action) {
 
         this.uuid = uuid;
 
         this.timeline = timeline;
 
-        this.behavior = behavior;
+        this.action = action;
 
-        this.behaviorState = new ArrayList<BehaviorState>();
-        String defaultState = behavior.getScript().getDefaultState();
-        this.behaviorState.add(new BehaviorState (defaultState));
+        this.state = new ArrayList<State>();
+        String defaultState = action.getScript().getDefaultState();
+        this.state.add(new State(defaultState));
     }
 
-    public Event (Timeline timeline, Behavior behavior) {
+    public Event (Timeline timeline, Action action) {
 
         this.uuid = UUID.randomUUID();
 
         this.timeline = timeline;
 
-        this.behavior = behavior;
+        this.action = action;
 
-        this.behaviorState = new ArrayList<BehaviorState>();
+        this.state = new ArrayList<State>();
 
-        this.initializeState(behavior);
-//        if (behavior.getBehaviors().size() == 0) {
-//            String defaultState = behavior.getScript().getDefaultState();
-//            this.behaviorState.add(new BehaviorState(defaultState));
+        this.initializeState(action);
+//        if (action.getActions().size() == 0) {
+//            String defaultState = action.getScript().getDefaultState();
+//            this.state.add(new State(defaultState));
 //        } else {
-//            this.initializeState(behavior);
+//            this.initializeState(action);
 //        }
     }
 
-    private void initializeState(Behavior behavior) {
-        if (behavior.hasScript()) {
-            String defaultState = behavior.getScript().getDefaultState();
-            this.behaviorState.add(new BehaviorState(defaultState));
+    private void initializeState(Action action) {
+        if (action.hasScript()) {
+            String defaultState = action.getScript().getDefaultState();
+            this.state.add(new State(defaultState));
         } else {
-            for (Behavior child : behavior.getBehaviors()) {
+            for (Action child : action.getActions()) {
                 initializeState(child);
             }
         }
@@ -72,18 +72,18 @@ public class Event {
 
         this.timeline = timeline;
 
-        this.behaviorState = new ArrayList<BehaviorState>();
+        this.state = new ArrayList<State>();
     }
 
-//    public Event (Timeline timeline, Behavior behavior, BehaviorState behaviorState) {
+//    public Event (Timeline timeline, Action action, State state) {
 //
 //        this.uuid = UUID.randomUUID();
 //
 //        this.timeline = timeline;
 //
-//        this.behavior = behavior;
+//        this.action = action;
 //
-//        this.behaviorState = behaviorState;
+//        this.state = state;
 //    }
 
     public UUID getUuid() {
@@ -102,15 +102,15 @@ public class Event {
         this.timeline = timeline;
     }
 
-    public Behavior getBehavior() { return this.behavior; }
+    public Action getAction() { return this.action; }
 
-    public void setBehavior (Behavior behavior) {
-        this.behavior = behavior;
+    public void setAction(Action action) {
+        this.action = action;
     }
 
-    public ArrayList<BehaviorState> getBehaviorState () { return this.behaviorState; }
+    public ArrayList<State> getState() { return this.state; }
 
-    public void addBehaviorState (BehaviorState behaviorState) { this.behaviorState.add (behaviorState); };
+    public void addBehaviorState (State state) { this.state.add (state); };
 
-    //public void setBehaviorState (BehaviorState behaviorState) { this.behaviorState = behaviorState; };
+    //public void setBehaviorState (State state) { this.state = state; };
 }

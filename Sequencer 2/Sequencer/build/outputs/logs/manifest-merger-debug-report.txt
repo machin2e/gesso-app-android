@@ -1,8 +1,6 @@
 -- Merging decision tree log ---
 manifest
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:2:1-41:12
-	xmlns:android
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:2:11-69
 	package
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:3:7-45
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
@@ -13,11 +11,22 @@ ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/s
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:4:7-30
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:2:11-69
 uses-sdk
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:6:5-7:39
 MERGED from [Sequencer 2:library:unspecified] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/Sequencer 2/library/unspecified/AndroidManifest.xml:7:5-9:41
-MERGED from [com.android.support:support-v4:23.1.0] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:support-v4:23.1.0] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:7:5-9:41
+MERGED from [com.android.support:appcompat-v7:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:design:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/design/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:appcompat-v7:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:recyclerview-v7:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
 	android:targetSdkVersion
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:7:7-36
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
@@ -52,12 +61,24 @@ ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/s
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:13:22-78
 application
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:14:5-40:19
-MERGED from [com.android.support:support-v4:23.1.0] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:23.1.0] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.0/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:11:5-15:19
+MERGED from [com.android.support:appcompat-v7:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:design:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/design/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:appcompat-v7:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
 	android:label
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:14:18-50
+	android:supportsRtl
+		ADDED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:14:9-35
 	android:icon
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:15:13-51
+	android:allowBackup
+		ADDED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:12:9-35
 activity#camp.computer.clay.sequencer.ApplicationView
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:16:9-23:20
 	android:label

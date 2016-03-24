@@ -40,7 +40,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
     private static final String DEVICE_TABLE_NAME          = "Device";
     private static final String TIMELINE_TABLE_NAME        = "Timeline";
     private static final String EVENT_TABLE_NAME           = "Event";
-    private static final String BEHAVIOR_TABLE_NAME        = "Behavior";
+    private static final String BEHAVIOR_TABLE_NAME        = "Action";
     private static final String SCRIPT_TABLE_NAME          = "Script";
     private static final String STATE_TABLE_NAME           = "State";
 
@@ -106,7 +106,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
         public static final String COLUMN_NAME_UUID          = "uuid";
         public static final String COLUMN_NAME_TAG           = "tag"; // Used by interpretter on devices
         public static final String COLUMN_NAME_STATE_PATTERN = "statePattern"; // Regular expression to validate state encoding
-        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize BehaviorState for a (Event, Behavior) pair
+        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize State for a (Event, Action) pair
 
         public static final String COLUMN_NAME_TIME_CREATED  = "timeCreated";
         public static final String COLUMN_NAME_HIDDEN        = "hidden";
@@ -331,7 +331,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
         /** Behaviors */
 
-        public void saveBehavior(Behavior behavior, Behavior parentBehavior) {
+        public void saveBehavior(Action action, Action parentAction) {
             Log.v ("Content_Manager", "saveBehavior");
 
             // Gets the data repository in write mode
@@ -339,20 +339,20 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             // Create a new map of values, where column names are the keys...
             ContentValues values = new ContentValues();
-            values.put(BehaviorEntry.COLUMN_NAME_UUID, behavior.getUuid().toString());
-            values.put(BehaviorEntry.COLUMN_NAME_TAG, behavior.getTag());
+            values.put(BehaviorEntry.COLUMN_NAME_UUID, action.getUuid().toString());
+            values.put(BehaviorEntry.COLUMN_NAME_TAG, action.getTag());
 
-            // ...and if the behavior node has a parent, store the parent and sibling index.
-            if (parentBehavior != null) {
+            // ...and if the action node has a parent, store the parent and sibling index.
+            if (parentAction != null) {
                 Log.v("Content_Manager", "non-root");
                 // Non-root node
-                values.put(BehaviorEntry.COLUMN_NAME_PARENT_UUID, parentBehavior.getUuid().toString());
-                values.put(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX, parentBehavior.getBehaviors().indexOf(behavior));
+                values.put(BehaviorEntry.COLUMN_NAME_PARENT_UUID, parentAction.getUuid().toString());
+                values.put(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX, parentAction.getActions().indexOf(action));
 
-//                if (behavior.hasScript()) {
+//                if (action.hasScript()) {
 //                    Log.v("Content_Manager", "leaf");
-//                    // Leaf, non-root node (associated with basic behavior)
-//                    values.put(BehaviorEntry.COLUMN_NAME_SCRIPT_UUID, behavior.getScript().getUuid().toString());
+//                    // Leaf, non-root node (associated with basic action)
+//                    values.put(BehaviorEntry.COLUMN_NAME_SCRIPT_UUID, action.getScript().getUuid().toString());
 //                } else {
 //                    Log.v("Content_Manager", "intermediate");
 //                    // Non-leaf, non-root node (intermediate node)
@@ -365,11 +365,11 @@ public class SQLiteContentManager implements ContentManagerInterface {
 //                values.put(BehaviorEntry.COLUMN_NAME_SCRIPT_UUID, "");
             }
 
-            if (behavior.hasScript()) {
+            if (action.hasScript()) {
                 Log.v("Content_Manager", "leaf");
-                // Leaf node (associated with basic behavior). Usually a non-root leaf node,
-                // but can be leaf node for basic behavior single-node trees.
-                values.put(BehaviorEntry.COLUMN_NAME_SCRIPT_UUID, behavior.getScript().getUuid().toString());
+                // Leaf node (associated with basic action). Usually a non-root leaf node,
+                // but can be leaf node for basic action single-node trees.
+                values.put(BehaviorEntry.COLUMN_NAME_SCRIPT_UUID, action.getScript().getUuid().toString());
             } else {
                 Log.v("Content_Manager", "non-leaf");
                 // Non-leaf, non-root node (intermediate node)
@@ -378,17 +378,17 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert(BehaviorEntry.TABLE_NAME, null, values);
-            Log.v("Content_Manager", "Inserted behavior into database " + entryId + " (UUID: " + behavior.getUuid() + ")");
+            Log.v("Content_Manager", "Inserted action into database " + entryId + " (UUID: " + action.getUuid() + ")");
 
-//            // Store behavior state object
-//            saveState(behavior, behavior.getState());
+//            // Store action state object
+//            saveState(action, action.getState());
 
         }
 
         // TODO: updateBehavior is not needed because entries in "behavior" are never updated once created.
         // TODO: ... When a behavior event is modified on the timeline, the event is updated.
-        // TODO: ... When a sequence of behaviors is chunked, new behavior entries are added,
-        // TODO: ... a new event is created, the events associated with the chunked behaviors
+        // TODO: ... When a sequence of actions is chunked, new behavior entries are added,
+        // TODO: ... a new event is created, the events associated with the chunked actions
         // TODO: ... are flagged as hidden/chunked (so they won't be on the timeline), and the
         // TODO: ... newly created event (for the newly created behavior) is added to the timeline,
         // TODO: ... then all the events' position index on the timeline are updated.
@@ -399,7 +399,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get behaviors with parent with root UUID, addUnit to parent's list of
+        // - For each root, get actions with parent with root UUID, addUnit to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -410,9 +410,9 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
         /**
          * Starts with root nodes and recursively constructs the behavior trees.
-         * @param parentBehavior
+         * @param parentAction
          */
-        public void queryBehaviors (Behavior parentBehavior) {
+        public void queryBehaviors (Action parentAction) {
 
             Log.v("Content_Manager", "queryBehaviors");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
@@ -431,19 +431,19 @@ public class SQLiteContentManager implements ContentManagerInterface {
                     BehaviorEntry.COLUMN_NAME_TIME_CREATED
             };
 
-            // Sort the behaviors by their sibling index so they will be added to the parent,
+            // Sort the actions by their sibling index so they will be added to the parent,
             // if any, in the correct order.
             String sortOrder = BehaviorEntry.COLUMN_NAME_SIBLING_INDEX + " ASC";
 
-            // Only get the behaviors with no parent (the root behaviors).
+            // Only get the actions with no parent (the root actions).
             String selection = null;
             String[] selectionArgs = null; // { timeline.getUuid().toString() };
-            if (parentBehavior == null) {
+            if (parentAction == null) {
                 selection = BehaviorEntry.COLUMN_NAME_PARENT_UUID + " = \"\" AND " + BehaviorEntry.COLUMN_NAME_HIDDEN + " = 0";
                 selectionArgs = null;
             } else {
                 selection = BehaviorEntry.COLUMN_NAME_PARENT_UUID + " LIKE ? AND " + BehaviorEntry.COLUMN_NAME_HIDDEN + " = 0";
-                selectionArgs = new String[] { parentBehavior.getUuid().toString() };
+                selectionArgs = new String[] { parentAction.getUuid().toString() };
             }
 
             Cursor cursor = db.query(
@@ -471,52 +471,52 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 int siblingIndex = cursor.getInt(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_SIBLING_INDEX));
                 */
 
-                // Create the behavior object
-                Behavior behavior = new Behavior (UUID.fromString (uuidString), tag);
+                // Create the action object
+                Action action = new Action(UUID.fromString (uuidString), tag);
 
-                // Add behavior as a child behavior to the parent behavior
-                if (parentBehavior != null) {
-                    parentBehavior.addBehavior(behavior);
-                    Log.v("Content_Manager", "\tAdding behavior to parent (UUID: " + behavior.getUuid() + ")");
-                    Log.v("Content_Manager", "\t\tParent UUID: " + parentBehavior.getUuid());
+                // Add action as a child action to the parent action
+                if (parentAction != null) {
+                    parentAction.addBehavior(action);
+                    Log.v("Content_Manager", "\tAdding action to parent (UUID: " + action.getUuid() + ")");
+                    Log.v("Content_Manager", "\t\tParent UUID: " + parentAction.getUuid());
                 }
 
                 /*
-                // Add the behavior to Clay
-                getClay().cacheBehavior(behavior);
+                // Add the action to Clay
+                getClay().cacheBehavior(action);
                 */
 
-                // Recursive call to reconstruct the behavior's children
-                Log.v("flem", "behavior.getUuid(): " + behavior.getUuid());
-                if (isParentBehavior (behavior.getUuid())) {
-                    // Recursive query to get the children of the behavior just created.
-                    queryBehaviors(behavior);
+                // Recursive call to reconstruct the action's children
+                Log.v("flem", "action.getUuid(): " + action.getUuid());
+                if (isParentBehavior (action.getUuid())) {
+                    // Recursive query to get the children of the action just created.
+                    queryBehaviors(action);
                 } else {
-                    // Basic behavior, so set script.
-                    BehaviorScript behaviorScript = getClay().getCache().getBehaviorScript(UUID.fromString(scriptUuidString));
-                    behavior.setScript(behaviorScript);
+                    // Basic action, so set script.
+                    Script script = getClay().getCache().getBehaviorScript(UUID.fromString(scriptUuidString));
+                    action.setScript(script);
                 }
 
-                // TODO: behavior.setState
-                // TODO: behavior.setScript
+                // TODO: action.setState
+                // TODO: action.setScript
 
-                // Add the behavior to Clay
-                // TODO: Only add root behaviors to Clay? Maybe only those should be available for selection.
-                getClay().cacheBehavior(behavior);
-                Log.v("Content_Manager", "> added beahvior: " + behavior.getUuid());
+                // Add the action to Clay
+                // TODO: Only add root actions to Clay? Maybe only those should be available for selection.
+                getClay().cacheBehavior(action);
+                Log.v("Content_Manager", "> added beahvior: " + action.getUuid());
 
                 // Move to the next entry returned by the query
                 cursor.moveToNext();
             }
         }
 
-        // TODO: queryScripts () // Get all behaviors, for use to create the first behaviors in the database.
+        // TODO: queryScripts () // Get all actions, for use to create the first actions in the database.
 
-        /** Behavior Script */
+        /** Action Script */
 
-        public void saveScript(BehaviorScript behaviorScript) {
+        public void saveScript(Script script) {
 
-            if (behaviorScript == null) {
+            if (script == null) {
                 return;
             }
 
@@ -525,21 +525,23 @@ public class SQLiteContentManager implements ContentManagerInterface {
             // Gets the data repository in write mode
             SQLiteDatabase db = SQLiteContentManager.this.db.getWritableDatabase();
 
-            Log.v("Content_Manager", "behaviorScript: " + behaviorScript);
-            Log.v("Content_Manager", "uuid: " + behaviorScript.getUuid());
-            Log.v("Content_Manager", "tag: " + behaviorScript.getTag());
-            Log.v("Content_Manager", "defaultState: " + behaviorScript.getDefaultState());
+            Log.v("Content_Manager", "script: " + script);
+            Log.v("Content_Manager", "uuid: " + script.getUuid());
+            Log.v("Content_Manager", "tag: " + script.getTag());
+            Log.v("Content_Manager", "pattern: " + script.getStatePattern());
+            Log.v("Content_Manager", "defaultState: " + script.getDefaultState());
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(ScriptEntry.COLUMN_NAME_UUID, behaviorScript.getUuid().toString());
-            values.put(ScriptEntry.COLUMN_NAME_TAG, behaviorScript.getTag());
-            values.put(ScriptEntry.COLUMN_NAME_DEFAULT_STATE, behaviorScript.getDefaultState());
+            values.put(ScriptEntry.COLUMN_NAME_UUID, script.getUuid().toString());
+            values.put(ScriptEntry.COLUMN_NAME_TAG, script.getTag());
+            values.put(ScriptEntry.COLUMN_NAME_STATE_PATTERN, script.getStatePattern());
+            values.put(ScriptEntry.COLUMN_NAME_DEFAULT_STATE, script.getDefaultState());
 
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert (ScriptEntry.TABLE_NAME, null, values);
 
-            Log.v("Content_Manager", "Inserted behavior script into database (_id: " + entryId + ")");
+            Log.v("Content_Manager", "Inserted script into database (_id: " + entryId + ")");
 
         }
 
@@ -554,6 +556,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
                     ScriptEntry._ID,
                     ScriptEntry.COLUMN_NAME_UUID,
                     ScriptEntry.COLUMN_NAME_TAG,
+                    ScriptEntry.COLUMN_NAME_STATE_PATTERN,
                     ScriptEntry.COLUMN_NAME_DEFAULT_STATE
             };
 
@@ -581,20 +584,21 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 // Read the entry
                 String uuidString = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_UUID));
                 String tag = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_TAG));
+                String stateSpacePattern = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_STATE_PATTERN));
                 String defaultState = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_DEFAULT_STATE));
 
                 // Create the object
-                BehaviorScript behaviorScript = new BehaviorScript (UUID.fromString(uuidString), tag, defaultState);
+                Script script = new Script(UUID.fromString(uuidString), tag, stateSpacePattern, defaultState);
 
                 // Cache the behavior script
-                getClay ().cacheScript(behaviorScript);
+                getClay ().cacheScript(script);
 
                 // Continue to next behavior script
                 cursor.moveToNext();
             }
         }
 
-//        public BehaviorScript queryBehaviorScript (UUID uuid) {
+//        public Script queryBehaviorScript (UUID uuid) {
 //            Log.v("Content_Manager", "queryBehaviorScript");
 //            SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
 //
@@ -639,7 +643,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 //                String defaultState = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_DEFAULT_STATE));
 //
 //                // Create the behavior
-//                BehaviorScript behaviorScript = new BehaviorScript (UUID.fromString(uuidString), tag, defaultState);
+//                Script behaviorScript = new Script (UUID.fromString(uuidString), tag, defaultState);
 //
 //                return behaviorScript;
 //            }
@@ -647,13 +651,13 @@ public class SQLiteContentManager implements ContentManagerInterface {
 //            return null;
 //        }
 
-        /** Behavior States */
+        /** Action States */
 
-        public void saveState(Event event, BehaviorState behaviorState) {
+        public void saveState(Event event, State state) {
 
             Log.v("Content_Manager", "saveState");
 
-            if (behaviorState == null) {
+            if (state == null) {
                 return;
             }
 
@@ -662,15 +666,15 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(StateEntry.COLUMN_NAME_UUID, behaviorState.getUuid().toString());
-            values.put(StateEntry.COLUMN_NAME_STATE, behaviorState.getState());
+            values.put(StateEntry.COLUMN_NAME_UUID, state.getUuid().toString());
+            values.put(StateEntry.COLUMN_NAME_STATE, state.getState());
             values.put(StateEntry.COLUMN_NAME_EVENT_UUID, event.getUuid().toString());
-            values.put(StateEntry.COLUMN_NAME_STATE_INDEX, event.getBehaviorState().indexOf(behaviorState));
+            values.put(StateEntry.COLUMN_NAME_STATE_INDEX, event.getState().indexOf(state));
 
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert (StateEntry.TABLE_NAME, null, values);
 
-            Log.v("Content_Manager", "\tSaving state index " + event.getBehaviorState().indexOf(behaviorState));
+            Log.v("Content_Manager", "\tSaving state index " + event.getState().indexOf(state));
 
 //            Log.v("Content_Manager", "Inserted behavior state into database (_id: " + entryId + ")");
 
@@ -728,29 +732,29 @@ public class SQLiteContentManager implements ContentManagerInterface {
             // Get the behavior and behavior script from the cache. Here, these are assumed to
             // be available in the cache, since it is assumed they are loaded and cached when
             // Clay is first opened.
-            BehaviorScript behaviorScript = getClay ().getCache ().getBehaviorScript(UUID.fromString(behaviorScriptUuidString));
-            Behavior behavior = getClay().getCache().getBehavior(UUID.fromString(behaviorUuidString));
+            Script behaviorScript = getClay ().getCache ().getBehaviorScript(UUID.fromString(behaviorScriptUuidString));
+            Action behavior = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
             behavior.setScript(behaviorScript);
 
             // Reconstruct behavior state object
 //            Log.v ("Query_Behavior_State", "state: " + state);
 //            Log.v("Query_Behavior_State", "uuid: " + UUID.fromString(uuidString));
-            BehaviorState behaviorState = new BehaviorState(UUID.fromString (uuidString), state);
-            event.setBehaviorState(behaviorState); // event.getBehavior ().setState (behaviorState);
+            State behaviorState = new State(UUID.fromString (uuidString), state);
+            event.setBehaviorState(behaviorState); // event.getAction ().setState (behaviorState);
 //            Log.v("Query_Behavior_State", "behavior.state: " + behavior.getState().getState());
 //            Log.v("Query_Behavior_State", "behavior.state.uuid: " + behavior.getState().getUuid());
 //            Log.v("Query_Behavior_State", "---");
 
             // Add the behavior object to the event object
             if (event != null) {
-                event.setBehavior(behavior);
+                event.setAction(behavior);
             }
         }
         */
 
         public void queryState(Event event) {
 
-//            Behavior behavior = event.getBehavior();
+//            Action behavior = event.getAction();
 
             Log.v("Content_Manager", "queryState");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
@@ -798,12 +802,12 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 // Get the behavior and behavior script from the cache. Here, these are assumed to
                 // be available in the cache, since it is assumed they are loaded and cached when
                 // Clay is first opened.
-//            BehaviorScript behaviorScript = getClay().getCache().getBehaviorScript(UUID.fromString(behaviorScriptUuidString));
+//            Script behaviorScript = getClay().getCache().getBehaviorScript(UUID.fromString(behaviorScriptUuidString));
 //            Log.v ("Content_Manager", "> behavior: " + behavior.getUuid());
 //            behavior.setScript(behaviorScript);
 
                 // Reconstruct list of behavior state objects
-                BehaviorState behaviorState = new BehaviorState(UUID.fromString(uuidString), state);
+                State behaviorState = new State(UUID.fromString(uuidString), state);
                 event.addBehaviorState(behaviorState);
 
                 cursor.moveToNext();
@@ -967,17 +971,17 @@ public class SQLiteContentManager implements ContentManagerInterface {
             values.put(EventEntry.COLUMN_NAME_UUID, event.getUuid().toString());
             values.put(EventEntry.COLUMN_NAME_EVENT_INDEX, timeline.getEvents().indexOf(event));
             values.put(EventEntry.COLUMN_NAME_TIMELINE_UUID, event.getTimeline().getUuid().toString());
-            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getBehavior().getUuid().toString());
-//            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID, (event.getBehaviorState() != null ? event.getBehaviorState().getUuid().toString() : ""));
+            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getAction().getUuid().toString());
+//            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID, (event.getState() != null ? event.getState().getUuid().toString() : ""));
 
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert(EventEntry.TABLE_NAME, null, values);
 
             // Store list of behavior state objects
             int i = 0;
-            for (BehaviorState behaviorState : event.getBehaviorState()) {
-                Log.v ("Content_Manager", "\tStoring state " + i + " (UUID: " + behaviorState.getUuid() + ".");
-                saveState(event, behaviorState);
+            for (State state : event.getState()) {
+                Log.v ("Content_Manager", "\tStoring state " + i + " (UUID: " + state.getUuid() + ".");
+                saveState(event, state);
                 i++;
             }
 
@@ -1023,18 +1027,18 @@ public class SQLiteContentManager implements ContentManagerInterface {
             }
         }
 
-        // TODO: Update the behavior table so basic behaviors contain behaviorScript UUID
-        public Behavior getBasicBehavior (BehaviorScript behaviorScript) {
+        // TODO: Update the behavior table so basic actions contain script UUID
+        public Action getBasicBehavior (Script script) {
 
-            Behavior basicBehavior = null;
+            Action basicAction = null;
 
             Log.v("Content_Manager", "getBasicBehavior");
 
             // Get connection to database
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
 
-            // Get the behaviors' UUIDs
-            UUID uuid = behaviorScript.getUuid();
+            // Get the actions' UUIDs
+            UUID uuid = script.getUuid();
 
             // Define a projection that specifies which columns from the database you will...
             // ...actually use after this query.
@@ -1052,10 +1056,10 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             String selection = null;
             String[] selectionArgs = null;
-            Log.v ("New_Behavior", "adding new behavior with tag " + behaviorScript.getTag());
+            Log.v ("New_Behavior", "adding new behavior with tag " + script.getTag());
             selection = BehaviorEntry.COLUMN_NAME_TAG + " = ? AND "
                     + BehaviorEntry.COLUMN_NAME_PARENT_UUID + " LIKE ?";
-            selectionArgs = new String[] { behaviorScript.getTag(), "" };
+            selectionArgs = new String[] { script.getTag(), "" };
 
             Cursor cursor = db.query(
                     BehaviorEntry.TABLE_NAME,  // The table to query
@@ -1078,26 +1082,26 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 UUID behaviorUuid = UUID.fromString (behaviorUuidString);
 
                 if (getClay().getCache().hasBehavior(behaviorUuid)) {
-                    basicBehavior = getClay().getCache().getBehavior(behaviorUuid);
-                    return basicBehavior;
+                    basicAction = getClay().getCache().getBehavior(behaviorUuid);
+                    return basicAction;
                 } else {
-                    basicBehavior = new Behavior (behaviorUuid, behaviorScript); // TODO: sets default state for script
-                    storeBehavior (basicBehavior);
-                    getClay().getCache().getBehaviors().add(basicBehavior);
-                    return basicBehavior;
+                    basicAction = new Action(behaviorUuid, script); // TODO: sets default state for script
+                    storeBehavior (basicAction);
+                    getClay().getCache().getActions().add(basicAction);
+                    return basicAction;
                 }
             } else {
                 Log.v ("New_Behavior", "\tThe behavior does not exist.");
-                basicBehavior = new Behavior (behaviorScript);
-                storeBehavior (basicBehavior);
-                getClay().getCache().getBehaviors().add(basicBehavior);
-                return basicBehavior;
+                basicAction = new Action(script);
+                storeBehavior (basicAction);
+                getClay().getCache().getActions().add(basicAction);
+                return basicAction;
             }
         }
 
-        public Behavior getBehaviorComposition (ArrayList<Behavior> children) {
+        public Action getBehaviorComposition (ArrayList<Action> children) {
 
-            Behavior parentBehavior = null;
+            Action parentAction = null;
 
             Log.v("Content_Manager", "getBehaviorComposition");
 
@@ -1106,13 +1110,13 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             ArrayList<UUID> candidateParentUuids = new ArrayList<UUID>();
 
-            for (Behavior childBehavior : children) {
+            for (Action childAction : children) {
 
-                // Get the behaviors' UUIDs
-                UUID uuid = childBehavior.getUuid();
+                // Get the actions' UUIDs
+                UUID uuid = childAction.getUuid();
 //                UUID parentUuid = null;
-//                if (parentBehavior != null) {
-//                    parentUuid = parentBehavior.getUuid();
+//                if (parentAction != null) {
+//                    parentUuid = parentAction.getUuid();
 //                }
 
                 // Define a projection that specifies which columns from the database you will...
@@ -1141,7 +1145,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 //                } else {
                     selection = BehaviorEntry.COLUMN_NAME_UUID + " LIKE ? AND "
                             + BehaviorEntry.COLUMN_NAME_SIBLING_INDEX + " = ?";
-                    selectionArgs = new String[]{ uuid.toString(), "" + children.indexOf (childBehavior) };
+                    selectionArgs = new String[]{ uuid.toString(), "" + children.indexOf (childAction) };
 //                }
                 Cursor cursor = db.query(
                         BehaviorEntry.TABLE_NAME,  // The table to query
@@ -1181,41 +1185,41 @@ public class SQLiteContentManager implements ContentManagerInterface {
             Log.v ("New_Behavior_Parent", "# candidates: " + candidateParentUuids.size());
 
             // No parent was found, so create a new one and return it
-            if (parentBehavior == null) {
+            if (parentAction == null) {
 
                 Log.v ("New_Behavior_Parent", "Creating new parent behavior.");
 
-                parentBehavior = new Behavior("so high");
-                parentBehavior.setDescription("oh yeah!");
+                parentAction = new Action("so high");
+                parentAction.setDescription("oh yeah!");
 
-                for (Behavior childBehavior : children) {
-                    parentBehavior.addBehavior(childBehavior);
+                for (Action childAction : children) {
+                    parentAction.addBehavior(childAction);
                 }
-//                parentBehavior.addBehavior(foundUnit.getTimeline().getEvents().get(0).getBehavior());
-//                parentBehavior.addBehavior(foundUnit.getTimeline().getEvents().get(1).getBehavior());
+//                parentAction.addBehavior(foundUnit.getTimeline().getEvents().get(0).getAction());
+//                parentAction.addBehavior(foundUnit.getTimeline().getEvents().get(1).getAction());
 
-//                storeBehavior(parentBehavior);
+//                storeBehavior(parentAction);
 //
-//                getClay().getCache().getBehaviors().add(parentBehavior);
+//                getClay().getCache().getActions().add(parentAction);
             }
 
-            return parentBehavior;
+            return parentAction;
         }
 
         // TODO: Add sibling index, because sibling order is part of unique tree structure!
         //public boolean queryBehaviorExists (UUID uuid, UUID parentUuid) {
-        public boolean queryBehaviorExists (Behavior behavior, Behavior parentBehavior) {
+        public boolean queryBehaviorExists (Action action, Action parentAction) {
 
             Log.v("Content_Manager", "queryBehaviorExists");
 
             // Get connection to database
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
 
-            // Get the behaviors' UUIDs
-            UUID uuid = behavior.getUuid();
+            // Get the actions' UUIDs
+            UUID uuid = action.getUuid();
             UUID parentUuid = null;
-            if (parentBehavior != null) {
-                parentUuid = parentBehavior.getUuid();
+            if (parentAction != null) {
+                parentUuid = parentAction.getUuid();
             }
 
             // Define a projection that specifies which columns from the database you will...
@@ -1233,11 +1237,11 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             String selection = null;
             String[] selectionArgs = null;
-            // TODO!!!!!!!!!!!! Check if behavior exists (by structure, varies for leaf/basic, intermediate, root)
+            // TODO!!!!!!!!!!!! Check if action exists (by structure, varies for leaf/basic, intermediate, root)
 //            if (parentUuid == null) {
-//                Log.v ("New_Behavior", "adding new behavior with tag " + behavior.getTag());
+//                Log.v ("New_Behavior", "adding new action with tag " + action.getTag());
 //                selection = BehaviorEntry.COLUMN_NAME_TAG + " = ?";
-//                selectionArgs = new String[] { behavior.getTag() };
+//                selectionArgs = new String[] { action.getTag() };
 //            } else {
                 selection = BehaviorEntry.COLUMN_NAME_UUID + " LIKE ? AND "
                         + BehaviorEntry.COLUMN_NAME_PARENT_UUID + " LIKE ?";
@@ -1257,19 +1261,19 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             // Return whether or not an entry exists with the UUID
             if (cursor.getCount () > 0) {
-                Log.v ("New_Behavior", "\tThe behavior exists.");
-                if (parentBehavior == null) {
-                    Log.v ("New_Behavior", "\tUpdating all object references to behavior to existing behavior.");
-                    // If the behavior exists, then update the behavior with the existing
-                    // behavior's with the same structure's UUID.
+                Log.v ("New_Behavior", "\tThe action exists.");
+                if (parentAction == null) {
+                    Log.v ("New_Behavior", "\tUpdating all object references to action to existing action.");
+                    // If the action exists, then update the action with the existing
+                    // action's with the same structure's UUID.
 //                    String existingBehaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(BehaviorEntry.COLUMN_NAME_UUID));
 //                    UUID existingBehaviorUuid = UUID.fromString (existingBehaviorUuidString);
-//                    behavior.setUuid (existingBehaviorUuid);
+//                    action.setUuid (existingBehaviorUuid);
                     // TODO: Point to existing reference! OR error?
                 }
                 return true;
             } else {
-                Log.v("New_Behavior", "\tThe behavior does not exist.");
+                Log.v("New_Behavior", "\tThe action does not exist.");
                 return false;
             }
         }
@@ -1406,45 +1410,45 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 // Reconstruct the event object
                 Event event = new Event (UUID.fromString (uuidString), timeline);
 
-                // Get the Behavior and BehaviorScript objects. These are assumed to be
+                // Get the Action and Script objects. These are assumed to be
                 // available in the cache at this point, since they should be loaded when Clay
                 // is first oepned.
-                //Behavior behavior = getClay ().getBehavior (UUID.fromString (behaviorUuidString));
+                //Action action = getClay ().getAction (UUID.fromString (behaviorUuidString));
 
-                // Reconstruct the associated behavior
-                Behavior behavior = getClay().getCache().getBehavior(UUID.fromString(behaviorUuidString));
-                event.setBehavior (behavior);
+                // Reconstruct the associated action
+                Action action = getClay().getCache().getBehavior(UUID.fromString(behaviorUuidString));
+                event.setAction(action);
 
                 // Reconstruct the event state objects
                 queryState (event);
 
                 /*
-                // Reconstruct the behavior object
+                // Reconstruct the action object
                 boolean isNonLeafNode = behaviorStateUuidString.equals("");
                 if (isNonLeafNode) {
-                    // Reconstruct root or non-leaf node. There is no behavior script or state
-                    // associated with these. Note that at this point, the behavior is assumed to
-                    // be present in the cache. This should be the case since all behaviors are
+                    // Reconstruct root or non-leaf node. There is no action script or state
+                    // associated with these. Note that at this point, the action is assumed to
+                    // be present in the cache. This should be the case since all actions are
                     // cached when the app starts.
-                    Behavior behavior = getClay().getCache().getBehavior(UUID.fromString(behaviorUuidString));
-                    event.setBehavior (behavior);
+                    Action action = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
+                    event.setAction (action);
                 } else {
                     // Reconstruct leaf node.
                     queryState(event, UUID.fromString(behaviorStateUuidString));
                 }
                 */
 
-                // Add the behavior object to the event object
-                // event.setBehavior(behavior);
+                // Add the action object to the event object
+                // event.setAction(action);
 
-//                // Get behavior state object by UUID
-//                BehaviorState behaviorState = null;
+//                // Get action state object by UUID
+//                State behaviorState = null;
 //                if (!behaviorStateUuid.equals("")) {
-//                    // TODO: Check if the behavior state is cached. First need to implement behavior state caching in cache manager.
+//                    // TODO: Check if the action state is cached. First need to implement action state caching in cache manager.
 //                    behaviorState = queryState (UUID.fromString(behaviorStateUuid));
 //                }
 
-                // TODO: Query timeline, behavior, behavior state if they're not cached...
+                // TODO: Query timeline, action, action state if they're not cached...
                 // TODO: ...then only draw events for which all fields are instantiated.
                 // TODO:    i.e., Use the event sort of as a filter, and only propagate use
                 // TODO:          of the event when it's populated. Or show it as "loading."
@@ -1453,14 +1457,14 @@ public class SQLiteContentManager implements ContentManagerInterface {
                 timeline.addEvent(event);
 
 
-                // If no behavior state was found in the store, then assign the default state
+                // If no action state was found in the store, then assign the default state
 //                if (behaviorState == null) {
-//                    behaviorState = new BehaviorState(behavior, behavior.getDefaultState());
+//                    behaviorState = new State(action, action.getDefaultState());
 //                }
 
                 // Create the event
                 Log.v ("Content_Manager", "Adding event to the timeline.");
-//                Event event = new Event(UUID.fromString(uuidString), timeline, behavior, behaviorState);
+//                Event event = new Event(UUID.fromString(uuidString), timeline, action, behaviorState);
 
                 cursor.moveToNext();
             }
@@ -1479,10 +1483,10 @@ public class SQLiteContentManager implements ContentManagerInterface {
             values.put(EventEntry.COLUMN_NAME_UUID, event.getUuid().toString());
             values.put(EventEntry.COLUMN_NAME_EVENT_INDEX, timeline.getEvents().indexOf(event));
             values.put(EventEntry.COLUMN_NAME_TIMELINE_UUID, event.getTimeline().getUuid().toString());
-            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getBehavior().getUuid().toString());
+            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_UUID, event.getAction().getUuid().toString());
 //            values.put(EventEntry.COLUMN_NAME_BEHAVIOR_STATE_UUID,
-//                    (event.getBehaviorState() != null
-//                            ? event.getBehaviorState().getUuid().toString()
+//                    (event.getState() != null
+//                            ? event.getState().getUuid().toString()
 //                            : ""));
 
             // Insert the new row, returning the primary key value of the new row
@@ -1527,14 +1531,14 @@ public class SQLiteContentManager implements ContentManagerInterface {
             }
         }
 
-        public boolean removeState (BehaviorState behaviorState) {
+        public boolean removeState (State state) {
 
             // Gets the data repository in write mode
             SQLiteDatabase db = SQLiteContentManager.this.db.getWritableDatabase();
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(StateEntry.COLUMN_NAME_UUID, behaviorState.getUuid().toString());
+            values.put(StateEntry.COLUMN_NAME_UUID, state.getUuid().toString());
             values.put(StateEntry.COLUMN_NAME_AVAILABLE, 1);
             values.put(StateEntry.COLUMN_NAME_HIDDEN, 1); // This is the flag indicating removal, if true.
 
@@ -1542,7 +1546,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
             long entryId = db.update(
                     StateEntry.TABLE_NAME,
                     values,
-                    StateEntry.COLUMN_NAME_UUID + " LIKE \"" + behaviorState.getUuid().toString() + "\"", null);
+                    StateEntry.COLUMN_NAME_UUID + " LIKE \"" + state.getUuid().toString() + "\"", null);
 
             if (entryId > 0) {
                 Log.v("Content_Manager", "Removed state from timeline " + entryId);
@@ -1585,69 +1589,69 @@ public class SQLiteContentManager implements ContentManagerInterface {
     }
 
     /**
-     * Store the behavior. Recursively stores the behavior tree graph by performing a breadth
+     * Store the action. Recursively stores the action tree graph by performing a breadth
      * first traversal.
-     * @param behavior The behavior to store.
+     * @param action The action to store.
      */
-    public void storeBehavior (Behavior behavior) {
+    public void storeBehavior (Action action) {
         Log.v ("Content_Manager", "storeBehavior");
 
-        if (behavior.hasScript()) {
+        if (action.hasScript()) {
 
-            // TODO: Update the basic behavior IF it now has a parent
+            // TODO: Update the basic action IF it now has a parent
 
-            if (!db.queryBehaviorExists(behavior, null)) {
-                Log.v ("Content_Manager", "Saving basic behavior.");
-                db.saveBehavior(behavior, null);
+            if (!db.queryBehaviorExists(action, null)) {
+                Log.v ("Content_Manager", "Saving basic action.");
+                db.saveBehavior(action, null);
             } else {
-                // This is called when a basic behavior's state is updated.
-                Log.v ("Content_Manager", "Updating basic behavior.");
+                // This is called when a basic action's state is updated.
+                Log.v ("Content_Manager", "Updating basic action.");
                 Log.v("Content_Manager", "NULL!!!!!!!!!!!!!!!!! SHOULD NEVER GET HERE!!!!!!!!!!");
-//                db.updateBehavior (behavior, null);
+//                db.updateBehavior (action, null);
             }
         } else {
-            Log.v("Content_Manager", "Saving non-basic behavior.");
+            Log.v("Content_Manager", "Saving non-basic action.");
 
-            storeBehaviorTree(behavior, null);
+            storeBehaviorTree(action, null);
         }
     }
 
-    private void storeBehaviorTree (Behavior behavior, Behavior parentBehavior) {
+    private void storeBehaviorTree (Action action, Action parentAction) {
 
         Log.v ("Content_Manager", "storeBehaviorTree");
 
-        // Breadth first storage, to ensure that a relation to a behavior's children can be
+        // Breadth first storage, to ensure that a relation to a action's children can be
         // created. The parent must be in the database before children can store a relation to
         // their parent.
 
-        Log.v ("Content_Manager", "\t\t\t\t\tBEHAVIOR SCRIPT: " + behavior.getScript());
+        Log.v ("Content_Manager", "\t\t\t\t\tBEHAVIOR SCRIPT: " + action.getScript());
 
         // Store this node with a relation to its parent (if any)
         // TODO: Only store if the tree STRUCTURE hasn't already been stored. When storing a...
-        // TODO: ...behavior, this means the database must be queried for the tree structure...
-        // TODO: ...before saving a behavior tree, not just the behavior node UUID.
-        if (!db.queryBehaviorExists(behavior, parentBehavior)) {
+        // TODO: ...action, this means the database must be queried for the tree structure...
+        // TODO: ...before saving a action tree, not just the action node UUID.
+        if (!db.queryBehaviorExists(action, parentAction)) {
 
-            // TODO: Update the basic behavior that has a script, addUnit a parent! Yes, the behavior can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic action that has a script, addUnit a parent! Yes, the action can have both a parent and a script! (leaf node!)
 
-            db.saveBehavior(behavior, parentBehavior);
+            db.saveBehavior(action, parentAction);
         } else {
-            // This is a behavior node added to represent the hierarchical structure.
-//            db.saveBehavior(behavior, parentBehavior);
-            //db.updateBehavior(behavior, parentBehavior);
+            // This is a action node added to represent the hierarchical structure.
+//            db.saveBehavior(action, parentAction);
+            //db.updateBehavior(action, parentAction);
             Log.v("Content_Manager", "NULL?????????????? SHOULD NEVER GET HERE?????????????");
         }
 
         // Store children (if any)
-//        if (parentBehavior != null) {
+//        if (parentAction != null) {
 
-        // Recursively store the behavior tree if this behavior is not a basic behavior
-        if (behavior.getBehaviors() != null) {
-            for (Behavior childBehavior : behavior.getBehaviors()) {
-//                if (!hasBehavior(behavior)) {
-                // TODO: Store behavior index in list
-                storeBehaviorTree(childBehavior, behavior);
-//                db.saveBehavior(childBehavior, behavior);
+        // Recursively store the action tree if this action is not a basic action
+        if (action.getActions() != null) {
+            for (Action childAction : action.getActions()) {
+//                if (!hasBehavior(action)) {
+                // TODO: Store action index in list
+                storeBehaviorTree(childAction, action);
+//                db.saveBehavior(childAction, action);
 //                }
             }
         }
@@ -1655,7 +1659,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
     public void restoreBehavior (UUID uuid, Callback callback) {
         Log.v("Content_Manager", "restoreBehavior");
-//        Behavior behavior = db.queryBehavior(uuid);
+//        Action behavior = db.queryBehavior(uuid);
 //        if (behavior == null) {
 //            callback.onFailure();
 //        } else {
@@ -1716,9 +1720,9 @@ public class SQLiteContentManager implements ContentManagerInterface {
     }
 
     @Override
-    public void storeScript(BehaviorScript behaviorScript) {
+    public void storeScript(Script script) {
         Log.v ("Content_Manager", "storeScript");
-        db.saveScript(behaviorScript);
+        db.saveScript(script);
     }
 
     @Override
@@ -1732,9 +1736,9 @@ public class SQLiteContentManager implements ContentManagerInterface {
     }
 
     @Override
-    public void storeState(Event event, BehaviorState behaviorState) {
+    public void storeState(Event event, State state) {
         Log.v ("Content_Manager", "storeState");
-        db.saveState(event, behaviorState);
+        db.saveState(event, state);
     }
 
     @Override
@@ -1760,18 +1764,18 @@ public class SQLiteContentManager implements ContentManagerInterface {
     }
 
     @Override
-    public Behavior getBehaviorComposition(ArrayList<Behavior> children) {
+    public Action getBehaviorComposition(ArrayList<Action> children) {
         return db.getBehaviorComposition(children);
     }
 
     @Override
-    public Behavior getBasicBehavior(BehaviorScript behaviorScript) {
-        return db.getBasicBehavior(behaviorScript);
+    public Action getBasicBehavior(Script script) {
+        return db.getBasicBehavior(script);
     }
 
     @Override
-    public void removeState(BehaviorState behaviorState) {
-        db.removeState (behaviorState);
+    public void removeState(State state) {
+        db.removeState (state);
     }
 
     @Override
