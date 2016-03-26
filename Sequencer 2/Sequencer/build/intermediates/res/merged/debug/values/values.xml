@@ -559,7 +559,7 @@
     <item format="float" name="disabled_alpha_material_light" type="dimen">0.26</item>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/values/dimens.xml -->
     <eat-comment/>
-    <dimen name="event_tag_text_size">15dp</dimen>
+    <dimen name="event_tag_text_size">12dp</dimen>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/values/values.xml -->
     <eat-comment/>
     <dimen name="fab_margin">16dp</dimen>

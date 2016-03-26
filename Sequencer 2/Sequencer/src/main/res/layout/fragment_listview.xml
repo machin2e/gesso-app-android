@@ -17,7 +17,7 @@
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
         android:paddingLeft="10dp"
-        android:layout_margin="10dp"
+        android:layout_margin="1dp"
         android:dividerHeight="0dp"
         android:fastScrollEnabled="true"
         dslv:drag_enabled="true"

@@ -7,16 +7,6 @@
     android:layout_margin="0dp"
     android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/event_tag_text_size"
-        android:fontFeatureSettings="smcp"
-        android:textStyle="normal"
-        android:textAlignment="textEnd">
-    </TextView>
-
     <ImageView
         android:id="@id/drag_handle"
         android:background="@drawable/drag"
@@ -27,11 +17,10 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_toRightOf="@+id/label"
         android:layout_width="22dp"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="0dp"
         android:src="@drawable/ic_launcher" >
     </ImageView>
@@ -46,7 +35,16 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/event_tag_text_size"
+            android:textStyle="bold">
+        </TextView>
+
+        <TextView
             android:id="@+id/text"
+            android:layout_below="@+id/label"
             android:layout_alignLeft="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,4 +54,4 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+</RelativeLayout><!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/layout/list_item_type_say_000.xml -->
