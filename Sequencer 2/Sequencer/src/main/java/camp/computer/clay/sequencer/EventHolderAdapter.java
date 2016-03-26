@@ -157,6 +157,9 @@ public class EventHolderAdapter extends BaseAdapter {
      * @param eventHolder
      */
     private void updateViewForType (View view, EventHolder eventHolder) {
+
+        Log.v ("Width", "updateViewForType");
+
         // Update layout of a behavior control
         if (eventHolder.type != SYSTEM_CONTROL_LAYOUT
                 && eventHolder.type != CONTROL_PLACEHOLDER_LAYOUT) {
@@ -229,6 +232,8 @@ public class EventHolderAdapter extends BaseAdapter {
 
         } else if (eventHolder.type == IO_CONTROL_LAYOUT) {
 
+            Log.v ("Width", "IO_CONTROL_LAYOUT");
+
             // Get layout containing light state visualizations
             LinearLayout previewLayout = (LinearLayout) view.findViewById(R.id.preview_layout);
 
@@ -255,6 +260,8 @@ public class EventHolderAdapter extends BaseAdapter {
 
                     int w = (previewLayout.getWidth() > 0 ? previewLayout.getWidth() : 20);
                     int h = (previewLayout.getHeight() > 0 ? previewLayout.getHeight() : 20);
+                    Log.v("Width", "w1 = " + w);
+                    Log.v("Width", "h1 = " + h);
 
                     if (preview != null) {
 
@@ -264,7 +271,8 @@ public class EventHolderAdapter extends BaseAdapter {
 
                         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
                         paint.setColor(Color.rgb(255, 61, 61));
-                        canvas.drawRect(0, 0, bmp.getWidth(), bmp.getHeight(), paint);
+
+                        canvas.drawCircle(bmp.getWidth() / 2, bmp.getWidth() / 2, bmp.getWidth(), paint);
 
                         preview.setImageBitmap(bmp);
 
@@ -380,6 +388,8 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     public View bindData(View view, int position) {
 
+        Log.v ("Width", "bindData");
+
         // Make sure it's worth drawing the view
         if (this.eventHolders.get(position) == null) {
             return view;
@@ -436,6 +446,9 @@ public class EventHolderAdapter extends BaseAdapter {
                     int w2 = (previewLayout.getWidth() > 0 ? previewLayout.getWidth() : 20);
                     int h2 = (previewLayout.getHeight() > 0 ? previewLayout.getHeight() : 20);
 
+                    Log.v ("Width", "w3 = " + w2);
+                    Log.v ("Width", "h3 = " + h2);
+
                     if (preview != null) {
 
                         Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
@@ -451,14 +464,6 @@ public class EventHolderAdapter extends BaseAdapter {
                         String[] lightStates = lightStateString.split(" ");
 
                         // Update the view
-//                        if (lightStates[i].equals("T")) {
-//                            paint2.setColor(Color.rgb(0, 0, 255));
-//                        } else {
-//                            paint2.setColor(Color.rgb(100, 100, 100));
-//                        }
-
-//                        String[] colors = eventHolder.getEvent().getState().get(0).getState().split(" ");
-
                         if (!lightStates[i].equals("000000")) {
                             String colorString = "#" + lightStates[i];
                             int color = Color.parseColor(colorString);
@@ -509,6 +514,9 @@ public class EventHolderAdapter extends BaseAdapter {
                     int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
                     int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
 
+                    Log.v("Width", "w2 = " + w2);
+                    Log.v("Width", "h2 = " + h2);
+
                     if (preview != null) {
 
                         Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
@@ -525,14 +533,15 @@ public class EventHolderAdapter extends BaseAdapter {
                         char ioSignalTypeState = ioStates[i].charAt(2);
                         char ioSignalValueState = ioStates[i].charAt(3);
 
-                        // Update the view
+                        // Update the view according to the state
                         if (ioState == 'T') {
                             paint2.setColor(Color.rgb(61, 255, 61));
                         } else {
                             paint2.setColor(Color.rgb(255, 61, 61));
                         }
 
-                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
+                        canvas2.drawCircle(bmp2.getWidth() / 2, bmp2.getWidth() / 2, convertDpToPixel(3.0f, ApplicationView.getContext()), paint2);
+//                        canvas2.drawRect(0, 0, bmp2.getWidth(), bmp2.getHeight(), paint2);
 
                         preview.setImageBitmap(bmp2);
 

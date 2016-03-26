@@ -8,6 +8,16 @@
     android:gravity="center_vertical"
     android:animateLayoutChanges="true">
 
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/event_tag_text_size"
+        android:textStyle="normal"
+        android:textAlignment="textEnd"
+        android:fontFeatureSettings="smcp">
+    </TextView>
+
     <ImageView
         android:id="@id/drag_handle"
         android:background="@drawable/drag"
@@ -18,10 +28,11 @@
 
     <ImageView
         android:id="@+id/icon"
+        android:layout_toRightOf="@+id/label"
         android:layout_width="22dp"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
         android:src="@drawable/ic_launcher" >
     </ImageView>
@@ -34,14 +45,6 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/event_tag_text_size"
-            android:textStyle="bold">
-        </TextView>
 
         <LinearLayout
             android:id="@+id/preview_layout"
@@ -59,21 +62,8 @@
                 android:layout_marginTop="5dp"
                 android:gravity="center">
 
-                <ImageView
-                    android:id="@+id/preview_1"
-                    android:layout_width="10dp"
-                    android:layout_height="10dp"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginRight="0dp"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center_horizontal"
-                    android:textAlignment="center"
-                    android:src="@drawable/ic_launcher">
-                </ImageView>
-
                 <TextView
                     android:id="@+id/preview_1_label"
-                    android:layout_below="@+id/preview_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -84,18 +74,9 @@
                     android:text="1">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_2"
+                    android:id="@+id/preview_1"
+                    android:layout_below="@+id/preview_1_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -106,9 +87,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_2_label"
-                    android:layout_below="@+id/preview_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -119,18 +109,9 @@
                     android:text="2">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_3"
+                    android:id="@+id/preview_2"
+                    android:layout_below="@+id/preview_2_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -141,9 +122,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_3_label"
-                    android:layout_below="@+id/preview_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -154,18 +144,9 @@
                     android:text="3">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_4"
+                    android:id="@+id/preview_3"
+                    android:layout_below="@+id/preview_3_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -176,9 +157,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_4_label"
-                    android:layout_below="@+id/preview_4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -189,18 +179,9 @@
                     android:text="4">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_5"
+                    android:id="@+id/preview_4"
+                    android:layout_below="@+id/preview_4_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -211,9 +192,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_5_label"
-                    android:layout_below="@+id/preview_5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -224,18 +214,9 @@
                     android:text="5">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_6"
+                    android:id="@+id/preview_5"
+                    android:layout_below="@+id/preview_5_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -246,9 +227,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_6_label"
-                    android:layout_below="@+id/preview_6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -259,18 +249,9 @@
                     android:text="6">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_7"
+                    android:id="@+id/preview_6"
+                    android:layout_below="@+id/preview_6_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -281,9 +262,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_7_label"
-                    android:layout_below="@+id/preview_7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -294,18 +284,9 @@
                     android:text="7">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_8"
+                    android:id="@+id/preview_7"
+                    android:layout_below="@+id/preview_7_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -316,9 +297,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_8_label"
-                    android:layout_below="@+id/preview_8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -329,18 +319,9 @@
                     android:text="8">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_9"
+                    android:id="@+id/preview_8"
+                    android:layout_below="@+id/preview_8_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -351,9 +332,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_9_label"
-                    android:layout_below="@+id/preview_9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -364,18 +354,9 @@
                     android:text="9">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_10"
+                    android:id="@+id/preview_9"
+                    android:layout_below="@+id/preview_9_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -386,9 +367,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_10_label"
-                    android:layout_below="@+id/preview_10"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -399,18 +389,9 @@
                     android:text="10">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_11"
+                    android:id="@+id/preview_10"
+                    android:layout_below="@+id/preview_10_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -421,9 +402,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_11_label"
-                    android:layout_below="@+id/preview_11"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -434,18 +424,9 @@
                     android:text="11">
                 </TextView>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="@dimen/light_preview_column_width"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="0dip"
-                android:layout_marginTop="5dp"
-                android:gravity="center">
-
                 <ImageView
-                    android:id="@+id/preview_12"
+                    android:id="@+id/preview_11"
+                    android:layout_below="@+id/preview_11_label"
                     android:layout_width="10dp"
                     android:layout_height="10dp"
                     android:layout_marginLeft="0dp"
@@ -456,9 +437,18 @@
                     android:src="@drawable/ic_launcher">
                 </ImageView>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="@dimen/light_preview_column_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="0dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center">
+
                 <TextView
                     android:id="@+id/preview_12_label"
-                    android:layout_below="@+id/preview_12"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -468,6 +458,19 @@
                     android:textStyle="normal"
                     android:text="12">
                 </TextView>
+
+                <ImageView
+                    android:id="@+id/preview_12"
+                    android:layout_below="@+id/preview_12_label"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center"
+                    android:src="@drawable/ic_launcher">
+                </ImageView>
 
             </LinearLayout>
 

@@ -7,33 +7,22 @@
     android:layout_margin="0dp"
     android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/event_tag_text_size"
-        android:fontFeatureSettings="smcp"
-        android:textStyle="normal"
-        android:textAlignment="textEnd">
-    </TextView>
-
     <ImageView
         android:id="@id/drag_handle"
         android:background="@drawable/drag"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/item_height"
-        android:layout_weight="0"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:layout_weight="0" />
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_toRightOf="@+id/label"
         android:layout_width="22dp"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="0dp"
-        android:src="@drawable/ic_launcher" >
+        android:src="@drawable/ic_launcher">
     </ImageView>
 
     <LinearLayout
@@ -41,17 +30,28 @@
         android:layout_toRightOf="@+id/icon"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:orientation="vertical">
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/text"
-            android:layout_alignLeft="@+id/label"
+            android:id="@+id/label"
+            android:layout_toRightOf="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/event_tag_text_size"
-            android:textStyle="normal">
+            android:textStyle="bold">
+        </TextView>
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_toRightOf="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/event_tag_text_size"
+            android:textStyle="normal"
+            android:layout_marginLeft="4dp"
+            android:gravity="center_vertical">
         </TextView>
 
     </LinearLayout>
