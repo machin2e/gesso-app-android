@@ -175,7 +175,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
         }
 
-        int segmentLength = 179;
+        int segmentLength = 120; // R.integer.event_timeline_segment_length;
         drawTimelineSegment (view, eventHolder, segmentLength);
 
         view.invalidate();

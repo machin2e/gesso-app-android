@@ -14,7 +14,8 @@
         android:textSize="@dimen/event_tag_text_size"
         android:fontFeatureSettings="smcp"
         android:textStyle="normal"
-        android:textAlignment="textEnd">
+        android:textAlignment="textEnd"
+        android:layout_centerVertical="true">
     </TextView>
 
     <ImageView
@@ -41,18 +42,18 @@
         android:layout_toRightOf="@+id/icon"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/text"
-            android:layout_below="@+id/label"
             android:layout_alignLeft="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/event_tag_text_size"
-            android:textStyle="normal">
+            android:textStyle="normal"
+            android:gravity="center_vertical">
         </TextView>
 
     </LinearLayout>

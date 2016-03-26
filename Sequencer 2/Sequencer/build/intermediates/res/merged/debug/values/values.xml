@@ -622,7 +622,7 @@
     <integer name="design_snackbar_text_max_lines">2</integer>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/values/dimens.xml -->
     <eat-comment/>
-    <integer name="event_timeline_segment_length">179</integer>
+    <integer name="event_timeline_segment_length">120</integer>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <integer name="status_bar_notification_info_maxnum">999</integer>
