@@ -15,7 +15,8 @@
         android:textSize="@dimen/event_tag_text_size"
         android:textStyle="normal"
         android:textAlignment="textEnd"
-        android:fontFeatureSettings="smcp">
+        android:fontFeatureSettings="smcp"
+        android:layout_centerVertical="true">
     </TextView>
 
     <ImageView
