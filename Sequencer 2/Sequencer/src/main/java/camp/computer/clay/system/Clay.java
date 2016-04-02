@@ -406,6 +406,12 @@ public class Clay {
                 getClay().generateBehaviorScript(uuid, "message", "TODO", "hello");
             }
 
+            if (!getCache().hasBehaviorScript ("tone")) {
+                Log.v("Clay_Behavior_Repo", "\"tone\" behavior not found in the repository. Adding it.");
+                UUID uuid = UUID.fromString("16626b1e-cf41-413f-bdb4-0188e82803e2");
+                getClay().generateBehaviorScript(uuid, "tone", "TODO", "frequency 0 hz 0 ms");
+            }
+
             if (!getCache().hasBehaviorScript ("pause")) {
                 Log.v("Clay_Behavior_Repo", "\"pause\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("56d0cf7d-ede6-4529-921c-ae9307d1afbc");

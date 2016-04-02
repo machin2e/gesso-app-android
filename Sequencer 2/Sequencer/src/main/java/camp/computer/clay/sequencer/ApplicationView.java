@@ -52,7 +52,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     // Configure the interface settings
     private static final boolean HIDE_TITLE = true;
-    private static final boolean HIDE_ACTION_BAR = false;
+    private static final boolean HIDE_ACTION_BAR = true;
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = false;
     private static final boolean FULLSCREEN = true;
 
@@ -68,6 +68,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         clay = new Clay();
 
         setContentView(R.layout.activity_main);
+
+//        DeviceViewPager viewPager = (DeviceViewPager) findViewById(R.id.pager);
+//        viewPager.setBackgroundResource(R.drawable.ic_launcher);
 
         // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
         // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
