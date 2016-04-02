@@ -75,7 +75,7 @@ public class TimelineListView extends DragSortListView {
                 @Override
                 public void drop(int from, int to) {
                     //String item=adapter.getItem(from);
-                    EventHolder item = (EventHolder) adapter.getItem (from);
+                    EventHolder item = (EventHolder) adapter.getItem(from);
 
                     adapter.notifyDataSetChanged();
                     adapter.remove(item);
@@ -114,7 +114,7 @@ public class TimelineListView extends DragSortListView {
             new DragSortListView.RemoveListener() {
                 @Override
                 public void remove(int which) {
-                    EventHolder eventHolder = (EventHolder) adapter.getItem (which);
+                    EventHolder eventHolder = (EventHolder) adapter.getItem(which);
 
                     adapter.remove(eventHolder);
 
@@ -405,6 +405,10 @@ public class TimelineListView extends DragSortListView {
             eventDesignerView.displayUpdateTagOptions(eventHolder);
         }
 
+        else if (eventHolder.type == 50) {
+            eventDesignerView.displayUpdateToneOptions (eventHolder);
+        }
+
     }
 
     private void removeEventHolder(final EventHolder eventHolder) {
@@ -692,6 +696,20 @@ public class TimelineListView extends DragSortListView {
                 displayBehaviorFinder(eventHolder);
 
             } else {
+
+//                // <HACK>
+//                if (eventHolder.type == 50) {
+//                    Log.v ("Tone", "updating summary: " + eventHolder.summary);
+//                    if (eventHolder.summary.equals("yes")) {
+//                        eventHolder.summary = "no";
+//                    } else {
+//                        eventHolder.summary = "yes";
+//                    }
+//                    refreshListViewFromData();
+//                }
+//                // </HACK>
+//
+//                else
 
                 if (!hasSelectedEventHolders()) {
                     displayUpdateOptions(eventHolder);

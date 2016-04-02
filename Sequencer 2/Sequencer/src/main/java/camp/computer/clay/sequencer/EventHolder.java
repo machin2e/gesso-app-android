@@ -7,6 +7,8 @@ package camp.computer.clay.sequencer;
 * object model.
 */
 
+import android.util.Log;
+
 import camp.computer.clay.system.Action;
 import camp.computer.clay.system.State;
 import camp.computer.clay.system.Event;
@@ -58,6 +60,8 @@ public class EventHolder {
             this.type = EventHolderAdapter.IO_CONTROL_LAYOUT;
         } else if (action.getTag().equals("message")) {
             this.type = EventHolderAdapter.MESSAGE_CONTROL_LAYOUT;
+        } else if (action.getTag().equals("tone")) {
+            this.type = 50; // TODO: Change 55 to a string such as "tone" for the type (or a UUID for the specific view, stored in database)
         } else if (action.getTag().equals("pause")) {
             this.type = EventHolderAdapter.WAIT_CONTROL_LAYOUT;
         } else if (action.getTag().equals("say")) {
@@ -69,6 +73,8 @@ public class EventHolder {
 
         // Initialize
         this.isSelected = false;
+
+        summary = "";
 
         // Initialize type
 //        initializeType();
@@ -82,6 +88,8 @@ public class EventHolder {
         this.title = title;
 
         this.type = type;
+
+        summary = "";
 
         // Initialize
         this.isSelected = false;

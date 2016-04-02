@@ -10,11 +10,13 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -272,7 +274,7 @@ public class EventDesignerView {
 //                getUnit().sendMessage ("start event " + eventHolder.getEvent().getUuid());
 //                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " action " + eventHolder.getEvent().getAction().getUuid());
 //                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
-                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"light" + lightHexColorString + "\"";
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + lightHexColorString + "\"";
                 Log.v ("Color", content);
                 getUnit().sendMessage (content); // <HACK />
                 /*
@@ -769,6 +771,12 @@ public class EventDesignerView {
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
 
+                // Send updated state to device
+                // <HACK>
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                getUnit().sendMessage(content);
+                // </HACK>
+
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
                 timelineListView.refreshListViewFromData();
@@ -837,23 +845,17 @@ public class EventDesignerView {
 //                unit.sendMessage (tagString);
 
                 // Create the behavior
-//                Action behavior = new Action(tagString);
-                Log.v("move", "event: " + eventHolder.getEvent());
-                Log.v("move", "event.behavior: " + eventHolder.getEvent().getAction());
                 eventHolder.getEvent().getAction().setTag(tagString);
 
-//                // Extract behaviors from the selected event holders and addUnit them to the behavior package.
-//                for (EventHolder selectedEventHolder : eventHolder.event) {
-//                    Action selectedBehavior = selectedEventHolder.getEvent().getAction();
-//                    behavior.cacheBehavior(selectedBehavior);
-//                }
-
                 // Store: Store the new behavior state and update the event.
-//                getClay().getStore().storeState(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getState());
-//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeBehavior(eventHolder.getEvent().getAction());
-//                getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + tagString + "\"";
+                getUnit().sendMessage(content);
+                // </HACK>
 
                 // Refresh the timeline view
                 timelineListView.refreshListViewFromData();
@@ -871,13 +873,44 @@ public class EventDesignerView {
 
     public void displayUpdateMessageOptions(final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle ("what's the message?");
+        builder.setTitle ("Message");
+
+        // Declare transformation layout
+        LinearLayout transformLayout = new LinearLayout (getContext());
+        transformLayout.setOrientation(LinearLayout.VERTICAL);
+
+        // Destination label
+        final TextView messageLabel = new TextView (getContext());
+        messageLabel.setText("Message");
+        messageLabel.setPadding(70, 20, 70, 20);
+        transformLayout.addView(messageLabel);
 
         // Set up the input
         final EditText input = new EditText(getContext());
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);//input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
+        transformLayout.addView(input);
+
+        // Get list of devices that have been discovered
+        ArrayList<String> unitUuidStrings = new ArrayList<String>();
+        for (Unit unit : getClay().getUnits()) {
+            unitUuidStrings.add(unit.getUuid().toString());
+        }
+
+        // Destination label
+        final TextView destinationLabel = new TextView (getContext());
+        destinationLabel.setText("Destination");
+        destinationLabel.setPadding(70, 20, 70, 20);
+        transformLayout.addView(destinationLabel);
+
+        // Set destination of message
+        Spinner destinationSpinner = new Spinner (getContext());
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, unitUuidStrings); //selected item will look like a spinner set from XML
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        destinationSpinner.setAdapter(spinnerArrayAdapter);
+        transformLayout.addView(destinationSpinner);
+
+        builder.setView(transformLayout);
 
         // Get the behavior state
         String message = eventHolder.getEvent().getState().get(0).getState();
@@ -904,6 +937,152 @@ public class EventDesignerView {
 //                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                getUnit().sendMessage(content);
+                // </HACK>
+
+                // Refresh the timeline view
+                // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
+                timelineListView.refreshListViewFromData();
+
+//                // Update the behavior state
+//                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
+//
+//                // ...then addUnit it to the device...
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//
+//                // ...and finally update the repository.
+//                getClay().getStore().storeState(behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
+//                //getClay ().getStore().updateBehaviorState(behaviorState);
+//                getClay().getStore().updateTimeline(unit.getTimeline());
+//
+//                // Refresh the timeline view
+//                refreshListViewFromData();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show ();
+    }
+
+    public void displayUpdateToneOptions(final EventHolder eventHolder) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle ("Tone");
+        builder.setMessage("Choose frequency and duration.");
+
+        // Declare transformation layout
+        LinearLayout transformLayout = new LinearLayout (getContext());
+        transformLayout.setOrientation(LinearLayout.VERTICAL);
+
+        // Set up the frequency
+        final TextView frequencyLabel = new TextView (getContext());
+        frequencyLabel.setPadding(70, 20, 70, 20);
+        transformLayout.addView(frequencyLabel);
+
+        final SeekBar frequencyVal = new SeekBar (getContext());
+        frequencyVal.setMax(5000);
+        frequencyVal.setHapticFeedbackEnabled(true); // TODO: Emulate this in the custom interface
+
+        // Get the behavior state
+        String stateString = eventHolder.getEvent().getState().get(0).getState();
+        String frequencyString = stateString.split(" ")[1];
+        int frequency = Integer.parseInt(frequencyString);
+
+        // Update the view
+        frequencyLabel.setText("Frequency (" + frequency + " Hz)");
+        frequencyVal.setProgress(frequency);
+
+        frequencyVal.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                frequencyLabel.setText("Frequency (" + progress + " Hz)");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        transformLayout.addView(frequencyVal);
+
+        // Set up the duration
+        final TextView durationLabel = new TextView (getContext());
+        durationLabel.setPadding(70, 20, 70, 20);
+        transformLayout.addView(durationLabel);
+
+        final SeekBar durationVal = new SeekBar (getContext());
+        durationVal.setMax(5000);
+        durationVal.setHapticFeedbackEnabled(true); // TODO: Emulate this in the custom interface
+
+        // Get the behavior state
+        String durationString = stateString.split(" ")[3];
+        int duration = Integer.parseInt(durationString);
+
+        // Update the view
+        durationLabel.setText("Duration (" + duration + " ms)");
+        durationVal.setProgress(duration);
+
+        durationVal.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                durationLabel.setText("Duration (" + progress + " ms)");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        transformLayout.addView(durationVal);
+
+        // Assign the layout to the alert dialog.
+        builder.setView(transformLayout);
+
+        // Set up the buttons
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Create transform string
+                String updatedStateString = "frequency " + frequencyVal.getProgress() + " hz " + durationVal.getProgress() + " ms";
+
+                // Update the behavior state
+                // <HACK>
+                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                // </HACK>
+                eventHolder.updateState(updatedStateString);
+
+                // Store: Store the new behavior state and update the event.
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+                getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                getUnit().sendMessage(content);
+                // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
@@ -974,6 +1153,12 @@ public class EventDesignerView {
 //                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                getUnit().sendMessage(content);
+                // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
@@ -1071,6 +1256,12 @@ public class EventDesignerView {
 //                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                getUnit().sendMessage(content);
+                // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mobeta.android.sequencer.R;
@@ -71,7 +72,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
     public int getItemType(int position){
         // Your if else code and return type ( TYPE_1 to TYPE_5 )
-        EventHolder eventHolder = getItem (position);
+        EventHolder eventHolder = getItem(position);
         return eventHolder.type;
     }
 
@@ -83,7 +84,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
         // Select the layout for the view based on the type of object being displayed in the view
         int type = getItemType (position);
-        int layoutResource = getLayoutByType(type); // Default resource
+        int layoutResource = getLayoutByType (type); // Default resource
 
 //        // Check if the view is reusable. The view is reusable if it is for the same type.
 //        // TODO: Only recycle view if it's for the same type (e.g., when updating state)
@@ -105,14 +106,99 @@ public class EventHolderAdapter extends BaseAdapter {
 
         // Create new view if none are recyclable
         if (convertView == null) {
-            view = this.inflater.inflate(layoutResource, parent, false);
+            if (type == 50) { // <HACK /> This should be a stirng comparison and use a layout stored in the database!
+                Log.v("Sound_View", "boo");
+                RelativeLayout actionView = new RelativeLayout(ApplicationView.getContext());
+
+                RelativeLayout.LayoutParams params = null;
+
+                // Add ImageView for rendering timeline segment
+                final ImageView dragImageView = new ImageView (ApplicationView.getContext());
+                dragImageView.setId(R.id.drag_handle);
+                dragImageView.setBackgroundResource(R.drawable.drag);
+                actionView.addView(dragImageView);
+
+                dragImageView.getLayoutParams().height = 100;
+
+                params = (RelativeLayout.LayoutParams) dragImageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                dragImageView.setLayoutParams(params);
+
+                dragImageView.requestLayout(); // call this if already laid out
+
+                // Action label
+                final TextView actionLabel = new TextView (ApplicationView.getContext());
+                actionLabel.setId(R.id.label);
+                actionLabel.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+                actionLabel.setAllCaps(true);
+                actionLabel.setTextSize(10.0f);
+                actionLabel.setWidth(150);
+                actionView.addView(actionLabel);
+
+                params = (RelativeLayout.LayoutParams) actionLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.CENTER_VERTICAL);
+                actionLabel.setLayoutParams(params);
+
+                // Add ImageView for rendering timeline segment
+                final ImageView imageView = new ImageView (ApplicationView.getContext());
+                imageView.setId(R.id.icon);
+                actionView.addView(imageView);
+
+                params = (RelativeLayout.LayoutParams) imageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.RIGHT_OF, actionLabel.getId());
+                imageView.setLayoutParams(params);
+
+                // Action interface
+
+                final TextView lightLabel = new TextView (ApplicationView.getContext());
+//                lightLabel.setPadding(70, 20, 70, 20);
+                lightLabel.setText(eventHolder.getEvent().getState().get(0).getState());
+//                lightLabel.setText("F♭ for 3 ms");
+                lightLabel.setTextSize(12.0f);
+                lightLabel.setPadding (0, 5, 0, 5);
+                actionView.addView(lightLabel);
+
+                params = (RelativeLayout.LayoutParams) lightLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
+                params.addRule(RelativeLayout.CENTER_VERTICAL);
+                lightLabel.setLayoutParams(params);
+
+                /*
+                final TextView lightLabel = new TextView (ApplicationView.getContext());
+//                lightLabel.setPadding(70, 20, 70, 20);
+                lightLabel.setText("Wut");
+                if (eventHolder.summary.equals("yes")) {
+                    lightLabel.setPadding(0, 200, 0, 200);
+                    lightLabel.setText("Yes");
+                } else {
+                    lightLabel.setPadding(0, 0, 0, 0);
+                    lightLabel.setText("No");
+                }
+                actionView.addView(lightLabel);
+
+                params = (RelativeLayout.LayoutParams) lightLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
+                params.addRule(RelativeLayout.CENTER_VERTICAL);
+                lightLabel.setLayoutParams(params);
+                */
+
+                view = actionView;
+
+            } else {
+                view = this.inflater.inflate(layoutResource, parent, false);
+            }
             view.setTag(eventHolder);
         } else {
+            if (type == 50) { // <HACK /> This should be a stirng comparison and use a layout stored in the database!
+                Log.v("Sound_View", "boo2");
+            }
             view = convertView;
         }
 
         // Update the list item's view according to the type
-        updateViewForType(view, eventHolder);
+        if (layoutResource != 50) {
+            updateViewForType(view, eventHolder);
+        }
 
         // bind the eventHolders to the view object
         return this.bindData(view, position);

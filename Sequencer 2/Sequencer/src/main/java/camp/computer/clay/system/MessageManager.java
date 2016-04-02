@@ -190,7 +190,7 @@ public class MessageManager {
             String[] messageTokens = message.getContent().split(" ");
 
             if (messageTokens.length == 3) {
-                String unitUuid = messageTokens[2];
+                String unitUuid = new String (messageTokens[2]);
                 String unitAddress = message.getFromAddress(); // messageTokens[5];
 
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
