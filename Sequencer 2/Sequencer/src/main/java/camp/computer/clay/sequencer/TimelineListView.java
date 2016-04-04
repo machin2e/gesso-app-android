@@ -555,11 +555,17 @@ public class TimelineListView extends DragSortListView {
         Log.v("Sending_Message", "start event " + event.getUuid());
         Log.v("Sending_Message", "set event " + event.getUuid() + " action " + action.getUuid());
         Log.v("Sending_Message", "set event " + event.getUuid() + " state " + event.getState().get(0).getState());
-        getUnit().sendMessage ("start event " + event.getUuid());
-        getUnit().sendMessage ("set event " + event.getUuid() + " action " + action.getUuid());
+//        getUnit().sendMessage ("start event " + event.getUuid());
+//        getUnit().sendMessage ("set event " + event.getUuid() + " action " + action.getUuid());
         // TODO: Set initial/default state for action type!
 //        getUnit().sendMessage ("set event " + event.getUuid() + " state \"light " + event.getState().get(0).getState() + "\""); // <HACK />
         // unit.sendMessage("update action " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
+        // </HACK>
+
+        // <HACK>
+        // TODO: Replace this with a queue.
+        getUnit().sendMessageTcp("start event " + event.getUuid());
+        getUnit().sendMessageTcp("set event " + event.getUuid() + " action " + action.getUuid());
         // </HACK>
 
 

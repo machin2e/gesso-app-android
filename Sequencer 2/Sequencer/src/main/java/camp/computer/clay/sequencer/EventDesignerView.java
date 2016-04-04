@@ -288,6 +288,11 @@ public class EventDesignerView {
                 // unit.sendMessage("update action " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
                 // </HACK>
 
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
+                // </HACK>
+
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
                 timelineListView.refreshListViewFromData();
@@ -774,7 +779,12 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-                getUnit().sendMessage(content);
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -854,7 +864,12 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + tagString + "\"";
-                getUnit().sendMessage(content);
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -941,7 +956,12 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-                getUnit().sendMessage(content);
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1081,7 +1101,12 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-                getUnit().sendMessage(content);
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1157,7 +1182,12 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-                getUnit().sendMessage(content);
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1260,7 +1290,12 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-                getUnit().sendMessage(content);
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().sendMessageTcp(content);
                 // </HACK>
 
                 // Refresh the timeline view

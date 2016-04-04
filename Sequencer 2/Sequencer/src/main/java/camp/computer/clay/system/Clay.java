@@ -1,9 +1,7 @@
 package camp.computer.clay.system;
 
-import android.text.TextUtils;
 import android.util.Log;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -171,6 +169,8 @@ public class Clay {
 
                 addUnit2(restoredUnit);
 
+                restoredUnit.connectTcp();
+
 //                Log.v("Content_Manager", "Clay is searching for the timeline (UUID: " + restoredUnit.getTimelineUuid() + ").");
 
                 /*
@@ -232,6 +232,8 @@ public class Clay {
                 // Cache the unit
                 addUnit2 (newUnit);
                 Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
+
+                newUnit.connectTcp();
 
                 Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 

@@ -52,7 +52,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     // Configure the interface settings
     private static final boolean HIDE_TITLE = true;
-    private static final boolean HIDE_ACTION_BAR = true;
+    private static final boolean HIDE_ACTION_BAR = false;
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = false;
     private static final boolean FULLSCREEN = true;
 

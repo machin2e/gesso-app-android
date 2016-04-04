@@ -1,7 +1,9 @@
 package camp.computer.clay.system;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -15,6 +17,8 @@ public class Unit {
     private UUID uuid = null; // The unit's static, unchanging, UUID
 
     private String internetAddress = null; // The unit's IP address
+
+    private TcpClient mTcpClient = null;
 
     private String meshAddress = null; // The unit's IP address
 
@@ -125,6 +129,45 @@ public class Unit {
         getClay().sendMessage(this, content);
     }
 
+    private ArrayList<Message> incomingMessages = new ArrayList<Message>(); // Create incoming message queue.
+    private ArrayList<Message> outgoingMessages = new ArrayList<Message>(); // Create outgoing message queue.
+
+    public void connectTcp() {
+        Log.v("TCP_Server", "Adding device");
+        new ConnectTask().execute(this.internetAddress);
+    }
+
+    // TODO: public void queueMessageTcp (String content, callbackToCallWhenReceiveResponse) // Adding a callback indicates that the message should be acknowledged and bookkeeping should track when it is received and invoke this callback when response is received.
+    public void sendMessageTcp (String content) {
+        Log.v("TCP_Server", "sendMessageTcp");
+
+        // Get source and destination addresses
+        String source = null; // TODO: getClay().getCurrentDevice().getInternetAddress()
+        String destination = getInternetAddress();
+
+        // Create message
+        Message message = new Message("tcp", source, destination, content);
+        message.setDeliveryGuaranteed(true);
+
+        // Queue message
+        outgoingMessages.add(message);
+
+        // <HACK>
+        // Send messages on queue
+        // TODO: Put this into a separate thread and call it periodically.
+        //mTcpClient.sendMessage("connected to " + getUuid().toString());
+        Message outgoingMessage = outgoingMessages.remove(0);
+
+        // Format message for transmission (according to messaging protocol)
+        String formattedMessage = outgoingMessage.getContent() + "\n";
+        mTcpClient.sendMessage (formattedMessage);
+        // </HACK>
+    }
+
+    public void disconnectTcp() {
+        mTcpClient.stopClient();
+    }
+
 //    public void cacheBehavior(UUID behaviorUuid) {
 //
 //        // Get the behavior with the specified UUID
@@ -148,4 +191,41 @@ public class Unit {
 //        // Add the event to the timeline
 //        this.getTimeline().addEvent(event);
 //    }
+
+    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
+
+        @Override
+        protected TcpClient doInBackground(String... params) {
+            Log.v("TCP_Server", "ConnectTask");
+
+            if (params.length == 0) {
+                return null;
+            }
+
+            String internetAddress = (String) params[0];
+            Log.v ("TCP_Server", "IP: " + internetAddress);
+
+            //we create a TCPClient object and
+            mTcpClient = new TcpClient(internetAddress);
+
+            // <HACK>
+            // TODO: Put this in an intermediate "DeviceTcpConnection" class, that contains "TcpClient" and has methods for registering callbacks?
+            mTcpClient.setOnMessageReceived(new TcpClient.OnMessageReceived() {
+                @Override
+                //here the messageReceived method is implemented
+                public void messageReceived(String message) {
+                    //this method calls the onProgressUpdate
+                    //publishProgress(message);
+                    Log.v("TCP_Server", "Input message: " + message);
+
+//                    sendMessageTcp("echoing received message: " + message);
+                }
+            });
+            // </HACK>
+
+            mTcpClient.run();
+
+            return null;
+        }
+    }
 }
