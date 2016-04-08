@@ -1,7 +1,9 @@
 package camp.computer.clay.system;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -25,6 +27,8 @@ public class Unit {
     private Date timeOfLastContact = null;
 
     // TODO: Cache/model the unit's state and behavior
+
+    TcpMessageClient tcpMessageClient = new TcpMessageClient();
 
     public Unit() {
         // This empty default constructor is necessary for Firebase to be able to deserialize objects.
@@ -123,6 +127,25 @@ public class Unit {
 
     public void sendMessage(String content) {
         getClay().sendMessage(this, content);
+    }
+
+    public void connectTcp() {
+        tcpMessageClient.connect(this.internetAddress);
+    }
+
+    // TODO: public void queueMessageTcp (String content, callbackToCallWhenReceiveResponse) // Adding a callback indicates that the message should be acknowledged and bookkeeping should track when it is received and invoke this callback when response is received.
+    public void sendMessageTcp (String content) {
+        Log.v("TCP_Server", "sendMessageTcp");
+
+        // Get source and destination addresses
+        String source = null; // TODO: getClay().getCurrentDevice().getInternetAddress()
+        String destination = getInternetAddress();
+
+        // Create message
+        Message message = new Message("tcp", source, destination, content);
+        message.setDeliveryGuaranteed(true);
+
+        tcpMessageClient.queueMessage(message);
     }
 
 //    public void cacheBehavior(UUID behaviorUuid) {

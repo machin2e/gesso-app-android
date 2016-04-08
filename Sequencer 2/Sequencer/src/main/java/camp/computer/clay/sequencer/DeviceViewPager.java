@@ -1,13 +1,24 @@
 package camp.computer.clay.sequencer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import com.mobeta.android.sequencer.R;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +28,8 @@ public class DeviceViewPager extends ViewPager {
     private static boolean ENABLE_TOUCH = true;
 
     private static int BACKGROUND_COLOR = Color.BLACK;
+
+    private boolean disableSelectingEvents = true;
 
     Calendar calendar = Calendar.getInstance();
 
@@ -45,7 +58,7 @@ public class DeviceViewPager extends ViewPager {
         this.addOnPageChangeListener(new OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                Log.v("Scroller", "onPageScrolled");
             }
 
             @Override
@@ -58,9 +71,34 @@ public class DeviceViewPager extends ViewPager {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                Log.v("Scroller", "onPageScrollStateChanged state = " + state);
             }
         });
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        DeviceViewPager viewPager = (DeviceViewPager) findViewById(R.id.pager);
+//        Drawable backgroundImage = getDrawable(R.drawable.clay_background_image);
+//        viewPager.setBackground(backgroundImage);
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.clay_background_image);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
+        bitmapDrawable.setGravity(Gravity.CENTER);
+
+//        Canvas canvas = new Canvas(bmp.copy(Bitmap.Config.ARGB_8888, true));
+        Paint p = new Paint();
+        p.setColor(Color.BLACK);
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+        Bitmap gbmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+        Canvas canvas = new Canvas(gbmp);
+        canvas.drawRect(0, 0, w, h, p);
+        //canvas.drawBitmap(bmp, viewPager.getWidth() / 2.0f, viewPager.getHeight() / 2.0f, p);
+        canvas.drawBitmap(bmp, (w / 2.0f)  - (bmp.getWidth() / 2.0f), (h / 2.0f) - (bmp.getHeight() / 2.0f), p);
+        BitmapDrawable gbitmapDrawable = new BitmapDrawable(gbmp);
+
+        viewPager.setBackground(gbitmapDrawable);
     }
 
     /**
@@ -211,10 +249,12 @@ public class DeviceViewPager extends ViewPager {
                 touchDistance = 0;
 
                 // Update the gesture classification
-                if (startTouch.x < 200) {
-                    interceptTouches = true;
-                } else {
-                    interceptTouches = false;
+                if (!disableSelectingEvents) {
+                    if (startTouch.x < 200) {
+                        interceptTouches = true;
+                    } else {
+                        interceptTouches = false;
+                    }
                 }
 
             }
@@ -242,5 +282,12 @@ public class DeviceViewPager extends ViewPager {
 
     public void setPagingEnabled (boolean enabled) {
         this.ENABLE_TOUCH = enabled;
+    }
+
+    @Override
+    protected void onPageScrolled(int position, float offset, int offsetPixels) {
+        super.onPageScrolled(position, offset, offsetPixels);
+
+        Log.v("Scroller", "onPageScrolled");
     }
 }

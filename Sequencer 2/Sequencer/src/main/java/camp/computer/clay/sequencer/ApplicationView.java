@@ -3,13 +3,20 @@ package camp.computer.clay.sequencer;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
 
-import com.azeesoft.lib.colorpicker.ColorPickerDialog;
 import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.resource.NetworkResource;
@@ -52,8 +59,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     // Configure the interface settings
     private static final boolean HIDE_TITLE = true;
-    private static final boolean HIDE_ACTION_BAR = true;
-    private static final boolean HIDE_ACTION_BAR_ON_SCROLL = false;
+    private static final boolean HIDE_ACTION_BAR = false;
+    private static final boolean HIDE_ACTION_BAR_ON_SCROLL = true;
     private static final boolean FULLSCREEN = true;
 
     /** Called when the activity is first created. */
@@ -69,9 +76,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         setContentView(R.layout.activity_main);
 
-//        DeviceViewPager viewPager = (DeviceViewPager) findViewById(R.id.pager);
-//        viewPager.setBackgroundResource(R.drawable.ic_launcher);
-
         // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
         // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
         // by the ViewPager; additional logic is lower in this file to synchronize the ViewPager
@@ -85,10 +89,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         if (HIDE_TITLE) {
             actionBar.setDisplayShowTitleEnabled(false);
-        }
-
-        if (HIDE_ACTION_BAR_ON_SCROLL) {
-            actionBar.setHideOnContentScrollEnabled(true);
         }
 
         if (FULLSCREEN) {
@@ -120,6 +120,29 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             }
         });
         // END_INCLUDE (page_change_listener)
+
+
+
+//        if (HIDE_ACTION_BAR_ON_SCROLL) {
+////            actionBar.setHideOnContentScrollEnabled(true);
+//
+//            mViewPager.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+//                @Override
+//                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                    //                    float y = ((ScrollView)findViewById(R.id.parent)).getScrollY();
+////                    if (y >= mActionBarHeight && mActionBar.isShowing()) {
+////                        mActionBar.hide();
+////                    } else if ( y==0 && !mActionBar.isShowing()) {
+////                        mActionBar.show();
+////                    }
+//                    Log.v("Scroller", "hmm");
+//
+//                    if (actionBar.isShowing()) {
+//                        actionBar.hide();
+//                    }
+//                }
+//            });
+//        }
 
         // Add the view provided by the host device.
         clay.addView(this);

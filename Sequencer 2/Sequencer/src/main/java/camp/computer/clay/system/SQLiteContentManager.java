@@ -899,10 +899,12 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             // Update event indices
             for (Event event : timeline.getEvents()) {
-                if (!queryEventExists(event.getUuid())) {
-                    saveEvent(event.getTimeline(), event);
-                } else {
-                    updateEvent(event.getTimeline(), event);
+                if (event != null) {
+                    if (!queryEventExists(event.getUuid())) {
+                        saveEvent(event.getTimeline(), event);
+                    } else {
+                        updateEvent(event.getTimeline(), event);
+                    }
                 }
             }
 
