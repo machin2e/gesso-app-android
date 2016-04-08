@@ -113,18 +113,18 @@ public class EventHolderAdapter extends BaseAdapter {
                 RelativeLayout.LayoutParams params = null;
 
                 // Add ImageView for rendering timeline segment
-                final ImageView dragImageView = new ImageView (ApplicationView.getContext());
-                dragImageView.setId(R.id.drag_handle);
-                dragImageView.setBackgroundResource(R.drawable.drag);
-                actionView.addView(dragImageView);
-
-                dragImageView.getLayoutParams().height = 100;
-
-                params = (RelativeLayout.LayoutParams) dragImageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                dragImageView.setLayoutParams(params);
-
-                dragImageView.requestLayout(); // call this if already laid out
+//                final ImageView dragImageView = new ImageView (ApplicationView.getContext());
+//                dragImageView.setId(R.id.drag_handle);
+//                dragImageView.setBackgroundResource(R.drawable.drag);
+//                actionView.addView(dragImageView);
+//
+//                dragImageView.getLayoutParams().height = 100;
+//
+//                params = (RelativeLayout.LayoutParams) dragImageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//                dragImageView.setLayoutParams(params);
+//
+//                dragImageView.requestLayout(); // call this if already laid out
 
                 // Action label
                 final TextView actionLabel = new TextView (ApplicationView.getContext());
@@ -599,9 +599,6 @@ public class EventHolderAdapter extends BaseAdapter {
 
                     int w2 = (preview_layout.getWidth() > 0 ? preview_layout.getWidth() : 20);
                     int h2 = (preview_layout.getHeight() > 0 ? preview_layout.getHeight() : 20);
-
-                    Log.v("Width", "w2 = " + w2);
-                    Log.v("Width", "h2 = " + h2);
 
                     if (preview != null) {
 

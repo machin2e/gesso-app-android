@@ -10,6 +10,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -274,7 +275,7 @@ public class EventDesignerView {
 //                getUnit().sendMessage ("start event " + eventHolder.getEvent().getUuid());
 //                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " action " + eventHolder.getEvent().getAction().getUuid());
 //                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
-                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + lightHexColorString + "\"";
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
                 Log.v ("Color", content);
                 getUnit().sendMessage (content); // <HACK />
                 /*
@@ -888,29 +889,51 @@ public class EventDesignerView {
 
     public void displayUpdateMessageOptions(final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle ("Message");
+
+        /* Pop-up title */
+
+        // builder.setTitle ("Message");
 
         // Declare transformation layout
         LinearLayout transformLayout = new LinearLayout (getContext());
         transformLayout.setOrientation(LinearLayout.VERTICAL);
 
-        // Destination label
+        /* Message content */
+
+        // Title
         final TextView messageLabel = new TextView (getContext());
         messageLabel.setText("Message");
         messageLabel.setPadding(70, 20, 70, 20);
         transformLayout.addView(messageLabel);
 
-        // Set up the input
+        // Content input field
         final EditText input = new EditText(getContext());
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);//input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
         transformLayout.addView(input);
 
+        /* Message type */
+
         // Get list of devices that have been discovered
-        ArrayList<String> unitUuidStrings = new ArrayList<String>();
-        for (Unit unit : getClay().getUnits()) {
-            unitUuidStrings.add(unit.getUuid().toString());
-        }
+        final ArrayList<String> destinationAddressStrings = new ArrayList<String>();
+
+        // Title
+        final TextView protocolLabel = new TextView (getContext());
+        protocolLabel.setText("Type");
+        protocolLabel.setPadding(70, 20, 70, 20);
+        transformLayout.addView(protocolLabel);
+
+        // List of types (i.e., TCP, UDP, Mesh, etc.)
+        final Spinner messageTypeSpinner = new Spinner (getContext());
+        ArrayList<String> messageTypeStrings = new ArrayList<String>();
+        messageTypeStrings.add("UDP"); // Internet
+        messageTypeStrings.add("TCP"); // Internet
+        messageTypeStrings.add("Mesh"); // Clay
+        ArrayAdapter<String> messageTypeSpinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, messageTypeStrings); //selected item will look like a spinner set from XML
+        messageTypeSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        messageTypeSpinner.setAdapter(messageTypeSpinnerArrayAdapter);
+        transformLayout.addView(messageTypeSpinner);
+
+        /* Message destination address */
 
         // Destination label
         final TextView destinationLabel = new TextView (getContext());
@@ -919,20 +942,116 @@ public class EventDesignerView {
         transformLayout.addView(destinationLabel);
 
         // Set destination of message
-        Spinner destinationSpinner = new Spinner (getContext());
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, unitUuidStrings); //selected item will look like a spinner set from XML
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        destinationSpinner.setAdapter(spinnerArrayAdapter);
+        final Spinner destinationSpinner = new Spinner (getContext());
+        final ArrayAdapter<String> destinationAddressArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, destinationAddressStrings); //selected item will look like a spinner set from XML
+        destinationAddressArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        destinationSpinner.setAdapter(destinationAddressArrayAdapter);
         transformLayout.addView(destinationSpinner);
+
+        // "Other" destination address, specified by user
+        final TextView otherDestinationTitle = new TextView (getContext());
+        otherDestinationTitle.setText("Other");
+        otherDestinationTitle.setPadding(70, 20, 70, 20);
+        otherDestinationTitle.setVisibility(View.GONE);
+        transformLayout.addView(otherDestinationTitle);
+
+        // "Other" destination input field
+        final EditText otherDestinationText = new EditText(getContext());
+        otherDestinationText.setInputType(InputType.TYPE_CLASS_TEXT);
+        otherDestinationText.setVisibility(View.GONE);
+        transformLayout.addView(otherDestinationText);
+
+        /* Set the view */
 
         builder.setView(transformLayout);
 
-        // Get the behavior state
-        String message = eventHolder.getEvent().getState().get(0).getState();
+        /* Set up interactivity */
 
-        // Update the view
-        input.setText(message);
+        messageTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItemText = messageTypeSpinner.getItemAtPosition(position).toString();
+                if (selectedItemText.equals("UDP") || selectedItemText.equals("TCP")) {
+                    // Get list of all discovered devices on the mesh network
+                    destinationAddressStrings.clear();
+                    // TODO: Get list of all discovered smartphones, tablets, and other devices for interacting with Clay
+                    destinationAddressStrings.add(getClay().getInternetBroadcastAddress() + ":4445"); // Broadcast address
+                    destinationAddressStrings.add(getClay().getInternetAddress() + ":4445"); // This device's address
+                    destinationAddressStrings.add("Other");
+                    destinationAddressArrayAdapter.notifyDataSetChanged();
+                } else if (selectedItemText.equals("Mesh")) {
+                    // Get list of all discovered devices on the mesh network
+                    destinationAddressStrings.clear();
+                    for (Unit unit : getClay().getUnits()) {
+                        destinationAddressStrings.add(unit.getUuid().toString());
+                    }
+                    // Note: There's no "Other" option for mesh.
+                    destinationAddressArrayAdapter.notifyDataSetChanged();
+                }
+
+                // Select the first item by default
+                destinationSpinner.setSelection(0, true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                messageTypeSpinner.setSelection(0, true);
+            }
+        });
+
+        destinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItemText = destinationSpinner.getItemAtPosition(position).toString();
+                if (selectedItemText.equals("Other")) {
+                    otherDestinationTitle.setVisibility(View.VISIBLE);
+                    otherDestinationText.setVisibility(View.VISIBLE);
+                    otherDestinationText.invalidate();
+                } else {
+                    otherDestinationTitle.setVisibility(View.GONE);
+                    otherDestinationText.setVisibility(View.GONE);
+                    otherDestinationText.invalidate();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                otherDestinationTitle.setVisibility(View.GONE);
+                otherDestinationText.setVisibility(View.GONE);
+            }
+        });
+
+        /* Perform "automated" interactions to initialize pop-up */
+
+        // TODO:
+
+        /* Initialize the state */
+
+        // Extract state from string representation
+        String currentStateString = eventHolder.getEvent().getState().get(0).getState();
+        int currentDestinationAddressStringIndex = currentStateString.indexOf(" ");
+        int currentContentStringIndex = currentStateString.indexOf(" ", currentDestinationAddressStringIndex + 1);
+
+        String currentTypeString = currentStateString.substring(0, currentDestinationAddressStringIndex);
+        String currentDestinationAddressString = currentStateString.substring(currentDestinationAddressStringIndex + 1, currentContentStringIndex);
+        String currentContentString = currentStateString.substring (currentContentStringIndex + 1);
+        currentContentString = currentContentString.substring(1, currentContentString.length() - 1);
+
+        /* Initialize the pop-up with the state */
+
+        // Message content
+        input.setText(currentContentString);
         input.setSelection(input.getText().length());
+
+        // Message type
+        int messageTypeIndex = messageTypeSpinnerArrayAdapter.getPosition(currentTypeString);
+        messageTypeSpinner.setSelection(messageTypeIndex);
+
+        // Message destination
+        int messageDestinationIndex = destinationAddressArrayAdapter.getPosition(currentDestinationAddressString);
+        destinationSpinner.setSelection(messageDestinationIndex);
+
+        otherDestinationText.setText (currentDestinationAddressString);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -940,22 +1059,32 @@ public class EventDesignerView {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Update the behavior profile state
-                String updatedStateString = input.getText().toString();
+                // e.g., "udp 192.168.1.255:4445 \"hello world\""
+                // TODO: "udp none 192.168.1.255:4445 \"hello world\""... make same message string format!
+                String updatedStateString = messageTypeSpinner.getSelectedItem().toString();
+//                updatedStateString += " none";
+                if (!destinationSpinner.getSelectedItem().toString().equals("Other")) {
+                    updatedStateString += " " + destinationSpinner.getSelectedItem().toString();
+                } else {
+                    updatedStateString += " " + otherDestinationText.getText().toString();
+                }
+                updatedStateString += " \'" + input.getText().toString() + "\'";
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent ().setTimeline (unit.getTimeline());
                 // </HACK>
-                eventHolder.updateState(updatedStateString);
+                eventHolder.updateState (updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
 //                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
-                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
-                getClay().getStore().storeEvent(eventHolder.getEvent());
+                getClay().getStore().storeState (eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+                getClay().getStore().storeEvent (eventHolder.getEvent());
 
                 // Send updated state to device
                 // <HACK>
-                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                String stateToSend = updatedStateString.substring (0, updatedStateString.indexOf(" ")).toLowerCase() + " " + updatedStateString.substring(updatedStateString.indexOf(" ") + 1);
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + stateToSend + "\"";
 //                getUnit().sendMessage(content);
                 // </HACK>
 

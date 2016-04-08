@@ -20,14 +20,6 @@
     </TextView>
 
     <ImageView
-        android:id="@id/drag_handle"
-        android:background="@drawable/drag"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/item_height"
-        android:layout_weight="0"
-        android:layout_alignParentRight="true" />
-
-    <ImageView
         android:id="@+id/icon"
         android:layout_toRightOf="@+id/label"
         android:layout_width="22dp"

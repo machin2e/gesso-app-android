@@ -1,13 +1,20 @@
 package camp.computer.clay.system;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
+import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Log;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
+
+import camp.computer.clay.sequencer.ApplicationView;
 
 public class Clay {
 
@@ -121,6 +128,42 @@ public class Clay {
         return this.units;
     }
 
+    public boolean hasNetworkManager () {
+        return this.networkManager != null;
+    }
+
+    // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
+    public String getInternetAddress () {
+//        if (hasNetworkManager()) {
+//            return this.networkManager.getInternetAddress();
+//        } else {
+//            return null;
+//        }
+
+        Context context = ApplicationView.getContext();
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        Log.v ("Clay", "Internet address: " + ip);
+        return ip;
+    }
+
+    // TODO: Move this to a "network interface"
+    public String getInternetBroadcastAddress () {
+//        if (hasNetworkManager()) {
+//            String broadcastAddressString = this.networkManager.getInternetAddress();
+            String broadcastAddressString = getInternetAddress();
+        Log.v ("Clay", "Broadcast: " + broadcastAddressString);
+        broadcastAddressString = broadcastAddressString.substring(0, broadcastAddressString.lastIndexOf("."));
+        broadcastAddressString += ".255";
+//            String[] broadcastAddressOctetStrings = broadcastAddressString.split(".");
+//            broadcastAddressOctetStrings[3] = "255"; // Replace the fourth octet with broadcast flag
+//            broadcastAddressString = TextUtils.join(".", broadcastAddressOctetStrings);
+            return broadcastAddressString;
+//        } else {
+//            return null;
+//        }
+    }
+
     public Unit getUnitByAddress (String address) {
         for (Unit unit : getUnits ()) {
             if (unit.getInternetAddress ().compareTo (address) == 0) {
@@ -167,9 +210,22 @@ public class Clay {
                 // Update restored unit with information from device
                 restoredUnit.setInternetAddress(internetAddress);
 
+                // Add unit to Clay
                 addUnit2(restoredUnit);
 
+                // Establish TCP connection
                 restoredUnit.connectTcp();
+
+                // Populate the timeline
+                // TODO: Populate from scratch only if no timeline has been programmed for the device
+                for (Event event : restoredUnit.getTimeline().getEvents()) {
+                    // <HACK>
+                    restoredUnit.sendMessageTcp("start event " + event.getUuid());
+                    restoredUnit.sendMessageTcp("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                    String content = "set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"";
+                    restoredUnit.sendMessageTcp(content);
+                    // </HACK>
+                }
 
 //                Log.v("Content_Manager", "Clay is searching for the timeline (UUID: " + restoredUnit.getTimelineUuid() + ").");
 
@@ -233,6 +289,7 @@ public class Clay {
                 addUnit2 (newUnit);
                 Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
 
+                // TCP connection
                 newUnit.connectTcp();
 
                 Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
@@ -283,7 +340,7 @@ public class Clay {
 
                         // Sends actions to the device's cache
                         // i.e., 'cache action <action-uuid> "<action-regex>"'
-                        unit.sendMessage ("cache action " + action.getUuid());
+//                        unit.sendMessage ("cache action " + action.getUuid());
                         //unit.sendMessage ("cache action " + action.getUuid() + " \"" + action.getScript().getStatePattern() + "\"");
 
 //                        UUID uuid = unit.getUuid();
@@ -399,31 +456,31 @@ public class Clay {
             if (!getCache().hasBehaviorScript ("signal")) {
                 Log.v("Clay_Behavior_Repo", "\"signal\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("bdb49750-9ead-466e-96a0-3aa88e7d246c");
-                getClay().generateBehaviorScript(uuid, "signal", "TODO", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+                getClay().generateBehaviorScript(uuid, "signal", "regex", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
             }
 
             if (!getCache().hasBehaviorScript ("message")) {
                 Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
-                getClay().generateBehaviorScript(uuid, "message", "TODO", "hello");
+                getClay().generateBehaviorScript(uuid, "message", "regex", "UDP Other \"hello\"");
             }
 
             if (!getCache().hasBehaviorScript ("tone")) {
                 Log.v("Clay_Behavior_Repo", "\"tone\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("16626b1e-cf41-413f-bdb4-0188e82803e2");
-                getClay().generateBehaviorScript(uuid, "tone", "TODO", "frequency 0 hz 0 ms");
+                getClay().generateBehaviorScript(uuid, "tone", "regex", "frequency 0 hz 0 ms");
             }
 
             if (!getCache().hasBehaviorScript ("pause")) {
                 Log.v("Clay_Behavior_Repo", "\"pause\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("56d0cf7d-ede6-4529-921c-ae9307d1afbc");
-                getClay().generateBehaviorScript(uuid, "pause", "TODO", "250");
+                getClay().generateBehaviorScript(uuid, "pause", "regex", "250");
             }
 
             if (!getCache().hasBehaviorScript ("say")) {
                 Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
                 UUID uuid = UUID.fromString("269f2e19-1fc8-40f5-99b2-6ca67e828e70");
-                getClay().generateBehaviorScript(uuid, "say", "TODO", "oh, that's great");
+                getClay().generateBehaviorScript(uuid, "say", "regex", "oh, that's great");
             }
         }
     }

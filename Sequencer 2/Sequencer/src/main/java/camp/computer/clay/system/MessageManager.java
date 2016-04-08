@@ -38,7 +38,7 @@ public class MessageManager {
     Handler handler = new Handler() {
         @Override
         public void handleMessage (android.os.Message msg) {
-            Log.v("Clay_Time", "addUnit called");
+//            Log.v("Clay_Time", "addUnit called");
 
             // Process the incoming message's data.
             Bundle bundle = msg.getData();
@@ -48,8 +48,8 @@ public class MessageManager {
             String senderAddress = null;
             senderAddress = tokens[0]; // InetAddress.getByName(tokens[0]);
 
-            Log.v("Clay_Queue", "dequeuedMessage = " + serializedMessageObject);
-            Log.v("Clay_Queue", "IP = " + senderAddress);
+//            Log.v("Clay_Queue", "dequeuedMessage = " + serializedMessageObject);
+//            Log.v("Clay_Queue", "IP = " + senderAddress);
 
             // Create the message
             Message message = new Message ("udp", senderAddress, null, tokens[1]);
@@ -112,7 +112,7 @@ public class MessageManager {
     }
 
     public void processIncomingMessages () {
-        Log.v ("UDP_Processing", "<<< processIncomingQueue");
+//        Log.v ("UDP_Processing", "<<< processIncomingQueue");
         // Dequeue and process the next message on the incoming message queue.
         if (hasIncomingMessages()) {
             Log.v("Clay_Time", "Processing incoming message");
@@ -195,34 +195,34 @@ public class MessageManager {
 
                 if (!getClay ().hasUnitByAddress (unitAddress)) {
 
-                    Log.v("UDP", "Adding Clay " + unitUuid + " with address " + unitAddress);
+//                    Log.v("UDP", "Adding Clay " + unitUuid + " with address " + unitAddress);
                     UUID deviceUuid = UUID.fromString(unitUuid);
                     getClay().addUnit(deviceUuid, unitAddress);
 
                 } else {
-                    Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
+//                    Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
 
                     UUID deviceUuid = UUID.fromString(unitUuid);
                     Unit unit = getClay().getUnitByUuid(deviceUuid);
                 }
             }
 
-            Log.v ("UDP", "---");
+//            Log.v ("UDP", "---");
 
         } else if (message.getContent().startsWith("say ")) {
 
-            Log.v("Clay_Verbalizer", message.getContent());
+//            Log.v("Clay_Verbalizer", message.getContent());
 
             String phrase = message.getContent().split(" ")[1];
 
 //            ((AppActivity) getClay ().getContext()).Hack_Speak(phrase);
 
         } else {
-            Log.v("Clay", "Error: Unrecognized message.");
+//            Log.v("Clay", "Error: Unrecognized message.");
             // TODO: Add the unrecognized message the FileContentManager in a category for unrecognized messages, and allow it to be defined.
         }
 
-        Log.v ("UDP", "---");
+//        Log.v ("UDP", "---");
     }
 
     public boolean hasOutgoingMessages () {
@@ -258,7 +258,7 @@ public class MessageManager {
     Date timeLastSentMessage = new Date(0);
     long outgoingMessagePeriod = 200;
     public void processOutgoingMessages () {
-        Log.v ("UDP_Processing", "processOutgoingMessage (count: " + outgoingMessages.size() + ")");
+//        Log.v ("UDP_Processing", "processOutgoingMessage (count: " + outgoingMessages.size() + ")");
 
         if (hasOutgoingMessages ()) {
 
@@ -277,11 +277,11 @@ public class MessageManager {
             // Get the next outgoing message.
             Message outgoingMessage = peekOutgoingMessage ();
 
-            Log.v("UDP", "                 Message: " + outgoingMessage.getContent());
-            Log.v("UDP", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-            Log.v("UDP", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
-            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
-            Log.v("UDP", "-----");
+//            Log.v("UDP", "                 Message: " + outgoingMessage.getContent());
+//            Log.v("UDP", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+//            Log.v("UDP", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+//            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
+//            Log.v("UDP", "-----");
 
 //            if ((currentTime.getTime () - timeLastSentMessage.getTime ()) > outgoingMessagePeriod) {
             long currentTimeMillis = currentTime.getTime();
@@ -294,15 +294,15 @@ public class MessageManager {
 //            if (outgoingMessage.getRetryCount() == 0 || (outgoingMessage.getRetryCount() > 0 && ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD))) {
             if (((currentTimeMillis - timeLastSentMessage.getTime ()) > outgoingMessagePeriod)) {
 
-                Log.v ("UDP_Time", "Sending message (of " + outgoingMessages.size() + ")");
+//                Log.v ("UDP_Time", "Sending message (of " + outgoingMessages.size() + ")");
 
-                Log.v ("UDP_Processing", ">>> processOutgoingQueue");
+//                Log.v ("UDP_Processing", ">>> processOutgoingQueue");
 
-                Log.v("UDP", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
-                for (Message queuedOutgoingMessage : outgoingMessages) {
-                    Log.v("UDP", "\t\t" + queuedOutgoingMessage.getContent());
-                }
-                Log.v("UDP", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
+//                Log.v("UDP", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
+//                for (Message queuedOutgoingMessage : outgoingMessages) {
+//                    Log.v("UDP", "\t\t" + queuedOutgoingMessage.getContent());
+//                }
+//                Log.v("UDP", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getToAddress());
 
                 outgoingMessage.setTimeLastSent(currentCalendar.getTime());
                 outgoingMessage.increaseRetryCount();
@@ -341,7 +341,7 @@ public class MessageManager {
     }
 
     public void sendMessage (String address, String content) {
-        Log.v("Clay", "sendMessageAsync");
+//        Log.v("Clay", "sendMessageAsync");
         //Message message = new Message (null, InetAddress.getByName(address), content);
         Message message = new Message("udp", null, address, content);
         message.setDeliveryGuaranteed(true);

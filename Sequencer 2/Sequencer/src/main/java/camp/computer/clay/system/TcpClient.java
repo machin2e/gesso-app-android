@@ -14,7 +14,7 @@ import java.net.Socket;
 public class TcpClient {
 
     public String SERVER_IP = null;
-    public int SERVER_PORT = 8080;
+    public int SERVER_PORT = 1002;
 
     // message to send to the server
     private String mServerMessage;
@@ -103,6 +103,7 @@ public class TcpClient {
                         //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(mServerMessage);
                     }
+                    Log.v ("TCP_Server", "running");
 
                 }
                 Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");

@@ -8,6 +8,8 @@ package camp.computer.clay.sequencer;
 */
 
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import camp.computer.clay.system.Action;
 import camp.computer.clay.system.State;
