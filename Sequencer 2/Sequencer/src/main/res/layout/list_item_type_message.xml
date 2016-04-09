@@ -40,11 +40,32 @@
 
         <TextView
             android:id="@+id/text"
-            android:layout_alignLeft="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/event_tag_text_size"
             android:textStyle="normal"
+            android:gravity="center_vertical">
+        </TextView>
+
+        <TextView
+            android:id="@+id/message_type_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/event_annotation_text_size"
+            android:textStyle="normal"
+            android:textColor="#666666"
+            android:textAlignment="textEnd"
+            android:gravity="center_vertical">
+        </TextView>
+
+        <TextView
+            android:id="@+id/address_destination_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/event_annotation_text_size"
+            android:textStyle="normal"
+            android:textColor="#666666"
+            android:textAlignment="textEnd"
             android:gravity="center_vertical">
         </TextView>
 

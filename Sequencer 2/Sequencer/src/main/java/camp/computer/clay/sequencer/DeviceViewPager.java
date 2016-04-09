@@ -14,9 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
 
@@ -179,7 +176,7 @@ public class DeviceViewPager extends ViewPager {
                 // Get current view
                 int index = currentListView.getViewIndexByPosition((int) event.getRawX(), (int) event.getRawY());
                 if (index != -1) {
-                    currentListView.selectItemByIndex(index);
+                    currentListView.selectEventHolderByIndex(index);
                 }
 
             } else if (event.getAction() == MotionEvent.ACTION_UP) {

@@ -3,18 +3,10 @@ package camp.computer.clay.sequencer;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.mobeta.android.sequencer.R;
@@ -59,7 +51,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     // Configure the interface settings
     private static final boolean HIDE_TITLE = true;
-    private static final boolean HIDE_ACTION_BAR = false;
+    private static final boolean HIDE_ACTION_BAR = true;
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = true;
     private static final boolean FULLSCREEN = true;
 
@@ -166,13 +158,21 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // </HACK>
 
 //        getClay().getStore().resetDatabase();
-//        getClay().generateStore();
+        getClay().generateStore();
         getClay().populateCache();
 //        getClay().simulateSession(true, 10, false);
 
         // Start worker process
         // Start the initial runnable task by posting through the handler
         handler.post(runnableCode);
+    }
+
+    public void showActionBar () {
+        actionBar.show();
+    }
+
+    public void hideActionBar () {
+        actionBar.hide();
     }
 
     @Override
@@ -250,6 +250,11 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                     actionBar.newTab()
                             .setText("Unit") // .setText(mSectionsPagerAdapter.getPageTitle(i))
                             .setTabListener(this));
+
+            // Show action bar if it is hidden (when device count is greater than o or 1)
+//            if (!actionBar.isShowing()) {
+//                actionBar.show();
+//            }
         }
 
     }

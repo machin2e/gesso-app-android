@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import camp.computer.clay.sequencer.ApplicationView;
+
 public class TcpClient {
 
     public String SERVER_IP = null;
@@ -30,9 +32,10 @@ public class TcpClient {
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TcpClient(String internetAddress) {
+    public TcpClient(String internetAddress, int port) {
 
         SERVER_IP = internetAddress;
+        SERVER_PORT = port;
     }
 
     public void setOnMessageReceived (OnMessageReceived onMessageReceived) {
@@ -98,11 +101,48 @@ public class TcpClient {
                 // TODO: Call callback (if any) for "connection established"
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-                    mServerMessage = mBufferIn.readLine();
-                    if (mServerMessage != null && mMessageListener != null) {
-                        //call the method messageReceived from MyActivity class
-                        mMessageListener.messageReceived(mServerMessage);
+                    int firstCharacter = mBufferIn.read();
+                    if (firstCharacter == -1) {
+                        Log.v("TCP_Server", "disconnected");
+                        stopClient ();
+                    } else {
+
+                        if (String.valueOf(firstCharacter).equals("\n")) { // TODO: Update "\n" to look for regex
+                            // call the method messageReceived from MyActivity class
+                            String messageCopy = new String (mServerMessage);
+                            mMessageListener.messageReceived(messageCopy);
+                            mServerMessage = ""; // Reset the string
+                        }
+
+                        // Append the character
+                        mServerMessage += String.valueOf((char) firstCharacter);
+
+                        /*
+                        mServerMessage = mBufferIn.readLine();
+                        if (mServerMessage != null && mMessageListener != null) {
+                            //call the method messageReceived from MyActivity class
+                            mMessageListener.messageReceived(mServerMessage);
+                        }
+                        */
                     }
+
+//                    if (socket.isClosed()) {
+//                        Log.v("TCP_Server", "closed");
+//                    }
+//
+//                    if (!socket.isConnected()) {
+//                        Log.v ("TCP_Server", "disconnected");
+//                    }
+
+                    /*
+                    // Check if connection is valid
+                    mBufferOut.print(" ");
+                    mBufferOut.flush();
+                    if (mBufferOut.checkError()) {
+                        Log.v ("TCP_Server", "checkError");
+                    }
+                    */
+
                     Log.v ("TCP_Server", "running");
 
                 }
@@ -113,6 +153,9 @@ public class TcpClient {
                 Log.e("TCP_Server", "S: Error", e);
 
             } finally {
+
+                stopClient();
+
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
                 socket.close();

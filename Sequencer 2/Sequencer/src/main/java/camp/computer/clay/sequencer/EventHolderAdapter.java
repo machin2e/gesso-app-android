@@ -107,61 +107,132 @@ public class EventHolderAdapter extends BaseAdapter {
         // Create new view if none are recyclable
         if (convertView == null) {
             if (type == 50) { // <HACK /> This should be a stirng comparison and use a layout stored in the database!
-                Log.v("Sound_View", "boo");
-                RelativeLayout actionView = new RelativeLayout(ApplicationView.getContext());
 
-                RelativeLayout.LayoutParams params = null;
+                view = getToneView (eventHolder);
+
+            } else {
+                view = this.inflater.inflate(layoutResource, parent, false);
+            }
+            view.setTag(eventHolder);
+        } else {
+            view = convertView;
+        }
+
+        // Update the list item's view according to the type
+        if (layoutResource != 50) {
+            updateViewForType(view, eventHolder);
+        }
+
+        // bind the eventHolders to the view object
+        return this.bindData(view, position);
+    }
+
+    private View getToneView (EventHolder eventHolder) {
+
+        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+
+        String stateText = eventHolder.getEvent().getState().get(0).getState();
+        String[] tokens = stateText.split(" ");
+        String frequencyText = tokens[1] + " Hz";
+        String durationText = tokens[3] + " ms";
+
+        RelativeLayout.LayoutParams params = null;
+
+        // Action label
+        final TextView actionLabel = new TextView (ApplicationView.getContext());
+        actionLabel.setId(R.id.label);
+        actionLabel.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+        actionLabel.setAllCaps(true);
+        actionLabel.setTextSize(10.0f);
+        actionLabel.setWidth(150);
+        actionView.addView(actionLabel);
+
+        params = (RelativeLayout.LayoutParams) actionLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
+        actionLabel.setLayoutParams(params);
+
+        // Add ImageView for rendering timeline segment
+        final ImageView imageView = new ImageView (ApplicationView.getContext());
+        imageView.setId(R.id.icon);
+        actionView.addView(imageView);
+
+                /*
 
                 // Add ImageView for rendering timeline segment
-//                final ImageView dragImageView = new ImageView (ApplicationView.getContext());
-//                dragImageView.setId(R.id.drag_handle);
-//                dragImageView.setBackgroundResource(R.drawable.drag);
-//                actionView.addView(dragImageView);
-//
-//                dragImageView.getLayoutParams().height = 100;
-//
-//                params = (RelativeLayout.LayoutParams) dragImageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-//                dragImageView.setLayoutParams(params);
-//
-//                dragImageView.requestLayout(); // call this if already laid out
+                final ImageView waveformImageView = new ImageView (ApplicationView.getContext());
+                waveformImageView.setId(R.id.waveform);
+                waveformImageView.setBackgroundResource(R.drawable.drag);
+                actionView.addView(waveformImageView);
 
-                // Action label
-                final TextView actionLabel = new TextView (ApplicationView.getContext());
-                actionLabel.setId(R.id.label);
-                actionLabel.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-                actionLabel.setAllCaps(true);
-                actionLabel.setTextSize(10.0f);
-                actionLabel.setWidth(150);
-                actionView.addView(actionLabel);
+                waveformImageView.getLayoutParams().height = 100;
 
-                params = (RelativeLayout.LayoutParams) actionLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.CENTER_VERTICAL);
-                actionLabel.setLayoutParams(params);
+                // Set the width and height of the visualization
+                int w = (actionView.getWidth() > 0 ? actionView.getWidth() : 250);
+                int h = (actionView.getHeight() > 0 ? actionView.getHeight() : 50);
 
-                // Add ImageView for rendering timeline segment
-                final ImageView imageView = new ImageView (ApplicationView.getContext());
-                imageView.setId(R.id.icon);
-                actionView.addView(imageView);
+                Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+                Bitmap bmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+                Canvas canvas = new Canvas(bmp);
 
-                params = (RelativeLayout.LayoutParams) imageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.RIGHT_OF, actionLabel.getId());
-                imageView.setLayoutParams(params);
+                Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+                paint2.setColor(Color.rgb(255, 61, 61));
+                canvas.drawRect(0, 0, bmp.getWidth(), bmp.getHeight(), paint2);
 
-                // Action interface
+                waveformImageView.setImageBitmap(bmp);
 
-                final TextView lightLabel = new TextView (ApplicationView.getContext());
+                RelativeLayout.LayoutParams lpView = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                lpView.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
+                waveformImageView.setLayoutParams(lpView);
+
+//                params = (RelativeLayout.LayoutParams) waveformImageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                params.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
+//                waveformImageView.setLayoutParams(params);
+
+                waveformImageView.requestLayout(); // call this if already laid out
+                */
+
+        // Layout for right side of timeline
+        params = (RelativeLayout.LayoutParams) imageView.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.RIGHT_OF, actionLabel.getId());
+        imageView.setLayoutParams(params);
+
+        LinearLayout linearLayout = new LinearLayout(ApplicationView.getContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+        actionView.addView (linearLayout);
+
+        params = (RelativeLayout.LayoutParams) linearLayout.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
+        linearLayout.setLayoutParams(params);
+
+        // Action interface
+
+        final TextView frequencyLabel = new TextView (ApplicationView.getContext());
 //                lightLabel.setPadding(70, 20, 70, 20);
-                lightLabel.setText(eventHolder.getEvent().getState().get(0).getState());
+        frequencyLabel.setText(frequencyText);
 //                lightLabel.setText("F♭ for 3 ms");
-                lightLabel.setTextSize(12.0f);
-                lightLabel.setPadding (0, 5, 0, 5);
-                actionView.addView(lightLabel);
+        frequencyLabel.setTextSize(12.0f);
+        frequencyLabel.setPadding(0, 5, 0, 5);
+        linearLayout.addView(frequencyLabel);
 
-                params = (RelativeLayout.LayoutParams) lightLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
-                params.addRule(RelativeLayout.CENTER_VERTICAL);
-                lightLabel.setLayoutParams(params);
+        LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) frequencyLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                params.addRule(RelativeLayout.RIGHT_OF, imageView.getId());
+//                params.addRule(RelativeLayout.CENTER_VERTICAL);
+        frequencyLabel.setLayoutParams(params2);
+
+        final TextView durationLabel = new TextView (ApplicationView.getContext());
+//                lightLabel.setPadding(70, 20, 70, 20);
+        durationLabel.setText(durationText);
+//                lightLabel.setText("F♭ for 3 ms");
+        durationLabel.setTextSize(12.0f);
+        durationLabel.setPadding(0, 5, 0, 5);
+        linearLayout.addView(durationLabel);
+
+        params2 = (LinearLayout.LayoutParams) durationLabel.getLayoutParams(); // new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//                params.addRule(RelativeLayout.BELOW, frequencyLabel.getId());
+//                params.addRule(RelativeLayout.CENTER_VERTICAL);
+        durationLabel.setLayoutParams(params2);
 
                 /*
                 final TextView lightLabel = new TextView (ApplicationView.getContext());
@@ -181,27 +252,7 @@ public class EventHolderAdapter extends BaseAdapter {
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 lightLabel.setLayoutParams(params);
                 */
-
-                view = actionView;
-
-            } else {
-                view = this.inflater.inflate(layoutResource, parent, false);
-            }
-            view.setTag(eventHolder);
-        } else {
-            if (type == 50) { // <HACK /> This should be a stirng comparison and use a layout stored in the database!
-                Log.v("Sound_View", "boo2");
-            }
-            view = convertView;
-        }
-
-        // Update the list item's view according to the type
-        if (layoutResource != 50) {
-            updateViewForType(view, eventHolder);
-        }
-
-        // bind the eventHolders to the view object
-        return this.bindData(view, position);
+        return actionView;
     }
 
     public void remove (EventHolder eventHolder) {
@@ -262,6 +313,9 @@ public class EventHolderAdapter extends BaseAdapter {
         }
 
         int segmentLength = 120; // R.integer.event_timeline_segment_length;
+        if (eventHolder.type == MESSAGE_CONTROL_LAYOUT) {
+            segmentLength = 200;
+        }
         drawTimelineSegment (view, eventHolder, segmentLength);
 
         view.invalidate();
@@ -639,13 +693,25 @@ public class EventHolderAdapter extends BaseAdapter {
         } else if (eventHolder.type == MESSAGE_CONTROL_LAYOUT) {
 
             TextView textView = (TextView) view.findViewById (R.id.text);
+            TextView typeView = (TextView) view.findViewById (R.id.message_type_text);
+            TextView destinationView = (TextView) view.findViewById (R.id.address_destination_text);
             if (textView != null) {
 
-                // Get behavior state
-                String message = eventHolder.getEvent().getState().get(0).getState();
+                // Extract state from string representation
+                // e.g., "UDP 192.168.1.6:3000 'hey there'"
+                String currentStateString = eventHolder.getEvent().getState().get(0).getState();
+                int currentDestinationAddressStringIndex = currentStateString.indexOf(" ");
+                int currentContentStringIndex = currentStateString.indexOf(" ", currentDestinationAddressStringIndex + 1);
+
+                String currentTypeString = currentStateString.substring(0, currentDestinationAddressStringIndex);
+                String currentDestinationAddressString = currentStateString.substring(currentDestinationAddressStringIndex + 1, currentContentStringIndex);
+                String currentContentString = currentStateString.substring(currentContentStringIndex + 1);
+                currentContentString = currentContentString.substring(1, currentContentString.length() - 1);
 
                 // Update the view
-                textView.setText("\"" + message + "\"");
+                textView.setText("\"" + currentContentString + "\"");
+                typeView.setText(currentTypeString);
+                destinationView.setText(currentDestinationAddressString);
             }
         } else if (eventHolder.type == WAIT_CONTROL_LAYOUT) {
 

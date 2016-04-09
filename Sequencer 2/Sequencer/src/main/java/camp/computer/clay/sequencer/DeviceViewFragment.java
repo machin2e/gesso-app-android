@@ -17,7 +17,7 @@ public class DeviceViewFragment extends Fragment {
     private Unit unit;
 
     // The timeline view used to draw the timeline.
-    TimelineListView listView;
+    TimelineListView timelineView;
 
     // Configure the interface settings
     private boolean DISABLE_SCROLLBAR_FADING = true;
@@ -45,10 +45,10 @@ public class DeviceViewFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_listview, container, false);
 
         // Define the view (get a reference to it and pass it an adapter)
-        listView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
-        listView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
+        timelineView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
+        timelineView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
 
-//        listView.setEventHolders(this.unit.getTimeline());
+//        timelineView.setTimeline(this.unit.getTimeline());
 
         /*
         String[] array = getResources().getStringArray(R.array.countries);
@@ -61,35 +61,35 @@ public class DeviceViewFragment extends Fragment {
         }
 
         Log.v ("Adding", "eventHolders.size: " + eventHolders.size());
-        listView.setEventHolders(eventHolders);
+        timelineView.setTimeline(eventHolders);
         */
 
 //        adapter = new EventHolderAdapter(getContext(), R.layout.list_item_handle_right, eventHolders);
-//        listView.setAdapter(adapter);
+//        timelineView.setAdapter(adapter);
 
         // Create behavior profiles for the unit's behaviors and assign the data to the ListView
         Log.v("CM_Log", "onCreateView");
 //        Log.v ("CM_Log", "\tunit: " + this.unit);
 //        Log.v("CM_Log", "\tunit.getTimeline: " + this.unit.getTimeline());
-        listView.setEventHolders(this.unit.getTimeline());
+        timelineView.setTimeline(this.unit.getTimeline());
 
         // <HACK>
-        listView.setUnit (unit);
+        timelineView.setUnit(unit);
         // </HACK>
 
         if (DISABLE_SCROLLBAR_FADING) {
-            listView.setScrollbarFadingEnabled(false);
+            timelineView.setScrollbarFadingEnabled(false);
         }
 
         // Disable the scrollbars.
         if (DISABLE_SCROLLBARS) {
-            listView.setVerticalScrollBarEnabled(false);
-            listView.setHorizontalScrollBarEnabled(false);
+            timelineView.setVerticalScrollBarEnabled(false);
+            timelineView.setHorizontalScrollBarEnabled(false);
         }
 
         // Disable overscroll effect.
         if (DISABLE_OVERSCROLL_EFFECT) {
-            listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            timelineView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
 
         return rootView;

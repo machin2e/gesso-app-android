@@ -1,9 +1,5 @@
 package camp.computer.clay.system;
 
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -14,10 +10,6 @@ public class Timeline {
     private ArrayList<Event> events = new ArrayList<Event>();
 
     private Unit unit = null;
-
-    Timeline () {
-
-    }
 
     public Timeline (UUID uuid) {
         this.uuid = uuid;
@@ -54,6 +46,10 @@ public class Timeline {
             // TODO: Store in remote repository
         }
 
+    }
+
+    public void addEvent (Event event, int index) {
+        getEvents().add (index, event);
     }
 
     public boolean hasEvents () {
