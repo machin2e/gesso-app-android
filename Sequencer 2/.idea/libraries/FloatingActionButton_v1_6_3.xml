@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="FloatingActionButton-v1.6.3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/Sequencer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/res" />
+      <root url="jar://$PROJECT_DIR$/Sequencer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Clans/FloatingActionButton/v1.6.3/610479e39e2f230b0e0fa55dd65ed1e2ef0879a5/FloatingActionButton-v1.6.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

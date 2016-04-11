@@ -297,7 +297,7 @@ public class TimelineListView extends DragSortListView {
         createEventHolders(timeline);
 
         // Add "create" option
-        this.eventHolders.add(new EventHolder("create", "create"));
+//        this.eventHolders.add(new EventHolder("create", "create"));
 
         // Add "update" firmware option
         // TODO: Conditionally show this, only if firmware update is available
@@ -323,9 +323,9 @@ public class TimelineListView extends DragSortListView {
      * Add eventHolders to the ListView.
      * @param eventHolder
      */
-    private void addEventHolder (EventHolder eventHolder) {
+    public void addEventHolder(EventHolder eventHolder) {
         if (adapter != null) {
-            eventHolders.add(eventHolders.size() - 1, eventHolder);
+            eventHolders.add(eventHolders.size(), eventHolder);
             refreshListViewFromData();
         }
     }
@@ -760,7 +760,7 @@ public class TimelineListView extends DragSortListView {
     /**
      * Display the behaviors available for selection, starting with basic, cached, public.
      */
-    private void displayBehaviorFinder (final EventHolder eventHolder) {
+    public void displayBehaviorFinder(final EventHolder eventHolder) {
 
         // Get list of behaviors available for selection
         int behaviorScriptCount = getClay().getCache().getScripts().size();

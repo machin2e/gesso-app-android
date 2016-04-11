@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.system.Unit;
@@ -60,6 +61,19 @@ public class DeviceViewFragment extends Fragment {
         if (DISABLE_OVERSCROLL_EFFECT) {
             timelineView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
+
+        // <HACK>
+        // Set up FAB
+        FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventHolder eventHolder = new EventHolder("choose", "choose");
+                timelineView.addEventHolder(eventHolder);
+                timelineView.displayBehaviorFinder(eventHolder);
+            }
+        });
+        // </HACK>
 
         return rootView;
     }

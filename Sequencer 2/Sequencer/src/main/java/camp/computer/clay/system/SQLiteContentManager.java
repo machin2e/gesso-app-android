@@ -346,21 +346,10 @@ public class SQLiteContentManager {
                 // Non-root node
                 values.put(ActionEntry.COLUMN_NAME_PARENT_UUID, parentAction.getUuid().toString());
                 values.put(ActionEntry.COLUMN_NAME_SIBLING_INDEX, parentAction.getActions().indexOf(action));
-
-//                if (action.hasScript()) {
-//                    Log.v("Content_Manager", "leaf");
-//                    // Leaf, non-root node (associated with basic action)
-//                    values.put(ActionEntry.COLUMN_NAME_SCRIPT_UUID, action.getScript().getUuid().toString());
-//                } else {
-//                    Log.v("Content_Manager", "intermediate");
-//                    // Non-leaf, non-root node (intermediate node)
-//                    values.put(ActionEntry.COLUMN_NAME_SCRIPT_UUID, "");
-//                }
             } else {
                 // Root node
                 values.put(ActionEntry.COLUMN_NAME_PARENT_UUID, "");
                 values.put(ActionEntry.COLUMN_NAME_SIBLING_INDEX, "");
-//                values.put(ActionEntry.COLUMN_NAME_SCRIPT_UUID, "");
             }
 
             if (action.hasScript()) {

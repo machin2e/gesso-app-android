@@ -13,8 +13,10 @@ import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.resource.NetworkResource;

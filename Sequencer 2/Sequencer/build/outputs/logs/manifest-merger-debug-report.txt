@@ -27,6 +27,7 @@ MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Ch
 MERGED from [com.android.support:recyclerview-v7:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/AndroidManifest.xml:20:5-43
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:20:5-43
+MERGED from [com.github.Clans:FloatingActionButton:v1.6.3] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/AndroidManifest.xml:8:5-10:41
 	android:targetSdkVersion
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:7:7-36
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml
@@ -71,6 +72,7 @@ MERGED from [com.android.support:appcompat-v7:23.1.1] /Users/mokogobo/Workspace/
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
+MERGED from [com.github.Clans:FloatingActionButton:v1.6.3] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/AndroidManifest.xml:12:5-20
 	android:label
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Sequencer/src/main/AndroidManifest.xml:14:18-50
 	android:supportsRtl
