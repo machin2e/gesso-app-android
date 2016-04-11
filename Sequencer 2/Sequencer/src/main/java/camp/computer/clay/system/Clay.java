@@ -2,12 +2,9 @@ package camp.computer.clay.system;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
-import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
 
-import java.net.InetAddress;
-import java.sql.SQLClientInfoException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -317,14 +314,14 @@ public class Clay {
                     int behaviorSelection = r.nextInt(actions.size());
                     UUID behaviorUuid = actions.get(behaviorSelection).getUuid();
 
-                    Log.v("Behavior_DB", "BEFORE unit.storeBehavior:");
-                    getStore().restoreBehavior(behaviorUuid.toString());
+                    Log.v("Behavior_DB", "BEFORE unit.storeAction:");
+                    getStore().restoreAction(behaviorUuid.toString());
 
                     // Generate a behavior of the selected type
-                    unit.cacheBehavior (behaviorUuid.toString());
+                    unit.cacheAction (behaviorUuid.toString());
 
-                    Log.v("Behavior_DB", "AFTER unit.storeBehavior:");
-                    getStore().restoreBehavior(behaviorUuid.toString());
+                    Log.v("Behavior_DB", "AFTER unit.storeAction:");
+                    getStore().restoreAction(behaviorUuid.toString());
                 }
             }
             // </TEST>
@@ -453,7 +450,7 @@ public class Clay {
 
         // Generate basic actions for all behavior scripts
         Action basicAction = new Action(script);
-        getStore ().storeBehavior(basicAction);
+        getStore ().storeAction(basicAction);
     }
 
     /**
@@ -473,7 +470,7 @@ public class Clay {
             }
 
             // Restore actions and addUnit them to the cache
-            getStore().restoreBehaviors();
+            getStore().restoreActions();
             Log.v("Content_Manager", "Restored actions:");
             for (Action action : getCache().getActions()) {
                 //Log.v("Content_Manager", "\t" + action.getUuid());
@@ -519,7 +516,7 @@ public class Clay {
 //                Script selectedBehaviorScript = getClay().getCache().getScripts().get(selectedBehaviorIndex);
 //                Action action = new Action(selectedBehaviorScript);
                 Action action = getClay().getCache().getActions().get(selectedBehaviorIndex);
-                getClay().getStore().storeBehavior(action);
+                getClay().getStore().storeAction(action);
 
                 // Create event for the action and add it to the unit's timeline
                 Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
@@ -535,16 +532,16 @@ public class Clay {
             Log.v("Content_Manager", "> Creating action");
 //            Action action = new Action("so high");
 //            action.setDescription("oh yeah!");
-//            action.addBehavior(foundUnit.getTimeline().getEvents().get(0).getAction());
-//            action.addBehavior(foundUnit.getTimeline().getEvents().get(1).getAction());
-//            getClay().getStore().storeBehavior(action);
+//            action.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
+//            action.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+//            getClay().getStore().storeAction(action);
             ArrayList<Action> children = new ArrayList<Action>();
             ArrayList<State> states = new ArrayList<State>();
             children.add(foundUnit.getTimeline().getEvents().get(0).getAction());
             states.addAll(foundUnit.getTimeline().getEvents().get(0).getState());
             children.add(foundUnit.getTimeline().getEvents().get(1).getAction());
             states.addAll(foundUnit.getTimeline().getEvents().get(1).getState());
-            Action action = getClay().getStore().getBehaviorComposition(children);
+            Action action = getClay().getStore().getActionComposition(children);
 
             // remove events for abstracted actions
             getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0));
@@ -574,10 +571,10 @@ public class Clay {
 //            Action behavior = new Action("so so high");
 //            behavior.setDescription("oh yeah!");
 //            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
-//            behavior.cacheBehavior(foundUnit.getTimeline().getEvents().get(0).getAction());
+//            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(0).getAction());
 //            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
-//            behavior.cacheBehavior(foundUnit.getTimeline().getEvents().get(1).getAction());
-//            getClay().getStore().storeBehavior(behavior);
+//            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+//            getClay().getStore().storeAction(behavior);
 //            // remove events for abstracted actions
 //            foundUnit.getTimeline().getEvents().remove(0); // if store behavior successful
 //            foundUnit.getTimeline().getEvents().remove(1); // if store behavior successful
@@ -628,7 +625,7 @@ public class Clay {
     /**
      * Adds the action, caches it, and stores it.
      */
-    public void cacheBehavior(Action action) {
+    public void cacheAction(Action action) {
 
         // Create action (and state) for the action script
 //        Script behaviorScript = new Script (UUID.randomUUID(), tag, defaultState);
@@ -639,7 +636,7 @@ public class Clay {
 
 //        // Store the action
 //        if (hasStore()) {
-//            getStore().storeBehavior(action);
+//            getStore().storeAction(action);
 //        }
 
     }
@@ -662,8 +659,8 @@ public class Clay {
 
     public Action getBehavior (UUID behaviorUuid) {
         if (hasCache()) {
-            if (getCache().hasBehavior(behaviorUuid.toString())) {
-                return getCache().getBehavior(behaviorUuid);
+            if (getCache().hasAction(behaviorUuid.toString())) {
+                return getCache().getAction(behaviorUuid);
             } else {
                 // TODO: Cache the behavior and callback to the object requesting the behavior.
             }
@@ -786,7 +783,7 @@ public class Clay {
                 getStore().storeEvent(event);
 
                 // Store behavior for event
-                getStore().storeBehavior(event.getAction());
+                getStore().storeAction(event.getAction());
 
                 // Store behavior state for behavior
 //                getStore().storeState(event.getAction().getState());

@@ -31,7 +31,7 @@ public class CacheManager {
         this.scripts.add(script);
     }
 
-    public boolean hasBehavior (String tag) {
+    public boolean hasAction(String tag) {
         for (Action cachedAction : this.actions) {
             if (cachedAction.getTag().equals(tag)) {
                 return true;
@@ -46,7 +46,7 @@ public class CacheManager {
      * @param behaviorUuid The UUID of the behavior to search for in the cache.
      * @return True if a behavior with the specified UUID was found. Otherwise, false.
      */
-    public boolean hasBehavior (UUID behaviorUuid) {
+    public boolean hasAction(UUID behaviorUuid) {
         for (Action cachedAction : this.actions) {
             if (cachedAction.getUuid().equals(behaviorUuid)) {
                 return true;
@@ -55,7 +55,7 @@ public class CacheManager {
         return false;
     }
 
-    public Action getBehavior (UUID behaviorUuid) {
+    public Action getAction(UUID behaviorUuid) {
         for (Action cachedAction : this.actions) {
             if (cachedAction.getUuid().equals(behaviorUuid)) {
                 return cachedAction;
@@ -77,7 +77,7 @@ public class CacheManager {
         return false;
     }
 
-    public Script getBehaviorScript (UUID behaviorScriptUuid) {
+    public Script getScript(UUID behaviorScriptUuid) {
         for (Script cachedScript : this.scripts) {
             if (cachedScript.getUuid().equals(behaviorScriptUuid)) {
                 return cachedScript;

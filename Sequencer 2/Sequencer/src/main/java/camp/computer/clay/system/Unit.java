@@ -148,7 +148,7 @@ public class Unit {
         tcpMessageClient.queueMessage(message);
     }
 
-//    public void cacheBehavior(UUID behaviorUuid) {
+//    public void cacheAction(UUID behaviorUuid) {
 //
 //        // Get the behavior with the specified UUID
 //        Action behavior = getClay().getAction(behaviorUuid);
@@ -163,7 +163,7 @@ public class Unit {
 //        this.getTimeline().addEvent(event);
 //    }
 
-//    public void cacheBehavior(Action behavior) {
+//    public void cacheAction(Action behavior) {
 //
 //        // Create an event for the behavior so it can be added to the timeline
 //        Event event = new Event(timeline, behavior);

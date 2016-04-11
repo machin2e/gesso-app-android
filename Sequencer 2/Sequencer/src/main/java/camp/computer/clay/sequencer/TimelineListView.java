@@ -15,7 +15,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import com.mobeta.android.dslv.DragSortListView;
-import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
@@ -346,7 +345,7 @@ public class TimelineListView extends DragSortListView {
         refreshListViewFromData();
 
         // Assign the action state
-        Action action = getClay().getStore().getBasicBehavior(script);
+        Action action = getClay().getStore().getScriptAction(script);
 
         // Update the event with the new action and state
         Event event = eventHolder.getEvent();
@@ -460,7 +459,7 @@ public class TimelineListView extends DragSortListView {
         for (EventHolder eventHolder : selectedEventHolders) {
             // TODO: Copy the behaviors
             Action b = eventHolder.getEvent().getAction();
-//            newBehavior.addBehavior (b);
+//            newBehavior.addAction (b);
             children.add(b);
             //states.addAll(eventHolder.getEvent().getState());
             for (State state : eventHolder.getEvent().getState()) {
@@ -470,11 +469,11 @@ public class TimelineListView extends DragSortListView {
             }
         }
 
-        Action action = getClay().getStore().getBehaviorComposition(children);
+        Action action = getClay().getStore().getActionComposition(children);
         action.setTag(behaviorListString);
         Log.v ("Compose_Behavior", "Composed action: " + action);
         Log.v("Compose_Behavior", "\tUUID: " + action);
-        getClay().getStore().storeBehavior(action);
+        getClay().getStore().storeAction(action);
         getClay().getCache().getActions().add(action);
 
         // Remove old behaviors from timeline in store

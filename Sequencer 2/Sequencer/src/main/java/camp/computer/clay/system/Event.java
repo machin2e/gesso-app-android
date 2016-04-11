@@ -110,7 +110,7 @@ public class Event {
 
     public ArrayList<State> getState() { return this.state; }
 
-    public void addBehaviorState (State state) { this.state.add (state); };
+    public void addActionState(State state) { this.state.add (state); };
 
     //public void setBehaviorState (State state) { this.state = state; };
 }

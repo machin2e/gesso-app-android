@@ -166,7 +166,7 @@ public class Action {
         return this.actions;
     }
 
-    public void addBehavior (Action action) {
+    public void addAction(Action action) {
 
         // Add actions. This changes the action so it is no longer a basic action.
         this.actions.add(action);

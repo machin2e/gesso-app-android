@@ -829,8 +829,8 @@ public class EventDesignerView {
                 eventHolder.tag = input.getText().toString();
 
                 // TODO: Update the corresponding behavior state... this should propagate back through the object model... and cloud...
-//                item.restoreBehavior().setTag(input.getText().toString())
-//                item.restoreBehavior().setTag(input.getText().toString());
+//                item.restoreAction().setTag(input.getText().toString())
+//                item.restoreAction().setTag(input.getText().toString());
 
                 // Send changes to unit
                 // TODO: "create behavior (...)"
@@ -842,7 +842,7 @@ public class EventDesignerView {
 
                 // Store: Store the new behavior state and update the event.
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
-                getClay().getStore().storeBehavior(eventHolder.getEvent().getAction());
+                getClay().getStore().storeAction(eventHolder.getEvent().getAction());
 
                 // Send updated state to device
                 // <HACK>
