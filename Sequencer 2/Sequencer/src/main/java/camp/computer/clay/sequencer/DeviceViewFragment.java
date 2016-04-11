@@ -26,16 +26,7 @@ public class DeviceViewFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
 
-    public DeviceViewFragment() {
-//            eventHolders = new ArrayList<EventHolder>();
-//            behaviorEvents.addUnit("hello a");
-//            behaviorEvents.addUnit("hello b");
-//            behaviorEvents.addUnit("hello c");
-//            behaviorEvents.addUnit("hello d");
-//            behaviorEvents.addUnit("hello e");
-//            behaviorEvents.addUnit("hello f");
-//            behaviorEvents.addUnit("hello g");
-    }
+    public DeviceViewFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,29 +39,7 @@ public class DeviceViewFragment extends Fragment {
         timelineView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
         timelineView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
 
-//        timelineView.setTimeline(this.unit.getTimeline());
-
-        /*
-        String[] array = getResources().getStringArray(R.array.countries);
-        ArrayList<String> eventTitles = new ArrayList<String>(Arrays.asList(array));
-        eventHolders = new ArrayList<EventHolder>();
-        for (int i = 0; i < eventTitles.size(); i++) {
-            String eventTitle = eventTitles.get (i);
-            Event event = new Event(i, eventTitle);
-            eventHolders.add(new EventHolder(event));
-        }
-
-        Log.v ("Adding", "eventHolders.size: " + eventHolders.size());
-        timelineView.setTimeline(eventHolders);
-        */
-
-//        adapter = new EventHolderAdapter(getContext(), R.layout.list_item_handle_right, eventHolders);
-//        timelineView.setAdapter(adapter);
-
         // Create behavior profiles for the unit's behaviors and assign the data to the ListView
-        Log.v("CM_Log", "onCreateView");
-//        Log.v ("CM_Log", "\tunit: " + this.unit);
-//        Log.v("CM_Log", "\tunit.getTimeline: " + this.unit.getTimeline());
         timelineView.setTimeline(this.unit.getTimeline());
 
         // <HACK>

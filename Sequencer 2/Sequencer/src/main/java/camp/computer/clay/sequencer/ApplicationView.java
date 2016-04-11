@@ -242,7 +242,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         mSectionsPagerAdapter.count++;
         mSectionsPagerAdapter.notifyDataSetChanged();
 
-        // Create a tab with text corresponding to the page title defined by the adapter. Also
+        // Create a tab with text corresponding to the page tag defined by the adapter. Also
         // specify this Activity object, which implements the TabListener interface, as the
         // callback (listener) for when this tab is selected.
         if (actionBar != null) {

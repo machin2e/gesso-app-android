@@ -603,6 +603,26 @@
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <item name="item_touch_helper_previous_elevation" type="id"/>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/values/ids.xml -->
+    <eat-comment/>
+    <item name="list_item_type_io" type="id"/>
+    <item name="list_item_type_light" type="id"/>
+    <item name="list_item_type_message" type="id"/>
+    <item name="list_item_type_say" type="id"/>
+    <item name="list_item_type_wait" type="id"/>
+    <item name="preview_1" type="id"/>
+    <item name="preview_10" type="id"/>
+    <item name="preview_11" type="id"/>
+    <item name="preview_12" type="id"/>
+    <item name="preview_2" type="id"/>
+    <item name="preview_3" type="id"/>
+    <item name="preview_4" type="id"/>
+    <item name="preview_5" type="id"/>
+    <item name="preview_6" type="id"/>
+    <item name="preview_7" type="id"/>
+    <item name="preview_8" type="id"/>
+    <item name="preview_9" type="id"/>
+    <item name="preview_layout" type="id"/>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
     <eat-comment/>
     <item name="progress_circular" type="id"/>

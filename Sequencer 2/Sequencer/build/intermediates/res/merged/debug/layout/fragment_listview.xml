@@ -34,17 +34,6 @@
         dslv:remove_enabled="true"
         dslv:drag_start_mode="onDown"
         dslv:remove_mode="flingRemove"/>
-    <!-- dslv:drag_handle_id="@id/drag_handle" -->
-
-    <!-- camp.computer.clay.sequencer.TimelineListView
-        android:id="@+id/listview_timeline"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:layout_margin="0dp"-->
 
 </RelativeLayout>
 <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/layout/fragment_listview.xml -->

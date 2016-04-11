@@ -59,9 +59,9 @@ public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     /**
-     * Get title for each of the pages. This will be displayed on each of the tabs.
+     * Get tag for each of the pages. This will be displayed on each of the tabs.
      *
-     * @param position Page to fetch title for.
+     * @param position Page to fetch tag for.
      * @return Title for specified page.
      */
     @Override

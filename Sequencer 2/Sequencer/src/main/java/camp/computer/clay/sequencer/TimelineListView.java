@@ -13,9 +13,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.RelativeLayout;
 
-import com.mobeta.android.dslv.DragSortItemView;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.sequencer.R;
 
@@ -275,7 +273,7 @@ public class TimelineListView extends DragSortListView {
 
         // Set up the eventHolders adaptor
 //        this.adapter = new EventHolderAdapter(getContext(), R.layout.list_item_handle_right, this.eventHolders);
-        this.adapter = new EventHolderAdapter(getContext(), R.layout.list_item_type_light, this.eventHolders);
+        this.adapter = new EventHolderAdapter(getContext(), this.eventHolders);
         setAdapter(adapter);
     }
 
@@ -300,7 +298,7 @@ public class TimelineListView extends DragSortListView {
         createEventHolders(timeline);
 
         // Add "create" option
-        this.eventHolders.add(new EventHolder("create", "", EventHolderAdapter.SYSTEM_CONTROL_LAYOUT));
+        this.eventHolders.add(new EventHolder("create", "create"));
 
         // Add "update" firmware option
         // TODO: Conditionally show this, only if firmware update is available
@@ -316,7 +314,7 @@ public class TimelineListView extends DragSortListView {
     private void createEventHolders (Timeline timeline) {
 
         // Create a behavior profile for each of the unit's behaviors
-        for (camp.computer.clay.system.Event event : timeline.getEvents()) {
+        for (Event event : timeline.getEvents()) {
             EventHolder eventHolder = new EventHolder(event);
             eventHolders.add(eventHolder);
         }
@@ -516,12 +514,12 @@ public class TimelineListView extends DragSortListView {
 
         // Add a new event holder to hold the new event that was made for the composed action
         EventHolder compositionEventHolder = new EventHolder (compositionEvent);
-//        compositionEventHolder.title = behaviorListString;
+//        compositionEventHolder.tag = behaviorListString;
 //        compositionEventHolder.summary = "" + selectedEventHolders.size() + " actions";
         eventHolders.add(index, compositionEventHolder);
 
         // Display designer
-        // NOTE: This causes the states to be stored wrong! Title isn't state. It's a tag/title.
+        // NOTE: This causes the states to be stored wrong! Title isn't state. It's a tag/tag.
 //        displayDesignerView(compositionEventHolder);
 //        eventDesignerView.displayUpdateTagOptions(compositionEventHolder);
 
@@ -536,7 +534,7 @@ public class TimelineListView extends DragSortListView {
     private void decomposeEventHolder (EventHolder eventHolder) {
 
         // Return if the item is not a complex item.
-        if (eventHolder.type != EventHolderAdapter.COMPLEX_LAYOUT) {
+        if (!eventHolder.getType().equals("complex")) {
             return;
         }
 
@@ -740,23 +738,23 @@ public class TimelineListView extends DragSortListView {
 
         displayDesignerView(eventHolder);
 
-        if (eventHolder.type == EventHolderAdapter.LIGHT_CONTROL_LAYOUT) {
+        // <HACK>
+        if (eventHolder.getType().equals("light")) {
             eventDesignerView.displayUpdateLightsOptions(eventHolder);
-        } else if (eventHolder.type == EventHolderAdapter.IO_CONTROL_LAYOUT) {
+        } else if (eventHolder.getType().equals("signal")) {
             eventDesignerView.displayUpdateIOOptions(eventHolder);
-        } else if (eventHolder.type == EventHolderAdapter.MESSAGE_CONTROL_LAYOUT) {
+        } if (eventHolder.getType().equals("message")) {
             eventDesignerView.displayUpdateMessageOptions(eventHolder);
-        } else if (eventHolder.type == EventHolderAdapter.WAIT_CONTROL_LAYOUT) {
+        } if (eventHolder.getType().equals("pause")) {
             eventDesignerView.displayUpdateWaitOptions(eventHolder);
-        } else if (eventHolder.type == EventHolderAdapter.SAY_CONTROL_LAYOUT) {
+        } if (eventHolder.getType().equals("say")) {
             eventDesignerView.displayUpdateSayOptions(eventHolder);
-        } else if (eventHolder.type == EventHolderAdapter.COMPLEX_LAYOUT) {
+        } if (eventHolder.getType().equals("complex")) {
             eventDesignerView.displayUpdateTagOptions(eventHolder);
+        } if (eventHolder.getType().equals("tone")) {
+            eventDesignerView.displayUpdateToneOptions(eventHolder);
         }
-
-        else if (eventHolder.type == 50) {
-            eventDesignerView.displayUpdateToneOptions (eventHolder);
-        }
+        // </HACK>
 
     }
 
@@ -775,7 +773,6 @@ public class TimelineListView extends DragSortListView {
 
         // Show the list of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Choose");
         builder.setItems(behaviorScripts, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int itemIndex) {
 
@@ -838,15 +835,15 @@ public class TimelineListView extends DragSortListView {
             final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
 
             // Check if the list item was a constructor
-            if (eventHolder.type == EventHolderAdapter.SYSTEM_CONTROL_LAYOUT) {
-                if (eventHolder.title == "create") {
+            if (eventHolder.getEvent().equals("create")) {
+                if (eventHolder.tag == "create") {
                     // Nothing?
                 }
                 // TODO: (?)
 
-            } else if (eventHolder.type != EventHolderAdapter.SYSTEM_CONTROL_LAYOUT && eventHolder.type != EventHolderAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (!eventHolder.getType().equals("create") && !eventHolder.getType().equals("choose")) {
 
-                if (eventHolder.type == EventHolderAdapter.COMPLEX_LAYOUT) {
+                if (eventHolder.getType().equals("complex")) {
 
                     decomposeEventHolder(eventHolder);
                     return true;
@@ -892,9 +889,9 @@ public class TimelineListView extends DragSortListView {
 //            }
 
             // Check if the list item was a constructor
-            if (eventHolder.type == EventHolderAdapter.SYSTEM_CONTROL_LAYOUT) {
+            if (eventHolder.getType().equals("create")) {
 
-                if (eventHolder.title == "create") {
+                if (eventHolder.tag == "create") {
                     // Add a placeholder if one doesn't already exist
                     if (!hasPlaceholder ()) {
 
@@ -904,22 +901,21 @@ public class TimelineListView extends DragSortListView {
                         //   - behavior
 
                         String title = "choose"; // color in "human" behavior indicator color
-                        String subtitle = "touch to choose behavior"; // super small
-                        int type = EventHolderAdapter.CONTROL_PLACEHOLDER_LAYOUT;
+                        String type = "choose";
 
                         // Add the behavior to the timeline
-                        addEventHolder(new EventHolder(title, subtitle, type));
+                        addEventHolder(new EventHolder(title, type));
 
                         // TODO: (?) Create a behavior?
                     }
                 }
-//                else if (eventHolder.title == "abstract") {
+//                else if (eventHolder.tag == "abstract") {
 //
 //                    composeEventHolderSelection();
 //
 //                }
 
-            } else if (eventHolder.type == EventHolderAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            } else if (eventHolder.getType().equals("choose")) {
 
                 displayBehaviorFinder(eventHolder);
 
@@ -953,7 +949,7 @@ public class TimelineListView extends DragSortListView {
      */
     private boolean hasPlaceholder() {
         for (EventHolder eventHolder : eventHolders) {
-            if (eventHolder.type == EventHolderAdapter.CONTROL_PLACEHOLDER_LAYOUT) {
+            if (eventHolder.getType().equals("choose")) {
                 return true;
             }
         }

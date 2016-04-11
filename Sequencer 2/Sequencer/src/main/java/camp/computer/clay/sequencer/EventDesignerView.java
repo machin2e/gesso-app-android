@@ -3,9 +3,6 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -23,8 +20,6 @@ import android.widget.ToggleButton;
 
 import com.azeesoft.lib.colorpicker.ColorPickerDialog;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import camp.computer.clay.system.Clay;
@@ -835,7 +830,7 @@ public class EventDesignerView {
         builder.setView(input);
 
         // Recover values
-        input.setText(eventHolder.title);
+        input.setText(eventHolder.tag);
         input.setSelection(input.getText().length());
 
         // Set up the buttons
@@ -844,7 +839,7 @@ public class EventDesignerView {
             public void onClick(DialogInterface dialog, int which) {
 
                 // Update the state of the behavior
-                eventHolder.title = input.getText().toString();
+                eventHolder.tag = input.getText().toString();
 
                 // TODO: Update the corresponding behavior state... this should propagate back through the object model... and cloud...
 //                item.restoreBehavior().setTag(input.getText().toString())
@@ -890,7 +885,7 @@ public class EventDesignerView {
     public void displayUpdateMessageOptions(final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-        /* Pop-up title */
+        /* Pop-up tag */
 
         // builder.setTitle ("Message");
 
