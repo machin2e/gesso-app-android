@@ -7,6 +7,7 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.net.InetAddress;
+import java.sql.SQLClientInfoException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,7 +20,7 @@ import camp.computer.clay.sequencer.ApplicationView;
 public class Clay {
 
     // Resource management systems (e.g., networking, messaging, content)
-    private ContentManagerInterface contentManager = null;
+    private SQLiteContentManager contentManager = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
 
@@ -60,7 +61,7 @@ public class Clay {
      * Adds a content manager for use by Clay. Retrieves the basic actions provided by the
      * content manager and makes them available in Clay.
      */
-    public void addContentManager (ContentManagerInterface contentManager) {
+    public void addContentManager (SQLiteContentManager contentManager) {
         // <HACK>
         // this.contentManager = new FileContentManager(this, "file"); // Start the content management system
         this.contentManager = contentManager;
@@ -120,7 +121,7 @@ public class Clay {
         return this.cacheManager;
     }
 
-    public ContentManagerInterface getStore() {
+    public SQLiteContentManager getStore() {
         return this.contentManager;
     }
 
@@ -199,128 +200,65 @@ public class Clay {
 
 //            getCache().setupRepository();
 //            getStore().storeDevice(unit);
-        getStore().restoreDevice(unitUuid, new ContentManagerInterface.Callback() {
-            @Override
-            public void onSuccess(Object object) {
+        Unit unit = getStore().restoreDevice(unitUuid);
 
-                final Unit restoredUnit = (Unit) object;
-                Log.v("Content_Manager", "Successfully restored unit (UUID: " + restoredUnit.getUuid() + ").");
-                Log.v("Content_Manager", "\tIP: " + restoredUnit.getInternetAddress());
+        if (unit != null) {
+            Log.v("Content_Manager", "Successfully restored unit (UUID: " + unit.getUuid() + ").");
+            Log.v("Content_Manager", "\tIP: " + unit.getInternetAddress());
 
-                // Update restored unit with information from device
-                restoredUnit.setInternetAddress(internetAddress);
+            // Update restored unit with information from device
+            unit.setInternetAddress(internetAddress);
 
-                // Add unit to Clay
-                addUnit2(restoredUnit);
+            // Add unit to Clay
+            addUnit2(unit);
 
-                // Establish TCP connection
-                restoredUnit.connectTcp();
+            // Establish TCP connection
+            unit.connectTcp();
 
-                // Populate the timeline
-                // TODO: Populate from scratch only if no timeline has been programmed for the device
-                for (Event event : restoredUnit.getTimeline().getEvents()) {
-                    // <HACK>
-                    restoredUnit.sendMessageTcp("start event " + event.getUuid());
-                    restoredUnit.sendMessageTcp("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                    String content = "set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"";
-                    restoredUnit.sendMessageTcp(content);
-                    // </HACK>
-                }
-
-//                Log.v("Content_Manager", "Clay is searching for the timeline (UUID: " + restoredUnit.getTimelineUuid() + ").");
-
-                /*
-                // Restore timeline
-                getStore().restoreTimeline(restoredUnit, restoredUnit.getTimelineUuid(), new ContentManagerInterface.Callback() {
-                    @Override
-                    public void onSuccess(Object object) {
-                        Log.v("Content_Manager", "Successfully restored timeline.");
-                        Timeline timeline = (Timeline) object;
-                        restoredUnit.setTimeline(timeline);
-
-                        // Restore events
-                        getStore().restoreEvents(timeline);
-
-                        // Add unit to cache
-                        addUnit2(restoredUnit);
-
-//                        // Update view
-//                        updateUnitView(restoredUnit);
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        Log.v("Content_Manager", "Failed to restore timeline.");
-
-                        // Graph timeline locally since it was not found
-                        Timeline newTimeline = new Timeline (restoredUnit.getTimelineUuid());
-                        newTimeline.setUnit(restoredUnit);
-                        restoredUnit.setTimeline(newTimeline);
-                        Log.v("Content_Manager", "Cached new timeline (UUID: " + newTimeline.getUuid() + ").");
-
-                        // Store timeline
-                        getStore().storeTimeline(restoredUnit.getTimeline());
-                        Log.v("Content_Manager", "Saved new timeline (UUID: " + newTimeline.getUuid() + ").");
-
-                        // Add unit to cache
-                        addUnit2(restoredUnit);
-                    }
-                });
-                */
-
-                // Restore events
-//                    getStore().restoreEvents(timeline);
-
-                // Update view
-//                    updateUnitView(newUnit);
+            // Populate the timeline
+            // TODO: Populate from scratch only if no timeline has been programmed for the device
+            for (Event event : unit.getTimeline().getEvents()) {
+                // <HACK>
+                unit.sendMessageTcp("start event " + event.getUuid());
+                unit.sendMessageTcp("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                String content = "set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"";
+                unit.sendMessageTcp(content);
+                // </HACK>
             }
+        } else {
 
-            @Override
-            public void onFailure() {
-                Log.v("Content_Manager", "Failed to restore unit.");
+            Log.v("Content_Manager", "Failed to restore unit.");
 
-                // Create unit in graph
-                Unit newUnit = new Unit (getClay (), unitUuid);
-                newUnit.setInternetAddress (internetAddress);
-                Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid () + ").");
-                Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
+            // Create unit in graph
+            Unit newUnit = new Unit (getClay (), unitUuid);
+            newUnit.setInternetAddress (internetAddress);
+            Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid () + ").");
+            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
-                // Cache the unit
-                addUnit2 (newUnit);
-                Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
+            // Cache the unit
+            addUnit2 (newUnit);
+            Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
 
-                // TCP connection
-                newUnit.connectTcp();
+            // TCP connection
+            newUnit.connectTcp();
 
-                Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
+            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
-                // Store the unit
-                getStore ().storeDevice (newUnit);
-                Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
+            // Store the unit
+            getStore ().storeDevice (newUnit);
+            Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
 
-                Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
+            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
-                getStore ().storeTimeline (newUnit.getTimeline ());
-                Log.v ("Content_Manager", "Stored new timeline (UUID: " + newUnit.getTimeline().getUuid() + ").");
+            getStore ().storeTimeline (newUnit.getTimeline ());
+            Log.v ("Content_Manager", "Stored new timeline (UUID: " + newUnit.getTimeline().getUuid() + ").");
 
-                Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
+            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
-                // Archive the unit
-                // TODO:
-            }
-        });
-//            getStore().storeTimeline(unit.getTimeline());
+            // Archive the unit
+            // TODO:
 
-//            // Add events if they don't already exist
-//            for (Event event : unit.getTimeline().getEvents()) {
-//                if (!getStore().hasEvent(event)) {
-//                    getStore().restoreEvents(unit.getTimeline());
-//                }
-//            }
-
-
-
-
+        }
     }
 
     private void addUnit2 (Unit unit) {
@@ -609,9 +547,9 @@ public class Clay {
             Action action = getClay().getStore().getBehaviorComposition(children);
 
             // remove events for abstracted actions
-            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
+            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0));
             foundUnit.getTimeline().getEvents().remove(0); // if store action successful
-            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
+            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1));
             foundUnit.getTimeline().getEvents().remove(1); // if store action successful
 
             // Create event for the action and add it to the unit's timeline

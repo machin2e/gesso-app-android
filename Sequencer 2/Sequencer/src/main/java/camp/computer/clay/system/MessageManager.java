@@ -215,7 +215,7 @@ public class MessageManager {
 
             String phrase = message.getContent().split(" ")[1];
 
-//            ((AppActivity) getClay ().getContext()).Hack_Speak(phrase);
+//            ((AppActivity) getClay ().getContext()).speakPhrase(phrase);
 
         } else {
 //            Log.v("Clay", "Error: Unrecognized message.");

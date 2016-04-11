@@ -3,6 +3,7 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -56,19 +57,19 @@ public class EventDesignerView {
         // Title
         builder.setTitle ("light");
 
-        // Instructions
-        // builder.setMessage ("What do you want to do?");
-
         // Layout
         LinearLayout transformLayout = new LinearLayout (getContext());
         transformLayout.setOrientation (LinearLayout.VERTICAL);
 
         // Enable or disable lights
-        final TextView lightLabel = new TextView (getContext());
-        lightLabel.setText("Choose some lights");
-        lightLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(lightLabel);
+        // final TextView lightLabel = new TextView (getContext());
+        // lightLabel.setText("Choose some lights");
+        // lightLabel.setPadding(70, 20, 70, 20);
+        // transformLayout.addView(lightLabel);
 
+        final ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog (getContext(), ColorPickerDialog.DARK_THEME);
+
+        /*
         LinearLayout lightLayout = new LinearLayout (getContext());
         lightLayout.setOrientation(LinearLayout.HORIZONTAL);
         final ArrayList<ToggleButton> lightToggleButtons = new ArrayList<> ();
@@ -100,10 +101,11 @@ public class EventDesignerView {
             lightLayout.addView(toggleButton);
         }
         transformLayout.addView(lightLayout);
+        */
 
         // Select light color
         final TextView lightColorLabel = new TextView (getContext());
-        lightColorLabel.setText("Choose light colors");
+        lightColorLabel.setText("Choose colors");
         lightColorLabel.setPadding(70, 20, 70, 20);
         transformLayout.addView(lightColorLabel);
 
@@ -116,7 +118,7 @@ public class EventDesignerView {
             final String channelLabel = Integer.toString(i + 1);
             final Button colorButton = new Button (getContext());
             colorButton.setPadding(0, 0, 0, 0);
-            colorButton.setText(Integer.toString(i));
+            colorButton.setText(Integer.toString(i + 1));
 
             lightColor.add(0);
             lightHexColor.add ("#ff000000");
@@ -124,35 +126,16 @@ public class EventDesignerView {
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //        // Show color picker
-//        ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog(getContext(), R.style.CustomColorPicker);
-//        colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
-//            @Override
-//            public void onColorPicked(int color, String hexVal) {
-//                System.out.println("Got color: " + color);
-//                System.out.println("Got color in hex form: " + hexVal);
-//
-//                // Make use of the picked color here
-//            }
-//        });
-//        colorPickerDialog.show();
 
-                    ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog (getContext(), ColorPickerDialog.DARK_THEME);
-                    colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
-                        @Override
-                        public void onColorPicked(int color, String hexVal) {
-                            colorButton.setBackgroundColor(color);
-                            lightColor.set(Integer.valueOf(String.valueOf(colorButton.getText())), color);
-                            lightHexColor.set (Integer.valueOf(String.valueOf(colorButton.getText())), hexVal);
-
-                            // edited to support big numbers bigger than 0x80000000
-                            // int color = (int)Long.parseLong(myColorString, 16);
-//                            int r = (color >> 16) & 0xFF;
-//                            int g = (color >> 8) & 0xFF;
-//                            int b = (color >> 0) & 0xFF;
-                        }
-                    });
-                    colorPickerDialog.show();
+                colorPickerDialog.setOnColorPickedListener(new ColorPickerDialog.OnColorPickedListener() {
+                    @Override
+                    public void onColorPicked(int color, String hexVal) {
+                        colorButton.setBackgroundColor(color);
+                        lightColor.set(Integer.valueOf(String.valueOf(colorButton.getText())), color);
+                        lightHexColor.set (Integer.valueOf(String.valueOf(colorButton.getText())), hexVal);
+                    }
+                });
+                colorPickerDialog.show();
                 }
             });
 
@@ -191,11 +174,14 @@ public class EventDesignerView {
                 Byte[] colorBytesString = new Byte[12 * 3]; // i.e., 12 lights, each with 3 color bytes
                 for (int i = 0; i < 12; i++) {
 
+                    /*
                     final ToggleButton lightEnableButton = lightToggleButtons.get (i);
+                    */
                     final Button lightColorButton = lightColorButtons.get (i);
 
                     // LED enable. Is the LED on or off?
 
+                    /*
                     if (lightEnableButton.isChecked ()) {
                         updatedStateString = updatedStateString.concat ("T");
 //                        event.lightStates.set(i, true);
@@ -206,6 +192,7 @@ public class EventDesignerView {
 //                        lightStates[i] = "F";
                     }
                     // transformString = transformString.concat (","); // Add comma
+                    */
 
                     // Get LED color
                     int color = lightColor.get(i);
@@ -1149,8 +1136,26 @@ public class EventDesignerView {
 
         frequencyVal.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onProgressChanged(SeekBar seekBar, final int progress, boolean fromUser) {
                 frequencyLabel.setText("Frequency (" + progress + " Hz)");
+
+                // Preview tone played in background thread
+                final Handler handler = new Handler();
+
+                // Use a new tread as this can take a while
+                final Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        // genTone();
+                        handler.post(new Runnable() {
+
+                            public void run() {
+                                // playSound();
+                                ApplicationView.getApplicationView().playTone (Double.parseDouble(String.valueOf (progress)), 0.2);
+                            }
+                        });
+                    }
+                });
+                thread.start();
             }
 
             @Override
@@ -1282,6 +1287,8 @@ public class EventDesignerView {
         input.setText(phrase);
         input.setSelection(input.getText().length());
 
+        ApplicationView.getApplicationView().speakPhrase(phrase);
+
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
             @Override
@@ -1291,6 +1298,8 @@ public class EventDesignerView {
 //                item.phrase = input.getText().toString();
 
                 String updatedStateString = input.getText().toString();
+
+                ApplicationView.getApplicationView().speakPhrase(updatedStateString);
 
                 // Update the behavior state
                 // <HACK>

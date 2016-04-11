@@ -3,10 +3,16 @@ package camp.computer.clay.sequencer;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.mobeta.android.sequencer.R;
@@ -19,6 +25,127 @@ import camp.computer.clay.system.Unit;
 import camp.computer.clay.system.ViewManagerInterface;
 
 public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
+
+    private final int CHECK_CODE = 0x1;
+    private final int LONG_DURATION = 5000;
+    private final int SHORT_DURATION = 1200;
+    private Speaker speaker;
+
+    private void checkTTS(){
+        Intent check = new Intent();
+        check.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(check, CHECK_CODE);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == CHECK_CODE){
+            if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS){
+                speaker = new Speaker(this);
+            }else {
+                Intent install = new Intent();
+                install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(install);
+            }
+        }
+    }
+
+    public void speakPhrase(String phrase) {
+        Log.v("Clay_Verbalizer", "speakPhrase: " + phrase);
+//        if (speaker.isAllowed ())
+        if (speaker != null) {
+            speaker.allow (true);
+            speaker.speak (phrase);
+            speaker.allow (false);
+        }
+    }
+
+    /**
+     * Reference: http://stackoverflow.com/questions/2413426/playing-an-arbitrary-tone-with-android
+     */
+    public void playTone(double freqOfTone, double duration) {
+        //double duration = 1000;                // seconds
+        //   double freqOfTone = 1000;           // hz
+        int sampleRate = 8000;              // a number
+
+        double dnumSamples = duration * sampleRate;
+        dnumSamples = Math.ceil(dnumSamples);
+        int numSamples = (int) dnumSamples;
+        double sample[] = new double[numSamples];
+        byte generatedSnd[] = new byte[2 * numSamples];
+
+
+        for (int i = 0; i < numSamples; ++i) {      // Fill the sample array
+            sample[i] = Math.sin(freqOfTone * 2 * Math.PI * i / (sampleRate));
+        }
+
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalized.
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        int i = 0 ;
+
+        int ramp = numSamples / 20 ;                                    // Amplitude ramp as a percent of sample count
+
+
+        for (i = 0; i< ramp; ++i) {                                     // Ramp amplitude up (to avoid clicks)
+            double dVal = sample[i];
+            // Ramp up to maximum
+            final short val = (short) ((dVal * 32767 * i/ramp));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+
+        for (i = i; i< numSamples - ramp; ++i) {                        // Max amplitude for most of the samples
+            double dVal = sample[i];
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+        for (i = i; i< numSamples; ++i) {                               // Ramp amplitude down
+            double dVal = sample[i];
+            // Ramp down to zero
+            final short val = (short) ((dVal * 32767 * (numSamples-i)/ramp ));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+
+        AudioTrack audioTrack = null;                                   // Get audio track
+        try {
+            int bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+                    sampleRate, AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT, bufferSize,
+                    AudioTrack.MODE_STREAM);
+            audioTrack.play();                                          // Play the track
+            audioTrack.write(generatedSnd, 0, generatedSnd.length);     // Load the track
+        }
+        catch (Exception e){
+        }
+
+        int x =0;
+        do{                                                     // Montior playback to find when done
+            if (audioTrack != null)
+                x = audioTrack.getPlaybackHeadPosition();
+            else
+                x = numSamples;
+        }while (x<numSamples);
+
+        if (audioTrack != null) audioTrack.release();           // Track play done. Release track.
+    }
 
     private static final long MESSAGE_SEND_FREQUENCY = 10;
 
@@ -158,13 +285,15 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // </HACK>
 
 //        getClay().getStore().resetDatabase();
-        getClay().generateStore();
+//        getClay().generateStore();
         getClay().populateCache();
 //        getClay().simulateSession(true, 10, false);
 
         // Start worker process
         // Start the initial runnable task by posting through the handler
         handler.post(runnableCode);
+
+        checkTTS();
     }
 
     public void showActionBar () {
@@ -203,6 +332,12 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             handler.postDelayed(runnableCode, MESSAGE_SEND_FREQUENCY);
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        speaker.destroy();
+    }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {

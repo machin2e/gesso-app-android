@@ -354,7 +354,7 @@ public class TimelineListView extends DragSortListView {
 
             // <HACK>
             // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
-            getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+            getClay().getStore().removeEvent(eventHolder.getEvent());
             // TODO: getUnit().sendMessage ("stop event " + event.getUuid());
             // TODO: ^ That won't work right unless an event on the MCU has all actions and states, not just 1:1 for event:action.
             getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store action successful
@@ -411,7 +411,7 @@ public class TimelineListView extends DragSortListView {
 
         // <HACK>
         // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
-        getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+        getClay().getStore().removeEvent(eventHolder.getEvent());
         getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
         // </HACK>
 
@@ -479,7 +479,7 @@ public class TimelineListView extends DragSortListView {
 
         // Remove old behaviors from timeline in store
         for (EventHolder eventHolder : selectedEventHolders) {
-            getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+            getClay().getStore().removeEvent(eventHolder.getEvent());
         }
 
         // Remove old behaviors from the timeline
@@ -548,7 +548,7 @@ public class TimelineListView extends DragSortListView {
         getUnit().getTimeline().removeEvent(eventHolder.getEvent());
 
         // Remove the event from the database
-        getClay().getStore().removeEvent(eventHolder.getEvent(), null);
+        getClay().getStore().removeEvent(eventHolder.getEvent());
 
         // Remove the selected item from the list (it will be replaced by the abstracted actions)
         eventHolders.remove(index);

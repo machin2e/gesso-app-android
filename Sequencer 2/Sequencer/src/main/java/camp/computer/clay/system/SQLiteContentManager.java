@@ -20,7 +20,7 @@ import java.util.UUID;
 
 import camp.computer.clay.sequencer.ApplicationView;
 
-public class SQLiteContentManager implements ContentManagerInterface {
+public class SQLiteContentManager {
 
     private Clay clay;
 
@@ -248,7 +248,6 @@ public class SQLiteContentManager implements ContentManagerInterface {
             }
         }
 
-        @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(SQL_CREATE_BEHAVIOR_ENTRIES);
             db.execSQL(SQL_CREATE_SCRIPT_ENTRIES);
@@ -258,7 +257,6 @@ public class SQLiteContentManager implements ContentManagerInterface {
             db.execSQL(SQL_CREATE_EVENT_ENTRIES);
         }
 
-        @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             // This database is only a cache for online data, so its upgrade policy is
             // to simply to discard the data and start over
@@ -680,12 +678,6 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
         }
 
-        /**
-         *
-         * @param event
-         * @param behaviorStateUuid
-         * @return
-         */
         /*
         public void queryState(Event event, UUID behaviorStateUuid) {
 
@@ -912,7 +904,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
         }
 
-        public void queryTimeline (Unit unit, UUID timelineUuid) {
+        public Timeline queryTimeline (Unit unit, UUID timelineUuid) {
 
             Log.v("Content_Manager", "queryTimeline");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
@@ -958,6 +950,8 @@ public class SQLiteContentManager implements ContentManagerInterface {
 
             // Assign the timeline to the device
             unit.setTimeline(timeline);
+
+            return timeline;
         }
 
         /** Event */
@@ -1659,7 +1653,7 @@ public class SQLiteContentManager implements ContentManagerInterface {
         }
     }
 
-    public void restoreBehavior (UUID uuid, Callback callback) {
+    public void restoreBehavior (UUID uuid) {
         Log.v("Content_Manager", "restoreBehavior");
 //        Action behavior = db.queryBehavior(uuid);
 //        if (behavior == null) {
@@ -1670,30 +1664,19 @@ public class SQLiteContentManager implements ContentManagerInterface {
         Log.v("Content_Manager", "NULL!!!!!!!!!!!!!!!!! SHOULD NEVER GET HERE!!!!!!!!!!");
     }
 
-
-    @Override
     public void storeTimeline(Timeline timeline) {
         db.saveTimeline(timeline);
     }
 
-    @Override
-    public void restoreTimeline (Unit unit, UUID uuid, Callback callback) {
-        db.queryTimeline(unit, uuid);
-        if (callback != null) {
-            if (unit.getTimeline() == null) {
-                callback.onFailure();
-            } else {
-                callback.onSuccess(unit.getTimeline());
-            }
-        }
+    public Timeline restoreTimeline (Unit unit, UUID uuid) {
+        Timeline timeline = db.queryTimeline(unit, uuid);
+        return timeline;
     }
 
-    @Override
     public boolean hasEvent (Event event) {
         return db.queryEventExists(event.getUuid());
     }
 
-    @Override
     public void storeEvent(Event event) {
         if (!hasEvent (event)) {
             db.saveEvent(event.getTimeline(), event);
@@ -1702,32 +1685,22 @@ public class SQLiteContentManager implements ContentManagerInterface {
         }
     }
 
-    @Override
-    public void removeEvent(Event event, Callback callback) {
+    public boolean removeEvent(Event event) {
         // boolean result = db.deleteEvent(event);
         boolean result = db.removeEvent(event);
-        if (callback != null) {
-            if (!result) {
-                callback.onFailure();
-            } else {
-                callback.onSuccess(null);
-            }
-        }
+        return result;
     }
 
-    @Override
     public void resetDatabase() {
         Log.v("Content_Manager", "resetDatabase");
         db.resetDatabase(db.getWritableDatabase());
     }
 
-    @Override
     public void storeScript(Script script) {
         Log.v ("Content_Manager", "storeScript");
         db.saveScript(script);
     }
 
-    @Override
     public void restoreScripts() {
         db.queryScripts();
     }
@@ -1737,50 +1710,36 @@ public class SQLiteContentManager implements ContentManagerInterface {
         db.queryBehaviors();
     }
 
-    @Override
     public void storeState(Event event, State state) {
         Log.v ("Content_Manager", "storeState");
         db.saveState(event, state);
     }
 
-    @Override
     public void restoreState(Event event) {
         db.queryState(event);
     }
 
-    @Override
     public void storeDevice(Unit unit) {
         db.insertDevice(unit);
     }
 
-    @Override
-    public void restoreDevice(UUID uuid, Callback callback) {
+    public Unit restoreDevice(UUID uuid) {
         Unit unit = db.queryUnit(uuid);
-        if (callback != null) {
-            if (unit == null) {
-                callback.onFailure();
-            } else {
-                callback.onSuccess(unit);
-            }
-        }
+        return unit;
     }
 
-    @Override
     public Action getBehaviorComposition(ArrayList<Action> children) {
         return db.getBehaviorComposition(children);
     }
 
-    @Override
     public Action getBasicBehavior(Script script) {
         return db.getBasicBehavior(script);
     }
 
-    @Override
     public void removeState(State state) {
         db.removeState (state);
     }
 
-    @Override
     public void writeDatabase () {
         try {
             db.writeDatabaseToSD(SQLiteContentManager.DATABASE_NAME);
