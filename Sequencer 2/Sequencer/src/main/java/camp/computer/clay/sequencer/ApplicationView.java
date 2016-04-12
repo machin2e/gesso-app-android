@@ -197,6 +197,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         setContentView(R.layout.activity_main);
 
+        // Hide the action buttons
+        FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+        fab.hide(false);
+
         // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
         // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
         // by the ViewPager; additional logic is lower in this file to synchronize the ViewPager

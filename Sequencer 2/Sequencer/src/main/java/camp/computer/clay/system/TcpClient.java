@@ -16,7 +16,7 @@ import camp.computer.clay.sequencer.ApplicationView;
 public class TcpClient {
 
     public String SERVER_IP = null;
-    public int SERVER_PORT = 1002;
+    public int SERVER_PORT = 3000;
 
     // message to send to the server
     private String mServerMessage;

@@ -1017,7 +1017,7 @@ public class SQLiteContentManager {
 
             Action scriptAction = null;
 
-            Log.v("Content_Manager", "getScriptAction");
+            Log.v("Content_Manager", "getAction");
 
             // Get connection to database
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
@@ -1721,7 +1721,7 @@ public class SQLiteContentManager {
         return db.getActionComposition(children);
     }
 
-    public Action getScriptAction (Script script) {
+    public Action getAction(Script script) {
         return db.getScriptAction(script);
     }
 

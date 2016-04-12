@@ -1,6 +1,5 @@
 package camp.computer.clay.sequencer;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,7 +13,9 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.dslv.DragSortListView;
+import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
@@ -102,6 +103,20 @@ public class TimelineListView extends DragSortListView {
                 // TODO Auto-generated method stub
                 this.currentScrollState = scrollState;
                 this.isScrollCompleted();
+
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    // Hide the action buttons
+                    FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+                    if (fab.isHidden()) {
+                        fab.show(true);
+                    }
+                } else if (scrollState == SCROLL_STATE_FLING) {
+                    // Hide the action buttons
+                    FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+                    if (!fab.isHidden()) {
+                        fab.hide(true);
+                    }
+                }
             }
 
             @Override
@@ -118,6 +133,8 @@ public class TimelineListView extends DragSortListView {
                 View v = getChildAt(0);
                 int top = (v == null) ? 0 : (v.getTop() - getPaddingTop());
 
+                /*
+                // Auto-hide/auto-show action bar
                 ActionBar mActionBar = ApplicationView.getApplicationView().getActionBar();
                 int mActionBarHeight = 40; // mActionBar.getHeight();
                 Log.v("Scroller", "mActionBarHeight: " + mActionBarHeight);
@@ -127,6 +144,7 @@ public class TimelineListView extends DragSortListView {
                 if (y >= mActionBarHeight && mActionBar.isShowing()) {
                     mActionBar.hide();
                     Log.v("Scroller", "hiding");
+
                 } else if (y == 0 && !mActionBar.isShowing()) {
                     mActionBar.show();
                     Log.v("Scroller", "showing");
@@ -134,6 +152,7 @@ public class TimelineListView extends DragSortListView {
 
                 Log.v("Scroller", "top: " + top);
                 Log.v("Scroller", "y: " + y);
+                */
 
 //                if (getChildCount() > 0) {
 //                    // TODO: Update size of top elements in timeline
@@ -326,14 +345,14 @@ public class TimelineListView extends DragSortListView {
     public void addEventHolder(EventHolder eventHolder) {
         if (adapter != null) {
             eventHolders.add(eventHolders.size(), eventHolder);
-            refreshListViewFromData();
+            refreshListViewFromData(); // <HACK />
         }
     }
 
     /**
      * Changes the specified eventHolder's type to the specified type.
      */
-    private void replaceEventHolder (final EventHolder eventHolder, Script script) {
+    public void replaceEventHolder(final EventHolder eventHolder, Action action) {
 
         // TODO: Refactor this method so it _reuses_ Clay's Event object. (Only the Action object needs to changed.)
 
@@ -342,10 +361,7 @@ public class TimelineListView extends DragSortListView {
         // TODO: Update the action object referenced by eventHolders, and update the view accordingly (i.e., eventHolder.action = <new action> then retrieve view for that action type).
         int index = eventHolders.indexOf(eventHolder);
         eventHolders.remove(index);
-        refreshListViewFromData();
-
-        // Assign the action state
-        Action action = getClay().getStore().getScriptAction(script);
+        refreshListViewFromData(); // <HACK />
 
         // Update the event with the new action and state
         Event event = eventHolder.getEvent();
@@ -356,7 +372,7 @@ public class TimelineListView extends DragSortListView {
             getClay().getStore().removeEvent(eventHolder.getEvent());
             // TODO: getUnit().sendMessage ("stop event " + event.getUuid());
             // TODO: ^ That won't work right unless an event on the MCU has all actions and states, not just 1:1 for event:action.
-            getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store action successful
+            getUnit().getTimeline().removeEvent (eventHolder.getEvent()); // if store action successful
             // </HACK>
 
             // Update state of the object associated with the selected view.
@@ -695,7 +711,7 @@ public class TimelineListView extends DragSortListView {
         adapter.notifyDataSetChanged();
     }
 
-    private void displayEventDesigner(final EventHolder event) {
+    private void displayEventDesigner(final EventHolder eventHolder) {
         int basicBehaviorCount = 3;
         final String[] behaviorOptions = new String[basicBehaviorCount];
 
@@ -712,15 +728,22 @@ public class TimelineListView extends DragSortListView {
 
                 if (behaviorOptions[itemIndex].toString().equals("delete")) {
 
-                    removeEventHolder(event);
+                    removeEventHolder(eventHolder);
 
                 } else if (behaviorOptions[itemIndex].toString().equals("update")) {
 
-                    displayUpdateOptions(event);
+                    displayUpdateOptions(eventHolder);
 
                 } else if (behaviorOptions[itemIndex].toString().equals("replace")) {
 
-                    displayBehaviorFinder(event);
+                    //displayActionBrowser(eventHolder);
+                    displayActionBrowser(new ActionSelectionListener() {
+                        @Override
+                        public void onSelect(Action action) {
+                            replaceEventHolder(eventHolder, action);
+                            refreshListViewFromData(); // <HACK />
+                        }
+                    });
 
                 }
 
@@ -757,36 +780,72 @@ public class TimelineListView extends DragSortListView {
 
     }
 
-    /**
-     * Display the behaviors available for selection, starting with basic, cached, public.
-     */
-    public void displayBehaviorFinder(final EventHolder eventHolder) {
+    public interface ActionSelectionListener {
+        public void onSelect (Action action);
+    }
+
+    public void displayActionBrowser(final ActionSelectionListener actionSelectionListener) {
 
         // Get list of behaviors available for selection
-        int behaviorScriptCount = getClay().getCache().getScripts().size();
-        final String[] behaviorScripts = new String[behaviorScriptCount];
-        for (int i = 0; i < behaviorScriptCount; i++) {
+        int actionScriptCount = getClay().getCache().getScripts().size();
+        final String[] actionScripts = new String[actionScriptCount];
+        for (int i = 0; i < actionScriptCount; i++) {
             Script cachedScript = unit.getClay().getCache().getScripts().get(i);
-            behaviorScripts[i] = cachedScript.getTag();
+            actionScripts[i] = cachedScript.getTag();
         }
 
         // Show the list of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setItems(behaviorScripts, new DialogInterface.OnClickListener() {
+        builder.setItems(actionScripts, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int itemIndex) {
 
                 // <HACK>
                 Script selectedScript = getClay().getCache().getScripts().get(itemIndex);
                 // </HACK>
 
-                replaceEventHolder(eventHolder, selectedScript);
+                // Assign the action state
+                Action action = getClay().getStore().getAction(selectedScript);
 
-                refreshListViewFromData();
+                actionSelectionListener.onSelect(action);
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+    /**
+     * Display the behaviors available for selection, starting with basic, cached, public.
+     */
+//    public void displayActionBrowser(final EventHolder eventHolder) {
+//
+//        // Get list of behaviors available for selection
+//        int actionScriptCount = getClay().getCache().getScripts().size();
+//        final String[] actionScripts = new String[actionScriptCount];
+//        for (int i = 0; i < actionScriptCount; i++) {
+//            Script cachedScript = unit.getClay().getCache().getScripts().get(i);
+//            actionScripts[i] = cachedScript.getTag();
+//        }
+//
+//        // Show the list of behaviors
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//        builder.setItems(actionScripts, new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int itemIndex) {
+//
+//                // <HACK>
+//                Script selectedScript = getClay().getCache().getScripts().get(itemIndex);
+//                // </HACK>
+//
+//                // Assign the action state
+//                Action action = getClay().getStore().getAction(selectedScript);
+//
+//                replaceEventHolder(eventHolder, action);
+//
+//                refreshListViewFromData(); // <HACK />
+//            }
+//        });
+//        AlertDialog alert = builder.create();
+//        alert.show();
+//    }
 
     private Clay getClay () {
         return unit.getClay();
@@ -887,38 +946,49 @@ public class TimelineListView extends DragSortListView {
 //                eventHolder.summary = "small";
 //            }
 
-            // Check if the list item was a constructor
-            if (eventHolder.getType().equals("create")) {
-
-                if (eventHolder.tag == "create") {
-                    // Add a placeholder if one doesn't already exist
-                    if (!hasPlaceholder ()) {
-
-                        // menu:
-                        // [ create, branch ]
-                        //   - choose
-                        //   - behavior
-
-                        String title = "choose"; // color in "human" behavior indicator color
-                        String type = "choose";
-
-                        // Add the behavior to the timeline
-                        addEventHolder(new EventHolder(title, type));
-
-                        // TODO: (?) Create a behavior?
-                    }
-                }
-//                else if (eventHolder.tag == "abstract") {
+//            // Check if the list item was a constructor
+//            if (eventHolder.getType().equals("create")) {
 //
-//                    composeEventHolderSelection();
+//                if (eventHolder.tag == "create") {
+//                    // Add a placeholder if one doesn't already exist
+//                    if (!hasPlaceholder ()) {
 //
+//                        // menu:
+//                        // [ create, branch ]
+//                        //   - choose
+//                        //   - behavior
+//
+//                        String title = "choose"; // color in "human" behavior indicator color
+//                        String type = "choose";
+//
+//                        // Add the behavior to the timeline
+//                        addEventHolder(new EventHolder(title, type));
+//
+//                        // TODO: (?) Create a behavior?
+//                    }
 //                }
+////                else if (eventHolder.tag == "abstract") {
+////
+////                    composeEventHolderSelection();
+////
+////                }
+//
+//            }
 
-            } else if (eventHolder.getType().equals("choose")) {
+//            else if (eventHolder.getType().equals("choose")) { // TODO: DELETE
+//
+////                displayActionBrowser(eventHolder);
+//                displayActionBrowser(new ActionSelectionListener() {
+//                    @Override
+//                    public void onSelect(Action action) {
+//                        replaceEventHolder(eventHolder, action);
+//                        refreshListViewFromData(); // <HACK />
+//                    }
+//                });
+//
+//            }
 
-                displayBehaviorFinder(eventHolder);
-
-            } else {
+//            else {
 
 //                // <HACK>
 //                if (eventHolder.type == 50) {
@@ -938,7 +1008,7 @@ public class TimelineListView extends DragSortListView {
                     displayUpdateOptions(eventHolder);
                 }
 
-            }
+//            }
 
         }
 

@@ -1,9 +1,13 @@
 package camp.computer.clay.system;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 import android.util.Log;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,6 +24,13 @@ public class Clay {
     private SQLiteContentManager contentManager = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
+
+    public Point downPoint;
+    public Point currentPoint;
+    public static int FAB_STOP_DRAGGING = 0;
+    public static int FAB_START_DRAGGING = 1;
+    public int fabStatus = FAB_STOP_DRAGGING;
+    public boolean fabDisableClick = false;
 
     // List of discovered touchscreen devices
     private ArrayList<ViewManagerInterface> views;
@@ -211,6 +222,10 @@ public class Clay {
 
             // Establish TCP connection
             unit.connectTcp();
+
+            // Show the action palette
+            FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+            fab.show(true);
 
             // Populate the timeline
             // TODO: Populate from scratch only if no timeline has been programmed for the device
