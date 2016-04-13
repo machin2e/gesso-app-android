@@ -113,11 +113,16 @@ public class EventHolderAdapter extends BaseAdapter {
                 view = getLightView(eventHolder);
             } else if (eventHolder.getType().equals("signal")) {
                 view = getSignalView(eventHolder);
-            } else if (eventHolder.getType().equals ("create")) {
-                view = getTextView(eventHolder, "", "create");
-            } else if (eventHolder.getType().equals ("choose")) {
-                view = getTextView (eventHolder, "", "choose");
+            } else if (eventHolder.getType().equals ("highlight")) {
+                view = getHighlightView (eventHolder, "", "");
+                view.setBackgroundColor(Color.BLUE);
             }
+
+//            else if (eventHolder.getType().equals ("create")) {
+//                view = getTextView(eventHolder, "", "create");
+//            } else if (eventHolder.getType().equals ("choose")) {
+//                view = getTextView (eventHolder, "", "choose");
+//            }
 
             if (view != null) {
                 view.setTag(eventHolder);
@@ -219,7 +224,7 @@ public class EventHolderAdapter extends BaseAdapter {
         actionView.addView(actionLabel);
 
         // Timeline segment
-        final ImageView imageView = getEventTimelineView (150, 3.0f, false);
+        final ImageView imageView = getEventTimelineView(150, 3.0f, false);
         actionView.addView(imageView);
 
         // Linear layout (to the right side of timeline)
@@ -626,6 +631,39 @@ public class EventHolderAdapter extends BaseAdapter {
         textView.setTextSize(10.0f);
         textView.setPadding(0, 5, 0, 5);
         linearLayout.addView(textView);
+
+        return actionView;
+    }
+
+    /**
+     * Message action view.
+     * @param eventHolder View holder with the Message event.
+     * @return View for the Message event.
+     */
+    private View getHighlightView (EventHolder eventHolder, String tag, String text) {
+
+        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout.LayoutParams params = null;
+
+        // Tag
+        final TextView actionLabel = getEventTagView (tag);
+        actionView.addView(actionLabel);
+
+        // Timeline
+        final ImageView imageView = getEventTimelineView (30, 3.0f, false);
+        actionView.addView(imageView);
+
+        // Linear layout (to the right side of timeline)
+        LinearLayout linearLayout = getDataLayout();
+        actionView.addView(linearLayout);
+
+//        // Action: Text content
+//        final TextView textView = new TextView (ApplicationView.getContext());
+//        textView.setText(text);
+//        textView.setAllCaps(true);
+//        textView.setTextSize(10.0f);
+//        textView.setPadding(0, 5, 0, 5);
+//        linearLayout.addView(textView);
 
         return actionView;
     }

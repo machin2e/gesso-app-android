@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Point;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
@@ -17,6 +19,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import camp.computer.clay.sequencer.ApplicationView;
+import camp.computer.clay.sequencer.EventHolder;
 
 public class Clay {
 
@@ -25,12 +28,37 @@ public class Clay {
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
 
-    public Point downPoint;
-    public Point currentPoint;
+    // <FAB>
+    public Point fabDownPoint;
+    public Point fabCurrentPoint;
     public static int FAB_STOP_DRAGGING = 0;
     public static int FAB_START_DRAGGING = 1;
     public int fabStatus = FAB_STOP_DRAGGING;
     public boolean fabDisableClick = false;
+    public int fabStartDragThresholdDistance = 75;
+    public int selectedEventHolderIndex = -1;
+    public EventHolder selectedEventHolder = null;
+
+    private void setUpActionButton(FloatingActionButton fab) {
+        // Get screen width and height of the device
+        DisplayMetrics metrics;
+        int screenWidth = 0, screenHeight = 0;
+        metrics = new DisplayMetrics();
+        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        screenHeight = metrics.heightPixels;
+        screenWidth = metrics.widthPixels;
+
+        Log.v ("Metrics", "width: " + screenWidth);
+        Log.v ("Metrics", "height: " + screenHeight);
+
+        // Update placement of action button (default)
+        int width = fab.getWidth();
+        int height = fab.getHeight();
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
+        params.leftMargin = (int) screenWidth - (int) (width * 1.1);
+        params.topMargin = (int) (screenHeight / 2.0) - (int) (height / 2.0);
+    }
+    // </FAB>
 
     // List of discovered touchscreen devices
     private ArrayList<ViewManagerInterface> views;
@@ -225,6 +253,7 @@ public class Clay {
 
             // Show the action palette
             FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+            setUpActionButton (fab);
             fab.show(true);
 
             // Populate the timeline

@@ -84,7 +84,7 @@ public class TcpClient {
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
 
-            Log.e("TCP_Server", "C: Connecting...");
+//            Log.e("TCP_Server", "C: Connecting...");
 
             //create a socket to make the connection with the server
             Socket socket = new Socket(serverAddr, SERVER_PORT);
@@ -150,7 +150,7 @@ public class TcpClient {
 
             } catch (Exception e) {
 
-                Log.e("TCP_Server", "S: Error", e);
+//                Log.e("TCP_Server", "S: Error", e);
 
             } finally {
 
@@ -163,7 +163,7 @@ public class TcpClient {
 
         } catch (Exception e) {
 
-            Log.e("TCP_Server", "C: Error", e);
+//            Log.e("TCP_Server", "C: Error", e);
 
         }
 

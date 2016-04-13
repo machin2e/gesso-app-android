@@ -3,6 +3,8 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -10,6 +12,7 @@ import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
@@ -41,6 +44,10 @@ public class TimelineListView extends DragSortListView {
     public TimelineListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setUpView();
+
+        // <HACK>
+        TimelineListView.timelineListView = this;
+        // </HACK>
     }
 
     /**
@@ -345,7 +352,18 @@ public class TimelineListView extends DragSortListView {
     public void addEventHolder(EventHolder eventHolder) {
         if (adapter != null) {
             eventHolders.add(eventHolders.size(), eventHolder);
-            refreshListViewFromData(); // <HACK />
+//            refreshListViewFromData(); // <HACK />
+        }
+    }
+
+    /**
+     * Add eventHolders to the ListView.
+     * @param eventHolder
+     */
+    public void addEventHolder(int index, EventHolder eventHolder) {
+        if (adapter != null) {
+            eventHolders.add(index, eventHolder);
+//            refreshListViewFromData(); // <HACK />
         }
     }
 
@@ -361,7 +379,7 @@ public class TimelineListView extends DragSortListView {
         // TODO: Update the action object referenced by eventHolders, and update the view accordingly (i.e., eventHolder.action = <new action> then retrieve view for that action type).
         int index = eventHolders.indexOf(eventHolder);
         eventHolders.remove(index);
-        refreshListViewFromData(); // <HACK />
+//        refreshListViewFromData(); // <HACK />
 
         // Update the event with the new action and state
         Event event = eventHolder.getEvent();
@@ -417,31 +435,33 @@ public class TimelineListView extends DragSortListView {
         eventHolders.add(index, replacementEventHolder);
     }
 
-    private void removeEventHolder(final EventHolder eventHolder) {
+    public void removeEventHolder(final EventHolder eventHolder) {
 
-        // <HACK>
-        // TODO: Replace this with a queue.
-        getUnit().sendMessageTcp("stop event " + eventHolder.getEvent().getUuid());
-        // </HACK>
+        if (eventHolder.getEvent() != null) {
 
-        // <HACK>
-        // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
-        getClay().getStore().removeEvent(eventHolder.getEvent());
-        getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
-        // </HACK>
+            // <HACK>
+            // TODO: Replace this with a queue.
+            getUnit().sendMessageTcp("stop event " + eventHolder.getEvent().getUuid());
+            // </HACK>
 
-        // Update state of the object associated with the selected view.
-        eventHolders.remove(eventHolder);
+            // <HACK>
+            // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
+            getClay().getStore().removeEvent(eventHolder.getEvent());
+            getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
+            // </HACK>
+        }
 
-        // Update the view after removing the specified list item
-        refreshListViewFromData();
+            // Update state of the object associated with the selected view.
+            eventHolders.remove(eventHolder);
+
+            // Update the view after removing the specified list item
+//            refreshListViewFromData(); // <HACK />
 
         /*
         // <HACK>
         getClay().getStore().updateTimeline(this.unit.getTimeline());
         // </HACK>
         */
-
     }
 
     /**
@@ -922,96 +942,83 @@ public class TimelineListView extends DragSortListView {
         }
     }
 
-    private class EventHolderTouchReleaseListener implements OnItemClickListener
-    {
-        @Override
-        public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
-        {
-            Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
+    // <HACK>
+    public static TimelineListView getTimelineListView () {
+        return TimelineListView.timelineListView;
+    }
 
-            final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
+    private static TimelineListView timelineListView = null;
+    // </HACK>
 
-//            // Update layout based on state
-//            if (eventHolder.summary.equals("small")) {
-//                // Update left padding
-////                view.setPadding(0, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
-//                AbsListView.LayoutParams mCompressedParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 150);
-//                view.setLayoutParams(mCompressedParams);
-//                eventHolder.summary = "large";
-//            } else {
-//                // Update left padding to indent the item
-////                view.setPadding(120, view.getPaddingTop(), view.getPaddingRight(), view.getPaddingBottom());
-//                AbsListView.LayoutParams mCompressedParams = new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 400);
-//                view.setLayoutParams(mCompressedParams);
-//                eventHolder.summary = "small";
-//            }
+    public void resetViewBackgrounds () {
 
-//            // Check if the list item was a constructor
-//            if (eventHolder.getType().equals("create")) {
-//
-//                if (eventHolder.tag == "create") {
-//                    // Add a placeholder if one doesn't already exist
-//                    if (!hasPlaceholder ()) {
-//
-//                        // menu:
-//                        // [ create, branch ]
-//                        //   - choose
-//                        //   - behavior
-//
-//                        String title = "choose"; // color in "human" behavior indicator color
-//                        String type = "choose";
-//
-//                        // Add the behavior to the timeline
-//                        addEventHolder(new EventHolder(title, type));
-//
-//                        // TODO: (?) Create a behavior?
-//                    }
-//                }
-////                else if (eventHolder.tag == "abstract") {
-////
-////                    composeEventHolderSelection();
-////
-////                }
-//
-//            }
 
-//            else if (eventHolder.getType().equals("choose")) { // TODO: DELETE
-//
-////                displayActionBrowser(eventHolder);
-//                displayActionBrowser(new ActionSelectionListener() {
-//                    @Override
-//                    public void onSelect(Action action) {
-//                        replaceEventHolder(eventHolder, action);
-//                        refreshListViewFromData(); // <HACK />
-//                    }
-//                });
-//
-//            }
+        int childCount = this.getChildCount();
+        View view;
+        int i = 0;
+        for ( ; i < childCount; i++) {
+            view = this.getChildAt(i);
 
-//            else {
+            view.setBackgroundColor(Color.TRANSPARENT);
+            view.requestLayout();
+            view.invalidate();
+        }
+    }
 
-//                // <HACK>
-//                if (eventHolder.type == 50) {
-//                    Log.v ("Tone", "updating summary: " + eventHolder.summary);
-//                    if (eventHolder.summary.equals("yes")) {
-//                        eventHolder.summary = "no";
-//                    } else {
-//                        eventHolder.summary = "yes";
-//                    }
-//                    refreshListViewFromData();
-//                }
-//                // </HACK>
-//
-//                else
+    public int findNearestTimelineIndex (int x, int y) {
+        View view = this.getViewByPosition(x, y);
+        EventHolder eventHolder = getListItemAtPosition(x, y);
 
-                if (!hasSelectedEventHolders()) {
-                    displayUpdateOptions(eventHolder);
-                }
-
-//            }
-
+        // TODO: Insert highlight _between_ existing events (temporary "highlight" view? EventHolder for action once added?)
+        if (view != null) {
+            view.setBackgroundColor(Color.LTGRAY);
+            view.requestLayout();
+            view.invalidate();
         }
 
+
+        if (eventHolder != null) {
+            if (eventHolder.getEvent() != null && eventHolder.getEvent().getAction() != null) {
+                Log.v("Nearby", "type: " + eventHolder.getEvent().getAction().getTag());
+            }
+        }
+
+        // TODO: Get nearby action points (for conversational interaction). And type.
+
+        return this.getPositionForView(view);
+    }
+
+    public void findNearbyViews(int x, int y) {
+        View view = this.getViewByPosition(x, y);
+        EventHolder eventHolder = getListItemAtPosition(x, y);
+        Log.v("Nearby", "view: " + view);
+        Log.v("Nearby", "eventHolder: " + eventHolder);
+
+        if (view != null) {
+            view.setBackgroundColor(Color.LTGRAY);
+            view.requestLayout();
+            view.invalidate();
+        }
+
+        if (eventHolder != null) {
+            if (eventHolder.getEvent() != null && eventHolder.getEvent().getAction() != null) {
+                Log.v("Nearby", "type: " + eventHolder.getEvent().getAction().getTag());
+            }
+        }
+
+        // TODO: Get nearby action points (for conversational interaction). And type.
+    }
+
+    private class EventHolderTouchReleaseListener implements OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+            Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
+
+            if (!hasSelectedEventHolders()) {
+                final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
+                displayUpdateOptions(eventHolder);
+            }
+        }
     }/**
      * Returns true if a placeholder event is found in the sequence.
      * @return

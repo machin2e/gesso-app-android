@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -12,9 +13,14 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
@@ -403,6 +409,83 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     @Override
     public void refreshListViewFromData(Unit unit) {
         // TODO: Update the view to reflect the latest state of the object model
+    }
+
+    // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
+    public void moveViewToScreenCenter(final View view, Point destinationPoint, int translateDuration)
+    {
+        FrameLayout root = (FrameLayout) findViewById(R.id.application_view);
+        DisplayMetrics dm = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics( dm );
+        int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
+
+        int originalPos[] = new int[2];
+        view.getLocationOnScreen( originalPos );
+
+        /*
+        int xDest = dm.widthPixels/2;
+        xDest -= (view.getMeasuredWidth()/2);
+        int yDest = dm.heightPixels/2 - (view.getMeasuredHeight()/2) - statusBarOffset;
+        */
+
+        int xDest = destinationPoint.x;
+        int yDest = destinationPoint.y;
+
+
+        final int amountToMoveRight = xDest - originalPos[0];
+        final int amountToMoveDown = yDest - originalPos[1];
+        TranslateAnimation anim = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
+        anim.setDuration(translateDuration);
+//        anim.setFillAfter(true);
+
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+                params.topMargin += amountToMoveDown;
+                params.leftMargin += amountToMoveRight;
+                view.setLayoutParams(params);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+
+        view.startAnimation(anim);
+
+
+
+//        TranslateAnimation anim = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
+//        anim.setDuration(1000);
+//
+//        anim.setAnimationListener(new TranslateAnimation.AnimationListener() {
+//
+//            @Override
+//            public void onAnimationStart(Animation animation) {
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animation animation) {
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animation animation) {
+//                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+//                params.topMargin += amountToMoveDown;
+//                params.leftMargin += amountToMoveRight;
+//                view.setLayoutParams(params);
+//            }
+//        });
+//
+//        view.startAnimation(anim);
     }
 
     public static ApplicationView getApplicationView () { return ApplicationView.applicationView; }
