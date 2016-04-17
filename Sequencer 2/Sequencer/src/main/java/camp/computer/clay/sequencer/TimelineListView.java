@@ -3,6 +3,7 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -15,6 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.dslv.DragSortListView;
@@ -234,16 +238,16 @@ public class TimelineListView extends DragSortListView {
                     // TODO: "start event <event-uuid> [before event <event-uuid>]"
                     if (toIndex == (adapter.getCount() - 1)) {
                         // <HACK>
-                        getUnit().sendMessageTcp("start event " + event.getUuid());
-                        getUnit().sendMessageTcp("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                        getUnit().sendMessageTcp("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+                        getUnit().enqueueMessage("start event " + event.getUuid());
+                        getUnit().enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                        getUnit().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
                         // </HACK>
                     } else {
                         Event nextEvent = getUnit().getTimeline().getEvents().get(toIndex + 1);
                         // <HACK>
-                        getUnit().sendMessageTcp("start event " + event.getUuid() + " before event " + nextEvent.getUuid());
-                        getUnit().sendMessageTcp("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                        getUnit().sendMessageTcp("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+                        getUnit().enqueueMessage("start event " + event.getUuid() + " before event " + nextEvent.getUuid());
+                        getUnit().enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                        getUnit().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
                         // </HACK>
                     }
                 }
@@ -363,7 +367,7 @@ public class TimelineListView extends DragSortListView {
     public void addEventHolder(int index, EventHolder eventHolder) {
         if (adapter != null) {
             eventHolders.add(index, eventHolder);
-//            refreshListViewFromData(); // <HACK />
+            refreshListViewFromData(); // <HACK />
         }
     }
 
@@ -379,7 +383,7 @@ public class TimelineListView extends DragSortListView {
         // TODO: Update the action object referenced by eventHolders, and update the view accordingly (i.e., eventHolder.action = <new action> then retrieve view for that action type).
         int index = eventHolders.indexOf(eventHolder);
         eventHolders.remove(index);
-//        refreshListViewFromData(); // <HACK />
+        refreshListViewFromData(); // <HACK />
 
         // Update the event with the new action and state
         Event event = eventHolder.getEvent();
@@ -422,9 +426,9 @@ public class TimelineListView extends DragSortListView {
 
         // <HACK>
         // TODO: Replace this with a queue.
-        getUnit().sendMessageTcp("start event " + event.getUuid());
-        getUnit().sendMessageTcp("set event " + event.getUuid() + " action " + action.getScript().getUuid()); // <HACK />
-        getUnit().sendMessageTcp("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+        getUnit().enqueueMessage("start event " + event.getUuid());
+        getUnit().enqueueMessage("set event " + event.getUuid() + " action " + action.getScript().getUuid()); // <HACK />
+        getUnit().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
         // </HACK>
 
         // Create and addUnit the new eventHolder to the timeline
@@ -433,6 +437,8 @@ public class TimelineListView extends DragSortListView {
 
         // Add the replacement item to the timeline view
         eventHolders.add(index, replacementEventHolder);
+
+        refreshListViewFromData();
     }
 
     public void removeEventHolder(final EventHolder eventHolder) {
@@ -441,7 +447,7 @@ public class TimelineListView extends DragSortListView {
 
             // <HACK>
             // TODO: Replace this with a queue.
-            getUnit().sendMessageTcp("stop event " + eventHolder.getEvent().getUuid());
+            getUnit().enqueueMessage("stop event " + eventHolder.getEvent().getUuid());
             // </HACK>
 
             // <HACK>
@@ -451,11 +457,11 @@ public class TimelineListView extends DragSortListView {
             // </HACK>
         }
 
-            // Update state of the object associated with the selected view.
-            eventHolders.remove(eventHolder);
+        // Update state of the object associated with the selected view.
+        eventHolders.remove(eventHolder);
 
-            // Update the view after removing the specified list item
-//            refreshListViewFromData(); // <HACK />
+        // Update the view after removing the specified list item
+        refreshListViewFromData(); // <HACK />
 
         /*
         // <HACK>
@@ -661,7 +667,7 @@ public class TimelineListView extends DragSortListView {
      * @param y
      * @return
      */
-    public EventHolder getListItemAtPosition(int x, int y) {
+    public EventHolder getEventHolderByPosition(int x, int y) {
         // Get the list item corresponding to the specified touch point
         int position = getViewIndexByPosition(x, y);
         EventHolder item = (EventHolder) getItemAtPosition(position);
@@ -678,8 +684,7 @@ public class TimelineListView extends DragSortListView {
         int x = (int) xPosition - listViewCoords[0];
         int y = (int) yPosition - listViewCoords[1];
         View child;
-        int i = 0;
-        for ( ; i < childCount; i++) {
+        for (int i = 0; i < childCount; i++) {
             child = this.getChildAt(i);
             child.getHitRect(rect);
             if (rect.contains(x, y)) {
@@ -689,6 +694,51 @@ public class TimelineListView extends DragSortListView {
         }
 
         return mDownView;
+    }
+
+//    private Dictionary<Integer, Integer> listViewItemHeights = new Hashtable<Integer, Integer>();
+//
+//    public int getScroll() {
+//        View c = this.getChildAt(0); //this is the first visible row
+//        int scrollY = -c.getTop();
+//        listViewItemHeights.put(this.getFirstVisiblePosition(), c.getHeight());
+//        for (int i = 0; i < this.getFirstVisiblePosition(); ++i) {
+//            if (listViewItemHeights.get(i) != null) // (this is a sanity check)
+//                scrollY += listViewItemHeights.get(i); //add all heights of the views that are gone
+//        }
+//        return scrollY;
+//    }
+
+    public Point getTimelinePoint (int xPosition, int yPosition) {
+        View mDownView = null;
+        // Find the child view that was touched (perform a hit test)
+        Rect rect = new Rect();
+//        int childCount = this.getChildCount();
+        int[] listViewCoords = new int[2];
+        int x = (int) xPosition - listViewCoords[0];
+        int y = (int) yPosition - listViewCoords[1];
+//        View child;
+//        int i = 0;
+//        for ( ; i < childCount; i++) {
+//            child = this.getChildAt(i);
+//            child.getHitRect(rect);
+//            if (rect.contains(x, y)) {
+//                mDownView = child; // This is your down view
+//                break;
+//            }
+//        }
+//
+//        // Check if the specified position is within the bounds of a view in the ListView.
+//        // If so, select the item.
+//        if (mDownView != null) {
+//            int itemIndex = this.getFirstVisiblePosition() + i;
+//            return itemIndex;
+//        }
+//
+//        return -1;
+
+        Point point = new Point (x, y);
+        return point;
     }
 
     public int getViewIndexByPosition (int xPosition, int yPosition) {
@@ -728,7 +778,38 @@ public class TimelineListView extends DragSortListView {
      */
     public void refreshListViewFromData() {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
-        adapter.notifyDataSetChanged();
+//        adapter.notifyDataSetChanged();
+        final TimelineListView lv = this;
+        ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
+            public void run() {
+                //reload content
+//                arraylist.clear();
+//                arraylist.addAll(db.readAll());
+                adapter.notifyDataSetChanged();
+                lv.invalidateViews();
+                lv.refreshDrawableState();
+            }
+        });
+    }
+
+    /**
+     * Resources:
+     * - http://stackoverflow.com/questions/2250770/how-to-refresh-android-listview
+     */
+    public void redrawListViewFromData() {
+        // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
+//        adapter.notifyDataSetChanged();
+        final TimelineListView lv = this;
+        ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
+            public void run() {
+                //reload content
+//                arraylist.clear();
+//                arraylist.addAll(db.readAll());
+//                adapter.notifyDataSetChanged();
+                lv.invalidateViews();
+                lv.refreshDrawableState();
+            }
+        });
     }
 
     private void displayEventDesigner(final EventHolder eventHolder) {
@@ -756,7 +837,6 @@ public class TimelineListView extends DragSortListView {
 
                 } else if (behaviorOptions[itemIndex].toString().equals("replace")) {
 
-                    //displayActionBrowser(eventHolder);
                     displayActionBrowser(new ActionSelectionListener() {
                         @Override
                         public void onSelect(Action action) {
@@ -766,8 +846,6 @@ public class TimelineListView extends DragSortListView {
                     });
 
                 }
-
-                refreshListViewFromData();
             }
         });
         AlertDialog alert = builder.create();
@@ -800,6 +878,32 @@ public class TimelineListView extends DragSortListView {
 
     }
 
+    public Point getPointUnderTimeline() {
+        Log.v("Top_Pos", "getPointUnderTimeline");
+
+        int viewCount = getChildCount();
+        //View bottomView = getChildAt(viewCount - 1);
+
+        Point point = null;
+
+        if (viewCount > 0) {
+            View bottomView = getChildAt(viewCount - 1);
+            //int top = (v == null) ? 0 : (v.getTop() - getPaddingTop());
+
+            Log.v("Top_Pos", "viewCount: " + viewCount);
+            Log.v("Top_Pos", "bottomView: " + bottomView);
+
+//            if (bottomView != null) {
+            point = new Point(0, 0);
+            point.y = bottomView.getBottom();
+//            int y = bottomView.getScrollY();
+                Log.v("Top_Pos", "top: " + point.y);
+//            }
+        }
+
+        return point;
+    }
+
     public interface ActionSelectionListener {
         public void onSelect (Action action);
     }
@@ -830,6 +934,94 @@ public class TimelineListView extends DragSortListView {
             }
         });
         AlertDialog alert = builder.create();
+        // alert.getListView().setBackgroundColor(Color.BLACK);
+
+
+        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface alert) {
+                ListView listView = ((AlertDialog) alert).getListView();
+                final ListAdapter originalAdapter = listView.getAdapter();
+
+                listView.setAdapter(new ListAdapter() {
+
+                    @Override
+                    public int getCount() {
+                        return originalAdapter.getCount();
+                    }
+
+                    @Override
+                    public Object getItem(int id) {
+                        return originalAdapter.getItem(id);
+                    }
+
+                    @Override
+                    public long getItemId(int id) {
+                        return originalAdapter.getItemId(id);
+                    }
+
+                    @Override
+                    public int getItemViewType(int id) {
+                        return originalAdapter.getItemViewType(id);
+                    }
+
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        View view = originalAdapter.getView(position, convertView, parent);
+                        TextView textView = (TextView) view;
+//                        textView.setTypeface(MyFontUtil.getTypeface(MyActivity,MY_DEFAULT_FONT));
+                        textView.setTextColor(Color.WHITE);
+                        textView.setAllCaps(true);
+                        textView.setTextSize(10.0f);
+                        return view;
+                    }
+
+                    @Override
+                    public int getViewTypeCount() {
+                        return originalAdapter.getViewTypeCount();
+                    }
+
+                    @Override
+                    public boolean hasStableIds() {
+                        return originalAdapter.hasStableIds();
+                    }
+
+                    @Override
+                    public boolean isEmpty() {
+                        return originalAdapter.isEmpty();
+                    }
+
+                    @Override
+                    public void registerDataSetObserver(DataSetObserver observer) {
+                        originalAdapter.registerDataSetObserver(observer);
+
+                    }
+
+                    @Override
+                    public void unregisterDataSetObserver(DataSetObserver observer) {
+                        originalAdapter.unregisterDataSetObserver(observer);
+
+                    }
+
+                    @Override
+                    public boolean areAllItemsEnabled() {
+                        return originalAdapter.areAllItemsEnabled();
+                    }
+
+                    @Override
+                    public boolean isEnabled(int position) {
+                        return originalAdapter.isEnabled(position);
+                    }
+
+                });
+
+            }
+
+        });
+
+        // alert.getListView().setBackgroundColor(ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+
         alert.show();
     }
 
@@ -952,7 +1144,6 @@ public class TimelineListView extends DragSortListView {
 
     public void resetViewBackgrounds () {
 
-
         int childCount = this.getChildCount();
         View view;
         int i = 0;
@@ -965,32 +1156,45 @@ public class TimelineListView extends DragSortListView {
         }
     }
 
+    public void resetHighlights () {
+        for (int i = 0; i < eventHolders.size(); ) {
+            if (eventHolders.get(i).getType().equals("highlight")) {
+                eventHolders.remove(i);
+                continue;
+            }
+            i++;
+        }
+        refreshListViewFromData();
+    }
+
     public int findNearestTimelineIndex (int x, int y) {
         View view = this.getViewByPosition(x, y);
-        EventHolder eventHolder = getListItemAtPosition(x, y);
+        EventHolder eventHolder = getEventHolderByPosition(x, y);
+        int index = -1;
 
         // TODO: Insert highlight _between_ existing events (temporary "highlight" view? EventHolder for action once added?)
-        if (view != null) {
-            view.setBackgroundColor(Color.LTGRAY);
-            view.requestLayout();
-            view.invalidate();
-        }
+//        if (view != null) {
+//            view.setBackgroundColor(Color.LTGRAY);
+//            view.requestLayout();
+//            view.invalidate();
+//        }
 
 
         if (eventHolder != null) {
             if (eventHolder.getEvent() != null && eventHolder.getEvent().getAction() != null) {
                 Log.v("Nearby", "type: " + eventHolder.getEvent().getAction().getTag());
+                index = this.getPositionForView(view);
             }
         }
 
         // TODO: Get nearby action points (for conversational interaction). And type.
 
-        return this.getPositionForView(view);
+        return index;
     }
 
     public void findNearbyViews(int x, int y) {
         View view = this.getViewByPosition(x, y);
-        EventHolder eventHolder = getListItemAtPosition(x, y);
+        EventHolder eventHolder = getEventHolderByPosition(x, y);
         Log.v("Nearby", "view: " + view);
         Log.v("Nearby", "eventHolder: " + eventHolder);
 

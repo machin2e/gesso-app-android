@@ -115,7 +115,8 @@ public class EventHolderAdapter extends BaseAdapter {
                 view = getSignalView(eventHolder);
             } else if (eventHolder.getType().equals ("highlight")) {
                 view = getHighlightView (eventHolder, "", "");
-                view.setBackgroundColor(Color.BLUE);
+            } else if (eventHolder.getType().equals ("timeline")) {
+                view = getTimelineSegmentView (eventHolder, "", "");
             }
 
 //            else if (eventHolder.getType().equals ("create")) {
@@ -640,7 +641,7 @@ public class EventHolderAdapter extends BaseAdapter {
      * @param eventHolder View holder with the Message event.
      * @return View for the Message event.
      */
-    private View getHighlightView (EventHolder eventHolder, String tag, String text) {
+    private View getTimelineSegmentView (EventHolder eventHolder, String tag, String text) {
 
         RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
         RelativeLayout.LayoutParams params = null;
@@ -650,12 +651,47 @@ public class EventHolderAdapter extends BaseAdapter {
         actionView.addView(actionLabel);
 
         // Timeline
-        final ImageView imageView = getEventTimelineView (30, 3.0f, false);
+        final ImageView imageView = getEventTimelineView (150, 3.0f, false);
         actionView.addView(imageView);
 
         // Linear layout (to the right side of timeline)
         LinearLayout linearLayout = getDataLayout();
         actionView.addView(linearLayout);
+
+        // Action: Text content
+        final TextView textView = new TextView (ApplicationView.getContext());
+        textView.setText(text);
+        textView.setAllCaps(true);
+        textView.setTextSize(10.0f);
+        textView.setPadding(0, 5, 0, 5);
+        linearLayout.addView(textView);
+
+        return actionView;
+    }
+
+    /**
+     * Message action view.
+     * @param eventHolder View holder with the Message event.
+     * @return View for the Message event.
+     */
+    private View getHighlightView (EventHolder eventHolder, String tag, String text) {
+
+        RelativeLayout eventView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout.LayoutParams params = null;
+
+        // Tag
+//        final TextView actionLabel = getEventTagView (tag);
+//        actionView.addView(actionLabel);
+
+        eventView.setBackgroundColor(ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+
+        // Timeline
+        final ImageView imageView = getEventTimelineView (15, 3.0f, false);
+        eventView.addView(imageView);
+
+        // Linear layout (to the right side of timeline)
+        LinearLayout linearLayout = getDataLayout();
+        eventView.addView(linearLayout);
 
 //        // Action: Text content
 //        final TextView textView = new TextView (ApplicationView.getContext());
@@ -665,7 +701,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //        textView.setPadding(0, 5, 0, 5);
 //        linearLayout.addView(textView);
 
-        return actionView;
+        return eventView;
     }
 
     private TextView getEventTagView(String tag) {
@@ -732,7 +768,8 @@ public class EventHolderAdapter extends BaseAdapter {
         Canvas canvas = new Canvas(bmp);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.rgb(255, 255, 255));
+        // paint.setColor(Color.rgb(255, 255, 255));
+        paint.setColor (ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
         paint.setStyle(Paint.Style.STROKE);
 
         paint.setStrokeWidth(strokeWidth);

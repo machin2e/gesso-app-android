@@ -296,8 +296,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         getClay().addContentManager(sqliteContentManager);
         // </HACK>
 
-//        getClay().getStore().resetDatabase();
-//        getClay().generateStore();
+        getClay().getStore().resetDatabase();
+        getClay().populateCache();
+        getClay().generateStore();
         getClay().populateCache();
 //        getClay().simulateSession(true, 10, false);
 
@@ -434,11 +435,11 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         final int amountToMoveRight = xDest - originalPos[0];
         final int amountToMoveDown = yDest - originalPos[1];
-        TranslateAnimation anim = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
-        anim.setDuration(translateDuration);
-//        anim.setFillAfter(true);
+        TranslateAnimation animation = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
+        animation.setDuration(translateDuration);
+        // animation.setFillAfter(true);
 
-        anim.setAnimationListener(new Animation.AnimationListener() {
+        animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
 
@@ -459,33 +460,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         });
 
 
-        view.startAnimation(anim);
-
-
-
-//        TranslateAnimation anim = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
-//        anim.setDuration(1000);
-//
-//        anim.setAnimationListener(new TranslateAnimation.AnimationListener() {
-//
-//            @Override
-//            public void onAnimationStart(Animation animation) {
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animation animation) {
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animation animation) {
-//                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-//                params.topMargin += amountToMoveDown;
-//                params.leftMargin += amountToMoveRight;
-//                view.setLayoutParams(params);
-//            }
-//        });
-//
-//        view.startAnimation(anim);
+        view.startAnimation (animation);
     }
 
     public static ApplicationView getApplicationView () { return ApplicationView.applicationView; }

@@ -43,21 +43,21 @@ public class CacheManager {
     /**
      * Search the cache for the behavior with the specified UUID and return whether or not it was
      * found.
-     * @param behaviorUuid The UUID of the behavior to search for in the cache.
+     * @param uuid The UUID of the behavior to search for in the cache.
      * @return True if a behavior with the specified UUID was found. Otherwise, false.
      */
-    public boolean hasAction(UUID behaviorUuid) {
+    public boolean hasAction(UUID uuid) {
         for (Action cachedAction : this.actions) {
-            if (cachedAction.getUuid().equals(behaviorUuid)) {
+            if (cachedAction.getUuid().equals(uuid)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Action getAction(UUID behaviorUuid) {
+    public Action getAction(UUID uuid) {
         for (Action cachedAction : this.actions) {
-            if (cachedAction.getUuid().equals(behaviorUuid)) {
+            if (cachedAction.getUuid().equals(uuid)) {
                 return cachedAction;
             }
         }
@@ -68,7 +68,7 @@ public class CacheManager {
         return this.actions;
     }
 
-    public boolean hasBehaviorScript (String tag) {
+    public boolean hasScript(String tag) {
         for (Script cachedScript : this.scripts) {
             if (cachedScript.getTag().equals(tag)) {
                 return true;
@@ -77,9 +77,18 @@ public class CacheManager {
         return false;
     }
 
-    public Script getScript(UUID behaviorScriptUuid) {
+    public boolean hasScript(UUID uuid) {
         for (Script cachedScript : this.scripts) {
-            if (cachedScript.getUuid().equals(behaviorScriptUuid)) {
+            if (cachedScript.getUuid().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Script getScript(UUID uuid) {
+        for (Script cachedScript : this.scripts) {
+            if (cachedScript.getUuid().equals(uuid)) {
                 return cachedScript;
             }
         }

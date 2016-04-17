@@ -2,17 +2,23 @@ package camp.computer.clay.sequencer;
 
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import camp.computer.clay.system.Action;
 import camp.computer.clay.system.Clay;
@@ -34,6 +40,33 @@ public class DeviceViewFragment extends Fragment {
     public static final String ARG_SECTION_NUMBER = "section_number";
 
     public DeviceViewFragment() {}
+
+    private FloatingActionButton generateFablet(int x, int y, boolean startHidden) {
+        FloatingActionButton newFab = new FloatingActionButton(getContext());
+
+        // Animations
+        newFab.setShowAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_scale_up));
+        newFab.setHideAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fab_scale_down));
+
+        // Style
+        newFab.setButtonSize(FloatingActionButton.SIZE_MINI);
+        newFab.setColorNormal(Color.parseColor("#1976D2"));
+
+        // Hide
+        if (startHidden) {
+            newFab.hide(false);
+        }
+
+        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+        root.addView(newFab);
+
+        // Position
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) newFab.getLayoutParams();
+        params.leftMargin = x - (int) (newFab.getWidth() / 2.0);
+        params.topMargin = y + (int) (newFab.getHeight() / 2.0);
+
+        return newFab;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +94,9 @@ public class DeviceViewFragment extends Fragment {
         if (DISABLE_SCROLLBARS) {
             timelineView.setVerticalScrollBarEnabled(false);
             timelineView.setHorizontalScrollBarEnabled(false);
+
+//            timelineView.setFastScrollAlwaysVisible(false);
+//            timelineView.
         }
 
         // Disable overscroll effect.
@@ -72,9 +108,7 @@ public class DeviceViewFragment extends Fragment {
         // Set up FAB
         final FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
 
-        /*
-        final FloatingActionButton[] fab2 = {null};
-        */
+        final ArrayList<FloatingActionButton> fablets = getUnit().getClay().fablets;
 
         fab.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -82,16 +116,22 @@ public class DeviceViewFragment extends Fragment {
                 boolean returnVal = false;
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
+                    // Reset selection
+                    getUnit().getClay().selectedEventHolderIndex = -1;
+                    getUnit().getClay().selectedEventHolder = null;
+
                     /*
                     // Remove generated action buttons
-                    if (fab2[0] != null) {
-                        if (!fab2[0].isHidden()) {
-                            fab2[0].hide(true);
-                        }
+                    if (fablets.size() > 0) {
+                        for (FloatingActionButton fablet : fablets) {
+                            if (!fablet.isHidden()) {
+                                fablet.hide(true);
+                            }
 
-                        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
-                        root.removeView(fab2[0]);
-                        fab2[0] = null;
+                            FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+                            root.removeView(fablet);
+                        }
+                        fablets.clear();
                     }
                     */
 
@@ -126,29 +166,24 @@ public class DeviceViewFragment extends Fragment {
 
                         /*
                         // Generate action path selectors
-                        if (fab2[0] == null) {
-                            FloatingActionButton newFab = new FloatingActionButton(getContext());
-                            fab2[0] = newFab;
+                        if (fablets.isEmpty()) {
 
-                            newFab.setButtonSize(FloatingActionButton.SIZE_MINI);
-                            newFab.setColorNormal(Color.parseColor("#1976D2"));
-                            newFab.setX(fab.getX() - 100);
-                            newFab.setY(fab.getY() - 200);
+                            FloatingActionButton newFab1 = generateFablet((int) fab.getX() - 100, (int) fab.getY() - 150, true);
+                            FloatingActionButton newFab2 = generateFablet((int) fab.getX() - 150, (int) fab.getY(), true);
+                            FloatingActionButton newFab3 = generateFablet((int) fab.getX() - 100, (int) fab.getY() + 150, true);
 
-                            FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
-                            root.addView(newFab);
-                        }
-                        */
+                            fablets.add(newFab1);
+                            fablets.add(newFab2);
+                            fablets.add(newFab3);
 
-                        /*
-                        // Remove generated action buttons
-                        if (fab2[0] != null) {
-                            FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
-                            root.removeView(fab2[0]);
-                            fab2[0] = null;
+                            // Show fablet
+                            newFab1.show(true);
+                            newFab2.show(true);
+                            newFab3.show(true);
                         }
                         */
                     }
+//                    Log.v ("Timeline_Point", "x: " + point.x + ", y: " + point.y);
 
                     // Reset action button's state
                     getUnit().getClay().fabStatus = Clay.FAB_STOP_DRAGGING;
@@ -159,6 +194,8 @@ public class DeviceViewFragment extends Fragment {
                     fab.invalidate();
 
                 } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+
+//                    Point point = TimelineListView.getTimelineListView().getPointUnderTimeline();
 
                     getUnit().getClay().fabCurrentPoint = new Point((int) event.getX(), (int) event.getY());
 
@@ -192,28 +229,66 @@ public class DeviceViewFragment extends Fragment {
 
 //                        if (getUnit().getClay().selectedEventHolder != null) {
 //                            timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
-////                            timelineView.refreshListViewFromData();
-//                            timelineView.refreshListViewFromData();
 //                        }
 
                         // TODO: Search for nearest/nearby events, actions, states, etc. (i.e., discovery context)
                         TimelineListView.getTimelineListView().resetViewBackgrounds();
-                        TimelineListView.getTimelineListView().findNearbyViews((int) event.getRawX(), (int) event.getRawY());
-                        getUnit().getClay().selectedEventHolderIndex = TimelineListView.getTimelineListView().findNearestTimelineIndex((int) event.getRawX(), (int) event.getRawY());
-                        // TODO: Highlight nearby elements
-                        // TODO: Generate contextual action palette and show semi-translucent (until release, then show opaque)
+//                        TimelineListView.getTimelineListView().findNearbyViews((int) event.getRawX(), (int) event.getRawY());
+                        int nearestViewIndex = TimelineListView.getTimelineListView().findNearestTimelineIndex((int) event.getRawX(), (int) event.getRawY());
 
-                        // Highlight the position where Clay will add the event on the timeline
-                        if (getUnit().getClay().selectedEventHolder == null) {
-                            getUnit().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
-                            timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
-//                            timelineView.refreshListViewFromData();
-                            timelineView.refreshListViewFromData();
-                        } else {
-                            timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
-                            timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
-//                            timelineView.refreshListViewFromData();
-                            timelineView.refreshListViewFromData();
+                        Log.v("Dist", "---");
+
+                        // Check if distance is within selection threshold
+                        Rect rect = new Rect();
+                        View nearestView = timelineView.getViewByPosition((int) event.getRawX(), (int) event.getRawY()); // ByIndex(nearestViewIndex);
+                        if (nearestViewIndex == -1) {
+                            nearestView = null;
+                        }
+
+                        Log.v ("Dist", "nearestViewIndex: " + nearestViewIndex);
+                        Log.v ("Dist", "nearestView: " + nearestView);
+                        if (nearestView != null) {
+                            Log.v("Dist", "rawY: " + (int) event.getRawY());
+
+                            // Get screen coordinates of the nearest view
+                            int[] listViewCoords = new int[2];
+                            nearestView.getLocationOnScreen(listViewCoords);
+                            // int x = (int) listViewCoords[0];
+                            int y = (int) listViewCoords[1] + (int) (nearestView.getHeight() / 2.0);
+
+                            // Compute distance to the top and bottom of the view
+                            int distanceToTop = Math.abs(y - (int) event.getRawY());
+                            int distanceToBottom = Math.abs((y + nearestView.getHeight()) - (int) event.getRawY());
+
+                            if (distanceToTop < 10) {
+
+                                getUnit().getClay().selectedEventHolderIndex = nearestViewIndex;
+
+                                // Highlight the position where Clay will add the event on the timeline
+                                if (getUnit().getClay().selectedEventHolder == null) {
+                                    // timelineView.resetHighlights();
+                                    getUnit().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
+                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+                                } else {
+                                    timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
+                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+                                }
+
+                            } else if (distanceToBottom < 10) {
+
+                                getUnit().getClay().selectedEventHolderIndex = nearestViewIndex;
+
+                                // Highlight the position where Clay will add the event on the timeline
+                                if (getUnit().getClay().selectedEventHolder == null) {
+                                    // timelineView.resetHighlights();
+                                    getUnit().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
+                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+                                } else {
+                                    timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
+                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+                                }
+
+                            }
                         }
 
 //                        fab.requestLayout();
@@ -233,17 +308,19 @@ public class DeviceViewFragment extends Fragment {
             public void onClick(View v) {
 
 //                if (getUnit().getClay().fabDisableClick == false) {
-                if (getUnit().getClay().selectedEventHolderIndex != -1) {
+//                if (getUnit().getClay().selectedEventHolderIndex != -1) {
                     timelineView.displayActionBrowser(new TimelineListView.ActionSelectionListener() {
                         @Override
                         public void onSelect(Action action) {
-//                            EventHolder eventHolder = new EventHolder("choose", "choose");
-                            //timelineView.addEventHolder(eventHolder);
-//                            timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
-                            timelineView.replaceEventHolder(getUnit().getClay().selectedEventHolder, action);
-                            timelineView.refreshListViewFromData();
-//                            timelineView.refreshListViewFromData(); // <HACK />
 
+                            if (getUnit().getClay().selectedEventHolderIndex != -1) {
+                                timelineView.replaceEventHolder(getUnit().getClay().selectedEventHolder, action);
+//                                timelineView.redrawListViewFromData();
+                            } else {
+                                EventHolder eventHolder = new EventHolder("choose", "choose");
+                                timelineView.addEventHolder(eventHolder);
+                                timelineView.replaceEventHolder(eventHolder, action);
+                            }
 
                             // <TEST>
                             // Move to original location
@@ -256,29 +333,30 @@ public class DeviceViewFragment extends Fragment {
                             screenHeight = metrics.heightPixels;
                             screenWidth = metrics.widthPixels;
 
-                            int width = fab.getWidth();
-                            int height = fab.getHeight();
-                            Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-                            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+                            // Get point under last event on timeline
+                            Point point = TimelineListView.getTimelineListView().getPointUnderTimeline();
+                            if (point != null) {
+                                point.x = 135;
+                                point.y = point.y + (int) (0.6 * fab.getHeight());
+                            }
+
+                            if (point != null && point.y < (screenHeight - fab.getHeight())) {
+                                ApplicationView.getApplicationView().moveViewToScreenCenter(fab, point, 400);
+                            } else {
+                                int width = fab.getWidth();
+                                int height = fab.getHeight();
+                                Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
+
+                                ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+
+                            }
                             // </TEST>
                         }
                     });
-                }
+
+//                }
 
                 getUnit().getClay().fabDisableClick = false;
-
-//                EventHolder eventHolder = new EventHolder(event);
-//                eventHolders.add(eventHolder);
-//
-//                EventHolder eventHolder = new EventHolder("choose", "choose");
-//                timelineView.addEventHolder(eventHolder);
-//                timelineView.displayActionBrowser(eventHolder);
-//
-//
-//
-//                Timeline timeline = this.getUnit().getTimeline();
-//                event = new Event(timeline, action);
-//                EventHolder replacementEventHolder = new EventHolder(event);
             }
         });
         // </HACK>

@@ -273,7 +273,7 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -762,12 +762,13 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+                Log.v ("Signal", content);
 //                getUnit().sendMessage(content);
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -852,7 +853,7 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1072,7 +1073,7 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1235,7 +1236,7 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1320,7 +1321,7 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
@@ -1428,7 +1429,7 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().sendMessageTcp(content);
+                getUnit().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view

@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import camp.computer.clay.sequencer.ApplicationView;
 import camp.computer.clay.sequencer.EventHolder;
+import camp.computer.clay.sequencer.TimelineListView;
 
 public class Clay {
 
@@ -29,6 +30,7 @@ public class Clay {
     private NetworkManager networkManager = null;
 
     // <FAB>
+    public ArrayList<FloatingActionButton> fablets = new ArrayList<FloatingActionButton>();
     public Point fabDownPoint;
     public Point fabCurrentPoint;
     public static int FAB_STOP_DRAGGING = 0;
@@ -58,6 +60,28 @@ public class Clay {
         params.leftMargin = (int) screenWidth - (int) (width * 1.1);
         params.topMargin = (int) (screenHeight / 2.0) - (int) (height / 2.0);
     }
+
+//    private void moveUnderTimeline(FloatingActionButton fab) {
+//        // Get screen width and height of the device
+//        DisplayMetrics metrics;
+//        int screenWidth = 0, screenHeight = 0;
+//        metrics = new DisplayMetrics();
+//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        screenHeight = metrics.heightPixels;
+//        screenWidth = metrics.widthPixels;
+//
+//        Log.v ("Metrics", "width: " + screenWidth);
+//        Log.v ("Metrics", "height: " + screenHeight);
+//
+//        // Update placement of action button (default)
+//        int width = fab.getWidth();
+//        int height = fab.getHeight();
+//        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
+//        params.leftMargin = (int) 200; // i.e., width of event label
+//
+//        int eventCount = (int) TimelineListView.getTimelineListView().getChildCount();
+//        params.topMargin = (int) TimelineListView.getTimelineListView().getChildAt(eventCount).getScrollY();
+//    }
     // </FAB>
 
     // List of discovered touchscreen devices
@@ -260,10 +284,10 @@ public class Clay {
             // TODO: Populate from scratch only if no timeline has been programmed for the device
             for (Event event : unit.getTimeline().getEvents()) {
                 // <HACK>
-                unit.sendMessageTcp("start event " + event.getUuid());
-                unit.sendMessageTcp("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                unit.enqueueMessage("start event " + event.getUuid());
+                unit.enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
                 String content = "set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"";
-                unit.sendMessageTcp(content);
+                unit.enqueueMessage(content);
                 // </HACK>
             }
         } else {
@@ -282,6 +306,11 @@ public class Clay {
 
             // TCP connection
             newUnit.connectTcp();
+
+            // Show the action palette
+            FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+            setUpActionButton(fab);
+            fab.show(true);
 
             Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
@@ -426,39 +455,48 @@ public class Clay {
     public void generateStore () {
 
         if (hasStore()) {
-            if (!getCache().hasBehaviorScript ("light")) {
+
+            UUID uuid;
+
+            // light
+            uuid = UUID.fromString("1470f5c4-eaf1-43fb-8fb3-d96dc4e2bee4");
+            if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"light\" behavior not found in the repository. Adding it.");
-                UUID uuid = UUID.fromString("1470f5c4-eaf1-43fb-8fb3-d96dc4e2bee4");
                 getClay().generateBehaviorScript(uuid, "light", "((T|F) ){11}(T|F)", "000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000");
             }
 
-            if (!getCache().hasBehaviorScript ("signal")) {
+            // signal
+            uuid = UUID.fromString("bdb49750-9ead-466e-96a0-3aa88e7d246c");
+            if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"signal\" behavior not found in the repository. Adding it.");
-                UUID uuid = UUID.fromString("bdb49750-9ead-466e-96a0-3aa88e7d246c");
                 getClay().generateBehaviorScript(uuid, "signal", "regex", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
             }
 
-            if (!getCache().hasBehaviorScript ("message")) {
+            // message
+            uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
+            if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-                UUID uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
                 getClay().generateBehaviorScript(uuid, "message", "regex", "UDP Other \"hello\"");
             }
 
-            if (!getCache().hasBehaviorScript ("tone")) {
+            // tone
+            uuid = UUID.fromString("16626b1e-cf41-413f-bdb4-0188e82803e2");
+            if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"tone\" behavior not found in the repository. Adding it.");
-                UUID uuid = UUID.fromString("16626b1e-cf41-413f-bdb4-0188e82803e2");
                 getClay().generateBehaviorScript(uuid, "tone", "regex", "frequency 0 hz 0 ms");
             }
 
-            if (!getCache().hasBehaviorScript ("pause")) {
+            // pause
+            uuid = UUID.fromString("56d0cf7d-ede6-4529-921c-ae9307d1afbc");
+            if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"pause\" behavior not found in the repository. Adding it.");
-                UUID uuid = UUID.fromString("56d0cf7d-ede6-4529-921c-ae9307d1afbc");
                 getClay().generateBehaviorScript(uuid, "pause", "regex", "250");
             }
 
-            if (!getCache().hasBehaviorScript ("say")) {
+            // say
+            uuid = UUID.fromString("269f2e19-1fc8-40f5-99b2-6ca67e828e70");
+            if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
-                UUID uuid = UUID.fromString("269f2e19-1fc8-40f5-99b2-6ca67e828e70");
                 getClay().generateBehaviorScript(uuid, "say", "regex", "oh, that's great");
             }
         }
@@ -504,7 +542,7 @@ public class Clay {
         Log.v("Content_Manager", "populateCache");
 
         if (hasStore()) {
-            Log.v ("Content_Manager", "populateCache");
+            Log.v("Content_Manager", "populateCache");
 
             // Restore behavior scripts and addUnit them to the cache
             getStore().restoreScripts();

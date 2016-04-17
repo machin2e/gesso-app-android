@@ -18,9 +18,10 @@
         android:paddingTop="0dp"
         android:paddingBottom="0dp"
         android:paddingLeft="0dp"
-        android:layout_margin="1dp"
+        android:layout_margin="0dp"
         android:dividerHeight="0dp"
-        android:fastScrollEnabled="true"
+        android:fastScrollEnabled="false"
+        android:verticalScrollbarPosition="left"
         dslv:drag_enabled="true"
         dslv:collapsed_height="2dp"
         dslv:drag_scroll_start="0.33"
@@ -33,7 +34,7 @@
         dslv:sort_enabled="true"
         dslv:remove_enabled="true"
         dslv:drag_start_mode="onDown"
-        dslv:remove_mode="flingRemove"/>
+        dslv:remove_mode="flingRemove" />
 
 </RelativeLayout>
 <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/layout/fragment_listview.xml -->

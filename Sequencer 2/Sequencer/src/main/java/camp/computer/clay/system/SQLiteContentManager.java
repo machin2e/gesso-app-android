@@ -574,11 +574,15 @@ public class SQLiteContentManager {
                 String stateSpacePattern = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_STATE_PATTERN));
                 String defaultState = cursor.getString(cursor.getColumnIndexOrThrow(ScriptEntry.COLUMN_NAME_DEFAULT_STATE));
 
-                // Create the object
-                Script script = new Script(UUID.fromString(uuidString), tag, stateSpacePattern, defaultState);
-
                 // Cache the behavior script
-                getClay ().cacheScript(script);
+                if (!getClay().getCache().hasScript(UUID.fromString(uuidString))) {
+
+                    // Create the object
+                    Script script = new Script(UUID.fromString(uuidString), tag, stateSpacePattern, defaultState);
+
+                    // Cache the script
+                    getClay().cacheScript(script);
+                }
 
                 // Continue to next behavior script
                 cursor.moveToNext();

@@ -1,9 +1,7 @@
 package camp.computer.clay.system;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -83,6 +81,8 @@ public class Unit {
 
     public void setInternetAddress (String address) {
         this.internetAddress = address;
+
+        tcpMessageClient.setInternetAddress(internetAddress);
     }
 
     public String getInternetAddress () {
@@ -134,8 +134,8 @@ public class Unit {
     }
 
     // TODO: public void queueMessageTcp (String content, callbackToCallWhenReceiveResponse) // Adding a callback indicates that the message should be acknowledged and bookkeeping should track when it is received and invoke this callback when response is received.
-    public void sendMessageTcp (String content) {
-        Log.v("TCP_Server", "sendMessageTcp");
+    public void enqueueMessage(String content) {
+        Log.v("TCP_Server", "enqueueMessage");
 
         // Get source and destination addresses
         String source = null; // TODO: getClay().getCurrentDevice().getInternetAddress()
@@ -145,7 +145,7 @@ public class Unit {
         Message message = new Message("tcp", source, destination, content);
         message.setDeliveryGuaranteed(true);
 
-        tcpMessageClient.queueMessage(message);
+        tcpMessageClient.enqueueMessage(message);
     }
 
 //    public void cacheAction(UUID behaviorUuid) {
