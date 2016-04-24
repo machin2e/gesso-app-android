@@ -27,4 +27,11 @@
     <item name="preview_10" type="id" />
     <item name="preview_11" type="id" />
     <item name="preview_12" type="id" />
+    <item name="event_top_layout" type="id" />
+    <item name="event_middle_layout" type="id" />
+    <item name="event_bottom_layout" type="id" />
+    <item name="event_label" type="id" />
+    <item name="timeline_segment" type="id" />
+    <item name="timeline_bottom_segment" type="id" />
+    <item name="timeline_top_segment" type="id" />
 </resources>

@@ -64,6 +64,9 @@ public class DeviceViewPager extends ViewPager {
                 // Select the page at the specified position
                 currentViewTag = position;
                 currentListView = (TimelineListView) findViewWithTag(currentViewTag);
+                // <HACK>
+                ApplicationView.getApplicationView().getActionButton().init();
+                // </HACK>
             }
 
             @Override
@@ -123,7 +126,12 @@ public class DeviceViewPager extends ViewPager {
 
         if (currentListView == null) {
             currentListView = (TimelineListView) findViewWithTag (currentViewTag);
+            // <HACK>
+            ApplicationView.getApplicationView().getActionButton().init();
+            // </HACK>
         }
+
+        Log.v ("Touch_Event", "onTouchEvent");
 
         final int action = event.getAction() & MotionEventCompat.ACTION_MASK;
         int counter = event.getPointerCount();
@@ -215,12 +223,17 @@ public class DeviceViewPager extends ViewPager {
     public boolean onInterceptTouchEvent (MotionEvent event) {
         String touchLocation = "" + event.getX () + ", " + event.getY ();
 
+        Log.v ("Touch_Event", "onInterceptTouchEvent");
+
         // Get the number of touch points
         int touchPointCount = event.getPointerCount();
 
         // Check if interacting with a list item
         if (currentListView == null) {
             currentListView = (TimelineListView) findViewWithTag (currentViewTag);
+            // <HACK>
+            ApplicationView.getApplicationView().getActionButton().init();
+            // </HACK>
         }
 
 
@@ -229,6 +242,8 @@ public class DeviceViewPager extends ViewPager {
         if (touchPointCount == 1) {
 
             if (event.getAction () == MotionEvent.ACTION_DOWN) {
+
+                Log.v ("Touch_Event", "Touched event tag");
 
                 // Save the start point and time of the gesture...
                 startTouch.set((int) event.getX(), (int) event.getY());
@@ -251,6 +266,31 @@ public class DeviceViewPager extends ViewPager {
                         interceptTouches = true;
                     } else {
                         interceptTouches = false;
+                    }
+                }
+
+            } else if (event.getAction () == MotionEvent.ACTION_UP) {
+
+                Log.v ("Touch_Event", "Released event tag");
+
+                // Save the current touch point...
+                currentTouch.set((int) event.getX(), (int) event.getY());
+                currentTime = startTime;
+
+                // ...and compute the distance between the touch down and up actions...
+                int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow (currentTouch.y - previousTouch.y, 2));
+
+                if (distance < 50) {
+                    Log.v ("Touch_Event", "distance: " + distance);
+                    if (startTouch.x < 200) {
+                        Log.v ("Touch_Event", "startTouch.x < 200");
+                        EventHolder eventHolder = TimelineListView.getTimelineListView().getEventHolderByPosition(currentTouch.x, currentTouch.y);
+                        if (eventHolder != null) {
+                            TimelineListView.getTimelineListView().expandEventView(eventHolder);
+                        }
+//                        interceptTouches = true;
+                    } else {
+//                        interceptTouches = false;
                     }
                 }
 
@@ -286,5 +326,13 @@ public class DeviceViewPager extends ViewPager {
         super.onPageScrolled(position, offset, offsetPixels);
 
         Log.v("Scroller", "onPageScrolled");
+    }
+
+    /**
+     * Returns the currently-selected timeline view.
+     * @return
+     */
+    public TimelineListView getTimelineView () {
+        return currentListView;
     }
 }

@@ -3,9 +3,11 @@ package camp.computer.clay.sequencer;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -58,14 +60,14 @@ public class EventDesignerView {
         builder.setTitle ("light");
 
         // Layout
-        LinearLayout transformLayout = new LinearLayout (getContext());
-        transformLayout.setOrientation (LinearLayout.VERTICAL);
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation (LinearLayout.VERTICAL);
 
         // Enable or disable lights
         // final TextView lightLabel = new TextView (getContext());
         // lightLabel.setText("Choose some lights");
         // lightLabel.setPadding(70, 20, 70, 20);
-        // transformLayout.addView(lightLabel);
+        // designerViewLayout.addView(lightLabel);
 
         final ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog (getContext(), ColorPickerDialog.DARK_THEME);
 
@@ -100,28 +102,28 @@ public class EventDesignerView {
             lightToggleButtons.add(toggleButton); // Add the button to the list.
             lightLayout.addView(toggleButton);
         }
-        transformLayout.addView(lightLayout);
+        designerViewLayout.addView(lightLayout);
         */
 
         // Select light color
         final TextView lightColorLabel = new TextView (getContext());
         lightColorLabel.setText("Choose colors");
         lightColorLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(lightColorLabel);
+        designerViewLayout.addView(lightColorLabel);
 
         LinearLayout lightColorLayout = new LinearLayout (getContext());
         lightColorLayout.setOrientation(LinearLayout.HORIZONTAL);
         final ArrayList<Button> lightColorButtons = new ArrayList<Button> ();
-        final ArrayList<Integer> lightColor = new ArrayList<Integer> ();
-        final ArrayList<String> lightHexColor = new ArrayList<String> ();
+        final ArrayList<Integer> lightColors = new ArrayList<Integer> ();
+        final ArrayList<String> lightColorHexStrings = new ArrayList<String> ();
         for (int i = 0; i < 12; i++) {
             final String channelLabel = Integer.toString(i + 1);
             final Button colorButton = new Button (getContext());
             colorButton.setPadding(0, 0, 0, 0);
             colorButton.setText(Integer.toString(i + 1));
 
-            lightColor.add(0);
-            lightHexColor.add ("#ff000000");
+            lightColors.add(0);
+            lightColorHexStrings.add("#ff000000");
 
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -131,8 +133,9 @@ public class EventDesignerView {
                     @Override
                     public void onColorPicked(int color, String hexVal) {
                         colorButton.setBackgroundColor(color);
-                        lightColor.set(Integer.valueOf(String.valueOf(colorButton.getText())), color);
-                        lightHexColor.set (Integer.valueOf(String.valueOf(colorButton.getText())), hexVal);
+                        int lightColorIndex = Integer.valueOf(String.valueOf(colorButton.getText())) - 1;
+                        lightColors.set(lightColorIndex, color);
+                        lightColorHexStrings.set(lightColorIndex, hexVal);
                     }
                 });
                 colorPickerDialog.show();
@@ -160,10 +163,32 @@ public class EventDesignerView {
             lightColorButtons.add(colorButton); // Add the button to the list.
             lightColorLayout.addView(colorButton);
         }
-        transformLayout.addView (lightColorLayout);
+        designerViewLayout.addView(lightColorLayout);
+
+        // Initialize state
+        String stateString = eventHolder.getEvent().getState().get(0).getState();
+        Log.v ("Light_State", stateString);
+        final String[] splitStateString = stateString.split(" ");
+
+        // Set button background to current color state
+        lightColors.clear();
+        lightColorHexStrings.clear();
+        for (int i = 0; i < lightColorButtons.size(); i++) {
+            Button lightColorButton = lightColorButtons.get (i);
+
+            // Format the event's colors in "#FFRRGGBB" format.
+            String lightColorHexString = "#FF" + splitStateString[i];
+            int color = Color.parseColor(lightColorHexString);
+
+            // Save color string and integer value
+            lightColorHexStrings.add(lightColorHexString);
+            lightColors.add(color);
+
+            lightColorButton.setBackgroundColor(color);
+        }
 
         // Assign the layout to the alert dialog.
-        builder.setView (transformLayout);
+        builder.setView(designerViewLayout);
 
         // Set up the buttons
         builder.setPositiveButton ("DONE", new DialogInterface.OnClickListener () {
@@ -195,14 +220,11 @@ public class EventDesignerView {
                     */
 
                     // Get LED color
-                    int color = lightColor.get(i);
-                    int r = (color & 0x00FF0000) >> 16; // ((color >> 16) & 0xFF);
+                    int color = lightColors.get(i);
+                    int r = (color & 0x00FF0000) >> 16;
                     int g = (color & 0x0000FF00) >> 8;
                     int b = (color & 0x000000FF) >> 0;
-//                    Log.v ("Color", Integer.toBinaryString(color));
-//                    Log.v ("Color", Integer.toBinaryString((color & 0x00FF0000) >> 16));
-//                    Log.v ("Color", Integer.toBinaryString((color & 0x0000FF00) >> 8));
-//                    Log.v ("Color", Integer.toBinaryString((color & 0x000000FF) >> 0));
+
                     colorBytesString[3 * i + 0] = (byte) r;
                     colorBytesString[3 * i + 1] = (byte) g;
                     colorBytesString[3 * i + 2] = (byte) b;
@@ -213,21 +235,27 @@ public class EventDesignerView {
                     }
                 }
 
-                String colorHexString = "";
-                byte[] colorBytes = new byte[12 * 3];
-                for (int i = 0; i < 12 * 3; i++) {
-                    colorBytes[i] = colorBytesString[i];
-                    String s1 = String.format("%8s", Integer.toBinaryString(colorBytesString[i] & 0xFF)).replace(' ', '0');
-                    colorHexString += s1 + " "; // Integer.toString((int) colorHexBytes[i]) + " ";
-                }
-                Log.v("Color", "color hex: " + colorHexString);
+//                Log.v ("Light_State", "updated: " + updatedStateString);
+//
+//                // Compute strings corresponding to bytes that represent color channels for each
+//                // of Clay's LEDs. Note this is not encoded as binary data, but as an ASCII string.
+//                String colorBitString = "";
+//                byte[] colorBytes = new byte[12 * 3];
+//                for (int i = 0; i < 12 * 3; i++) {
+//                    colorBytes[i] = colorBytesString[i];
+//                    String s1 = String.format("%8s", Integer.toBinaryString(colorBytesString[i] & 0xFF)).replace(' ', '0');
+//                    colorBitString += s1 + " "; // Integer.toString((int) colorHexBytes[i]) + " ";
+//                }
+//                Log.v("Light_State", "color hex: " + colorBitString);
 
 
                 String lightHexColorString = "";
-                for (int i = 0; i < lightHexColor.size(); i++) {
-                    lightHexColorString += " " + lightHexColor.get(i).substring(3).toUpperCase();
+                for (int i = 0; i < lightColorHexStrings.size(); i++) {
+                    lightHexColorString += " " + lightColorHexStrings.get(i).substring(3).toUpperCase();
                 }
                 updatedStateString = lightHexColorString.trim();
+
+                Log.v("Light_State", "updated state: " + updatedStateString);
 
                 // Update the behavior state
                 // <HACK>
@@ -259,7 +287,7 @@ public class EventDesignerView {
 //                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
                 Log.v ("Color", content);
-                getUnit().sendMessage (content); // <HACK />
+                //getUnit().sendMessage (content); // <HACK />
                 /*
                 String packedBytes = new String(colorBytes, Charset.forName("UTF-8")); // "US-ASCII"
                 String msg2 = "set event " + eventHolder.getEvent().getUuid() + " state \"color " + packedBytes + "\"";
@@ -278,7 +306,7 @@ public class EventDesignerView {
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {
@@ -291,7 +319,738 @@ public class EventDesignerView {
         builder.show ();
     }
 
-    public void displayUpdateIOOptions (final EventHolder eventHolder) {
+    public void displayEventTriggerOptions(final EventHolder eventHolder) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("trigger (message)");
+
+        // Declare transformation layout
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
+
+        // Trigger
+        final EditText triggerMessageText = new EditText(getContext());
+        triggerMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
+        triggerMessageText.setVisibility(View.VISIBLE);
+        designerViewLayout.addView(triggerMessageText);
+
+        builder.setView(designerViewLayout);
+
+        // Get behavior state
+        //String triggerMessageContent = eventHolder.getEvent().getState().get(0).getState();
+        String triggerMessageContent = "";
+
+        // Update the view
+        triggerMessageText.setText(triggerMessageContent);
+        triggerMessageText.setSelection(triggerMessageText.getText().length());
+
+        ApplicationView.getApplicationView().speakPhrase(triggerMessageContent);
+
+        // Set up the buttons
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Save configuration options to object
+////                item.phrase = input.getText().toString();
+//
+//                String updatedStateString = triggerMessageText.getText().toString();
+//
+//                // Update the behavior state
+//                // <HACK>
+//                eventHolder.getEvent().setTimeline(unit.getTimeline());
+//                // </HACK>
+//                eventHolder.updateState (updatedStateString);
+
+                // Store: Store the new behavior state and update the event.
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+//                getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                String triggerText = triggerMessageText.getText().toString();
+                if (triggerText.length() > 0) {
+                    getUnit().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " trigger \"" + triggerText + "\"");
+                }
+                // </HACK>
+
+                // Refresh the timeline view
+                timelineListView.refreshTimelineView();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show ();
+    }
+
+    public void displayUpdateSignalOptions(final EventHolder eventHolder) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        final ArrayList<String> channelStateStrings = new ArrayList<String>();
+
+        /* Pop-up tag */
+
+        // builder.setTitle("Signal");
+
+        // Declare transformation layout
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout channelConfigurationLayout = new LinearLayout (getContext());
+        channelConfigurationLayout.setOrientation(LinearLayout.HORIZONTAL);
+        designerViewLayout.addView(channelConfigurationLayout);
+
+        channelConfigurationLayout.setPadding(10, 10, 10, 10);
+
+        /* Message content */
+
+//        // Title
+//        final TextView messageContentTitle = new TextView (getContext());
+//        messageContentTitle.setText("Channel");
+//        messageContentTitle.setPadding(70, 20, 70, 20);
+//        designerViewLayout.addView(messageContentTitle);
+
+        // Content input field
+        final ArrayList<String> channelNumberData = new ArrayList<String>();
+        for (int i = 1; i <= 12; i++) {
+            channelNumberData.add(Integer.toString(i));
+        }
+        final Spinner channelNumberSelector = new Spinner (getContext());
+        final ArrayAdapter<String> channelNumberDataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, channelNumberData); //selected item will look like a spinner set from XML
+        channelNumberDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        channelNumberSelector.setAdapter(channelNumberDataAdapter);
+        //designerViewLayout.addView(channelNumberSelector);
+        channelConfigurationLayout.addView(channelNumberSelector);
+
+        /* Direction */
+
+//        // Title
+//        final TextView messageTypeTitle = new TextView (getContext());
+//        messageTypeTitle.setText("Direction");
+//        messageTypeTitle.setPadding(70, 20, 70, 20);
+//        designerViewLayout.addView(messageTypeTitle);
+
+        // List of types (i.e., TCP, UDP, Mesh, etc.)
+        final Spinner signalDirectionSelector = new Spinner (getContext());
+        final ArrayList<String> signalDirectionData = new ArrayList<String>();
+        signalDirectionData.add("input");
+        signalDirectionData.add("output");
+        ArrayAdapter<String> signalDirectionDataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, signalDirectionData); //selected item will look like a spinner set from XML
+        signalDirectionDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        signalDirectionSelector.setAdapter(signalDirectionDataAdapter);
+        //designerViewLayout.addView(messageTypeSelector);
+        channelConfigurationLayout.addView(signalDirectionSelector);
+
+        /* Type */
+
+        // Get list of devices that have been discovered
+        final ArrayList<String> signalTypeData = new ArrayList<String>();
+        signalTypeData.add("toggle");
+        signalTypeData.add("pulse");
+        signalTypeData.add("waveform");
+
+//        // Destination label
+//        final TextView signalTypeTitle = new TextView (getContext());
+//        signalTypeTitle.setText("Type");
+//        signalTypeTitle.setPadding(70, 20, 70, 20);
+//        designerViewLayout.addView(signalTypeTitle);
+
+        // Set destination of message
+        final Spinner signalTypeSelector = new Spinner (getContext());
+        final ArrayAdapter<String> signalTypeDataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, signalTypeData); //selected item will look like a spinner set from XML
+        signalTypeDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        signalTypeSelector.setAdapter(signalTypeDataAdapter);
+        //designerViewLayout.addView(signalTypeSelector);
+        channelConfigurationLayout.addView(signalTypeSelector);
+
+
+
+
+
+
+
+
+        // "Toggle" data editor
+        final LinearLayout toggleDataLayout = new LinearLayout (getContext());
+        toggleDataLayout.setOrientation(LinearLayout.HORIZONTAL);
+        toggleDataLayout.setVisibility(View.GONE);
+        designerViewLayout.addView(toggleDataLayout);
+
+        final TextView toggleDataTitle = new TextView (getContext());
+        toggleDataTitle.setText("State");
+        toggleDataTitle.setPadding(70, 20, 70, 20);
+        toggleDataLayout.addView(toggleDataTitle);
+
+        final EditText toggleSignalDataEditor = new EditText(getContext());
+        toggleSignalDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
+        toggleDataLayout.addView(toggleSignalDataEditor);
+
+        // "Pulse" data editor: Frequency
+        final LinearLayout pulseDataLayout = new LinearLayout (getContext());
+        pulseDataLayout.setOrientation(LinearLayout.HORIZONTAL);
+        pulseDataLayout.setVisibility(View.GONE);
+        designerViewLayout.addView(pulseDataLayout);
+
+        final TextView pulseFrequencyTitle = new TextView (getContext());
+        pulseFrequencyTitle.setText("Period");
+        pulseFrequencyTitle.setPadding(70, 20, 70, 20);
+        pulseDataLayout.addView(pulseFrequencyTitle);
+
+        final EditText pulseSignalFrequencyDataEditor = new EditText(getContext());
+        pulseSignalFrequencyDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
+        pulseDataLayout.addView(pulseSignalFrequencyDataEditor);
+
+        // "Pulse" data editor: Duty Cycle
+        final TextView pulseDutyCycleTitle = new TextView (getContext());
+        pulseDutyCycleTitle.setText("Duty Cycle");
+        pulseDutyCycleTitle.setPadding(70, 20, 70, 20);
+        pulseDataLayout.addView(pulseDutyCycleTitle);
+
+        final EditText pulseSignalDutyCycleDataEditor = new EditText(getContext());
+        pulseSignalDutyCycleDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
+        pulseDataLayout.addView(pulseSignalDutyCycleDataEditor);
+
+        // Set up key listeners
+
+        toggleSignalDataEditor.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // <HACK>
+                String channelNumberString = channelNumberSelector.getSelectedItem().toString();
+                String signalDirectionString = signalDirectionSelector.getSelectedItem().toString();
+                String signalTypeString = signalTypeSelector.getSelectedItem().toString();
+
+                String stateString = "";
+                if (signalDirectionString.equals("input")) {
+                    // TODO: Display the values received from the device
+                    stateString += "none";
+                } else if (signalDirectionString.equals("output")) {
+                    if (signalTypeString.equals("toggle")) {
+                        stateString += toggleSignalDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("pulse")) {
+                        stateString += pulseSignalFrequencyDataEditor.getText().toString() + ",";
+                        stateString += pulseSignalDutyCycleDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("waveform")) {
+                        stateString += "none";
+                    }
+                }
+
+                String currentState = channelNumberString + " " + signalDirectionString + " " + signalTypeString + ": " + stateString;
+
+                currentState = "T";
+                if (signalDirectionString.equals("input")) {
+                    currentState += "I";
+                } else if (signalDirectionString.equals("output")) {
+                    currentState += "O";
+                }
+                if (signalTypeString.equals("toggle")) {
+                    currentState += "T";
+                } else if (signalTypeString.equals("pulse")) {
+                    currentState += "P";
+                } else if (signalTypeString.equals("waveform")) {
+                    currentState += "W";
+                }
+                currentState += ":";
+                currentState += stateString;
+
+                int channelIndex = Integer.parseInt(channelNumberSelector.getSelectedItem().toString()) - 1;
+                channelStateStrings.set(channelIndex, currentState);
+
+                Log.v("Signal", "" + currentState);
+                // </HACK>
+                return false;
+            }
+        });
+
+        pulseSignalFrequencyDataEditor.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // <HACK>
+                String channelNumberString = channelNumberSelector.getSelectedItem().toString();
+                String signalDirectionString = signalDirectionSelector.getSelectedItem().toString();
+                String signalTypeString = signalTypeSelector.getSelectedItem().toString();
+
+                String stateString = "";
+                if (signalDirectionString.equals("input")) {
+                    // TODO: Display the values received from the device
+                    stateString += "none";
+                } else if (signalDirectionString.equals("output")) {
+                    if (signalTypeString.equals("toggle")) {
+                        stateString += toggleSignalDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("pulse")) {
+                        stateString += pulseSignalFrequencyDataEditor.getText().toString() + ",";
+                        stateString += pulseSignalDutyCycleDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("waveform")) {
+                        stateString += "none";
+                    }
+                }
+
+                String currentState = channelNumberString + " " + signalDirectionString + " " + signalTypeString + ": " + stateString;
+
+                currentState = "T";
+                if (signalDirectionString.equals("input")) {
+                    currentState += "I";
+                } else if (signalDirectionString.equals("output")) {
+                    currentState += "O";
+                }
+                if (signalTypeString.equals("toggle")) {
+                    currentState += "T";
+                } else if (signalTypeString.equals("pulse")) {
+                    currentState += "P";
+                } else if (signalTypeString.equals("waveform")) {
+                    currentState += "W";
+                }
+                currentState += ":";
+                currentState += stateString;
+
+                int channelIndex = Integer.parseInt(channelNumberSelector.getSelectedItem().toString()) - 1;
+                channelStateStrings.set(channelIndex, currentState);
+
+                Log.v("Signal", "" + currentState);
+                // </HACK>
+                return false;
+            }
+        });
+
+        pulseSignalDutyCycleDataEditor.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // <HACK>
+                String channelNumberString = channelNumberSelector.getSelectedItem().toString();
+                String signalDirectionString = signalDirectionSelector.getSelectedItem().toString();
+                String signalTypeString = signalTypeSelector.getSelectedItem().toString();
+
+                String stateString = "";
+                if (signalDirectionString.equals("input")) {
+                    // TODO: Display the values received from the device
+                    stateString += "none";
+                } else if (signalDirectionString.equals("output")) {
+                    if (signalTypeString.equals("toggle")) {
+                        stateString += toggleSignalDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("pulse")) {
+                        stateString += pulseSignalFrequencyDataEditor.getText().toString() + ",";
+                        stateString += pulseSignalDutyCycleDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("waveform")) {
+                        stateString += "none";
+                    }
+                }
+
+                String currentState = channelNumberString + " " + signalDirectionString + " " + signalTypeString + ": " + stateString;
+
+                currentState = "T";
+                if (signalDirectionString.equals("input")) {
+                    currentState += "I";
+                } else if (signalDirectionString.equals("output")) {
+                    currentState += "O";
+                }
+                if (signalTypeString.equals("toggle")) {
+                    currentState += "T";
+                } else if (signalTypeString.equals("pulse")) {
+                    currentState += "P";
+                } else if (signalTypeString.equals("waveform")) {
+                    currentState += "W";
+                }
+                currentState += ":";
+                currentState += stateString;
+
+                int channelIndex = Integer.parseInt(channelNumberSelector.getSelectedItem().toString()) - 1;
+                channelStateStrings.set(channelIndex, currentState);
+
+                Log.v("Signal", "" + currentState);
+                // </HACK>
+                return false;
+            }
+        });
+
+        /* Set the view */
+
+        builder.setView(designerViewLayout);
+
+        /* Set up interactivity */
+
+        channelNumberSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.v ("Signal", "SELECTED CHANNEL");
+
+                // Get selected channel's state
+                String channelNumberString = channelNumberSelector.getItemAtPosition(position).toString();
+                int channelIndex = Integer.parseInt(channelNumberString) - 1;
+                String channelStateString = channelStateStrings.get(channelIndex);
+
+                // Get channel's direction
+                String channelDirectionString = "" + channelStateString.charAt(1);
+                if (channelDirectionString.equals("I")) {
+                    signalDirectionSelector.setSelection(0);
+                } else if (channelDirectionString.equals("O")) {
+                    signalDirectionSelector.setSelection(1);
+                }
+//                signalDirectionSelector.setVisibility(View.VISIBLE);
+
+                // Get channel's type
+                String channelTypeString = "" + channelStateString.charAt(2);
+                if (channelTypeString.equals("T")) {
+                    signalTypeSelector.setSelection(0);
+                } else {
+                    signalTypeSelector.setSelection(1);
+                }
+//                signalTypeSelector.setVisibility(View.GONE);
+
+                // Get channel's data
+                if (channelDirectionString.equals("O")) {
+                    String toggleSignalDataString = channelStateString.split(":")[1];
+                    if (channelTypeString.equals("T")) {
+                        toggleSignalDataEditor.setText(toggleSignalDataString);
+//                        toggleSignalDataEditor.setVisibility(View.GONE);
+                    } else if (channelTypeString.equals("P")) {
+                        String[] toggleSignalDataStrings = toggleSignalDataString.split(",");
+                        pulseSignalFrequencyDataEditor.setText(toggleSignalDataStrings[0]);
+//                        pulseSignalFrequencyDataEditor.setVisibility(View.GONE);
+                        pulseSignalDutyCycleDataEditor.setText(toggleSignalDataStrings[1]);
+//                        pulseSignalDutyCycleDataEditor.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        signalDirectionSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItemText = signalDirectionSelector.getItemAtPosition(position).toString();
+                if (selectedItemText.equals("input")) {
+//                    signalTypeTitle.setVisibility(View.VISIBLE);
+                    signalTypeSelector.setVisibility(View.VISIBLE);
+                    // Get list of all discovered devices on the mesh network
+                    signalTypeData.clear();
+                    signalTypeData.add("toggle");
+                    signalTypeData.add("waveform");
+                    signalTypeDataAdapter.notifyDataSetChanged();
+
+                    toggleDataLayout.setVisibility(View.GONE);
+                    pulseDataLayout.setVisibility(View.GONE);
+                } else if (selectedItemText.equals("output")) {
+//                    signalTypeTitle.setVisibility(View.VISIBLE);
+                    signalTypeSelector.setVisibility(View.VISIBLE);
+                    signalTypeData.clear();
+                    signalTypeData.add("toggle");
+                    signalTypeData.add("pulse");
+                    signalTypeDataAdapter.notifyDataSetChanged();
+
+                    toggleDataLayout.setVisibility(View.GONE);
+                    pulseDataLayout.setVisibility(View.GONE);
+                }
+
+                // <HACK>
+                String channelNumberString = channelNumberSelector.getSelectedItem().toString();
+                String signalDirectionString = signalDirectionSelector.getSelectedItem().toString();
+                String signalTypeString = signalTypeSelector.getSelectedItem().toString();
+
+                String stateString = "";
+                if (signalDirectionString.equals("input")) {
+                    // TODO: Display the values received from the device
+                    stateString += "none";
+                } else if (signalDirectionString.equals("output")) {
+                    if (signalTypeString.equals("toggle")) {
+                        stateString += toggleSignalDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("pulse")) {
+                        stateString += pulseSignalFrequencyDataEditor.getText().toString() + ",";
+                        stateString += pulseSignalDutyCycleDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("waveform")) {
+                        stateString += "none";
+                    }
+                }
+
+                String currentState = channelNumberString + " " + signalDirectionString + " " + signalTypeString + ": " + stateString;
+
+                currentState = "T";
+                if (signalDirectionString.equals("input")) {
+                    currentState += "I";
+                } else if (signalDirectionString.equals("output")) {
+                    currentState += "O";
+                }
+                if (signalTypeString.equals("toggle")) {
+                    currentState += "T";
+                } else if (signalTypeString.equals("pulse")) {
+                    currentState += "P";
+                } else if (signalTypeString.equals("waveform")) {
+                    currentState += "W";
+                }
+                currentState += ":";
+                currentState += stateString;
+
+                int channelIndex = Integer.parseInt(channelNumberSelector.getSelectedItem().toString()) - 1;
+                channelStateStrings.set(channelIndex, currentState);
+
+                Log.v("Signal", "" + currentState);
+                // </HACK>
+
+//                // Select the first item by default
+//                signalTypeSelector.setSelection(0, true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                signalTypeSelector.setSelection(0, true);
+            }
+        });
+
+        signalTypeSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedItemText = signalTypeSelector.getItemAtPosition(position).toString();
+                if (selectedItemText.equals("toggle")) {
+                    toggleSignalDataEditor.setText("0");
+                    toggleDataLayout.setVisibility(View.VISIBLE);
+                    pulseDataLayout.setVisibility(View.GONE);
+                } else if (selectedItemText.equals("pulse")) {
+                    pulseSignalFrequencyDataEditor.setText("0");
+                    pulseSignalDutyCycleDataEditor.setText("0");
+                    toggleDataLayout.setVisibility(View.GONE);
+                    pulseDataLayout.setVisibility(View.VISIBLE);
+                } else if (selectedItemText.equals("waveform")) {
+                    toggleDataLayout.setVisibility(View.GONE);
+                    pulseDataLayout.setVisibility(View.GONE);
+                }
+
+                // <HACK>
+                String channelNumberString = channelNumberSelector.getSelectedItem().toString();
+                String signalDirectionString = signalDirectionSelector.getSelectedItem().toString();
+                String signalTypeString = signalTypeSelector.getSelectedItem().toString();
+
+                String stateString = "";
+                if (signalDirectionString.equals("input")) {
+                    // TODO: Display the values received from the device
+                    stateString += "none";
+                } else if (signalDirectionString.equals("output")) {
+                    if (signalTypeString.equals("toggle")) {
+                        stateString += toggleSignalDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("pulse")) {
+                        stateString += pulseSignalFrequencyDataEditor.getText().toString() + ",";
+                        stateString += pulseSignalDutyCycleDataEditor.getText().toString();
+                    } else if (signalTypeString.equals("waveform")) {
+                        stateString += "none";
+                    }
+                }
+
+                String currentState = channelNumberString + " " + signalDirectionString + " " + signalTypeString + ": " + stateString;
+
+                currentState = "T";
+                if (signalDirectionString.equals("input")) {
+                    currentState += "I";
+                } else if (signalDirectionString.equals("output")) {
+                    currentState += "O";
+                }
+                if (signalTypeString.equals("toggle")) {
+                    currentState += "T";
+                } else if (signalTypeString.equals("pulse")) {
+                    currentState += "P";
+                } else if (signalTypeString.equals("waveform")) {
+                    currentState += "W";
+                }
+                currentState += ":";
+                currentState += stateString;
+
+                int channelIndex = Integer.parseInt(channelNumberSelector.getSelectedItem().toString()) - 1;
+                channelStateStrings.set(channelIndex, currentState);
+
+                Log.v("Signal", "" + currentState);
+                // </HACK>
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                toggleDataLayout.setVisibility(View.GONE);
+                pulseDataLayout.setVisibility(View.GONE);
+            }
+        });
+
+        /* Perform "automated" interactions to initialize pop-up */
+
+        // TODO:
+
+        /* Initialize the state */
+
+        // Extract state from string representation
+        // e.g., "TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none"
+        String currentStateString = eventHolder.getEvent().getState().get(0).getState();
+        final String[] currentStateStrings = currentStateString.split(" ");
+        channelStateStrings.clear();
+        for (int i = 0; i < currentStateStrings.length; i++) {
+            channelStateStrings.add(currentStateStrings[i]);
+            Log.v("Signal", "state " + i + ": " + channelStateStrings.get(i));
+        }
+
+        Log.v ("Signal", "current state: " + currentStateString);
+
+
+
+        int currentDestinationAddressStringIndex = currentStateString.indexOf(" ");
+        int currentContentStringIndex = currentStateString.indexOf(" ", currentDestinationAddressStringIndex + 1);
+
+        String currentTypeString = currentStateString.substring(0, currentDestinationAddressStringIndex);
+        String currentDestinationAddressString = currentStateString.substring(currentDestinationAddressStringIndex + 1, currentContentStringIndex);
+        String currentContentString = currentStateString.substring (currentContentStringIndex + 1);
+        currentContentString = currentContentString.substring(1, currentContentString.length() - 1);
+
+        /* Initialize the pop-up with the state */
+
+        // Message content
+//        messageContentEditor.setText(currentContentString);
+//        messageContentEditor.setSelection(messageContentEditor.getText().length());
+
+        // Message type
+        int messageTypeIndex = signalDirectionDataAdapter.getPosition(currentTypeString);
+        signalTypeSelector.setSelection(messageTypeIndex);
+
+        // Message destination
+        int messageDestinationIndex = signalTypeDataAdapter.getPosition(currentDestinationAddressString);
+        signalTypeSelector.setSelection(messageDestinationIndex);
+
+        toggleSignalDataEditor.setText(currentDestinationAddressString);
+
+        // Set up the buttons
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String stateString = "";
+                for (String state : channelStateStrings) {
+                    stateString += " " + state;
+                }
+                stateString = stateString.trim();
+                Log.v("Signal", "state: " + stateString);
+
+
+
+//                String channelNumberString = channelNumberSelector.getSelectedItem().toString();
+//                String signalDirectionString = signalDirectionSelector.getSelectedItem().toString();
+//                String signalTypeString = signalTypeSelector.getSelectedItem().toString();
+//
+//                String stateString = "";
+//                if (signalDirectionString.equals("input")) {
+//                    // TODO: Display the values received from the device
+//                    stateString += "none";
+//                } else if (signalDirectionString.equals("output")) {
+//                    if (signalTypeString.equals("toggle")) {
+//                        stateString += toggleSignalDataEditor.getText().toString();
+//                    } else if (signalTypeString.equals("pulse")) {
+//                        stateString += pulseSignalFrequencyDataEditor.getText().toString() + ",";
+//                        stateString += pulseSignalDutyCycleDataEditor.getText().toString();
+//                    } else if (signalTypeString.equals("waveform")) {
+//                        stateString += "none";
+//                    }
+//                }
+//
+//                String currentState = channelNumberString + " " + signalDirectionString + " " + signalTypeString + ": " + stateString;
+//
+//                // index by: (channelNumberString - 1)
+//                currentState = "T";
+//                if (signalDirectionString.equals("input")) {
+//                    currentState += "I";
+//                } else if (signalDirectionString.equals("output")) {
+//                    currentState += "O";
+//                }
+//                if (signalTypeString.equals("toggle")) {
+//                    currentState += "T";
+//                } else if (signalTypeString.equals("pulse")) {
+//                    currentState += "P";
+//                } else if (signalTypeString.equals("waveform")) {
+//                    currentState += "W";
+//                }
+//                currentState += ":";
+//                currentState += stateString;
+//
+//                Log.v("Signal", "" + currentState);
+
+//                // Update the behavior profile state
+//                // e.g., "udp 192.168.1.255:4445 \"hello world\""
+//                // TODO: "udp none 192.168.1.255:4445 \"hello world\""... make same message string format!
+//                String messageTypeString = messageTypeSelector.getSelectedItem().toString();
+//                String stateString = "";
+//                if (messageTypeString.equals("Device")) {
+//                    stateString = messageTypeString;
+//                    stateString += " " + "none";
+//                    stateString += " \'" + messageContentEditor.getText().toString() + "\'";
+//                } else {
+//                    stateString = messageTypeString;
+//                    if (!signalTypeSelector.getSelectedItem().toString().equals("Other")) {
+//                        stateString += " " + signalTypeSelector.getSelectedItem().toString();
+//                    } else {
+//                        stateString += " " + messageCustomDestinationEditor.getText().toString();
+//                    }
+//                    stateString += " \'" + messageContentEditor.getText().toString() + "\'";
+//                }
+//
+
+                // Update the behavior state
+                // <HACK>
+                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                // </HACK>
+                eventHolder.updateState(stateString);
+
+                // Store: Store the new behavior state and update the event.
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+                getClay().getStore().storeEvent (eventHolder.getEvent());
+
+                // Send updated state to device
+                // <HACK>
+                //String stateToSend = stateString.substring (0, stateString.indexOf(" ")).toLowerCase() + " " + stateString.substring(stateString.indexOf(" ") + 1);
+                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + stateString + "\"";
+//                getUnit().sendMessage(content);
+                // </HACK>
+
+                Log.v ("Event_Trigger", "state: " + stateString);
+                Log.v ("Event_Trigger", "update: " + content);
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getUnit().enqueueMessage(content);
+                // </HACK>
+
+                // Refresh the timeline view
+                // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
+                timelineListView.refreshTimelineView();
+
+//                // Update the behavior state
+//                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
+//
+//                // ...then addUnit it to the device...
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//
+//                // ...and finally update the repository.
+//                getClay().getStore().storeState(behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
+//                //getClay ().getStore().updateBehaviorState(behaviorState);
+//                getClay().getStore().updateTimeline(unit.getTimeline());
+//
+//                // Refresh the timeline view
+//                refreshTimelineView();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show ();
+    }
+
+    public void displayUpdateIOOptions2 (final EventHolder eventHolder) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle ("Change the channel.");
         builder.setMessage ("What do you want to do?");
@@ -300,8 +1059,8 @@ public class EventDesignerView {
         // TODO: Specify the units to receive the change.
 
         // Declare transformation layout
-        LinearLayout transformLayout = new LinearLayout (getContext());
-        transformLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
 
         // Channels
 
@@ -314,7 +1073,7 @@ public class EventDesignerView {
         final TextView channelEnabledLabel = new TextView (getContext());
         channelEnabledLabel.setText("Enable channels");
         channelEnabledLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(channelEnabledLabel);
+        designerViewLayout.addView(channelEnabledLabel);
 
         // Get behavior state
 //        String stateString = eventHolder.getEvent().getAction().getState().getState();
@@ -349,13 +1108,13 @@ public class EventDesignerView {
             channelEnableToggleButtons.add(toggleButton); // Add the button to the list.
             channelEnabledLayout.addView (toggleButton);
         }
-        transformLayout.addView (channelEnabledLayout);
+        designerViewLayout.addView (channelEnabledLayout);
 
         // Set up the label
         final TextView signalLabel = new TextView (getContext());
         signalLabel.setText("Set channel direction, mode, and value"); // INPUT: Discrete/Digital, Continuous/Analog; OUTPUT: Discrete, Continuous/PWM
         signalLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(signalLabel);
+        designerViewLayout.addView(signalLabel);
 
         // Show I/O options
         final LinearLayout ioLayout = new LinearLayout (getContext());
@@ -387,14 +1146,14 @@ public class EventDesignerView {
             ioLayout.addView(toggleButton);
 
         }
-        transformLayout.addView (ioLayout);
+        designerViewLayout.addView (ioLayout);
 
         /*
         // Set up the I/O mode label
         final TextView ioModeLabel = new TextView (this);
         ioModeLabel.setText ("I/O Mode"); // INPUT: Discrete/Digital, Continuous/Analog; OUTPUT: Discrete, Continuous/PWM
         ioModeLabel.setPadding (70, 20, 70, 20);
-        transformLayout.addView (ioModeLabel);
+        designerViewLayout.addView (ioModeLabel);
         */
 
         // Show I/O selection mode (Discrete or Continuous)
@@ -426,7 +1185,7 @@ public class EventDesignerView {
             channelModeButtons.add(toggleButton); // Add the button to the list.
             channelModeLayout.addView(toggleButton);
         }
-        transformLayout.addView(channelModeLayout);
+        designerViewLayout.addView(channelModeLayout);
 
         // Value. Show channel value.
         LinearLayout channelValueLayout = new LinearLayout (getContext());
@@ -469,7 +1228,7 @@ public class EventDesignerView {
                 toggleButton.setChecked(false);
             }
         }
-        transformLayout.addView(channelValueLayout);
+        designerViewLayout.addView(channelValueLayout);
 
         // Set up interactivity for channel enable buttons.
         for (int i = 0; i < 12; i++) {
@@ -669,7 +1428,7 @@ public class EventDesignerView {
         }
 
         // Assign the layout to the alert dialog.
-        builder.setView (transformLayout);
+        builder.setView (designerViewLayout);
 
         // Set up the buttons
         builder.setPositiveButton ("DONE", new DialogInterface.OnClickListener () {
@@ -773,7 +1532,7 @@ public class EventDesignerView {
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), updatedStateString);
@@ -790,7 +1549,7 @@ public class EventDesignerView {
 //                getClay ().getStore().updateTimeline(unit.getTimeline());
 //
 //                // Refresh the timeline view
-//                refreshListViewFromData();
+//                refreshTimelineView();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {
@@ -857,7 +1616,7 @@ public class EventDesignerView {
                 // </HACK>
 
                 // Refresh the timeline view
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -878,129 +1637,141 @@ public class EventDesignerView {
         // builder.setTitle ("Message");
 
         // Declare transformation layout
-        LinearLayout transformLayout = new LinearLayout (getContext());
-        transformLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
 
         /* Message content */
 
         // Title
-        final TextView messageLabel = new TextView (getContext());
-        messageLabel.setText("Message");
-        messageLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(messageLabel);
+        final TextView messageContentTitle = new TextView (getContext());
+        messageContentTitle.setText("Message");
+        messageContentTitle.setPadding(70, 20, 70, 20);
+        designerViewLayout.addView(messageContentTitle);
 
         // Content input field
-        final EditText input = new EditText(getContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        transformLayout.addView(input);
+        final EditText messageContentEditor = new EditText(getContext());
+        messageContentEditor.setInputType(InputType.TYPE_CLASS_TEXT);
+        designerViewLayout.addView(messageContentEditor);
 
         /* Message type */
 
         // Get list of devices that have been discovered
-        final ArrayList<String> destinationAddressStrings = new ArrayList<String>();
+        final ArrayList<String> messageDestinationData = new ArrayList<String>();
 
         // Title
-        final TextView protocolLabel = new TextView (getContext());
-        protocolLabel.setText("Type");
-        protocolLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(protocolLabel);
+        final TextView messageTypeTitle = new TextView (getContext());
+        messageTypeTitle.setText("Type");
+        messageTypeTitle.setPadding(70, 20, 70, 20);
+        designerViewLayout.addView(messageTypeTitle);
 
         // List of types (i.e., TCP, UDP, Mesh, etc.)
-        final Spinner messageTypeSpinner = new Spinner (getContext());
-        ArrayList<String> messageTypeStrings = new ArrayList<String>();
-        messageTypeStrings.add("UDP"); // Internet
-        messageTypeStrings.add("TCP"); // Internet
-        messageTypeStrings.add("Mesh"); // Clay
-        ArrayAdapter<String> messageTypeSpinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, messageTypeStrings); //selected item will look like a spinner set from XML
-        messageTypeSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        messageTypeSpinner.setAdapter(messageTypeSpinnerArrayAdapter);
-        transformLayout.addView(messageTypeSpinner);
+        final Spinner messageTypeSelector = new Spinner (getContext());
+        ArrayList<String> messageTypeData = new ArrayList<String>();
+        messageTypeData.add("Device"); // Same device (pure message passing between events)
+        messageTypeData.add("UDP"); // Internet
+        messageTypeData.add("TCP"); // Internet
+        messageTypeData.add("Mesh"); // Clay
+        ArrayAdapter<String> messageTypeDataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, messageTypeData); //selected item will look like a spinner set from XML
+        messageTypeDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        messageTypeSelector.setAdapter(messageTypeDataAdapter);
+        designerViewLayout.addView(messageTypeSelector);
 
         /* Message destination address */
 
         // Destination label
-        final TextView destinationLabel = new TextView (getContext());
-        destinationLabel.setText("Destination");
-        destinationLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(destinationLabel);
+        final TextView messageDestinationTitle = new TextView (getContext());
+        messageDestinationTitle.setText("Destination");
+        messageDestinationTitle.setPadding(70, 20, 70, 20);
+        designerViewLayout.addView(messageDestinationTitle);
 
         // Set destination of message
-        final Spinner destinationSpinner = new Spinner (getContext());
-        final ArrayAdapter<String> destinationAddressArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, destinationAddressStrings); //selected item will look like a spinner set from XML
-        destinationAddressArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        destinationSpinner.setAdapter(destinationAddressArrayAdapter);
-        transformLayout.addView(destinationSpinner);
+        final Spinner messageDestinationSelector = new Spinner (getContext());
+        final ArrayAdapter<String> messageDestinationDataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, messageDestinationData); //selected item will look like a spinner set from XML
+        messageDestinationDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        messageDestinationSelector.setAdapter(messageDestinationDataAdapter);
+        designerViewLayout.addView(messageDestinationSelector);
 
         // "Other" destination address, specified by user
-        final TextView otherDestinationTitle = new TextView (getContext());
-        otherDestinationTitle.setText("Other");
-        otherDestinationTitle.setPadding(70, 20, 70, 20);
-        otherDestinationTitle.setVisibility(View.GONE);
-        transformLayout.addView(otherDestinationTitle);
+        final TextView messageCustomDestinationTitle = new TextView (getContext());
+        messageCustomDestinationTitle.setText("Other");
+        messageCustomDestinationTitle.setPadding(70, 20, 70, 20);
+        messageCustomDestinationTitle.setVisibility(View.GONE);
+        designerViewLayout.addView(messageCustomDestinationTitle);
 
         // "Other" destination input field
-        final EditText otherDestinationText = new EditText(getContext());
-        otherDestinationText.setInputType(InputType.TYPE_CLASS_TEXT);
-        otherDestinationText.setVisibility(View.GONE);
-        transformLayout.addView(otherDestinationText);
+        final EditText messageCustomDestinationEditor = new EditText(getContext());
+        messageCustomDestinationEditor.setInputType(InputType.TYPE_CLASS_TEXT);
+        messageCustomDestinationEditor.setVisibility(View.GONE);
+        designerViewLayout.addView(messageCustomDestinationEditor);
 
         /* Set the view */
 
-        builder.setView(transformLayout);
+        builder.setView(designerViewLayout);
 
         /* Set up interactivity */
 
-        messageTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        messageTypeSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItemText = messageTypeSpinner.getItemAtPosition(position).toString();
-                if (selectedItemText.equals("UDP") || selectedItemText.equals("TCP")) {
+                String selectedItemText = messageTypeSelector.getItemAtPosition(position).toString();
+                if (selectedItemText.equals("Device")) {
+                    messageDestinationTitle.setVisibility(View.GONE);
+                    messageDestinationSelector.setVisibility(View.GONE);
                     // Get list of all discovered devices on the mesh network
-                    destinationAddressStrings.clear();
+                    messageDestinationData.clear();
                     // TODO: Get list of all discovered smartphones, tablets, and other devices for interacting with Clay
-                    destinationAddressStrings.add(getClay().getInternetBroadcastAddress() + ":4445"); // Broadcast address
-                    destinationAddressStrings.add(getClay().getInternetAddress() + ":4445"); // This device's address
-                    destinationAddressStrings.add("Other");
-                    destinationAddressArrayAdapter.notifyDataSetChanged();
-                } else if (selectedItemText.equals("Mesh")) {
+                    messageDestinationDataAdapter.notifyDataSetChanged();
+                } else if (selectedItemText.equals("UDP") || selectedItemText.equals("TCP")) {
+                    messageDestinationTitle.setVisibility(View.VISIBLE);
+                    messageDestinationSelector.setVisibility(View.VISIBLE);
                     // Get list of all discovered devices on the mesh network
-                    destinationAddressStrings.clear();
+                    messageDestinationData.clear();
+                    // TODO: Get list of all discovered smartphones, tablets, and other devices for interacting with Clay
+                    messageDestinationData.add(getClay().getInternetBroadcastAddress() + ":4445"); // Broadcast address
+                    messageDestinationData.add(getClay().getInternetAddress() + ":4445"); // This device's address
+                    messageDestinationData.add("Other");
+                    messageDestinationDataAdapter.notifyDataSetChanged();
+                } else if (selectedItemText.equals("Mesh")) {
+                    messageDestinationTitle.setVisibility(View.VISIBLE);
+                    messageDestinationSelector.setVisibility(View.VISIBLE);
+                    // Get list of all discovered devices on the mesh network
+                    messageDestinationData.clear();
                     for (Unit unit : getClay().getUnits()) {
-                        destinationAddressStrings.add(unit.getUuid().toString());
+                        messageDestinationData.add(unit.getUuid().toString());
                     }
                     // Note: There's no "Other" option for mesh.
-                    destinationAddressArrayAdapter.notifyDataSetChanged();
+                    messageDestinationDataAdapter.notifyDataSetChanged();
                 }
 
                 // Select the first item by default
-                destinationSpinner.setSelection(0, true);
+                messageDestinationSelector.setSelection(0, true);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                messageTypeSpinner.setSelection(0, true);
+                messageTypeSelector.setSelection(0, true);
             }
         });
 
-        destinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        messageDestinationSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItemText = destinationSpinner.getItemAtPosition(position).toString();
+                String selectedItemText = messageDestinationSelector.getItemAtPosition(position).toString();
                 if (selectedItemText.equals("Other")) {
-                    otherDestinationTitle.setVisibility(View.VISIBLE);
-                    otherDestinationText.setVisibility(View.VISIBLE);
-                    otherDestinationText.invalidate();
+                    messageCustomDestinationTitle.setVisibility(View.VISIBLE);
+                    messageCustomDestinationEditor.setVisibility(View.VISIBLE);
+                    messageCustomDestinationEditor.invalidate();
                 } else {
-                    otherDestinationTitle.setVisibility(View.GONE);
-                    otherDestinationText.setVisibility(View.GONE);
-                    otherDestinationText.invalidate();
+                    messageCustomDestinationTitle.setVisibility(View.GONE);
+                    messageCustomDestinationEditor.setVisibility(View.GONE);
+                    messageCustomDestinationEditor.invalidate();
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                otherDestinationTitle.setVisibility(View.GONE);
-                otherDestinationText.setVisibility(View.GONE);
+                messageCustomDestinationTitle.setVisibility(View.GONE);
+                messageCustomDestinationEditor.setVisibility(View.GONE);
             }
         });
 
@@ -1023,18 +1794,18 @@ public class EventDesignerView {
         /* Initialize the pop-up with the state */
 
         // Message content
-        input.setText(currentContentString);
-        input.setSelection(input.getText().length());
+        messageContentEditor.setText(currentContentString);
+        messageContentEditor.setSelection(messageContentEditor.getText().length());
 
         // Message type
-        int messageTypeIndex = messageTypeSpinnerArrayAdapter.getPosition(currentTypeString);
-        messageTypeSpinner.setSelection(messageTypeIndex);
+        int messageTypeIndex = messageTypeDataAdapter.getPosition(currentTypeString);
+        messageTypeSelector.setSelection(messageTypeIndex);
 
         // Message destination
-        int messageDestinationIndex = destinationAddressArrayAdapter.getPosition(currentDestinationAddressString);
-        destinationSpinner.setSelection(messageDestinationIndex);
+        int messageDestinationIndex = messageDestinationDataAdapter.getPosition(currentDestinationAddressString);
+        messageDestinationSelector.setSelection(messageDestinationIndex);
 
-        otherDestinationText.setText (currentDestinationAddressString);
+        messageCustomDestinationEditor.setText(currentDestinationAddressString);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -1044,32 +1815,42 @@ public class EventDesignerView {
                 // Update the behavior profile state
                 // e.g., "udp 192.168.1.255:4445 \"hello world\""
                 // TODO: "udp none 192.168.1.255:4445 \"hello world\""... make same message string format!
-                String updatedStateString = messageTypeSpinner.getSelectedItem().toString();
-//                updatedStateString += " none";
-                if (!destinationSpinner.getSelectedItem().toString().equals("Other")) {
-                    updatedStateString += " " + destinationSpinner.getSelectedItem().toString();
+                String messageTypeString = messageTypeSelector.getSelectedItem().toString();
+                String stateString = "";
+                if (messageTypeString.equals("Device")) {
+                    stateString = messageTypeString;
+                    stateString += " " + "none";
+                    stateString += " \'" + messageContentEditor.getText().toString() + "\'";
                 } else {
-                    updatedStateString += " " + otherDestinationText.getText().toString();
+                    stateString = messageTypeString;
+                    if (!messageDestinationSelector.getSelectedItem().toString().equals("Other")) {
+                        stateString += " " + messageDestinationSelector.getSelectedItem().toString();
+                    } else {
+                        stateString += " " + messageCustomDestinationEditor.getText().toString();
+                    }
+                    stateString += " \'" + messageContentEditor.getText().toString() + "\'";
                 }
-                updatedStateString += " \'" + input.getText().toString() + "\'";
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent ().setTimeline (unit.getTimeline());
+                eventHolder.getEvent().setTimeline(unit.getTimeline());
                 // </HACK>
-                eventHolder.updateState (updatedStateString);
+                eventHolder.updateState(stateString);
 
                 // Store: Store the new behavior state and update the event.
 //                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
-                getClay().getStore().storeState (eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent (eventHolder.getEvent());
 
                 // Send updated state to device
                 // <HACK>
-                String stateToSend = updatedStateString.substring (0, updatedStateString.indexOf(" ")).toLowerCase() + " " + updatedStateString.substring(updatedStateString.indexOf(" ") + 1);
+                String stateToSend = stateString.substring (0, stateString.indexOf(" ")).toLowerCase() + " " + stateString.substring(stateString.indexOf(" ") + 1);
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + stateToSend + "\"";
 //                getUnit().sendMessage(content);
                 // </HACK>
+
+                Log.v ("Event_Trigger", "state: " + stateToSend);
+                Log.v ("Event_Trigger", "update: " + content);
 
                 // <HACK>
                 // TODO: Replace this with a queue.
@@ -1078,7 +1859,7 @@ public class EventDesignerView {
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
@@ -1095,7 +1876,7 @@ public class EventDesignerView {
 //                getClay().getStore().updateTimeline(unit.getTimeline());
 //
 //                // Refresh the timeline view
-//                refreshListViewFromData();
+//                refreshTimelineView();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1114,13 +1895,13 @@ public class EventDesignerView {
         builder.setMessage("Choose frequency and duration.");
 
         // Declare transformation layout
-        LinearLayout transformLayout = new LinearLayout (getContext());
-        transformLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
 
         // Set up the frequency
         final TextView frequencyLabel = new TextView (getContext());
         frequencyLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(frequencyLabel);
+        designerViewLayout.addView(frequencyLabel);
 
         final SeekBar frequencyVal = new SeekBar (getContext());
         frequencyVal.setMax(5000);
@@ -1169,12 +1950,12 @@ public class EventDesignerView {
 
             }
         });
-        transformLayout.addView(frequencyVal);
+        designerViewLayout.addView(frequencyVal);
 
         // Set up the duration
         final TextView durationLabel = new TextView (getContext());
         durationLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(durationLabel);
+        designerViewLayout.addView(durationLabel);
 
         final SeekBar durationVal = new SeekBar (getContext());
         durationVal.setMax(5000);
@@ -1204,10 +1985,10 @@ public class EventDesignerView {
 
             }
         });
-        transformLayout.addView(durationVal);
+        designerViewLayout.addView(durationVal);
 
         // Assign the layout to the alert dialog.
-        builder.setView(transformLayout);
+        builder.setView(designerViewLayout);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -1241,7 +2022,7 @@ public class EventDesignerView {
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
@@ -1258,7 +2039,7 @@ public class EventDesignerView {
 //                getClay().getStore().updateTimeline(unit.getTimeline());
 //
 //                // Refresh the timeline view
-//                refreshListViewFromData();
+//                refreshTimelineView();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1326,7 +2107,7 @@ public class EventDesignerView {
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
 
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
 ////                eventHolder.getEvent().getAction().setState(behaviorState);
@@ -1343,7 +2124,7 @@ public class EventDesignerView {
 //                getClay ().getStore().updateTimeline(unit.getTimeline());
 //
 //                // Refresh the timeline view
-//                refreshListViewFromData();
+//                refreshTimelineView();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1362,13 +2143,13 @@ public class EventDesignerView {
         builder.setMessage("How do you want to change time?");
 
         // Declare transformation layout
-        LinearLayout transformLayout = new LinearLayout (getContext());
-        transformLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout designerViewLayout = new LinearLayout (getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
 
         // Set up the label
         final TextView waitLabel = new TextView (getContext());
         waitLabel.setPadding(70, 20, 70, 20);
-        transformLayout.addView(waitLabel);
+        designerViewLayout.addView(waitLabel);
 
         final SeekBar waitVal = new SeekBar (getContext());
         waitVal.setMax(1000);
@@ -1397,10 +2178,10 @@ public class EventDesignerView {
 
             }
         });
-        transformLayout.addView(waitVal);
+        designerViewLayout.addView(waitVal);
 
         // Assign the layout to the alert dialog.
-        builder.setView(transformLayout);
+        builder.setView(designerViewLayout);
 
         // Set up the buttons
         builder.setPositiveButton ("DONE", new DialogInterface.OnClickListener () {
@@ -1434,7 +2215,7 @@ public class EventDesignerView {
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshListViewFromData();
+                timelineListView.refreshTimelineView();
 
 //                // Add wait
 //                State behaviorState = new State (eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), "" + waitVal.getProgress());
@@ -1450,7 +2231,7 @@ public class EventDesignerView {
 //                getClay ().getStore().updateTimeline(unit.getTimeline());
 //
 //                // Refresh the timeline view
-//                refreshListViewFromData();
+//                refreshTimelineView();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {

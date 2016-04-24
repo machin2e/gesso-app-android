@@ -356,7 +356,9 @@ public class TimelineListView extends DragSortListView {
     public void addEventHolder(EventHolder eventHolder) {
         if (adapter != null) {
             eventHolders.add(eventHolders.size(), eventHolder);
-//            refreshListViewFromData(); // <HACK />
+            refreshTimelineView(); // <HACK />
+
+            scrollToBottom();
         }
     }
 
@@ -367,7 +369,7 @@ public class TimelineListView extends DragSortListView {
     public void addEventHolder(int index, EventHolder eventHolder) {
         if (adapter != null) {
             eventHolders.add(index, eventHolder);
-            refreshListViewFromData(); // <HACK />
+            refreshTimelineView(); // <HACK />
         }
     }
 
@@ -383,7 +385,7 @@ public class TimelineListView extends DragSortListView {
         // TODO: Update the action object referenced by eventHolders, and update the view accordingly (i.e., eventHolder.action = <new action> then retrieve view for that action type).
         int index = eventHolders.indexOf(eventHolder);
         eventHolders.remove(index);
-        refreshListViewFromData(); // <HACK />
+        refreshTimelineView(); // <HACK />
 
         // Update the event with the new action and state
         Event event = eventHolder.getEvent();
@@ -399,6 +401,7 @@ public class TimelineListView extends DragSortListView {
 
             // Update state of the object associated with the selected view.
             eventHolders.remove(eventHolder);
+            refreshTimelineView();
         }
 
         // Create event object
@@ -438,7 +441,7 @@ public class TimelineListView extends DragSortListView {
         // Add the replacement item to the timeline view
         eventHolders.add(index, replacementEventHolder);
 
-        refreshListViewFromData();
+        refreshTimelineView();
     }
 
     public void removeEventHolder(final EventHolder eventHolder) {
@@ -461,7 +464,9 @@ public class TimelineListView extends DragSortListView {
         eventHolders.remove(eventHolder);
 
         // Update the view after removing the specified list item
-        refreshListViewFromData(); // <HACK />
+//        refreshTimelineView();
+
+        refreshAvatarView();
 
         /*
         // <HACK>
@@ -565,7 +570,7 @@ public class TimelineListView extends DragSortListView {
 //        eventDesignerView.displayUpdateTagOptions(compositionEventHolder);
 
         // Update timeline view after modifying the list
-        refreshListViewFromData();
+        refreshTimelineView();
 
     }
 
@@ -653,13 +658,17 @@ public class TimelineListView extends DragSortListView {
         getClay().getStore().storeTimeline(getUnit().getTimeline());
         // </HACK>
 
-        refreshListViewFromData(); // Update view after removing items from the list
+        refreshTimelineView(); // Update view after removing items from the list
 
     }
 
     /**
      * Timeline and timeline view access operations
      */
+
+    public ArrayList<EventHolder> getEventHolders () {
+        return eventHolders;
+    }
 
     /**
      * Returns the list item corresponding to the specified position.
@@ -776,7 +785,7 @@ public class TimelineListView extends DragSortListView {
     /**
      * Refresh the entire ListView from the eventHolders.
      */
-    public void refreshListViewFromData() {
+    public void refreshTimelineView() {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
 //        adapter.notifyDataSetChanged();
         final TimelineListView lv = this;
@@ -791,6 +800,8 @@ public class TimelineListView extends DragSortListView {
             }
         });
     }
+
+
 
     /**
      * Resources:
@@ -810,6 +821,44 @@ public class TimelineListView extends DragSortListView {
                 lv.refreshDrawableState();
             }
         });
+    }
+
+    /**
+     * Resources:
+     * - http://stackoverflow.com/questions/2250770/how-to-refresh-android-listview
+     */
+    public void redrawEventView(final View view) {
+        // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
+//        adapter.notifyDataSetChanged();
+//        final TimelineListView lv = this;
+        ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
+            public void run() {
+                // Update view's layout
+                view.requestLayout();
+                view.invalidate();
+            }
+        });
+    }
+
+    public void refreshAvatarView() {
+        // <FAB>
+        addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+
+                // Remove the layout
+                removeOnLayoutChangeListener(this);
+                Log.e("Move_Finger", "Updated timeline layout.");
+
+                // Update position
+                //ClayActionButton fab = (ClayActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+                ApplicationView.getApplicationView().getActionButton().fabUpdatePosition();
+//                fab.fabUpdatePosition();
+            }
+        });
+
+        refreshTimelineView();
+        // </FAB>
     }
 
     private void displayEventDesigner(final EventHolder eventHolder) {
@@ -841,7 +890,7 @@ public class TimelineListView extends DragSortListView {
                         @Override
                         public void onSelect(Action action) {
                             replaceEventHolder(eventHolder, action);
-                            refreshListViewFromData(); // <HACK />
+                            refreshTimelineView(); // <HACK />
                         }
                     });
 
@@ -862,7 +911,7 @@ public class TimelineListView extends DragSortListView {
         if (eventHolder.getType().equals("light")) {
             eventDesignerView.displayUpdateLightsOptions(eventHolder);
         } else if (eventHolder.getType().equals("signal")) {
-            eventDesignerView.displayUpdateIOOptions(eventHolder);
+            eventDesignerView.displayUpdateSignalOptions(eventHolder);
         } if (eventHolder.getType().equals("message")) {
             eventDesignerView.displayUpdateMessageOptions(eventHolder);
         } if (eventHolder.getType().equals("pause")) {
@@ -879,22 +928,22 @@ public class TimelineListView extends DragSortListView {
     }
 
     public Point getPointUnderTimeline() {
-        Log.v("Top_Pos", "getPointUnderTimeline");
+        Log.v("Move_Finger", "getPointUnderTimeline");
 
         int viewCount = getChildCount();
         //View bottomView = getChildAt(viewCount - 1);
+        Log.v("Move_Finger", "\tviewCount: " + viewCount);
 
         Point point = null;
 
         if (viewCount > 0) {
             View bottomView = getChildAt(viewCount - 1);
-            //int top = (v == null) ? 0 : (v.getTop() - getPaddingTop());
 
-            Log.v("Top_Pos", "viewCount: " + viewCount);
-            Log.v("Top_Pos", "bottomView: " + bottomView);
+            Log.v("Move_Finger", "\tviewCount: " + viewCount);
+            Log.v("Move_Finger", "\tbottomView: " + bottomView);
 
 //            if (bottomView != null) {
-            point = new Point(0, 0);
+            point = new Point (0, 0);
             point.y = bottomView.getBottom();
 //            int y = bottomView.getScrollY();
                 Log.v("Top_Pos", "top: " + point.y);
@@ -903,6 +952,55 @@ public class TimelineListView extends DragSortListView {
 
         return point;
     }
+
+    public void scrollToBottom () {
+        this.post(new Runnable() {
+            public void run() {
+                setSelection(getCount() - 1);
+            }
+        });
+    }
+
+//    public void fabUpdatePosition(FloatingActionButton fab) {
+//
+//        // Get screen width and height of the device
+//        DisplayMetrics metrics;
+//        int screenWidth = 0, screenHeight = 0;
+//        metrics = new DisplayMetrics();
+//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        screenHeight = metrics.heightPixels;
+//        screenWidth = metrics.widthPixels;
+//
+//        if (eventHolders.size() == 0) {
+//            int width = fab.getWidth();
+//            int height = fab.getHeight();
+//            Point dest = new Point((int) (screenWidth / 2.0)  - (int) (width / 2.0), (int) (screenHeight / 2.0) - (int) (height / 2.0));
+////            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+//
+//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
+//            params.leftMargin = (int) dest.x;
+//            params.topMargin = (int) dest.y;
+//            return;
+//        }
+//
+//        // Get point under last event on timeline
+//        Point point = TimelineListView.getTimelineListView().getPointUnderTimeline();
+//        if (point != null) {
+//            point.x = 135;
+//            point.y = point.y + (int) (0.01 * fab.getHeight());
+//        }
+//
+//        if (point != null && point.y < (screenHeight - fab.getHeight())) {
+//            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, point, 400);
+//        } else {
+//            int width = fab.getWidth();
+//            int height = fab.getHeight();
+//            Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
+//
+//            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+//
+//        }
+//    }
 
     public interface ActionSelectionListener {
         public void onSelect (Action action);
@@ -1052,7 +1150,7 @@ public class TimelineListView extends DragSortListView {
 //
 //                replaceEventHolder(eventHolder, action);
 //
-//                refreshListViewFromData(); // <HACK />
+//                refreshTimelineView(); // <HACK />
 //            }
 //        });
 //        AlertDialog alert = builder.create();
@@ -1075,6 +1173,13 @@ public class TimelineListView extends DragSortListView {
         if (eventDesignerView == null) {
             eventDesignerView = new EventDesignerView(getUnit(), this);
         }
+    }
+
+    public EventDesignerView getEventDesigner () {
+        if (eventDesignerView == null) {
+            eventDesignerView = new EventDesignerView(getUnit(), this);
+        }
+        return eventDesignerView;
     }
 
     private class EventHolderTouchDragListener implements OnDragListener {
@@ -1104,34 +1209,94 @@ public class TimelineListView extends DragSortListView {
 
             final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
 
-            // Check if the list item was a constructor
-            if (eventHolder.getEvent().equals("create")) {
-                if (eventHolder.tag == "create") {
-                    // Nothing?
-                }
-                // TODO: (?)
+            expandEventView (eventHolder);
 
-            } else if (!eventHolder.getType().equals("create") && !eventHolder.getType().equals("choose")) {
 
-                if (eventHolder.getType().equals("complex")) {
 
-                    decomposeEventHolder(eventHolder);
-                    return true;
+            // TODO: Show options for editing...
 
-                } else {
+//            // Check if the list item was a constructor
+//            if (eventHolder.getEvent().equals("create")) {
+//                if (eventHolder.tag == "create") {
+//                    // Nothing?
+//                }
+//                // TODO: (?)
+//
+//            } else if (!eventHolder.getType().equals("create") && !eventHolder.getType().equals("choose")) {
+//
+//                if (eventHolder.getType().equals("complex")) {
+//
+//                    decomposeEventHolder(eventHolder);
+//                    return true;
+//
+//                } else {
+//
+//                    displayEventDesigner(eventHolder);
+//                    return true;
+//
+//                }
+//
+//                // Request the ListView to be redrawn so the views in it will be displayed
+//                // according to their updated state information.
+////                refreshTimelineView();
+//            }
 
-                    displayEventDesigner(eventHolder);
-                    return true;
-
-                }
-
-                // Request the ListView to be redrawn so the views in it will be displayed
-                // according to their updated state information.
-//                refreshListViewFromData();
-            }
-
-            return false;
+            return true;
         }
+    }
+
+    public void expandEventView(EventHolder eventHolder) {
+        if (eventHolder.isStateVisible()) {
+
+            //getEventHolderByPosition()
+
+            //final View view = (EventHolder) eventHolders.get (position);
+//            int eventHolderIndex = eventHolders.indexOf(eventHolder);
+//            View this.getChildAt(eventHolderIndex);
+            
+
+//            View topView = (View) view.findViewById(R.id.timeline_top_segment);
+//            topView.getLayoutParams().height = 0;
+//            View bottomView = (View) view.findViewById(R.id.timeline_bottom_segment);
+//            bottomView.getLayoutParams().height = 0;
+
+            eventHolder.setStateVisible(false);
+        } else {
+            resetEventViews();
+
+//            View topView = (View) view.findViewById(R.id.timeline_top_segment);
+//            topView.getLayoutParams().height = 200;
+//            View bottomView = (View) view.findViewById(R.id.timeline_bottom_segment);
+//            bottomView.getLayoutParams().height = 200;
+
+            eventHolder.setStateVisible(true);
+        }
+
+//            View topView = (View) view.findViewById(R.id.event_upper_layout);
+//            if (topView.getLayoutParams().height != 200) {
+//                topView.getLayoutParams().height = 200;
+////                topView.setVisibility(VISIBLE);
+//            } else {
+//                topView.getLayoutParams().height = 0;
+////                topView.setVisibility(GONE);
+//            }
+//
+//            View bottomView = (View) view.findViewById(R.id.event_bottom_layout);
+//            if (bottomView.getLayoutParams().height != 200) {
+//                bottomView.getLayoutParams().height = 200;
+////                bottomView.setVisibility(VISIBLE);
+//            } else {
+//                bottomView.getLayoutParams().height = 0;
+////                bottomView.setVisibility(GONE);
+//            }
+
+        Log.v ("Touch", "longTouch");
+
+//            redrawEventView (topView);
+//            redrawEventView (bottomView);
+
+        refreshTimelineView();
+        refreshAvatarView();
     }
 
     // <HACK>
@@ -1164,7 +1329,17 @@ public class TimelineListView extends DragSortListView {
             }
             i++;
         }
-        refreshListViewFromData();
+        refreshTimelineView();
+    }
+
+    public void resetEventViews () {
+        if (eventHolders != null && eventHolders.size() > 0) {
+            for (EventHolder eventHolder : eventHolders) {
+                eventHolder.setStateVisible(false);
+            }
+//            refreshTimelineView();
+//            refreshAvatarView();
+        }
     }
 
     public int findNearestTimelineIndex (int x, int y) {
@@ -1217,6 +1392,10 @@ public class TimelineListView extends DragSortListView {
         @Override
         public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
             Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
+
+            resetEventViews();
+            refreshTimelineView();
+            refreshAvatarView();
 
             if (!hasSelectedEventHolders()) {
                 final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
@@ -1300,7 +1479,7 @@ public class TimelineListView extends DragSortListView {
             if (index < eventHolders.size()) {
                 EventHolder eventHolder = (EventHolder) eventHolders.get(index);
                 selectEventHolder(eventHolder);
-//                refreshListViewFromData();
+//                refreshTimelineView();
             }
 
         } else {
@@ -1318,7 +1497,7 @@ public class TimelineListView extends DragSortListView {
                     EventHolder eventHolder = eventHolders.get(i);
                     deselectEventHolder(eventHolder);
                 }
-//                refreshListViewFromData();
+//                refreshTimelineView();
 
             }
 

@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class TcpMessageClient {
 
-    public static int MESSAGE_SEND_FREQUENCY = 300;
+    public static int MESSAGE_SEND_FREQUENCY = 100;
 
     private ArrayList<Message> incomingMessages = new ArrayList<Message>(); // Create incoming message queue.
 

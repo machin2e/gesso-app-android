@@ -626,6 +626,10 @@
     <item name="click_remove" type="id"/>
     <item name="content" type="id"/>
     <item name="drag_handle" type="id"/>
+    <item name="event_bottom_layout" type="id"/>
+    <item name="event_label" type="id"/>
+    <item name="event_middle_layout" type="id"/>
+    <item name="event_top_layout" type="id"/>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/res/values/values.xml -->
     <eat-comment/>
     <item name="fab_label" type="id"/>
@@ -660,6 +664,13 @@
     <item name="progress_circular" type="id"/>
     <item name="progress_horizontal" type="id"/>
     <item name="split_action_bar" type="id"/>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/values/ids.xml -->
+    <eat-comment/>
+    <item name="timeline_bottom_segment" type="id"/>
+    <item name="timeline_segment" type="id"/>
+    <item name="timeline_top_segment" type="id"/>
+    <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values/values.xml -->
+    <eat-comment/>
     <item name="up" type="id"/>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.android.support/design/23.1.1/res/values/values.xml -->
     <eat-comment/>

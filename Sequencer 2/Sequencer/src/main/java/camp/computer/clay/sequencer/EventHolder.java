@@ -35,6 +35,8 @@ public class EventHolder {
 
     private boolean isSelected = false;
 
+    private boolean isStateVisible = false;
+
     public EventHolder(Event event) {
         super();
 
@@ -70,6 +72,8 @@ public class EventHolder {
         // Initialize
         this.isSelected = false;
 
+        this.isStateVisible = false;
+
         summary = "";
     }
 
@@ -86,6 +90,8 @@ public class EventHolder {
 
         // Initialize
         this.isSelected = false;
+
+        this.isStateVisible = false;
     }
 
     public Event getEvent() {
@@ -98,6 +104,12 @@ public class EventHolder {
 
     public void setSelected (boolean isSelected) {
         this.isSelected = isSelected;
+    }
+
+    public boolean isStateVisible () { return this.isStateVisible; }
+
+    public void setStateVisible (boolean isStateVisible) {
+        this.isStateVisible = isStateVisible;
     }
 
     /**

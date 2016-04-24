@@ -22,7 +22,6 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 
-import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.resource.NetworkResource;
@@ -190,6 +189,16 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = true;
     private static final boolean FULLSCREEN = true;
 
+    public TimelineListView getTimelineView () {
+        return mViewPager.getTimelineView();
+    }
+
+    private ClayActionButton cab;
+
+    public ClayActionButton getActionButton () {
+        return cab;
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -204,8 +213,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         setContentView(R.layout.activity_main);
 
         // Hide the action buttons
-        FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-        fab.hide(false);
+        cab = new ClayActionButton();
+        cab.hide(false);
 
         // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
         // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
@@ -410,57 +419,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     @Override
     public void refreshListViewFromData(Unit unit) {
         // TODO: Update the view to reflect the latest state of the object model
-    }
-
-    // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
-    public void moveViewToScreenCenter(final View view, Point destinationPoint, int translateDuration)
-    {
-        FrameLayout root = (FrameLayout) findViewById(R.id.application_view);
-        DisplayMetrics dm = new DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics( dm );
-        int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
-
-        int originalPos[] = new int[2];
-        view.getLocationOnScreen( originalPos );
-
-        /*
-        int xDest = dm.widthPixels/2;
-        xDest -= (view.getMeasuredWidth()/2);
-        int yDest = dm.heightPixels/2 - (view.getMeasuredHeight()/2) - statusBarOffset;
-        */
-
-        int xDest = destinationPoint.x;
-        int yDest = destinationPoint.y;
-
-
-        final int amountToMoveRight = xDest - originalPos[0];
-        final int amountToMoveDown = yDest - originalPos[1];
-        TranslateAnimation animation = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
-        animation.setDuration(translateDuration);
-        // animation.setFillAfter(true);
-
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-                params.topMargin += amountToMoveDown;
-                params.leftMargin += amountToMoveRight;
-                view.setLayoutParams(params);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-
-        view.startAnimation (animation);
     }
 
     public static ApplicationView getApplicationView () { return ApplicationView.applicationView; }

@@ -6,6 +6,7 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -19,6 +20,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import camp.computer.clay.sequencer.ApplicationView;
+import camp.computer.clay.sequencer.ClayActionButton;
 import camp.computer.clay.sequencer.EventHolder;
 import camp.computer.clay.sequencer.TimelineListView;
 
@@ -28,61 +30,6 @@ public class Clay {
     private SQLiteContentManager contentManager = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
-
-    // <FAB>
-    public ArrayList<FloatingActionButton> fablets = new ArrayList<FloatingActionButton>();
-    public Point fabDownPoint;
-    public Point fabCurrentPoint;
-    public static int FAB_STOP_DRAGGING = 0;
-    public static int FAB_START_DRAGGING = 1;
-    public int fabStatus = FAB_STOP_DRAGGING;
-    public boolean fabDisableClick = false;
-    public int fabStartDragThresholdDistance = 75;
-    public int selectedEventHolderIndex = -1;
-    public EventHolder selectedEventHolder = null;
-
-    private void setUpActionButton(FloatingActionButton fab) {
-        // Get screen width and height of the device
-        DisplayMetrics metrics;
-        int screenWidth = 0, screenHeight = 0;
-        metrics = new DisplayMetrics();
-        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        screenHeight = metrics.heightPixels;
-        screenWidth = metrics.widthPixels;
-
-        Log.v ("Metrics", "width: " + screenWidth);
-        Log.v ("Metrics", "height: " + screenHeight);
-
-        // Update placement of action button (default)
-        int width = fab.getWidth();
-        int height = fab.getHeight();
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
-        params.leftMargin = (int) screenWidth - (int) (width * 1.1);
-        params.topMargin = (int) (screenHeight / 2.0) - (int) (height / 2.0);
-    }
-
-//    private void moveUnderTimeline(FloatingActionButton fab) {
-//        // Get screen width and height of the device
-//        DisplayMetrics metrics;
-//        int screenWidth = 0, screenHeight = 0;
-//        metrics = new DisplayMetrics();
-//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-//        screenHeight = metrics.heightPixels;
-//        screenWidth = metrics.widthPixels;
-//
-//        Log.v ("Metrics", "width: " + screenWidth);
-//        Log.v ("Metrics", "height: " + screenHeight);
-//
-//        // Update placement of action button (default)
-//        int width = fab.getWidth();
-//        int height = fab.getHeight();
-//        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
-//        params.leftMargin = (int) 200; // i.e., width of event label
-//
-//        int eventCount = (int) TimelineListView.getTimelineListView().getChildCount();
-//        params.topMargin = (int) TimelineListView.getTimelineListView().getChildAt(eventCount).getScrollY();
-//    }
-    // </FAB>
 
     // List of discovered touchscreen devices
     private ArrayList<ViewManagerInterface> views;
@@ -152,9 +99,6 @@ public class Clay {
         // Create message
         Message message = new Message("udp", source, destination, content);
         message.setDeliveryGuaranteed(true);
-        Log.v ("Messagez", message.getFromAddress());
-        Log.v ("Messagez", message.getToAddress());
-        Log.v ("Messagez", message.getContent());
 
         // Queue message for sending
         messageManager.queueOutgoingMessage(message);
@@ -276,9 +220,11 @@ public class Clay {
             unit.connectTcp();
 
             // Show the action palette
-            FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-            setUpActionButton (fab);
-            fab.show(true);
+            //FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+            //ClayActionButton fab = (ClayActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+//            cab = new ClayActionButton();
+            ApplicationView.getApplicationView().getActionButton().setUpActionButton();
+            ApplicationView.getApplicationView().getActionButton().show(true);
 
             // Populate the timeline
             // TODO: Populate from scratch only if no timeline has been programmed for the device
@@ -296,8 +242,8 @@ public class Clay {
 
             // Create unit in graph
             Unit newUnit = new Unit (getClay (), unitUuid);
-            newUnit.setInternetAddress (internetAddress);
-            Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid () + ").");
+            newUnit.setInternetAddress(internetAddress);
+            Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid() + ").");
             Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
             // Cache the unit
@@ -308,9 +254,9 @@ public class Clay {
             newUnit.connectTcp();
 
             // Show the action palette
-            FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-            setUpActionButton(fab);
-            fab.show(true);
+//            ClayActionButton fab = (ClayActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+            ApplicationView.getApplicationView().getActionButton().setUpActionButton();
+            ApplicationView.getApplicationView().getActionButton().show(true);
 
             Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
 
@@ -469,14 +415,15 @@ public class Clay {
             uuid = UUID.fromString("bdb49750-9ead-466e-96a0-3aa88e7d246c");
             if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"signal\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "signal", "regex", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+                //getClay().generateBehaviorScript(uuid, "signal", "regex", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+                getClay().generateBehaviorScript(uuid, "signal", "regex", "TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none");
             }
 
             // message
             uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
             if (!getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "message", "regex", "UDP Other \"hello\"");
+                getClay().generateBehaviorScript(uuid, "message", "regex", "Device Other \"hello\"");
             }
 
             // tone
