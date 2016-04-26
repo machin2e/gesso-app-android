@@ -57,13 +57,13 @@ public class MessageManager {
             // Update the unit construct associated with the message
             if (getClay ().hasUnitByAddress (tokens[0])) {
 
-                // Get the unit associated with the received message
-                Unit unit = getClay ().getUnitByAddress (tokens[0]);
+                // Get the device associated with the received message
+                Device device = getClay ().getUnitByAddress (tokens[0]);
 
                 // Set time that this message was added to the message queue.
                 // NOTE: This is NOT the time that the message was received! It is probably shortly thereafter, though!
                 Calendar currentTime = Calendar.getInstance();
-                unit.setTimeOfLastContact(currentTime.getTime());
+                device.setTimeOfLastContact(currentTime.getTime());
             }
 
             // Insert the message into the incoming message queue.
@@ -200,10 +200,10 @@ public class MessageManager {
                     getClay().addUnit(deviceUuid, unitAddress);
 
                 } else {
-//                    Log.v("Clay", "Updating state of existing Unit with address " + unitAddress);
+//                    Log.v("Clay", "Updating state of existing Device with address " + unitAddress);
 
                     UUID deviceUuid = UUID.fromString(unitUuid);
-                    Unit unit = getClay().getUnitByUuid(deviceUuid);
+                    Device device = getClay().getUnitByUuid(deviceUuid);
                 }
             }
 

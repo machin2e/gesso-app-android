@@ -1,5 +1,7 @@
 package camp.computer.clay.system;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -97,5 +99,67 @@ public class CacheManager {
 
     public ArrayList<Script> getScripts() {
         return this.scripts;
+    }
+
+
+
+    /**
+     * Populates cache with all behavior scripts and actions from the available content managers.
+     */
+    public void populate () {
+        Log.v("Content_Manager", "populateCache");
+
+
+        // if (useClay().canStore()) {
+        if (getClay().hasStore()) {
+            Log.v("Content_Manager", "populateCache");
+
+            // Restore behavior scripts and addUnit them to the cache
+            getClay().getStore().restoreScripts();
+            Log.v("Content_Manager", "Restored behavior scripts:");
+            for (Script script : getClay().getCache().getScripts()) {
+                Log.v("Content_Manager", "\t" + script.getUuid());
+            }
+
+            // Restore actions and addUnit them to the cache
+            getClay().getStore().restoreActions();
+            Log.v("Content_Manager", "Restored actions:");
+            for (Action action : getClay().getCache().getActions()) {
+                //Log.v("Content_Manager", "\t" + action.getUuid());
+                printRestoredBehavior(action, 1);
+            }
+        }
+    }
+
+    private void printRestoredBehavior (Action action, int tabCount) {
+        String tabString = "";
+        for (int i = 0; i < tabCount; i++) {
+            tabString += "\t";
+        }
+        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
+        if (!action.hasScript()) {
+            for (Action childAction : action.getActions()) {
+                printBehavior(childAction, tabCount + 1);
+            }
+        } else {
+//            Log.v("Content_Manager", tabString + "\tScript (UUID: " + action.getScript().getUuid() + ")");
+//            Log.v("Content_Manager", tabString + "\tState (UUID: " + action.getState().getUuid() + ")");
+        }
+    }
+
+    private void printBehavior (Action action, int tabCount) {
+        String tabString = "";
+        for (int i = 0; i < tabCount; i++) {
+            tabString += "\t";
+        }
+        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
+        if (!action.hasScript()) {
+            for (Action childAction : action.getActions()) {
+                printBehavior(childAction, tabCount + 1);
+            }
+        } else {
+            Log.v("Content_Manager", tabString + "\tScript (UUID: " + action.getScript().getUuid() + ")");
+//            Log.v("Content_Manager", tabString + "\tState (UUID: " + action.getState().getUuid() + ")");
+        }
     }
 }

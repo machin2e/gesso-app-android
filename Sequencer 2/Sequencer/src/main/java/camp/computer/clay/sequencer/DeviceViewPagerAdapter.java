@@ -5,19 +5,21 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.Unit;
+import camp.computer.clay.system.Device;
 
 public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
-
-    public int count = 0;
 
     private Clay clay;
 
     public DeviceViewPagerAdapter(FragmentManager fm) {
         super(fm);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return super.getItemPosition(object);
     }
 
     /**
@@ -30,10 +32,10 @@ public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
 
-        // Get the unit in the specified position
-        Unit unit = null;
-        if (position < getClay().getUnits().size()) {
-            unit = getClay().getUnits().get(position);
+        // Get the device in the specified position
+        Device device = null;
+        if (position < getClay().getDevices().size()) {
+            device = getClay().getDevices().get(position);
         }
 
         // getItem is called to instantiate the fragment for the given page.
@@ -44,7 +46,7 @@ public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
         Bundle args = new Bundle();
         args.putInt(DeviceViewFragment.ARG_SECTION_NUMBER, position + 0); // was "position + 1"
         fragment.setArguments(args);
-        fragment.setUnit(unit);
+        fragment.setDevice(device);
         return (Fragment) fragment;
     }
 
@@ -55,7 +57,11 @@ public class DeviceViewPagerAdapter extends FragmentStatePagerAdapter {
      */
     @Override
     public int getCount() {
-        return this.count;
+        if (getClay() != null) {
+            return getClay().getDevices().size();
+        } else {
+            return 0;
+        }
     }
 
     /**

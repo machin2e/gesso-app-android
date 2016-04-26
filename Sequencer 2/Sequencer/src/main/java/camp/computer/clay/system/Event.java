@@ -91,7 +91,7 @@ public class Event {
     }
 
     public Clay getClay() {
-        return getTimeline().getUnit().getClay();
+        return getTimeline().getDevice().getClay();
     }
 
     public Timeline getTimeline() {

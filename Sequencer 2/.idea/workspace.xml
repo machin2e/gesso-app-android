@@ -6,7 +6,6 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="Signal" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
@@ -37,143 +36,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DeviceViewFragment.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewFragment.java">
+      <file leaf-file-name="TcpMessageInterface.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageInterface.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="49" column="59" selection-start-line="49" selection-start-column="56" selection-end-line="49" selection-end-column="59" />
+              <caret line="26" column="23" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#413#422#0" expanded="true" />
+                <element signature="e#802#803#0" expanded="true" />
+                <element signature="e#853#854#0" expanded="true" />
+                <element signature="e#6182#7017#0" expanded="true" />
+                <element signature="e#7016#7017#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationView.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ApplicationView.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ApplicationView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="412" column="35" selection-start-line="412" selection-start-column="35" selection-end-line="412" selection-end-column="35" />
+            <state vertical-scroll-proportion="-0.024844721">
+              <caret line="256" column="17" selection-start-line="256" selection-start-column="17" selection-end-line="256" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#7291#7292#0" expanded="true" />
-                <element signature="e#7342#7343#0" expanded="true" />
-                <element signature="e#7427#7428#0" expanded="true" />
-                <element signature="e#7453#7454#0" expanded="true" />
-                <element signature="e#13764#13765#0" expanded="true" />
-                <element signature="e#13796#13797#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClayActionButton.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ClayActionButton.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.3333335">
-              <caret line="98" column="7" selection-start-line="98" selection-start-column="7" selection-end-line="98" selection-end-column="7" />
-              <folding>
-                <element signature="e#18246#20327#0" expanded="true" />
-                <element signature="e#18727#20238#0" expanded="true" />
-                <element signature="e#20237#20238#0" expanded="true" />
-                <element signature="e#20326#20327#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DeviceViewPager.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="288" column="57" selection-start-line="288" selection-start-column="57" selection-end-line="288" selection-end-column="57" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EventDesignerView.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventDesignerView.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.39919356">
-              <caret line="487" column="75" selection-start-line="487" selection-start-column="75" selection-end-line="487" selection-end-column="75" />
-              <folding>
-                <element signature="e#1147#1148#0" expanded="true" />
-                <element signature="e#1206#1207#0" expanded="true" />
-                <element signature="e#1236#1237#0" expanded="true" />
-                <element signature="e#1278#1279#0" expanded="true" />
-                <element signature="e#1308#1309#0" expanded="true" />
-                <element signature="e#1340#1341#0" expanded="true" />
-                <element signature="e#4184#4192#0" expanded="true" />
-                <element signature="e#4257#4266#0" expanded="true" />
-                <element signature="e#4339#4347#0" expanded="true" />
-                <element signature="e#4756#5493#0" expanded="true" />
-                <element signature="e#4917#5417#0" expanded="true" />
-                <element signature="e#5416#5417#0" expanded="true" />
-                <element signature="e#5492#5493#0" expanded="true" />
-                <element signature="e#7583#14125#0" expanded="true" />
-                <element signature="e#14124#14125#0" expanded="true" />
-                <element signature="e#14173#14363#0" expanded="true" />
-                <element signature="e#14362#14363#0" expanded="true" />
-                <element signature="e#15590#16948#0" expanded="true" />
-                <element signature="e#16947#16948#0" expanded="true" />
-                <element signature="e#16995#17182#0" expanded="true" />
-                <element signature="e#17181#17182#0" expanded="true" />
-                <element signature="e#17439#17447#0" expanded="true" />
-                <element signature="e#18379#18387#0" expanded="true" />
-                <element signature="e#18649#18657#0" expanded="true" />
-                <element signature="e#19561#19569#0" expanded="true" />
-                <element signature="e#19732#19740#0" expanded="true" />
-                <element signature="e#20316#20324#0" expanded="true" />
-                <element signature="e#20884#20892#0" expanded="true" />
-                <element signature="e#23363#25770#0" expanded="true" />
-                <element signature="e#25769#25770#0" expanded="true" />
-                <element signature="e#25830#28237#0" expanded="true" />
-                <element signature="e#28236#28237#0" expanded="true" />
-                <element signature="e#28297#30704#0" expanded="true" />
-                <element signature="e#30703#30704#0" expanded="true" />
-                <element signature="e#43123#49478#0" expanded="true" />
-                <element signature="e#49477#49478#0" expanded="true" />
-                <element signature="e#49525#49712#0" expanded="true" />
-                <element signature="e#49711#49712#0" expanded="true" />
-                <element signature="e#59583#60813#0" expanded="true" />
-                <element signature="e#60812#60813#0" expanded="true" />
-                <element signature="e#61218#69418#0" expanded="true" />
-                <element signature="e#61876#64202#0" expanded="true" />
-                <element signature="e#64201#64202#0" expanded="true" />
-                <element signature="e#64969#67343#0" expanded="true" />
-                <element signature="e#67342#67343#0" expanded="true" />
-                <element signature="e#68114#69362#0" expanded="true" />
-                <element signature="e#69361#69362#0" expanded="true" />
-                <element signature="e#69417#69418#0" expanded="true" />
-                <element signature="e#69602#76242#0" expanded="true" />
-                <element signature="e#76241#76242#0" expanded="true" />
-                <element signature="e#76290#76480#0" expanded="true" />
-                <element signature="e#76479#76480#0" expanded="true" />
-                <element signature="e#77385#79056#0" expanded="true" />
-                <element signature="e#79055#79056#0" expanded="true" />
-                <element signature="e#79103#79290#0" expanded="true" />
-                <element signature="e#79289#79290#0" expanded="true" />
-                <element signature="e#80405#80413#0" expanded="true" />
-                <element signature="e#80839#80847#0" expanded="true" />
-                <element signature="e#81154#81162#0" expanded="true" />
-                <element signature="e#82040#82048#0" expanded="true" />
-                <element signature="e#88795#92713#0" expanded="true" />
-                <element signature="e#92712#92713#0" expanded="true" />
-                <element signature="e#92760#92947#0" expanded="true" />
-                <element signature="e#92946#92947#0" expanded="true" />
-                <element signature="e#94707#95182#0" expanded="true" />
-                <element signature="e#94839#95140#0" expanded="true" />
-                <element signature="e#95139#95140#0" expanded="true" />
-                <element signature="e#95181#95182#0" expanded="true" />
-                <element signature="e#96904#99563#0" expanded="true" />
-                <element signature="e#99562#99563#0" expanded="true" />
-                <element signature="e#99610#99797#0" expanded="true" />
-                <element signature="e#99796#99797#0" expanded="true" />
-                <element signature="e#100778#103574#0" expanded="true" />
-                <element signature="e#103573#103574#0" expanded="true" />
-                <element signature="e#103621#103808#0" expanded="true" />
-                <element signature="e#103807#103808#0" expanded="true" />
+                <element signature="e#9887#10157#0" expanded="true" />
+                <element signature="e#10156#10157#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -183,7 +71,7 @@
         <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Clay.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="418" column="75" selection-start-line="418" selection-start-column="75" selection-end-line="418" selection-end-column="75" />
+              <caret line="200" column="32" selection-start-line="200" selection-start-column="32" selection-end-line="200" selection-end-column="32" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -191,69 +79,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MessageManager.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/MessageManager.java">
+      <file leaf-file-name="DeviceViewPager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPager.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="237" column="17" selection-start-line="237" selection-start-column="17" selection-end-line="237" selection-end-column="17" />
-              <folding />
+              <caret line="291" column="112" selection-start-line="291" selection-start-column="112" selection-end-line="291" selection-end-column="112" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TimelineListView.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineListView.java">
+      <file leaf-file-name="CursorView.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/CursorView.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="1248" column="0" selection-start-line="1248" selection-start-column="0" selection-end-line="1248" selection-end-column="0" />
+              <caret line="154" column="51" selection-start-line="154" selection-start-column="51" selection-end-line="154" selection-end-column="51" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#7307#10164#0" expanded="true" />
-                <element signature="e#10163#10164#0" expanded="true" />
-                <element signature="e#10245#10577#0" expanded="true" />
-                <element signature="e#10576#10577#0" expanded="true" />
-                <element signature="e#10977#11396#0" expanded="true" />
-                <element signature="e#11395#11396#0" expanded="true" />
-                <element signature="e#19544#19552#0" expanded="true" />
-                <element signature="e#19603#19610#0" expanded="true" />
-                <element signature="e#26893#26894#0" expanded="true" />
-                <element signature="e#26928#26929#0" expanded="true" />
-                <element signature="e#31299#31620#0" expanded="true" />
-                <element signature="e#31619#31620#0" expanded="true" />
-                <element signature="e#32065#32388#0" expanded="true" />
-                <element signature="e#32387#32388#0" expanded="true" />
-                <element signature="e#32841#33026#0" expanded="true" />
-                <element signature="e#33025#33026#0" expanded="true" />
-                <element signature="e#33125#33806#0" expanded="true" />
-                <element signature="e#33805#33806#0" expanded="true" />
-                <element signature="e#34408#35276#0" expanded="true" />
-                <element signature="e#34924#35231#0" expanded="true" />
-                <element signature="e#35230#35231#0" expanded="true" />
-                <element signature="e#35275#35276#0" expanded="true" />
-                <element signature="e#37269#37387#0" expanded="true" />
-                <element signature="e#37386#37387#0" expanded="true" />
-                <element signature="e#40001#40464#0" expanded="true" />
-                <element signature="e#40463#40464#0" expanded="true" />
-                <element signature="e#40611#43535#0" expanded="true" />
-                <element signature="e#41007#41008#0" expanded="true" />
-                <element signature="e#41088#41089#0" expanded="true" />
-                <element signature="e#41171#41172#0" expanded="true" />
-                <element signature="e#41253#41254#0" expanded="true" />
-                <element signature="e#41336#41337#0" expanded="true" />
-                <element signature="e#41420#41421#0" expanded="true" />
-                <element signature="e#42280#42281#0" expanded="true" />
-                <element signature="e#42369#42370#0" expanded="true" />
-                <element signature="e#42452#42453#0" expanded="true" />
-                <element signature="e#42537#42538#0" expanded="true" />
-                <element signature="e#42615#42616#0" expanded="true" />
-                <element signature="e#42695#42696#0" expanded="true" />
-                <element signature="e#43534#43535#0" expanded="true" />
-                <element signature="e#45128#45129#0" expanded="true" />
-                <element signature="e#45165#45166#0" expanded="true" />
-                <element signature="e#45195#45196#0" expanded="true" />
-                <element signature="e#45227#45228#0" expanded="true" />
-                <element signature="e#45265#45266#0" expanded="true" />
-                <element signature="e#45297#45298#0" expanded="true" />
+                <element signature="e#2352#3027#0" expanded="true" />
+                <element signature="e#3026#3027#0" expanded="true" />
+                <element signature="e#8401#18431#0" expanded="true" />
+                <element signature="e#18430#18431#0" expanded="true" />
+                <element signature="e#18466#20651#0" expanded="true" />
+                <element signature="e#19058#20562#0" expanded="true" />
+                <element signature="e#20561#20562#0" expanded="true" />
+                <element signature="e#20650#20651#0" expanded="true" />
+                <element signature="e#20690#21332#0" expanded="true" />
+                <element signature="e#20952#21210#0" expanded="true" />
+                <element signature="e#21209#21210#0" expanded="true" />
+                <element signature="e#21331#21332#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -263,36 +119,74 @@
         <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolderAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="625" column="84" selection-start-line="625" selection-start-column="82" selection-end-line="625" selection-end-column="84" />
+              <caret line="148" column="52" selection-start-line="148" selection-start-column="52" selection-end-line="148" selection-end-column="52" />
               <folding>
                 <element signature="e#1192#1193#0" expanded="true" />
                 <element signature="e#1245#1246#0" expanded="true" />
-                <element signature="e#1414#1415#0" expanded="true" />
-                <element signature="e#1461#1462#0" expanded="true" />
-                <element signature="e#1523#1524#0" expanded="true" />
-                <element signature="e#1577#1578#0" expanded="true" />
                 <element signature="e#1634#1635#0" expanded="true" />
                 <element signature="e#1665#1666#0" expanded="true" />
-                <element signature="e#29814#30095#0" expanded="true" />
-                <element signature="e#30094#30095#0" expanded="true" />
+                <element signature="e#30031#30328#0" expanded="true" />
+                <element signature="e#30327#30328#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EventHolder.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolder.java">
+      <file leaf-file-name="TimelineView.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineView.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="108" column="25" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
+              <caret line="1334" column="86" selection-start-line="1334" selection-start-column="86" selection-end-line="1334" selection-end-column="86" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2692#2693#0" expanded="true" />
-                <element signature="e#2725#2726#0" expanded="true" />
-                <element signature="e#2761#2762#0" expanded="true" />
-                <element signature="e#2799#2800#0" expanded="true" />
-                <element signature="e#3025#3026#0" expanded="true" />
-                <element signature="e#3077#3078#0" expanded="true" />
+                <element signature="e#19761#19769#0" expanded="true" />
+                <element signature="e#19820#19827#0" expanded="true" />
+                <element signature="e#44593#45056#0" expanded="true" />
+                <element signature="e#45055#45056#0" expanded="true" />
+                <element signature="e#45203#48127#0" expanded="true" />
+                <element signature="e#48126#48127#0" expanded="true" />
+                <element signature="e#56442#56443#0" expanded="true" />
+                <element signature="e#56490#56491#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Device.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Device.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="101" column="57" selection-start-line="101" selection-start-column="57" selection-end-line="101" selection-end-column="57" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#2041#2042#0" expanded="true" />
+                <element signature="e#2083#2084#0" expanded="true" />
+                <element signature="e#2122#2123#0" expanded="true" />
+                <element signature="e#2161#2162#0" expanded="true" />
+                <element signature="e#2198#2199#0" expanded="true" />
+                <element signature="e#2234#2235#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SQLiteContentManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/SQLiteContentManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="946" column="0" selection-start-line="946" selection-start-column="0" selection-end-line="946" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Timeline.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Timeline.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="106" column="36" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+              <folding>
+                <element signature="e#2660#2661#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -2633,8 +2527,6 @@
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/MessageInterface.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageHandler.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/InterfaceDevice.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Timeline.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPagerAdapter.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/res/layout/list_item_type_placeholder.xml" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/res/layout/list_item_type_message.xml" />
@@ -2644,24 +2536,29 @@
         <option value="$PROJECT_DIR$/Sequencer/build.gradle" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/res/values/colors.xml" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/res/drawable/scrollbar_vertical_thumb.xml" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/res/values/dimens.xml" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/res/layout/fragment_listview.xml" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Unit.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpClient.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/CacheManager.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/SQLiteContentManager.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageClient.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/MessageManager.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewFragment.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/res/layout/activity_main.xml" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ApplicationView.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/res/values/dimens.xml" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/CacheManager.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolder.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ClayActionButton.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineListView.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPager.java" />
-        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Clay.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolderAdapter.java" />
         <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventDesignerView.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPagerAdapter.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineListView.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPager.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ClayActionButton.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Unit.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageClient.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageInterface.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/SQLiteContentManager.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Timeline.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Clay.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Device.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineView.java" />
+        <option value="$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ApplicationView.java" />
       </list>
     </option>
   </component>
@@ -3163,7 +3060,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="device.picker.selection" value="Nexus_5_API_23" />
     <property name="recentsLimit" value="5" />
-    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="192.168.1.5:5555" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="TA9921BF1K" />
     <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Nexus_5_API_21_x86" />
     <property name="android.project.structure.last.selected" value="Sequencer" />
     <property name="android.project.structure.proportion" value="0.15" />
@@ -3347,11 +3244,12 @@
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32820514" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3448718" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32820514" sideWeight="0.49213162" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3448718" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32820514" sideWeight="0.49213162" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
@@ -3372,7 +3270,6 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -3393,13 +3290,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolder.java</url>
-          <line>91</line>
+          <line>101</line>
           <properties />
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolder.java</url>
-          <line>63</line>
+          <line>73</line>
           <properties />
           <option name="timeStamp" value="11" />
         </line-breakpoint>
@@ -3409,32 +3306,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/NetworkManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.18145162">
-          <caret line="6" column="22" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/NetworkResourceInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24193548">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Timeline.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="92" column="5" selection-start-line="92" selection-start-column="5" selection-end-line="92" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/mipmap-xxhdpi/ic_launcher_001.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/drawable/section_div.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33199194">
@@ -3523,7 +3394,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/Speaker.java">
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/SpeechGenerator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
@@ -3551,33 +3422,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/values/values.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.30542988">
-          <caret line="9" column="58" selection-start-line="9" selection-start-column="58" selection-end-line="9" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/values/dimens.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3326613">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/values/colors.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.24193548">
           <caret line="8" column="51" selection-start-line="8" selection-start-column="51" selection-end-line="8" selection-end-column="51" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/res/anim/fab_scale_up.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.28784648">
-          <caret line="9" column="29" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -3619,89 +3468,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="50" column="27" selection-start-line="50" selection-start-column="27" selection-end-line="50" selection-end-column="27" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/SQLiteContentManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="580" column="92" selection-start-line="580" selection-start-column="92" selection-end-line="580" selection-end-column="92" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="13" column="31" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/CacheManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="81" column="53" selection-start-line="81" selection-start-column="53" selection-end-line="81" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/DatagramManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="184" column="20" selection-start-line="184" selection-start-column="20" selection-end-line="184" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Unit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="127" column="21" selection-start-line="127" selection-start-column="21" selection-end-line="127" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1144#1145#0" expanded="false" />
-            <element signature="e#1176#1177#0" expanded="false" />
-            <element signature="e#1214#1215#0" expanded="false" />
-            <element signature="e#1249#1250#0" expanded="false" />
-            <element signature="e#2252#2253#0" expanded="false" />
-            <element signature="e#2284#2285#0" expanded="false" />
-            <element signature="e#2491#2492#0" expanded="false" />
-            <element signature="e#2534#2535#0" expanded="false" />
-            <element signature="e#2585#2586#0" expanded="false" />
-            <element signature="e#2627#2628#0" expanded="false" />
-            <element signature="e#2666#2667#0" expanded="false" />
-            <element signature="e#2705#2706#0" expanded="false" />
-            <element signature="e#2742#2743#0" expanded="false" />
-            <element signature="e#2778#2779#0" expanded="false" />
-            <element signature="e#3665#3666#0" expanded="false" />
-            <element signature="e#3727#3728#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPagerAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.44959676">
-          <caret line="70" column="0" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/layout/fragment_listview.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.25267667">
-          <caret line="6" column="56" selection-start-line="6" selection-start-column="56" selection-end-line="6" selection-end-column="56" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="android-designer">
-        <state />
       </provider>
     </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.Clans/FloatingActionButton/v1.6.3/610479e39e2f230b0e0fa55dd65ed1e2ef0879a5/FloatingActionButton-v1.6.3-sources.jar!/com/github/clans/fab/FloatingActionButton.java">
@@ -3716,8 +3488,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/layout/activity_main.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.54603857">
-          <caret line="17" column="44" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
+        <state vertical-scroll-proportion="0.6745182">
+          <caret line="21" column="39" selection-start-line="21" selection-start-column="39" selection-end-line="21" selection-end-column="39" />
           <folding />
         </state>
       </provider>
@@ -3725,140 +3497,67 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewFragment.java">
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/layout/fragment_listview.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="49" column="59" selection-start-line="49" selection-start-column="56" selection-end-line="49" selection-end-column="59" />
+        <state vertical-scroll-proportion="-2.586207">
+          <caret line="5" column="52" selection-start-line="5" selection-start-column="52" selection-end-line="5" selection-end-column="52" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#231#266#0" expanded="true" />
           </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ApplicationView.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="412" column="35" selection-start-line="412" selection-start-column="35" selection-end-line="412" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#7291#7292#0" expanded="true" />
-            <element signature="e#7342#7343#0" expanded="true" />
-            <element signature="e#7427#7428#0" expanded="true" />
-            <element signature="e#7453#7454#0" expanded="true" />
-            <element signature="e#13764#13765#0" expanded="true" />
-            <element signature="e#13796#13797#0" expanded="true" />
-          </folding>
-        </state>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolder.java">
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/res/values/dimens.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="108" column="25" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2692#2693#0" expanded="true" />
-            <element signature="e#2725#2726#0" expanded="true" />
-            <element signature="e#2761#2762#0" expanded="true" />
-            <element signature="e#2799#2800#0" expanded="true" />
-            <element signature="e#3025#3026#0" expanded="true" />
-            <element signature="e#3077#3078#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ClayActionButton.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-6.3333335">
-          <caret line="98" column="7" selection-start-line="98" selection-start-column="7" selection-end-line="98" selection-end-column="7" />
-          <folding>
-            <element signature="e#18246#20327#0" expanded="true" />
-            <element signature="e#18727#20238#0" expanded="true" />
-            <element signature="e#20237#20238#0" expanded="true" />
-            <element signature="e#20326#20327#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="288" column="57" selection-start-line="288" selection-start-column="57" selection-end-line="288" selection-end-column="57" />
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolderAdapter.java">
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/CacheManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="625" column="84" selection-start-line="625" selection-start-column="82" selection-end-line="625" selection-end-column="84" />
+          <caret line="128" column="49" selection-start-line="128" selection-start-column="49" selection-end-line="128" selection-end-column="49" />
           <folding>
-            <element signature="e#1192#1193#0" expanded="true" />
-            <element signature="e#1245#1246#0" expanded="true" />
-            <element signature="e#1414#1415#0" expanded="true" />
-            <element signature="e#1461#1462#0" expanded="true" />
-            <element signature="e#1523#1524#0" expanded="true" />
-            <element signature="e#1577#1578#0" expanded="true" />
-            <element signature="e#1634#1635#0" expanded="true" />
-            <element signature="e#1665#1666#0" expanded="true" />
-            <element signature="e#29814#30095#0" expanded="true" />
-            <element signature="e#30094#30095#0" expanded="true" />
+            <element signature="e#327#328#0" expanded="true" />
+            <element signature="e#359#360#0" expanded="true" />
+            <element signature="e#389#390#0" expanded="true" />
+            <element signature="e#421#422#0" expanded="true" />
+            <element signature="e#556#557#0" expanded="true" />
+            <element signature="e#596#597#0" expanded="true" />
+            <element signature="e#1704#1705#0" expanded="true" />
+            <element signature="e#1739#1740#0" expanded="true" />
+            <element signature="e#2479#2480#0" expanded="true" />
+            <element signature="e#2514#2515#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineListView.java">
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventDesignerView.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="1248" column="0" selection-start-line="1248" selection-start-column="0" selection-end-line="1248" selection-end-column="0" />
+          <caret line="364" column="90" selection-start-line="364" selection-start-column="90" selection-end-line="364" selection-end-column="90" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#7307#10164#0" expanded="true" />
-            <element signature="e#10163#10164#0" expanded="true" />
-            <element signature="e#10245#10577#0" expanded="true" />
-            <element signature="e#10576#10577#0" expanded="true" />
-            <element signature="e#10977#11396#0" expanded="true" />
-            <element signature="e#11395#11396#0" expanded="true" />
-            <element signature="e#19544#19552#0" expanded="true" />
-            <element signature="e#19603#19610#0" expanded="true" />
-            <element signature="e#26893#26894#0" expanded="true" />
-            <element signature="e#26928#26929#0" expanded="true" />
-            <element signature="e#31299#31620#0" expanded="true" />
-            <element signature="e#31619#31620#0" expanded="true" />
-            <element signature="e#32065#32388#0" expanded="true" />
-            <element signature="e#32387#32388#0" expanded="true" />
-            <element signature="e#32841#33026#0" expanded="true" />
-            <element signature="e#33025#33026#0" expanded="true" />
-            <element signature="e#33125#33806#0" expanded="true" />
-            <element signature="e#33805#33806#0" expanded="true" />
-            <element signature="e#34408#35276#0" expanded="true" />
-            <element signature="e#34924#35231#0" expanded="true" />
-            <element signature="e#35230#35231#0" expanded="true" />
-            <element signature="e#35275#35276#0" expanded="true" />
-            <element signature="e#37269#37387#0" expanded="true" />
-            <element signature="e#37386#37387#0" expanded="true" />
-            <element signature="e#40001#40464#0" expanded="true" />
-            <element signature="e#40463#40464#0" expanded="true" />
-            <element signature="e#40611#43535#0" expanded="true" />
-            <element signature="e#41007#41008#0" expanded="true" />
-            <element signature="e#41088#41089#0" expanded="true" />
-            <element signature="e#41171#41172#0" expanded="true" />
-            <element signature="e#41253#41254#0" expanded="true" />
-            <element signature="e#41336#41337#0" expanded="true" />
-            <element signature="e#41420#41421#0" expanded="true" />
-            <element signature="e#42280#42281#0" expanded="true" />
-            <element signature="e#42369#42370#0" expanded="true" />
-            <element signature="e#42452#42453#0" expanded="true" />
-            <element signature="e#42537#42538#0" expanded="true" />
-            <element signature="e#42615#42616#0" expanded="true" />
-            <element signature="e#42695#42696#0" expanded="true" />
-            <element signature="e#43534#43535#0" expanded="true" />
-            <element signature="e#45128#45129#0" expanded="true" />
-            <element signature="e#45165#45166#0" expanded="true" />
-            <element signature="e#45195#45196#0" expanded="true" />
-            <element signature="e#45227#45228#0" expanded="true" />
-            <element signature="e#45265#45266#0" expanded="true" />
-            <element signature="e#45297#45298#0" expanded="true" />
+            <element signature="e#4181#4189#0" expanded="true" />
+            <element signature="e#4254#4263#0" expanded="true" />
+            <element signature="e#4336#4344#0" expanded="true" />
+            <element signature="e#15601#17021#0" expanded="true" />
+            <element signature="e#17020#17021#0" expanded="true" />
+            <element signature="e#17512#17520#0" expanded="true" />
+            <element signature="e#18452#18460#0" expanded="true" />
+            <element signature="e#18722#18730#0" expanded="true" />
+            <element signature="e#19634#19642#0" expanded="true" />
+            <element signature="e#19805#19813#0" expanded="true" />
+            <element signature="e#20389#20397#0" expanded="true" />
+            <element signature="e#20957#20965#0" expanded="true" />
+            <element signature="e#80494#80502#0" expanded="true" />
+            <element signature="e#80928#80936#0" expanded="true" />
+            <element signature="e#81243#81251#0" expanded="true" />
+            <element signature="e#82129#82137#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3866,7 +3565,101 @@
     <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/MessageManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="237" column="17" selection-start-line="237" selection-start-column="17" selection-end-line="237" selection-end-column="17" />
+          <caret line="199" column="34" selection-start-line="199" selection-start-column="34" selection-end-line="199" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/ViewManagerInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3416149">
+          <caret line="11" column="7" selection-start-line="11" selection-start-column="7" selection-end-line="11" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/Library/Android/sdk/extras/android/m2repository/com/android/support/support-v4/23.1.1/support-v4-23.1.1-sources.jar!/android/support/v4/view/PagerAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.24016564">
+          <caret line="271" column="74" selection-start-line="271" selection-start-column="74" selection-end-line="271" selection-end-column="74" />
+          <folding>
+            <element signature="e#12097#12098#0" expanded="false" />
+            <element signature="e#12140#12141#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Android/sdk/sources/android-23/android/app/ActionBar.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3326613">
+          <caret line="634" column="25" selection-start-line="634" selection-start-column="25" selection-end-line="634" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="58" column="5" selection-start-line="58" selection-start-column="5" selection-end-line="58" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPagerAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="15" column="47" selection-start-line="15" selection-start-column="47" selection-end-line="15" selection-end-column="47" />
+          <folding>
+            <element signature="e#572#573#0" expanded="true" />
+            <element signature="e#624#625#0" expanded="true" />
+            <element signature="e#2416#2417#0" expanded="true" />
+            <element signature="e#2463#2464#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="30" column="7" selection-start-line="30" selection-start-column="7" selection-end-line="30" selection-end-column="7" />
+          <folding>
+            <element signature="e#6202#6203#0" expanded="true" />
+            <element signature="e#6229#6230#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/TcpMessageInterface.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="26" column="23" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#413#422#0" expanded="true" />
+            <element signature="e#802#803#0" expanded="true" />
+            <element signature="e#853#854#0" expanded="true" />
+            <element signature="e#6182#7017#0" expanded="true" />
+            <element signature="e#7016#7017#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Timeline.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="106" column="36" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+          <folding>
+            <element signature="e#2660#2661#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/SQLiteContentManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="946" column="0" selection-start-line="946" selection-start-column="0" selection-end-line="946" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -3874,94 +3667,112 @@
     <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Clay.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="418" column="75" selection-start-line="418" selection-start-column="75" selection-end-line="418" selection-end-column="75" />
+          <caret line="200" column="32" selection-start-line="200" selection-start-column="32" selection-end-line="200" selection-end-column="32" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventDesignerView.java">
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/system/Device.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.39919356">
-          <caret line="487" column="75" selection-start-line="487" selection-start-column="75" selection-end-line="487" selection-end-column="75" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="101" column="57" selection-start-line="101" selection-start-column="57" selection-end-line="101" selection-end-column="57" />
           <folding>
-            <element signature="e#1147#1148#0" expanded="true" />
-            <element signature="e#1206#1207#0" expanded="true" />
-            <element signature="e#1236#1237#0" expanded="true" />
-            <element signature="e#1278#1279#0" expanded="true" />
-            <element signature="e#1308#1309#0" expanded="true" />
-            <element signature="e#1340#1341#0" expanded="true" />
-            <element signature="e#4184#4192#0" expanded="true" />
-            <element signature="e#4257#4266#0" expanded="true" />
-            <element signature="e#4339#4347#0" expanded="true" />
-            <element signature="e#4756#5493#0" expanded="true" />
-            <element signature="e#4917#5417#0" expanded="true" />
-            <element signature="e#5416#5417#0" expanded="true" />
-            <element signature="e#5492#5493#0" expanded="true" />
-            <element signature="e#7583#14125#0" expanded="true" />
-            <element signature="e#14124#14125#0" expanded="true" />
-            <element signature="e#14173#14363#0" expanded="true" />
-            <element signature="e#14362#14363#0" expanded="true" />
-            <element signature="e#15590#16948#0" expanded="true" />
-            <element signature="e#16947#16948#0" expanded="true" />
-            <element signature="e#16995#17182#0" expanded="true" />
-            <element signature="e#17181#17182#0" expanded="true" />
-            <element signature="e#17439#17447#0" expanded="true" />
-            <element signature="e#18379#18387#0" expanded="true" />
-            <element signature="e#18649#18657#0" expanded="true" />
-            <element signature="e#19561#19569#0" expanded="true" />
-            <element signature="e#19732#19740#0" expanded="true" />
-            <element signature="e#20316#20324#0" expanded="true" />
-            <element signature="e#20884#20892#0" expanded="true" />
-            <element signature="e#23363#25770#0" expanded="true" />
-            <element signature="e#25769#25770#0" expanded="true" />
-            <element signature="e#25830#28237#0" expanded="true" />
-            <element signature="e#28236#28237#0" expanded="true" />
-            <element signature="e#28297#30704#0" expanded="true" />
-            <element signature="e#30703#30704#0" expanded="true" />
-            <element signature="e#43123#49478#0" expanded="true" />
-            <element signature="e#49477#49478#0" expanded="true" />
-            <element signature="e#49525#49712#0" expanded="true" />
-            <element signature="e#49711#49712#0" expanded="true" />
-            <element signature="e#59583#60813#0" expanded="true" />
-            <element signature="e#60812#60813#0" expanded="true" />
-            <element signature="e#61218#69418#0" expanded="true" />
-            <element signature="e#61876#64202#0" expanded="true" />
-            <element signature="e#64201#64202#0" expanded="true" />
-            <element signature="e#64969#67343#0" expanded="true" />
-            <element signature="e#67342#67343#0" expanded="true" />
-            <element signature="e#68114#69362#0" expanded="true" />
-            <element signature="e#69361#69362#0" expanded="true" />
-            <element signature="e#69417#69418#0" expanded="true" />
-            <element signature="e#69602#76242#0" expanded="true" />
-            <element signature="e#76241#76242#0" expanded="true" />
-            <element signature="e#76290#76480#0" expanded="true" />
-            <element signature="e#76479#76480#0" expanded="true" />
-            <element signature="e#77385#79056#0" expanded="true" />
-            <element signature="e#79055#79056#0" expanded="true" />
-            <element signature="e#79103#79290#0" expanded="true" />
-            <element signature="e#79289#79290#0" expanded="true" />
-            <element signature="e#80405#80413#0" expanded="true" />
-            <element signature="e#80839#80847#0" expanded="true" />
-            <element signature="e#81154#81162#0" expanded="true" />
-            <element signature="e#82040#82048#0" expanded="true" />
-            <element signature="e#88795#92713#0" expanded="true" />
-            <element signature="e#92712#92713#0" expanded="true" />
-            <element signature="e#92760#92947#0" expanded="true" />
-            <element signature="e#92946#92947#0" expanded="true" />
-            <element signature="e#94707#95182#0" expanded="true" />
-            <element signature="e#94839#95140#0" expanded="true" />
-            <element signature="e#95139#95140#0" expanded="true" />
-            <element signature="e#95181#95182#0" expanded="true" />
-            <element signature="e#96904#99563#0" expanded="true" />
-            <element signature="e#99562#99563#0" expanded="true" />
-            <element signature="e#99610#99797#0" expanded="true" />
-            <element signature="e#99796#99797#0" expanded="true" />
-            <element signature="e#100778#103574#0" expanded="true" />
-            <element signature="e#103573#103574#0" expanded="true" />
-            <element signature="e#103621#103808#0" expanded="true" />
-            <element signature="e#103807#103808#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#2041#2042#0" expanded="true" />
+            <element signature="e#2083#2084#0" expanded="true" />
+            <element signature="e#2122#2123#0" expanded="true" />
+            <element signature="e#2161#2162#0" expanded="true" />
+            <element signature="e#2198#2199#0" expanded="true" />
+            <element signature="e#2234#2235#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.39314517">
+          <caret line="120" column="39" selection-start-line="120" selection-start-column="39" selection-end-line="120" selection-end-column="39" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/DeviceViewPager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="291" column="112" selection-start-line="291" selection-start-column="112" selection-end-line="291" selection-end-column="112" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/EventHolderAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="148" column="52" selection-start-line="148" selection-start-column="52" selection-end-line="148" selection-end-column="52" />
+          <folding>
+            <element signature="e#1192#1193#0" expanded="true" />
+            <element signature="e#1245#1246#0" expanded="true" />
+            <element signature="e#1634#1635#0" expanded="true" />
+            <element signature="e#1665#1666#0" expanded="true" />
+            <element signature="e#30031#30328#0" expanded="true" />
+            <element signature="e#30327#30328#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/CursorView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="154" column="51" selection-start-line="154" selection-start-column="51" selection-end-line="154" selection-end-column="51" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2352#3027#0" expanded="true" />
+            <element signature="e#3026#3027#0" expanded="true" />
+            <element signature="e#8401#18431#0" expanded="true" />
+            <element signature="e#18430#18431#0" expanded="true" />
+            <element signature="e#18466#20651#0" expanded="true" />
+            <element signature="e#19058#20562#0" expanded="true" />
+            <element signature="e#20561#20562#0" expanded="true" />
+            <element signature="e#20650#20651#0" expanded="true" />
+            <element signature="e#20690#21332#0" expanded="true" />
+            <element signature="e#20952#21210#0" expanded="true" />
+            <element signature="e#21209#21210#0" expanded="true" />
+            <element signature="e#21331#21332#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/TimelineView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1334" column="86" selection-start-line="1334" selection-start-column="86" selection-end-line="1334" selection-end-column="86" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#19761#19769#0" expanded="true" />
+            <element signature="e#19820#19827#0" expanded="true" />
+            <element signature="e#44593#45056#0" expanded="true" />
+            <element signature="e#45055#45056#0" expanded="true" />
+            <element signature="e#45203#48127#0" expanded="true" />
+            <element signature="e#48126#48127#0" expanded="true" />
+            <element signature="e#56442#56443#0" expanded="true" />
+            <element signature="e#56490#56491#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sequencer/src/main/java/camp/computer/clay/sequencer/ApplicationView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.024844721">
+          <caret line="256" column="17" selection-start-line="256" selection-start-column="17" selection-end-line="256" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#9887#10157#0" expanded="true" />
+            <element signature="e#10156#10157#0" expanded="true" />
           </folding>
         </state>
       </provider>

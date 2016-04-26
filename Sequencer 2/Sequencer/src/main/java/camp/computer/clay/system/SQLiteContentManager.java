@@ -28,6 +28,92 @@ public class SQLiteContentManager {
 
     private SQLiteDatabaseHelper db;
 
+
+
+    public void generate () {
+
+        if (getClay().hasStore()) {
+
+            UUID uuid;
+
+            // light
+            uuid = UUID.fromString("1470f5c4-eaf1-43fb-8fb3-d96dc4e2bee4");
+            if (!getClay().getCache().hasScript(uuid)) {
+                Log.v("Clay_Behavior_Repo", "\"light\" behavior not found in the repository. Adding it.");
+                generateBehaviorScript(uuid, "light", "((T|F) ){11}(T|F)", "000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000");
+            }
+
+            // signal
+            uuid = UUID.fromString("bdb49750-9ead-466e-96a0-3aa88e7d246c");
+            if (!getClay().getCache().hasScript(uuid)) {
+                Log.v("Clay_Behavior_Repo", "\"signal\" behavior not found in the repository. Adding it.");
+                //getClay().generateBehaviorScript(uuid, "signal", "regex", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
+                generateBehaviorScript(uuid, "signal", "regex", "TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none");
+            }
+
+            // message
+            uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
+            if (!getClay().getCache().hasScript(uuid)) {
+                Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
+                generateBehaviorScript(uuid, "message", "regex", "Device Other \"hello\"");
+            }
+
+            // tone
+            uuid = UUID.fromString("16626b1e-cf41-413f-bdb4-0188e82803e2");
+            if (!getClay().getCache().hasScript(uuid)) {
+                Log.v("Clay_Behavior_Repo", "\"tone\" behavior not found in the repository. Adding it.");
+                generateBehaviorScript(uuid, "tone", "regex", "frequency 0 hz 0 ms");
+            }
+
+            // pause
+            uuid = UUID.fromString("56d0cf7d-ede6-4529-921c-ae9307d1afbc");
+            if (!getClay().getCache().hasScript(uuid)) {
+                Log.v("Clay_Behavior_Repo", "\"pause\" behavior not found in the repository. Adding it.");
+                generateBehaviorScript(uuid, "pause", "regex", "250");
+            }
+
+            // say
+            uuid = UUID.fromString("269f2e19-1fc8-40f5-99b2-6ca67e828e70");
+            if (!getClay().getCache().hasScript(uuid)) {
+                Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
+                generateBehaviorScript(uuid, "say", "regex", "oh, that's great");
+            }
+        }
+    }
+
+    /**
+     * Creates a new behavior with the specified tag and state and stores it.
+     * @param tag
+     * @param defaultState
+     */
+    private void generateBehaviorScript (UUID uuid, String tag, String stateSpacePattern, String defaultState) {
+
+        Log.v ("Content_Manager", "Creating script.");
+
+        // Create behavior (and state) for the behavior script
+        Script script = new Script (uuid, tag, stateSpacePattern, defaultState);
+
+        // Cache the behavior
+//        this.cache(script);
+
+        // Store the behavior
+        if (getClay().hasStore()) {
+            getClay().getStore().storeScript(script);
+        }
+
+        generateBasicBehavior(script);
+
+    }
+
+    private void generateBasicBehavior (Script script) {
+
+        Log.v ("Content_Manager", "Generating basic behavior for script.");
+
+        // Generate basic actions for all behavior scripts
+        Action basicAction = new Action(script);
+        getClay().getStore().storeAction(basicAction);
+    }
+
     /* Database */
 
     // If you change the database schema, you must increment the database version.
@@ -801,24 +887,24 @@ public class SQLiteContentManager {
 
         /** Units */
 
-        public void insertDevice(Unit unit) {
+        public void insertDevice(Device device) {
 
             // Gets the data repository in write mode
             SQLiteDatabase db = SQLiteContentManager.this.db.getWritableDatabase();
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(DeviceEntry.COLUMN_NAME_UUID, unit.getUuid().toString());
-            values.put(DeviceEntry.COLUMN_NAME_TIMELINE_UUID, unit.getTimeline().getUuid().toString());
+            values.put(DeviceEntry.COLUMN_NAME_UUID, device.getUuid().toString());
+            values.put(DeviceEntry.COLUMN_NAME_TIMELINE_UUID, device.getTimeline().getUuid().toString());
 
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert(DeviceEntry.TABLE_NAME, null, values);
 
-            Log.v("Content_Manager", "Inserted unit into database (_id: " + entryId + ")");
+            Log.v("Content_Manager", "Inserted device into database (_id: " + entryId + ")");
 
         }
 
-        public Unit queryUnit (UUID uuid) {
+        public Device queryUnit (UUID uuid) {
             Log.v("Content_Manager", "queryUnit");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
 
@@ -856,13 +942,13 @@ public class SQLiteContentManager {
                 String timelineUuidString = cursor.getString(cursor.getColumnIndexOrThrow(DeviceEntry.COLUMN_NAME_TIMELINE_UUID));
 
                 // Create the behavior
-                Unit unit = new Unit(getClay(), UUID.fromString(uuidString));
-                unit.setTimelineUuid(UUID.fromString(timelineUuidString));
+                Device device = new Device(getClay(), UUID.fromString(uuidString));
+                device.getTimeline().setUuid(UUID.fromString(timelineUuidString));
 
-                // Reconstruct the unit's timeline
-                queryTimeline (unit, UUID.fromString(timelineUuidString));
+                // Reconstruct the device's timeline
+                queryTimeline (device, UUID.fromString(timelineUuidString));
 
-                return unit;
+                return device;
             }
 
             return null;
@@ -897,7 +983,7 @@ public class SQLiteContentManager {
 
         }
 
-        public Timeline queryTimeline (Unit unit, UUID timelineUuid) {
+        public Timeline queryTimeline (Device device, UUID timelineUuid) {
 
             Log.v("Content_Manager", "queryTimeline");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
@@ -939,10 +1025,10 @@ public class SQLiteContentManager {
             Timeline timeline = new Timeline (UUID.fromString(uuidString));
 
             // Populate the timeline with its events
-            queryEvents (unit, timeline);
+            queryEvents (device, timeline);
 
             // Assign the timeline to the device
-            unit.setTimeline(timeline);
+            device.setTimeline(timeline);
 
             return timeline;
         }
@@ -1350,10 +1436,10 @@ public class SQLiteContentManager {
         /**
          * Called by queryTimeline after it reconstructs a timeline.
          *
-         * @param unit
+         * @param device
          * @param timeline
          */
-        public void queryEvents (Unit unit, Timeline timeline) {
+        public void queryEvents (Device device, Timeline timeline) {
 
             Log.v("Content_Manager", "queryEvents");
             SQLiteDatabase db = SQLiteContentManager.this.db.getReadableDatabase();
@@ -1661,8 +1747,8 @@ public class SQLiteContentManager {
         db.saveTimeline(timeline);
     }
 
-    public Timeline restoreTimeline (Unit unit, UUID uuid) {
-        Timeline timeline = db.queryTimeline(unit, uuid);
+    public Timeline restoreTimeline (Device device, UUID uuid) {
+        Timeline timeline = db.queryTimeline(device, uuid);
         return timeline;
     }
 
@@ -1684,8 +1770,8 @@ public class SQLiteContentManager {
         return result;
     }
 
-    public void resetDatabase() {
-        Log.v("Content_Manager", "resetDatabase");
+    public void erase() {
+        Log.v("Content_Manager", "empty");
         db.resetDatabase(db.getWritableDatabase());
     }
 
@@ -1712,13 +1798,13 @@ public class SQLiteContentManager {
         db.queryState(event);
     }
 
-    public void storeDevice(Unit unit) {
-        db.insertDevice(unit);
+    public void storeDevice(Device device) {
+        db.insertDevice(device);
     }
 
-    public Unit restoreDevice(UUID uuid) {
-        Unit unit = db.queryUnit(uuid);
-        return unit;
+    public Device restoreDevice(UUID uuid) {
+        Device device = db.queryUnit(uuid);
+        return device;
     }
 
     public Action getActionComposition(ArrayList<Action> children) {

@@ -9,13 +9,17 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,15 +29,16 @@ import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import camp.computer.clay.system.*;
 import camp.computer.clay.system.Event;
 
-public class TimelineListView extends DragSortListView {
+public class TimelineView extends DragSortListView {
 
     private static final boolean HIDE_LIST_ITEM_SEPARATOR = true;
 
-    private Unit unit;
+    private Device device;
 
     /**
      * List of event holders that hold events on the timeline. This has to be repopulated on
@@ -45,12 +50,12 @@ public class TimelineListView extends DragSortListView {
 
     private EventDesignerView eventDesignerView;
 
-    public TimelineListView(Context context, AttributeSet attrs) {
+    public TimelineView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setUpView();
 
         // <HACK>
-        TimelineListView.timelineListView = this;
+        TimelineView.timelineView = this;
         // </HACK>
     }
 
@@ -222,32 +227,32 @@ public class TimelineListView extends DragSortListView {
                     if (event != null) {
                         // <HACK>
                         // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
-                        getUnit().getTimeline().removeEvent(event);
+                        getDevice().getTimeline().removeEvent(event);
                         // </HACK>
                     }
 
                     // Object: Add event to timeline
-//                    getUnit().getTimeline().getEvents().add (toIndex, event);
-                    getUnit().getTimeline().addEvent(toIndex, event); // if store event was successful
+//                    getDevice().getTimeline().getEvents().add (toIndex, event);
+                    getDevice().getTimeline().addEvent(toIndex, event); // if store event was successful
 
                     // Store: Update timeline indices
-                    getClay().getStore().storeTimeline(getUnit().getTimeline());
+                    getClay().getStore().storeTimeline(getDevice().getTimeline());
 
                     // Device: Send messages to update device state
                     // TODO: "start event <event-uuid> [after event <event-uuid>]"
                     // TODO: "start event <event-uuid> [before event <event-uuid>]"
                     if (toIndex == (adapter.getCount() - 1)) {
                         // <HACK>
-                        getUnit().enqueueMessage("start event " + event.getUuid());
-                        getUnit().enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                        getUnit().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+                        getDevice().enqueueMessage("start event " + event.getUuid());
+                        getDevice().enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
                         // </HACK>
                     } else {
-                        Event nextEvent = getUnit().getTimeline().getEvents().get(toIndex + 1);
+                        Event nextEvent = getDevice().getTimeline().getEvents().get(toIndex + 1);
                         // <HACK>
-                        getUnit().enqueueMessage("start event " + event.getUuid() + " before event " + nextEvent.getUuid());
-                        getUnit().enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                        getUnit().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+                        getDevice().enqueueMessage("start event " + event.getUuid() + " before event " + nextEvent.getUuid());
+                        getDevice().enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
                         // </HACK>
                     }
                 }
@@ -307,7 +312,7 @@ public class TimelineListView extends DragSortListView {
     }
 
     private void setUpLayout() {
-        if (TimelineListView.HIDE_LIST_ITEM_SEPARATOR) {
+        if (TimelineView.HIDE_LIST_ITEM_SEPARATOR) {
             setDivider(null);
             setDividerHeight(0);
         }
@@ -342,7 +347,7 @@ public class TimelineListView extends DragSortListView {
      */
     private void createEventHolders (Timeline timeline) {
 
-        // Create a behavior profile for each of the unit's behaviors
+        // Create a behavior profile for each of the device's behaviors
         for (Event event : timeline.getEvents()) {
             EventHolder eventHolder = new EventHolder(event);
             eventHolders.add(eventHolder);
@@ -394,9 +399,9 @@ public class TimelineListView extends DragSortListView {
             // <HACK>
             // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
             getClay().getStore().removeEvent(eventHolder.getEvent());
-            // TODO: getUnit().sendMessage ("stop event " + event.getUuid());
+            // TODO: getDevice().sendMessage ("stop event " + event.getUuid());
             // TODO: ^ That won't work right unless an event on the MCU has all actions and states, not just 1:1 for event:action.
-            getUnit().getTimeline().removeEvent (eventHolder.getEvent()); // if store action successful
+            getDevice().getTimeline().removeEvent (eventHolder.getEvent()); // if store action successful
             // </HACK>
 
             // Update state of the object associated with the selected view.
@@ -405,22 +410,22 @@ public class TimelineListView extends DragSortListView {
         }
 
         // Create event object
-        Timeline timeline = this.getUnit().getTimeline();
+        Timeline timeline = this.getDevice().getTimeline();
         event = new Event(timeline, action);
 //        event.getAction().setState(behaviorState);
 
         // Object: Add event to timeline
-        getUnit().getTimeline().getEvents().add(index, event); // if store event was successful
+        getDevice().getTimeline().getEvents().add(index, event); // if store event was successful
 
         // Store: Store the event
         getClay().getStore().storeEvent(event);
 
         // Store: Update timeline indices
-        getClay().getStore().storeTimeline(getUnit().getTimeline());
+        getClay().getStore().storeTimeline(getDevice().getTimeline());
 
         // Notify Clay of the change to the event
 //        getClay().notifyChange(event);
-//        getUnit().notifyChange(event);
+//        getDevice().notifyChange(event);
 
         // Send the event to the device
         Log.v("Sending_Message", "start event " + event.getUuid());
@@ -429,9 +434,9 @@ public class TimelineListView extends DragSortListView {
 
         // <HACK>
         // TODO: Replace this with a queue.
-        getUnit().enqueueMessage("start event " + event.getUuid());
-        getUnit().enqueueMessage("set event " + event.getUuid() + " action " + action.getScript().getUuid()); // <HACK />
-        getUnit().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+        getDevice().enqueueMessage("start event " + event.getUuid());
+        getDevice().enqueueMessage("set event " + event.getUuid() + " action " + action.getScript().getUuid()); // <HACK />
+        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
         // </HACK>
 
         // Create and addUnit the new eventHolder to the timeline
@@ -450,13 +455,13 @@ public class TimelineListView extends DragSortListView {
 
             // <HACK>
             // TODO: Replace this with a queue.
-            getUnit().enqueueMessage("stop event " + eventHolder.getEvent().getUuid());
+            getDevice().enqueueMessage("stop event " + eventHolder.getEvent().getUuid());
             // </HACK>
 
             // <HACK>
             // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
             getClay().getStore().removeEvent(eventHolder.getEvent());
-            getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
+            getDevice().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
             // </HACK>
         }
 
@@ -470,7 +475,7 @@ public class TimelineListView extends DragSortListView {
 
         /*
         // <HACK>
-        getClay().getStore().updateTimeline(this.unit.getTimeline());
+        getClay().getStore().updateTimeline(this.device.getTimeline());
         // </HACK>
         */
     }
@@ -530,14 +535,14 @@ public class TimelineListView extends DragSortListView {
 
         // Remove old behaviors from the timeline
         for (EventHolder eventHolder : selectedEventHolders) {
-            getUnit().getTimeline().removeEvent(eventHolder.getEvent()); // if store action successful
+            getDevice().getTimeline().removeEvent(eventHolder.getEvent()); // if store action successful
         }
 
-        // Create event for the action and add it to the unit's timeline
-//        Event compositionEvent = new Event(getUnit().getTimeline(), newBehavior);
-//        getUnit().getTimeline().addEvent(index, compositionEvent);
+        // Create event for the action and add it to the device's timeline
+//        Event compositionEvent = new Event(getDevice().getTimeline(), newBehavior);
+//        getDevice().getTimeline().addEvent(index, compositionEvent);
 //        getClay().getStore().storeEvent(compositionEvent);
-        Event compositionEvent = new Event(getUnit().getTimeline(), action);
+        Event compositionEvent = new Event(getDevice().getTimeline(), action);
         // insert new event for abstract action
         //            foundUnit.getTimeline().addEvent(event);
         compositionEvent.getState().clear();
@@ -547,11 +552,11 @@ public class TimelineListView extends DragSortListView {
         for (State state : compositionEvent.getState()) {
             Log.v("New_Behavior_Parent", "\t" + state.getState());
         }
-        getUnit().getTimeline().addEvent(index, compositionEvent);
+        getDevice().getTimeline().addEvent(index, compositionEvent);
         getClay().getStore().storeEvent(compositionEvent);
 
         // Store: Reindex the timeline events
-        getClay().getStore().storeTimeline(getUnit().getTimeline());
+        getClay().getStore().storeTimeline(getDevice().getTimeline());
 
         // View: Remove the selected items from the list
         for (EventHolder eventHolder : selectedEventHolders) {
@@ -591,7 +596,7 @@ public class TimelineListView extends DragSortListView {
         int index = eventHolders.indexOf(eventHolder);
 
         // Remove the event from the timeline
-        getUnit().getTimeline().removeEvent(eventHolder.getEvent());
+        getDevice().getTimeline().removeEvent(eventHolder.getEvent());
 
         // Remove the event from the database
         getClay().getStore().removeEvent(eventHolder.getEvent());
@@ -613,7 +618,7 @@ public class TimelineListView extends DragSortListView {
             //!!!!!!!!!!!!!!!!
 
             // Create event for the action and add it to the timeline
-            Event decomposedEvent = new Event (getUnit ().getTimeline (), action);
+            Event decomposedEvent = new Event (getDevice().getTimeline (), action);
 
             // Reassign states to events based on their number of children
             decomposedEvent.getState().clear();
@@ -642,7 +647,7 @@ public class TimelineListView extends DragSortListView {
             }
 
             // Add the new event to the timeline
-            getUnit().getTimeline().addEvent(index, decomposedEvent);
+            getDevice().getTimeline().addEvent(index, decomposedEvent);
 
             // Store the new event
             getClay ().getStore ().storeEvent (decomposedEvent);
@@ -655,7 +660,7 @@ public class TimelineListView extends DragSortListView {
             index++;
         }
 
-        getClay().getStore().storeTimeline(getUnit().getTimeline());
+        getClay().getStore().storeTimeline(getDevice().getTimeline());
         // </HACK>
 
         refreshTimelineView(); // Update view after removing items from the list
@@ -788,11 +793,11 @@ public class TimelineListView extends DragSortListView {
     public void refreshTimelineView() {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
 //        adapter.notifyDataSetChanged();
-        final TimelineListView lv = this;
+        final TimelineView lv = this;
         ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
             public void run() {
                 //reload content
-//                arraylist.clear();
+//                arraylist.erase();
 //                arraylist.addAll(db.readAll());
                 adapter.notifyDataSetChanged();
                 lv.invalidateViews();
@@ -810,11 +815,11 @@ public class TimelineListView extends DragSortListView {
     public void redrawListViewFromData() {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
 //        adapter.notifyDataSetChanged();
-        final TimelineListView lv = this;
+        final TimelineView lv = this;
         ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
             public void run() {
                 //reload content
-//                arraylist.clear();
+//                arraylist.erase();
 //                arraylist.addAll(db.readAll());
 //                adapter.notifyDataSetChanged();
                 lv.invalidateViews();
@@ -851,9 +856,9 @@ public class TimelineListView extends DragSortListView {
                 Log.e("Move_Finger", "Updated timeline layout.");
 
                 // Update position
-                //ClayActionButton fab = (ClayActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-                ApplicationView.getApplicationView().getActionButton().fabUpdatePosition();
-//                fab.fabUpdatePosition();
+                //CursorView fab = (CursorView) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+                ApplicationView.getApplicationView().getCursorView().updatePosition();
+//                fab.updatePosition();
             }
         });
 
@@ -961,7 +966,7 @@ public class TimelineListView extends DragSortListView {
         });
     }
 
-//    public void fabUpdatePosition(FloatingActionButton fab) {
+//    public void updatePosition(FloatingActionButton fab) {
 //
 //        // Get screen width and height of the device
 //        DisplayMetrics metrics;
@@ -975,7 +980,7 @@ public class TimelineListView extends DragSortListView {
 //            int width = fab.getWidth();
 //            int height = fab.getHeight();
 //            Point dest = new Point((int) (screenWidth / 2.0)  - (int) (width / 2.0), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-////            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+////            ApplicationView.getApplicationView().moveToPoint(fab, dest, 400);
 //
 //            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
 //            params.leftMargin = (int) dest.x;
@@ -991,13 +996,13 @@ public class TimelineListView extends DragSortListView {
 //        }
 //
 //        if (point != null && point.y < (screenHeight - fab.getHeight())) {
-//            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, point, 400);
+//            ApplicationView.getApplicationView().moveToPoint(fab, point, 400);
 //        } else {
 //            int width = fab.getWidth();
 //            int height = fab.getHeight();
 //            Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
 //
-//            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+//            ApplicationView.getApplicationView().moveToPoint(fab, dest, 400);
 //
 //        }
 //    }
@@ -1012,7 +1017,7 @@ public class TimelineListView extends DragSortListView {
         int actionScriptCount = getClay().getCache().getScripts().size();
         final String[] actionScripts = new String[actionScriptCount];
         for (int i = 0; i < actionScriptCount; i++) {
-            Script cachedScript = unit.getClay().getCache().getScripts().get(i);
+            Script cachedScript = device.getClay().getCache().getScripts().get(i);
             actionScripts[i] = cachedScript.getTag();
         }
 
@@ -1123,6 +1128,126 @@ public class TimelineListView extends DragSortListView {
         alert.show();
     }
 
+    public interface DeviceSelectionListener {
+        public void onSelect (Device device);
+    }
+
+    public void displayDeviceBrowser(final DeviceSelectionListener deviceSelectionListener) {
+
+        // Get list of behaviors available for selection
+        int deviceCount = getClay().getDevices().size();
+        final String[] deviceTitles = new String[deviceCount];
+        for (int i = 0; i < deviceCount; i++) {
+            Device device = getClay().getDevices().get(i);
+            deviceTitles[i] = device.getUuid().toString();
+        }
+
+        // Show the list of behaviors
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setItems(deviceTitles, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int itemIndex) {
+
+                // TODO: Change the DeviceViewPager to the timeline associated with the specified device.
+
+                String deviceUuidString = deviceTitles[itemIndex];
+
+                Device device = getClay().getUnitByUuid(UUID.fromString(deviceUuidString));
+
+                deviceSelectionListener.onSelect(device);
+            }
+        });
+        AlertDialog alert = builder.create();
+        // alert.getListView().setBackgroundColor(Color.BLACK);
+
+
+        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface alert) {
+                ListView listView = ((AlertDialog) alert).getListView();
+                final ListAdapter originalAdapter = listView.getAdapter();
+
+                listView.setAdapter(new ListAdapter() {
+
+                    @Override
+                    public int getCount() {
+                        return originalAdapter.getCount();
+                    }
+
+                    @Override
+                    public Object getItem(int id) {
+                        return originalAdapter.getItem(id);
+                    }
+
+                    @Override
+                    public long getItemId(int id) {
+                        return originalAdapter.getItemId(id);
+                    }
+
+                    @Override
+                    public int getItemViewType(int id) {
+                        return originalAdapter.getItemViewType(id);
+                    }
+
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        View view = originalAdapter.getView(position, convertView, parent);
+                        TextView textView = (TextView) view;
+//                        textView.setTypeface(MyFontUtil.getTypeface(MyActivity,MY_DEFAULT_FONT));
+                        textView.setTextColor(Color.WHITE);
+                        textView.setAllCaps(true);
+                        textView.setTextSize(10.0f);
+                        return view;
+                    }
+
+                    @Override
+                    public int getViewTypeCount() {
+                        return originalAdapter.getViewTypeCount();
+                    }
+
+                    @Override
+                    public boolean hasStableIds() {
+                        return originalAdapter.hasStableIds();
+                    }
+
+                    @Override
+                    public boolean isEmpty() {
+                        return originalAdapter.isEmpty();
+                    }
+
+                    @Override
+                    public void registerDataSetObserver(DataSetObserver observer) {
+                        originalAdapter.registerDataSetObserver(observer);
+
+                    }
+
+                    @Override
+                    public void unregisterDataSetObserver(DataSetObserver observer) {
+                        originalAdapter.unregisterDataSetObserver(observer);
+
+                    }
+
+                    @Override
+                    public boolean areAllItemsEnabled() {
+                        return originalAdapter.areAllItemsEnabled();
+                    }
+
+                    @Override
+                    public boolean isEnabled(int position) {
+                        return originalAdapter.isEnabled(position);
+                    }
+
+                });
+
+            }
+
+        });
+
+        // alert.getListView().setBackgroundColor(ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+
+        alert.show();
+    }
+
     /**
      * Display the behaviors available for selection, starting with basic, cached, public.
      */
@@ -1132,7 +1257,7 @@ public class TimelineListView extends DragSortListView {
 //        int actionScriptCount = getClay().getCache().getScripts().size();
 //        final String[] actionScripts = new String[actionScriptCount];
 //        for (int i = 0; i < actionScriptCount; i++) {
-//            Script cachedScript = unit.getClay().getCache().getScripts().get(i);
+//            Script cachedScript = device.getClay().getCache().getScripts().get(i);
 //            actionScripts[i] = cachedScript.getTag();
 //        }
 //
@@ -1158,26 +1283,26 @@ public class TimelineListView extends DragSortListView {
 //    }
 
     private Clay getClay () {
-        return unit.getClay();
+        return device.getClay();
     }
 
-    public Unit getUnit () {
-        return this.unit;
+    public Device getDevice() {
+        return this.device;
     }
 
-    public void setUnit(Unit unit) {
-        this.unit = unit;
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     private void displayDesignerView (EventHolder eventHolder) {
         if (eventDesignerView == null) {
-            eventDesignerView = new EventDesignerView(getUnit(), this);
+            eventDesignerView = new EventDesignerView(getDevice(), this);
         }
     }
 
     public EventDesignerView getEventDesigner () {
         if (eventDesignerView == null) {
-            eventDesignerView = new EventDesignerView(getUnit(), this);
+            eventDesignerView = new EventDesignerView(getDevice(), this);
         }
         return eventDesignerView;
     }
@@ -1210,6 +1335,7 @@ public class TimelineListView extends DragSortListView {
             final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
 
             expandEventView (eventHolder);
+//            expandEventView2 (eventHolder, view, 100);
 
 
 
@@ -1243,6 +1369,59 @@ public class TimelineListView extends DragSortListView {
 
             return true;
         }
+    }
+
+    // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
+    public void expandEventView2 (EventHolder eventHolder, final View view, int translateDuration)
+    {
+        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+        DisplayMetrics dm = new DisplayMetrics();
+        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics( dm );
+        int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
+
+        int originalPos[] = new int[2];
+        view.getLocationOnScreen( originalPos );
+
+        /*
+        int xDest = dm.widthPixels/2;
+        xDest -= (view.getMeasuredWidth()/2);
+        int yDest = dm.heightPixels/2 - (view.getMeasuredHeight()/2) - statusBarOffset;
+        */
+
+//        int xDest = destinationPoint.x;
+//        int yDest = destinationPoint.y;
+
+
+//        final int amountToMoveRight = xDest - originalPos[0];
+//        final int amountToMoveDown = yDest - originalPos[1];
+        final int amountToMoveRight = 0;
+        final int amountToMoveDown = 150;
+        TranslateAnimation animation = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
+        animation.setDuration(translateDuration);
+        // animation.setFillAfter(true);
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                AbsListView.LayoutParams params = (AbsListView.LayoutParams) view.getLayoutParams();
+                params.height += amountToMoveDown;
+//                params.bottomMargin += amountToMoveDown;
+                // view.setLayoutParams(params);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+
+        view.startAnimation (animation);
     }
 
     public void expandEventView(EventHolder eventHolder) {
@@ -1300,11 +1479,11 @@ public class TimelineListView extends DragSortListView {
     }
 
     // <HACK>
-    public static TimelineListView getTimelineListView () {
-        return TimelineListView.timelineListView;
+    public static TimelineView getTimelineView() {
+        return TimelineView.timelineView;
     }
 
-    private static TimelineListView timelineListView = null;
+    private static TimelineView timelineView = null;
     // </HACK>
 
     public void resetViewBackgrounds () {

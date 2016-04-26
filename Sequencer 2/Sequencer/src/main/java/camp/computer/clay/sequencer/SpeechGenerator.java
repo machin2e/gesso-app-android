@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
-public class Speaker implements TextToSpeech.OnInitListener {
+public class SpeechGenerator implements TextToSpeech.OnInitListener {
 
     private TextToSpeech tts;
 
@@ -17,7 +17,7 @@ public class Speaker implements TextToSpeech.OnInitListener {
 
     private boolean allowed = false;
 
-    public Speaker (Context context){
+    public SpeechGenerator(Context context){
         tts = new TextToSpeech(context, this);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {

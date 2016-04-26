@@ -1,28 +1,17 @@
 package camp.computer.clay.system;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.github.clans.fab.FloatingActionButton;
-import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import camp.computer.clay.sequencer.ApplicationView;
-import camp.computer.clay.sequencer.ClayActionButton;
-import camp.computer.clay.sequencer.EventHolder;
-import camp.computer.clay.sequencer.TimelineListView;
 
 public class Clay {
 
@@ -34,8 +23,8 @@ public class Clay {
     // List of discovered touchscreen devices
     private ArrayList<ViewManagerInterface> views;
 
-    // List of discovered units
-    private ArrayList<Unit> units = new ArrayList<Unit>();
+    // List of discovered devices
+    private ArrayList<Device> devices = new ArrayList<Device>();
 
     // List of actions cached on this device
     private CacheManager cacheManager = null;
@@ -80,18 +69,18 @@ public class Clay {
      */
 
     /**
-     * Sends a message to the specified unit.
-     * @param unit
+     * Sends a message to the specified device.
+     * @param device
      * @param content
      */
-    public void sendMessage (Unit unit, String content) {
+    public void sendMessage (Device device, String content) {
 
         // Get source address
         String source = this.networkManager.getInternetAddress ();
 
         // Get destination address
-        // String destination = unit.getInternetAddress();
-        String destination = unit.getInternetAddress();
+        // String destination = device.getInternetAddress();
+        String destination = device.getInternetAddress();
 //        String[] destinationOctets = destination.split("\\.");
 //        destinationOctets[3] = "255";
 //        destination = TextUtils.join(".", destinationOctets);
@@ -129,8 +118,8 @@ public class Clay {
         return this.contentManager;
     }
 
-    public ArrayList<Unit> getUnits () {
-        return this.units;
+    public ArrayList<Device> getDevices() {
+        return this.devices;
     }
 
     public boolean hasNetworkManager () {
@@ -169,10 +158,10 @@ public class Clay {
 //        }
     }
 
-    public Unit getUnitByAddress (String address) {
-        for (Unit unit : getUnits ()) {
-            if (unit.getInternetAddress ().compareTo (address) == 0) {
-                return unit;
+    public Device getUnitByAddress (String address) {
+        for (Device device : getDevices()) {
+            if (device.getInternetAddress ().compareTo (address) == 0) {
+                return device;
             }
         }
         return null;
@@ -185,471 +174,216 @@ public class Clay {
     /**
      * Adds the specified unit to Clay's operating environment.
      */
-    public void addUnit(final UUID unitUuid, final String internetAddress) {
+    public Device addUnit (final UUID unitUuid, final String internetAddress) {
 
-//        final Unit newUnit = new Unit(this, unitUuid);
-//        newUnit.setInternetAddress(internetAddress);
-
-        Log.v("Content_Manager", "Clay is searching for the unit (UUID: " + unitUuid + ").");
-
+        // Search for the device in the store
         if (hasUnitByUuid(unitUuid)) {
-            Log.v("Content_Manager", "Clay already has the unit (UUID: " + unitUuid + ").");
-            return;
+            return null;
         }
 
-        Log.v("Content_Manager", "Clay couldn't find the unit (UUID: " + unitUuid + ").");
+        // Try to restore the device profile from the store.
+        Device device = getStore().restoreDevice(unitUuid);
 
-        // Restore the unit in Clay's object model
-        // Request unit profile from history (i.e., the remote store).
+        // If unable to restore the device's profile, then create a profile for the device.
+        if (device == null) {
+            device = new Device(getClay (), unitUuid);
+        }
 
-//            getCache().setupRepository();
-//            getStore().storeDevice(unit);
-        Unit unit = getStore().restoreDevice(unitUuid);
+        // Update the device's profile based on information received from device itself.
+        if (device != null) {
+            // Update restored device with information from device
+            device.setInternetAddress(internetAddress);
 
-        if (unit != null) {
-            Log.v("Content_Manager", "Successfully restored unit (UUID: " + unit.getUuid() + ").");
-            Log.v("Content_Manager", "\tIP: " + unit.getInternetAddress());
-
-            // Update restored unit with information from device
-            unit.setInternetAddress(internetAddress);
-
-            // Add unit to Clay
-            addUnit2(unit);
+            // Add device to Clay
+            addUnit2(device);
 
             // Establish TCP connection
-            unit.connectTcp();
+            device.connectTcp();
 
-            // Show the action palette
-            //FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-            //ClayActionButton fab = (ClayActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-//            cab = new ClayActionButton();
-            ApplicationView.getApplicationView().getActionButton().setUpActionButton();
-            ApplicationView.getApplicationView().getActionButton().show(true);
+//            // Show the action button
+//            ApplicationView.getApplicationView().getCursorView().show(true);
 
             // Populate the timeline
             // TODO: Populate from scratch only if no timeline has been programmed for the device
-            for (Event event : unit.getTimeline().getEvents()) {
+            for (Event event : device.getTimeline().getEvents()) {
                 // <HACK>
-                unit.enqueueMessage("start event " + event.getUuid());
-                unit.enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                String content = "set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"";
-                unit.enqueueMessage(content);
+                device.enqueueMessage("start event " + event.getUuid());
+                device.enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                device.enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
                 // </HACK>
             }
-        } else {
 
-            Log.v("Content_Manager", "Failed to restore unit.");
-
-            // Create unit in graph
-            Unit newUnit = new Unit (getClay (), unitUuid);
-            newUnit.setInternetAddress(internetAddress);
-            Log.v("Content_Manager", "Graphed unit (UUID: " + newUnit.getUuid() + ").");
-            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
-
-            // Cache the unit
-            addUnit2 (newUnit);
-            Log.v("Content_Manager", "Cached unit (UUID: " + newUnit.getUuid() + ").");
-
-            // TCP connection
-            newUnit.connectTcp();
-
-            // Show the action palette
-//            ClayActionButton fab = (ClayActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
-            ApplicationView.getApplicationView().getActionButton().setUpActionButton();
-            ApplicationView.getApplicationView().getActionButton().show(true);
-
-            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
-
-            // Store the unit
-            getStore ().storeDevice (newUnit);
-            Log.v("Content_Manager", "Stored new unit (UUID: " + newUnit.getUuid() + ").");
-
-            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
-
-            getStore ().storeTimeline (newUnit.getTimeline ());
-            Log.v ("Content_Manager", "Stored new timeline (UUID: " + newUnit.getTimeline().getUuid() + ").");
-
-            Log.v("Content_Manager", "\tIP: " + newUnit.getInternetAddress());
-
-            // Archive the unit
-            // TODO:
-
+            // Store the updated device profile.
+            getStore ().storeDevice (device);
+            getStore ().storeTimeline (device.getTimeline ());
         }
+
+        return device;
     }
 
-    private void addUnit2 (Unit unit) {
+    private void addUnit2 (Device device) {
         Log.v ("Content_Manager", "addUnit2");
 
-        if (!this.units.contains (unit)) {
+        if (!this.devices.contains (device)) {
 
-            // Add unit to present (i.e., local cache).
-            this.units.add(unit);
+            // Add device to present (i.e., local cache).
+            this.devices.add(device);
             Log.v("Content_Manager", "Successfully added timeline.");
 
-            // Caches actions on the device
-            if (getClay().hasCache()) {
-                // Only cache the basic actions
-                for (Action action : getClay().getCache().getActions()) {
-                    if (action.hasScript()) {
-
-                        // Sends actions to the device's cache
-                        // i.e., 'cache action <action-uuid> "<action-regex>"'
-//                        unit.sendMessage ("cache action " + action.getUuid());
-                        //unit.sendMessage ("cache action " + action.getUuid() + " \"" + action.getScript().getStatePattern() + "\"");
-
-//                        UUID uuid = unit.getUuid();
-//                        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-//                        bb.putLong(uuid.getMostSignificantBits());
-//                        bb.putLong(uuid.getLeastSignificantBits());
-//                        byte[] uuidBytes = bb.array();
-////                        return bb.array();
-//
-//                        String byteString = "";
-//                        for (int i = 0; i < uuidBytes.length; i++) {
-//                            byteString = "" + uuidBytes[i];
-//                        }
-//                        Log.v ("New_Map", byteString);
-
-                    }
-                }
-            }
-
-            /*
-            // <TEST>
-            // Add a random number of random actions to the unit.
-            // This will be replaced with the actual actions on the device's timeline.
-            Random r = new Random ();
-            int behaviorCount = r.nextInt(20);
-            for (int i = 0; i < behaviorCount; i++) {
-
-                // Get list of the available behavior types
-                ArrayList<Action> actions = getCache().getActions();
-
-
-                // Generate a random behavior
-                if (actions.size() > 0) {
-
-                    // Select random behavior type
-                    int behaviorSelection = r.nextInt(actions.size());
-                    UUID behaviorUuid = actions.get(behaviorSelection).getUuid();
-
-                    Log.v("Behavior_DB", "BEFORE unit.storeAction:");
-                    getStore().restoreAction(behaviorUuid.toString());
-
-                    // Generate a behavior of the selected type
-                    unit.cacheAction (behaviorUuid.toString());
-
-                    Log.v("Behavior_DB", "AFTER unit.storeAction:");
-                    getStore().restoreAction(behaviorUuid.toString());
-                }
-            }
-            // </TEST>
-            */
-
-//            Log.v("Behavior_Count", "Unit behavior count: " + unit.getTimeline().getEvents().size());
-//
             // Add timelines to attached views
             for (ViewManagerInterface view : this.views) {
                 // TODO: (1) addUnit a page to the ViewPager
                 // TODO: (2) Add a tab to the action bar to support navigation to the specified page.
-                view.addUnitView(unit);
+                view.addUnitView(device);
             }
         }
     }
 
     public boolean hasUnits () {
-        return this.units.size () > 0;
+        return this.devices.size () > 0;
     }
 
-    public boolean hasUnit (Unit unit) {
-        return this.units.contains (unit);
+    public boolean hasUnit (Device device) {
+        return this.devices.contains (device);
     }
 
     public boolean hasUnitByUuid (UUID unitUuid) {
-        for (Unit unit : getUnits ()) {
-            if (unit.getUuid().compareTo(unitUuid) == 0) {
+        for (Device device : getDevices()) {
+            if (device.getUuid().compareTo(unitUuid) == 0) {
                 return true;
             }
         }
         return false;
     }
 
-    public Unit getUnitByUuid (UUID unitUuid) {
-        for (Unit unit : getUnits ()) {
-            if (unit.getUuid().compareTo(unitUuid) == 0) {
-                return unit;
+    public Device getUnitByUuid (UUID unitUuid) {
+        for (Device device : getDevices()) {
+            if (device.getUuid().compareTo(unitUuid) == 0) {
+                return device;
             }
         }
         return null;
     }
 
     public boolean hasUnitByAddress (String address) {
-        for (Unit unit : getUnits()) {
-            if (unit.getInternetAddress().equals(address)) {
+        for (Device device : getDevices()) {
+            if (device.getInternetAddress().equals(address)) {
                 return true;
             }
         }
         return false;
     }
 
-//    public void removeUnit (Unit unit) {
-//        if (hasUnit(unit)) {
-//            this.units.remove (unit);
-//        }
-//    }
-
-    public void generateStore () {
-
-        if (hasStore()) {
-
-            UUID uuid;
-
-            // light
-            uuid = UUID.fromString("1470f5c4-eaf1-43fb-8fb3-d96dc4e2bee4");
-            if (!getCache().hasScript(uuid)) {
-                Log.v("Clay_Behavior_Repo", "\"light\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "light", "((T|F) ){11}(T|F)", "000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000 000000");
-            }
-
-            // signal
-            uuid = UUID.fromString("bdb49750-9ead-466e-96a0-3aa88e7d246c");
-            if (!getCache().hasScript(uuid)) {
-                Log.v("Clay_Behavior_Repo", "\"signal\" behavior not found in the repository. Adding it.");
-                //getClay().generateBehaviorScript(uuid, "signal", "regex", "FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL FITL");
-                getClay().generateBehaviorScript(uuid, "signal", "regex", "TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none");
-            }
-
-            // message
-            uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
-            if (!getCache().hasScript(uuid)) {
-                Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "message", "regex", "Device Other \"hello\"");
-            }
-
-            // tone
-            uuid = UUID.fromString("16626b1e-cf41-413f-bdb4-0188e82803e2");
-            if (!getCache().hasScript(uuid)) {
-                Log.v("Clay_Behavior_Repo", "\"tone\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "tone", "regex", "frequency 0 hz 0 ms");
-            }
-
-            // pause
-            uuid = UUID.fromString("56d0cf7d-ede6-4529-921c-ae9307d1afbc");
-            if (!getCache().hasScript(uuid)) {
-                Log.v("Clay_Behavior_Repo", "\"pause\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "pause", "regex", "250");
-            }
-
-            // say
-            uuid = UUID.fromString("269f2e19-1fc8-40f5-99b2-6ca67e828e70");
-            if (!getCache().hasScript(uuid)) {
-                Log.v("Clay_Behavior_Repo", "\"say\" behavior not found in the repository. Adding it.");
-                getClay().generateBehaviorScript(uuid, "say", "regex", "oh, that's great");
-            }
-        }
-    }
-
-    /**
-     * Creates a new behavior with the specified tag and state and stores it.
-     * @param tag
-     * @param defaultState
-     */
-    private void generateBehaviorScript (UUID uuid, String tag, String stateSpacePattern, String defaultState) {
-
-        Log.v ("Content_Manager", "Creating script.");
-
-        // Create behavior (and state) for the behavior script
-        Script script = new Script (uuid, tag, stateSpacePattern, defaultState);
-
-        // Cache the behavior
-//        this.cache(script);
-
-        // Store the behavior
-        if (hasStore()) {
-            getStore().storeScript(script);
-        }
-
-        generateBasicBehavior(script);
-
-    }
-
-    private void generateBasicBehavior (Script script) {
-
-        Log.v ("Content_Manager", "Generating basic behavior for script.");
-
-        // Generate basic actions for all behavior scripts
-        Action basicAction = new Action(script);
-        getStore ().storeAction(basicAction);
-    }
-
-    /**
-     * Populates cache with all behavior scripts and actions from the available content managers.
-     */
-    public void populateCache () {
-        Log.v("Content_Manager", "populateCache");
-
-        if (hasStore()) {
-            Log.v("Content_Manager", "populateCache");
-
-            // Restore behavior scripts and addUnit them to the cache
-            getStore().restoreScripts();
-            Log.v("Content_Manager", "Restored behavior scripts:");
-            for (Script script : getCache().getScripts()) {
-                Log.v("Content_Manager", "\t" + script.getUuid());
-            }
-
-            // Restore actions and addUnit them to the cache
-            getStore().restoreActions();
-            Log.v("Content_Manager", "Restored actions:");
-            for (Action action : getCache().getActions()) {
-                //Log.v("Content_Manager", "\t" + action.getUuid());
-                printRestoredBehavior(action, 1);
-            }
-        }
-    }
-
-    private void printRestoredBehavior (Action action, int tabCount) {
-        String tabString = "";
-        for (int i = 0; i < tabCount; i++) {
-            tabString += "\t";
-        }
-        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
-        if (!action.hasScript()) {
-            for (Action childAction : action.getActions()) {
-                printBehavior(childAction, tabCount + 1);
-            }
-        } else {
-//            Log.v("Content_Manager", tabString + "\tScript (UUID: " + action.getScript().getUuid() + ")");
-//            Log.v("Content_Manager", tabString + "\tState (UUID: " + action.getState().getUuid() + ")");
-        }
-    }
-
-    public void simulateSession (boolean addBehaviorToTimeline, int behaviorCount, boolean addAbstractBehaviorToTimeline) {
-        Log.v("Content_Manager", "simulateSession");
-
-        // Discover first device
-        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
-        getClay().addUnit(unitUuidA, "10.1.10.29");
-        Unit foundUnit = getUnitByUuid(unitUuidA);
-
-        // Discover second device
-        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
-        getClay().addUnit(unitUuidB, "192.168.1.123");
-
-        if (addBehaviorToTimeline) {
-            for (int i = 0; i < behaviorCount; i++) {
-                // Create action based on action script
-                Log.v("Content_Manager", "> Creating action");
-                Random r = new Random();
-                int selectedBehaviorIndex = r.nextInt(getClay().getCache().getActions().size());
-//                Script selectedBehaviorScript = getClay().getCache().getScripts().get(selectedBehaviorIndex);
-//                Action action = new Action(selectedBehaviorScript);
-                Action action = getClay().getCache().getActions().get(selectedBehaviorIndex);
-                getClay().getStore().storeAction(action);
-
-                // Create event for the action and add it to the unit's timeline
-                Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
-                Event event = new Event(foundUnit.getTimeline(), action);
-                getClay().getUnitByUuid(unitUuidA).getTimeline().addEvent(event);
-                getClay().getStore().storeEvent(event);
-                // TODO: Update unit
-            }
-        }
-
-        if (addAbstractBehaviorToTimeline) {
-            // Create action based on action script
-            Log.v("Content_Manager", "> Creating action");
-//            Action action = new Action("so high");
-//            action.setDescription("oh yeah!");
-//            action.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
-//            action.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
-//            getClay().getStore().storeAction(action);
-            ArrayList<Action> children = new ArrayList<Action>();
-            ArrayList<State> states = new ArrayList<State>();
-            children.add(foundUnit.getTimeline().getEvents().get(0).getAction());
-            states.addAll(foundUnit.getTimeline().getEvents().get(0).getState());
-            children.add(foundUnit.getTimeline().getEvents().get(1).getAction());
-            states.addAll(foundUnit.getTimeline().getEvents().get(1).getState());
-            Action action = getClay().getStore().getActionComposition(children);
-
-            // remove events for abstracted actions
-            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0));
-            foundUnit.getTimeline().getEvents().remove(0); // if store action successful
-            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1));
-            foundUnit.getTimeline().getEvents().remove(1); // if store action successful
-
-            // Create event for the action and add it to the unit's timeline
-            Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
-            Event event = new Event(foundUnit.getTimeline(), action);
-            // insert new event for abstract action
-            //            foundUnit.getTimeline().addEvent(event);
-            event.getState().clear();
-            event.getState().addAll(states);
-            Log.v("New_Behavior_Parent", "Added " + states.size() + " states to new event.");
-            for (State state : event.getState()) {
-                Log.v("New_Behavior_Parent", "\t" + state.getState());
-            }
-            foundUnit.getTimeline().getEvents().add(0, event); // if store event was successful
-            getClay().getStore().storeEvent(event);
-            // TODO: Update unit
-        }
-
-//        if (addAbstractBehaviorToTimeline) {
-//            // Create behavior based on behavior script
-//            Log.v("Content_Manager", "> Creating behavior");
-//            Action behavior = new Action("so so high");
-//            behavior.setDescription("oh yeah!");
-//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
-//            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(0).getAction());
-//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
-//            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(1).getAction());
-//            getClay().getStore().storeAction(behavior);
-//            // remove events for abstracted actions
-//            foundUnit.getTimeline().getEvents().remove(0); // if store behavior successful
-//            foundUnit.getTimeline().getEvents().remove(1); // if store behavior successful
+//    public void simulateSession (boolean addBehaviorToTimeline, int behaviorCount, boolean addAbstractBehaviorToTimeline) {
+//        Log.v("Content_Manager", "simulateSession");
 //
-//            // Create event for the behavior and add it to the unit's timeline
-//            Log.v("Content_Manager", "> Unit (UUID: " + foundUnit.getUuid() + ")");
-//            Event event = new Event(foundUnit.getTimeline(), behavior);
-//            // insert new event for abstract behavior
+//        // Discover first device
+//        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
+//        getClay().addUnit(unitUuidA, "10.1.10.29");
+//        Device foundUnit = getUnitByUuid(unitUuidA);
+//
+//        // Discover second device
+//        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
+//        getClay().addUnit(unitUuidB, "192.168.1.123");
+//
+//        if (addBehaviorToTimeline) {
+//            for (int i = 0; i < behaviorCount; i++) {
+//                // Create action based on action script
+//                Log.v("Content_Manager", "> Creating action");
+//                Random r = new Random();
+//                int selectedBehaviorIndex = r.nextInt(getClay().getCache().getActions().size());
+////                Script selectedBehaviorScript = getClay().getCache().getScripts().get(selectedBehaviorIndex);
+////                Action action = new Action(selectedBehaviorScript);
+//                Action action = getClay().getCache().getActions().get(selectedBehaviorIndex);
+//                getClay().getStore().storeAction(action);
+//
+//                // Create event for the action and add it to the unit's timeline
+//                Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
+//                Event event = new Event(foundUnit.getTimeline(), action);
+//                getClay().getUnitByUuid(unitUuidA).getTimeline().addEvent(event);
+//                getClay().getStore().storeEvent(event);
+//                // TODO: Update unit
+//            }
+//        }
+//
+//        if (addAbstractBehaviorToTimeline) {
+//            // Create action based on action script
+//            Log.v("Content_Manager", "> Creating action");
+////            Action action = new Action("so high");
+////            action.setDescription("oh yeah!");
+////            action.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
+////            action.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+////            getClay().getStore().storeAction(action);
+//            ArrayList<Action> children = new ArrayList<Action>();
+//            ArrayList<State> states = new ArrayList<State>();
+//            children.add(foundUnit.getTimeline().getEvents().get(0).getAction());
+//            states.addAll(foundUnit.getTimeline().getEvents().get(0).getState());
+//            children.add(foundUnit.getTimeline().getEvents().get(1).getAction());
+//            states.addAll(foundUnit.getTimeline().getEvents().get(1).getState());
+//            Action action = getClay().getStore().getActionComposition(children);
+//
+//            // remove events for abstracted actions
+//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0));
+//            foundUnit.getTimeline().getEvents().remove(0); // if store action successful
+//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1));
+//            foundUnit.getTimeline().getEvents().remove(1); // if store action successful
+//
+//            // Create event for the action and add it to the unit's timeline
+//            Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
+//            Event event = new Event(foundUnit.getTimeline(), action);
+//            // insert new event for abstract action
 //            //            foundUnit.getTimeline().addEvent(event);
+//            event.getState().erase();
+//            event.getState().addAll(states);
+//            Log.v("New_Behavior_Parent", "Added " + states.size() + " states to new event.");
+//            for (State state : event.getState()) {
+//                Log.v("New_Behavior_Parent", "\t" + state.getState());
+//            }
 //            foundUnit.getTimeline().getEvents().add(0, event); // if store event was successful
 //            getClay().getStore().storeEvent(event);
 //            // TODO: Update unit
 //        }
-
-//        getClay().notifyChange(event);
-
-        getClay().getStore().writeDatabase();
-
-        for (Unit unit : getClay().getUnits()) {
-            Log.v ("Content_Manager", "Unit (UUID: " + unit.getUuid() + ")");
-            Log.v ("Content_Manager", "\tTimeline (UUID: " + unit.getTimeline().getUuid() + ")");
-
-            int tabCount = 3;
-            for (Event e : unit.getTimeline().getEvents()) {
-                Log.v ("Content_Manager", "\t\tEvent (UUID: " + e.getUuid() + ")");
-                // TODO: Recursively print out the behavior tree
-                printBehavior (e.getAction(), tabCount);
-            }
-        }
-    }
-
-    private void printBehavior (Action action, int tabCount) {
-        String tabString = "";
-        for (int i = 0; i < tabCount; i++) {
-            tabString += "\t";
-        }
-        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
-        if (!action.hasScript()) {
-            for (Action childAction : action.getActions()) {
-                printBehavior(childAction, tabCount + 1);
-            }
-        } else {
-            Log.v("Content_Manager", tabString + "\tScript (UUID: " + action.getScript().getUuid() + ")");
-//            Log.v("Content_Manager", tabString + "\tState (UUID: " + action.getState().getUuid() + ")");
-        }
-    }
+//
+////        if (addAbstractBehaviorToTimeline) {
+////            // Create behavior based on behavior script
+////            Log.v("Content_Manager", "> Creating behavior");
+////            Action behavior = new Action("so so high");
+////            behavior.setDescription("oh yeah!");
+////            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
+////            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(0).getAction());
+////            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
+////            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+////            getClay().getStore().storeAction(behavior);
+////            // remove events for abstracted actions
+////            foundUnit.getTimeline().getEvents().remove(0); // if store behavior successful
+////            foundUnit.getTimeline().getEvents().remove(1); // if store behavior successful
+////
+////            // Create event for the behavior and add it to the unit's timeline
+////            Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
+////            Event event = new Event(foundUnit.getTimeline(), behavior);
+////            // insert new event for abstract behavior
+////            //            foundUnit.getTimeline().addEvent(event);
+////            foundUnit.getTimeline().getEvents().add(0, event); // if store event was successful
+////            getClay().getStore().storeEvent(event);
+////            // TODO: Update unit
+////        }
+//
+////        getClay().notifyChange(event);
+//
+//        getClay().getStore().writeDatabase();
+//
+//        for (Device unit : getClay().getDevices()) {
+//            Log.v ("Content_Manager", "Device (UUID: " + unit.getUuid() + ")");
+//            Log.v ("Content_Manager", "\tTimeline (UUID: " + unit.getTimeline().getUuid() + ")");
+//
+//            int tabCount = 3;
+//            for (Event e : unit.getTimeline().getEvents()) {
+//                Log.v ("Content_Manager", "\t\tEvent (UUID: " + e.getUuid() + ")");
+//                // TODO: Recursively print out the behavior tree
+//                printBehavior (e.getAction(), tabCount);
+//            }
+//        }
+//    }
 
     /**
      * Adds the action, caches it, and stores it.
@@ -682,7 +416,7 @@ public class Clay {
      * Returns true if Clay has a content manager.
      * @return True if Clay has a content manager. False otherwise.
      */
-    private boolean hasStore() {
+    public boolean hasStore() {
         return this.contentManager != null;
     }
 
@@ -743,56 +477,56 @@ public class Clay {
     }
 
     /**
-     * Adds a Unit to Clay's object model.
-     * @param unit The Unit to addUnit to Clay's object model.
+     * Adds a Device to Clay's object model.
+     * @param device The Device to addUnit to Clay's object model.
      */
-    public void addUnit(Unit unit) {
-        this.units.add(unit);
+    public void addUnit(Device device) {
+        this.devices.add(device);
     }
 
     /**
-     * Push updated unit object to views so they can show the updated information
-     * @param unit
+     * Push updated device object to views so they can show the updated information
+     * @param device
      */
-    public void updateUnitView (Unit unit) {
+    public void updateUnitView (Device device) {
 
         for (ViewManagerInterface view : this.views) {
-            view.refreshListViewFromData(unit);
+            view.refreshListViewFromData(device);
         }
     }
 
     /**
-     * Requests a view for a unit.
-     * @param unit The unit for which a view is requested.
+     * Requests a view for a device.
+     * @param device The device for which a view is requested.
      */
-    public void addUnitView (Unit unit) {
+    public void addUnitView (Device device) {
 
         // TODO: (?) Add DeviceViewFragment to a list here?
 
         // <HACK>
-        // Make sure no units are in an invalid state (null reference)
+        // Make sure no devices are in an invalid state (null reference)
         boolean addView = true;
-        for (Event event : unit.getTimeline().getEvents()) {
+        for (Event event : device.getTimeline().getEvents()) {
             if (event.getAction() == null) {
                 addView = false;
             }
         }
         if (addView) {
-            addUnitView2(unit);
+            addUnitView2(device);
         }
         // </HACK>
     }
 
-    private void addUnitView2(Unit unit) {
+    private void addUnitView2(Device device) {
         // Add timelines to attached views
         for (ViewManagerInterface view : this.views) {
             // TODO: (1) addUnit a page to the ViewPager
 
             // (2) Add a tab to the action bar to support navigation to the specified page.
             Log.v ("CM_Log", "addUnitView2");
-            Log.v ("CM_Log", "\tunit: " + unit);
-            Log.v ("CM_Log", "\tunit/timeline: " + unit.getTimeline());
-            view.addUnitView(unit);
+            Log.v ("CM_Log", "\tdevice: " + device);
+            Log.v ("CM_Log", "\tdevice/timeline: " + device.getTimeline());
+            view.addUnitView(device);
         }
     }
 

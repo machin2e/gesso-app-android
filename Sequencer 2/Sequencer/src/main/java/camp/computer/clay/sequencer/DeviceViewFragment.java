@@ -1,13 +1,9 @@
 package camp.computer.clay.sequencer;
 
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -16,19 +12,15 @@ import android.widget.FrameLayout;
 import com.github.clans.fab.FloatingActionButton;
 import com.mobeta.android.sequencer.R;
 
-import java.util.ArrayList;
-
-import camp.computer.clay.system.Action;
-import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.Unit;
+import camp.computer.clay.system.Device;
 
 public class DeviceViewFragment extends Fragment {
 
-    // The Clay unit associated with this fragment.
-    private Unit unit;
+    // The Clay device associated with this fragment.
+    private Device device;
 
     // The timeline view used to draw the timeline.
-    TimelineListView timelineView;
+    TimelineView timelineView;
 
     // Configure the interface settings
     private boolean DISABLE_SCROLLBAR_FADING = true;
@@ -74,14 +66,14 @@ public class DeviceViewFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_listview, container, false);
 
         // Define the view (get a reference to it and pass it an adapter)
-        timelineView = (TimelineListView) rootView.findViewById(R.id.listview_timeline);
+        timelineView = (TimelineView) rootView.findViewById(R.id.listview_timeline);
         timelineView.setTag(getArguments().getInt(ARG_SECTION_NUMBER));
 
-        // Create behavior profiles for the unit's behaviors and assign the data to the ListView
-        timelineView.setTimeline(this.unit.getTimeline());
+        // Create behavior profiles for the device's behaviors and assign the data to the ListView
+        timelineView.setTimeline(this.device.getTimeline());
 
         // <HACK>
-        timelineView.setUnit(unit);
+        timelineView.setDevice(device);
         // </HACK>
 
         if (DISABLE_SCROLLBAR_FADING) {
@@ -106,7 +98,7 @@ public class DeviceViewFragment extends Fragment {
 //        // Set up FAB
 //        final FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
 //
-//        final ArrayList<FloatingActionButton> fablets = getUnit().getClay().fablets;
+//        final ArrayList<FloatingActionButton> fablets = getDevice().getClay().fablets;
 //
 //        fab.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
@@ -115,8 +107,8 @@ public class DeviceViewFragment extends Fragment {
 //                if (event.getAction() == MotionEvent.ACTION_DOWN) {
 //
 //                    // Reset selection
-//                    getUnit().getClay().selectedEventHolderIndex = -1;
-//                    getUnit().getClay().selectedEventHolder = null;
+//                    getDevice().getClay().selectedEventHolderIndex = -1;
+//                    getDevice().getClay().selectedEventHolder = null;
 //
 //                    /*
 //                    // Remove generated action buttons
@@ -129,19 +121,19 @@ public class DeviceViewFragment extends Fragment {
 //                            FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
 //                            root.removeView(fablet);
 //                        }
-//                        fablets.clear();
+//                        fablets.erase();
 //                    }
 //                    */
 //
 //                    // Save first touch point
-//                    getUnit().getClay().fabDownPoint = new Point((int) event.getX(), (int) event.getY());
+//                    getDevice().getClay().fabDownPoint = new Point((int) event.getX(), (int) event.getY());
 //                }
 //
 //                if (event.getAction() == MotionEvent.ACTION_UP) {
 //
 //                    // If dragging, skip the click event following release
-//                    if (getUnit().getClay().fabStatus == Clay.FAB_START_DRAGGING) {
-////                        getUnit().getClay().fabDisableClick = true;
+//                    if (getDevice().getClay().fabStatus == Clay.FAB_START_DRAGGING) {
+////                        getDevice().getClay().fabDisableClick = true;
 //
 //                        /*
 //                        // <TEST>
@@ -158,7 +150,7 @@ public class DeviceViewFragment extends Fragment {
 //                        int width = fab.getWidth();
 //                        int height = fab.getHeight();
 //                        Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-//                        ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 100);
+//                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
 //                        // </TEST>
 //                        */
 //
@@ -184,7 +176,7 @@ public class DeviceViewFragment extends Fragment {
 ////                    Log.v ("Timeline_Point", "x: " + point.x + ", y: " + point.y);
 //
 //                    // Reset action button's state
-//                    getUnit().getClay().fabStatus = Clay.FAB_STOP_DRAGGING;
+//                    getDevice().getClay().fabStatus = Clay.FAB_STOP_DRAGGING;
 //
 //                    // TODO: If no contextual cue is nearby, start animation to return home (warp? translate?).
 //
@@ -195,19 +187,19 @@ public class DeviceViewFragment extends Fragment {
 //
 ////                    Point point = TimelineListView.getTimelineListView().getPointUnderTimeline();
 //
-//                    getUnit().getClay().fabCurrentPoint = new Point((int) event.getX(), (int) event.getY());
+//                    getDevice().getClay().fabCurrentPoint = new Point((int) event.getX(), (int) event.getY());
 //
-//                    if (getUnit().getClay().fabStatus == Clay.FAB_STOP_DRAGGING) {
+//                    if (getDevice().getClay().fabStatus == Clay.FAB_STOP_DRAGGING) {
 //
-//                        double distance = Math.sqrt(Math.pow((getUnit().getClay().fabCurrentPoint.x - getUnit().getClay().fabDownPoint.x), 2) + Math.pow((getUnit().getClay().fabCurrentPoint.y - getUnit().getClay().fabDownPoint.y), 2));
+//                        double distance = Math.sqrt(Math.pow((getDevice().getClay().fabCurrentPoint.x - getDevice().getClay().fabDownPoint.x), 2) + Math.pow((getDevice().getClay().fabCurrentPoint.y - getDevice().getClay().fabDownPoint.y), 2));
 //
 //                        // Check if drag threshold is exceeded
-//                        if (distance > getUnit().getClay().fabStartDragThresholdDistance) {
-//                            getUnit().getClay().fabStatus = Clay.FAB_START_DRAGGING;
+//                        if (distance > getDevice().getClay().fabStartDragThresholdDistance) {
+//                            getDevice().getClay().fabStatus = Clay.FAB_START_DRAGGING;
 //                        }
 //                    }
 //
-//                    if (getUnit().getClay().fabStatus == Clay.FAB_START_DRAGGING) {
+//                    if (getDevice().getClay().fabStatus == Clay.FAB_START_DRAGGING) {
 //
 //                        // Update placement of action button
 //                        int width = fab.getWidth();
@@ -223,10 +215,10 @@ public class DeviceViewFragment extends Fragment {
 ////                        int width = fab.getWidth();
 ////                        int height = fab.getHeight();
 ////                        Point dest = new Point((int) event.getRawX() - (int) (width / 2.0), (int) event.getRawY() - (int) (height / 2.0));
-////                        ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 100);
+////                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
 //
-////                        if (getUnit().getClay().selectedEventHolder != null) {
-////                            timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
+////                        if (getDevice().getClay().selectedEventHolder != null) {
+////                            timelineView.removeEventHolder(getDevice().getClay().selectedEventHolder);
 ////                        }
 //
 //                        // TODO: Search for nearest/nearby events, actions, states, etc. (i.e., discovery context)
@@ -260,30 +252,30 @@ public class DeviceViewFragment extends Fragment {
 //
 //                            if (distanceToTop < 10) {
 //
-//                                getUnit().getClay().selectedEventHolderIndex = nearestViewIndex;
+//                                getDevice().getClay().selectedEventHolderIndex = nearestViewIndex;
 //
 //                                // Highlight the position where Clay will add the event on the timeline
-//                                if (getUnit().getClay().selectedEventHolder == null) {
+//                                if (getDevice().getClay().selectedEventHolder == null) {
 //                                    // timelineView.resetHighlights();
-//                                    getUnit().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
-//                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+//                                    getDevice().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
+//                                    timelineView.addEventHolder(getDevice().getClay().selectedEventHolderIndex, getDevice().getClay().selectedEventHolder);
 //                                } else {
-//                                    timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
-//                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+//                                    timelineView.removeEventHolder(getDevice().getClay().selectedEventHolder);
+//                                    timelineView.addEventHolder(getDevice().getClay().selectedEventHolderIndex, getDevice().getClay().selectedEventHolder);
 //                                }
 //
 //                            } else if (distanceToBottom < 10) {
 //
-//                                getUnit().getClay().selectedEventHolderIndex = nearestViewIndex;
+//                                getDevice().getClay().selectedEventHolderIndex = nearestViewIndex;
 //
 //                                // Highlight the position where Clay will add the event on the timeline
-//                                if (getUnit().getClay().selectedEventHolder == null) {
+//                                if (getDevice().getClay().selectedEventHolder == null) {
 //                                    // timelineView.resetHighlights();
-//                                    getUnit().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
-//                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+//                                    getDevice().getClay().selectedEventHolder = new EventHolder("highlight", "highlight");
+//                                    timelineView.addEventHolder(getDevice().getClay().selectedEventHolderIndex, getDevice().getClay().selectedEventHolder);
 //                                } else {
-//                                    timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
-//                                    timelineView.addEventHolder(getUnit().getClay().selectedEventHolderIndex, getUnit().getClay().selectedEventHolder);
+//                                    timelineView.removeEventHolder(getDevice().getClay().selectedEventHolder);
+//                                    timelineView.addEventHolder(getDevice().getClay().selectedEventHolderIndex, getDevice().getClay().selectedEventHolder);
 //                                }
 //
 //                            }
@@ -305,14 +297,14 @@ public class DeviceViewFragment extends Fragment {
 //            @Override
 //            public void onClick(View v) {
 //
-////                if (getUnit().getClay().fabDisableClick == false) {
-////                if (getUnit().getClay().selectedEventHolderIndex != -1) {
+////                if (getDevice().getClay().fabDisableClick == false) {
+////                if (getDevice().getClay().selectedEventHolderIndex != -1) {
 //                    timelineView.displayActionBrowser(new TimelineListView.ActionSelectionListener() {
 //                        @Override
 //                        public void onSelect(Action action) {
 //
-//                            if (getUnit().getClay().selectedEventHolderIndex != -1) {
-//                                timelineView.replaceEventHolder(getUnit().getClay().selectedEventHolder, action);
+//                            if (getDevice().getClay().selectedEventHolderIndex != -1) {
+//                                timelineView.replaceEventHolder(getDevice().getClay().selectedEventHolder, action);
 ////                                timelineView.redrawListViewFromData();
 //                            } else {
 //                                EventHolder eventHolder = new EventHolder("choose", "choose");
@@ -326,7 +318,7 @@ public class DeviceViewFragment extends Fragment {
 //                                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 //
 //                                    // Update position
-//                                    timelineView.fabUpdatePosition(fab);
+//                                    timelineView.updatePosition(fab);
 //
 //                                    // Remove the layout
 //                                    timelineView.removeOnLayoutChangeListener(this);
@@ -341,7 +333,7 @@ public class DeviceViewFragment extends Fragment {
 //
 ////                }
 //
-//                getUnit().getClay().fabDisableClick = false;
+//                getDevice().getClay().fabDisableClick = false;
 //            }
 //        });
 //        // </HACK>
@@ -349,15 +341,15 @@ public class DeviceViewFragment extends Fragment {
         return rootView;
     }
 
-    public void setUnit (Unit unit) {
-        this.unit = unit;
+    public void setDevice(Device device) {
+        this.device = device;
 
         // Create behavior profiles for the timeline
 //            createTimelineEvents();
     }
 
-    public Unit getUnit () {
-        return this.unit;
+    public Device getDevice() {
+        return this.device;
     }
 
 }

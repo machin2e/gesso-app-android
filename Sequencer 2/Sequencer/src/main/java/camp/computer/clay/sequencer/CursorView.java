@@ -17,8 +17,9 @@ import com.mobeta.android.sequencer.R;
 import java.util.ArrayList;
 
 import camp.computer.clay.system.Action;
+import camp.computer.clay.system.Device;
 
-public class ClayActionButton /* extends FloatingActionButton */ {
+public class CursorView /* extends FloatingActionButton */ {
 
     public FloatingActionButton fab = null;
     public ArrayList<FloatingActionButton> fablets = new ArrayList<FloatingActionButton>();
@@ -32,7 +33,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
     public int selectedEventHolderIndex = -1;
     public EventHolder selectedEventHolder = null;
 
-    ClayActionButton () {
+    CursorView() {
 
         // Set up FAB
         fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
@@ -59,21 +60,22 @@ public class ClayActionButton /* extends FloatingActionButton */ {
 //        params.leftMargin = (int) screenWidth - (int) (width * 1.1);
 //        params.topMargin = (int) (screenHeight / 2.0) - (int) (height / 2.0);
 
-        TimelineListView.getTimelineListView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        ApplicationView.getApplicationView().getTimelineView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 
                 // Update position
-                //TimelineListView.getTimelineListView().fabUpdatePosition();
-                fabUpdatePosition();
+                //TimelineListView.getTimelineListView().updatePosition();
+                updatePosition();
 
                 // Remove the layout
-                TimelineListView.getTimelineListView().removeOnLayoutChangeListener(this);
+                ApplicationView.getApplicationView().getTimelineView().removeOnLayoutChangeListener(this);
+//                TimelineListView.getTimelineListView().removeOnLayoutChangeListener(this);
                 Log.e("Move_Finger", "Updated timeline layout.");
             }
         });
 
-        TimelineListView.getTimelineListView().refreshTimelineView();
+        ApplicationView.getApplicationView().getTimelineView().refreshTimelineView();
     }
 
 //    private void moveUnderTimeline(FloatingActionButton fab) {
@@ -99,7 +101,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
 //    }
 // </FAB>
 
-    public void fabUpdatePosition() {
+    public void updatePosition() {
 
         if (fabStatus != FAB_START_DRAGGING) {
 
@@ -111,13 +113,13 @@ public class ClayActionButton /* extends FloatingActionButton */ {
             screenHeight = metrics.heightPixels;
             screenWidth = metrics.widthPixels;
 
-            if (TimelineListView.getTimelineListView().getEventHolders().size() == 0) {
+            if (ApplicationView.getApplicationView().getTimelineView().getEventHolders().size() == 0) {
                 int width = fab.getWidth();
                 int height = fab.getHeight();
                 int xOffset = 170; // TODO: Make dynamic
                 int yOffset = 55; // TODO: Make dynaimc
                 Point dest = new Point((int) (screenWidth / 2.0) - (int) (width / 2.0) + xOffset, (int) (screenHeight / 2.0) - (int) (height / 2.0) + yOffset);
-//            ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 400);
+//            ApplicationView.getApplicationView().moveToPoint(fab, dest, 400);
 
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
                 params.leftMargin = (int) dest.x;
@@ -126,22 +128,22 @@ public class ClayActionButton /* extends FloatingActionButton */ {
             }
 
             // Get point under last event on timeline
-            Point point = TimelineListView.getTimelineListView().getPointUnderTimeline();
+            Point point = ApplicationView.getApplicationView().getTimelineView().getPointUnderTimeline();
             if (point != null) {
-                point.x = 135;
+                point.x = 90; // TODO: Dynamically get x coordinate of timeline
                 point.y = point.y + (int) (0.01 * fab.getHeight());
             }
 
             if (point != null && point.y < (screenHeight - fab.getHeight())) {
                 // Timeline does not fill screen
-                moveViewToScreenCenter(fab, point, 400);
+                moveToPoint(fab, point, 400);
             } else {
                 // Timeline fills screen
                 int width = fab.getWidth();
                 int height = fab.getHeight();
                 Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
 
-                moveViewToScreenCenter(fab, dest, 400);
+                moveToPoint(fab, dest, 400);
 
             }
 
@@ -151,7 +153,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
 
 
     // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
-    public void moveViewToScreenCenter(final View view, Point destinationPoint, int translateDuration)
+    public void moveToPoint (final View view, Point destinationPoint, int translateDuration)
     {
         FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
         DisplayMetrics dm = new DisplayMetrics();
@@ -204,12 +206,14 @@ public class ClayActionButton /* extends FloatingActionButton */ {
     public void init() {
         // <HACK>
 
-        final TimelineListView timelineView = ApplicationView.getApplicationView().getTimelineView();
-
         fab.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 boolean returnVal = false;
+
+                final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
                     // Reset selection
@@ -227,7 +231,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
                             FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
                             root.removeView(fablet);
                         }
-                        fablets.clear();
+                        fablets.erase();
                     }
                     */
 
@@ -239,7 +243,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
 
                     // If dragging, skip the click event following release
                     if (fabStatus == FAB_START_DRAGGING) {
-//                        getUnit().getClay().fabDisableClick = true;
+//                        getDevice().getClay().fabDisableClick = true;
 
                         /*
                         // <TEST>
@@ -256,7 +260,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
                         int width = fab.getWidth();
                         int height = fab.getHeight();
                         Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-                        ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 100);
+                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
                         // </TEST>
                         */
 
@@ -326,16 +330,16 @@ public class ClayActionButton /* extends FloatingActionButton */ {
 //                        int width = fab.getWidth();
 //                        int height = fab.getHeight();
 //                        Point dest = new Point((int) event.getRawX() - (int) (width / 2.0), (int) event.getRawY() - (int) (height / 2.0));
-//                        ApplicationView.getApplicationView().moveViewToScreenCenter(fab, dest, 100);
+//                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
 
-//                        if (getUnit().getClay().selectedEventHolder != null) {
-//                            timelineView.removeEventHolder(getUnit().getClay().selectedEventHolder);
+//                        if (getDevice().getClay().selectedEventHolder != null) {
+//                            timelineView.removeEventHolder(getDevice().getClay().selectedEventHolder);
 //                        }
 
                         // TODO: Search for nearest/nearby events, actions, states, etc. (i.e., discovery context)
-                        TimelineListView.getTimelineListView().resetViewBackgrounds();
+                        ApplicationView.getApplicationView().getTimelineView().resetViewBackgrounds();
 //                        TimelineListView.getTimelineListView().findNearbyViews((int) event.getRawX(), (int) event.getRawY());
-                        int nearestViewIndex = TimelineListView.getTimelineListView().findNearestTimelineIndex((int) event.getRawX(), (int) event.getRawY());
+                        int nearestViewIndex = ApplicationView.getApplicationView().getTimelineView().findNearestTimelineIndex((int) event.getRawX(), (int) event.getRawY());
 
                         Log.v("Dist", "---");
 
@@ -408,14 +412,16 @@ public class ClayActionButton /* extends FloatingActionButton */ {
             @Override
             public void onClick(View v) {
 
+                final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+
                 // Update timeline view
                 timelineView.resetEventViews();
                 timelineView.refreshTimelineView();
                 timelineView.refreshAvatarView();
 
-//                if (getUnit().getClay().fabDisableClick == false) {
-//                if (getUnit().getClay().selectedEventHolderIndex != -1) {
-                timelineView.displayActionBrowser(new TimelineListView.ActionSelectionListener() {
+//                if (getDevice().getClay().fabDisableClick == false) {
+//                if (getDevice().getClay().selectedEventHolderIndex != -1) {
+                timelineView.displayActionBrowser(new TimelineView.ActionSelectionListener() {
                     @Override
                     public void onSelect(Action action) {
 
@@ -434,7 +440,7 @@ public class ClayActionButton /* extends FloatingActionButton */ {
                             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 
                                 // Update position
-                                fabUpdatePosition();
+                                updatePosition();
 
                                 // Remove the layout
                                 timelineView.removeOnLayoutChangeListener(this);
@@ -450,6 +456,27 @@ public class ClayActionButton /* extends FloatingActionButton */ {
 //                }
 
                 fabDisableClick = false;
+            }
+        });
+
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+
+                timelineView.displayDeviceBrowser(new TimelineView.DeviceSelectionListener() {
+                    @Override
+                    public void onSelect(Device device) {
+                        ApplicationView.getApplicationView().setTimelineView(device);
+                    }
+                });
+
+//                }
+
+//                fabDisableClick = false;
+
+                return false;
             }
         });
         // </HACK>

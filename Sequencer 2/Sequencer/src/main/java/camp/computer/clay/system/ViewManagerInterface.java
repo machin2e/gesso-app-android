@@ -7,13 +7,13 @@ public interface ViewManagerInterface {
     public Clay getClay();
 
     /**
-     * Defines a timeline view and associated data structures for the specified unit.
-     * @param unit
+     * Defines a timeline view and associated data structures for the specified device.
+     * @param device
      */
-    public void addUnitView(Unit unit);
+    public void addUnitView(Device device);
 
-    public void refreshListViewFromData(Unit unit);
+    public void refreshListViewFromData(Device device);
 
-    // TODO: removeTimelineView (Unit unit);
-    // TODO: hideTimelineView (Unit unit);
+    // TODO: removeTimelineView (Device unit);
+    // TODO: hideTimelineView (Device unit);
 }

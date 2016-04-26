@@ -20,6 +20,8 @@ import com.mobeta.android.sequencer.R;
 import java.util.Calendar;
 import java.util.Date;
 
+import camp.computer.clay.system.Device;
+
 public class DeviceViewPager extends ViewPager {
 
     private static boolean ENABLE_TOUCH = true;
@@ -46,7 +48,7 @@ public class DeviceViewPager extends ViewPager {
     boolean interceptTouches = false;
 
     int currentViewTag = 0;
-    TimelineListView currentListView = null;
+    TimelineView currentListView = null;
 
     public DeviceViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -63,10 +65,11 @@ public class DeviceViewPager extends ViewPager {
                 Log.v("Device", "setting position to " + position);
                 // Select the page at the specified position
                 currentViewTag = position;
-                currentListView = (TimelineListView) findViewWithTag(currentViewTag);
+                currentListView = (TimelineView) findViewWithTag(currentViewTag);
                 // <HACK>
-                ApplicationView.getApplicationView().getActionButton().init();
+                ApplicationView.getApplicationView().getCursorView().init();
                 // </HACK>
+                ApplicationView.getApplicationView().getCursorView().updatePosition();
             }
 
             @Override
@@ -125,9 +128,9 @@ public class DeviceViewPager extends ViewPager {
     public boolean onTouchEvent(MotionEvent event) {
 
         if (currentListView == null) {
-            currentListView = (TimelineListView) findViewWithTag (currentViewTag);
+            currentListView = (TimelineView) findViewWithTag (currentViewTag);
             // <HACK>
-            ApplicationView.getApplicationView().getActionButton().init();
+            ApplicationView.getApplicationView().getCursorView().init();
             // </HACK>
         }
 
@@ -230,9 +233,9 @@ public class DeviceViewPager extends ViewPager {
 
         // Check if interacting with a list item
         if (currentListView == null) {
-            currentListView = (TimelineListView) findViewWithTag (currentViewTag);
+            currentListView = (TimelineView) findViewWithTag (currentViewTag);
             // <HACK>
-            ApplicationView.getApplicationView().getActionButton().init();
+            ApplicationView.getApplicationView().getCursorView().init();
             // </HACK>
         }
 
@@ -284,9 +287,9 @@ public class DeviceViewPager extends ViewPager {
                     Log.v ("Touch_Event", "distance: " + distance);
                     if (startTouch.x < 200) {
                         Log.v ("Touch_Event", "startTouch.x < 200");
-                        EventHolder eventHolder = TimelineListView.getTimelineListView().getEventHolderByPosition(currentTouch.x, currentTouch.y);
+                        EventHolder eventHolder = ApplicationView.getApplicationView().getTimelineView().getEventHolderByPosition(currentTouch.x, currentTouch.y);
                         if (eventHolder != null) {
-                            TimelineListView.getTimelineListView().expandEventView(eventHolder);
+                            ApplicationView.getApplicationView().getTimelineView().expandEventView(eventHolder);
                         }
 //                        interceptTouches = true;
                     } else {
@@ -332,7 +335,19 @@ public class DeviceViewPager extends ViewPager {
      * Returns the currently-selected timeline view.
      * @return
      */
-    public TimelineListView getTimelineView () {
+    public TimelineView getTimelineView () {
         return currentListView;
+    }
+
+    public void setTimelineView (Device device) {
+        DeviceViewPagerAdapter adapter = (DeviceViewPagerAdapter) this.getAdapter();
+        int deviceCount = adapter.getCount();
+        for (int i = 0; i < deviceCount; i++) {
+            DeviceViewFragment fragment = (DeviceViewFragment) adapter.getItem(i);
+            if (fragment.getDevice().getUuid().equals(device.getUuid())) {
+                this.setCurrentItem(i);
+                break;
+            }
+        }
     }
 }

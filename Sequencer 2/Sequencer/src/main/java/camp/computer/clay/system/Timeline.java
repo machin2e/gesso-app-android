@@ -9,31 +9,31 @@ public class Timeline {
 
     private ArrayList<Event> events = new ArrayList<Event>();
 
-    private Unit unit = null;
+    private Device device = null;
 
     public Timeline (UUID uuid) {
         this.uuid = uuid;
     }
 
-    public Timeline(Unit unit) {
+    public Timeline(Device device) {
         super();
 
         this.uuid = UUID.randomUUID();
 
-        this.unit = unit;
+        this.device = device;
     }
 
     public UUID getUuid () {
         return this.uuid;
     }
 
-    public Unit getUnit () {
-        return this.unit;
+    public Device getDevice() {
+        return this.device;
     }
 
     // <HACK>
-    public void setUnit (Unit unit) {
-        this.unit = unit;
+    public void setDevice(Device device) {
+        this.device = device;
     }
     // </HACK>
 
@@ -71,7 +71,7 @@ public class Timeline {
         }
 
 //        if (event != null) {
-//            getUnit().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
+//            getDevice().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
 //                @Override
 //                public void onSuccess(Object object) {
 //                    Log.v("Content_Manager", "Deleted event from database.");
@@ -102,5 +102,9 @@ public class Timeline {
 
     public void addEvent(int index, Event event) {
         this.events.add(index, event);
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 }

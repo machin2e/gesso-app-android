@@ -33,9 +33,19 @@ public class EventHolder {
         this.type = type;
     }
 
+    private String triggerMessage = "";
+
     private boolean isSelected = false;
 
     private boolean isStateVisible = false;
+
+    public String getTriggerMessage () {
+        return this.triggerMessage;
+    }
+
+    public void setTriggerMessage (String message) {
+        this.triggerMessage = message;
+    }
 
     public EventHolder(Event event) {
         super();

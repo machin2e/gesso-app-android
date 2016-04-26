@@ -26,19 +26,19 @@ import com.azeesoft.lib.colorpicker.ColorPickerDialog;
 import java.util.ArrayList;
 
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.Unit;
+import camp.computer.clay.system.Device;
 
 public class EventDesignerView {
 
-    private Unit unit;
+    private Device device;
 
-    private TimelineListView timelineListView;
+    private TimelineView timelineView;
 
-    public EventDesignerView(Unit unit, TimelineListView timelineListView) {
+    public EventDesignerView(Device device, TimelineView timelineView) {
 
-        this.unit = unit;
+        this.device = device;
 
-        this.timelineListView = timelineListView;
+        this.timelineView = timelineView;
     }
 
     public Context getContext () {
@@ -46,11 +46,11 @@ public class EventDesignerView {
     }
 
     public Clay getClay () {
-        return getUnit().getClay();
+        return getDevice().getClay();
     }
 
-    public Unit getUnit () {
-        return this.unit;
+    public Device getDevice() {
+        return this.device;
     }
 
     public void displayUpdateLightsOptions(final EventHolder eventHolder) {
@@ -259,7 +259,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState (updatedStateString);
 
@@ -281,32 +281,32 @@ public class EventDesignerView {
                 // i.e., "set event <event-uuid> state "<state>"" (assigns the state string the specified event)
                 // ON REMOVE ACTION FROM TIMELINE:
                 // i.e., "stop event <action-uuid>" (removes event for action with the uuid)
-//        getUnit().sendMessage ("cache action " + action.getUuid() + " \"" + action.getTag() + " " + event.getState().get(0).getState() + "\"");
-//                getUnit().sendMessage ("start event " + eventHolder.getEvent().getUuid());
-//                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " action " + eventHolder.getEvent().getAction().getUuid());
-//                getUnit().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
+//        getDevice().sendMessage ("cache action " + action.getUuid() + " \"" + action.getTag() + " " + event.getState().get(0).getState() + "\"");
+//                getDevice().sendMessage ("start event " + eventHolder.getEvent().getUuid());
+//                getDevice().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " action " + eventHolder.getEvent().getAction().getUuid());
+//                getDevice().sendMessage ("set event " + eventHolder.getEvent().getUuid() + " state \"light " + eventHolder.getEvent().getState().get(0).getState() + "\""); // <HACK />
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
                 Log.v ("Color", content);
-                //getUnit().sendMessage (content); // <HACK />
+                //getDevice().sendMessage (content); // <HACK />
                 /*
                 String packedBytes = new String(colorBytes, Charset.forName("UTF-8")); // "US-ASCII"
                 String msg2 = "set event " + eventHolder.getEvent().getUuid() + " state \"color " + packedBytes + "\"";
-                getUnit().sendMessage (msg2); // <HACK />
+                getDevice().sendMessage (msg2); // <HACK />
                 for (int i = 0; i < msg2.length(); i++) {
                     Log.v ("Color", String.valueOf(Integer.valueOf(msg2.getBytes()[i])));
                 }
                 */
-                // unit.sendMessage("update action " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
+                // device.sendMessage("update action " + behaviorUuid + " \"" + behaviorState.getState() + "\"");
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
             }
         });
         builder.setNegativeButton ("Cancel", new DialogInterface.OnClickListener () {
@@ -357,7 +357,7 @@ public class EventDesignerView {
 //
 //                // Update the behavior state
 //                // <HACK>
-//                eventHolder.getEvent().setTimeline(unit.getTimeline());
+//                eventHolder.getEvent().setTimeline(device.getTimeline());
 //                // </HACK>
 //                eventHolder.updateState (updatedStateString);
 
@@ -368,13 +368,16 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String triggerText = triggerMessageText.getText().toString();
+
+                eventHolder.setTriggerMessage(triggerText);
+
                 if (triggerText.length() > 0) {
-                    getUnit().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " trigger \"" + triggerText + "\"");
+                    getDevice().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " trigger \"" + triggerText + "\"");
                 }
                 // </HACK>
 
                 // Refresh the timeline view
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -994,7 +997,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState(stateString);
 
@@ -1007,7 +1010,7 @@ public class EventDesignerView {
                 // <HACK>
                 //String stateToSend = stateString.substring (0, stateString.indexOf(" ")).toLowerCase() + " " + stateString.substring(stateString.indexOf(" ") + 1);
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + stateString + "\"";
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 Log.v ("Event_Trigger", "state: " + stateString);
@@ -1015,12 +1018,12 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
@@ -1028,13 +1031,13 @@ public class EventDesignerView {
 //
 //                // ...then addUnit it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
-//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay().getStore().storeState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
-//                getClay().getStore().updateTimeline(unit.getTimeline());
+//                getClay().getStore().updateTimeline(device.getTimeline());
 //
 //                // Refresh the timeline view
 //                refreshTimelineView();
@@ -1508,7 +1511,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState (updatedStateString);
 
@@ -1522,17 +1525,17 @@ public class EventDesignerView {
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
                 Log.v ("Signal", content);
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), updatedStateString);
@@ -1540,13 +1543,13 @@ public class EventDesignerView {
 //
 //                // ...then addUnit it to the device.
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
-//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay ().getStore().storeState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
-//                getClay ().getStore().updateTimeline(unit.getTimeline());
+//                getClay ().getStore().updateTimeline(device.getTimeline());
 //
 //                // Refresh the timeline view
 //                refreshTimelineView();
@@ -1592,10 +1595,10 @@ public class EventDesignerView {
 //                item.restoreAction().setTag(input.getText().toString())
 //                item.restoreAction().setTag(input.getText().toString());
 
-                // Send changes to unit
+                // Send changes to device
                 // TODO: "create behavior (...)"
                 String tagString = input.getText().toString();
-//                unit.sendMessage (tagString);
+//                device.sendMessage (tagString);
 
                 // Create the behavior
                 eventHolder.getEvent().getAction().setTag(tagString);
@@ -1607,16 +1610,16 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + tagString + "\"";
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -1736,8 +1739,8 @@ public class EventDesignerView {
                     messageDestinationSelector.setVisibility(View.VISIBLE);
                     // Get list of all discovered devices on the mesh network
                     messageDestinationData.clear();
-                    for (Unit unit : getClay().getUnits()) {
-                        messageDestinationData.add(unit.getUuid().toString());
+                    for (Device device : getClay().getDevices()) {
+                        messageDestinationData.add(device.getUuid().toString());
                     }
                     // Note: There's no "Other" option for mesh.
                     messageDestinationDataAdapter.notifyDataSetChanged();
@@ -1833,7 +1836,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState(stateString);
 
@@ -1846,7 +1849,7 @@ public class EventDesignerView {
                 // <HACK>
                 String stateToSend = stateString.substring (0, stateString.indexOf(" ")).toLowerCase() + " " + stateString.substring(stateString.indexOf(" ") + 1);
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + stateToSend + "\"";
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 Log.v ("Event_Trigger", "state: " + stateToSend);
@@ -1854,12 +1857,12 @@ public class EventDesignerView {
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
@@ -1867,13 +1870,13 @@ public class EventDesignerView {
 //
 //                // ...then addUnit it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
-//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay().getStore().storeState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
-//                getClay().getStore().updateTimeline(unit.getTimeline());
+//                getClay().getStore().updateTimeline(device.getTimeline());
 //
 //                // Refresh the timeline view
 //                refreshTimelineView();
@@ -2000,7 +2003,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState(updatedStateString);
 
@@ -2012,17 +2015,17 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
 
 //                // Update the behavior state
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
@@ -2030,13 +2033,13 @@ public class EventDesignerView {
 //
 //                // ...then addUnit it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
-//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay().getStore().storeState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
-//                getClay().getStore().updateTimeline(unit.getTimeline());
+//                getClay().getStore().updateTimeline(device.getTimeline());
 //
 //                // Refresh the timeline view
 //                refreshTimelineView();
@@ -2085,7 +2088,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState (updatedStateString);
 
@@ -2097,17 +2100,17 @@ public class EventDesignerView {
                 // Send updated state to device
                 // <HACK>
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage(content);
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
 
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
 ////                eventHolder.getEvent().getAction().setState(behaviorState);
@@ -2115,13 +2118,13 @@ public class EventDesignerView {
 //
 //                // ...then addUnit it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
-//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay ().getStore().storeState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //                //getClay ().getStore().updateBehaviorState(behaviorState);
-//                getClay ().getStore().updateTimeline(unit.getTimeline());
+//                getClay ().getStore().updateTimeline(device.getTimeline());
 //
 //                // Refresh the timeline view
 //                refreshTimelineView();
@@ -2166,6 +2169,8 @@ public class EventDesignerView {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 waitLabel.setText("Wait (" + progress + " ms)");
+//                getDevice().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " state \"" + String.valueOf(progress) + "\"");
+//                getDevice().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " duration \"" + String.valueOf(progress) + "\"");
             }
 
             @Override
@@ -2193,7 +2198,7 @@ public class EventDesignerView {
 
                 // Update the behavior state
                 // <HACK>
-                eventHolder.getEvent().setTimeline(unit.getTimeline());
+                eventHolder.getEvent().setTimeline(device.getTimeline());
                 // </HACK>
                 eventHolder.updateState(updatedStateString);
 
@@ -2204,18 +2209,18 @@ public class EventDesignerView {
 
                 // Send updated state to device
                 // <HACK>
-                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
-//                getUnit().sendMessage(content);
+//                getDevice().sendMessage(content);
                 // </HACK>
 
                 // <HACK>
                 // TODO: Replace this with a queue.
-                getUnit().enqueueMessage(content);
+                getDevice().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"");
+                getDevice().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " duration \"" + updatedStateString + "\"");
                 // </HACK>
 
                 // Refresh the timeline view
                 // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
-                timelineListView.refreshTimelineView();
+                timelineView.refreshTimelineView();
 
 //                // Add wait
 //                State behaviorState = new State (eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), "" + waitVal.getProgress());
@@ -2223,12 +2228,12 @@ public class EventDesignerView {
 //
 //                // ...then addUnit it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
-//                unit.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
 //                // ...and finally update the repository.
 //                getClay ().getStore().storeState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
-//                getClay ().getStore().updateTimeline(unit.getTimeline());
+//                getClay ().getStore().updateTimeline(device.getTimeline());
 //
 //                // Refresh the timeline view
 //                refreshTimelineView();

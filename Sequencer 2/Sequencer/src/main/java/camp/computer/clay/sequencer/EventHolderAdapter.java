@@ -730,12 +730,17 @@ public class EventHolderAdapter extends BaseAdapter {
         innerTopViewLayout.addView(actionLayout);
 
         // Action: Trigger
-        final TextView frequencyLabel = getTextButtonView("trigger");
+        String triggerMessage = "none";
+        if (!eventHolder.getTriggerMessage().equals("")) {
+            triggerMessage = eventHolder.getTriggerMessage();
+        }
+        final TextView frequencyLabel = getTextButtonView(triggerMessage);
+        frequencyLabel.setAllCaps(true);
         frequencyLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.v("Touch", "Trigger Button");
-                TimelineListView.getTimelineListView().getEventDesigner().displayEventTriggerOptions(eventHolder);
+                ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
             }
         });
         actionLayout.addView(frequencyLabel);
