@@ -10,7 +10,7 @@ public interface ViewManagerInterface {
      * Defines a timeline view and associated data structures for the specified device.
      * @param device
      */
-    public void addUnitView(Device device);
+    public void addDeviceView(Device device);
 
     public void refreshListViewFromData(Device device);
 

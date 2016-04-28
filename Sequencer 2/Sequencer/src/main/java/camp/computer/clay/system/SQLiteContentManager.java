@@ -472,7 +472,7 @@ public class SQLiteContentManager {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get actions with parent with root UUID, addUnit to parent's list of
+        // - For each root, get actions with parent with root UUID, addDevice to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -575,7 +575,7 @@ public class SQLiteContentManager {
 
                 // Add the action to Clay
                 // TODO: Only add root actions to Clay? Maybe only those should be available for selection.
-                getClay().cacheAction(action);
+                getClay().getCache().cache(action);
                 Log.v("Content_Manager", "> added beahvior: " + action.getUuid());
 
                 // Move to the next entry returned by the query
@@ -667,7 +667,7 @@ public class SQLiteContentManager {
                     Script script = new Script(UUID.fromString(uuidString), tag, stateSpacePattern, defaultState);
 
                     // Cache the script
-                    getClay().cacheScript(script);
+                    getClay().getCache().cache(script);
                 }
 
                 // Continue to next behavior script
@@ -1707,7 +1707,7 @@ public class SQLiteContentManager {
         // TODO: ...before saving a action tree, not just the action node UUID.
         if (!db.queryActionExists(action, parentAction)) {
 
-            // TODO: Update the basic action that has a script, addUnit a parent! Yes, the action can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic action that has a script, addDevice a parent! Yes, the action can have both a parent and a script! (leaf node!)
 
             db.saveAction(action, parentAction);
         } else {

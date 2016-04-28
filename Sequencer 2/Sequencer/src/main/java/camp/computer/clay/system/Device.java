@@ -23,7 +23,7 @@ public class Device {
 
     // TODO: Cache/model the unit's state and behavior
 
-    private TcpMessageInterface tcpMessageInterface;
+    private TcpMessageClient tcpMessageClient;
 
     public Device() {
     }
@@ -92,14 +92,14 @@ public class Device {
 
     public void connectTcp() {
 
-        if (tcpMessageInterface == null) {
-            tcpMessageInterface = new TcpMessageInterface();
+        if (tcpMessageClient == null) {
+            tcpMessageClient = new TcpMessageClient();
         }
 
         try {
             if (this.internetAddress != null) {
                 InetAddress inetAddress = InetAddress.getByName(this.internetAddress);
-                tcpMessageInterface.connect(inetAddress);
+                tcpMessageClient.connect(inetAddress);
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -118,6 +118,6 @@ public class Device {
         Message message = new Message("tcp", source, destination, content);
         message.setDeliveryGuaranteed(true);
 
-        tcpMessageInterface.enqueueMessage(message);
+        tcpMessageClient.enqueueMessage(message);
     }
 }

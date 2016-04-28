@@ -113,9 +113,10 @@ public class CursorView /* extends FloatingActionButton */ {
             screenHeight = metrics.heightPixels;
             screenWidth = metrics.widthPixels;
 
-            if (ApplicationView.getApplicationView().getTimelineView().getEventHolders().size() == 0) {
-                int width = fab.getWidth();
-                int height = fab.getHeight();
+            int width = fab.getWidth();
+            int height = fab.getHeight();
+
+            if (ApplicationView.getApplicationView().getTimelineView() == null || ApplicationView.getApplicationView().getTimelineView().getEventHolders().size() == 0) {
                 int xOffset = 170; // TODO: Make dynamic
                 int yOffset = 55; // TODO: Make dynaimc
                 Point dest = new Point((int) (screenWidth / 2.0) - (int) (width / 2.0) + xOffset, (int) (screenHeight / 2.0) - (int) (height / 2.0) + yOffset);
@@ -139,8 +140,6 @@ public class CursorView /* extends FloatingActionButton */ {
                 moveToPoint(fab, point, 400);
             } else {
                 // Timeline fills screen
-                int width = fab.getWidth();
-                int height = fab.getHeight();
                 Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
 
                 moveToPoint(fab, dest, 400);
@@ -463,14 +462,19 @@ public class CursorView /* extends FloatingActionButton */ {
             @Override
             public boolean onLongClick(View v) {
 
-                final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+                if (fabStatus != FAB_START_DRAGGING) {
 
-                timelineView.displayDeviceBrowser(new TimelineView.DeviceSelectionListener() {
-                    @Override
-                    public void onSelect(Device device) {
-                        ApplicationView.getApplicationView().setTimelineView(device);
-                    }
-                });
+                    final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+
+                    timelineView.displayDeviceBrowser(new TimelineView.DeviceSelectionListener() {
+                        @Override
+                        public void onSelect(Device device) {
+                            ApplicationView.getApplicationView().setTimelineView(device);
+                        }
+                    });
+
+                    return true;
+                }
 
 //                }
 

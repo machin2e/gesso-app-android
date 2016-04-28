@@ -65,10 +65,6 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
         }
     }
 
-
-
-
-
     public void run() {
         byte[] messageBytes = new byte[MAX_UDP_DATAGRAM_LEN];
         DatagramSocket serverSocket = null;
@@ -133,28 +129,16 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
         if (multicastLock == null) {
             WifiManager wm = (WifiManager) ApplicationView.getContext().getSystemService(Context.WIFI_SERVICE);
             multicastLock = wm.createMulticastLock ("mydebuginfo");
-//            if (!multicastLock.isHeld ()) {
             multicastLock.acquire ();
-//            }
         }
 
-//        Log.v ("Clay_Time", "Starting datagram server.");
-//        if (datagramServer == null) {
-            Log.v("Clay_Threads", "Starting datagram server.");
-//            datagramServer = new DatagramManager ();
-            this.start();
-//        }
+        Log.v("Clay_Threads", "Starting datagram server.");
+        this.start();
         if (getState() == State.TERMINATED) {
             Log.v("Clay_Threads", "Re-starting datagram server.");
             start();
         }
         bKeepRunning = true;
-
-        // Display (or store) sever information
-//        Context context = ApplicationView.getAppContext();
-//        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-//        String ip = Formatter.formatIpAddress (wm.getConnectionInfo ().getIpAddress ());
-//        Log.v ("Clay", "Internet address: " + ip);
     }
 
     public void stopServer () {
@@ -211,7 +195,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
 //
 //        }
 
-        // Dequeue the message if it has been verified or if no verifiaction is requested.\
+        // Dequeue the message if it has been verified or if no verifiaction is requested.
     }
 
     private void sendMessageAsync (Message message) {

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TcpMessageInterface {
+public class TcpMessageClient {
 
     public static int MESSAGE_SEND_FREQUENCY = 100;
 
@@ -24,7 +24,7 @@ public class TcpMessageInterface {
 
     private TcpClient mTcpClient = null;
 
-    public TcpMessageInterface() {
+    public TcpMessageClient() {
 
     }
 

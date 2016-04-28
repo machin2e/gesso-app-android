@@ -68,8 +68,8 @@ public class DeviceViewPager extends ViewPager {
                 currentListView = (TimelineView) findViewWithTag(currentViewTag);
                 // <HACK>
                 ApplicationView.getApplicationView().getCursorView().init();
-                // </HACK>
                 ApplicationView.getApplicationView().getCursorView().updatePosition();
+                // </HACK>
             }
 
             @Override

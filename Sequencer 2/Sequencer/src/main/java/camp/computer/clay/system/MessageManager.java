@@ -38,7 +38,7 @@ public class MessageManager {
     Handler handler = new Handler() {
         @Override
         public void handleMessage (android.os.Message msg) {
-//            Log.v("Clay_Time", "addUnit called");
+//            Log.v("Clay_Time", "addDevice called");
 
             // Process the incoming message's data.
             Bundle bundle = msg.getData();
@@ -55,10 +55,10 @@ public class MessageManager {
             Message message = new Message ("udp", senderAddress, null, tokens[1]);
 
             // Update the unit construct associated with the message
-            if (getClay ().hasUnitByAddress (tokens[0])) {
+            if (getClay ().hasDeviceByAddress(tokens[0])) {
 
                 // Get the device associated with the received message
-                Device device = getClay ().getUnitByAddress (tokens[0]);
+                Device device = getClay ().getDeviceByAddress(tokens[0]);
 
                 // Set time that this message was added to the message queue.
                 // NOTE: This is NOT the time that the message was received! It is probably shortly thereafter, though!
@@ -193,17 +193,17 @@ public class MessageManager {
                 String unitUuid = new String (messageTokens[2]);
                 String unitAddress = message.getFromAddress(); // messageTokens[5];
 
-                if (!getClay ().hasUnitByAddress (unitAddress)) {
+                if (!getClay ().hasDeviceByAddress(unitAddress)) {
 
 //                    Log.v("UDP", "Adding Clay " + unitUuid + " with address " + unitAddress);
                     UUID deviceUuid = UUID.fromString(unitUuid);
-                    getClay().addUnit(deviceUuid, unitAddress);
+                    getClay().addDevice(deviceUuid, unitAddress);
 
                 } else {
 //                    Log.v("Clay", "Updating state of existing Device with address " + unitAddress);
 
                     UUID deviceUuid = UUID.fromString(unitUuid);
-                    Device device = getClay().getUnitByUuid(deviceUuid);
+                    Device device = getClay().getDeviceByUuid(deviceUuid);
                 }
             }
 

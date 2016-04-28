@@ -1029,7 +1029,7 @@ public class EventDesignerView {
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
-//                // ...then addUnit it to the device...
+//                // ...then addDevice it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
 //                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
@@ -1541,7 +1541,7 @@ public class EventDesignerView {
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), updatedStateString);
 //                eventHolder.getEvent().getAction().setState(behaviorState);
 //
-//                // ...then addUnit it to the device.
+//                // ...then addDevice it to the device.
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
 //                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
@@ -1868,7 +1868,7 @@ public class EventDesignerView {
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
-//                // ...then addUnit it to the device...
+//                // ...then addDevice it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
 //                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
@@ -2031,7 +2031,7 @@ public class EventDesignerView {
 //                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
-//                // ...then addUnit it to the device...
+//                // ...then addDevice it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
 //                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
@@ -2116,7 +2116,7 @@ public class EventDesignerView {
 ////                eventHolder.getEvent().getAction().setState(behaviorState);
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
-//                // ...then addUnit it to the device...
+//                // ...then addDevice it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
 //                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //
@@ -2226,7 +2226,7 @@ public class EventDesignerView {
 //                State behaviorState = new State (eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), "" + waitVal.getProgress());
 //                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
 //
-//                // ...then addUnit it to the device...
+//                // ...then addDevice it to the device...
 //                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
 //                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
 //

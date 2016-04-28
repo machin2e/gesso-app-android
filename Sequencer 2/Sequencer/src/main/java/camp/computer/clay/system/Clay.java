@@ -16,7 +16,7 @@ import camp.computer.clay.sequencer.ApplicationView;
 public class Clay {
 
     // Resource management systems (e.g., networking, messaging, content)
-    private SQLiteContentManager contentManager = null;
+    private SQLiteContentManager store = null;
     private MessageManager messageManager = null;
     private NetworkManager networkManager = null;
 
@@ -27,7 +27,7 @@ public class Clay {
     private ArrayList<Device> devices = new ArrayList<Device>();
 
     // List of actions cached on this device
-    private CacheManager cacheManager = null;
+    private CacheManager cache = null;
 
     // The calendar used by Clay
     private Calendar calendar = Calendar.getInstance (TimeZone.getTimeZone("GMT"));
@@ -38,7 +38,7 @@ public class Clay {
         this.messageManager = new MessageManager(this); // Start the communications systems
         this.networkManager = new NetworkManager (this); // Start the networking systems
 
-        this.cacheManager = new CacheManager(this); // Set up behavior repository
+        this.cache = new CacheManager(this); // Set up behavior repository
     }
 
     /*
@@ -57,41 +57,13 @@ public class Clay {
      * Adds a content manager for use by Clay. Retrieves the basic actions provided by the
      * content manager and makes them available in Clay.
      */
-    public void addContentManager (SQLiteContentManager contentManager) {
-        // <HACK>
-        // this.contentManager = new FileContentManager(this, "file"); // Start the content management system
-        this.contentManager = contentManager;
-        // </HACK>
+    public void setStore(SQLiteContentManager contentManager) {
+        this.store = contentManager;
     }
 
     /*
      * Clay's infrastructure management functions.
      */
-
-    /**
-     * Sends a message to the specified device.
-     * @param device
-     * @param content
-     */
-    public void sendMessage (Device device, String content) {
-
-        // Get source address
-        String source = this.networkManager.getInternetAddress ();
-
-        // Get destination address
-        // String destination = device.getInternetAddress();
-        String destination = device.getInternetAddress();
-//        String[] destinationOctets = destination.split("\\.");
-//        destinationOctets[3] = "255";
-//        destination = TextUtils.join(".", destinationOctets);
-
-        // Create message
-        Message message = new Message("udp", source, destination, content);
-        message.setDeliveryGuaranteed(true);
-
-        // Queue message for sending
-        messageManager.queueOutgoingMessage(message);
-    }
 
     /**
      * Adds a view to Clay. This makes the view available for use in systems built with Clay.
@@ -111,11 +83,11 @@ public class Clay {
     }
 
     public CacheManager getCache() {
-        return this.cacheManager;
+        return this.cache;
     }
 
     public SQLiteContentManager getStore() {
-        return this.contentManager;
+        return this.store;
     }
 
     public ArrayList<Device> getDevices() {
@@ -128,12 +100,6 @@ public class Clay {
 
     // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
     public String getInternetAddress () {
-//        if (hasNetworkManager()) {
-//            return this.networkManager.getInternetAddress();
-//        } else {
-//            return null;
-//        }
-
         Context context = ApplicationView.getContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
@@ -141,24 +107,15 @@ public class Clay {
         return ip;
     }
 
-    // TODO: Move this to a "network interface"
     public String getInternetBroadcastAddress () {
-//        if (hasNetworkManager()) {
-//            String broadcastAddressString = this.networkManager.getInternetAddress();
-            String broadcastAddressString = getInternetAddress();
+        String broadcastAddressString = getInternetAddress();
         Log.v ("Clay", "Broadcast: " + broadcastAddressString);
         broadcastAddressString = broadcastAddressString.substring(0, broadcastAddressString.lastIndexOf("."));
         broadcastAddressString += ".255";
-//            String[] broadcastAddressOctetStrings = broadcastAddressString.split(".");
-//            broadcastAddressOctetStrings[3] = "255"; // Replace the fourth octet with broadcast flag
-//            broadcastAddressString = TextUtils.join(".", broadcastAddressOctetStrings);
-            return broadcastAddressString;
-//        } else {
-//            return null;
-//        }
+        return broadcastAddressString;
     }
 
-    public Device getUnitByAddress (String address) {
+    public Device getDeviceByAddress(String address) {
         for (Device device : getDevices()) {
             if (device.getInternetAddress ().compareTo (address) == 0) {
                 return device;
@@ -174,19 +131,19 @@ public class Clay {
     /**
      * Adds the specified unit to Clay's operating environment.
      */
-    public Device addUnit (final UUID unitUuid, final String internetAddress) {
+    public Device addDevice(final UUID deviceUuid, final String internetAddress) {
 
         // Search for the device in the store
-        if (hasUnitByUuid(unitUuid)) {
+        if (hasDeviceByUuid(deviceUuid)) {
             return null;
         }
 
         // Try to restore the device profile from the store.
-        Device device = getStore().restoreDevice(unitUuid);
+        Device device = getStore().restoreDevice(deviceUuid);
 
         // If unable to restore the device's profile, then create a profile for the device.
         if (device == null) {
-            device = new Device(getClay (), unitUuid);
+            device = new Device(getClay (), deviceUuid);
         }
 
         // Update the device's profile based on information received from device itself.
@@ -194,8 +151,22 @@ public class Clay {
             // Update restored device with information from device
             device.setInternetAddress(internetAddress);
 
+            // Store the updated device profile.
+            getStore ().storeDevice (device);
+            getStore ().storeTimeline(device.getTimeline());
+
             // Add device to Clay
-            addUnit2(device);
+            if (!this.devices.contains (device)) {
+
+                // Add device to present (i.e., local cache).
+                this.devices.add (device);
+                Log.v("Content_Manager", "Successfully added timeline.");
+
+                // Add timelines to attached views
+                for (ViewManagerInterface view : this.views) {
+                    view.addDeviceView(device);
+                }
+            }
 
             // Establish TCP connection
             device.connectTcp();
@@ -203,7 +174,7 @@ public class Clay {
 //            // Show the action button
 //            ApplicationView.getApplicationView().getCursorView().show(true);
 
-            // Populate the timeline
+            // Populate the device's timeline
             // TODO: Populate from scratch only if no timeline has been programmed for the device
             for (Event event : device.getTimeline().getEvents()) {
                 // <HACK>
@@ -212,60 +183,30 @@ public class Clay {
                 device.enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
                 // </HACK>
             }
-
-            // Store the updated device profile.
-            getStore ().storeDevice (device);
-            getStore ().storeTimeline (device.getTimeline ());
         }
 
         return device;
     }
 
-    private void addUnit2 (Device device) {
-        Log.v ("Content_Manager", "addUnit2");
-
-        if (!this.devices.contains (device)) {
-
-            // Add device to present (i.e., local cache).
-            this.devices.add(device);
-            Log.v("Content_Manager", "Successfully added timeline.");
-
-            // Add timelines to attached views
-            for (ViewManagerInterface view : this.views) {
-                // TODO: (1) addUnit a page to the ViewPager
-                // TODO: (2) Add a tab to the action bar to support navigation to the specified page.
-                view.addUnitView(device);
-            }
-        }
-    }
-
-    public boolean hasUnits () {
-        return this.devices.size () > 0;
-    }
-
-    public boolean hasUnit (Device device) {
-        return this.devices.contains (device);
-    }
-
-    public boolean hasUnitByUuid (UUID unitUuid) {
+    public boolean hasDeviceByUuid(UUID uuid) {
         for (Device device : getDevices()) {
-            if (device.getUuid().compareTo(unitUuid) == 0) {
+            if (device.getUuid().compareTo(uuid) == 0) {
                 return true;
             }
         }
         return false;
     }
 
-    public Device getUnitByUuid (UUID unitUuid) {
+    public Device getDeviceByUuid(UUID uuid) {
         for (Device device : getDevices()) {
-            if (device.getUuid().compareTo(unitUuid) == 0) {
+            if (device.getUuid().compareTo(uuid) == 0) {
                 return device;
             }
         }
         return null;
     }
 
-    public boolean hasUnitByAddress (String address) {
+    public boolean hasDeviceByAddress(String address) {
         for (Device device : getDevices()) {
             if (device.getInternetAddress().equals(address)) {
                 return true;
@@ -279,12 +220,12 @@ public class Clay {
 //
 //        // Discover first device
 //        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
-//        getClay().addUnit(unitUuidA, "10.1.10.29");
-//        Device foundUnit = getUnitByUuid(unitUuidA);
+//        getClay().addDevice(unitUuidA, "10.1.10.29");
+//        Device foundUnit = getDeviceByUuid(unitUuidA);
 //
 //        // Discover second device
 //        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
-//        getClay().addUnit(unitUuidB, "192.168.1.123");
+//        getClay().addDevice(unitUuidB, "192.168.1.123");
 //
 //        if (addBehaviorToTimeline) {
 //            for (int i = 0; i < behaviorCount; i++) {
@@ -300,7 +241,7 @@ public class Clay {
 //                // Create event for the action and add it to the unit's timeline
 //                Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
 //                Event event = new Event(foundUnit.getTimeline(), action);
-//                getClay().getUnitByUuid(unitUuidA).getTimeline().addEvent(event);
+//                getClay().getDeviceByUuid(unitUuidA).getTimeline().addEvent(event);
 //                getClay().getStore().storeEvent(event);
 //                // TODO: Update unit
 //            }
@@ -386,65 +327,21 @@ public class Clay {
 //    }
 
     /**
-     * Adds the action, caches it, and stores it.
-     */
-    public void cacheAction(Action action) {
-
-        // Create action (and state) for the action script
-//        Script behaviorScript = new Script (UUID.randomUUID(), tag, defaultState);
-//        Action action = new Action (behaviorScript);
-
-        // Cache the action
-        this.cache(action);
-
-//        // Store the action
-//        if (hasStore()) {
-//            getStore().storeAction(action);
-//        }
-
-    }
-
-    public void cacheScript (Script script) {
-
-        if (hasCache ()) {
-            this.cache (script);
-        }
-
-    }
-
-    /**
      * Returns true if Clay has a content manager.
      * @return True if Clay has a content manager. False otherwise.
      */
     public boolean hasStore() {
-        return this.contentManager != null;
-    }
-
-    public Action getBehavior (UUID behaviorUuid) {
-        if (hasCache()) {
-            if (getCache().hasAction(behaviorUuid.toString())) {
-                return getCache().getAction(behaviorUuid);
-            } else {
-                // TODO: Cache the behavior and callback to the object requesting the behavior.
-            }
-        }
-        // TODO: throw NoCacheManagerException
-        return null;
+        return this.store != null;
     }
 
     private boolean hasCache() {
-        if (getCache() != null) {
-            return true;
-        }
-        return false;
+        return this.cache != null;
     }
 
     /**
      * Cycle through routine operations.
      */
-    public void cycle () {
-
-        // Process messages
+    public void step () {
         messageManager.processMessage();
     }
 
@@ -458,101 +355,5 @@ public class Clay {
 
     public long getTime () {
         return this.calendar.getTimeInMillis();
-    }
-
-    /**
-     * Caches a Action in memory.
-     * @param action The Action to cache.
-     */
-    public void cache (Action action) {
-        this.getCache().cache (action);
-    }
-
-    /**
-     * Caches a behavior interface to the cache.
-     * @param script The behavior interface to cache.
-     */
-    public void cache (Script script) {
-        this.getCache().cache (script);
-    }
-
-    /**
-     * Adds a Device to Clay's object model.
-     * @param device The Device to addUnit to Clay's object model.
-     */
-    public void addUnit(Device device) {
-        this.devices.add(device);
-    }
-
-    /**
-     * Push updated device object to views so they can show the updated information
-     * @param device
-     */
-    public void updateUnitView (Device device) {
-
-        for (ViewManagerInterface view : this.views) {
-            view.refreshListViewFromData(device);
-        }
-    }
-
-    /**
-     * Requests a view for a device.
-     * @param device The device for which a view is requested.
-     */
-    public void addUnitView (Device device) {
-
-        // TODO: (?) Add DeviceViewFragment to a list here?
-
-        // <HACK>
-        // Make sure no devices are in an invalid state (null reference)
-        boolean addView = true;
-        for (Event event : device.getTimeline().getEvents()) {
-            if (event.getAction() == null) {
-                addView = false;
-            }
-        }
-        if (addView) {
-            addUnitView2(device);
-        }
-        // </HACK>
-    }
-
-    private void addUnitView2(Device device) {
-        // Add timelines to attached views
-        for (ViewManagerInterface view : this.views) {
-            // TODO: (1) addUnit a page to the ViewPager
-
-            // (2) Add a tab to the action bar to support navigation to the specified page.
-            Log.v ("CM_Log", "addUnitView2");
-            Log.v ("CM_Log", "\tdevice: " + device);
-            Log.v ("CM_Log", "\tdevice/timeline: " + device.getTimeline());
-            view.addUnitView(device);
-        }
-    }
-
-    /**
-     * Notify Clay of a change to an Event in the object model. Clay will propagate the change
-     * to the cache, store, and repository.
-     * @param event
-     */
-    public void notifyChange(Event event) {
-
-        if (hasStore()) {
-
-            // Add events if they don't already exist
-//            if (!contentManager.hasEvent(event)) {
-
-                // Store event, behavior, state
-                getStore().storeEvent(event);
-
-                // Store behavior for event
-                getStore().storeAction(event.getAction());
-
-                // Store behavior state for behavior
-//                getStore().storeState(event.getAction().getState());
-
-//            }
-        }
-
     }
 }

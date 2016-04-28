@@ -57,6 +57,19 @@ public class TimelineView extends DragSortListView {
         // <HACK>
         TimelineView.timelineView = this;
         // </HACK>
+
+        // <HACK>
+        if (ApplicationView.getApplicationView().mViewPager.currentListView == null) {
+            ApplicationView.getApplicationView().mViewPager.currentListView = this;
+        }
+        // </HACK>
+
+        // <HACK>
+        // Show the action button
+        ApplicationView.getApplicationView().getCursorView().init();
+        ApplicationView.getApplicationView().getCursorView().updatePosition();
+        ApplicationView.getApplicationView().getCursorView().show(true);
+        // </HACK>
     }
 
     /**
@@ -328,7 +341,7 @@ public class TimelineView extends DragSortListView {
         this.eventHolders.clear();
         this.adapter.notifyDataSetChanged();
 
-        // Create and addUnit eventHolders for each behavior
+        // Create and addDevice eventHolders for each behavior
         createEventHolders(timeline);
 
         // Add "create" option
@@ -336,7 +349,7 @@ public class TimelineView extends DragSortListView {
 
         // Add "update" firmware option
         // TODO: Conditionally show this, only if firmware update is available
-        // this.eventHolders.addUnit(new EventHolder("update firmware", "", EventHolderAdapter.SYSTEM_CONTROL_LAYOUT));
+        // this.eventHolders.addDevice(new EventHolder("update firmware", "", EventHolderAdapter.SYSTEM_CONTROL_LAYOUT));
 
         this.adapter.notifyDataSetChanged();
     }
@@ -439,7 +452,7 @@ public class TimelineView extends DragSortListView {
         getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
         // </HACK>
 
-        // Create and addUnit the new eventHolder to the timeline
+        // Create and addDevice the new eventHolder to the timeline
         // TODO: DO NOT create a new event, just update the existing one!
         EventHolder replacementEventHolder = new EventHolder(event);
 
@@ -856,9 +869,7 @@ public class TimelineView extends DragSortListView {
                 Log.e("Move_Finger", "Updated timeline layout.");
 
                 // Update position
-                //CursorView fab = (CursorView) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
                 ApplicationView.getApplicationView().getCursorView().updatePosition();
-//                fab.updatePosition();
             }
         });
 
@@ -1151,7 +1162,7 @@ public class TimelineView extends DragSortListView {
 
                 String deviceUuidString = deviceTitles[itemIndex];
 
-                Device device = getClay().getUnitByUuid(UUID.fromString(deviceUuidString));
+                Device device = getClay().getDeviceByUuid(UUID.fromString(deviceUuidString));
 
                 deviceSelectionListener.onSelect(device);
             }
@@ -1332,40 +1343,14 @@ public class TimelineView extends DragSortListView {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-            final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
+            resetEventViews();
+            refreshTimelineView();
+            refreshAvatarView();
 
-            expandEventView (eventHolder);
-//            expandEventView2 (eventHolder, view, 100);
-
-
-
-            // TODO: Show options for editing...
-
-//            // Check if the list item was a constructor
-//            if (eventHolder.getEvent().equals("create")) {
-//                if (eventHolder.tag == "create") {
-//                    // Nothing?
-//                }
-//                // TODO: (?)
-//
-//            } else if (!eventHolder.getType().equals("create") && !eventHolder.getType().equals("choose")) {
-//
-//                if (eventHolder.getType().equals("complex")) {
-//
-//                    decomposeEventHolder(eventHolder);
-//                    return true;
-//
-//                } else {
-//
-//                    displayEventDesigner(eventHolder);
-//                    return true;
-//
-//                }
-//
-//                // Request the ListView to be redrawn so the views in it will be displayed
-//                // according to their updated state information.
-////                refreshTimelineView();
-//            }
+            if (!hasSelectedEventHolders()) {
+                final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
+                displayUpdateOptions(eventHolder);
+            }
 
             return true;
         }
@@ -1572,14 +1557,40 @@ public class TimelineView extends DragSortListView {
         public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
             Log.v("Gesture_Log", "OnItemClickListener from CustomListView");
 
-            resetEventViews();
-            refreshTimelineView();
-            refreshAvatarView();
+            final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
 
-            if (!hasSelectedEventHolders()) {
-                final EventHolder eventHolder = (EventHolder) eventHolders.get (position);
-                displayUpdateOptions(eventHolder);
-            }
+            expandEventView (eventHolder);
+//            expandEventView2 (eventHolder, view, 100);
+
+
+
+            // TODO: Show options for editing...
+
+//            // Check if the list item was a constructor
+//            if (eventHolder.getEvent().equals("create")) {
+//                if (eventHolder.tag == "create") {
+//                    // Nothing?
+//                }
+//                // TODO: (?)
+//
+//            } else if (!eventHolder.getType().equals("create") && !eventHolder.getType().equals("choose")) {
+//
+//                if (eventHolder.getType().equals("complex")) {
+//
+//                    decomposeEventHolder(eventHolder);
+//                    return true;
+//
+//                } else {
+//
+//                    displayEventDesigner(eventHolder);
+//                    return true;
+//
+//                }
+//
+//                // Request the ListView to be redrawn so the views in it will be displayed
+//                // according to their updated state information.
+////                refreshTimelineView();
+//            }
         }
     }/**
      * Returns true if a placeholder event is found in the sequence.
