@@ -449,8 +449,23 @@ public class TimelineView extends DragSortListView {
         // TODO: Replace this with a queue.
         getDevice().enqueueMessage("start event " + event.getUuid());
         getDevice().enqueueMessage("set event " + event.getUuid() + " action " + action.getScript().getUuid()); // <HACK />
-        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+//        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
         // </HACK>
+
+
+
+        String contextString = "TIT:none TIT:none TIW:none TOP:3,'waveform_sample_value'|'pulse_duty_cycle';F,0.02|'pulse_period_seconds' TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none";
+        String contextContent = "set event " + event.getUuid() + " context \"" + contextString + "\"";
+        getDevice().enqueueMessage(contextContent);
+
+//        String stateString = "TIT:none:none TIT:none:none TIW:none TOP:0.02,64450:3,'waveform-sample-value'|'pulse_duty_cycle' TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none";
+        String stateString = "none none none 0.02,64450 none none none none none none none none";
+        String content = "set event " + event.getUuid() + " state \"" + stateString + "\"";
+        getDevice().enqueueMessage(content);
+
+
+
+
 
         // Create and addDevice the new eventHolder to the timeline
         // TODO: DO NOT create a new event, just update the existing one!

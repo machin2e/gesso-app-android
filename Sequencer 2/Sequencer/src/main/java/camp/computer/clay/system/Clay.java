@@ -151,9 +151,13 @@ public class Clay {
             // Update restored device with information from device
             device.setInternetAddress(internetAddress);
 
+            Log.v ("TCP", "device.internetAddress: " + internetAddress);
+
             // Store the updated device profile.
             getStore ().storeDevice (device);
-            getStore ().storeTimeline(device.getTimeline());
+            getStore().storeTimeline(device.getTimeline());
+
+            Log.v("TCP", "device.internetAddress (2): " + internetAddress);
 
             // Add device to Clay
             if (!this.devices.contains (device)) {
@@ -168,8 +172,12 @@ public class Clay {
                 }
             }
 
+            Log.v("TCP", "device.internetAddress (3): " + internetAddress);
+
             // Establish TCP connection
             device.connectTcp();
+
+            Log.v("TCP", "device.internetAddress (4): " + internetAddress);
 
 //            // Show the action button
 //            ApplicationView.getApplicationView().getCursorView().show(true);

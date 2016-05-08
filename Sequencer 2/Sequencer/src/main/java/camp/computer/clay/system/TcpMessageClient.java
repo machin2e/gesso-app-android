@@ -33,14 +33,16 @@ public class TcpMessageClient {
     }
 
     public void enqueueMessage(Message message) {
-        Log.v("TCP_Server", "enqueueMessage");
+        Log.v("TCP_Server", "enqueueMessage (size: " + outgoingMessages.size() + ")");
         if (outgoingMessages != null) {
             outgoingMessages.add(message);
         }
     }
 
-    public void connect (InetAddress internetAddress) {
+    public void connect (InetAddress inetAddress) {
         Log.v("TCP_Client", "Connecting to " + inetAddress);
+
+        this.inetAddress = inetAddress;
 
         // Start task to send messages only if TcpConnectTask successful
         executeAsyncTask(new SendMessageTask());

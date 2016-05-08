@@ -66,6 +66,7 @@ public class Device {
     }
 
     public void setInternetAddress (String address) {
+        Log.v("TCP", "setInternetAddress(): " + internetAddress);
         this.internetAddress = address;
     }
 
@@ -98,7 +99,9 @@ public class Device {
 
         try {
             if (this.internetAddress != null) {
+                Log.v ("TCP", "internetAddress: " + this.internetAddress);
                 InetAddress inetAddress = InetAddress.getByName(this.internetAddress);
+                Log.v ("TCP", "inetAddress: " + inetAddress);
                 tcpMessageClient.connect(inetAddress);
             }
         } catch (UnknownHostException e) {

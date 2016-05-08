@@ -504,7 +504,7 @@ public class EventDesignerView {
         pulseDataLayout.addView(pulseFrequencyTitle);
 
         final EditText pulseSignalFrequencyDataEditor = new EditText(getContext());
-        pulseSignalFrequencyDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
+//        pulseSignalFrequencyDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
         pulseDataLayout.addView(pulseSignalFrequencyDataEditor);
 
         // "Pulse" data editor: Duty Cycle
@@ -514,7 +514,7 @@ public class EventDesignerView {
         pulseDataLayout.addView(pulseDutyCycleTitle);
 
         final EditText pulseSignalDutyCycleDataEditor = new EditText(getContext());
-        pulseSignalDutyCycleDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
+//        pulseSignalDutyCycleDataEditor.setInputType(InputType.TYPE_CLASS_NUMBER);
         pulseDataLayout.addView(pulseSignalDutyCycleDataEditor);
 
         // Set up key listeners
@@ -1006,9 +1006,18 @@ public class EventDesignerView {
                 getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
                 getClay().getStore().storeEvent (eventHolder.getEvent());
 
+                // Context
+                // i.e., The context is generally encoded as <channel-settings>:<channel-source>,<observable-source-key>|<observable-destination-key>
+                // e.g., set event <event-uuid> context "TOT:3,\"waveform-sample-value\"|\"pulse_duty_cycle\""
+                String contextString = "TIT:none TIT:none TIW:none TOP:3,'waveform_sample_value'|'pulse_duty_cycle' TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none";
+                String contextContent = "set event " + eventHolder.getEvent().getUuid() + " context \"" + contextString + "\"";
+
+                getDevice().enqueueMessage(contextContent);
+
                 // Send updated state to device
                 // <HACK>
-                //String stateToSend = stateString.substring (0, stateString.indexOf(" ")).toLowerCase() + " " + stateString.substring(stateString.indexOf(" ") + 1);
+                stateString = "none none none 0.02,64450 none none none none none none none none";
+                //stateString = "TIT:none:none TIT:none:none TIW:none TOP:0.02,64450:3,'waveform-sample-value'|'pulse_duty_cycle' TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none";
                 String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + stateString + "\"";
 //                getDevice().sendMessage(content);
                 // </HACK>
