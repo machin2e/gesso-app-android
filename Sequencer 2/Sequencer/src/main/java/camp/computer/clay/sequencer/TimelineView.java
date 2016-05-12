@@ -942,7 +942,9 @@ public class TimelineView extends DragSortListView {
         if (eventHolder.getType().equals("light")) {
             eventDesignerView.displayUpdateLightsOptions(eventHolder);
         } else if (eventHolder.getType().equals("signal")) {
-            eventDesignerView.displayUpdateSignalOptions(eventHolder);
+            ContentEntry contentEntry = getClay().getContent().get("devices").get(getDevice().getUuid().toString()).get("channels");
+            eventDesignerView.displayUpdateSignalOptions(contentEntry);
+            //eventDesignerView.displayUpdateSignalOptions(eventHolder);
         } if (eventHolder.getType().equals("message")) {
             eventDesignerView.displayUpdateMessageOptions(eventHolder);
         } if (eventHolder.getType().equals("pause")) {

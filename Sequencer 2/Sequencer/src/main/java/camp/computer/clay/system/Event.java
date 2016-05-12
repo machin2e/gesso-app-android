@@ -14,6 +14,11 @@ public class Event {
 //    private State state;
     private ArrayList<State> state;
 
+
+    // <HACK>
+    public ContentEntry contentEntry; // Content entry for the event (replaces state)
+    // </HACK>
+
     public Event (UUID uuid, Timeline timeline) {
 
         this.uuid = uuid;

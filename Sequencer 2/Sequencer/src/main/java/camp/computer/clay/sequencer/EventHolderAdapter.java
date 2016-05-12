@@ -7,15 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -702,9 +699,9 @@ public class EventHolderAdapter extends BaseAdapter {
                     if (contentEntry != null) {
                         Log.v ("Content_View", "contentEntry: " + contentEntry.getKey());
                         Log.v("Content_View", "contentEntry: " + contentEntry.getContent());
-//                        displayUpdateData (contentEntry, true, true);
+//                        displayUpdateSignalOptions (contentEntry, true, true);
                         //ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
-                        ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayUpdateData(contentEntry, true, true);
+                        ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayUpdateSignalOptions(contentEntry);
                     }
                 }
             });

@@ -184,7 +184,8 @@ public class Clay {
                 ContentEntry channelContentContent = channelContent.put("content");
 
                 // device/<uuid>/channels/<number>/content/<observable>
-                channelContentContent.put("toggle_value", "off");
+                // TODO: Retreive the "from" values and the "default" value from the exposed observables on the actual hardware (or the hardware profile)
+                channelContentContent.put("toggle_value").from("on", "off").set("off");
                 channelContentContent.put("waveform_sample_value", "none");
                 channelContentContent.put("pulse_period_seconds", "0");
                 channelContentContent.put("pulse_duty_cycle", "0");
