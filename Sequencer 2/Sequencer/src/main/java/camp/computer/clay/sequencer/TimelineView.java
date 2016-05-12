@@ -239,7 +239,7 @@ public class TimelineView extends DragSortListView {
                     Event event = eventHolder.getEvent();
                     if (event != null) {
                         // <HACK>
-                        // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
+                        // TODO: Make this choose update AFTER the data model. Basically update the view, but do all changes to OM first.
                         getDevice().getTimeline().removeEvent(event);
                         // </HACK>
                     }
@@ -307,7 +307,7 @@ public class TimelineView extends DragSortListView {
      */
 
     /**
-     * Set up the eventHolders source and populate the list of eventHolders to show in this ListView.
+     * Set up the eventHolders source and populate the choose of eventHolders to show in this ListView.
      *
      * TODO: Initialize eventHolders from cache or from remote source in this function.
      * TODO:    Do this because ViewPager will destroy this object when moving between pages.
@@ -399,7 +399,7 @@ public class TimelineView extends DragSortListView {
         // TODO: Refactor this method so it _reuses_ Clay's Event object. (Only the Action object needs to changed.)
 
         // <HACK>
-        // This removes the specified eventHolder from the list and replaces it with an eventHolder of a specific type.
+        // This removes the specified eventHolder from the choose and replaces it with an eventHolder of a specific type.
         // TODO: Update the action object referenced by eventHolders, and update the view accordingly (i.e., eventHolder.action = <new action> then retrieve view for that action type).
         int index = eventHolders.indexOf(eventHolder);
         eventHolders.remove(index);
@@ -410,7 +410,7 @@ public class TimelineView extends DragSortListView {
         if (event != null) {
 
             // <HACK>
-            // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
+            // TODO: Make this choose update AFTER the data model. Basically update the view, but do all changes to OM first.
             getClay().getStore().removeEvent(eventHolder.getEvent());
             // TODO: getDevice().sendMessage ("stop event " + event.getUuid());
             // TODO: ^ That won't work right unless an event on the MCU has all actions and states, not just 1:1 for event:action.
@@ -449,19 +449,19 @@ public class TimelineView extends DragSortListView {
         // TODO: Replace this with a queue.
         getDevice().enqueueMessage("start event " + event.getUuid());
         getDevice().enqueueMessage("set event " + event.getUuid() + " action " + action.getScript().getUuid()); // <HACK />
-//        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
+        getDevice().enqueueMessage("set event " + event.getUuid() + " state \"" + event.getState().get(0).getState().toString() + "\"");
         // </HACK>
 
 
 
-        String contextString = "TIT:none TIT:none TIW:none TOP:3,'waveform_sample_value'|'pulse_duty_cycle';F,0.02|'pulse_period_seconds' TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none";
-        String contextContent = "set event " + event.getUuid() + " context \"" + contextString + "\"";
+//        String contextString = "TIT:none TIT:none TIW:none TOP:3,'waveform_sample_value'|'pulse_duty_cycle';F,0.02|'pulse_period_seconds' TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none";
+        String contextContent = "set event " + event.getUuid() + " context \"" + event.getState().get(0).getState().toString() + "\"";
         getDevice().enqueueMessage(contextContent);
 
 //        String stateString = "TIT:none:none TIT:none:none TIW:none TOP:0.02,64450:3,'waveform-sample-value'|'pulse_duty_cycle' TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none TIT:none:none";
-        String stateString = "none none none 0.02,64450 none none none none none none none none";
-        String content = "set event " + event.getUuid() + " state \"" + stateString + "\"";
-        getDevice().enqueueMessage(content);
+//        String stateString = "none none none 0.02,64450 none none none none none none none none";
+//        String content = "set event " + event.getUuid() + " state \"" + stateString + "\"";
+//        getDevice().enqueueMessage(content);
 
 
 
@@ -487,7 +487,7 @@ public class TimelineView extends DragSortListView {
             // </HACK>
 
             // <HACK>
-            // TODO: Make this list update AFTER the data model. Basically update the view, but do all changes to OM first.
+            // TODO: Make this choose update AFTER the data model. Basically update the view, but do all changes to OM first.
             getClay().getStore().removeEvent(eventHolder.getEvent());
             getDevice().getTimeline().removeEvent(eventHolder.getEvent()); // if store behavior successful
             // </HACK>
@@ -496,7 +496,7 @@ public class TimelineView extends DragSortListView {
         // Update state of the object associated with the selected view.
         eventHolders.remove(eventHolder);
 
-        // Update the view after removing the specified list item
+        // Update the view after removing the specified choose item
 //        refreshTimelineView();
 
         refreshAvatarView();
@@ -517,7 +517,7 @@ public class TimelineView extends DragSortListView {
      */
     public void composeEventHolderSelection () {
 
-        // Get list of the selected items
+        // Get choose of the selected items
         ArrayList<EventHolder> selectedEventHolders = getSelectedEventHolders();
         ArrayList<String> selectedEventTags = getSelectedEventTags();
         int index = getFirstSelectedEventHolderIndex();
@@ -586,7 +586,7 @@ public class TimelineView extends DragSortListView {
         // Store: Reindex the timeline events
         getClay().getStore().storeTimeline(getDevice().getTimeline());
 
-        // View: Remove the selected items from the list
+        // View: Remove the selected items from the choose
         for (EventHolder eventHolder : selectedEventHolders) {
             eventHolders.remove(eventHolder);
         }
@@ -602,7 +602,7 @@ public class TimelineView extends DragSortListView {
 //        displayDesignerView(compositionEventHolder);
 //        eventDesignerView.displayUpdateTagOptions(compositionEventHolder);
 
-        // Update timeline view after modifying the list
+        // Update timeline view after modifying the choose
         refreshTimelineView();
 
     }
@@ -617,7 +617,7 @@ public class TimelineView extends DragSortListView {
             return;
         }
 
-        // Get the list of actions in the behavior composition
+        // Get the choose of actions in the behavior composition
         ArrayList<Action> actions = eventHolder.getEvent().getAction().getActions();
 
         // Get position of the selected item
@@ -629,7 +629,7 @@ public class TimelineView extends DragSortListView {
         // Remove the event from the database
         getClay().getStore().removeEvent(eventHolder.getEvent());
 
-        // Remove the selected item from the list (it will be replaced by the abstracted actions)
+        // Remove the selected item from the choose (it will be replaced by the abstracted actions)
         eventHolders.remove(index);
 
         // Create event for each of the actions in the composition, create an event holder for
@@ -691,7 +691,7 @@ public class TimelineView extends DragSortListView {
         getClay().getStore().storeTimeline(getDevice().getTimeline());
         // </HACK>
 
-        refreshTimelineView(); // Update view after removing items from the list
+        refreshTimelineView(); // Update view after removing items from the choose
 
     }
 
@@ -704,13 +704,13 @@ public class TimelineView extends DragSortListView {
     }
 
     /**
-     * Returns the list item corresponding to the specified position.
+     * Returns the choose item corresponding to the specified position.
      * @param x
      * @param y
      * @return
      */
     public EventHolder getEventHolderByPosition(int x, int y) {
-        // Get the list item corresponding to the specified touch point
+        // Get the choose item corresponding to the specified touch point
         int position = getViewIndexByPosition(x, y);
         EventHolder item = (EventHolder) getItemAtPosition(position);
         return item;
@@ -901,7 +901,7 @@ public class TimelineView extends DragSortListView {
         behaviorOptions[1] = "delete";
         behaviorOptions[2] = "replace";
 
-        // Show the list of behaviors
+        // Show the choose of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Action options");
         builder.setItems(behaviorOptions, new DialogInterface.OnClickListener() {
@@ -1039,7 +1039,7 @@ public class TimelineView extends DragSortListView {
 
     public void displayActionBrowser(final ActionSelectionListener actionSelectionListener) {
 
-        // Get list of behaviors available for selection
+        // Get choose of behaviors available for selection
         int actionScriptCount = getClay().getCache().getScripts().size();
         final String[] actionScripts = new String[actionScriptCount];
         for (int i = 0; i < actionScriptCount; i++) {
@@ -1047,7 +1047,7 @@ public class TimelineView extends DragSortListView {
             actionScripts[i] = cachedScript.getTag();
         }
 
-        // Show the list of behaviors
+        // Show the choose of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setItems(actionScripts, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int itemIndex) {
@@ -1160,7 +1160,7 @@ public class TimelineView extends DragSortListView {
 
     public void displayDeviceBrowser(final DeviceSelectionListener deviceSelectionListener) {
 
-        // Get list of behaviors available for selection
+        // Get choose of behaviors available for selection
         int deviceCount = getClay().getDevices().size();
         final String[] deviceTitles = new String[deviceCount];
         for (int i = 0; i < deviceCount; i++) {
@@ -1168,7 +1168,7 @@ public class TimelineView extends DragSortListView {
             deviceTitles[i] = device.getUuid().toString();
         }
 
-        // Show the list of behaviors
+        // Show the choose of behaviors
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setItems(deviceTitles, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int itemIndex) {
@@ -1279,7 +1279,7 @@ public class TimelineView extends DragSortListView {
      */
 //    public void displayActionBrowser(final EventHolder eventHolder) {
 //
-//        // Get list of behaviors available for selection
+//        // Get choose of behaviors available for selection
 //        int actionScriptCount = getClay().getCache().getScripts().size();
 //        final String[] actionScripts = new String[actionScriptCount];
 //        for (int i = 0; i < actionScriptCount; i++) {
@@ -1287,7 +1287,7 @@ public class TimelineView extends DragSortListView {
 //            actionScripts[i] = cachedScript.getTag();
 //        }
 //
-//        // Show the list of behaviors
+//        // Show the choose of behaviors
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 //        builder.setItems(actionScripts, new DialogInterface.OnClickListener() {
 //            public void onClick(DialogInterface dialog, int itemIndex) {
@@ -1581,7 +1581,7 @@ public class TimelineView extends DragSortListView {
 
             // TODO: Show options for editing...
 
-//            // Check if the list item was a constructor
+//            // Check if the choose item was a constructor
 //            if (eventHolder.getEvent().equals("create")) {
 //                if (eventHolder.tag == "create") {
 //                    // Nothing?

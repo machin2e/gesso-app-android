@@ -623,6 +623,7 @@
     <item name="action_menu_presenter" type="id"/>
     <!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/src/main/res/values/ids.xml -->
     <eat-comment/>
+    <item name="channel_direction" type="id"/>
     <item name="click_remove" type="id"/>
     <item name="content" type="id"/>
     <item name="drag_handle" type="id"/>

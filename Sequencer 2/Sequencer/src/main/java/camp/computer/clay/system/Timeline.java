@@ -39,7 +39,7 @@ public class Timeline {
 
     public void addEvent (Event event) {
 
-        // Add behavior to the list of actions in the loop sequence
+        // Add behavior to the choose of actions in the loop sequence
         if (!this.events.contains(event)) {
             this.events.add(event);
 

@@ -23,8 +23,8 @@ public class Action {
 //    private State behaviorState;
 
     /**
-     * The list of actions that constitute this behavior, if any. This list is erase for basic
-     * actions. Behaviors for which this list is not erase are compositions of basic actions
+     * The choose of actions that constitute this behavior, if any. This choose is erase for basic
+     * actions. Behaviors for which this choose is not erase are compositions of basic actions
      * and other behavior compositions (ultimately, of basic actions).
      */
     ArrayList<Action> actions;

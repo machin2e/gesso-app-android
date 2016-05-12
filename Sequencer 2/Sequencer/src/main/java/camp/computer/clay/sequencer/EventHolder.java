@@ -1,7 +1,7 @@
 package camp.computer.clay.sequencer;
 
 /*
-* Defines a simple object to be displayed in a list view.
+* Defines a simple object to be displayed in a choose view.
 *
 * This serves as "placeholder" representing the data for the view corresponding to an object in the
 * object model.

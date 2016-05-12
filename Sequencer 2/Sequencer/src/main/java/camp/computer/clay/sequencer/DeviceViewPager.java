@@ -178,7 +178,7 @@ public class DeviceViewPager extends ViewPager {
                 currentTime = calendar.getTime();
 
                 // TODO: Update the gesture classification
-                // TODO: Selected any additional list items covered by the drag
+                // TODO: Selected any additional choose items covered by the drag
 
                 // Calculate distance
                 int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow (currentTouch.y - previousTouch.y, 2));
@@ -231,7 +231,7 @@ public class DeviceViewPager extends ViewPager {
         // Get the number of touch points
         int touchPointCount = event.getPointerCount();
 
-        // Check if interacting with a list item
+        // Check if interacting with a choose item
         if (currentListView == null) {
             currentListView = (TimelineView) findViewWithTag (currentViewTag);
             // <HACK>

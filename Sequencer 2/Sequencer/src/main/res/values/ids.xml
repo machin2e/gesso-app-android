@@ -34,4 +34,5 @@
     <item name="timeline_segment" type="id" />
     <item name="timeline_bottom_segment" type="id" />
     <item name="timeline_top_segment" type="id" />
+    <item name="channel_direction" type="id" />
 </resources>

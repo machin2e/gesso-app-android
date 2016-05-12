@@ -7,12 +7,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,6 +24,10 @@ import android.widget.TextView;
 import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
+import camp.computer.clay.system.Clay;
+import camp.computer.clay.system.ContentEntry;
 
 public class EventHolderAdapter extends BaseAdapter {
 
@@ -526,12 +532,87 @@ public class EventHolderAdapter extends BaseAdapter {
         return eventView;
     }
 
+//    private View getSignalView (EventHolder eventHolder) {
+//        // <SECTION: CONTENT PROVIDER SELECTION BUTTONS>
+//        final ArrayList<Button> channelSelectionButtonList = new ArrayList<Button>();
+//        final Button[] selectedButton = {null};
+//        // final LinearLayout channelSelectionButtonsLayout = new LinearLayout (getContext());
+//        channelSelectionButtonsLayout.setOrientation(LinearLayout.HORIZONTAL);
+//        for (int i = 0; i < 12; i++) {
+//
+//            // Create
+//            final Button channelNumberButton = new Button (getContext());
+//
+//            // Text
+//            final String channelNumberString = Integer.toString (i + 1);
+//            channelNumberButton.setText(channelNumberString);
+//            channelNumberButton.setTextSize(12);
+//
+//            // Style
+//            channelNumberButton.setPadding(0, 0, 0, 0);
+//            channelNumberButton.setBackgroundColor(Color.TRANSPARENT);
+//            channelNumberButton.setTextColor(Color.LTGRAY);
+//
+//            // Style (LayoutParams)
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(10, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+//            params.setMargins(0, 0, 0, 0);
+//            channelNumberButton.setLayoutParams(params);
+//
+//            // Add to view
+//            channelSelectionButtonsLayout.addView(channelNumberButton);
+//
+//            // Add to button choose
+//            channelSelectionButtonList.add(channelNumberButton);
+//        }
+//
+//        // Setup: Set up interactivity.
+//        for (int i = 0; i < channelSelectionButtonList.size(); i++) {
+//
+//            final Button channelSelectionButton = channelSelectionButtonList.get (i);
+//
+//            channelSelectionButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    // Reset.
+//                    for (int i = 0; i < channelSelectionButtonList.size(); i++) {
+//                        channelSelectionButtonList.get(i).setTextColor(Color.LTGRAY);
+//                        channelSelectionButtonList.get(i).setTypeface(null, Typeface.NORMAL);
+//                    }
+//
+//                    // Select.
+//                    if (selectedButton[0] != channelSelectionButton) {
+//                        selectedButton[0] = channelSelectionButton; // Button. Select the button.
+//                    } else {
+//                        selectedButton[0] = null; // Deselect the button.
+//                    }
+//
+//                    // Color.
+//                    if (selectedButton[0] != null) {
+//                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+//                        selectedButton[0].setTextColor(textColor); // Color. Update the color.
+//                        selectedButton[0].setTypeface(null, Typeface.BOLD);
+//                    }
+//
+//                    // Data.
+//                    contentEntry.choice().get("content").put("provider", selectedButton[0].getText().toString());
+//                }
+//            });
+//        }
+//
+//
+//        designerViewLayout.addView (channelSelectionButtonsLayout);
+//        // </SECTION: CONTENT PROVIDER SELECTION BUTTONS>
+//
+//
+//    }
+
     /**
      * Signal action view.
      * @param eventHolder View holder with the Signal event.
      * @return View for the Signal event.
      */
-    private View getSignalView (EventHolder eventHolder) {
+    private View getSignalView (final EventHolder eventHolder) {
 
         RelativeLayout eventView = new RelativeLayout (ApplicationView.getContext());
         RelativeLayout.LayoutParams params = null;
@@ -575,57 +656,112 @@ public class EventHolderAdapter extends BaseAdapter {
 //            LinearLayout.LayoutParams lightLinearLayoutParams = new LinearLayout.LayoutParams(100, LinearLayout.LayoutParams.WRAP_CONTENT);
 //            linearLayout.setLayoutParams(lightLinearLayoutParams);
 
-            lightLinearLayout.getLayoutParams().width = 60;
+            lightLinearLayout.getLayoutParams().width = 70;
 
-            // Action: Preview 1 label
-            final TextView previewLabel = new TextView(ApplicationView.getContext());
-//            previewLabel.setId(R.id.preview_1_label); // TODO: Create new resource dynamically
-            previewLabel.setText(String.valueOf(i + 1));
-            previewLabel.setTextSize(10.0f);
-            previewLabel.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            previewLabel.setPadding(0, 5, 0, 5);
-            lightLinearLayout.addView(previewLabel);
+
+
+
+
+
+
+            // Create
+            final Button channelNumberButton = new Button (ApplicationView.getContext());
+
+            // Text
+            final String channelNumberString = Integer.toString (i + 1);
+            channelNumberButton.setText(channelNumberString);
+            channelNumberButton.setTextSize(10);
+
+            // Style
+            channelNumberButton.setPadding(0, 0, 0, 0);
+            channelNumberButton.setBackgroundColor(Color.TRANSPARENT);
+            channelNumberButton.setTextColor(Color.LTGRAY);
+
+            // Style (LayoutParams)
+            LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(60, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+            params2.setMargins(0, 0, 0, 0);
+            channelNumberButton.setLayoutParams(params2);
+
+            // Add to view
+            lightLinearLayout.addView(channelNumberButton);
+
+            // Add to button choose
+//            channelSelectionButtonList.add(channelNumberButton);
+
+
+            channelNumberButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UUID deviceUuid = eventHolder.getEvent().getTimeline().getDevice().getUuid();
+                    //ContentEntry contentEntry = getClay().getContent().get("devices").get(deviceUuid.toString()).get("channels").get(String.valueOf(channelIndex[0] + 1));
+                    Clay clay = eventHolder.getEvent().getClay();
+                    ContentEntry contentEntry = clay.getContent().get("devices").get(deviceUuid.toString()).get("channels");
+                    // TODO: ContentEntry contentEntry = getClay().getContent().get("devices").get(deviceUuid.toString()).get("channels").get(String.valueOf(channelIndex[0] + 1)).get("content");
+//                displayListItemSelector (contentEntry);
+                    Log.v ("Content_View", "contentEntry: " + contentEntry);
+                    if (contentEntry != null) {
+                        Log.v ("Content_View", "contentEntry: " + contentEntry.getKey());
+                        Log.v("Content_View", "contentEntry: " + contentEntry.getContent());
+//                        displayUpdateData (contentEntry, true, true);
+                        //ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
+                        ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayUpdateData(contentEntry, true, true);
+                    }
+                }
+            });
+
+
+
+
+
+//            // Action: Preview 1 label
+//            final TextView previewLabel = new TextView(ApplicationView.getContext());
+////            previewLabel.setId(R.id.preview_1_label); // TODO: Create new resource dynamically
+//            previewLabel.setText(String.valueOf(i + 1));
+//            previewLabel.setTextSize(10.0f);
+//            previewLabel.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+//            previewLabel.setPadding(0, 5, 0, 5);
+//            lightLinearLayout.addView(previewLabel);
 
             // TODO: Add params
 
-            // Action: Preview 1
-            final ImageView previewImageView = new ImageView(ApplicationView.getContext());
-            previewImageView.setId(previewResourceIds[i]);
-            lightLinearLayout.addView(previewImageView);
-
-            /* State: Generate bitmap */
-
-            int w = 25;
-            int h = 25;
-
-            Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
-            Bitmap bmp2 = Bitmap.createBitmap(w, h, conf2); // this creates a MUTABLE bitmap
-            Canvas canvas2 = new Canvas(bmp2);
-            Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-            // Get behavior state
-            String ioStateString = eventHolder.getEvent().getState().get(0).getState();
-            Log.v ("Signal", "ioStateString: " + ioStateString);
-            String[] ioStates = ioStateString.split(" ");
-            Log.v("Signal", "ioStates.length: " + ioStates.length);
-
-            Log.v("Signal", "ioStates[" + i + "]: " + ioStates[i]);
-
-            char ioState = 'T'; // ioStates[i].charAt(0);
-//            char ioDirectionState = ioStates[i].charAt(1);
-//            char ioSignalTypeState = ioStates[i].charAt(2);
-//            char ioSignalValueState = ioStates[i].charAt(3);
-
-            // Update the view according to the state
-            if (ioState == 'T') {
-                paint2.setColor(Color.rgb(61, 255, 61));
-            } else {
-                paint2.setColor(Color.rgb(255, 61, 61));
-            }
-
-            canvas2.drawCircle(bmp2.getWidth() / 2, bmp2.getWidth() / 2, convertDpToPixel(3.0f, ApplicationView.getContext()), paint2);
-
-            previewImageView.setImageBitmap(bmp2);
+//            // Action: Preview 1
+//            final ImageView previewImageView = new ImageView(ApplicationView.getContext());
+//            previewImageView.setId(previewResourceIds[i]);
+//            lightLinearLayout.addView(previewImageView);
+//
+//            /* State: Generate bitmap */
+//
+//            int w = 25;
+//            int h = 25;
+//
+//            Bitmap.Config conf2 = Bitmap.Config.ARGB_8888; // see other conf types
+//            Bitmap bmp2 = Bitmap.createBitmap(w, h, conf2); // this creates a MUTABLE bitmap
+//            Canvas canvas2 = new Canvas(bmp2);
+//            Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+//
+//            // Get behavior state
+//            String ioStateString = eventHolder.getEvent().getState().get(0).getState();
+//            Log.v ("Signal", "ioStateString: " + ioStateString);
+//            String[] ioStates = ioStateString.split(" ");
+//            Log.v("Signal", "ioStates.length: " + ioStates.length);
+//
+//            Log.v("Signal", "ioStates[" + i + "]: " + ioStates[i]);
+//
+//            char ioState = 'T'; // ioStates[i].charAt(0);
+////            char ioDirectionState = ioStates[i].charAt(1);
+////            char ioSignalTypeState = ioStates[i].charAt(2);
+////            char ioSignalValueState = ioStates[i].charAt(3);
+//
+//            // Update the view according to the state
+//            if (ioState == 'T') {
+//                paint2.setColor(Color.rgb(61, 255, 61));
+//            } else {
+//                paint2.setColor(Color.rgb(255, 61, 61));
+//            }
+//
+//            canvas2.drawCircle(bmp2.getWidth() / 2, bmp2.getWidth() / 2, convertDpToPixel(3.0f, ApplicationView.getContext()), paint2);
+//
+//            previewImageView.setImageBitmap(bmp2);
         }
 
         return eventView;

@@ -15,6 +15,8 @@ import camp.computer.clay.sequencer.ApplicationView;
 
 public class Clay {
 
+    private ContentEntry state;
+
     // Resource management systems (e.g., networking, messaging, content)
     private SQLiteContentManager store = null;
     private MessageManager messageManager = null;
@@ -34,11 +36,20 @@ public class Clay {
 
     public Clay() {
 
-        this.views = new ArrayList<ViewManagerInterface>(); // Create list to store views.
+        this.views = new ArrayList<ViewManagerInterface>(); // Create choose to store views.
         this.messageManager = new MessageManager(this); // Start the communications systems
         this.networkManager = new NetworkManager (this); // Start the networking systems
 
         this.cache = new CacheManager(this); // Set up behavior repository
+
+        // Content
+        // TODO: Stream this in from the Internet and devices.
+        state = new ContentEntry ("clay", "");
+        state.choose ("devices");
+    }
+
+    public ContentEntry getContent () {
+        return this.state;
     }
 
     /*
@@ -148,6 +159,38 @@ public class Clay {
 
         // Update the device's profile based on information received from device itself.
         if (device != null) {
+
+            // Data.
+            ContentEntry deviceContent = getClay().getContent().get("devices").put(deviceUuid.toString());
+
+            // <HACK>
+            // TODO: Update this from a choose of the observables received from the boards.
+            ContentEntry channelsContent = deviceContent.choose("channels");
+            for (int i = 0; i < 12; i++) {
+
+                // device/<uuid>/channels/<number>
+                ContentEntry channelContent = channelsContent.put(String.valueOf(i + 1));
+
+                // device/<uuid>/channels/<number>/number
+                channelContent.put("number", String.valueOf(i + 1));
+
+                // device/<uuid>/channels/<number>/direction
+                channelContent.put("direction").from("input", "output").set("input");
+
+                // device/<uuid>/channels/<number>/type
+                channelContent.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
+
+                // device/<uuid>/channels/<number>/content
+                ContentEntry channelContentContent = channelContent.put("content");
+
+                // device/<uuid>/channels/<number>/content/<observable>
+                channelContentContent.put("toggle_value", "off");
+                channelContentContent.put("waveform_sample_value", "none");
+                channelContentContent.put("pulse_period_seconds", "0");
+                channelContentContent.put("pulse_duty_cycle", "0");
+            }
+            // </HACK>
+
             // Update restored device with information from device
             device.setInternetAddress(internetAddress);
 
