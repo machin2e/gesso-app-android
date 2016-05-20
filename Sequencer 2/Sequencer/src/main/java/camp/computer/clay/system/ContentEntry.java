@@ -3,8 +3,12 @@ package camp.computer.clay.system;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class ContentEntry {
+
+    private UUID uuid;
+
     private String key;
     private String content;
     private ArrayList<String> contentRange = null;
@@ -19,6 +23,9 @@ public class ContentEntry {
     private ContentEntry listChoice;
 
     public ContentEntry(String key, String content) {
+
+        this.uuid = UUID.randomUUID();
+
         this.key = key;
 
         this.isList = false;
@@ -33,6 +40,22 @@ public class ContentEntry {
 
         this.setContent(content);
     }
+
+    public ContentEntry (String key) {
+        this(key, null);
+    }
+
+    // TODO: diff detection to generate events.
+    // TODO: apply a copy of this tree, accepted as input (e.g., for an event), and compute changes to apply to make changes to this tree based on others
+
+    // TODO: Linked data. Support it. Consider using @ prefix. Research JSON-LD and RDFa.
+    // TODO: Semantic relationships between entries. Add them.
+    // TODO: State synchronization. Add it to support distributed data structure. (a la transclusion or aliasing)
+    // TODO: Aliasing. Add support.
+    // TODO: Add "type" field.
+    // TODO: Tags. Add support for tagging entries.
+
+    // Concepts: embed, map, nesting, object, property, has, concept, actions (schema that does things, micro-program)
 
     public void setKey (String key) {
         this.key = key;
@@ -158,7 +181,7 @@ public class ContentEntry {
 
     public ContentEntry set (String content, boolean notifyContentTree) {
         if ((this.contentRange == null) || (this.contentRange != null && this.contentRange.contains(content))) {
-            Log.v("Content", "set '" + this.key + "' to '" + content + "'");
+            Log.v("ContentEntry", "set '" + this.key + "' to '" + content + "'");
             if (this.isList) {
                 Log.v("Content_Decision_List", "LIST");
 
@@ -227,10 +250,11 @@ public class ContentEntry {
     public ContentEntry get (String key) {
         for (ContentEntry contentEntry : this.children) {
             if (contentEntry.getKey().equals(key)) {
-                Log.v ("Content", "get '" + key + "'");
+                Log.v ("ContentEntry", "get '" + key + "'");
                 return contentEntry;
             }
         }
+        Log.v ("ContentEntry", "failed to get '" + key + "'");
         return null;
     }
 
@@ -255,7 +279,7 @@ public class ContentEntry {
         return put (key, null);
     }
 
-    public ContentEntry choose (String key) { // alt. "choose(...)"
+    public ContentEntry list (String key) {
         ContentEntry contentEntry = put (key);
         contentEntry.isList = true;
         return contentEntry;
@@ -263,9 +287,9 @@ public class ContentEntry {
 
     public ContentEntry put (String key, String content) {
         if (content == null) {
-            Log.v("Content", "set '" + key);
+            Log.v("ContentEntry", "set '" + key);
         } else {
-            Log.v("Content", "set '" + key + "' to '" + content + "'");
+            Log.v("ContentEntry", "set '" + key + "' to '" + content + "'");
         }
 
         ContentEntry contentEntry = this.get(key);

@@ -16,7 +16,7 @@ public class Event {
 
 
     // <HACK>
-    public ContentEntry contentEntry; // Content entry for the event (replaces state)
+    private ContentEntry contentEntry; // Content entry for the event (replaces state)
     // </HACK>
 
     public Event (UUID uuid, Timeline timeline) {
@@ -26,6 +26,8 @@ public class Event {
         this.timeline = timeline;
 
         this.state = new ArrayList<State>();
+
+        this.initializeContent();
     }
 
     public Event (UUID uuid, Timeline timeline, Action action) {
@@ -39,6 +41,8 @@ public class Event {
         this.state = new ArrayList<State>();
         String defaultState = action.getScript().getDefaultState();
         this.state.add(new State(defaultState));
+
+        this.initializeContent();
     }
 
     public Event (Timeline timeline, Action action) {
@@ -52,6 +56,7 @@ public class Event {
         this.state = new ArrayList<State>();
 
         this.initializeState(action);
+        this.initializeContent();
 //        if (action.getActions().size() == 0) {
 //            String defaultState = action.getScript().getDefaultState();
 //            this.state.add(new State(defaultState));
@@ -71,6 +76,57 @@ public class Event {
         }
     }
 
+
+
+    public ContentEntry getContent() {
+        return this.contentEntry;
+    }
+
+    private void initializeContent() {
+        // <HACK>
+        // TODO: Update this from a list of the observables received from the boards.
+        ContentEntry eventContent = new ContentEntry("event");
+        ContentEntry channelsContent = eventContent.list("channels");
+        //ContentEntry channelsContent = eventContent.list("channels").each(12).has("number", "direction", );
+        for (int i = 0; i < 12; i++) {
+
+            // device/<uuid>/channels/<number>
+            ContentEntry channelContent = channelsContent.put(String.valueOf(i + 1));
+
+            // device/<uuid>/channels/<number>/enable
+            channelContent.put("enable").from("true", "false").set("false");
+
+            // device/<uuid>/channels/<number>/number
+            channelContent.put("number", String.valueOf(i + 1));
+
+            // device/<uuid>/channels/<number>/direction
+            channelContent.put("direction").from("input", "output").set("input");
+
+            // device/<uuid>/channels/<number>/type
+            channelContent.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
+
+            // device/<uuid>/channels/<number>/content
+            ContentEntry channelContentContent = channelContent.put("content");
+
+            // device/<uuid>/channels/<number>/content/<observable>
+            // TODO: Retreive the "from" values and the "default" value from the exposed observables on the actual hardware (or the hardware profile)
+            channelContentContent.put("toggle_value").from("on", "off").set("off");
+            channelContentContent.put("waveform_sample_value", "none");
+            channelContentContent.put("pulse_period_seconds", "0");
+            channelContentContent.put("pulse_duty_cycle", "0");
+
+            for (ContentEntry child : channelContentContent.getChildren()) {
+                child.put("type");
+                child.put("device").set(this.getTimeline().getDevice().getUuid().toString());
+                    child.put("source");
+                child.put("provider");
+                child.put("value");
+            }
+        }
+        this.contentEntry = eventContent;
+        // </HACK>
+    }
+
     public Event (Timeline timeline) {
 
         this.uuid = UUID.randomUUID();
@@ -78,6 +134,8 @@ public class Event {
         this.timeline = timeline;
 
         this.state = new ArrayList<State>();
+
+        this.initializeContent();
     }
 
 //    public Event (Timeline timeline, Action action, State state) {

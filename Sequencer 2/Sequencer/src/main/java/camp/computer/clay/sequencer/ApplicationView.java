@@ -255,7 +255,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     @Override
     public void addDeviceView(Device device) {
 
-        // TODO: (?) Add DeviceViewFragment to choose here?
+        // TODO: (?) Add DeviceViewFragment to list here?
 
         // Increment the number of pages to be the same as the number of discovered units.
 //        mSectionsPagerAdapter.count++;

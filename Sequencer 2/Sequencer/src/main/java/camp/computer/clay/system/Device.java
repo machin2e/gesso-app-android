@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ public class Device {
 
     private TcpMessageClient tcpMessageClient;
 
+    private ArrayList<String> tags;
+
     public Device() {
     }
 
@@ -34,6 +37,8 @@ public class Device {
         this.uuid = uuid;
 
         this.timeline = new Timeline(this);
+
+        tags = new ArrayList<String>();
     }
 
     public Clay getClay () {
@@ -55,6 +60,29 @@ public class Device {
 //            return Long.MAX_VALUE;
 //        }
 //    }
+
+    public void setTag (String tag) {
+        if (this.tags != null && this.tags.size() > 0) {
+            this.tags.add(0, tag);
+        } else {
+            this.tags.add(tag);
+        }
+    }
+
+    public void addTag (String tag) {
+        this.tags.add(tag);
+    }
+
+    public String getTag () {
+        if (this.tags != null && this.tags.size() > 0) {
+            return this.tags.get(0);
+        }
+        return null;
+    }
+
+    public ArrayList<String> getTags () {
+        return this.tags;
+    }
 
     public void setTimeOfLastContact (Date time) {
         this.timeOfLastContact = time;

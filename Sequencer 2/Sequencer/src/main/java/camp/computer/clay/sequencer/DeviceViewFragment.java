@@ -307,7 +307,7 @@ public class DeviceViewFragment extends Fragment {
 //                                timelineView.replaceEventHolder(getDevice().getClay().selectedEventHolder, action);
 ////                                timelineView.redrawListViewFromData();
 //                            } else {
-//                                EventHolder eventHolder = new EventHolder("choose", "choose");
+//                                EventHolder eventHolder = new EventHolder("list", "list");
 //                                timelineView.addEventHolder(eventHolder);
 //                                timelineView.replaceEventHolder(eventHolder, action);
 //                            }

@@ -152,7 +152,7 @@ public class TcpMessageClient {
 
 //                String inetAddress = (String) params[0];
             InetAddress remoteServerAddress = (InetAddress) params[0];
-//                Log.v ("TCP_Client", "IP: " + inetAddress);
+                Log.v ("TCP_Client", "IP: " + inetAddress);
 
             //we create a TCPClient object and
 //                InetAddress remoteServerAddress = remoteServerAddress = InetAddress.getByName(inetAddress);

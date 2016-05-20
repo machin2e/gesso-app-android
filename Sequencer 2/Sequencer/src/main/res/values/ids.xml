@@ -35,4 +35,5 @@
     <item name="timeline_bottom_segment" type="id" />
     <item name="timeline_top_segment" type="id" />
     <item name="channel_direction" type="id" />
+    <item name="UUID_TAG_INDEX" type="id" />
 </resources>

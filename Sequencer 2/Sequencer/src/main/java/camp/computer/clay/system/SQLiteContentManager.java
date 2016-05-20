@@ -177,7 +177,7 @@ public class SQLiteContentManager {
         public static final String COLUMN_NAME_UUID                 = "uuid";
         public static final String COLUMN_NAME_TAG                  = "tag";
         public static final String COLUMN_NAME_PARENT_UUID          = "parentActionUuid";
-        public static final String COLUMN_NAME_SIBLING_INDEX        = "siblingIndex"; // i.e., Index in parent behavior's choose of children.
+        public static final String COLUMN_NAME_SIBLING_INDEX        = "siblingIndex"; // i.e., Index in parent behavior's list of children.
         public static final String COLUMN_NAME_SCRIPT_UUID          = "scriptUuid";
 
         public static final String COLUMN_NAME_TIME_CREATED         = "timeCreated";
@@ -472,7 +472,7 @@ public class SQLiteContentManager {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get actions with parent with root UUID, addDevice to parent's choose of
+        // - For each root, get actions with parent with root UUID, addDevice to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -877,7 +877,7 @@ public class SQLiteContentManager {
 //            Log.v ("Content_Manager", "> behavior: " + behavior.getUuid());
 //            behavior.setScript(behaviorScript);
 
-                // Reconstruct choose of behavior state objects
+                // Reconstruct list of behavior state objects
                 State actionState = new State(UUID.fromString(uuidString), state);
                 event.addActionState(actionState);
 
@@ -1052,7 +1052,7 @@ public class SQLiteContentManager {
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert(EventEntry.TABLE_NAME, null, values);
 
-            // Store choose of behavior state objects
+            // Store list of behavior state objects
             int i = 0;
             for (State state : event.getState()) {
                 Log.v ("Content_Manager", "\tStoring state " + i + " (UUID: " + state.getUuid() + ".");
@@ -1242,7 +1242,7 @@ public class SQLiteContentManager {
                     cursor.moveToFirst();
                     while (!cursor.isAfterLast()) {
 
-                        // Add the UUID to the choose of candidate parent UUIDs
+                        // Add the UUID to the list of candidate parent UUIDs
                         String parentActionUuidString = cursor.getString(cursor.getColumnIndexOrThrow(ActionEntry.COLUMN_NAME_PARENT_UUID));
                         UUID parentActionUuid = UUID.fromString(parentActionUuidString);
                         if (candidateParentUuids.contains(parentActionUuid)) {
@@ -1724,7 +1724,7 @@ public class SQLiteContentManager {
         if (action.getActions() != null) {
             for (Action childAction : action.getActions()) {
 //                if (!hasAction(action)) {
-                // TODO: Store action index in choose
+                // TODO: Store action index in list
                 storeActionTree(childAction, action);
 //                db.saveAction(childAction, action);
 //                }

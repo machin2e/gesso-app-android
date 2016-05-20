@@ -428,7 +428,7 @@ public class CursorView /* extends FloatingActionButton */ {
                             timelineView.replaceEventHolder(selectedEventHolder, action);
 //                                timelineView.redrawListViewFromData();
                         } else {
-                            EventHolder eventHolder = new EventHolder("choose", "choose");
+                            EventHolder eventHolder = new EventHolder("list", "list");
                             timelineView.addEventHolder(eventHolder);
                             timelineView.replaceEventHolder(eventHolder, action);
                         }

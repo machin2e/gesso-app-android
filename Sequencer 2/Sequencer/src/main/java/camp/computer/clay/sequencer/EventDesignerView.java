@@ -6,33 +6,38 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.azeesoft.lib.colorpicker.ColorPickerDialog;
 import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.ContentEntry;
 import camp.computer.clay.system.Device;
+import camp.computer.clay.view.DynamicHorizontalListLayout;
+import camp.computer.clay.view.DynamicLinearLayout;
 
 public class EventDesignerView {
 
@@ -105,7 +110,7 @@ public class EventDesignerView {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(10, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
             params.setMargins(0, 0, 0, 0);
             toggleButton.setLayoutParams(params);
-            lightToggleButtons.add(toggleButton); // Add the button to the choose.
+            lightToggleButtons.add(toggleButton); // Add the button to the list.
             lightLayout.addView(toggleButton);
         }
         designerViewLayout.addView(lightLayout);
@@ -166,7 +171,7 @@ public class EventDesignerView {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(10, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
             params.setMargins(0, 0, 0, 0);
             colorButton.setLayoutParams(params);
-            lightColorButtons.add(colorButton); // Add the button to the choose.
+            lightColorButtons.add(colorButton); // Add the button to the list.
             lightColorLayout.addView(colorButton);
         }
         designerViewLayout.addView(lightColorLayout);
@@ -396,7 +401,1051 @@ public class EventDesignerView {
         builder.show();
     }
 
-    public void displayUpdateSignalOptions(final ContentEntry contentEntry) {
+    public void displayUpdateSignalOptions (final EventHolder eventHolder) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Layout
+        final LinearLayout designerViewLayout = new LinearLayout(getContext());
+        designerViewLayout.setOrientation(LinearLayout.VERTICAL);
+
+        // Layout Style (LayoutParams)
+        LinearLayout.LayoutParams params5 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        params5.setMargins(0, 0, 0, 0);
+        designerViewLayout.setLayoutParams(params5);
+
+        // <TITLE>
+        LinearLayout row = (LinearLayout) getRowView();
+        designerViewLayout.addView(row);
+
+        //final TextView channelEnabledLabel = getTitleView(contentEntry.getKey());
+        final TextView channelEnabledLabel = getTitleView("Channel");
+        row.addView(channelEnabledLabel);
+        // </TITLE>
+
+
+        //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        LinearLayout separatorView = null;
+
+        int separatorColor = Color.parseColor("#555555");
+        int separatorHeight = 4;
+        int verticalPadding = 10;
+
+        final DynamicHorizontalListLayout destinationChannelNumberLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(destinationChannelNumberLayout);
+
+        final DynamicHorizontalListLayout destinationChannelDirectionLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(destinationChannelDirectionLayout);
+
+        separatorView = (LinearLayout) getSeparatorLayout(separatorColor, separatorHeight, verticalPadding);
+        destinationChannelDirectionLayout.addDependentView(separatorView);
+        designerViewLayout.addView(separatorView);
+
+        final DynamicHorizontalListLayout destinationChannelTypeLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(destinationChannelTypeLayout);
+
+        separatorView = (LinearLayout) getSeparatorLayout(separatorColor, separatorHeight, verticalPadding);
+        destinationChannelTypeLayout.addDependentView(separatorView);
+        designerViewLayout.addView(separatorView);
+
+        final DynamicHorizontalListLayout destinationChannelObservableLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(destinationChannelObservableLayout);
+
+        separatorView = (LinearLayout) getSeparatorLayout(separatorColor, separatorHeight, verticalPadding);
+        destinationChannelObservableLayout.addDependentView(separatorView);
+        designerViewLayout.addView(separatorView);
+
+        final DynamicHorizontalListLayout sourceDeviceSourceLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(sourceDeviceSourceLayout);
+
+        separatorView = (LinearLayout) getSeparatorLayout(separatorColor, separatorHeight, verticalPadding);
+        sourceDeviceSourceLayout.addDependentView(separatorView);
+        designerViewLayout.addView(separatorView);
+
+        final DynamicHorizontalListLayout sourceChannelNumberLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(sourceChannelNumberLayout);
+
+        separatorView = (LinearLayout) getSeparatorLayout(separatorColor, separatorHeight, verticalPadding);
+        sourceChannelNumberLayout.addDependentView(separatorView);
+        designerViewLayout.addView(separatorView);
+
+        final DynamicHorizontalListLayout sourceChannelObservableLayout = new DynamicHorizontalListLayout(getContext());
+        designerViewLayout.addView(sourceChannelObservableLayout);
+
+        separatorView = (LinearLayout) getSeparatorLayout(separatorColor, separatorHeight, verticalPadding);
+        sourceChannelObservableLayout.addDependentView(separatorView);
+        designerViewLayout.addView(separatorView);
+
+        // <HACK>
+        final EditText sourceChannelContentEntryView = new EditText(getContext());
+        // <HACK>
+        // TODO: Set the input type based on the type of the source observable
+        sourceChannelContentEntryView.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        sourceChannelContentEntryView.setHint("0.02");
+        // </HACK>
+        sourceChannelContentEntryView.clearFocus();
+        designerViewLayout.addView(sourceChannelContentEntryView);
+        // </HACK>
+
+        final AlertDialog[] dialog = { null };
+
+
+        final ContentEntry eventContent = eventHolder.getEvent().getContent();
+
+        //------------------------------------------------------------------------------------------
+        ArrayList<String> channelOptionsList = new ArrayList<String>();
+        for (int i = 0; i < 12; i++) {
+            channelOptionsList.add (String.valueOf(i + 1));
+        }
+        destinationChannelNumberLayout.setOptions(channelOptionsList);
+
+        destinationChannelNumberLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                Log.v("onSelect", "channelNumberLayout.onSelectOption");
+
+
+                destinationChannelDirectionLayout.resetSelection();
+                // Restore the channel direction and type
+                if (destinationChannelNumberLayout.hasSelection()) {
+                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                    String channelDirection = channelContent.get("direction").getContent();
+                    destinationChannelDirectionLayout.setSelection(channelDirection);
+                }
+
+                // Hide and show dependent layouts (dependencies via channel type)
+                destinationChannelObservableLayout.setVisibility(View.GONE);
+                sourceDeviceSourceLayout.setVisibility(View.GONE);
+                sourceChannelNumberLayout.setVisibility(View.GONE);
+                sourceChannelObservableLayout.setVisibility(View.GONE);
+                sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                // Hide or show "next step" options
+                if (dialog[0] != null) {
+                    Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                    if (positiveButton != null) {
+                        positiveButton.setVisibility(View.GONE);
+                    }
+                }
+
+
+
+
+
+
+                destinationChannelTypeLayout.resetSelection();
+                // Restore the channel direction and type
+                if (destinationChannelNumberLayout.hasSelection()) {
+                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                    String channelType = channelContent.get("type").getContent();
+                    destinationChannelTypeLayout.setSelection(channelType);
+                }
+
+                // Hide and show dependent layouts (dependencies via channel type)
+                destinationChannelObservableLayout.setVisibility(View.GONE);
+                sourceDeviceSourceLayout.setVisibility(View.GONE);
+                sourceChannelNumberLayout.setVisibility(View.GONE);
+                sourceChannelObservableLayout.setVisibility(View.GONE);
+                sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                // Hide or show "next step" options
+                if (dialog[0] != null) {
+                    Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                    if (positiveButton != null) {
+                        positiveButton.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
+
+
+
+        //------------------------------------------------------------------------------------------
+        ArrayList<String> directionOptionsList = new ArrayList<String>();
+        directionOptionsList.add ("input");
+        directionOptionsList.add ("output");
+        destinationChannelDirectionLayout.setOptions(directionOptionsList);
+
+        destinationChannelDirectionLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                Log.v("onSelect", "channelDirectionLayout.onSelectOption");
+
+                // Save the channel direction
+                if (destinationChannelNumberLayout.hasSelection()) {
+                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                    channelContent.get("direction").set(destinationChannelDirectionLayout.getSelection());
+                    // channelDirectionLayout.setSelection(channelDirection);
+                }
+
+                // Update others...
+                if (destinationChannelDirectionLayout.hasSelection()) {
+                    if (destinationChannelDirectionLayout.getSelection().equals("input")) {
+                        ArrayList<String> typeOptionsList = new ArrayList<String>();
+                        if (destinationChannelNumberLayout.getSelection().equals("2") || destinationChannelNumberLayout.getSelection().equals("3") || destinationChannelNumberLayout.getSelection().equals("12")) {
+                            typeOptionsList.add("waveform");
+                        } else {
+                            typeOptionsList.add("toggle");
+                            typeOptionsList.add("waveform");
+                        }
+                        destinationChannelTypeLayout.setOptions(typeOptionsList);
+
+                        // Hide and show dependent layouts (dependencies via channel type)
+                        destinationChannelObservableLayout.setVisibility(View.GONE);
+                        sourceDeviceSourceLayout.setVisibility(View.GONE);
+                        sourceChannelNumberLayout.setVisibility(View.GONE);
+                        sourceChannelObservableLayout.setVisibility(View.GONE);
+                        sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    } else if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+                        ArrayList<String> typeOptionsList = new ArrayList<String>();
+                        if (destinationChannelNumberLayout.getSelection().equals("4") || destinationChannelNumberLayout.getSelection().equals("6")) {
+                            typeOptionsList.add("pulse");
+                        } else {
+                            typeOptionsList.add("toggle");
+                            typeOptionsList.add("pulse");
+                        }
+                        destinationChannelTypeLayout.setOptions(typeOptionsList);
+
+                        // Hide and show dependent layouts (dependencies via channel type)
+                        destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceDeviceSourceLayout.setVisibility(View.GONE);
+                        sourceChannelNumberLayout.setVisibility(View.GONE);
+                        sourceChannelObservableLayout.setVisibility(View.GONE);
+                        sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    }
+                }
+
+                // Select the dependent option automatically if there's only one value for it
+                if (destinationChannelTypeLayout.getOptions().size() == 1) {
+                    destinationChannelTypeLayout.setSelection(destinationChannelTypeLayout.getOptions().get(0));
+                }
+            }
+        });
+
+
+
+        //------------------------------------------------------------------------------------------
+        ArrayList<String> typeOptionsList = new ArrayList<String>();
+        typeOptionsList.add ("toggle");
+        typeOptionsList.add ("waveform");
+        typeOptionsList.add("pulse");
+        destinationChannelTypeLayout.setOptions(typeOptionsList);
+
+        destinationChannelTypeLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                Log.v("onSelect", "channelTypeLayout.onSelectOption");
+
+                // Save the channel direction
+                if (destinationChannelNumberLayout.hasSelection()) {
+                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                    channelContent.get("type").set(destinationChannelTypeLayout.getSelection());
+                    // channelDirectionLayout.setSelection(channelDirection);
+                }
+
+                // Update others...
+                if (destinationChannelDirectionLayout.hasSelection()) {
+                    if (destinationChannelDirectionLayout.getSelection().equals("input")) {
+                        if (destinationChannelTypeLayout.hasSelection()) {
+                            ArrayList<String> dataOptionsList = new ArrayList<String>();
+                            ArrayList<String> dataOptionsTextList = new ArrayList<String>();
+                            if (destinationChannelTypeLayout.getSelection().equals("toggle")) {
+                                dataOptionsList.add("toggle_value");
+                                dataOptionsTextList.add("state");
+                            } else if (destinationChannelTypeLayout.getSelection().equals("waveform")) {
+                                dataOptionsList.add("waveform_sample_value");
+                                dataOptionsTextList.add("amplitude");
+                            } else if (destinationChannelTypeLayout.getSelection().equals("pulse")) {
+                                dataOptionsList.add("pulse_period_seconds");
+                                dataOptionsTextList.add("duration");
+                                dataOptionsList.add("pulse_duty_cycle");
+                                dataOptionsTextList.add("on time");
+                            }
+                            destinationChannelObservableLayout.setOptions(dataOptionsList, dataOptionsTextList);
+                        }
+
+                        // Hide and show dependent layouts (dependencies via channel type)
+                        destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceDeviceSourceLayout.setVisibility(View.GONE);
+                        sourceChannelNumberLayout.setVisibility(View.GONE);
+                        sourceChannelObservableLayout.setVisibility(View.GONE);
+                        sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    } else if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+                        if (destinationChannelTypeLayout.hasSelection()) {
+                            ArrayList<String> dataOptionsList = new ArrayList<String>();
+                            ArrayList<String> dataOptionsTextList = new ArrayList<String>();
+                            if (destinationChannelTypeLayout.getSelection().equals("toggle")) {
+                                dataOptionsList.add("toggle_value");
+                                dataOptionsTextList.add("state");
+                            } else if (destinationChannelTypeLayout.getSelection().equals("waveform")) {
+                                dataOptionsList.add("waveform_sample_value");
+                                dataOptionsTextList.add("amplitude");
+                            } else if (destinationChannelTypeLayout.getSelection().equals("pulse")) {
+                                dataOptionsList.add("pulse_period_seconds");
+                                dataOptionsTextList.add("duration");
+                                dataOptionsList.add("pulse_duty_cycle");
+                                dataOptionsTextList.add("on time");
+                            }
+                            destinationChannelObservableLayout.setOptions(dataOptionsList, dataOptionsTextList);
+                        }
+
+                        // Hide and show dependent layouts (dependencies via channel type)
+                        destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceDeviceSourceLayout.setVisibility(View.GONE);
+                        sourceChannelNumberLayout.setVisibility(View.GONE);
+                        sourceChannelObservableLayout.setVisibility(View.GONE);
+                        sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    }
+                }
+
+//                // Hide dependent layouts
+//                sourceChannelNumberLayout.setVisibility(View.GONE);
+//                sourceChannelObservableLayout.setVisibility(View.GONE);
+
+                // Select the dependent option automatically if there's only one value for it
+                if (destinationChannelObservableLayout.getOptions().size() == 1) {
+                    destinationChannelObservableLayout.setSelection(destinationChannelObservableLayout.getOptions().get(0));
+                }
+            }
+        });
+
+
+
+        //------------------------------------------------------------------------------------------
+        final ArrayList<String> dataOptionsList = new ArrayList<String>();
+        dataOptionsList.add ("toggle_value");
+        dataOptionsList.add ("waveform_sample_value");
+        dataOptionsList.add ("pulse_period_seconds");
+        dataOptionsList.add("pulse_duty_cycle");
+        destinationChannelObservableLayout.setOptions(dataOptionsList);
+
+        destinationChannelObservableLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+
+                if (destinationChannelDirectionLayout.hasSelection()) {
+                    if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+
+                        // Hide and show dependent layouts (dependencies via channel type)
+                        destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceDeviceSourceLayout.setVisibility(View.VISIBLE);
+                        sourceChannelNumberLayout.setVisibility(View.GONE);
+                        sourceChannelObservableLayout.setVisibility(View.GONE);
+                        sourceChannelContentEntryView.setVisibility(View.VISIBLE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        //==========================================================================================
+        ArrayList<String> deviceOptionsList = new ArrayList<String>();
+        // <HACK>
+        final ArrayList<String> deviceOptionsList2 = new ArrayList<String>();
+        // </HACK>
+        for (int i = 0; i < getClay().getDevices().size(); i++) {
+            deviceOptionsList.add(getClay().getDevices().get(i).getTag());
+            deviceOptionsList2.add(getClay().getDevices().get(i).getUuid().toString());
+        }
+        sourceDeviceSourceLayout.setOptions(deviceOptionsList2, deviceOptionsList);
+
+        sourceDeviceSourceLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                Log.v("onSelect", "deviceSourceLayout.onSelectOption");
+
+                if (destinationChannelDirectionLayout.hasSelection()) {
+
+                    // Hide and show dependent layouts (dependencies via channel type)
+                    if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+
+                        destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceDeviceSourceLayout.setVisibility(View.VISIBLE);
+                        sourceChannelNumberLayout.setVisibility(View.VISIBLE);
+                        sourceChannelObservableLayout.setVisibility(View.GONE);
+                        sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    }
+
+                    // Save the channel source observable (<HACK /> via channel/provider/source...)
+
+                    // Save the channel source
+                    if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceDeviceSourceLayout.hasSelection()) {
+                        ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                        String destinationObservable = destinationChannelObservableLayout.getSelection();
+//                    // <HACK>
+//                    String selection = deviceSourceLayout.getSelection();
+//                    for (int i = 0; i < deviceOptionsList2.size(); i++) {
+//                        if (deviceOptionsList2.equals(selection)) {
+//                            selection2 = deviceOptionsList2.get(i);
+//                            break;
+//                        }
+//                    }
+                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("device").set(sourceDeviceSourceLayout.getSelection());
+                        // </HACK>
+                        // channelDirectionLayout.setSelection(channelDirection);
+                    }
+
+                }
+            }
+        });
+
+//        // <HACK>
+//        // Select defaults
+//        String sourceDeviceUuid = null;
+//        for (int i = 0; i < deviceOptionsList2.size(); i++) {
+//            Log.v("ContentEntry2", "" + deviceOptionsList2.get(i));
+//            //if (deviceOptionsList2.get(i).equals(ApplicationView.getApplicationView().getTimelineView().getDevice().getUuid().toString())) {
+//            if (deviceOptionsList2.get(i).equals(getDevice().getUuid().toString())) {
+//                deviceSourceLayout.setSelection(deviceOptionsList.get(i));
+//                Log.v("ContentEntry2", "Set the default!");
+//                sourceDeviceUuid = deviceOptionsList2.get(i);
+//                break;
+//            }
+//        }
+//        // </HACK>
+
+
+        // Initialize. Select default.
+        // Here, the default device is the one for which the current timeline is being displayed.
+        String destinationDeviceUuid = getDevice().getUuid().toString();
+        sourceDeviceSourceLayout.setSelection(destinationDeviceUuid);
+
+
+//        if (finalSourceDeviceUuid.equals(destinationDeviceUuid)) {
+//            Log.v ("ContentEntry2", "DIFFERENT devices");
+//        } else {
+//            Log.v ("ContentEntry2", "SAME devices");
+//        }
+
+
+
+
+        //==========================================================================================
+        ArrayList<String> dataSourceChannelOptionsList = new ArrayList<String>();
+        for (int i = 0; i < 12; i++) {
+            dataSourceChannelOptionsList.add (String.valueOf(i + 1));
+        }
+        sourceChannelNumberLayout.setOptions(dataSourceChannelOptionsList);
+
+        sourceChannelNumberLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                Log.v("onSelect", "channelDataSourceChannelLayout.onSelectOption");
+
+                // Hide and show dependent layouts (dependencies via channel type)
+                if (destinationChannelDirectionLayout.hasSelection()) {
+
+                    if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+
+                        destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceDeviceSourceLayout.setVisibility(View.VISIBLE);
+                        sourceChannelNumberLayout.setVisibility(View.VISIBLE);
+                        sourceChannelObservableLayout.setVisibility(View.VISIBLE);
+                        sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                        // Hide or show "next step" options
+                        if (dialog[0] != null) {
+                            Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                            if (positiveButton != null) {
+                                positiveButton.setVisibility(View.GONE);
+                            }
+                        }
+
+                    }
+
+                }
+
+                // Save the channel source observable (<HACK /> via channel/provider/source...)
+
+                // Save the channel provider
+                if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelNumberLayout.hasSelection()) {
+                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                    String destinationObservable = destinationChannelObservableLayout.getSelection();
+                    ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("provider").set(sourceChannelNumberLayout.getSelection());
+                    // channelDirectionLayout.setSelection(channelDirection);
+                }
+
+                // Update others...
+                if (sourceChannelNumberLayout.hasSelection()) {
+                    String sourceChannelNumber = sourceChannelNumberLayout.getSelection();
+                    String sourceChannelDirection = eventContent.get("channels").get(sourceChannelNumber).get("direction").getContent();
+                    String sourceChannelType = eventContent.get("channels").get(sourceChannelNumber).get("type").getContent();
+
+                    ArrayList<String> dataOptionsList = new ArrayList<String>();
+                    ArrayList<String> dataOptionsTextList = new ArrayList<String>();
+                    if (sourceChannelDirection.equals("input")) {
+                        if (sourceChannelType.equals("toggle")) {
+                            dataOptionsList.add("toggle_value");
+                            dataOptionsTextList.add("state");
+                        } else if (sourceChannelType.equals("waveform")) {
+                            dataOptionsList.add("waveform_sample_value");
+                            dataOptionsTextList.add("amplitude");
+                        } else if (sourceChannelType.equals("pulse")) {
+                            dataOptionsList.add("pulse_period_seconds");
+                            dataOptionsTextList.add("duration");
+                            dataOptionsList.add("pulse_duty_cycle");
+                            dataOptionsTextList.add("on time");
+                        }
+                    }
+                    sourceChannelObservableLayout.setOptions(dataOptionsList, dataOptionsTextList);
+                }
+            }
+        });
+
+
+
+        //==========================================================================================
+
+        // Set default selection
+        sourceChannelNumberLayout.setSelection(channelOptionsList.get(0));
+
+        sourceChannelNumberLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                // Hide and show dependent layouts (dependencies via channel type)
+                if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+
+                    // Hide and show dependent layouts (dependencies via channel type)
+                    destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                    sourceDeviceSourceLayout.setVisibility(View.VISIBLE);
+                    sourceChannelNumberLayout.setVisibility(View.VISIBLE);
+                    sourceChannelObservableLayout.setVisibility(View.VISIBLE);
+                    sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                    // Hide or show "next step" options
+                    if (dialog[0] != null) {
+                        Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                        if (positiveButton != null) {
+                            positiveButton.setVisibility(View.GONE);
+                        }
+                    }
+
+                }
+            }
+        });
+
+
+
+
+        //==========================================================================================
+        ArrayList<String> dataSourceOptionsList = new ArrayList<String>();
+        ArrayList<String> dataSourceTextOptionsList = new ArrayList<String>();
+        dataSourceOptionsList.add("toggle_value");
+        dataSourceTextOptionsList.add("state");
+        dataSourceOptionsList.add("waveform_sample_value");
+        dataSourceTextOptionsList.add("amplitude");
+        dataSourceOptionsList.add("pulse_period_seconds");
+        dataSourceTextOptionsList.add("duration");
+        dataSourceOptionsList.add("pulse_duty_cycle");
+        dataSourceTextOptionsList.add("on time");
+        sourceChannelObservableLayout.setOptions(dataSourceOptionsList, dataSourceTextOptionsList);
+
+        sourceChannelObservableLayout.addOnSelectOptionListener(new DynamicHorizontalListLayout.OnSelectOptionListener() {
+            @Override
+            public void onSelectOption(View dynamicLayout) {
+                Log.v("onSelect", "channelDataSourceLayout.onSelectOption");
+
+                // Hide and show dependent layouts (dependencies via channel type)
+                if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+
+                    destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                    sourceDeviceSourceLayout.setVisibility(View.VISIBLE);
+                    sourceChannelNumberLayout.setVisibility(View.VISIBLE);
+                    sourceChannelObservableLayout.setVisibility(View.VISIBLE);
+                    sourceChannelContentEntryView.setVisibility(View.GONE);
+
+                    // Hide or show "next step" options
+                    if (dialog[0] != null) {
+                        Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                        if (positiveButton != null) {
+                            positiveButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                }
+
+                // Save the channel source observable (<HACK /> via channel/provider/source...)
+
+                // Save the channel source
+                if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelObservableLayout.hasSelection()) {
+                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                    String destinationObservable = destinationChannelObservableLayout.getSelection();
+                    ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("source").set(sourceChannelObservableLayout.getSelection());
+                    // channelDirectionLayout.setSelection(channelDirection);
+                }
+            }
+        });
+
+
+
+        //==========================================================================================
+
+        sourceChannelContentEntryView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Hide and show dependent layouts (dependencies via channel type)
+                if (destinationChannelDirectionLayout.getSelection().equals("output")) {
+
+                    destinationChannelObservableLayout.setVisibility(View.VISIBLE);
+                    sourceDeviceSourceLayout.setVisibility(View.GONE);
+                    sourceChannelNumberLayout.setVisibility(View.GONE);
+                    sourceChannelObservableLayout.setVisibility(View.GONE);
+                    sourceChannelContentEntryView.setVisibility(View.VISIBLE);
+
+                    // Hide or show "next step" options
+                    if (dialog[0] != null) {
+                        Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                        if (positiveButton != null) {
+                            positiveButton.setVisibility(View.GONE);
+                        }
+                    }
+
+                }
+            }
+        });
+
+        sourceChannelContentEntryView.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+
+                // you can call or do what you want with your EditText here
+                Log.v("onSelect", "...numberEntryView.afterTextChanged");
+
+//                ContentEntry channelContent = null;
+//
+//                // Update content
+//                channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+//                String enableChannel = channelContent.get("enabled").getContent();
+
+                String sourceChannelContent = sourceChannelContentEntryView.getText().toString();
+                Pattern sourceChannelContentRegEx = Pattern.compile("^[0-9]\\d*(\\.\\d+)?$");
+                Matcher sourceChannelContentValidator = sourceChannelContentRegEx.matcher(sourceChannelContent);
+
+                if (sourceChannelContentValidator.matches()) {
+                    Log.v("onSelect", "numberEntryView.setOnKeyListener");
+
+                    // Save the channel provider
+                    if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelNumberLayout.hasSelection()) {
+                        ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                        String destinationObservable = destinationChannelObservableLayout.getSelection();
+                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("provider").set("number");
+                        // channelDirectionLayout.setSelection(channelDirection);
+                    }
+
+                    // Save the channel source
+                    if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelObservableLayout.hasSelection()) {
+                        ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
+                        String destinationObservable = destinationChannelObservableLayout.getSelection();
+                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("source").set(sourceChannelContent);
+                        // channelDirectionLayout.setSelection(channelDirection);
+                    }
+
+                    // Hide or show "next step" options
+                    if (dialog[0] != null) {
+                        Button positiveButton = dialog[0].getButton(AlertDialog.BUTTON_POSITIVE);
+                        if (positiveButton != null) {
+                            positiveButton.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Log.v("onSelect", "...numberEntryView.beforeTextChanged");
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Log.v("onSelect", "...numberEntryView.onTextChanged");
+            }
+        });
+
+
+
+
+
+        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        builder.setView(designerViewLayout);
+
+        // Set up the buttons
+//        final String finalSourceDeviceUuid = sourceDeviceUuid;
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+//                ContentEntry channelContent = eventContent.get("channels").get(channelNumberLayout.getSelection());
+//                String destinationChannelNumber = channelContent.get("number").getContent(); // @channel.3.content.waveform_sample_value
+
+                // TODO: Generate messages from content model, rather than doing it manually... then sync with those messages automatically, too!
+
+
+
+
+                // "TIT:none TIT:none TIW:none TOP:3,'waveform_sample_value'|'pulse_duty_cycle';F,0.02|'pulse_period_seconds' TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none";
+
+                // Initialize state strings for each channel
+                ArrayList<String> sourceDeviceChannelState = new ArrayList<String>();
+                ArrayList<String> destinationDeviceChannelState = new ArrayList<String>();
+                for (int i = 0; i < 12; i++) {
+                    sourceDeviceChannelState.add("TIT:none");
+                    destinationDeviceChannelState.add("TIT:none");
+                }
+
+                // Update the state strings
+                Log.v ("Content_Editor", "Destination Channels:");
+                Log.v ("Content_Editor", " ");
+                String destinationStateString = "";
+                for (ContentEntry channelContentEntry : eventContent.get("channels").getChildren()) {
+
+                    Log.v ("Content_Editor", "destination.number: " + channelContentEntry.getKey());
+                    Log.v ("Content_Editor", "destination.type: " + channelContentEntry.get("type").getContent());
+                    Log.v ("Content_Editor", "destination.direction: " + channelContentEntry.get("direction").getContent());
+
+                    Log.v ("Content_Editor", " ");
+
+                    String destinationChannelNumber = channelContentEntry.get("number").getContent(); // @channel.3.content.waveform_sample_value
+
+                    String destinationChannelStateString = "T";
+
+                    if (channelContentEntry.get("direction").getContent().equals("output")) {
+                        destinationChannelStateString += "O";
+                    } else {
+                        destinationChannelStateString += "I";
+                    }
+
+                    if (channelContentEntry.get("type").getContent().equals("toggle")) {
+                        destinationChannelStateString += "T";
+                    } else if (channelContentEntry.get("type").getContent().equals("waveform")) {
+                        destinationChannelStateString += "W";
+                    } else if (channelContentEntry.get("type").getContent().equals("pulse")) {
+                        destinationChannelStateString += "P";
+                    }
+
+                    destinationChannelStateString += ":";
+
+                    if (channelContentEntry.get("direction").getContent().equals("output")) {
+
+                        for (ContentEntry observableEntry : channelContentEntry.get("content").getChildren()) {
+
+//                        String destinationObservable = channelDataLayout.getSelection();
+                            String destinationObservable = observableEntry.getKey();
+                            // String destinationDirection = channelContent.get("direction").getContent();
+                            // String destinationType = channelContent.get("type").getContent();
+                            String sourceChannelNumber = sourceChannelNumberLayout.getSelection();
+                            String sourceObservable = sourceChannelObservableLayout.getSelection();
+
+                            String contentDevice = channelContentEntry.get("content").get(destinationObservable).get("device").getContent();
+                            String contentType = channelContentEntry.get("content").get(destinationObservable).get("type").getContent();
+                            String contentProvider = channelContentEntry.get("content").get(destinationObservable).get("provider").getContent();
+                            String contentSource = channelContentEntry.get("content").get(destinationObservable).get("source").getContent();
+                            String contentValue = channelContentEntry.get("content").get(destinationObservable).get("value").getContent();
+
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ":");
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".type: " + contentType);
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".provider: " + contentProvider);
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".device: " + contentDevice);
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".source: " + contentSource);
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".value: " + contentValue);
+
+                            Log.v("Content_Editor", " ");
+
+                            // TODO: loop through destination channel's content
+                            Log.v("Content_Editor", "\tdestination.content: " + destinationObservable);
+                            Log.v("Content_Editor", "\tsource.number: " + sourceChannelNumber);
+                            Log.v("Content_Editor", "\tsource.content: " + sourceObservable);
+
+                            Log.v("Content_Editor", " ");
+
+
+
+                            String sourceDeviceUuid = contentDevice;
+                            String destinationDeviceUuid = getDevice().getUuid().toString();
+
+                            // TOP:3,'waveform_sample_value'|'pulse_duty_cycle';F,0.02|'pulse_period_seconds'
+                            String destinationChannelType = channelContentEntry.get("type").getContent();
+                            if (destinationObservable.startsWith(destinationChannelType)) {
+                                if (contentProvider.equals("number")) {
+                                    destinationChannelStateString += sourceDeviceUuid + ",F," + contentSource + "|'" + destinationObservable + "'" + ";";
+                                    //destinationChannelStateString += hackDest + ",F," + contentSource + "|'" + destinationObservable + "'" + ";";
+                                } else {
+                                    destinationChannelStateString += sourceDeviceUuid + "," + contentProvider + ",'" + contentSource + "'|'" + destinationObservable + "'" + ";";
+                                    //destinationChannelStateString += hackDest + "," + contentProvider + ",'" + contentSource + "'|'" + destinationObservable + "'" + ";";
+
+                                    // <HACK>
+                                    // Set source device state!
+                                    if (sourceDeviceUuid.equals(destinationDeviceUuid)) {
+                                        Log.v ("ContentEntry2", "SAME devices");
+                                    } else {
+                                        Log.v ("ContentEntry2", "DIFFERENT devices");
+
+                                        // Set state
+//                                int sourceProvider = Integer.parseInt(contentProvider);
+//                                destinationDeviceChannelState.get(sourceProvider - 1);
+
+                                        // Create propagator
+                                        // e.g., "propagate 3,'waveform_sample_value' to <destination-device-uuid>,4,'pulse_duty_cycle'
+                                        //String propagatorMessage = "propagate " + contentProvider + ",'" + contentSource + "' to " + destinationDeviceUuid + "," + channelContentEntry.getKey() + ",'" + destinationObservable + "'";
+                                        String[] channelProviderUuids = new String[] {
+                                                "00000000-0000-0000-0000-000000000001",
+                                                "00000000-0000-0000-0000-000000000002",
+                                                "00000000-0000-0000-0000-000000000003",
+                                                "00000000-0000-0000-0000-000000000004",
+                                                "00000000-0000-0000-0000-000000000005",
+                                                "00000000-0000-0000-0000-000000000006",
+                                                "00000000-0000-0000-0000-000000000007",
+                                                "00000000-0000-0000-0000-000000000008",
+                                                "00000000-0000-0000-0000-000000000009",
+                                                "00000000-0000-0000-0000-000000000010",
+                                                "00000000-0000-0000-0000-000000000011",
+                                                "00000000-0000-0000-0000-000000000012"
+                                        };
+                                        int sourceContentProviderIndex = Integer.parseInt(contentProvider) - 1;
+                                        String sourceContentProviderUuid = channelProviderUuids[sourceContentProviderIndex];
+                                        int destinationContentProviderIndex = Integer.parseInt(channelContentEntry.getKey()) - 1;
+                                        String destinationContentProviderUuid = channelProviderUuids[destinationContentProviderIndex];
+                                        String propagatorMessage = "propagate " + sourceContentProviderUuid + " " + contentSource + " to " + destinationDeviceUuid + " " + destinationContentProviderUuid + " " + destinationObservable + "";
+                                        getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage(propagatorMessage);
+                                        Log.v ("TCP_Propagate", propagatorMessage);
+                                    }
+                                    // </HACK>
+                                }
+                            }
+
+
+
+
+                        }
+
+                        destinationChannelStateString = destinationChannelStateString.substring(0, destinationChannelStateString.length() - 1);
+
+                    } else {
+                        // ":none"
+                        destinationChannelStateString += "none";
+                    }
+
+                    destinationStateString += destinationChannelStateString + " ";
+                }
+                destinationStateString = destinationStateString.substring(0, destinationStateString.length() - 1);
+
+                Log.v ("Content_Editor", "stateString: " + destinationStateString);
+
+
+
+
+
+//                String sourceDeviceUuid = deviceSourceLayout.getSelection();
+//                String destinationDeviceUuid = getDevice().getUuid().toString();
+
+//                if (sourceDeviceUuid.equals(destinationDeviceUuid)) {
+//                    Log.v ("ContentEntry2", "SAME devices");
+//                } else {
+//                    Log.v ("ContentEntry2", "DIFFERENT devices");
+//                }
+
+                // Example:
+                //
+                // TO SOURCE:
+                // "start event ..."
+                // "set event TIT:none TIT:none TIW:none ..."
+                //
+                // TO DESTINATION:
+                // "start event ..."
+                // "set event TIT:none TIT:none TIT:none TOP:none ..."
+
+                // GET OUTPUT MESSAGE WITH "none" SOURCE IF SOURCE DEVICE IS NOT W. THE CURRENT TIMELINE
+                // in that case, send messages to both devices, accordingly, for the source and destination
+
+
+
+
+                // Update the behavior state
+                // <HACK>
+                eventHolder.getEvent().setTimeline(device.getTimeline());
+                // </HACK>
+                eventHolder.updateState(destinationStateString);
+
+                // Store: Store the new behavior state and update the event.
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+                getClay().getStore().storeEvent(eventHolder.getEvent());
+
+                // TODO: Add contentEntry to each event (since it could change on a per-event level)
+                // TODO: Iterate through the observables and print the state for each one!
+
+//                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".type: " + contentType);
+//                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".provider: " + contentProvider);
+//                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".source: " + contentSource);
+
+                // Save configuration options to object
+//                item.phrase = input.getText().toString();
+
+//                String updatedStateString = numberEntryView.getText().toString();
+//
+//                ApplicationView.getApplicationView().speakPhrase(updatedStateString);
+//
+//                // Update the behavior state
+//                // <HACK>
+//                eventHolder.getEvent().setTimeline(device.getTimeline());
+//                // </HACK>
+//                eventHolder.updateState (updatedStateString);
+//
+//                // Store: Store the new behavior state and update the event.
+////                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
+//                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
+//                getClay().getStore().storeEvent(eventHolder.getEvent());
+//
+//                // Send updated state to device
+//                // <HACK>
+//                String content = "set event " + eventHolder.getEvent().getUuid() + " state \"" + updatedStateString + "\"";
+////                getDevice().sendMessage(content);
+//                // </HACK>
+//
+//                // <HACK>
+//                // TODO: Replace this with a queue.
+//                getDevice().enqueueMessage(content);
+//                // </HACK>
+
+                // <HACK>
+                // TODO: Replace this with a queue.
+                getDevice().enqueueMessage("set event " + eventHolder.getEvent().getUuid() + " state \"" + eventHolder.getEvent().getState().get(0).getState().toString() + "\"");
+                // </HACK>
+
+
+
+//        String contextString = "TIT:none TIT:none TIW:none TOP:3,'waveform_sample_value'|'pulse_duty_cycle';F,0.02|'pulse_period_seconds' TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none";
+                String contextContent = "set event " + eventHolder.getEvent().getUuid() + " context \"" + eventHolder.getEvent().getState().get(0).getState().toString() + "\"";
+                getDevice().enqueueMessage(contextContent);
+
+//
+//                // Refresh the timeline view
+//                // TODO: Move this into a manager that is called by Clay _after_ propagating changes through the data model.
+//                timelineView.refreshTimelineView();
+
+//                State behaviorState = new State(eventHolder.getEvent().getAction(), eventHolder.getEvent().getAction().getTag(), stateString);
+////                eventHolder.getEvent().getAction().setState(behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
+//
+//                // ...then addDevice it to the device...
+//                String behaviorUuid = eventHolder.getEvent().getAction().getUuid().toString();
+//                device.sendMessage("update behavior " + behaviorUuid + " \"" + eventHolder.getEvent().getState().getState() + "\"");
+//
+//                // ...and finally update the repository.
+//                getClay ().getStore().storeState(behaviorState);
+//                eventHolder.getEvent().setAction(eventHolder.getEvent().getAction(), behaviorState);
+//                //getClay ().getStore().updateBehaviorState(behaviorState);
+//                getClay ().getStore().updateTimeline(device.getTimeline());
+//
+//                // Refresh the timeline view
+//                refreshTimelineView();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // AlertDialog alertDialog = builder.create();
+
+        dialog[0] = builder.create();
+
+        dialog[0].setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setVisibility(View.GONE);
+            }
+        });
+
+        dialog[0].show();
+    }
+
+    private View getSeparatorLayout(int color, int height, int verticalMargin) {
+
+        LinearLayout separatorLayout = new LinearLayout(getContext());
+        separatorLayout.setMinimumHeight(height);
+        separatorLayout.setBackgroundColor(color);
+
+        // Layout Style (LayoutParams)
+        LinearLayout.LayoutParams separatorLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        separatorLayoutParams.setMargins(0, verticalMargin, 0, verticalMargin);
+        separatorLayout.setLayoutParams(separatorLayoutParams);
+
+        return separatorLayout;
+    }
+
+    public void displayUpdateSignalOptions2(final ContentEntry contentEntry) {
+
+        Log.v ("Choice", "displayUpdateSignalOptions");
 
         // <SETTINGS>
         boolean showConstant = true;
@@ -427,10 +1476,10 @@ public class EventDesignerView {
         designerViewLayout.setLayoutParams(params5);
 
         // Layouts
-        LinearLayout channelChooserView = new LinearLayout(getContext());
-        final LinearLayout channelDirectionSelectionButtonsLayout = new LinearLayout(getContext());
+        DynamicLinearLayout channelChooserView;
+        LinearLayout channelDirectionSelectionButtonsLayout = new LinearLayout(getContext());
         channelDirectionSelectionButtonsLayout.setId(R.id.channel_direction);
-        final LinearLayout channelTypeSelectionButtonsLayout = new LinearLayout(getContext());
+        LinearLayout channelTypeSelectionButtonsLayout = new LinearLayout(getContext());
 
         // Views
         final Spinner contentTypeSelector = new Spinner(getContext());
@@ -449,7 +1498,7 @@ public class EventDesignerView {
         // </TITLE>
 
         // <CHANNEL CHOOSER>
-        channelChooserView = (LinearLayout) generateChannelChooserView(contentEntry);
+        channelChooserView = (DynamicLinearLayout) generateChannelChooserView(contentEntry);
         designerViewLayout.addView(channelChooserView);
         // </CHANNEL CHOOSER>
 
@@ -474,7 +1523,7 @@ public class EventDesignerView {
 //
 //        designerViewLayout.addView(baseView);
 
-        LinearLayout channelContentView = (LinearLayout) generateChannelContentChooserView (contentEntry, null);
+        DynamicLinearLayout channelContentView = (DynamicLinearLayout) generateChannelContentChooserView (contentEntry, null);
         designerViewLayout.addView(channelContentView);
 
 //        LinearLayout contentEditorView = (LinearLayout) generateChannelContentEditorView (contentEntry);
@@ -506,13 +1555,16 @@ public class EventDesignerView {
             public void onClick(DialogInterface dialog, int which) {
 
                 String number = contentEntry.choice().get("number").getContent();
-                String contentType = contentEntry.choice().get("content").get("type").getContent();
-                String contentProvider = contentEntry.choice().get("content").get("provider").getContent();
-                String contentSource = contentEntry.choice().get("content").get("source").getContent();
+                String contentType = contentEntry.choice().get("content").get(selectedObservable).get("type").getContent();
+                String contentProvider = contentEntry.choice().get("content").get(selectedObservable).get("provider").getContent();
+                String contentSource = contentEntry.choice().get("content").get(selectedObservable).get("source").getContent();
 
-                Log.v("Content_Editor", "channel." + number + ".content.type: " + contentType);
-                Log.v("Content_Editor", "channel." + number + ".content.provider: " + contentProvider);
-                Log.v("Content_Editor", "channel." + number + ".content.source: " + contentSource);
+                // TODO: Add contentEntry to each event (since it could change on a per-event level)
+                // TODO: Iterate through the observables and print the state for each one!
+
+                Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".type: " + contentType);
+                Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".provider: " + contentProvider);
+                Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".source: " + contentSource);
 
                 // Save configuration options to object
 //                item.phrase = input.getText().toString();
@@ -615,7 +1667,10 @@ public class EventDesignerView {
 
                 // Data.
 //                contentEntry.choice().get("content").put("type", contentTypeSelector.getSelectedItem().toString());
-                contentEntry.choice().put("type", contentTypeSelector.getSelectedItem().toString());
+                if (selectedObservable != null) {
+                    contentEntry.choice().get("content").get(selectedObservable).put("type", contentTypeSelector.getSelectedItem().toString());
+//                    String contentType = contentEntry.choice().get("content").get(selectedObservable).get("type").getContent();
+                }
 
 //                // View.
 //                if (contentEntry.choice().get("content").get("type").getContent().equals("number")) {
@@ -700,7 +1755,7 @@ public class EventDesignerView {
             // Add to view
             channelSelectionButtonsLayout.addView(channelNumberButton);
 
-            // Add to button choose
+            // Add to button list
             channelSelectionButtonList.add(channelNumberButton);
         }
 
@@ -762,7 +1817,7 @@ public class EventDesignerView {
         // ListView contentProviderListView = new ListView(getContext());
         ArrayList<String> contentProviderData = new ArrayList<String>();
         // <HACK>
-        // TODO: Generate a choose based on observables received from the device being configured: constraint to possible value choose or regex
+        // TODO: Generate a list based on observables received from the device being configured: constraint to possible value list or regex
         contentProviderData.add("toggle_value");
         contentProviderData.add("waveform_sample_value");
         contentProviderData.add("pulse_period_seconds");
@@ -810,12 +1865,14 @@ public class EventDesignerView {
     }
 
     private TextView getTitleView(String title) {
-        return getTextView (title, 20);
+        return getTextView (title, 16);
     }
 
     private TextView getTextView(String text, int textSize) {
         final TextView textView = new TextView(getContext());
         textView.setText(text);
+        textView.setTextColor(Color.parseColor("#656565"));
+        textView.setAllCaps(true);
         textView.setTextSize(textSize);
         textView.setPadding(70, 20, 70, 20);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -835,14 +1892,15 @@ public class EventDesignerView {
     }
 
     private View generateChannelChooserView(final ContentEntry contentEntry) {
+        Log.v ("Choice", "generateChannelChooserView");
 
         // Choices.
         final ArrayList<Button> optionButtonList = new ArrayList<Button>();
         final Button[] selectedOptionButton = {null};
 
         // Layout.
-        final LinearLayout baseView = new LinearLayout(getContext());
-        baseView.setOrientation(LinearLayout.HORIZONTAL);
+        final DynamicLinearLayout baseView = new DynamicLinearLayout(getContext());
+        baseView.setOrientation(DynamicLinearLayout.HORIZONTAL);
         baseView.setVerticalGravity(Gravity.CENTER_HORIZONTAL);
 
 //        TODO: contentEntry.addOnContentChangeListener(/* code to update the graphical state of the column to reflect the ContentEntry */);
@@ -864,14 +1922,14 @@ public class EventDesignerView {
             channelNumberButton.setTextColor(Color.LTGRAY);
 
             // Style (LayoutParams)
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(10, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+            DynamicLinearLayout.LayoutParams params = new DynamicLinearLayout.LayoutParams(10, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
             params.setMargins(0, 0, 0, 0);
             channelNumberButton.setLayoutParams(params);
 
             // Add to view
             baseView.addView(channelNumberButton);
 
-            // Add to button choose
+            // Add to button list
             optionButtonList.add(channelNumberButton);
         }
 
@@ -938,6 +1996,8 @@ public class EventDesignerView {
 
     private View generateChannelConfigurationView(ContentEntry contentEntry, boolean horizontal, String... keys) {
 
+        Log.v ("Choice", "generateChannelConfigurationView");
+
         final LinearLayout baseView = new LinearLayout(getContext());
 
         if (horizontal) {
@@ -965,12 +2025,21 @@ public class EventDesignerView {
     // TODO: public View generateVerticalChooserView (ContentEntry contentEntry, OnContentChangeListener onContentChangeListener) {
     public View generateChannelContentChooserView (final ContentEntry contentEntry, final String key2) {
 
-        final LinearLayout baseLayout = new LinearLayout(getContext());
+        Log.v ("Choice", "generateChannelContentChooserView");
+
+        final DynamicLinearLayout baseLayout = new DynamicLinearLayout(getContext());
         baseLayout.setOrientation(LinearLayout.VERTICAL);
 
+        DynamicLinearLayout channelContentView = null;
+        DynamicLinearLayout channelChooserView = null;
+
         // Channel content selector
-        LinearLayout channelContentView = (LinearLayout) generateChannelContentChooserView2 (contentEntry, null);
+        channelContentView = (DynamicLinearLayout) generateChannelContentChooserView2(contentEntry);
         baseLayout.addView(channelContentView);
+
+        channelChooserView = (DynamicLinearLayout) generateChannelChooserView(contentEntry);
+        channelContentView.addListener(channelChooserView);
+        baseLayout.addView (channelChooserView);
 
         // Content editor
         LinearLayout contentEditorView = (LinearLayout) generateChannelContentEditorView(contentEntry);
@@ -980,19 +2049,25 @@ public class EventDesignerView {
         return baseLayout;
 
     }
-    public View generateChannelContentChooserView2 (final ContentEntry contentEntry, final String key2) {
 
-        final LinearLayout baseLayout = new LinearLayout(getContext());
-        baseLayout.setOrientation(LinearLayout.VERTICAL);
+    public interface OnChoiceListener {
+        void apply (String choice);
+    }
 
-        // Choices.
-        final ArrayList<Button> optionButtonList = new ArrayList<Button>();
-        final Button[] selectedOptionButton = { null };
+    public View generateChannelContentChooserView2 (final ContentEntry contentEntry) {
 
-        // Layout.
-        final LinearLayout buttonListView = new LinearLayout(getContext());
-        buttonListView.setOrientation(LinearLayout.HORIZONTAL);
-        buttonListView.setVerticalGravity(Gravity.CENTER_HORIZONTAL);
+        final DynamicLinearLayout baseLayout = new DynamicLinearLayout(contentEntry.choice().get("content"), getContext());
+//        baseLayout.setOrientation(DynamicLinearLayout.VERTICAL);
+
+
+//        // Choices.
+//        final ArrayList<Button> optionButtonList = new ArrayList<Button>();
+//        final Button[] selectedOptionButton = { null };
+//
+//        // Layout.
+//        final DynamicLinearLayout buttonListView = new DynamicLinearLayout(getContext());
+//        buttonListView.setOrientation(DynamicLinearLayout.HORIZONTAL);
+//        buttonListView.setVerticalGravity(Gravity.CENTER_HORIZONTAL);
 
         // TODO: Put rendering code in here. Just make the layout scaffolding outside of this...
 //        contentEntry.addOnContentChangeListener(new ContentEntry.OnContentChangeListener() {
@@ -1007,128 +2082,130 @@ public class EventDesignerView {
 //        TODO: contentEntry.addOnContentChangeListener(/* code to update the graphical state of the column to reflect the ContentEntry */);
 //        TODO: eventually, only call contentChangeListeners for entries that have constraints (i.e., that potentially require updates)
 
-        //ArrayList<String> optionList = contentEntry.choice().get(key).getContentRange();
-        ArrayList<String> optionList = contentEntry.choice().get("content").getKeys();
+//        //ArrayList<String> optionList = contentEntry.choice().get(key).getContentRange();
+//        ArrayList<String> optionList = contentEntry.choice().get("content").getKeys();
+//
+//        contentEntry.addOnContentChangeListener(new ContentEntry.OnContentChangeListener() {
+//            @Override
+//            public void notifyContentChanged() {
+//
+//                // Reset.
+//                for (int k = 0; k < optionButtonList.size(); k++) {
+//                    optionButtonList.get(k).setTextColor(Color.LTGRAY);
+//                    optionButtonList.get(k).setTypeface(null, Typeface.NORMAL);
+//                }
+//
+////                baseLayout.findViewWithTag("content_editor_view").setVisibility(View.GONE);
+//
+//            }
+//        });
 
-        contentEntry.addOnContentChangeListener(new ContentEntry.OnContentChangeListener() {
-            @Override
-            public void notifyContentChanged() {
-
-                // Reset.
-                for (int k = 0; k < optionButtonList.size(); k++) {
-                    optionButtonList.get(k).setTextColor(Color.LTGRAY);
-                    optionButtonList.get(k).setTypeface(null, Typeface.NORMAL);
-                }
-
-//                baseLayout.findViewWithTag("content_editor_view").setVisibility(View.GONE);
-
-            }
-        });
-
-        for (int i = 0; i < optionList.size(); i++) {
-
-            final String key = optionList.get(i);
-
-            Log.v ("Hello", "\t" + optionList.get(i));
-
-            // Create
-            final Button optionButton = new Button(getContext());
-
-            // Text
-            optionButton.setText(optionList.get(i));
-            optionButton.setTextSize(12);
-
-            // Style
-            optionButton.setPadding(0, 0, 0, 0);
-            optionButton.setBackgroundColor(Color.TRANSPARENT);
-            optionButton.setTextColor(Color.LTGRAY);
-
-            // Style (LayoutParams)
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 80);
-            params.setMargins(0, 0, 0, 0);
-            optionButton.setLayoutParams(params);
-
-            // Add to view (column)
-            buttonListView.addView(optionButton);
-
-            // Add to button choose
-            optionButtonList.add(optionButton);
-
-            final ContentEntry.OnContentChangeListener contentListener = new ContentEntry.OnContentChangeListener() {
-                @Override
-                public void notifyContentChanged() {
-
-                    // contentEntry2.removeOnContentChangeListener(this);
-
-//                    Log.v("Compare", "\t\t\tnotifyContentChanged: " + key);
-
-                    Log.v("Content_Tree", "\t\t\tnotifyContentChanged");
-                    Log.v("Content_Tree_Notify", "\t\t\tnotifyContentChanged");
-
-                    // Reset.
-                    for (int k = 0; k < optionButtonList.size(); k++) {
-                        optionButtonList.get(k).setTextColor(Color.LTGRAY);
-                        optionButtonList.get(k).setTypeface(null, Typeface.NORMAL);
-                    }
-
-                    // Select.
-                    Log.v("Compare", "...");
-                    for (Button optionButton : optionButtonList) {
-                        //if (optionButton.getText().toString().equals(contentEntry.getContent())) {
-//                        Log.v("Compare", "choice.key: " + contentEntry.choice().get(key).getContent());
-                        if (optionButton.getText().toString().equals(contentEntry.choice().get("content").get(key).getKey())) {
-                            selectedOptionButton[0] = optionButton; // Button. Select the button.
-
-                            // <HACK>
-                            selectedObservable = optionButton.getText().toString();
-                            // </HACK>
-                            break;
-                        }
-                    }
-
-                    // Color.
-                    if (selectedOptionButton[0] != null) {
-
-//                        baseLayout.findViewWithTag("content_editor_view").setVisibility(View.VISIBLE);
-
-                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
-                        selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
-                        selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
-                    }
-
-//                    // Data.
-//                    if (selectedOptionButton[0] != null) {
-//                        contentEntry.choice().get(key).set(selectedOptionButton[0].getText().toString(), false);
+//        for (int i = 0; i < optionList.size(); i++) {
+//
+//            final String key = optionList.get(i);
+//
+//            Log.v ("Hello", "\t" + optionList.get(i));
+//
+//            // Create
+//            final Button optionButton = new Button(getContext());
+//
+//            // Text
+//            optionButton.setText(optionList.get(i));
+//            optionButton.setTextSize(12);
+//
+//            // Style
+//            optionButton.setPadding(0, 0, 0, 0);
+//            optionButton.setBackgroundColor(Color.TRANSPARENT);
+//            optionButton.setTextColor(Color.LTGRAY);
+//
+//            // Style (LayoutParams)
+//            DynamicLinearLayout.LayoutParams params = new DynamicLinearLayout.LayoutParams(150, 80);
+//            params.setMargins(0, 0, 0, 0);
+//            optionButton.setLayoutParams(params);
+//
+//            // Add to view (column)
+//            buttonListView.addView(optionButton);
+//
+//            // Add to button list
+//            optionButtonList.add(optionButton);
+//
+//            final ContentEntry.OnContentChangeListener contentListener = new ContentEntry.OnContentChangeListener() {
+//                @Override
+//                public void notifyContentChanged() {
+//
+//                    // contentEntry2.removeOnContentChangeListener(this);
+//
+////                    Log.v("Compare", "\t\t\tnotifyContentChanged: " + key);
+//
+//                    Log.v("Content_Tree", "\t\t\tnotifyContentChanged");
+//                    Log.v("Content_Tree_Notify", "\t\t\tnotifyContentChanged");
+//
+//                    // Reset.
+//                    for (int k = 0; k < optionButtonList.size(); k++) {
+//                        optionButtonList.get(k).setTextColor(Color.LTGRAY);
+//                        optionButtonList.get(k).setTypeface(null, Typeface.NORMAL);
 //                    }
-                }
-            };
+//
+//                    // Select.
+//                    Log.v("Compare", "...");
+//                    for (Button optionButton : optionButtonList) {
+//                        //if (optionButton.getText().toString().equals(contentEntry.getContent())) {
+////                        Log.v("Compare", "choice.key: " + contentEntry.choice().get(key).getContent());
+//                        if (optionButton.getText().toString().equals(contentEntry.choice().get("content").get(key).getKey())) {
+//                            selectedOptionButton[0] = optionButton; // Button. Select the button.
+//
+//                            // <HACK>
+//                            selectedObservable = optionButton.getText().toString();
+//                            // </HACK>
+//                            break;
+//                        }
+//                    }
+//
+//                    // Color.
+//                    if (selectedOptionButton[0] != null) {
+//
+////                        baseLayout.findViewWithTag("content_editor_view").setVisibility(View.VISIBLE);
+//
+//                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+//                        selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
+//                        selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
+//                    }
+//
+////                    // Data.
+////                    if (selectedOptionButton[0] != null) {
+////                        contentEntry.choice().get(key).set(selectedOptionButton[0].getText().toString(), false);
+////                    }
+//                }
+//            };
+//
+//            // Setup: Set up interactivity.
+//            optionButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    // List for changes to data state...
+////                    contentEntry.addOnContentChangeListener(contentListener);
+//                    //contentEntry.choice().get("content").get(key).addOnContentChangeListener(contentListener);
+//
+//                    baseLayout.notifyOnChoiceListeners();
+//                    //onChoiceListener.apply(optionButton.getText().toString());
+//                    //contentListener.notifyContentChanged();
+//
+//                    // Data.
+//                    // Note: Don't update the content here, since this represents a choice of which
+//                    // observable to edit, not an actual change to its content.
+////                    contentEntry.choice().get("content").get(key).set(optionButton.getText().toString());
+//
+//                }
+//            });
+//        }
 
-            // Setup: Set up interactivity.
-            optionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    // List for changes to data state...
-//                    contentEntry.addOnContentChangeListener(contentListener);
-                    //contentEntry.choice().get("content").get(key).addOnContentChangeListener(contentListener);
-
-                    contentListener.notifyContentChanged();
-
-                    // Data.
-                    // Note: Don't update the content here, since this represents a choice of which
-                    // observable to edit, not an actual change to its content.
-//                    contentEntry.choice().get("content").get(key).set(optionButton.getText().toString());
-
-                }
-            });
-        }
-
-        // Style (LayoutParams)
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        // params.setMargins(0, 0, 0, 0);
-        buttonListView.setLayoutParams(params);
-
-        baseLayout.addView(buttonListView);
+//        // Style (LayoutParams)
+//        DynamicLinearLayout.LayoutParams params = new DynamicLinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        // params.setMargins(0, 0, 0, 0);
+//        buttonListView.setLayoutParams(params);
+//
+//        baseLayout.addView(buttonListView);
 
 
         return baseLayout;
@@ -1168,7 +2245,7 @@ public class EventDesignerView {
             // Add to view
             baseView.addView(channelNumberButton);
 
-            // Add to button choose
+            // Add to button list
             optionButtonList.add(channelNumberButton);
         }
 
@@ -1251,7 +2328,7 @@ public class EventDesignerView {
             // Add to view (column)
             columnView.addView(optionButton);
 
-            // Add to button choose
+            // Add to button list
             optionButtonList.add(optionButton);
 
             final ContentEntry.OnContentChangeListener contentListener = new ContentEntry.OnContentChangeListener() {
@@ -1361,7 +2438,7 @@ public class EventDesignerView {
         // Add to view (column)
         columnView.addView(optionButton);
 
-        // Add to button choose
+        // Add to button list
         optionButtonList.add(optionButton);
 
         final ContentEntry.OnContentChangeListener contentListener = new ContentEntry.OnContentChangeListener() {
@@ -1520,7 +2597,7 @@ public class EventDesignerView {
 
         /* Message type */
 
-        // Get choose of devices that have been discovered
+        // Get list of devices that have been discovered
         final ArrayList<String> messageDestinationData = new ArrayList<String>();
 
         // Title
@@ -1582,16 +2659,16 @@ public class EventDesignerView {
                 if (selectedItemText.equals("Device")) {
                     messageDestinationTitle.setVisibility(View.GONE);
                     messageDestinationSelector.setVisibility(View.GONE);
-                    // Get choose of all discovered devices on the mesh network
+                    // Get list of all discovered devices on the mesh network
                     messageDestinationData.clear();
-                    // TODO: Get choose of all discovered smartphones, tablets, and other devices for interacting with Clay
+                    // TODO: Get list of all discovered smartphones, tablets, and other devices for interacting with Clay
                     messageDestinationDataAdapter.notifyDataSetChanged();
                 } else if (selectedItemText.equals("UDP") || selectedItemText.equals("TCP")) {
                     messageDestinationTitle.setVisibility(View.VISIBLE);
                     messageDestinationSelector.setVisibility(View.VISIBLE);
-                    // Get choose of all discovered devices on the mesh network
+                    // Get list of all discovered devices on the mesh network
                     messageDestinationData.clear();
-                    // TODO: Get choose of all discovered smartphones, tablets, and other devices for interacting with Clay
+                    // TODO: Get list of all discovered smartphones, tablets, and other devices for interacting with Clay
                     messageDestinationData.add(getClay().getInternetBroadcastAddress() + ":4445"); // Broadcast address
                     messageDestinationData.add(getClay().getInternetAddress() + ":4445"); // This device's address
                     messageDestinationData.add("Other");
@@ -1599,7 +2676,7 @@ public class EventDesignerView {
                 } else if (selectedItemText.equals("Mesh")) {
                     messageDestinationTitle.setVisibility(View.VISIBLE);
                     messageDestinationSelector.setVisibility(View.VISIBLE);
-                    // Get choose of all discovered devices on the mesh network
+                    // Get list of all discovered devices on the mesh network
                     messageDestinationData.clear();
                     for (Device device : getClay().getDevices()) {
                         messageDestinationData.add(device.getUuid().toString());

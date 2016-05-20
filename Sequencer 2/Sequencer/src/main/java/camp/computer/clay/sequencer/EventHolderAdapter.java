@@ -127,8 +127,8 @@ public class EventHolderAdapter extends BaseAdapter {
 
 //            else if (eventHolder.getType().equals ("create")) {
 //                view = getTextView(eventHolder, "", "create");
-//            } else if (eventHolder.getType().equals ("choose")) {
-//                view = getTextView (eventHolder, "", "choose");
+//            } else if (eventHolder.getType().equals ("list")) {
+//                view = getTextView (eventHolder, "", "list");
 //            }
 
             if (view != null) {
@@ -558,7 +558,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //            // Add to view
 //            channelSelectionButtonsLayout.addView(channelNumberButton);
 //
-//            // Add to button choose
+//            // Add to button list
 //            channelSelectionButtonList.add(channelNumberButton);
 //        }
 //
@@ -682,7 +682,7 @@ public class EventHolderAdapter extends BaseAdapter {
             // Add to view
             lightLinearLayout.addView(channelNumberButton);
 
-            // Add to button choose
+            // Add to button list
 //            channelSelectionButtonList.add(channelNumberButton);
 
 
@@ -701,7 +701,7 @@ public class EventHolderAdapter extends BaseAdapter {
                         Log.v("Content_View", "contentEntry: " + contentEntry.getContent());
 //                        displayUpdateSignalOptions (contentEntry, true, true);
                         //ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
-                        ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayUpdateSignalOptions(contentEntry);
+                        ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayUpdateSignalOptions(eventHolder);
                     }
                 }
             });
