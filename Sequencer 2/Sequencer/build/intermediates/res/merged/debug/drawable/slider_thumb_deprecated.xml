@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#6555"/>
-    <size
-        android:width="30dp"
-        android:height="5dp"/>
-</shape><!-- From: file:/D:/Projects/ASProjects/ColorPicker/colorpicker/src/main/res/drawable/slider_thumb_deprecated.xml --><!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/drawable/slider_thumb_deprecated.xml -->
