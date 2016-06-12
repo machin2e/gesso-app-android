@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -13,7 +14,9 @@ import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 
 import com.mobeta.android.sequencer.R;
 
@@ -210,6 +213,23 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         getClay().getStore().generate();
         getClay().getCache().populate();
         // getClay().simulateSession(true, 10, false);
+
+        // --- Timeline Button ---
+        final Button timelineButton = (Button) findViewById(R.id.timeline_button);
+        timelineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mViewPager.getVisibility() == View.GONE) {
+                    mViewPager.setVisibility(View.VISIBLE);
+                    //mViewPager.setBackgroundColor(Color.parseColor("#9a000000"));
+                    timelineButton.setText("Map");
+                } else {
+                    mViewPager.setVisibility(View.GONE);
+                    timelineButton.setText("Timeline");
+                }
+            }
+        });
+        // ^^^ Timeline Button ^^^
 
         // Start the initial worker thread (runnable task) by posting through the handler
         handler.post(runnableCode);

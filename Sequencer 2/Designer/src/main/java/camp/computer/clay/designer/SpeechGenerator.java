@@ -92,7 +92,7 @@ public class SpeechGenerator implements TextToSpeech.OnInitListener {
 
     public void speak(String text){
 
-        setSpeechCharacteristics ();
+        // setSpeechCharacteristics ();
 
         // Speak only if the TTS is ready
         // and the user has allowed speech
