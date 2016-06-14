@@ -39,24 +39,32 @@ public class BoardSprite {
     public void setTransparency (float transparency) {
         int transparencyInteger = (int) (255.0f * transparency);
         String transparencyString = String.format("%02x", transparencyInteger);
+        // Board color
         this.boardColor = Color.parseColor("#" + transparencyString + boardColorString);
+        this.boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+        // Header color
+        this.headerColor = Color.parseColor("#" + transparencyString + headerColorString);
+        this.headerOutlineColor = Color.parseColor("#" + transparencyString + headerOutlineColorString);
     }
 
     // --- STYLE ---
     // TODO: Make these private once the map is working well and the sprite is working well.
     public float boardWidth = 250;
     float boardHeight = 250;
-    private String boardColorString = "414141";
-    private int boardColor = Color.parseColor("#9a414141"); // Color.parseColor("#212121");
+    private String boardColorString = "ffffff"; // "414141";
+    private int boardColor = Color.parseColor("#ff" + boardColorString); // Color.parseColor("#212121");
     boolean showBoardOutline = true;
-    int boardOutlineColor = Color.parseColor("#212121"); // Color.parseColor("#737272");
+    private String boardOutlineColorString = "212121";
+    int boardOutlineColor = Color.parseColor("#ff" + boardOutlineColorString); // Color.parseColor("#737272");
     float boardOutlineThickness = 1.0f;
 
     float headerWidth = 60;
     float headerHeight = 15;
-    int headerColor = Color.parseColor("#000000");
+    private String headerColorString = "000000";
+    int headerColor = Color.parseColor("#ff" + headerColorString);
     boolean showHeaderOutline = false;
-    int headerOutlineColor = boardOutlineColor;
+    private String headerOutlineColorString = "000000";
+    int headerOutlineColor = Color.parseColor("#ff" + headerOutlineColorString);
     float headerOutlineThickness = boardOutlineThickness;
 
     public boolean showHighlights = false;

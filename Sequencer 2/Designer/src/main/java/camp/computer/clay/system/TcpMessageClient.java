@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import camp.computer.clay.utilities.Crc16;
+
 public class TcpMessageClient {
 
     public static int MESSAGE_SEND_FREQUENCY = 100;
@@ -118,7 +120,26 @@ public class TcpMessageClient {
                             Message outgoingMessage = outgoingMessages.get(0);
                             Log.v("TCP_Client_Send", "Sending message: " + outgoingMessage.getContent());
                             if (mTcpClient != null) {
-                                boolean result = mTcpClient.sendMessage(outgoingMessage.getContent());
+
+
+
+//                                Crc16 crc16 = new Crc16(Crc16.DEFAULT_POLYNOMIAL);
+                                Crc16 crc16 = new Crc16();
+                                int seed = 0;
+                                byte[] outgoingMessageBytes = outgoingMessage.getContent().getBytes();
+                                int check = crc16.calculate(outgoingMessageBytes, seed);
+                                String outmsg =
+                                        "\f" +
+                                        String.valueOf(outgoingMessage.getContent().length()) + "\t" +
+                                        String.valueOf(check) + "\t" +
+                                        "text" + "\t" +
+                                        outgoingMessage.getContent();
+
+                                Log.v ("TCP_Send", "outmsg: " + outmsg);
+
+
+
+                                boolean result = mTcpClient.sendMessage(outmsg);
                                 if (result) {
                                     outgoingMessages.remove(0);
                                 }

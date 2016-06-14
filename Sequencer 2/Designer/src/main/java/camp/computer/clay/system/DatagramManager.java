@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.utilities.Crc16;
 
 public class DatagramManager extends Thread implements MessageManagerInterface {
 
@@ -87,17 +90,41 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
                 // Note: "This method blocks until a packet is received or a timeout has expired."
                 serverSocket.receive (packet);
 
+                String source = getIpAsString(packet.getAddress());
+
                 // Get the message from the incoming packet...
                 String content = new String(messageBytes, 0, packet.getLength());
-                String source = getIpAsString(packet.getAddress ());
-                String destination = null;
 
-                // ...and create a serialized object...
-                Message incomingMessage = new Message("udp", source, destination, content);
+                // "\f<content_length>\t<content_checksum>\t<content_type>\t<content>"
+                // e.g., "\f52	16561	text	announce device 002fffff-ffff-ffff-4e45-3158200a0015"
+                if (content.charAt(0) == '\f') {
 
-                // ...then pass the message to the message manager running in the main thread.
-                if (messageManager != null) {
-                    messageManager.addMessage(incomingMessage);
+                    // Remove "start of message" character (i.e., '\f'). // Split message into terms.
+                    content = content.substring(1);
+                    String[] terms = content.split("\t");
+
+                    // TODO: Extract checksum, compute new one, and compare. If equal, add message.
+                    String incomingMessageSize = terms[0];
+                    int incomingChecksum = Integer.parseInt(terms[1]);
+
+                    String incomingMessageType = terms[2];
+                    String incomingMessageContent = terms[3];
+
+                    // Compute checksum from received message
+                    Crc16 crc16 = new Crc16();
+                    int computedChecksum = crc16.calculate(incomingMessageContent.getBytes("UTF-8"), 0);
+
+                    if (computedChecksum == incomingChecksum) {
+                        // String destination = null;
+
+                        // ...and create a serialized object...
+                        Message incomingMessage = new Message("udp", source, null, incomingMessageContent);
+
+                        // ...then pass the message to the message manager running in the main thread.
+                        if (messageManager != null) {
+                            messageManager.addMessage(incomingMessage);
+                        }
+                    }
                 }
             }
         } catch (Throwable e) {
