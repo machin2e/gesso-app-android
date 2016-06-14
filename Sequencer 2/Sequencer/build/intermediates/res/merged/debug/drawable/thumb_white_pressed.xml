@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-     android:shape="oval">
-    <size android:height="20dp"
-        android:width="20dp"/>
-    <solid android:color="@color/colorPrimaryDark">
-    </solid>
-</shape><!-- From: file:/D:/Projects/ASProjects/ColorPicker/colorpicker/src/main/res/drawable/thumb_white_pressed.xml --><!-- From: file:/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer%202/Sequencer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/drawable/thumb_white_pressed.xml -->

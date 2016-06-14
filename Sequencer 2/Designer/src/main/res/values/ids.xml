@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="drag_handle" />
+    <item type="id" name="click_remove" />
+
+    <item name="waveform" type="id" />
+
+    <item name="list_item_type_light" type="id" />
+    <item name="list_item_type_io" type="id" />
+    <item name="list_item_type_message" type="id" />
+    <item name="list_item_type_wait" type="id" />
+    <item name="list_item_type_say" type="id" />
+
+    <item name="content" type="id" />
+
+    <item name="preview_layout" type="id" />
+
+    <item name="preview_1" type="id" />
+    <item name="preview_2" type="id" />
+    <item name="preview_3" type="id" />
+    <item name="preview_4" type="id" />
+    <item name="preview_5" type="id" />
+    <item name="preview_6" type="id" />
+    <item name="preview_7" type="id" />
+    <item name="preview_8" type="id" />
+    <item name="preview_9" type="id" />
+    <item name="preview_10" type="id" />
+    <item name="preview_11" type="id" />
+    <item name="preview_12" type="id" />
+    <item name="event_top_layout" type="id" />
+    <item name="event_middle_layout" type="id" />
+    <item name="event_bottom_layout" type="id" />
+    <item name="event_label" type="id" />
+    <item name="timeline_segment" type="id" />
+    <item name="timeline_bottom_segment" type="id" />
+    <item name="timeline_top_segment" type="id" />
+    <item name="channel_direction" type="id" />
+    <item name="UUID_TAG_INDEX" type="id" />
+</resources>

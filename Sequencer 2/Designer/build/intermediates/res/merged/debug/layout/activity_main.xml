@@ -1,0 +1,47 @@
+<!-- BEGIN_INCLUDE (view_pager_layout) -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/application_view"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    tools:context="camp.computer.clay.designer.ApplicationView">
+
+    <camp.computer.clay.designer.MapView
+        android:id="@+id/app_surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <camp.computer.clay.designer.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/timeline_button"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="Timeline"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginBottom="0dp"
+        android:layout_marginRight="0dp"
+        android:src="@drawable/fab_add"
+        fab:fabSize="normal"
+        fab:fab_showAnimation="@anim/fab_scale_up"
+        fab:fab_hideAnimation="@anim/fab_scale_down"
+        fab:fab_colorNormal="@color/app_primary"
+        fab:fab_colorPressed="@color/app_primary_pressed"
+        fab:fab_colorRipple="@color/app_ripple" />
+
+</FrameLayout>
+<!-- END_INCLUDE (view_pager_layout) -->
