@@ -90,9 +90,13 @@ public class SpeechGenerator implements TextToSpeech.OnInitListener {
         }
     }
 
-    public void speak(String text){
+    public void speak (String text){
 
         // setSpeechCharacteristics ();
+
+        if (tts.isSpeaking()) {
+            tts.stop();
+        }
 
         // Speak only if the TTS is ready
         // and the user has allowed speech
@@ -102,6 +106,12 @@ public class SpeechGenerator implements TextToSpeech.OnInitListener {
             hash.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
                     String.valueOf(AudioManager.STREAM_NOTIFICATION));
             tts.speak(text, TextToSpeech.QUEUE_ADD, hash);
+        }
+    }
+
+    public void stop () {
+        if (ready && allowed) {
+            tts.stop();
         }
     }
 

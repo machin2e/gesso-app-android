@@ -1,11 +1,13 @@
 package camp.computer.clay.designer;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Handler;
@@ -224,6 +226,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    @SuppressLint("WrongCall")
     public void updateSurfaceView () {
         // The function run in background thread, not UI thread.
 
@@ -250,6 +253,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         for (BoardSprite boardSprite : boardSprites) {
             drawSprite(boardSprite);
+        }
+
+        for (BoardSprite boardSprite : boardSprites) {
+            boardSprite.drawPaths(mapCanvas, paint);
         }
     }
 
@@ -488,12 +495,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                             if (touchedChannelScopeSource == -1) {
 
                                 if (touchedBoardSpriteSource != null) {
-                                    if (touchedBoardSpriteSource.showChannelScopes) {
-                                        // If no channel source has been touched yet, check if one is dragged over.
+                                    // If no channel source has been touched yet, check if one is dragged over.
 
-                                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                                        // Check if the touched board's I/O node is touched
-                                        for (int i = 0; i < touchedBoardSpriteSource.channelScopePositions.size(); i++) {
+                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
+                                    // Check if the touched board's I/O node is touched
+                                    for (int i = 0; i < touchedBoardSpriteSource.channelScopePositions.size(); i++) {
+                                        if (touchedBoardSpriteSource.showChannelScopes[i]) {
                                             // Check if one of the objects is touched
                                             PointF channelScopePosition = touchedBoardSpriteSource.channelScopePositions.get(i);
                                             if (getDistance((int) channelScopePosition.x, (int) channelScopePosition.y, (int) xTouch[pointerId], (int) yTouch[pointerId]) < 60) {
@@ -529,7 +536,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                             //this.isTouchingSprite[pointerId] = true;
                                             touchedBoardSpriteDestination = boardSprite;
 
-                                            touchedBoardSpriteDestination.showChannelScopes = true;
+                                            touchedBoardSpriteDestination.showChannelScopes();
 
                                             // TODO: Callback: call Sprite.onTouchDestination (via Sprite.touch())
                                         }
@@ -541,12 +548,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                             else if (touchedChannelScopeDestination == -1) {
                                 Log.v ("MapViewTouch", "\tLooking for destination SCOPE");
                                 if (touchedBoardSpriteDestination != null) {
-                                    if (touchedBoardSpriteDestination.showChannelScopes) {
-                                        // If no channel source has been touched yet, check if one is dragged over.
+                                    // If no channel source has been touched yet, check if one is dragged over.
 
-                                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                                        // Check if the touched board's I/O node is touched
-                                        for (int i = 0; i < touchedBoardSpriteDestination.channelScopePositions.size(); i++) {
+                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
+                                    // Check if the touched board's I/O node is touched
+                                    for (int i = 0; i < touchedBoardSpriteDestination.channelScopePositions.size(); i++) {
+                                        if (touchedBoardSpriteDestination.showChannelScopes[i]) {
                                             // Check if one of the objects is touched
                                             PointF channelScopePosition = touchedBoardSpriteDestination.channelScopePositions.get(i);
                                             if (getDistance((int) channelScopePosition.x, (int) channelScopePosition.y, (int) xTouch[pointerId], (int) yTouch[pointerId]) < 60) {
@@ -623,28 +630,31 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                                         touchedBoardSpriteSource = boardSprite;
 
-                                        if (touchedBoardSpriteSource.showChannelScopes) {
-                                            // Touched board that's showing channel scopes.
-                                            touchedBoardSpriteSource.showChannelScopes = false;
-                                            touchedBoardSpriteSource = null;
-
-                                            // Reset style and visualization.
-                                            for (BoardSprite boardSprite2 : this.boardSprites) {
-                                                boardSprite2.showChannelScopes = false;
-                                                boardSprite2.setTransparency(1.0f);
-                                            }
-
-                                            ApplicationView.getApplicationView().speakPhrase("stopping");
-                                        } else {
+//                                        if (touchedBoardSpriteSource.showChannelScopes) {
+//                                            // Touched board that's showing channel scopes.
+//                                            touchedBoardSpriteSource.showChannelScopes = false;
+//                                            touchedBoardSpriteSource.showChannelPaths = false;
+//                                            touchedBoardSpriteSource = null;
+//
+//                                            // Reset style and visualization.
+//                                            for (BoardSprite boardSprite2 : this.boardSprites) {
+//                                                boardSprite2.showChannelScopes = false;
+//                                                boardSprite2.setTransparency(1.0f);
+//                                            }
+//
+//                                            ApplicationView.getApplicationView().speakPhrase("stopping");
+//                                        } else {
                                             // No touch on board or scope. Touch is on map. So hide scopes.
                                             for (BoardSprite boardSprite2 : this.boardSprites) {
-                                                boardSprite2.showChannelScopes = false;
+                                                boardSprite2.hideChannelScopes();
+                                                boardSprite2.showChannelPaths = false;
                                                 boardSprite2.setTransparency(0.2f);
                                             }
-                                            touchedBoardSpriteSource.showChannelScopes = true;
+                                            touchedBoardSpriteSource.showChannelScopes();
+                                            touchedBoardSpriteSource.showChannelPaths = true;
                                             touchedBoardSpriteSource.setTransparency(1.0f);
                                             ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
-                                        }
+//                                        }
 
                                         handledTouch = true;
 
@@ -773,7 +783,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                         if (getDistance((int) boardSprite.getPosition().x, (int) boardSprite.getPosition().y, (int) xTouchStart[pointerId], (int) yTouchStart[pointerId]) < 80) {
                                             Log.v("MapView", "\tDestination board touched.");
                                             touchedBoardSpriteDestination = boardSprite;
-                                            boardSprite.showChannelScopes = true;
+                                            boardSprite.showChannelScopes();
 
                                             ApplicationView.getApplicationView().speakPhrase("that board will be the destination. now choose the output channel.");
 
@@ -819,12 +829,18 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                                                 Log.v("MapViewLink", "Created data path.");
 
+                                                touchedBoardSpriteSource.addPath(
+                                                        touchedBoardSpriteSource,
+                                                        touchedChannelScopeSource,
+                                                        touchedBoardSpriteDestination,
+                                                        touchedChannelScopeDestination
+                                                );
+
                                                 // Reset connection state
                                                 touchedBoardSpriteSource = null;
                                                 touchedBoardSpriteDestination = null;
                                                 touchedChannelScopeSource = -1;
                                                 touchedChannelScopeDestination = -1;
-
 
 
                                                 handledTouch = true;
@@ -863,7 +879,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                             // No touch on board or scope. Touch is on map. So hide scopes.
                             for (BoardSprite boardSprite : this.boardSprites) {
-                                boardSprite.showChannelScopes = false;
+                                boardSprite.hideChannelScopes();
+                                boardSprite.showChannelPaths = false;
                                 boardSprite.setTransparency(1.0f);
                             }
 
@@ -909,7 +926,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                                 // Hide scopes.
                                 for (BoardSprite boardSprite : this.boardSprites) {
-                                    boardSprite.showChannelScopes = false;
+                                    boardSprite.hideChannelScopes();
+                                    boardSprite.showChannelPaths = false;
                                 }
 
                                 // Style. Reset the style of touched boards.
@@ -977,14 +995,16 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             // Hide scopes
             if (touchedChannelScopeSource == -1) {
                 for (BoardSprite boardSprite : this.boardSprites) {
-                    boardSprite.showChannelScopes = false;
+                    boardSprite.hideChannelScopes();
+                    boardSprite.showChannelPaths = false;
                 }
             }
 
             // Show scope for source board
             if (touchedSprite[pointerId] != null) {
                 touchedBoardSpriteSource = touchedSprite[pointerId];
-                touchedBoardSpriteSource.showChannelScopes = true;
+                touchedBoardSpriteSource.showChannelScopes();
+                touchedBoardSpriteSource.showChannelPaths = true;
             }
 
         }

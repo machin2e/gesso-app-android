@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -13,16 +14,22 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
 import camp.computer.clay.resource.NetworkResource;
+import camp.computer.clay.sprites.utilities.Movement;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
 import camp.computer.clay.system.Device;
@@ -33,9 +40,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     private MapView mapView;
 
-    private final int CHECK_CODE = 0x1;
-    private final int LONG_DURATION = 5000;
-    private final int SHORT_DURATION = 1200;
     private SpeechGenerator speechGenerator;
 
     @Override
@@ -49,7 +53,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         if(requestCode == CHECK_CODE){
             if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS){
                 speechGenerator = new SpeechGenerator(this);
-            }else {
+            } else {
                 Intent install = new Intent();
                 install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
                 startActivity(install);
@@ -57,7 +61,17 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         }
     }
 
+    // <Settings>
+    private static final boolean ENABLE_TONE_GENERATOR = false;
+    private static final boolean ENABLE_SPEECH_GENERATOR = false;
     private static final long MESSAGE_SEND_FREQUENCY = 10;
+    // </Settings>
+
+    // <Settings/Speech>
+    private final int CHECK_CODE = 0x1;
+    private final int LONG_DURATION = 5000;
+    private final int SHORT_DURATION = 1200;
+    // <Settings/Speech>
 
     private static Context context;
 
@@ -91,8 +105,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     private static final boolean HIDE_ACTION_BAR = true;
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = true;
     private static final boolean FULLSCREEN = true;
-
-    private static final boolean ENABLE_TONE_GENERATOR = false;
 
     public TimelineView getTimelineView () {
         return mViewPager.getTimelineView();
@@ -140,6 +152,84 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // Hide the action buttons
         cursorView = new CursorView();
         cursorView.hide(false);
+
+        Button contextButton = (Button) findViewById (R.id.context_button);
+        contextButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+
+                    // Get button holder
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
+
+                    // Get screen width and height of the device
+                    DisplayMetrics metrics = new DisplayMetrics();
+                    ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    int screenWidth = metrics.widthPixels;
+                    int screenHeight = metrics.heightPixels;
+
+                    // Get button width and height
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
+                    int buttonWidth = relativeLayout.getWidth();
+                    int buttonHeight = relativeLayout.getHeight();
+
+                    // Reposition button
+                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+
+                    relativeLayout.requestLayout();
+                    relativeLayout.invalidate();
+
+
+
+
+
+//                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) relativeLayout.getLayoutParams();
+//                    params.bottomMargin = screenHeight - (int) event.getY();
+//                    params.rightMargin = screenWidth - (int) event.getX();
+//                    relativeLayout.setLayoutParams(params);
+
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                    // Get button holder
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
+
+                    // TODO: Compute relative to dependant sprite position
+                    Point originPoint = new Point(955, 1655);
+
+                    Movement movement = new Movement();
+                    movement.moveToPoint(relativeLayout, originPoint, 300);
+
+
+
+
+
+//                    // Get screen width and height of the device
+//                    DisplayMetrics metrics = new DisplayMetrics();
+//                    ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//                    int screenWidth = metrics.widthPixels;
+//                    int screenHeight = metrics.heightPixels;
+//
+//                    // Get button width and height
+//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
+//                    int buttonWidth = relativeLayout.getWidth();
+//                    int buttonHeight = relativeLayout.getHeight();
+//
+//                    // Reposition button
+//                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+//                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+//
+//                    relativeLayout.requestLayout();
+//                    relativeLayout.invalidate();
+
+                }
+
+                return false;
+            }
+        });
 
         // <MAP>
         mapView = (MapView) findViewById (R.id.app_surface_view);
@@ -221,11 +311,13 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             public void onClick(View v) {
                 if (mViewPager.getVisibility() == View.GONE) {
                     mViewPager.setVisibility(View.VISIBLE);
-                    //mViewPager.setBackgroundColor(Color.parseColor("#9a000000"));
+                    // mViewPager.setBackgroundColor(Color.parseColor("#9a000000"));
                     timelineButton.setText("Map");
+                    cursorView.show(true);
                 } else {
                     mViewPager.setVisibility(View.GONE);
                     timelineButton.setText("Timeline");
+                    cursorView.hide(true);
                 }
             }
         });
@@ -359,10 +451,12 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     }
 
     public void speakPhrase(String phrase) {
-        if (speechGenerator != null) {
-            speechGenerator.allow (true);
-            speechGenerator.speak (phrase);
-            speechGenerator.allow (false);
+        if (ENABLE_SPEECH_GENERATOR) {
+            if (speechGenerator != null) {
+                speechGenerator.allow(true);
+                speechGenerator.speak(phrase);
+                speechGenerator.allow(false);
+            }
         }
     }
 

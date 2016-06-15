@@ -6,7 +6,7 @@ ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/sr
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
 	android:versionName
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:5:7-34
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:5:7-30
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
 	android:versionCode
