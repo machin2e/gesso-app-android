@@ -104,10 +104,6 @@
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-mdpi/abc_scrubber_control_off_mtrl_alpha.png"
     },
     {
-        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-mdpi-v4/drag.png",
-        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/res/drawable-mdpi/drag.png"
-    },
-    {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_textfield_activated_mtrl_alpha.9.png",
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-mdpi/abc_textfield_activated_mtrl_alpha.9.png"
     },

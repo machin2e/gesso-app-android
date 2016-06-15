@@ -12,21 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <camp.computer.clay.designer.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/pager"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <Button
-        android:id="@+id/timeline_button"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:text="Timeline"
-        android:layout_marginBottom="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp" />
+        android:layout_height="match_parent">
+        <camp.computer.clay.designer.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </RelativeLayout>
 
     <com.github.clans.fab.FloatingActionButton
         android:id="@+id/fab_create"
@@ -42,6 +36,72 @@
         fab:fab_colorNormal="@color/app_primary"
         fab:fab_colorPressed="@color/app_primary_pressed"
         fab:fab_colorRipple="@color/app_ripple" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
+        <Button
+            android:id="@+id/timeline_button"
+            android:text="Timeline"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:padding="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/timeline_button" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/context_button_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
+        <Button
+            android:id="@+id/context_button"
+            android:text="+"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp"
+            android:padding="0dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/context_button" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="60dp">
+        <Button
+            android:id="@+id/info_cue"
+            android:text="!"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp"
+            android:padding="0dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/context_button" />
+    </RelativeLayout>
+
+    <!--<Button-->
+        <!--android:id="@+id/timeline_button"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:layout_gravity="bottom|center_horizontal"-->
+        <!--android:text="Timeline"-->
+        <!--android:layout_marginBottom="15dp"-->
+        <!--android:layout_marginLeft="15dp"-->
+        <!--android:layout_marginRight="15dp" />-->
 
 </FrameLayout>
 <!-- END_INCLUDE (view_pager_layout) -->

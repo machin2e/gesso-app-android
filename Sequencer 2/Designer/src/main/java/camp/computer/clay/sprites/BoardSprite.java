@@ -24,6 +24,24 @@ public class BoardSprite {
     public ArrayList<ChannelType> channelTypes = new ArrayList<ChannelType>();
     public ArrayList<ChannelDirection> channelDirections = new ArrayList<>();
 
+    public void addPath(BoardSprite touchedBoardSpriteSource, int touchedChannelScopeSource, BoardSprite touchedBoardSpriteDestination, int touchedChannelScopeDestination) {
+        ChannelPath channelPath = new ChannelPath();
+        channelPath.source = touchedBoardSpriteSource;
+        channelPath.sourceChannel = touchedChannelScopeSource;
+        channelPath.destination = touchedBoardSpriteDestination;
+        channelPath.destinationChannel = touchedChannelScopeDestination;
+        channelPaths.add(channelPath);
+    }
+
+    public class ChannelPath {
+        BoardSprite source;
+        int sourceChannel;
+        BoardSprite destination;
+        int destinationChannel;
+    }
+
+    public ArrayList<ChannelPath> channelPaths = new ArrayList<ChannelPath>();
+
     public PointF getPosition() {
         return this.position;
     }
@@ -80,7 +98,7 @@ public class BoardSprite {
     int lightOutlineColor = Color.parseColor("#212121");
     float lightOutlineThickness = 0.0f;
 
-    public boolean showChannelScopes = false;
+    public boolean[] showChannelScopes = new boolean[channelCount];
     boolean showChannelLabel = false;
     boolean showChannelData = true;
     boolean showChannelNodeOutline = false;
@@ -91,6 +109,8 @@ public class BoardSprite {
     float distanceNodeToBoard = 45.0f;
     float distanceBetweenNodes = 5.0f;
     float[][] channelDataPoints = new float[channelCount][(int) channelNodeRadius * 2];
+
+    public boolean showChannelPaths = true;
     // ^^^ STYLE ^^^
 
     public BoardSprite(float x, float y, float angle) {
@@ -192,7 +212,7 @@ public class BoardSprite {
                 // Translate (Nodes)
                 float nodeRadiusPlusPadding = channelNodeRadius + distanceBetweenNodes;
                 point.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
-                point.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding));
+                point.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + channelNodeRadius;
 
                 // Rotate (Nodes)
                 point.set(
@@ -459,16 +479,18 @@ public class BoardSprite {
 
         // --- NODES ---
 
-        if (boardSprite.showChannelScopes) {
+//        if (boardSprite.showChannelScopes) {
 
-            for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
 
-                mapCanvas.save();
+            mapCanvas.save();
 
-                mapCanvas.rotate(-90 * i);
-                mapCanvas.translate(0, 0);
+            mapCanvas.rotate(-90 * i);
+            mapCanvas.translate(0, 0);
 
-                for (int j = 0; j < 3; j++) {
+            for (int j = 0; j < 3; j++) {
+
+                if (boardSprite.showChannelScopes[3 * i + j]) {
 
                     mapCanvas.save();
                     mapCanvas.translate(
@@ -539,14 +561,65 @@ public class BoardSprite {
                     mapCanvas.restore();
 
                 }
-
-                mapCanvas.restore();
-
             }
+
+            mapCanvas.restore();
         }
         // ^^^ NODES ^^^
 
         mapCanvas.restore();
+    }
+
+    public void drawPaths(Canvas mapCanvas, Paint paint) {
+        // --- PATH ---
+        if (this.showChannelPaths) {
+            for (int i = 0; i < channelPaths.size(); i++) {
+                ChannelPath channelPath = channelPaths.get(i);
+
+                channelPath.destination.showChannelScope(channelPath.destinationChannel);
+
+                mapCanvas.save();
+                // Color
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(15.0f);
+                paint.setColor(channelColorPalette[channelPath.sourceChannel]);
+
+                mapCanvas.drawLine(
+                        channelPath.source.channelScopePositions.get(channelPath.sourceChannel).x,
+                        channelPath.source.channelScopePositions.get(channelPath.sourceChannel).y,
+                        channelPath.destination.channelScopePositions.get(channelPath.destinationChannel).x,
+                        channelPath.destination.channelScopePositions.get(channelPath.destinationChannel).y,
+                        paint
+                );
+
+
+                mapCanvas.restore();
+            }
+        }
+        // ^^^ PATH ^^^
+    }
+
+    public void showChannelScopes() {
+        for (int i = 0; i < this.showChannelScopes.length; i++) {
+            this.showChannelScopes[i] = true;
+        }
+    }
+
+    private void showChannelScope (int channelIndex) {
+        this.showChannelScopes[channelIndex] = true;
+    }
+
+    public void hideChannelScopes() {
+        for (int i = 0; i < this.showChannelScopes.length; i++) {
+            this.showChannelScopes[i] = false;
+        }
+    }
+
+    private void hideChannelScope (int channelIndex) {
+        this.showChannelScopes[channelIndex] = false;
+    }
+
+    private void showChannelPath(int destinationChannel) {
 
     }
 
