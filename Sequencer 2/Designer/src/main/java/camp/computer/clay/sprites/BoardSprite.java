@@ -3,6 +3,7 @@ package camp.computer.clay.sprites;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.Log;
@@ -12,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class BoardSprite {
+import camp.computer.clay.sprites.utilities.Geometry;
+
+public class BoardSprite extends Sprite {
 
     private int channelCount = 12;
 
@@ -631,6 +634,14 @@ public class BoardSprite {
 
     public void setScale(float scale) {
         this.scale = scale;
+    }
+
+    //-------------------------
+    // Interaction
+    //-------------------------
+
+    public boolean isTouching (PointF point) {
+        return Geometry.getDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardWidth / 2.0f);
     }
 }
 
