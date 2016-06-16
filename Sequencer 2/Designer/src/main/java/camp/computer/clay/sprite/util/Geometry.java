@@ -1,4 +1,4 @@
-package camp.computer.clay.sprites.utilities;
+package camp.computer.clay.sprite.util;
 
 import android.graphics.PointF;
 

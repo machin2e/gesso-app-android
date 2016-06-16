@@ -9,11 +9,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import camp.computer.clay.designer.ApplicationView;
-import camp.computer.clay.utilities.Crc16;
+import camp.computer.clay.util.Crc16;
 
 public class DatagramManager extends Thread implements MessageManagerInterface {
 

@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
@@ -29,7 +27,7 @@ import com.mobeta.android.sequencer.R;
 import java.util.ArrayList;
 
 import camp.computer.clay.resource.NetworkResource;
-import camp.computer.clay.sprites.utilities.Movement;
+import camp.computer.clay.sprite.util.Animation;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
 import camp.computer.clay.system.Device;
@@ -200,8 +198,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                     // TODO: Compute relative to dependant sprite position
                     Point originPoint = new Point(955, 1655);
 
-                    Movement movement = new Movement();
-                    movement.moveToPoint(relativeLayout, originPoint, 300);
+                    Animation animation = new Animation();
+                    animation.moveToPoint(relativeLayout, originPoint, 300);
 
 
 

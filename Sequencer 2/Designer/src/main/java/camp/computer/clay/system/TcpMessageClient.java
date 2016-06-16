@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import camp.computer.clay.utilities.Crc16;
+import camp.computer.clay.util.Crc16;
 
 public class TcpMessageClient {
 

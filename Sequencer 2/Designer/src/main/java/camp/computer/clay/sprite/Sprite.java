@@ -1,4 +1,4 @@
-package camp.computer.clay.sprites;
+package camp.computer.clay.sprite;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

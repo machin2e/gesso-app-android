@@ -1,10 +1,9 @@
-package camp.computer.clay.sprites.utilities;
+package camp.computer.clay.sprite.util;
 
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -13,7 +12,7 @@ import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.designer.ApplicationView;
 
-public class Movement {
+public class Animation {
 
     // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
     public void moveToPoint (final View view, final Point destinationPoint, int translateDuration)
@@ -43,14 +42,14 @@ public class Movement {
         animation.setDuration(translateDuration);
         // animation.setFillAfter(true);
 
-        animation.setAnimationListener(new Animation.AnimationListener() {
+        animation.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {
+            public void onAnimationStart(android.view.animation.Animation animation) {
 
             }
 
             @Override
-            public void onAnimationEnd(Animation animation) {
+            public void onAnimationEnd(android.view.animation.Animation animation) {
 //                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
 //                params.topMargin += amountToMoveDown;
 //                params.leftMargin += amountToMoveRight;
@@ -83,7 +82,7 @@ public class Movement {
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
+            public void onAnimationRepeat(android.view.animation.Animation animation) {
 
             }
         });

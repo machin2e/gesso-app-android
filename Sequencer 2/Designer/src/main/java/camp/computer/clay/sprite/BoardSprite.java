@@ -1,19 +1,15 @@
-package camp.computer.clay.sprites;
+package camp.computer.clay.sprite;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
-import camp.computer.clay.sprites.utilities.Geometry;
+import camp.computer.clay.sprite.util.Geometry;
 
 public class BoardSprite extends Sprite {
 
@@ -115,7 +111,7 @@ public class BoardSprite extends Sprite {
     float distanceBetweenNodes = 5.0f;
     float[][] channelDataPoints = new float[channelCount][(int) channelNodeRadius * 2];
 
-    public boolean showChannelPaths = true;
+    public boolean[] showChannelPaths = new boolean[channelCount];
     // ^^^ STYLE ^^^
 
     public BoardSprite(float x, float y, float angle) {
@@ -660,9 +656,10 @@ public class BoardSprite extends Sprite {
 
     public void drawPaths(Canvas mapCanvas, Paint paint) {
         // --- PATH ---
-        if (this.showChannelPaths) {
-            for (int j = 0; j < channelCount; j++) {
-                for (int i = 0; i < portScopeSprites.get(j).channelPaths.size(); i++) {
+
+        for (int j = 0; j < channelCount; j++) {
+            for (int i = 0; i < portScopeSprites.get(j).channelPaths.size(); i++) {
+                if (this.showChannelPaths[j]) {
                     PortScopeSprite.ChannelPath channelPath = portScopeSprites.get(j).channelPaths.get(i);
 
                     channelPath.destination.showChannelScope(channelPath.destinationChannel);
@@ -695,7 +692,7 @@ public class BoardSprite extends Sprite {
         }
     }
 
-    private void showChannelScope (int channelIndex) {
+    public void showChannelScope (int channelIndex) {
         this.showChannelScopes[channelIndex] = true;
     }
 
@@ -709,8 +706,20 @@ public class BoardSprite extends Sprite {
         this.showChannelScopes[channelIndex] = false;
     }
 
-    private void showChannelPath(int destinationChannel) {
+    public void showChannelPaths() {
+        for (int i = 0; i < this.showChannelPaths.length; i++) {
+            this.showChannelPaths[i] = true;
+        }
+    }
 
+    public void hideChannelPaths() {
+        for (int i = 0; i < this.showChannelPaths.length; i++) {
+            this.showChannelPaths[i] = false;
+        }
+    }
+
+    public void showChannelPath(int destinationChannel) {
+        this.showChannelPaths[destinationChannel] = true;
     }
 
     public void setPosition(float x, float y) {
