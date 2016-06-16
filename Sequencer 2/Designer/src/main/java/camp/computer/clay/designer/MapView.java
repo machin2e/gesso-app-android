@@ -261,7 +261,15 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         for (BoardSprite boardSprite : boardSprites) {
+            boardSprite.drawChannelScopeShadows(mapCanvas, paint);
+        }
+
+        for (BoardSprite boardSprite : boardSprites) {
             boardSprite.drawPaths(mapCanvas, paint);
+        }
+
+        for (BoardSprite boardSprite : boardSprites) {
+            boardSprite.drawChannelScopes(mapCanvas, paint);
         }
     }
 
@@ -341,7 +349,6 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent (MotionEvent motionEvent) {
-         Log.v("MapViewEvent", "onTouchEvent");
 
         int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
         int pointerId = motionEvent.getPointerId (pointerIndex);
@@ -386,6 +393,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void onTouchCallback (int pointerId) {
+        Log.v("MapViewEvent", "onTouchCallback");
 
         // Previous
         isTouchingPrevious[pointerId] = isTouching[pointerId]; // (or) isTouchingPrevious[pointerId] = false;
@@ -412,18 +420,14 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             for (BoardSprite boardSprite : boardSprites) {
                 // Log.v ("MapViewTouch", "Object at " + boardSprite.x + ", " + boardSprite.y);
 
-                // TODO: Add this to an isTouch? function of the sprite object
                 // Check if one of the objects is touched
-                //if (getDistance((int) boardSprite.getPosition().x, (int) boardSprite.getPosition().y, (int) xTouchStart[pointerId], (int) yTouchStart[pointerId]) < (boardSprite.boardWidth / 2.0f)) {
                 if (boardSprite.isTouching(touchStart[pointerId])) {
 
                     // TODO: Add this to an onTouch callback for the sprite's channel nodes
+                    // TODO: i.e., callback Sprite.onTouch (via Sprite.touch())
 
-                    // Log.v ("MapViewTouch", "\tTouching object at " + boardSprite.x + ", " + boardSprite.y);
                     this.isTouchingSprite[pointerId] = true;
                     this.touchedSprite[pointerId] = boardSprite;
-
-                    // TODO: Callback: call Sprite.onTouch (via Sprite.touch())
 
                     isPanningDisabled = true;
 
@@ -466,7 +470,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //                        }
 
             // Touch the canvas
-            if (this.sourceBoardSprite == null) {
+            if (this.touchedSprite[pointerId] == null) {
                 this.isTouchingSprite[pointerId] = false;
                 this.isPanningDisabled = false;
             }
@@ -481,11 +485,20 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //                            boardSprites.add(sourceBoardSprite);
 //                        }
 
-            // Log.v ("MapViewTouch", "Started touching at " + xTouchStart[pointerId] + ", " + yTouchStart[pointerId]);
         }
     }
 
+    private void onTapCallback (int pointerId) {
+
+    }
+
+    private void onDoubleTapCallback (int pointerId) {
+
+    }
+
     private void onHoldCallback (int pointerId) {
+        Log.v("MapViewEvent", "onHoldCallback");
+
         if (dragDistance[pointerId] < this.MINIMUM_DRAG_DISTANCE) {
             // Holding but not (yet) dragging.
 
@@ -511,6 +524,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void onMoveCallback (int pointerId) {
+        Log.v("MapViewEvent", "onMoveCallback");
 
         // Previous
         isTouchingPrevious[pointerId] = isTouching[pointerId];
@@ -526,123 +540,146 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         dragDistance[pointerId] = Geometry.getDistance(touch[pointerId], touchStart[pointerId]);
 
         // Classify/Callback
-        if (dragDistance[pointerId] > this.MINIMUM_DRAG_DISTANCE) {
-            // Dragging.
+        if (dragDistance[pointerId] < this.MINIMUM_DRAG_DISTANCE) {
+            // Pre-dragging
+            onPreDragCallback(pointerId);
+        } else {
+            // Dragging
             this.isDragging[pointerId] = true;
-
             onDragCallback(pointerId);
-
         }
     }
 
+    private void onPreDragCallback (int pointerId) {
+
+    }
+
     private void onDragCallback (int pointerId) {
+        Log.v("MapViewEvent", "onDragCallback");
+
         // Process
         // TODO: Put into callback
 
         // Dragging and holding.
-        if (touchTime[pointerId] - touchStartTime > MINIMUM_HOLD_DURATION) {
+        if (touchTime[pointerId] - touchStartTime < MINIMUM_HOLD_DURATION) {
 
-            // Holding and dragging.
-
-            // TODO: Check if (1) drag through a channel connector node, then if (2) drag to another board, then (3) set up communication channel (or abandon if not all steps done)
-
-            // Start touch on a channel scope
-            if (sourceChannelScopeIndex == -1) {
-
-                if (sourceBoardSprite != null) {
-                    // If no channel source has been touched yet, check if one is dragged over.
-
-                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                    // Check if the touched board's I/O node is touched
-                    for (int i = 0; i < sourceBoardSprite.channelScopePositions.size(); i++) {
-                        if (sourceBoardSprite.showChannelScopes[i]) {
-                            // Check if one of the objects is touched
-                            if (Geometry.getDistance(touch[pointerId], sourceBoardSprite.channelScopePositions.get(i)) < 60) {
-                                Log.v("MapViewTouch", "touched node " + (i + 1));
-                                sourceChannelScopeIndex = i;
-                                sourceBoardSprite.channelTypes.set(
-                                        i,
-                                        BoardSprite.ChannelType.getNextType(sourceBoardSprite.channelTypes.get(i)) // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
-                                );
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            else if (destinationBoardSprite == null) {
-
-                if (sourceChannelScopeIndex >= 0) {
-                    Log.v ("MapViewTouch", "\tLooking for destination");
-
-                    // Check if a board was touched
-                    for (BoardSprite boardSprite : boardSprites) {
-                        // Log.v ("MapViewTouch", "Object at " + boardSprite.x + ", " + boardSprite.y);
-
-                        // TODO: Add this to an isTouch? function of the sprite object
-                        // Check if one of the objects is touched
-                        if (Geometry.getDistance(touch[pointerId], boardSprite.getPosition()) < (boardSprite.boardWidth / 3.0f)) {
-
-                            // TODO: Add this to an onTouch callback for the sprite's channel nodes
-
-                            Log.v ("MapViewTouch", "\tTouching object at " + boardSprite.getPosition().x + ", " + boardSprite.getPosition().y);
-                            //this.isTouchingSprite[pointerId] = true;
-                            destinationBoardSprite = boardSprite;
-
-                            destinationBoardSprite.showChannelScopes();
-
-                            // TODO: Callback: call Sprite.onTouchDestination (via Sprite.touch())
-                        }
-                    }
-
-                }
-            }
-
-            else if (destinationChannelScopeIndex == -1) {
-                Log.v ("MapViewTouch", "\tLooking for destination SCOPE");
-                if (destinationBoardSprite != null) {
-                    // If no channel source has been touched yet, check if one is dragged over.
-
-                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                    // Check if the touched board's I/O node is touched
-                    for (int i = 0; i < destinationBoardSprite.channelScopePositions.size(); i++) {
-                        if (destinationBoardSprite.showChannelScopes[i]) {
-                            // Check if one of the objects is touched
-                            if (Geometry.getDistance(touch[pointerId], destinationBoardSprite.channelScopePositions.get(i)) < 60.0f) {
-                                Log.v("MapViewTouch", "touched node " + (i + 1));
-                                destinationChannelScopeIndex = i;
-                                destinationBoardSprite.channelTypes.set(
-                                        i,
-                                        BoardSprite.ChannelType.getNextType(destinationBoardSprite.channelTypes.get(i)) // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
-                                );
-                            }
-                        }
-
-                    }
-                }
-            }
-
-        } else {
             // Dragging only (not holding)
+
+            Log.v("MapViewEvent", "\tB");
 
             // TODO: Put into callback
             if (!isPanningDisabled) {
                 currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
             } else {
-                if (sourceBoardSprite != null) {
+//                if (sourceBoardSprite != null) {
                     if (this.isTouchingSprite[pointerId]) {
                         //sourceBoardSprite.scale = 1.3f;
-                        sourceBoardSprite.showHighlights = true;
-                        sourceBoardSprite.setPosition(touch[pointerId].x, touch[pointerId].y);
+                        touchedSprite[pointerId].showHighlights = true;
+                        touchedSprite[pointerId].setPosition(touch[pointerId].x, touch[pointerId].y);
                     }
+//                }
+            }
+
+        } else {
+            Log.v("MapViewEvent", "\tA");
+
+            // Holding and dragging.
+
+            // TODO: Check if (1) drag through a channel connector node, then if (2) drag to another board, then (3) set up communication channel (or abandon if not all steps done)
+            if (sourceBoardSprite != null) {
+                Log.v("MapViewEvent", "\tA2");
+
+                // Start touch on a channel scope
+                if (sourceChannelScopeIndex == -1) {
+
+                    if (sourceBoardSprite != null) {
+                        // If no channel source has been touched yet, check if one is dragged over.
+
+                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
+                        // Check if the touched board's I/O node is touched
+                        for (int i = 0; i < sourceBoardSprite.channelScopePositions.size(); i++) {
+                            if (sourceBoardSprite.showChannelScopes[i]) {
+                                // Check if one of the objects is touched
+                                if (Geometry.getDistance(touch[pointerId], sourceBoardSprite.channelScopePositions.get(i)) < 60) {
+                                    Log.v("MapViewTouch", "touched node " + (i + 1));
+                                    sourceChannelScopeIndex = i;
+                                    sourceBoardSprite.channelTypes.set(
+                                            i,
+                                            BoardSprite.ChannelType.getNextType(sourceBoardSprite.channelTypes.get(i)) // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
+                                    );
+                                }
+                            }
+
+                        }
+                    }
+                } else if (destinationBoardSprite == null) {
+
+                    if (sourceChannelScopeIndex >= 0) {
+                        Log.v("MapViewTouch", "\tLooking for destination");
+
+                        // Check if a board was touched
+                        for (BoardSprite boardSprite : boardSprites) {
+                            // Log.v ("MapViewTouch", "Object at " + boardSprite.x + ", " + boardSprite.y);
+
+                            // TODO: Add this to an isTouch? function of the sprite object
+                            // Check if one of the objects is touched
+                            if (Geometry.getDistance(touch[pointerId], boardSprite.getPosition()) < (boardSprite.boardWidth / 3.0f)) {
+
+                                // TODO: Add this to an onTouch callback for the sprite's channel nodes
+
+                                Log.v("MapViewTouch", "\tTouching object at " + boardSprite.getPosition().x + ", " + boardSprite.getPosition().y);
+                                //this.isTouchingSprite[pointerId] = true;
+                                destinationBoardSprite = boardSprite;
+
+                                destinationBoardSprite.showChannelScopes();
+
+                                // TODO: Callback: call Sprite.onTouchDestination (via Sprite.touch())
+                            }
+                        }
+
+                    }
+                } else if (destinationChannelScopeIndex == -1) {
+                    Log.v("MapViewTouch", "\tLooking for destination SCOPE");
+                    if (destinationBoardSprite != null) {
+                        // If no channel source has been touched yet, check if one is dragged over.
+
+                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
+                        // Check if the touched board's I/O node is touched
+                        for (int i = 0; i < destinationBoardSprite.channelScopePositions.size(); i++) {
+                            if (destinationBoardSprite.showChannelScopes[i]) {
+                                // Check if one of the objects is touched
+                                if (Geometry.getDistance(touch[pointerId], destinationBoardSprite.channelScopePositions.get(i)) < 60.0f) {
+                                    Log.v("MapViewTouch", "touched node " + (i + 1));
+                                    destinationChannelScopeIndex = i;
+                                    destinationBoardSprite.channelTypes.set(
+                                            i,
+                                            BoardSprite.ChannelType.getNextType(destinationBoardSprite.channelTypes.get(i)) // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
+                                    );
+                                }
+                            }
+
+                        }
+                    }
+
                 }
+
+            } else {
+
+                // TODO: Put into callback
+                 if (this.isTouchingSprite[pointerId]) {
+                    //sourceBoardSprite.scale = 1.3f;
+                    touchedSprite[pointerId].showHighlights = true;
+                    touchedSprite[pointerId].setPosition(touch[pointerId].x, touch[pointerId].y);
+                } else if (!isPanningDisabled) {
+                     currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
+                 }
             }
 
         }
     }
 
     private void onReleaseCallback (int pointerId) {
+        Log.v("MapViewEvent", "onReleaseCallback");
 
         // Previous
         isTouchingPrevious[pointerId] = isTouching[pointerId];
@@ -659,10 +696,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             this.touchStopTime = java.lang.System.currentTimeMillis ();
         }
 
+        boolean handledTouch = false;
+
         // Classify/Callbacks
         if (touchStopTime - touchStartTime < MAXIMUM_TAP_DURATION) {
-
-            boolean handledTouch = false;
 
             // Step 1: Touch source board
             if (/*sourceBoardSprite == null && */ sourceChannelScopeIndex == -1
@@ -904,44 +941,44 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
 
-            if (!handledTouch) {
-
-                Log.v("MapViewTouch", "Partial data path was abandoned.");
-
-                if (sourceBoardSprite != null && sourceChannelScopeIndex != -1 && destinationBoardSprite != null) {
-                    ApplicationView.getApplicationView().speakPhrase("the channel was interrupted.");
-                }
-
-                // Reset selected source channel scope
-                Log.v ("MapView", "sourceBoard: " + sourceBoardSprite);
-                if (sourceChannelScopeIndex != -1) {
-                    Log.v ("MapView", "sourceChannelType: " + sourceBoardSprite.channelTypes.get(sourceChannelScopeIndex));
-                    sourceBoardSprite.channelTypes.set(sourceChannelScopeIndex, BoardSprite.ChannelType.NONE);
-                    Log.v ("MapView", "sourceBoard: " + sourceBoardSprite);
-                    Log.v ("MapView", "sourceChannelType: " + sourceBoardSprite.channelTypes.get(sourceChannelScopeIndex));
-                }
-
-                // Reset selected destination channel scope
-                if (destinationChannelScopeIndex != -1) {
-                    destinationBoardSprite.channelTypes.set(destinationChannelScopeIndex, BoardSprite.ChannelType.NONE);
-                }
-
-                // No touch on board or scope. Touch is on map. So hide scopes.
-                for (BoardSprite boardSprite : this.boardSprites) {
-                    boardSprite.hideChannelScopes();
-                    boardSprite.showChannelPaths = false;
-                    boardSprite.setTransparency(1.0f);
-                }
-
-                // Reset connection state
-                sourceBoardSprite = null;
-                destinationBoardSprite = null;
-                sourceChannelScopeIndex = -1;
-                destinationChannelScopeIndex = -1;
-
-                // Reset map interactivity
-                isPanningDisabled = false;
-            }
+//            if (!handledTouch) {
+//
+//                Log.v("MapViewTouch", "Partial data path was abandoned.");
+//
+//                if (sourceBoardSprite != null && sourceChannelScopeIndex != -1 && destinationBoardSprite != null) {
+//                    ApplicationView.getApplicationView().speakPhrase("the channel was interrupted.");
+//                }
+//
+//                // Reset selected source channel scope
+//                Log.v ("MapView", "sourceBoard: " + sourceBoardSprite);
+//                if (sourceChannelScopeIndex != -1) {
+//                    Log.v ("MapView", "sourceChannelType: " + sourceBoardSprite.channelTypes.get(sourceChannelScopeIndex));
+//                    sourceBoardSprite.channelTypes.set(sourceChannelScopeIndex, BoardSprite.ChannelType.NONE);
+//                    Log.v ("MapView", "sourceBoard: " + sourceBoardSprite);
+//                    Log.v ("MapView", "sourceChannelType: " + sourceBoardSprite.channelTypes.get(sourceChannelScopeIndex));
+//                }
+//
+//                // Reset selected destination channel scope
+//                if (destinationChannelScopeIndex != -1) {
+//                    destinationBoardSprite.channelTypes.set(destinationChannelScopeIndex, BoardSprite.ChannelType.NONE);
+//                }
+//
+//                // No touch on board or scope. Touch is on map. So hide scopes.
+//                for (BoardSprite boardSprite : this.boardSprites) {
+//                    boardSprite.hideChannelScopes();
+//                    boardSprite.showChannelPaths = false;
+//                    boardSprite.setTransparency(1.0f);
+//                }
+//
+//                // Reset connection state
+//                sourceBoardSprite = null;
+//                destinationBoardSprite = null;
+//                sourceChannelScopeIndex = -1;
+//                destinationChannelScopeIndex = -1;
+//
+//                // Reset map interactivity
+//                isPanningDisabled = false;
+//            }
 
         } else {
 
@@ -952,6 +989,13 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                         && destinationBoardSprite != null && destinationChannelScopeIndex != -1) {
 
                     Log.v("MapViewLink", "Created data path.");
+
+                    sourceBoardSprite.addPath(
+                            sourceBoardSprite,
+                            sourceChannelScopeIndex,
+                            destinationBoardSprite,
+                            destinationChannelScopeIndex
+                    );
 
                     // Reset connection state
                     sourceBoardSprite = null;
@@ -979,10 +1023,6 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                         boardSprite.showChannelPaths = false;
                     }
 
-                    // Style. Reset the style of touched boards.
-                    sourceBoardSprite.showHighlights = false;
-                    sourceBoardSprite.setScale(1.0f);
-
                     // Reset connection state
                     sourceBoardSprite = null;
                     destinationBoardSprite = null;
@@ -994,19 +1034,63 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         }
 
+
+
+        if (!handledTouch) {
+
+            Log.v("MapViewTouch", "Partial data path was abandoned.");
+
+            if (sourceBoardSprite != null && sourceChannelScopeIndex != -1 && destinationBoardSprite != null) {
+                ApplicationView.getApplicationView().speakPhrase("the channel was interrupted.");
+            }
+
+            // Reset selected source channel scope
+            Log.v ("MapView", "sourceBoard: " + sourceBoardSprite);
+            if (sourceChannelScopeIndex != -1) {
+                Log.v ("MapView", "sourceChannelType: " + sourceBoardSprite.channelTypes.get(sourceChannelScopeIndex));
+                sourceBoardSprite.channelTypes.set(sourceChannelScopeIndex, BoardSprite.ChannelType.NONE);
+                Log.v ("MapView", "sourceBoard: " + sourceBoardSprite);
+                Log.v ("MapView", "sourceChannelType: " + sourceBoardSprite.channelTypes.get(sourceChannelScopeIndex));
+            }
+
+            // Reset selected destination channel scope
+            if (destinationChannelScopeIndex != -1) {
+                destinationBoardSprite.channelTypes.set(destinationChannelScopeIndex, BoardSprite.ChannelType.NONE);
+            }
+
+            // No touch on board or scope. Touch is on map. So hide scopes.
+            for (BoardSprite boardSprite : this.boardSprites) {
+                boardSprite.hideChannelScopes();
+                boardSprite.showChannelPaths = false;
+                boardSprite.setTransparency(1.0f);
+            }
+
+            // Reset connection state
+            sourceBoardSprite = null;
+            destinationBoardSprite = null;
+            sourceChannelScopeIndex = -1;
+            destinationChannelScopeIndex = -1;
+
+            // Reset map interactivity
+            isPanningDisabled = false;
+        }
+
+
+
+
         // Stop touching sprite
-        this.touchedSprite[pointerId] = null;
+        // Style. Reset the style of touched boards.
+        if (isTouching[pointerId] || touchedSprite[pointerId] != null) {
+            isTouching[pointerId] = false;
+            if (touchedSprite[pointerId] != null) {
+                touchedSprite[pointerId].showHighlights = false;
+                touchedSprite[pointerId].setScale(1.0f);
+                touchedSprite[pointerId] = null;
+            }
+        }
 
         // Stop dragging
         this.isDragging[pointerId] = false;
 
-    }
-
-    //----------------------------------------------------------------------------------------------
-
-    public double getDistance (int x, int y, int x2, int y2) {
-        double distanceSquare = Math.pow (x - x2, 2) + Math.pow (y - y2, 2);
-        double distance = Math.sqrt (distanceSquare);
-        return distance;
     }
 }
