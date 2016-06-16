@@ -376,7 +376,11 @@ public class BoardSprite extends Sprite {
                                 -((boardSprite.channelNodeRadius + boardSprite.distanceBetweenNodes) * 2.0f) + j * ((boardSprite.channelNodeRadius + boardSprite.distanceBetweenNodes) * 2),
                                 (boardSprite.boardWidth / 2.0f) + boardSprite.channelNodeRadius + boardSprite.distanceNodeToBoard
                         );
-                        mapCanvas.rotate(0);
+                        if (boardSprite.portScopeSprites.get(3 * i + j).channelDirection == PortScopeSprite.ChannelDirection.OUTPUT) {
+                            mapCanvas.rotate(180.0f);
+                        } else {
+                            mapCanvas.rotate(0.0f);
+                        }
 
                         mapCanvas.save();
                         // Color

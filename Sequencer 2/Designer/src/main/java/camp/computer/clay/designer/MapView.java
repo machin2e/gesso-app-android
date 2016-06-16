@@ -949,6 +949,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                                 destinationChannelScopeIndex
                                         );
 
+                                        sourceBoardSprite.portScopeSprites.get(sourceChannelScopeIndex).channelDirection = PortScopeSprite.ChannelDirection.INPUT;
+
+                                        destinationBoardSprite.portScopeSprites.get(destinationChannelScopeIndex).channelDirection = PortScopeSprite.ChannelDirection.OUTPUT;
+
                                         // Reset connection state
                                         sourceBoardSprite = null;
                                         destinationBoardSprite = null;
@@ -985,6 +989,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                             destinationBoardSprite,
                             destinationChannelScopeIndex
                     );
+
+                    sourceBoardSprite.portScopeSprites.get(sourceChannelScopeIndex).channelDirection = PortScopeSprite.ChannelDirection.INPUT;
+
+                    destinationBoardSprite.portScopeSprites.get(destinationChannelScopeIndex).channelDirection = PortScopeSprite.ChannelDirection.OUTPUT;
 
                     // Reset connection state
                     sourceBoardSprite = null;
