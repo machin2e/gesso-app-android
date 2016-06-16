@@ -42,8 +42,8 @@
       <file leaf-file-name="MapView.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="905" column="54" selection-start-line="905" selection-start-column="54" selection-end-line="905" selection-end-column="54" />
+            <state relative-caret-position="221">
+              <caret line="1007" column="50" selection-start-line="1007" selection-start-column="50" selection-end-line="1007" selection-end-column="50" />
               <folding />
             </state>
           </provider>
@@ -52,9 +52,30 @@
       <file leaf-file-name="BoardSprite.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/BoardSprite.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="304" column="0" selection-start-line="304" selection-start-column="0" selection-end-line="304" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="405">
+              <caret line="158" column="28" selection-start-line="158" selection-start-column="28" selection-end-line="158" selection-end-column="28" />
+              <folding>
+                <element signature="e#724#741#0" expanded="true" />
+                <element signature="e#6796#6797#0" expanded="true" />
+                <element signature="e#6831#6832#0" expanded="true" />
+                <marker date="1466043625000" expanded="false" signature="890:903" ph="&lt;~&gt;" />
+                <marker date="1466043625000" expanded="false" signature="1773:1786" ph="&lt;~&gt;" />
+                <marker date="1466043625000" expanded="false" signature="4778:4800" ph="&lt;~&gt;" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PortScopeSprite.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/PortScopeSprite.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="30" column="18" selection-start-line="30" selection-start-column="18" selection-end-line="30" selection-end-column="18" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#2875#2876#0" expanded="true" />
+                <element signature="e#2903#2904#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -2516,8 +2537,9 @@
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/ApplicationView.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/utilities/Geometry.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/Sprite.java" />
-        <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java" />
+        <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/PortScopeSprite.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/BoardSprite.java" />
+        <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java" />
       </list>
     </option>
   </component>
@@ -3072,7 +3094,7 @@
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32903227" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32903227" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -3136,18 +3158,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/PortScopeSprite.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="30" column="18" selection-start-line="30" selection-start-column="18" selection-end-line="30" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2875#2876#0" expanded="true" />
+            <element signature="e#2903#2904#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/sprites/BoardSprite.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="304" column="0" selection-start-line="304" selection-start-column="0" selection-end-line="304" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="405">
+          <caret line="158" column="28" selection-start-line="158" selection-start-column="28" selection-end-line="158" selection-end-column="28" />
+          <folding>
+            <element signature="e#724#741#0" expanded="true" />
+            <element signature="e#6796#6797#0" expanded="true" />
+            <element signature="e#6831#6832#0" expanded="true" />
+            <marker date="1466043625000" expanded="false" signature="890:903" ph="&lt;~&gt;" />
+            <marker date="1466043625000" expanded="false" signature="1773:1786" ph="&lt;~&gt;" />
+            <marker date="1466043625000" expanded="false" signature="4778:4800" ph="&lt;~&gt;" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="905" column="54" selection-start-line="905" selection-start-column="54" selection-end-line="905" selection-end-column="54" />
+        <state relative-caret-position="221">
+          <caret line="1007" column="50" selection-start-line="1007" selection-start-column="50" selection-end-line="1007" selection-end-column="50" />
           <folding />
         </state>
       </provider>
