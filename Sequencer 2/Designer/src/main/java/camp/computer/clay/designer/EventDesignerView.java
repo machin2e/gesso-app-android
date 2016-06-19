@@ -582,7 +582,7 @@ public class EventDesignerView {
                 if (destinationChannelNumberLayout.hasSelection()) {
                     ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                     channelContent.get("direction").set(destinationChannelDirectionLayout.getSelection());
-                    // channelDirectionLayout.setSelection(channelDirection);
+                    // channelDirectionLayout.setSelection(portDirection);
                 }
 
                 // Update others...
@@ -667,7 +667,7 @@ public class EventDesignerView {
                 if (destinationChannelNumberLayout.hasSelection()) {
                     ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                     channelContent.get("type").set(destinationChannelTypeLayout.getSelection());
-                    // channelDirectionLayout.setSelection(channelDirection);
+                    // channelDirectionLayout.setSelection(portDirection);
                 }
 
                 // Update others...
@@ -864,7 +864,7 @@ public class EventDesignerView {
 //                    }
                         ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("device").set(sourceDeviceSourceLayout.getSelection());
                         // </HACK>
-                        // channelDirectionLayout.setSelection(channelDirection);
+                        // channelDirectionLayout.setSelection(portDirection);
                     }
 
                 }
@@ -921,7 +921,7 @@ public class EventDesignerView {
                     ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                     String destinationObservable = destinationChannelObservableLayout.getSelection();
                     ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("provider").set(sourceChannelNumberLayout.getSelection());
-                    // channelDirectionLayout.setSelection(channelDirection);
+                    // channelDirectionLayout.setSelection(portDirection);
                 }
 
                 // Hide and show dependent layouts (dependencies via channel type)
@@ -994,8 +994,8 @@ public class EventDesignerView {
 //                // Restore the channel direction and type
 //                if (destinationChannelNumberLayout.hasSelection()) {
 //                    ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
-//                    String channelDirection = channelContent.get("direction").getContent();
-//                    destinationChannelDirectionLayout.setSelection(channelDirection);
+//                    String portDirection = channelContent.get("direction").getContent();
+//                    destinationChannelDirectionLayout.setSelection(portDirection);
 //                }
 
                 // Update others...
@@ -1115,7 +1115,7 @@ public class EventDesignerView {
                         ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                         String destinationObservable = destinationChannelObservableLayout.getSelection();
                         ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("source").set(sourceChannelObservableLayout.getSelection());
-                        // channelDirectionLayout.setSelection(channelDirection);
+                        // channelDirectionLayout.setSelection(portDirection);
                     }
 
                     // Validate this one generated form. Store valid or invalid.
@@ -1243,7 +1243,7 @@ public class EventDesignerView {
                         ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                         String destinationObservable = destinationChannelObservableLayout.getSelection();
                         ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("provider").set("number");
-                        // channelDirectionLayout.setSelection(channelDirection);
+                        // channelDirectionLayout.setSelection(portDirection);
                     }
 
                     // Save the channel source
@@ -1251,7 +1251,7 @@ public class EventDesignerView {
                         ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                         String destinationObservable = destinationChannelObservableLayout.getSelection();
                         ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("source").set(sourceChannelContent);
-                        // channelDirectionLayout.setSelection(channelDirection);
+                        // channelDirectionLayout.setSelection(portDirection);
                     }
 
                     // <FINAL VALIDATION>

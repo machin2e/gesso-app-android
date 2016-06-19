@@ -64,4 +64,11 @@ public abstract class Geometry {
         point.y = from.y + distance * (float) Math.sin(Math.toRadians(angle - 90));
         return point;
     }
+
+    public static PointF calculateMidpoint(PointF from, PointF to) {
+        PointF midpoint = new PointF();
+        midpoint.x = ((from.x + to.x) / 2.0f);
+        midpoint.y = ((from.y + to.y) / 2.0f);
+        return midpoint;
+    }
 }

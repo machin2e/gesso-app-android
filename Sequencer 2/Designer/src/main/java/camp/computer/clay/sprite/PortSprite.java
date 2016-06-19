@@ -4,18 +4,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import camp.computer.clay.sprite.util.FlowPathSprite;
-
-public class PortScopeSprite extends Sprite {
+public class PortSprite extends Sprite {
 
     // --- STYLE ---
     public static float DISTANCE_FROM_BOARD = 45.0f;
     public static float DISTANCE_BETWEEN_NODES = 5.0f;
+    public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
 
     public boolean showFormLayer = false;
     public boolean showStyleLayer = true;
@@ -27,50 +25,26 @@ public class PortScopeSprite extends Sprite {
 
     boolean showChannelLabel = false;
     float labelTextSize = 30.0f;
+    private int uniqueColor = Color.BLACK;
     // ^^^ STYLE ^^^
 
-    // --- DATA ---
-    public int dataSampleCount = 40;
-    public float[] dataSamples = new float[dataSampleCount];
-    // ^^^ DATA ^^^
-
-    public ArrayList<FlowPathSprite> flowPathSprites = new ArrayList<FlowPathSprite>();
-
-    private PointF position = new PointF(0, 0); // Sprite position
-    private float scale = 1.0f; // Sprite scale factor
-    private float angle = 0.0f; // Sprite heading angle
-
-//    public ArrayList<PointF> channelScopePositions = new ArrayList<PointF>();
-    public ChannelType channelType = PortScopeSprite.ChannelType.NONE;
-    public ChannelDirection channelDirection = PortScopeSprite.ChannelDirection.NONE;
-
-    public PortScopeSprite() {
-        initializeChannelTypes();
-        initializeChannelDirections();
-        initializeData();
-    }
-
-    public void initializeData () {
-        for (int i = 0; i < this.dataSamples.length; i++) {
-            this.dataSamples[i] = -(this.shapeRadius / 2.0f) + 0;
-        }
-    }
-
-    public enum ChannelDirection {
+    // <MODEL>
+    public enum PortDirection {
 
         NONE(0),
         OUTPUT(1),
-        INPUT(2);
+        INPUT(2),
+        BOTH(3); // i.e., for I2C, etc.
 
         // TODO: Change the index to a UUID?
         int index;
 
-        ChannelDirection(int index) {
+        PortDirection(int index) {
             this.index = index;
         }
     }
 
-    public enum ChannelType {
+    public enum PortType {
 
         NONE(0),
         SWITCH(1),
@@ -82,21 +56,45 @@ public class PortScopeSprite extends Sprite {
         // TODO: Change the index to a UUID?
         int index;
 
-        ChannelType(int index) {
+        PortType(int index) {
             this.index = index;
         }
 
-        public static ChannelType getNextType(ChannelType currentChannelType) {
-            return ChannelType.values()[(currentChannelType.index + 1) % ChannelType.values().length];
+        public static PortType getNextType(PortType currentPortType) {
+            return PortType.values()[(currentPortType.index + 1) % PortType.values().length];
         }
     }
 
-    private void initializeChannelTypes() {
-        channelType = PortScopeSprite.ChannelType.NONE; // 0 for "none" (disabled)
+    public PortType portType = PortType.NONE;
+    public PortDirection portDirection = PortDirection.NONE;
+
+    // TODO: Physical dimensions
+    // </MODEL>
+
+    // --- DATA ---
+    private int dataSampleCount = 40;
+    private float[] dataSamples = new float[dataSampleCount];
+    // ^^^ DATA ^^^
+
+    public ArrayList<PathSprite> pathSprites = new ArrayList<PathSprite>();
+
+    private PointF position = new PointF(0, 0); // Sprite position
+    private float scale = 1.0f; // Sprite scale factor
+    private float angle = 0.0f; // Sprite heading angle
+
+    public PortSprite() {
+        this.uniqueColor = updateUniqueColor();
+        initialize();
     }
 
-    private void initializeChannelDirections() {
-        channelDirection = PortScopeSprite.ChannelDirection.NONE; // 0 for "none" (disabled)
+    private void initialize() {
+        initializeData();
+    }
+
+    private void initializeData () {
+        for (int i = 0; i < this.dataSamples.length; i++) {
+            this.dataSamples[i] = -(this.shapeRadius / 2.0f) + 0;
+        }
     }
 
     public PointF getPosition() {
@@ -109,29 +107,45 @@ public class PortScopeSprite extends Sprite {
 //        this.updateChannelScopePositions();
     }
 
-    public void addPath(BoardSprite touchedBoardSpriteSource, int touchedChannelScopeSource, BoardSprite touchedBoardSpriteDestination, int touchedChannelScopeDestination) {
-        FlowPathSprite channelPath = new FlowPathSprite(touchedBoardSpriteSource, touchedChannelScopeSource, touchedBoardSpriteDestination, touchedChannelScopeDestination);
-        flowPathSprites.add(channelPath);
+    public void addPath(DroneSprite sourceDrone, int sourcePort, DroneSprite destinationDrone, int destinationPort) {
+        PathSprite path = new PathSprite(sourceDrone, sourcePort, destinationDrone, destinationPort);
+        destinationDrone.getPortSprite(destinationPort).setUniqueColor(this.uniqueColor);
+        pathSprites.add(path);
     }
 
-    public void showFullPaths() {
-        for (FlowPathSprite flowPathSprite : flowPathSprites) {
-            flowPathSprite.showOnlyPathTerminals = false;
+    public int getUniqueColor() {
+        return this.uniqueColor;
+    }
+
+    private void setUniqueColor(int uniqueColor) {
+        this.uniqueColor = uniqueColor;
+    }
+
+    public int updateUniqueColor() {
+        this.uniqueColor = camp.computer.clay.sprite.util.Color.getUniqueColor(this);
+        return this.uniqueColor;
+    }
+
+    public void showPaths() {
+        for (PathSprite pathSprite : pathSprites) {
+            pathSprite.showOnlyPathTerminals = false;
         }
     }
 
-    public void showPartialPaths() {
-        for (FlowPathSprite flowPathSprite : flowPathSprites) {
-            flowPathSprite.showOnlyPathTerminals = true;
+    public void showPathDocks() {
+        for (PathSprite pathSprite : pathSprites) {
+            pathSprite.showOnlyPathTerminals = true;
         }
     }
 
     @Override
     public void draw(Canvas mapCanvas, Paint paint) {
-        drawFormLayer(mapCanvas, paint);
+        drawShapeLayer(mapCanvas, paint);
         drawStyleLayer(mapCanvas, paint);
         drawDataLayer(mapCanvas, paint);
         drawAnnotationLayer(mapCanvas, paint);
+
+        // draw pathSprites
     }
 
     /**
@@ -140,7 +154,7 @@ public class PortScopeSprite extends Sprite {
      * @param mapCanvas
      * @param paint
      */
-    public void drawFormLayer(Canvas mapCanvas, Paint paint) {
+    public void drawShapeLayer(Canvas mapCanvas, Paint paint) {
 
         if (showFormLayer) {
 
@@ -148,7 +162,7 @@ public class PortScopeSprite extends Sprite {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(BoardSprite.CHANNEL_COLOR_OFF);
+            paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
             mapCanvas.drawCircle(
                     0,
                     0,
@@ -182,12 +196,12 @@ public class PortScopeSprite extends Sprite {
 
         if (showStyleLayer) {
 
-            if (channelType != PortScopeSprite.ChannelType.NONE) {
+            if (portType != PortSprite.PortType.NONE) {
 
                 mapCanvas.save();
                 // Color
                 paint.setStyle(Paint.Style.FILL);
-                paint.setColor(BoardSprite.CHANNEL_COLOR_PALETTE[1]); // [3 * i + j]);
+                paint.setColor(this.uniqueColor); // [3 * i + j]);
                 mapCanvas.drawCircle(
                         0,
                         0,
@@ -222,7 +236,7 @@ public class PortScopeSprite extends Sprite {
 
         if (showDataLayer) {
 
-            if (channelType != PortScopeSprite.ChannelType.NONE) {
+            if (portType != PortSprite.PortType.NONE) {
 
                 mapCanvas.save();
 
@@ -266,7 +280,7 @@ public class PortScopeSprite extends Sprite {
 
         if (showAnnotationLayer) {
 
-            if (channelType != PortScopeSprite.ChannelType.NONE) {
+            if (portType != PortSprite.PortType.NONE) {
 
                 mapCanvas.save();
 
@@ -299,7 +313,7 @@ public class PortScopeSprite extends Sprite {
     private float xWaveStart = 0;
     public void updateChannelData () {
         Random random = new Random();
-        if (channelType == PortScopeSprite.ChannelType.SWITCH) {
+        if (portType == PortType.SWITCH) {
             // Shift data to make room for new samples
             for (int k = 0; k < dataSamples.length - 1; k++) {
                 dataSamples[k] = dataSamples[k + 1];
@@ -311,7 +325,7 @@ public class PortScopeSprite extends Sprite {
             if (switchHalfPeriodSampleCount == 0) {
                 previousSwitchState = (previousSwitchState + 1) % 2;
             }
-        } else if (channelType == PortScopeSprite.ChannelType.PULSE) {
+        } else if (portType == PortType.PULSE) {
             // Shift data to make room for new samples
             for (int k = 0; k < dataSamples.length - 1; k++) {
                 dataSamples[k] = dataSamples[k + 1];
@@ -325,7 +339,7 @@ public class PortScopeSprite extends Sprite {
                 pulseDutyCycle = random.nextFloat();
                 previousPulseState = (previousPulseState + 1) % 2;
             }
-        } else if (channelType == PortScopeSprite.ChannelType.WAVE) {
+        } else if (portType == PortType.WAVE) {
             // Add new sample for the channel type
             for (int k = 0; k < dataSamples.length; k++) {
                 dataSamples[k] = getSyntheticWaveSample(k);
@@ -345,6 +359,19 @@ public class PortScopeSprite extends Sprite {
 
     private float getSyntheticWaveSample(int x) {
         return ((float) Math.sin(xWaveStart + x * 0.2)) * shapeRadius * 0.5f;
+    }
+
+    public void setVisibility(boolean isVisible) {
+        showFormLayer = isVisible;
+        showStyleLayer = isVisible;
+        showDataLayer = isVisible;
+        showAnnotationLayer = isVisible;
+    }
+
+    public void setPathVisibility (boolean isVisible) {
+        for (PathSprite pathSprite : this.pathSprites) {
+            pathSprite.setVisibility(isVisible);
+        }
     }
 
     @Override

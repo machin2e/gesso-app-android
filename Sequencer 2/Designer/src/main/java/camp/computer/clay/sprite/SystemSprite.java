@@ -1,22 +1,15 @@
 package camp.computer.clay.sprite;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.PointF;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.sprite.util.physics.Diagram;
-import camp.computer.clay.sprite.util.physics.Node;
-import camp.computer.clay.sprite.util.physics.Rectangle;
-
 public class SystemSprite extends Sprite {
 
     // Sprites
-    private ArrayList<BoardSprite> boardSprites = new ArrayList<BoardSprite>();
+    private ArrayList<DroneSprite> droneSprites = new ArrayList<DroneSprite>();
 
     public SystemSprite() {
         initialize();
@@ -27,33 +20,33 @@ public class SystemSprite extends Sprite {
     }
 
     public void initializeSprites() {
-        boardSprites.add(new BoardSprite(0, 0, 0));
-        boardSprites.add(new BoardSprite(300, 400, 30));
-        boardSprites.add(new BoardSprite(-200, -440, -55));
+        droneSprites.add(new DroneSprite(0, 0, 0));
+        droneSprites.add(new DroneSprite(300, 400, 30));
+        droneSprites.add(new DroneSprite(-200, -440, -55));
     }
 
-    public ArrayList<BoardSprite> getBoardSprites() {
-        return this.boardSprites;
+    public ArrayList<DroneSprite> getDroneSprites() {
+        return this.droneSprites;
     }
 
     @Override
     public void draw(Canvas mapCanvas, Paint paint) {
         // drawTitle();
 
-        for (BoardSprite boardSprite : boardSprites) {
-            boardSprite.draw(mapCanvas, paint);
+        for (DroneSprite droneSprite : droneSprites) {
+            droneSprite.draw(mapCanvas, paint);
         }
 
-//        for (BoardSprite boardSprite : boardSprites) {
-//            boardSprite.drawFormLayer(mapCanvas, paint);
+//        for (DroneSprite boardSprite : droneSprites) {
+//            boardSprite.drawShapeLayer(mapCanvas, paint);
 //        }
 
-//        for (BoardSprite boardSprite : boardSprites) {
+//        for (DroneSprite boardSprite : droneSprites) {
             // boardSprite.drawPaths(mapCanvas, paint);
-//            boardSprite.drawTrianglePaths(mapCanvas, paint);
+//            boardSprite.drawTrianglePath(mapCanvas, paint);
 //        }
 
-//        for (BoardSprite boardSprite : boardSprites) {
+//        for (DroneSprite boardSprite : droneSprites) {
 //            boardSprite.drawStyleLayer(mapCanvas, paint);
 //        }
     }
@@ -65,8 +58,8 @@ public class SystemSprite extends Sprite {
 
     public void updateState () {
 
-        for (BoardSprite boardSprite : boardSprites) {
-            boardSprite.updateChannelData();
+        for (DroneSprite droneSprite : droneSprites) {
+            droneSprite.updateChannelData();
         }
     }
 }
