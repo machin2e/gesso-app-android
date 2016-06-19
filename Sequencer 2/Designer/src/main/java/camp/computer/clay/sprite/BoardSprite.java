@@ -4,11 +4,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.graphics.Rect;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import camp.computer.clay.sprite.util.FlowPathSprite;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class BoardSprite extends Sprite {
@@ -26,22 +26,22 @@ public class BoardSprite extends Sprite {
 //    public ArrayList<ChannelDirection> channelDirections = new ArrayList<>();
 //
 //    public void addPath(BoardSprite touchedBoardSpriteSource, int touchedChannelScopeSource, BoardSprite touchedBoardSpriteDestination, int touchedChannelScopeDestination) {
-//        ChannelPath channelPath = new ChannelPath();
+//        FlowPath channelPath = new FlowPath();
 //        channelPath.source = touchedBoardSpriteSource;
 //        channelPath.sourceChannel = touchedChannelScopeSource;
 //        channelPath.destination = touchedBoardSpriteDestination;
 //        channelPath.destinationChannel = touchedChannelScopeDestination;
-//        channelPaths.add(channelPath);
+//        flowPathSprites.add(channelPath);
 //    }
 //
-//    public class ChannelPath {
+//    public class FlowPath {
 //        BoardSprite source;
 //        int sourceChannel;
 //        BoardSprite destination;
 //        int destinationChannel;
 //    }
 //
-//    public ArrayList<ChannelPath> channelPaths = new ArrayList<ChannelPath>();
+//    public ArrayList<FlowPath> flowPathSprites = new ArrayList<FlowPath>();
 
     public PointF getPosition() {
         return this.position;
@@ -77,7 +77,7 @@ public class BoardSprite extends Sprite {
     int boardOutlineColor = Color.parseColor("#ff" + boardOutlineColorString); // Color.parseColor("#737272");
     float boardOutlineThickness = 1.0f;
 
-    float headerWidth = 60;
+    float headerWidth = 40;
     float headerHeight = 15;
     private String headerColorString = "000000";
     int headerColor = Color.parseColor("#ff" + headerColorString);
@@ -93,26 +93,32 @@ public class BoardSprite extends Sprite {
     float distanceLightsToEdge = 15.0f;
     float lightWidth = 12;
     float lightHeight = 20;
-    int channelColorNone = Color.parseColor("#efefef");
-    int[] channelColorPalette = new int[] { Color.parseColor("#19B5FE"), Color.parseColor("#2ECC71"), Color.parseColor("#F22613"), Color.parseColor("#F9690E"), Color.parseColor("#9A12B3"), Color.parseColor("#F9BF3B"), Color.parseColor("#DB0A5B"), Color.parseColor("#BF55EC"), Color.parseColor("#A2DED0"), Color.parseColor("#1E8BC3"), Color.parseColor("#36D7B7"), Color.parseColor("#EC644B") };
+    public static int CHANNEL_COLOR_OFF = Color.parseColor("#efefef");
+    public static int[] CHANNEL_COLOR_PALETTE = new int[] { Color.parseColor("#19B5FE"), Color.parseColor("#2ECC71"), Color.parseColor("#F22613"), Color.parseColor("#F9690E"), Color.parseColor("#9A12B3"), Color.parseColor("#F9BF3B"), Color.parseColor("#DB0A5B"), Color.parseColor("#BF55EC"), Color.parseColor("#A2DED0"), Color.parseColor("#1E8BC3"), Color.parseColor("#36D7B7"), Color.parseColor("#EC644B") };
     boolean showLightOutline = true;
     int lightOutlineColor = Color.parseColor("#212121");
     float lightOutlineThickness = 0.0f;
 
-    public boolean[] showChannelScopes = new boolean[channelCount];
-    boolean showChannelLabel = false;
-    boolean showChannelData = true;
-    boolean showChannelNodeOutline = false;
-    float labelTextSize = 30.0f;
-    float channelNodeRadius = 40.0f;
+//    public boolean[] showChannelScopes = new boolean[channelCount];
+//    boolean showChannelLabel = false;
+//    boolean showChannelData = true;
+//    boolean showChannelNodeOutline = false;
+//    float labelTextSize = 30.0f;
+//    float channelNodeRadius = 40.0f;
 //    private Map<ChannelType, Integer> channelTypeColors = new HashMap<ChannelType, Integer>();
     // String[] channelNodeColor = new String[] { "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1" };
-    float distanceNodeToBoard = 45.0f;
-    float distanceBetweenNodes = 5.0f;
-    float[][] channelDataPoints = new float[channelCount][(int) channelNodeRadius * 2];
+//    float DISTANCE_FROM_BOARD = 45.0f;
+//    float DISTANCE_BETWEEN_NODES = 5.0f;
+//    float[][] channelDataPoints = new float[channelCount][(int) channelNodeRadius * 2];
 
     public boolean[] showChannelPaths = new boolean[channelCount];
     // ^^^ STYLE ^^^
+
+    private void initializeStyle () {
+        for (int i = 0; i < channelCount; i++) {
+            showChannelPaths[i] = false;
+        }
+    }
 
     public BoardSprite(float x, float y, float angle) {
 
@@ -122,7 +128,8 @@ public class BoardSprite extends Sprite {
 
 //        initializeChannelTypes();
 //        initializeChannelDirections();
-        initializeChannelData();
+//        initializeChannelData();
+        initializeStyle();
 
         //public String[] channelTypeColors = new String[] { "#efefef", "#1467f1", "#62df42", "#cc0033", "#ff9900" };
 //        channelTypeColors.put(ChannelType.NONE, Color.parseColor("#efefef"));
@@ -170,37 +177,30 @@ public class BoardSprite extends Sprite {
 
             for (int j = 0; j < 3; j++) {
 
-                PointF point = portScopeSprites.get(3 * i + j).getPosition();
+                PortScopeSprite portScopeSprite = portScopeSprites.get(3 * i + j);
+                PointF portScopeSpritePosition = portScopeSprites.get(3 * i + j).getPosition();
 
                 // Translate (Nodes)
-                float nodeRadiusPlusPadding = channelNodeRadius + distanceBetweenNodes;
-                point.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
-                point.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + channelNodeRadius;
+                float nodeRadiusPlusPadding = portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES;
+                portScopeSpritePosition.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
+                portScopeSpritePosition.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + portScopeSprite.channelNodeRadius;
 
                 // Rotate (Nodes)
-                point.set(
-                        point.x * cosBoardFacingAngle - point.y * sinBoardFacingAngle,
-                        point.x * sinBoardFacingAngle + point.y * cosBoardFacingAngle
+                portScopeSpritePosition.set(
+                        portScopeSpritePosition.x * cosBoardFacingAngle - portScopeSpritePosition.y * sinBoardFacingAngle,
+                        portScopeSpritePosition.x * sinBoardFacingAngle + portScopeSpritePosition.y * cosBoardFacingAngle
                 );
 
                 // Rotate (Board)
-                point.set(
-                        point.x * cosBoardAngle - point.y * sinBoardAngle,
-                        point.x * sinBoardAngle + point.y * cosBoardAngle
+                portScopeSpritePosition.set(
+                        portScopeSpritePosition.x * cosBoardAngle - portScopeSpritePosition.y * sinBoardAngle,
+                        portScopeSpritePosition.x * sinBoardAngle + portScopeSpritePosition.y * cosBoardAngle
                 );
 
                 // Translate (Board)
-                point.x = point.x + this.position.x;
-                point.y = point.y + this.position.y;
+                portScopeSpritePosition.x = portScopeSpritePosition.x + this.position.x;
+                portScopeSpritePosition.y = portScopeSpritePosition.y + this.position.y;
 
-            }
-        }
-    }
-
-    public void initializeChannelData () {
-        for (int j = 0; j < this.channelCount; j++) {
-            for (int i = 0; i < this.channelDataPoints.length; i++) {
-                this.channelDataPoints[j][i] = -(this.channelNodeRadius / 2.0f) + 0;
             }
         }
     }
@@ -209,249 +209,35 @@ public class BoardSprite extends Sprite {
     public void updateChannelData () {
         for (int j = 0; j < this.channelCount; j++) {
             Random random = new Random();
-            if (this.portScopeSprites.get(j).channelType == PortScopeSprite.ChannelType.SWITCH) {
+            PortScopeSprite portScopeSprite = this.portScopeSprites.get(j);
+            if (portScopeSprite.channelType == PortScopeSprite.ChannelType.SWITCH) {
                 // Add new sample for the channel type
                 int squareWidth = 20;
-                float sample = -(this.channelNodeRadius / 2.0f) + random.nextInt(2) * this.channelNodeRadius;
-                for (int k = this.channelDataPoints[j].length - squareWidth; k < this.channelDataPoints[j].length; k++) {
-                    this.channelDataPoints[j][k] = sample;
+                float sample = -(portScopeSprite.channelNodeRadius / 2.0f) + random.nextInt(2) * portScopeSprite.channelNodeRadius;
+                for (int k = portScopeSprite.channelDataPoints.length - squareWidth; k < portScopeSprite.channelDataPoints.length; k++) {
+                    portScopeSprite.channelDataPoints[k] = sample;
                 }
                 // Shift data
-                for (int k = 0; k < this.channelDataPoints[j].length - 1; k++) {
-                    this.channelDataPoints[j][k] = this.channelDataPoints[j][k + 1];
+                for (int k = 0; k < portScopeSprite.channelDataPoints.length - 1; k++) {
+                    portScopeSprite.channelDataPoints[k] = portScopeSprite.channelDataPoints[k + 1];
                 }
             } else if (this.portScopeSprites.get(j).channelType == PortScopeSprite.ChannelType.PULSE) {
                 // Shift data
-                for (int k = 0; k < this.channelDataPoints[j].length - 1; k++) {
-                    this.channelDataPoints[j][k] = this.channelDataPoints[j][k + 1];
+                for (int k = 0; k < portScopeSprite.channelDataPoints.length - 1; k++) {
+                    portScopeSprite.channelDataPoints[k] = portScopeSprite.channelDataPoints[k + 1];
                 }
                 // Add new sample for the channel type
-                this.channelDataPoints[j][this.channelDataPoints[j].length - 1] = -(this.channelNodeRadius / 2.0f) + random.nextInt(2) * this.channelNodeRadius;
+                portScopeSprite.channelDataPoints[portScopeSprite.channelDataPoints.length - 1] = -(portScopeSprite.channelNodeRadius / 2.0f) + random.nextInt(2) * portScopeSprite.channelNodeRadius;
             } else if (this.portScopeSprites.get(j).channelType == PortScopeSprite.ChannelType.WAVE) {
                 // Shift data
-                for (int k = 0; k < this.channelDataPoints[j].length; k++) {
+                for (int k = 0; k < portScopeSprite.channelDataPoints.length; k++) {
                     // Add new sample for the channel type
-                    this.channelDataPoints[j][k] = ((float) Math.sin(xWaveStart + k * 0.2)) * this.channelNodeRadius * 0.5f;
+                    portScopeSprite.channelDataPoints[k] = ((float) Math.sin(xWaveStart + k * 0.2)) * portScopeSprite.channelNodeRadius * 0.5f;
                 }
                 //xWaveStart = (xWaveStart + ((2.0f * (float) Math.PI) / ((float) this.channelDataPoints[j].length))) % (2.0f * (float) Math.PI);
                 xWaveStart = (xWaveStart + 0.9f) % ((float) Math.PI * 2.0f);
             }
         }
-    }
-
-    public void drawChannelScopeShadows (Canvas mapCanvas, Paint paint) {
-
-        BoardSprite boardSprite = this;
-
-        mapCanvas.save();
-
-        mapCanvas.translate(boardSprite.getPosition().x, boardSprite.getPosition().y);
-        mapCanvas.rotate(boardSprite.getAngle());
-
-        mapCanvas.scale(boardSprite.getScale(), boardSprite.getScale());
-
-        // --- NODES ---
-
-//        if (boardSprite.showChannelScopes) {
-
-        for (int i = 0; i < 4; i++) {
-
-            mapCanvas.save();
-
-            mapCanvas.rotate(-90 * i);
-            mapCanvas.translate(0, 0);
-
-            for (int j = 0; j < 3; j++) {
-
-                if (boardSprite.showChannelScopes[3 * i + j]) {
-
-                    mapCanvas.save();
-                    mapCanvas.translate(
-                            -((boardSprite.channelNodeRadius + boardSprite.distanceBetweenNodes) * 2.0f) + j * ((boardSprite.channelNodeRadius + boardSprite.distanceBetweenNodes) * 2),
-                            (boardSprite.boardWidth / 2.0f) + boardSprite.channelNodeRadius + boardSprite.distanceNodeToBoard
-                    );
-                    mapCanvas.rotate(0);
-
-                    mapCanvas.save();
-                    // Color
-                    paint.setStyle(Paint.Style.FILL);
-                    // paint.setColor(boardSprite.channelTypeColors.get(boardSprite.channelTypes.get(3 * i + j)));
-//                    if (boardSprite.channelTypes.get(3 * i + j) != ChannelType.NONE) {
-//                        paint.setColor(channelColorPalette[3 * i + j]);
-//                    } else {
-                        paint.setColor(channelColorNone);
-//                    }
-                    boardSprite.updateChannelScopePositions();
-                    mapCanvas.drawCircle(
-                            0,
-                            0,
-                            boardSprite.channelNodeRadius,
-                            paint
-                    );
-                    // Outline
-                    if (boardSprite.showChannelNodeOutline) {
-                        paint.setStyle(Paint.Style.STROKE);
-                        paint.setStrokeWidth(3);
-                        paint.setColor(Color.BLACK);
-                        mapCanvas.drawCircle(
-                                0,
-                                0,
-                                boardSprite.channelNodeRadius,
-                                paint
-                        );
-                    }
-                    // Label
-                    if (boardSprite.showChannelLabel) {
-                        paint.setTextSize(boardSprite.labelTextSize);
-                        Rect textBounds = new Rect();
-                        String channelNumberText = String.valueOf(3 * i + j + 1);
-                        paint.getTextBounds(channelNumberText, 0, channelNumberText.length(), textBounds);
-                        paint.setStyle(Paint.Style.FILL);
-                        paint.setStrokeWidth(3);
-                        paint.setColor(Color.BLACK);
-                        mapCanvas.drawText(channelNumberText, -(textBounds.width() / 2.0f), textBounds.height() / 2.0f, paint);
-                    }
-                    // Outline
-                    if (boardSprite.showChannelData) {
-                        if (boardSprite.portScopeSprites.get(3 * i + j).channelType != PortScopeSprite.ChannelType.NONE) {
-                            paint.setStyle(Paint.Style.STROKE);
-                            paint.setStrokeWidth(2.0f);
-                            paint.setColor(Color.WHITE);
-                            int step = 1;
-                            for (int k = 0; k + step < boardSprite.channelDataPoints[3 * i + j].length - 1; k += step) {
-                                mapCanvas.drawLine(
-                                        boardSprite.channelDataPoints[3 * i + j][k],
-                                        -boardSprite.channelNodeRadius + k,
-                                        boardSprite.channelDataPoints[3 * i + j][k + step],
-                                        -boardSprite.channelNodeRadius + k + step,
-                                        paint
-                                );
-                            }
-                        }
-                    }
-                    mapCanvas.restore();
-
-                    mapCanvas.restore();
-
-                }
-            }
-
-            mapCanvas.restore();
-        }
-        // ^^^ NODES ^^^
-
-        mapCanvas.restore();
-    }
-
-    public void drawChannelScopes (Canvas mapCanvas, Paint paint) {
-
-        BoardSprite boardSprite = this;
-
-        mapCanvas.save();
-
-        mapCanvas.translate(boardSprite.getPosition().x, boardSprite.getPosition().y);
-        mapCanvas.rotate(boardSprite.getAngle());
-
-        mapCanvas.scale(boardSprite.getScale(), boardSprite.getScale());
-
-        // --- NODES ---
-
-//        if (boardSprite.showChannelScopes) {
-
-        for (int i = 0; i < 4; i++) {
-
-            mapCanvas.save();
-
-            mapCanvas.rotate(-90 * i);
-            mapCanvas.translate(0, 0);
-
-            for (int j = 0; j < 3; j++) {
-
-                if (boardSprite.portScopeSprites.get(3 * i + j).channelType != PortScopeSprite.ChannelType.NONE) {
-
-                    if (boardSprite.showChannelScopes[3 * i + j]) {
-
-                        mapCanvas.save();
-                        mapCanvas.translate(
-                                -((boardSprite.channelNodeRadius + boardSprite.distanceBetweenNodes) * 2.0f) + j * ((boardSprite.channelNodeRadius + boardSprite.distanceBetweenNodes) * 2),
-                                (boardSprite.boardWidth / 2.0f) + boardSprite.channelNodeRadius + boardSprite.distanceNodeToBoard
-                        );
-                        if (boardSprite.portScopeSprites.get(3 * i + j).channelDirection == PortScopeSprite.ChannelDirection.OUTPUT) {
-                            mapCanvas.rotate(180.0f);
-                        } else {
-                            mapCanvas.rotate(0.0f);
-                        }
-
-                        mapCanvas.save();
-                        // Color
-                        paint.setStyle(Paint.Style.FILL);
-                        // paint.setColor(boardSprite.channelTypeColors.get(boardSprite.channelTypes.get(3 * i + j)));
-//                        if (boardSprite.channelTypes.get(3 * i + j) != ChannelType.NONE) {
-                            paint.setColor(channelColorPalette[3 * i + j]);
-//                        } else {
-//                            paint.setColor(channelColorNone);
-//                        }
-                        boardSprite.updateChannelScopePositions();
-                        mapCanvas.drawCircle(
-                                0,
-                                0,
-                                boardSprite.channelNodeRadius,
-                                paint
-                        );
-                        // Outline
-                        if (boardSprite.showChannelNodeOutline) {
-                            paint.setStyle(Paint.Style.STROKE);
-                            paint.setStrokeWidth(3);
-                            paint.setColor(Color.BLACK);
-                            mapCanvas.drawCircle(
-                                    0,
-                                    0,
-                                    boardSprite.channelNodeRadius,
-                                    paint
-                            );
-                        }
-                        // Label
-                        if (boardSprite.showChannelLabel) {
-                            paint.setTextSize(boardSprite.labelTextSize);
-                            Rect textBounds = new Rect();
-                            String channelNumberText = String.valueOf(3 * i + j + 1);
-                            paint.getTextBounds(channelNumberText, 0, channelNumberText.length(), textBounds);
-                            paint.setStyle(Paint.Style.FILL);
-                            paint.setStrokeWidth(3);
-                            paint.setColor(Color.BLACK);
-                            mapCanvas.drawText(channelNumberText, -(textBounds.width() / 2.0f), textBounds.height() / 2.0f, paint);
-                        }
-                        // Outline
-                        if (boardSprite.showChannelData) {
-                            if (boardSprite.portScopeSprites.get(3 * i + j).channelType != PortScopeSprite.ChannelType.NONE) {
-                                paint.setStyle(Paint.Style.STROKE);
-                                paint.setStrokeWidth(2.0f);
-                                paint.setColor(Color.WHITE);
-                                int step = 1;
-                                for (int k = 0; k + step < boardSprite.channelDataPoints[3 * i + j].length - 1; k += step) {
-                                    mapCanvas.drawLine(
-                                            boardSprite.channelDataPoints[3 * i + j][k],
-                                            -boardSprite.channelNodeRadius + k,
-                                            boardSprite.channelDataPoints[3 * i + j][k + step],
-                                            -boardSprite.channelNodeRadius + k + step,
-                                            paint
-                                    );
-                                }
-                            }
-                        }
-                        mapCanvas.restore();
-
-                        mapCanvas.restore();
-
-                    }
-                }
-            }
-
-            mapCanvas.restore();
-        }
-        // ^^^ NODES ^^^
-
-        mapCanvas.restore();
     }
 
     public void draw(Canvas mapCanvas, Paint paint) {
@@ -616,9 +402,9 @@ public class BoardSprite extends Sprite {
                 paint.setStrokeWidth(3);
                 //paint.setColor(boardSprite.channelTypeColors.get(boardSprite.channelTypes.get(3 * i + j)));
                 if (boardSprite.portScopeSprites.get(3 * i + j).channelType != PortScopeSprite.ChannelType.NONE) {
-                    paint.setColor(channelColorPalette[3 * i + j]);
+                    paint.setColor(CHANNEL_COLOR_PALETTE[3 * i + j]);
                 } else {
-                    paint.setColor(channelColorNone);
+                    paint.setColor(CHANNEL_COLOR_OFF);
                 }
                 mapCanvas.drawRoundRect(
                         0 - (boardSprite.lightWidth / 2.0f),
@@ -655,35 +441,71 @@ public class BoardSprite extends Sprite {
         }
         // ^^^ LIGHTS ^^^
 
+        // --- PORT SCOPES ---
         mapCanvas.restore();
+
+        mapCanvas.save();
+
+        mapCanvas.translate(boardSprite.getPosition().x, boardSprite.getPosition().y);
+        mapCanvas.rotate(boardSprite.getAngle());
+
+        mapCanvas.scale(boardSprite.getScale(), boardSprite.getScale());
+
+        for (int i = 0; i < 4; i++) {
+
+            mapCanvas.save();
+
+            mapCanvas.rotate(-90 * i);
+            mapCanvas.translate(0, 0);
+
+            for (int j = 0; j < 3; j++) {
+
+                PortScopeSprite portScopeSprite = portScopeSprites.get(3 * i + j);
+
+//                mapCanvas.save();
+//                mapCanvas.translate(
+//                        -((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2),
+//                        (boardSprite.boardWidth / 2.0f) + portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_FROM_BOARD
+//                );
+//                mapCanvas.rotate(0);
+
+                mapCanvas.save();
+                mapCanvas.translate(
+                        -((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2),
+                        (boardSprite.boardWidth / 2.0f) + portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_FROM_BOARD
+                );
+                if (boardSprite.portScopeSprites.get(3 * i + j).channelDirection == PortScopeSprite.ChannelDirection.OUTPUT) {
+                    mapCanvas.rotate(180.0f);
+                } else {
+                    mapCanvas.rotate(0.0f);
+                }
+
+                boardSprite.updateChannelScopePositions(); // TODO: Move this into step()/updateState()
+
+
+                portScopeSprite.draw(mapCanvas, paint);
+
+                mapCanvas.restore();
+            }
+
+            mapCanvas.restore();
+        }
+
+        mapCanvas.restore();
+        // ^^^ PORT SCOPES ^^^
+
+        drawPaths(mapCanvas, paint);
     }
 
     public void drawPaths(Canvas mapCanvas, Paint paint) {
         // --- PATH ---
 
         for (int j = 0; j < channelCount; j++) {
-            for (int i = 0; i < portScopeSprites.get(j).channelPaths.size(); i++) {
+            for (int i = 0; i < portScopeSprites.get(j).flowPathSprites.size(); i++) {
                 if (this.showChannelPaths[j]) {
-                    PortScopeSprite.ChannelPath channelPath = portScopeSprites.get(j).channelPaths.get(i);
+                    FlowPathSprite flowPathSprite = portScopeSprites.get(j).flowPathSprites.get(i);
 
-                    channelPath.destination.showChannelScope(channelPath.destinationChannel);
-
-                    mapCanvas.save();
-                    // Color
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setStrokeWidth(15.0f);
-                    paint.setColor(channelColorPalette[channelPath.sourceChannel]);
-
-                    mapCanvas.drawLine(
-                            channelPath.source.portScopeSprites.get(channelPath.sourceChannel).getPosition().x,
-                            channelPath.source.portScopeSprites.get(channelPath.sourceChannel).getPosition().y,
-                            channelPath.destination.portScopeSprites.get(channelPath.destinationChannel).getPosition().x,
-                            channelPath.destination.portScopeSprites.get(channelPath.destinationChannel).getPosition().y,
-                            paint
-                    );
-
-
-                    mapCanvas.restore();
+                    flowPathSprite.draw(mapCanvas, paint);
                 }
             }
         }
@@ -691,23 +513,23 @@ public class BoardSprite extends Sprite {
     }
 
     public void showChannelScopes() {
-        for (int i = 0; i < this.showChannelScopes.length; i++) {
-            this.showChannelScopes[i] = true;
+        for (int i = 0; i < portScopeSprites.size(); i++) {
+            portScopeSprites.get(i).showChannelScopes = true;
         }
     }
 
     public void showChannelScope (int channelIndex) {
-        this.showChannelScopes[channelIndex] = true;
+        portScopeSprites.get(channelIndex).showChannelScopes = true;
     }
 
     public void hideChannelScopes() {
-        for (int i = 0; i < this.showChannelScopes.length; i++) {
-            this.showChannelScopes[i] = false;
+        for (int i = 0; i < portScopeSprites.size(); i++) {
+            portScopeSprites.get(i).showChannelScopes = false;
         }
     }
 
     private void hideChannelScope (int channelIndex) {
-        this.showChannelScopes[channelIndex] = false;
+        portScopeSprites.get(channelIndex).showChannelScopes = false;
     }
 
     public void showChannelPaths() {
@@ -719,11 +541,17 @@ public class BoardSprite extends Sprite {
     public void hideChannelPaths() {
         for (int i = 0; i < this.showChannelPaths.length; i++) {
             this.showChannelPaths[i] = false;
+            this.portScopeSprites.get(i).showPartialPaths();
         }
     }
 
-    public void showChannelPath(int destinationChannel) {
+    public void showChannelPath(int destinationChannel, boolean showFullPath) {
         this.showChannelPaths[destinationChannel] = true;
+        if (showFullPath) {
+            this.portScopeSprites.get(destinationChannel).showFullPaths();
+        } else {
+            this.portScopeSprites.get(destinationChannel).showPartialPaths();
+        }
     }
 
     public void setPosition(float x, float y) {

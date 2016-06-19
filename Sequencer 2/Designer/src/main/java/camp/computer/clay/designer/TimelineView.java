@@ -70,6 +70,8 @@ public class TimelineView extends DragSortListView {
         ApplicationView.getApplicationView().getCursorView().updatePosition();
         ApplicationView.getApplicationView().getCursorView().show(true);
         // </HACK>
+
+        this.setBackgroundColor(Color.TRANSPARENT);
     }
 
     /**

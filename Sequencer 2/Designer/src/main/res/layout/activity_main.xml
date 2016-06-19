@@ -13,13 +13,25 @@
         android:layout_height="match_parent" />
 
     <RelativeLayout
+        android:id="@+id/timeline_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="hi there" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/old_timeline_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
         <camp.computer.clay.designer.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:layout_height="match_parent"/>
     </RelativeLayout>
 
     <com.github.clans.fab.FloatingActionButton

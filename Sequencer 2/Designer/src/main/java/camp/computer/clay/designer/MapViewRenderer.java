@@ -30,6 +30,7 @@ public class MapViewRenderer extends Thread {
         while (isRunning) {
 
             startTime = java.lang.System.currentTimeMillis ();
+
             mapView.updateSurfaceView ();
 
             // Sleep until the time remaining in the frame's allocated draw time (for the specified FRAMES_PER_SECOND) is reached.

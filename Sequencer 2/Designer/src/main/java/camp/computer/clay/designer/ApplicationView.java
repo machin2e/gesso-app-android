@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -304,19 +305,36 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         // --- Timeline Button ---
         final Button timelineButton = (Button) findViewById(R.id.timeline_button);
+        final RelativeLayout timelineView = (RelativeLayout) findViewById(R.id.timeline_view);
         timelineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mViewPager.getVisibility() == View.GONE) {
-                    mViewPager.setVisibility(View.VISIBLE);
-                    // mViewPager.setBackgroundColor(Color.parseColor("#9a000000"));
+                if (timelineView.getVisibility() == View.GONE) {
+                    timelineView.setVisibility(View.VISIBLE);
+                    timelineView.setBackgroundColor(Color.parseColor("#9a000000"));
+                    timelineButton.setText("Map");
+                } else {
+                    timelineView.setVisibility(View.GONE);
+                    timelineView.setBackgroundColor(Color.TRANSPARENT);
+                    timelineButton.setText("Timeline");
+                }
+            }
+        });
+
+        final RelativeLayout oldTimelineView = (RelativeLayout) findViewById(R.id.old_timeline_view);
+        timelineButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (oldTimelineView.getVisibility() == View.GONE) {
+                    oldTimelineView.setVisibility(View.VISIBLE);
                     timelineButton.setText("Map");
                     cursorView.show(true);
                 } else {
-                    mViewPager.setVisibility(View.GONE);
+                    oldTimelineView.setVisibility(View.GONE);
                     timelineButton.setText("Timeline");
                     cursorView.hide(true);
                 }
+                return true;
             }
         });
         // ^^^ Timeline Button ^^^
