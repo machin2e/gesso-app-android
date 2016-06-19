@@ -99,17 +99,17 @@ public class BoardSprite extends Sprite {
     int lightOutlineColor = Color.parseColor("#212121");
     float lightOutlineThickness = 0.0f;
 
-//    public boolean[] showChannelScopes = new boolean[channelCount];
+//    public boolean[] showFormLayer = new boolean[channelCount];
 //    boolean showChannelLabel = false;
-//    boolean showChannelData = true;
-//    boolean showChannelNodeOutline = false;
+//    boolean showDataLayer = true;
+//    boolean showShapeOutline = false;
 //    float labelTextSize = 30.0f;
-//    float channelNodeRadius = 40.0f;
+//    float shapeRadius = 40.0f;
 //    private Map<ChannelType, Integer> channelTypeColors = new HashMap<ChannelType, Integer>();
     // String[] channelNodeColor = new String[] { "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1", "#1467f1" };
 //    float DISTANCE_FROM_BOARD = 45.0f;
 //    float DISTANCE_BETWEEN_NODES = 5.0f;
-//    float[][] channelDataPoints = new float[channelCount][(int) channelNodeRadius * 2];
+//    float[][] dataSamples = new float[channelCount][(int) shapeRadius * 2];
 
     public boolean[] showChannelPaths = new boolean[channelCount];
     // ^^^ STYLE ^^^
@@ -181,9 +181,9 @@ public class BoardSprite extends Sprite {
                 PointF portScopeSpritePosition = portScopeSprites.get(3 * i + j).getPosition();
 
                 // Translate (Nodes)
-                float nodeRadiusPlusPadding = portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES;
+                float nodeRadiusPlusPadding = portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES;
                 portScopeSpritePosition.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
-                portScopeSpritePosition.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + portScopeSprite.channelNodeRadius;
+                portScopeSpritePosition.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + portScopeSprite.shapeRadius;
 
                 // Rotate (Nodes)
                 portScopeSpritePosition.set(
@@ -205,38 +205,9 @@ public class BoardSprite extends Sprite {
         }
     }
 
-    private float xWaveStart = 0;
     public void updateChannelData () {
         for (int j = 0; j < this.channelCount; j++) {
-            Random random = new Random();
-            PortScopeSprite portScopeSprite = this.portScopeSprites.get(j);
-            if (portScopeSprite.channelType == PortScopeSprite.ChannelType.SWITCH) {
-                // Add new sample for the channel type
-                int squareWidth = 20;
-                float sample = -(portScopeSprite.channelNodeRadius / 2.0f) + random.nextInt(2) * portScopeSprite.channelNodeRadius;
-                for (int k = portScopeSprite.channelDataPoints.length - squareWidth; k < portScopeSprite.channelDataPoints.length; k++) {
-                    portScopeSprite.channelDataPoints[k] = sample;
-                }
-                // Shift data
-                for (int k = 0; k < portScopeSprite.channelDataPoints.length - 1; k++) {
-                    portScopeSprite.channelDataPoints[k] = portScopeSprite.channelDataPoints[k + 1];
-                }
-            } else if (this.portScopeSprites.get(j).channelType == PortScopeSprite.ChannelType.PULSE) {
-                // Shift data
-                for (int k = 0; k < portScopeSprite.channelDataPoints.length - 1; k++) {
-                    portScopeSprite.channelDataPoints[k] = portScopeSprite.channelDataPoints[k + 1];
-                }
-                // Add new sample for the channel type
-                portScopeSprite.channelDataPoints[portScopeSprite.channelDataPoints.length - 1] = -(portScopeSprite.channelNodeRadius / 2.0f) + random.nextInt(2) * portScopeSprite.channelNodeRadius;
-            } else if (this.portScopeSprites.get(j).channelType == PortScopeSprite.ChannelType.WAVE) {
-                // Shift data
-                for (int k = 0; k < portScopeSprite.channelDataPoints.length; k++) {
-                    // Add new sample for the channel type
-                    portScopeSprite.channelDataPoints[k] = ((float) Math.sin(xWaveStart + k * 0.2)) * portScopeSprite.channelNodeRadius * 0.5f;
-                }
-                //xWaveStart = (xWaveStart + ((2.0f * (float) Math.PI) / ((float) this.channelDataPoints[j].length))) % (2.0f * (float) Math.PI);
-                xWaveStart = (xWaveStart + 0.9f) % ((float) Math.PI * 2.0f);
-            }
+            this.portScopeSprites.get(j).updateChannelData();
         }
     }
 
@@ -464,15 +435,15 @@ public class BoardSprite extends Sprite {
 
 //                mapCanvas.save();
 //                mapCanvas.translate(
-//                        -((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2),
-//                        (boardSprite.boardWidth / 2.0f) + portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_FROM_BOARD
+//                        -((portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2),
+//                        (boardSprite.boardWidth / 2.0f) + portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_FROM_BOARD
 //                );
 //                mapCanvas.rotate(0);
 
                 mapCanvas.save();
                 mapCanvas.translate(
-                        -((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2),
-                        (boardSprite.boardWidth / 2.0f) + portScopeSprite.channelNodeRadius + PortScopeSprite.DISTANCE_FROM_BOARD
+                        -((portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_BETWEEN_NODES) * 2),
+                        (boardSprite.boardWidth / 2.0f) + portScopeSprite.shapeRadius + PortScopeSprite.DISTANCE_FROM_BOARD
                 );
                 if (boardSprite.portScopeSprites.get(3 * i + j).channelDirection == PortScopeSprite.ChannelDirection.OUTPUT) {
                     mapCanvas.rotate(180.0f);
@@ -514,22 +485,22 @@ public class BoardSprite extends Sprite {
 
     public void showChannelScopes() {
         for (int i = 0; i < portScopeSprites.size(); i++) {
-            portScopeSprites.get(i).showChannelScopes = true;
+            portScopeSprites.get(i).showFormLayer = true;
         }
     }
 
     public void showChannelScope (int channelIndex) {
-        portScopeSprites.get(channelIndex).showChannelScopes = true;
+        portScopeSprites.get(channelIndex).showFormLayer = true;
     }
 
     public void hideChannelScopes() {
         for (int i = 0; i < portScopeSprites.size(); i++) {
-            portScopeSprites.get(i).showChannelScopes = false;
+            portScopeSprites.get(i).showFormLayer = false;
         }
     }
 
     private void hideChannelScope (int channelIndex) {
-        portScopeSprites.get(channelIndex).showChannelScopes = false;
+        portScopeSprites.get(channelIndex).showFormLayer = false;
     }
 
     public void showChannelPaths() {

@@ -437,7 +437,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     }
 
 //                            // Start touch on a channel scope
-//                            if (boardSprite.showChannelScopes) {
+//                            if (boardSprite.showFormLayer) {
 //
 //                                if (sourceChannelScopeIndex == -1) {
 //
@@ -601,7 +601,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                         // TODO: Add this to an onTouch callback for the sprite's channel nodes
                         // Check if the touched board's I/O node is touched
                         for (int i = 0; i < sourceBoardSprite.getChannelCount(); i++) {
-                            if (sourceBoardSprite.portScopeSprites.get(i).showChannelScopes) {
+                            if (sourceBoardSprite.portScopeSprites.get(i).showFormLayer) {
                                 // Check if one of the objects is touched
                                 if (Geometry.getDistance(touch[pointerId], sourceBoardSprite.portScopeSprites.get(i).getPosition()) < 60) {
                                     Log.v("MapViewTouch", "touched node " + (i + 1));
@@ -648,7 +648,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                         // TODO: Add this to an onTouch callback for the sprite's channel nodes
                         // Check if the touched board's I/O node is touched
                         for (int i = 0; i < destinationBoardSprite.getChannelCount(); i++) {
-                            if (destinationBoardSprite.portScopeSprites.get(i).showChannelScopes) {
+                            if (destinationBoardSprite.portScopeSprites.get(i).showFormLayer) {
                                 // Check if one of the objects is touched
                                 if (Geometry.getDistance(touch[pointerId], destinationBoardSprite.portScopeSprites.get(i).getPosition()) < 60.0f) {
                                     Log.v("MapViewTouch", "touched node " + (i + 1));
@@ -718,15 +718,15 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                             sourceBoardSprite = boardSprite;
 
-//                                        if (sourceBoardSprite.showChannelScopes) {
+//                                        if (sourceBoardSprite.showFormLayer) {
 //                                            // Touched board that's showing channel scopes.
-//                                            sourceBoardSprite.showChannelScopes = false;
+//                                            sourceBoardSprite.showFormLayer = false;
 //                                            sourceBoardSprite.showChannelPaths = false;
 //                                            sourceBoardSprite = null;
 //
 //                                            // Reset style and visualization.
 //                                            for (BoardSprite boardSprite2 : this.boardSprites) {
-//                                                boardSprite2.showChannelScopes = false;
+//                                                boardSprite2.showFormLayer = false;
 //                                                boardSprite2.setTransparency(1.0f);
 //                                            }
 //

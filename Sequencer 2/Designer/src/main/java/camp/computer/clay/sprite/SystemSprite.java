@@ -45,7 +45,7 @@ public class SystemSprite extends Sprite {
         }
 
 //        for (BoardSprite boardSprite : boardSprites) {
-//            boardSprite.drawChannelScopeShadows(mapCanvas, paint);
+//            boardSprite.drawFormLayer(mapCanvas, paint);
 //        }
 
 //        for (BoardSprite boardSprite : boardSprites) {
@@ -54,7 +54,7 @@ public class SystemSprite extends Sprite {
 //        }
 
 //        for (BoardSprite boardSprite : boardSprites) {
-//            boardSprite.drawChannelScopes(mapCanvas, paint);
+//            boardSprite.drawStyleLayer(mapCanvas, paint);
 //        }
     }
 
