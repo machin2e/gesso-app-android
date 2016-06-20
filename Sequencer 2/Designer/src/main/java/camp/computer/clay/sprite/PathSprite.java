@@ -5,10 +5,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import camp.computer.clay.model.Path;
 import camp.computer.clay.sprite.util.Geometry;
 
@@ -45,7 +41,7 @@ public class PathSprite extends Sprite {
 
     public boolean showLinePaths = false;
     public boolean showDirectedPaths = true;
-    public boolean showOnlyPathTerminals = true;
+    public boolean showPathDocks = true;
     float pathTerminalLength = 100.0f;
     float triangleWidth = 25;
     float triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
@@ -329,7 +325,7 @@ public class PathSprite extends Sprite {
                     path.destination.portSprites.get(path.destinationPort).getPosition()
             );
 
-            if (showOnlyPathTerminals) {
+            if (showPathDocks) {
 
                 float distance = (float) Geometry.getDistance(
                         path.source.portSprites.get(path.sourcePort).getPosition(),
@@ -408,13 +404,15 @@ public class PathSprite extends Sprite {
                 );
 
                 paint.setStyle(Paint.Style.FILL);
+                mapCanvas.translate(pathMidpoint.x, pathMidpoint.y);
+                mapCanvas.rotate(rotationAngle + 180);
                 paint.setColor(path.source.getPortSprite(path.sourcePort).getUniqueColor());
                 float spreadsheetSpriteWidth = 50.0f;
                 mapCanvas.drawRect(
-                        pathMidpoint.x - (spreadsheetSpriteWidth / 2.0f),
-                        pathMidpoint.y - (spreadsheetSpriteWidth / 2.0f),
-                        pathMidpoint.x + (spreadsheetSpriteWidth / 2.0f),
-                        pathMidpoint.y + (spreadsheetSpriteWidth / 2.0f),
+                        -(spreadsheetSpriteWidth / 2.0f),
+                        -(spreadsheetSpriteWidth / 2.0f),
+                        (spreadsheetSpriteWidth / 2.0f),
+                        (spreadsheetSpriteWidth / 2.0f),
                         paint
                 );
 

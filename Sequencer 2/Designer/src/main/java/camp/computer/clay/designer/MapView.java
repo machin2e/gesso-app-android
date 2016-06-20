@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -21,6 +22,7 @@ import camp.computer.clay.sprite.DroneSprite;
 import camp.computer.clay.sprite.PortSprite;
 import camp.computer.clay.sprite.Sprite;
 import camp.computer.clay.sprite.SystemSprite;
+import camp.computer.clay.sprite.util.Animation;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class MapView extends SurfaceView implements SurfaceHolder.Callback {
@@ -146,12 +148,24 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     //----------------------------------------------------------------------------------------------
 
     public static float DEFAULT_SCALE_FACTOR = 1.0f;
+    public static int DEFAULT_SCALE_DURATION = 50;
 
-    //private Point originPosition = new Point (0, 0);
-    private float scale = DEFAULT_SCALE_FACTOR;
+    // private Point originPosition = new Point (0, 0);
+    public float scale = DEFAULT_SCALE_FACTOR;
+    private int scaleDuration = DEFAULT_SCALE_DURATION;
 
-    public void setScale (float scale) {
-        this.scale = scale;
+    public void setScale (float targetScale) {
+        Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleCallback() {
+            @Override
+            public void onScale(float currentScale) {
+                scale = currentScale;
+            }
+        });
+        // this.scale = scale;
+
+        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        v.vibrate(50);
     }
 
     public void setOrigin (PointF position) {
@@ -1071,5 +1085,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         // Stop dragging
         this.isDragging[pointerId] = false;
 
+    }
+
+    public float getScale() {
+        return scale;
     }
 }

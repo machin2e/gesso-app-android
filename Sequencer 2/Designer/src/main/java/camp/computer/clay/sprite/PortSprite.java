@@ -128,13 +128,13 @@ public class PortSprite extends Sprite {
 
     public void showPaths() {
         for (PathSprite pathSprite : pathSprites) {
-            pathSprite.showOnlyPathTerminals = false;
+            pathSprite.showPathDocks = false;
         }
     }
 
     public void showPathDocks() {
         for (PathSprite pathSprite : pathSprites) {
-            pathSprite.showOnlyPathTerminals = true;
+            pathSprite.showPathDocks = true;
         }
     }
 

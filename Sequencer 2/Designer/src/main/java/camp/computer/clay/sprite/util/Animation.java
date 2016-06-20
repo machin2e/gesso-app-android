@@ -1,9 +1,13 @@
 package camp.computer.clay.sprite.util;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -11,6 +15,7 @@ import android.widget.RelativeLayout;
 import com.mobeta.android.sequencer.R;
 
 import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.MapView;
 
 public class Animation {
 
@@ -89,6 +94,69 @@ public class Animation {
 
 
         view.startAnimation (animation);
+    }
+
+    public interface OnScaleCallback {
+        public void onScale (float currentScale);
+    }
+
+    public static void scaleValue (final float startScale, final float targetScale, int duration, final OnScaleCallback onScaleCallback) {
+//        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+//        DisplayMetrics dm = new DisplayMetrics();
+//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics( dm );
+//        int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
+
+//        int originalPos[] = new int[2];
+//        view.getLocationOnScreen( originalPos );
+
+        /*
+        int xDest = dm.widthPixels/2;
+        xDest -= (view.getMeasuredWidth()/2);
+        int yDest = dm.heightPixels/2 - (view.getMeasuredHeight()/2) - statusBarOffset;
+        */
+
+//        int xDest = targetScale.x;
+//        int yDest = targetScale.y;
+
+//        float startScale = ((MapView) view).getScale();
+
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(startScale, targetScale);
+        valueAnimator.setDuration(duration);
+        // valueAnimator.setInterpolator(new LinearInterpolator());
+        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (onScaleCallback != null) {
+                    onScaleCallback.onScale((float) animation.getAnimatedValue());
+                }
+            }
+        });
+
+        valueAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+//                ((MapView) view).scale = targetScale;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+        valueAnimator.start();
     }
 
 }

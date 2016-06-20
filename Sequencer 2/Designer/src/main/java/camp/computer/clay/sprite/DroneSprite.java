@@ -7,6 +7,7 @@ import android.graphics.PointF;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.sprite.util.Animation;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class DroneSprite extends Sprite {
@@ -31,15 +32,20 @@ public class DroneSprite extends Sprite {
         return this.scale;
     }
 
-    public void setTransparency (float transparency) {
-        int transparencyInteger = (int) (255.0f * transparency);
-        String transparencyString = String.format("%02x", transparencyInteger);
-        // Drone color
-        this.boardColor = Color.parseColor("#" + transparencyString + boardColorString);
-        this.boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
-        // Header color
-        this.headerColor = Color.parseColor("#" + transparencyString + headerColorString);
-        this.headerOutlineColor = Color.parseColor("#" + transparencyString + headerOutlineColorString);
+    public void setTransparency (final float transparency) {
+        Animation.scaleValue(255.0f, 255.0f * transparency, 80, new Animation.OnScaleCallback() {
+            @Override
+            public void onScale(float currentScale) {
+                int transparencyInteger = (int) currentScale;
+                String transparencyString = String.format("%02x", transparencyInteger);
+                // Drone color
+                boardColor = Color.parseColor("#" + transparencyString + boardColorString);
+                boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+                // Header color
+                headerColor = Color.parseColor("#" + transparencyString + headerColorString);
+                headerOutlineColor = Color.parseColor("#" + transparencyString + headerOutlineColorString);
+            }
+        });
     }
 
     // --- STYLE ---

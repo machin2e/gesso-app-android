@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:2:1-25:12
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:2:1-26:12
 	package
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:3:7-45
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
@@ -62,8 +62,12 @@ uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:13:5-81
 	android:name
 		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:13:22-78
+uses-permission#android.permission.VIBRATE
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:14:5-65
+	android:name
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:14:22-63
 application
-ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:14:5-24:19
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:15:5-25:19
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
 MERGED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:11:5-15:19
@@ -76,28 +80,28 @@ MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Ch
 MERGED from [com.android.support:support-v4:23.1.1] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/AndroidManifest.xml:22:5-20
 MERGED from [com.github.Clans:FloatingActionButton:v1.6.3] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.github.Clans/FloatingActionButton/v1.6.3/AndroidManifest.xml:12:5-20
 	android:label
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:14:18-50
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:15:18-50
 	android:supportsRtl
 		ADDED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:14:9-35
 	android:icon
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:15:13-49
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:16:13-49
 	android:allowBackup
 		ADDED from [com.azeesoft.lib.colorpicker:colorpicker:1.0.9] /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/AndroidManifest.xml:12:9-35
 activity#camp.computer.clay.designer.ApplicationView
-ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:16:9-23:20
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:17:9-24:20
 	android:label
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:18:19-51
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:19:19-51
 	android:icon
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:17:19-55
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:18:19-55
 	android:name
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:16:19-77
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:17:19-77
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:19:13-22:29
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:20:13-23:29
 action#android.intent.action.MAIN
-ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:20:17-69
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:21:17-69
 	android:name
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:20:25-66
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:21:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:21:17-77
+ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:22:17-77
 	android:name
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:21:27-74
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:22:27-74
