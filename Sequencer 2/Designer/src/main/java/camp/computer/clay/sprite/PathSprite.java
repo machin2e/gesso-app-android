@@ -8,7 +8,7 @@ import android.util.Log;
 
 import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.Path;
-import camp.computer.clay.model.TouchAction;
+import camp.computer.clay.model.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class PathSprite extends Sprite {
@@ -473,26 +473,26 @@ public class PathSprite extends Sprite {
     public static final String CLASS_NAME = "PATH_SPRITE";
 
     @Override
-    public void onTouchAction(TouchAction touchAction) {
+    public void onTouchAction(TouchInteraction touchInteraction) {
 
-        if (touchAction.getType() == TouchAction.TouchActionType.NONE) {
-            Log.v("onTouchAction", "TouchAction.NONE to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.TOUCH) {
-            Log.v("onTouchAction", "TouchAction.TOUCH to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.TAP) {
-            Log.v("onTouchAction", "TouchAction.TAP to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchAction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.HOLD) {
-            Log.v("onTouchAction", "TouchAction.HOLD to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.MOVE) {
-            Log.v("onTouchAction", "TouchAction.MOVE to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchAction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.DRAG) {
-            Log.v("onTouchAction", "TouchAction.DRAG to " + CLASS_NAME);
-        } else if (touchAction.getType() == TouchAction.TouchActionType.RELEASE) {
-            Log.v("onTouchAction", "TouchAction.RELEASE to " + CLASS_NAME);
+        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
+            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
+            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
+            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
+            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
+            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
+            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
+            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }
 }

@@ -2,9 +2,9 @@ package camp.computer.clay.model;
 
 import android.graphics.PointF;
 
-public class TouchAction {
+public class TouchInteraction {
 
-    public enum TouchActionType {
+    public enum TouchInteractionType {
 
         NONE(0),
         TOUCH(1),
@@ -19,12 +19,12 @@ public class TouchAction {
         // TODO: Change the index to a UUID?
         int index;
 
-        TouchActionType(int index) {
+        TouchInteractionType(int index) {
             this.index = index;
         }
     }
 
-    private TouchActionType touchActionType;
+    private TouchInteractionType touchInteractionType;
 
     private Body body;
     // TODO: targetSprite? or is the state of body containing this info (e.g., hand occupied with model <M>)
@@ -33,17 +33,17 @@ public class TouchAction {
     // touchedSprite
     // overlappedSprite (not needed, probably, because can look in history, or look at first action in interaction)
 
-    public TouchAction(PointF position, TouchActionType touchActionType) {
+    public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
         this.position = position;
-        this.touchActionType = touchActionType;
+        this.touchInteractionType = touchInteractionType;
     }
 
     public Body getBody() {
         return this.body;
     }
 
-    public TouchActionType getType() {
-        return this.touchActionType;
+    public TouchInteractionType getType() {
+        return this.touchInteractionType;
     }
 
     public PointF getPosition() {

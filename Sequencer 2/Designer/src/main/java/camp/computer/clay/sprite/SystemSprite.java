@@ -1,14 +1,12 @@
 package camp.computer.clay.sprite;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PointF;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchAction;
+import camp.computer.clay.model.TouchInteraction;
 
 public class SystemSprite extends Sprite {
 
@@ -49,7 +47,7 @@ public class SystemSprite extends Sprite {
     }
 
     @Override
-    public void onTouchAction(TouchAction touchAction) {
+    public void onTouchAction(TouchInteraction touchInteraction) {
 
     }
 

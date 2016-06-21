@@ -1,11 +1,9 @@
 package camp.computer.clay.sprite;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PointF;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchAction;
+import camp.computer.clay.model.TouchInteraction;
 
 public abstract class Sprite {
 
@@ -19,25 +17,25 @@ public abstract class Sprite {
     public abstract boolean isTouching (PointF point);
 
     public interface TouchActionListener {
-//        void onTouch(TouchAction touchAction);
-//        void onTap(TouchAction touchAction);
-//        void onDoubleTap(TouchAction touchAction);
-//        void onHold(TouchAction touchAction);
-//        void onMove(TouchAction touchAction);
-//        void onPreDrag(TouchAction touchAction);
-//        void onDrag(TouchAction touchAction);
-//        void onRelease(TouchAction touchAction);
+//        void onTouch(TouchInteraction touchAction);
+//        void onTap(TouchInteraction touchAction);
+//        void onDoubleTap(TouchInteraction touchAction);
+//        void onHold(TouchInteraction touchAction);
+//        void onMove(TouchInteraction touchAction);
+//        void onPreDrag(TouchInteraction touchAction);
+//        void onDrag(TouchInteraction touchAction);
+//        void onRelease(TouchInteraction touchAction);
     }
 
-    public abstract void onTouchAction(TouchAction touchAction);
+    public abstract void onTouchAction(TouchInteraction touchInteraction);
 
     // TODO: change this to addOnTouchListener (since have abstract onTouchAction)... and call at end of that
     public void setOnTouchActionListener(TouchActionListener touchActionListener) {
         this.touchActionListener = touchActionListener;
     }
 
-    public void touch (TouchAction touchAction) {
-        onTouchAction(touchAction);
+    public void touch (TouchInteraction touchInteraction) {
+        onTouchAction(touchInteraction);
     }
 
 }
