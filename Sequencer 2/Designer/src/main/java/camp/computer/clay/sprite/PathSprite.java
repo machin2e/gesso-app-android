@@ -4,8 +4,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.util.Log;
 
+import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.Path;
+import camp.computer.clay.model.TouchAction;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class PathSprite extends Sprite {
@@ -90,11 +93,11 @@ public class PathSprite extends Sprite {
     // TODO: Physical dimensions
     // </MODEL>
 
-    public PathSprite(DroneSprite touchedDroneSpriteSource, int touchedChannelScopeSource, DroneSprite touchedDroneSpriteDestination, int touchedChannelScopeDestination) {
+    public PathSprite(MachineSprite touchedMachineSpriteSource, int touchedChannelScopeSource, MachineSprite touchedMachineSpriteDestination, int touchedChannelScopeDestination) {
         Path path = new Path();
-        path.source = touchedDroneSpriteSource;
+        path.source = touchedMachineSpriteSource;
         path.sourcePort = touchedChannelScopeSource;
-        path.destination = touchedDroneSpriteDestination;
+        path.destination = touchedMachineSpriteDestination;
         path.destinationPort = touchedChannelScopeDestination;
         this.path = path;
 
@@ -115,7 +118,10 @@ public class PathSprite extends Sprite {
     }
 
     @Override
-    public void draw(Canvas mapCanvas, Paint paint) {
+    public void draw(MapView mapView) {
+
+        Canvas mapCanvas = mapView.getCanvas();
+        Paint paint = mapView.getPaint();
 
 //        drawStyleLayer(mapCanvas, paint);
 //        drawDataLayer(mapCanvas, paint);
@@ -288,7 +294,7 @@ public class PathSprite extends Sprite {
     private void drawLinePath (Canvas mapCanvas, Paint paint) {
 
         if (showLinePaths) {
-            path.destination.showChannelScope(path.destinationPort);
+            path.destination.showPort(path.destinationPort);
 
             mapCanvas.save();
             // Color
@@ -310,7 +316,7 @@ public class PathSprite extends Sprite {
 
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
 
-        path.destination.showChannelScope(path.destinationPort);
+        path.destination.showPort(path.destinationPort);
 
         mapCanvas.save();
 
@@ -327,7 +333,7 @@ public class PathSprite extends Sprite {
 
             if (showPathDocks) {
 
-                float distance = (float) Geometry.getDistance(
+                float distance = (float) Geometry.calculateDistance(
                         path.source.portSprites.get(path.sourcePort).getPosition(),
                         path.destination.portSprites.get(path.destinationPort).getPosition()
                 );
@@ -364,7 +370,7 @@ public class PathSprite extends Sprite {
 
             } else {
 
-                float pathDistance = (float) Geometry.getDistance(
+                float pathDistance = (float) Geometry.calculateDistance(
                         path.source.portSprites.get(path.sourcePort).getPosition(),
                         path.destination.portSprites.get(path.destinationPort).getPosition()
                 );
@@ -462,5 +468,31 @@ public class PathSprite extends Sprite {
     @Override
     public boolean isTouching(PointF point) {
         return false;
+    }
+
+    public static final String CLASS_NAME = "PATH_SPRITE";
+
+    @Override
+    public void onTouchAction(TouchAction touchAction) {
+
+        if (touchAction.getType() == TouchAction.TouchActionType.NONE) {
+            Log.v("onTouchAction", "TouchAction.NONE to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.TOUCH) {
+            Log.v("onTouchAction", "TouchAction.TOUCH to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.TAP) {
+            Log.v("onTouchAction", "TouchAction.TAP to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchAction.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.HOLD) {
+            Log.v("onTouchAction", "TouchAction.HOLD to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.MOVE) {
+            Log.v("onTouchAction", "TouchAction.MOVE to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchAction.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.DRAG) {
+            Log.v("onTouchAction", "TouchAction.DRAG to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.RELEASE) {
+            Log.v("onTouchAction", "TouchAction.RELEASE to " + CLASS_NAME);
+        }
     }
 }

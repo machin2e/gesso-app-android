@@ -18,7 +18,8 @@ import android.view.SurfaceView;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.sprite.DroneSprite;
+import camp.computer.clay.model.TouchAction;
+import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PortSprite;
 import camp.computer.clay.sprite.Sprite;
 import camp.computer.clay.sprite.SystemSprite;
@@ -31,12 +32,13 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     private SurfaceHolder surfaceHolder;
 
-    // Canvas
+    // Drawing context
     private Bitmap canvasBitmap = null;
-    private Canvas mapCanvas = null;
+    private Canvas canvas = null;
     private int canvasWidth, canvasHeight;
     private Paint paint = new Paint (Paint.ANTI_ALIAS_FLAG);
     private Matrix identityMatrix;
+    private Matrix originMatrix;
 
     // Map
     private PointF originPosition = new PointF ();
@@ -74,17 +76,22 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         canvasWidth = getWidth ();
         canvasHeight = getHeight();
         canvasBitmap = Bitmap.createBitmap (canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
-        mapCanvas = new Canvas ();
-        mapCanvas.setBitmap(canvasBitmap);
-
-
-        // TODO: Move setPosition to a better location!
-//        getClay().getPerspective ().setPosition(mapCanvas.getWidth() / 2, mapCanvas.getHeight() / 2);
-        originPosition.set(mapCanvas.getWidth() / 2.0f, mapCanvas.getHeight() / 2.0f);
-
-        currentPosition.set(originPosition.x, originPosition.y);
+        canvas = new Canvas ();
+        canvas.setBitmap(canvasBitmap);
 
         identityMatrix = new Matrix ();
+
+        originMatrix = new Matrix ();
+        originMatrix.setTranslate(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+//
+//        canvas.setMatrix(originMatrix);
+
+        // TODO: Move setPosition to a better location!
+//        getClay().getPerspective ().setPosition(canvas.getWidth() / 2, canvas.getHeight() / 2);
+        originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+//        originPosition.set(0, 0);
+
+        currentPosition.set(originPosition.x, originPosition.y);
     }
 
     @Override
@@ -136,12 +143,23 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void drawSprite(Sprite sprite) {
-        sprite.draw(mapCanvas, paint);
+        sprite.draw(this);
     }
 
     //----------------------------------------------------------------------------------------------
     // Coordinate System
     //----------------------------------------------------------------------------------------------
+
+    public Matrix getOriginMatrix(boolean scale) {
+        Matrix originMatrixCopy = new Matrix();
+        float[] v = new float[9];
+        this.originMatrix.getValues(v);
+//        if (scale) {
+//            originMatrixCopy.setScale(this.scale, this.scale);
+//        }
+        originMatrixCopy.setTranslate(v[Matrix.MTRANS_X], v[Matrix.MTRANS_Y]);
+        return originMatrixCopy;
+    }
 
     //----------------------------------------------------------------------------------------------
     // Perspective
@@ -155,13 +173,14 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     private int scaleDuration = DEFAULT_SCALE_DURATION;
 
     public void setScale (float targetScale) {
-        Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleCallback() {
-            @Override
-            public void onScale(float currentScale) {
-                scale = currentScale;
-            }
-        });
-        // this.scale = scale;
+        if (this.scale != targetScale) {
+            Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleListener() {
+                @Override
+                public void onScale(float currentScale) {
+                    scale = currentScale;
+                }
+            });
+        }
 
         Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 500 milliseconds
@@ -181,24 +200,26 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // <PERSPECTIVE>
         // Move the perspective
-        mapCanvas.save ();
-        //mapCanvas.translate (originPosition.x, originPosition.y);
-        mapCanvas.translate (currentPosition.x, currentPosition.y);
-        mapCanvas.scale (scale, scale);
-//        mapCanvas.translate (getClay ().getPerspective ().getPosition ().x, getClay ().getPerspective ().getPosition ().y);
-//        mapCanvas.scale (getClay ().getPerspective ().getScaleFactor (), getClay ().getPerspective ().getScaleFactor ());
+        this.canvas.save ();
+        //canvas.translate (originPosition.x, originPosition.y);
+        this.canvas.translate (currentPosition.x, currentPosition.y);
+        this.canvas.scale (scale, scale);
+//        canvas.translate (getClay ().getPerspective ().getPosition ().x, getClay ().getPerspective ().getPosition ().y);
+//        canvas.scale (getClay ().getPerspective ().getScaleFactor (), getClay ().getPerspective ().getScaleFactor ());
+        // </PERSPECTIVE>
 
         // Draw the background
-        mapCanvas.drawColor (Color.WHITE);
+        this.canvas.drawColor (Color.WHITE);
 
         // Scene
-        drawScene();
+        drawScene(this);
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap (canvasBitmap, identityMatrix, null);
 
-        mapCanvas.restore();
+        this.canvas.restore();
     }
 
     @SuppressLint("WrongCall")
@@ -231,7 +252,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    private void drawScene () {
+    private void drawScene (MapView mapView) {
         // drawTitle();
 
         for (SystemSprite systemSprite : systemSprites) {
@@ -240,7 +261,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //----------------------------------------------------------------------------------------------
-    // Human Interaction Model
+    // Body Interaction Model
     //----------------------------------------------------------------------------------------------
 
     public static int MAXIMUM_TOUCH_POINT_COUNT = 5;
@@ -274,17 +295,25 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean hasTouches = false; // i.e., At least one touch is detected.
     private int touchCount = 0; // i.e., The total number of touch points detected.
     private boolean[] isTouchingSprite = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
-    private DroneSprite[] touchedSprite = new DroneSprite[MAXIMUM_TOUCH_POINT_COUNT];
+    private Sprite[] touchedSprite = new Sprite[MAXIMUM_TOUCH_POINT_COUNT];
 
     // Interactivity state
     private boolean isPanningDisabled = false;
 
+    // TODO: In the queue, store the touch actions persistently after exceeding maximum number for immediate interactions.
+    //private ArrayList<TouchAction> touchActionHistory = new ArrayList<TouchAction>();
+    private ArrayList<TouchAction> touchInteraction = new ArrayList<TouchAction>();
+    // Touch Interaction is a sequence of actions
+    // classifyOngoingInteraction --> make callback
+    // classifyCompleteInteraction --> make callback
+    private Sprite overlappedSprite = null;
+
     // Gesture Envelope for Making a Wireless Channel
     // Gestural language. Grammar for the gestures composing it. Think of these as templates for
     // gestures that Clay attempts to evaluate and cleans up after, following each touch action.
-    private DroneSprite sourceDroneSprite = null;
+    private Sprite touchSourceSprite = null;
     private int sourceChannelScopeIndex = -1;
-    private DroneSprite destinationDroneSprite = null;
+    private Sprite touchDestinationSprite = null;
     private int destinationChannelScopeIndex = -1;
 
     private Handler timerHandler = new Handler();
@@ -322,13 +351,29 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         return false;
     }
 
+    // Perspective/Activity:
+    //
+    // - default
+    //    - focus on machine (after touching it)
+    //       - focus on one port + all its paths (after touching it)
+    //          - focus on one path(s) (after touching it)
+    //          - search for dest. port of those appearing near touch (after dragging from a port)
+    //    - scan/browse map (after dragging on map/device)
+    //    - move machine (after holding it, then/before dragging it)
+
+
     @Override
     public boolean onTouchEvent (MotionEvent motionEvent) {
 
         int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
         int pointerId = motionEvent.getPointerId (pointerIndex);
-        int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+        //int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+        int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
         int pointCount = motionEvent.getPointerCount ();
+
+        // TODO: Encapsulate TouchAction in TouchEvent
+//        TouchAction touchAction = new TouchAction();
+//        touchActionHistory.add(touchAction);
 
         if (pointCount <= MAXIMUM_TOUCH_POINT_COUNT) {
             if (pointerIndex <= MAXIMUM_TOUCH_POINT_COUNT - 1) {
@@ -341,22 +386,22 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     touch[id].y = (motionEvent.getY (i) - currentPosition.y) / scale;
                     touchTime[id] = java.lang.System.currentTimeMillis ();
 
-//                    xTouch[id] = (motionEvent.getX (i) - currentPosition.x) / scale + mapCanvas.getClipBounds().left;
-//                    yTouch[id] = (motionEvent.getY (i) - currentPosition.y) / scale + mapCanvas.getClipBounds().top;
+//                    xTouch[id] = (motionEvent.getX (i) - currentPosition.x) / scale + canvas.getClipBounds().left;
+//                    yTouch[id] = (motionEvent.getY (i) - currentPosition.y) / scale + canvas.getClipBounds().top;
                 }
 
                 // Update the state of the touched object based on the current touch interaction state.
-                if (touchAction == MotionEvent.ACTION_DOWN) {
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
                     onTouchCallback(pointerId);
-                } else if (touchAction == MotionEvent.ACTION_POINTER_DOWN) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO:
-                } else if (touchAction == MotionEvent.ACTION_MOVE) {
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                     onMoveCallback(pointerId);
-                } else if (touchAction == MotionEvent.ACTION_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
                    onReleaseCallback(pointerId);
-                } else if (touchAction == MotionEvent.ACTION_POINTER_UP) {
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
-                } else if (touchAction == MotionEvent.ACTION_CANCEL) {
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:
                 } else {
                     // TODO:
@@ -393,17 +438,22 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
             // Reset object interaction state
             for (SystemSprite systemSprite : systemSprites) {
-                for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
-                    // Log.v ("MapViewTouch", "Object at " + droneSprite.x + ", " + droneSprite.y);
+                for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
+                    // Log.v ("MapViewTouch", "Object at " + machineSprite.x + ", " + machineSprite.y);
 
                     // Check if one of the objects is touched
-                    if (droneSprite.isTouching(touchStart[pointerId])) {
+                    if (machineSprite.isTouching(touchStart[pointerId])) {
+
+                        // <TOUCH_ACTION>
+                        TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.TOUCH);
+                        machineSprite.touch(touchAction);
+                        // </TOUCH_ACTION>
 
                         // TODO: Add this to an onTouch callback for the sprite's channel nodes
                         // TODO: i.e., callback Sprite.onTouch (via Sprite.touch())
 
                         this.isTouchingSprite[pointerId] = true;
-                        this.touchedSprite[pointerId] = droneSprite;
+                        this.touchedSprite[pointerId] = machineSprite;
 
                         isPanningDisabled = true;
 
@@ -412,56 +462,35 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                     }
 
-//                            // Start touch on a channel scope
-//                            if (droneSprite.showFormLayer) {
-//
-//                                if (sourceChannelScopeIndex == -1) {
-//
-//                                    /*
-//                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
-//                                    // Check if the touched board's I/O node is touched
-//                                    for (int i = 0; i < droneSprite.channelScopePositions.size(); i++) {
-//                                        PointF channelNodePoint = droneSprite.channelScopePositions.get(i);
-//                                        // Check if one of the objects is touched
-//                                        if (getDistance((int) channelNodePoint.x, (int) channelNodePoint.y, (int) xTouchStart[pointerId], (int) yTouchStart[pointerId]) < 60) {
-//                                            Log.v("MapViewTouch", "touched node " + (i + 1));
-//                                            sourceChannelScopeIndex = i;
-//                                            droneSprite.channelTypes.set(
-//                                                    i,
-//                                                    DroneSprite.ChannelType.getNextType(droneSprite.channelTypes.get(i)) // (droneSprite.channelTypes.get(i) + 1) % droneSprite.channelTypeColors.length
-//                                            );
-//                                        }
-//                                    }
-//                                    */
-//
-//                                }
-//
-//                            }
+                    for (PortSprite portSprite: machineSprite.portSprites) {
+                        if (portSprite.isTouching(touchStart[pointerId])) {
+                            Log.v ("PortTouch", "start touch on port " + portSprite);
 
+                            // <TOUCH_ACTION>
+                            TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.TOUCH);
+                            portSprite.touch(touchAction);
+                            // </TOUCH_ACTION>
+
+                            this.isTouchingSprite[pointerId] = true;
+                            this.touchedSprite[pointerId] = portSprite;
+
+                            isPanningDisabled = true;
+
+                            break;
+                        }
+                    }
                 }
             }
-
-//                        if (touchedSprite == false) {
-//                            if ()
-//                            sourceDroneSprite = null;
-//                        }
 
             // Touch the canvas
             if (this.touchedSprite[pointerId] == null) {
                 this.isTouchingSprite[pointerId] = false;
-                this.isPanningDisabled = false;
+//                this.isPanningDisabled = false;
             }
 
             // Start timer to check for hold
             timerHandler.removeCallbacks(timerRunnable);
             timerHandler.postDelayed(timerRunnable, MINIMUM_HOLD_DURATION);
-
-//                        // Move the touched object to be the top object layer
-//                        if (sourceDroneSprite != null) {
-//                            boardSprites.remove(sourceDroneSprite);
-//                            boardSprites.add(sourceDroneSprite);
-//                        }
-
         }
     }
 
@@ -479,28 +508,44 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         if (dragDistance[pointerId] < this.MINIMUM_DRAG_DISTANCE) {
             // Holding but not (yet) dragging.
 
+            /*
             // Disable panning
             isPanningDisabled = false;
 
             // Hide scopes
             if (sourceChannelScopeIndex == -1) {
                 for (SystemSprite systemSprite : this.systemSprites) {
-                    for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
-                        droneSprite.hideChannelScopes();
-                        this.setScale(1.0f);
-                        droneSprite.hideChannelPaths();
+                    for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
+                        machineSprite.hidePorts();
+                        machineSprite.hidePaths();
                     }
                 }
+                this.setScale(1.0f);
             }
+            */
 
             // Show scope for source board
             if (touchedSprite[pointerId] != null) {
-                sourceDroneSprite = touchedSprite[pointerId];
-                sourceDroneSprite.showChannelScopes();
-                sourceDroneSprite.showChannelPaths();
-                this.setScale(0.8f);
-            }
+                if (touchedSprite[pointerId] instanceof MachineSprite) {
+                    MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
+                    TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.HOLD);
+                    machineSprite.touch(touchAction);
 
+                    //machineSprite.showPorts();
+                    //machineSprite.showPaths();
+                    //touchSourceSprite = machineSprite;
+                    this.setScale(0.8f);
+                } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                    PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+                    TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.HOLD);
+                    portSprite.touch(touchAction);
+
+//                    portSprite.showPorts();
+//                    portSprite.showPaths();
+                    this.setScale(0.8f);
+                    touchSourceSprite = portSprite;
+                }
+            }
         }
     }
 
@@ -512,13 +557,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         touchPrevious[pointerId].x = touch[pointerId].x;
         touchPrevious[pointerId].y = touch[pointerId].y;
 
-//                    // Current
-//                    isTouching[pointerId] = true;
-//                    xTouch[pointerId] = motionEvent.getX (i);
-//                    yTouch[pointerId] = motionEvent.getY (i);
-
         // Calculate drag distance
-        dragDistance[pointerId] = Geometry.getDistance(touch[pointerId], touchStart[pointerId]);
+        dragDistance[pointerId] = Geometry.calculateDistance(touch[pointerId], touchStart[pointerId]);
 
         // Classify/Callback
         if (dragDistance[pointerId] < this.MINIMUM_DRAG_DISTANCE) {
@@ -536,7 +576,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void onDragCallback (int pointerId) {
-        Log.v("MapViewEvent", "onDragCallback");
+        //Log.v("MapViewEvent", "onDragCallback");
 
         // Process
         // TODO: Put into callback
@@ -546,113 +586,232 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
             // Dragging only (not holding)
 
-            Log.v("MapViewEvent", "\tB");
-
             // TODO: Put into callback
-            if (!isPanningDisabled) {
-                currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
+            //if (this.isTouchingSprite[pointerId]) {
+            if (touchedSprite[pointerId] != null) {
+                if (touchedSprite[pointerId] instanceof MachineSprite) {
+                    /*
+                    MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
+                    TouchAction touchAction = new TouchAction(TouchAction.TouchActionType.DRAG);
+                    machineSprite.touch(touchAction);
+                        machineSprite.showHighlights = true;
+                        machineSprite.setPosition(touch[pointerId].x, touch[pointerId].y);
+                    */
+                } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                    PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+                    TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.DRAG);
+                    portSprite.touch(touchAction);
+                }
             } else {
-//                if (sourceDroneSprite != null) {
-                    if (this.isTouchingSprite[pointerId]) {
-                        //sourceDroneSprite.scale = 1.3f;
-                        touchedSprite[pointerId].showHighlights = true;
-                        touchedSprite[pointerId].setPosition(touch[pointerId].x, touch[pointerId].y);
-                    }
-//                }
+                if (!isPanningDisabled) {
+                    currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
+                }
             }
 
         } else {
-            Log.v("MapViewEvent", "\tA");
 
-            // Holding and dragging.
+            // TODO: Put into callback
+            //if (this.isTouchingSprite[pointerId]) {
+            if (touchedSprite[pointerId] != null) {
+                if (touchedSprite[pointerId] instanceof MachineSprite) {
+                    MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
+                    TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.DRAG);
+                    machineSprite.touch(touchAction);
+                        machineSprite.showHighlights = true;
+                        machineSprite.setPosition(touch[pointerId].x, touch[pointerId].y);
+                } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                    PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+                    TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.DRAG);
+                    portSprite.touch(touchAction);
 
-            // TODO: Check if (1) drag through a channel connector node, then if (2) drag to another board, then (3) set up communication channel (or abandon if not all steps done)
-            if (sourceDroneSprite != null) {
-                Log.v("MapViewEvent", "\tA2");
 
-                // Start touch on a channel scope
-                if (sourceChannelScopeIndex == -1) {
 
-                    if (sourceDroneSprite != null) {
-                        // If no channel source has been touched yet, check if one is dragged over.
+                    // Show ports of nearby machines
+                    for (SystemSprite systemSprite: this.systemSprites) {
+                        for (MachineSprite nearbyMachineSprite: systemSprite.getMachineSprites()) {
 
-                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                        // Check if the touched board's I/O node is touched
-                        for (int i = 0; i < sourceDroneSprite.getChannelCount(); i++) {
-                            if (sourceDroneSprite.portSprites.get(i).showFormLayer) {
-                                // Check if one of the objects is touched
-                                if (Geometry.getDistance(touch[pointerId], sourceDroneSprite.portSprites.get(i).getPosition()) < 60) {
-                                    Log.v("MapViewTouch", "touched node " + (i + 1));
-                                    sourceChannelScopeIndex = i;
-                                    sourceDroneSprite.portSprites.get(i).portType = PortSprite.PortType.getNextType(sourceDroneSprite.portSprites.get(i).portType); // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
+                            // Update style of nearby machines
+                            float distanceToMachineSprite = (float) Geometry.calculateDistance(
+                                    touch[pointerId],
+                                    nearbyMachineSprite.getPosition()
+                            );
+                            Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
+                            if (distanceToMachineSprite < nearbyMachineSprite.boardWidth + 50) {
+                                nearbyMachineSprite.setTransparency(1.0f);
+                                nearbyMachineSprite.showPorts();
+
+                                for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
+                                    if (nearbyPortSprite != portSprite) {
+                                        // Scaffold interaction to connect path to with nearby ports
+                                        float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
+                                                touch[pointerId],
+                                                nearbyPortSprite.getPosition()
+                                        );
+                                        if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
+                                            portSprite.setPosition(nearbyPortSprite.getPosition());
+                                            if (nearbyPortSprite != overlappedSprite) {
+                                                overlappedSprite = nearbyPortSprite;
+                                                Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                                                // Vibrate for 500 milliseconds
+                                                v.vibrate(50); // Vibrate once for "YES"
+                                            }
+                                            break;
+                                        }
+                                    } else {
+                                        // TODO: Vibrate twice for "NO"
+                                    }
+                                }
+
+                            } else if (distanceToMachineSprite < nearbyMachineSprite.boardWidth + 80) {
+                                if (nearbyMachineSprite != portSprite.getMachineSprite()) {
+                                    nearbyMachineSprite.setTransparency(0.5f);
+                                }
+                            } else {
+                                if (nearbyMachineSprite != portSprite.getMachineSprite()) {
+                                    nearbyMachineSprite.setTransparency(0.1f);
+                                    nearbyMachineSprite.hidePorts();
                                 }
                             }
-
-                        }
-                    }
-                } else if (destinationDroneSprite == null) {
-
-                    if (sourceChannelScopeIndex >= 0) {
-                        Log.v("MapViewTouch", "\tLooking for destination");
-
-                        // Check if a board was touched
-                        for (SystemSprite systemSprite : this.systemSprites) {
-                            for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
-                                // Log.v ("MapViewTouch", "Object at " + droneSprite.x + ", " + droneSprite.y);
-
-                                // TODO: Add this to an isTouch? function of the sprite object
-                                // Check if one of the objects is touched
-                                if (Geometry.getDistance(touch[pointerId], droneSprite.getPosition()) < (droneSprite.boardWidth / 3.0f)) {
-
-                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
-
-                                    Log.v("MapViewTouch", "\tTouching object at " + droneSprite.getPosition().x + ", " + droneSprite.getPosition().y);
-                                    //this.isTouchingSprite[pointerId] = true;
-                                    destinationDroneSprite = droneSprite;
-
-                                    destinationDroneSprite.showChannelScopes();
-                                    this.setScale(0.8f);
-
-                                    // TODO: Callback: call Sprite.onTouchDestination (via Sprite.touch())
-                                }
-                            }
-                        }
-
-                    }
-                } else if (destinationChannelScopeIndex == -1) {
-                    Log.v("MapViewTouch", "\tLooking for destination SCOPE");
-                    if (destinationDroneSprite != null) {
-                        // If no channel source has been touched yet, check if one is dragged over.
-
-                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                        // Check if the touched board's I/O node is touched
-                        for (int i = 0; i < destinationDroneSprite.getChannelCount(); i++) {
-                            if (destinationDroneSprite.portSprites.get(i).showFormLayer) {
-                                // Check if one of the objects is touched
-                                if (Geometry.getDistance(touch[pointerId], destinationDroneSprite.portSprites.get(i).getPosition()) < 60.0f) {
-                                    Log.v("MapViewTouch", "touched node " + (i + 1));
-                                    destinationChannelScopeIndex = i;
-                                    destinationDroneSprite.portSprites.get(i).portType = PortSprite.PortType.getNextType(destinationDroneSprite.portSprites.get(i).portType); // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
-                                }
-                            }
-
                         }
                     }
 
                 }
-
             } else {
-
-                // TODO: Put into callback
-                 if (this.isTouchingSprite[pointerId]) {
-                    //sourceDroneSprite.scale = 1.3f;
-                    touchedSprite[pointerId].showHighlights = true;
-                    touchedSprite[pointerId].setPosition(touch[pointerId].x, touch[pointerId].y);
-                } else if (!isPanningDisabled) {
-                     currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
-                 }
+                if (!isPanningDisabled) {
+                    currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
+                }
             }
 
+//            // Holding and dragging.
+//
+//            if (this.isTouchingSprite[pointerId]) {
+//                if (touchedSprite[pointerId] instanceof MachineSprite) {
+//
+//                    // TODO: Check if (1) drag through a channel connector node, then if (2) drag to another board, then (3) set up communication channel (or abandon if not all steps done)
+//                    if (touchSourceSprite != null) {
+//
+//                        if (touchSourceSprite instanceof MachineSprite) {
+//                            MachineSprite machineSprite3 = (MachineSprite) touchSourceSprite;
+//
+//                            // Start touch on a channel scope
+//                            if (sourceChannelScopeIndex == -1) {
+//
+//                                if (touchSourceSprite != null) {
+//                                    // If no channel source has been touched yet, check if one is dragged over.
+//                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
+//
+//                                    // TODO: Move this into the following condition for PortSprite
+//                                    // Check if the touched board's I/O node is touched
+//                                    for (int i = 0; i < machineSprite3.getChannelCount(); i++) {
+//                                        if (machineSprite3.portSprites.get(i).showFormLayer) {
+//                                            // Check if one of the objects is touched
+//                                            if (Geometry.calculateDistance(touch[pointerId], machineSprite3.getPortSprite(i).getPosition()) < 60) {
+//
+//                                                // <TOUCH_ACTION>
+//                                                TouchAction touchAction = new TouchAction(TouchAction.TouchActionType.DRAG);
+//                                                machineSprite3.getPortSprite(i).touch(touchAction);
+//                                                // </TOUCH_ACTION>
+//
+//                                                Log.v("MapViewTouch", "touched node " + (i + 1));
+//                                                sourceChannelScopeIndex = i;
+//                                                machineSprite3.portSprites.get(i).portType = PortSprite.PortType.getNextType(machineSprite3.portSprites.get(i).portType); // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//
+//                            } else if (touchDestinationSprite == null) {
+//
+//                                if (sourceChannelScopeIndex >= 0) {
+//                                    Log.v("MapViewTouch", "\tLooking for destination");
+//
+//                                    if (touchSourceSprite instanceof MachineSprite) {
+//                                        MachineSprite machineSprite2 = (MachineSprite) touchDestinationSprite;
+//                                        // Check if a board was touched
+//                                        for (SystemSprite systemSprite : this.systemSprites) {
+//                                            for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
+//                                                // Log.v ("MapViewTouch", "Object at " + machineSprite.x + ", " + machineSprite.y);
+//
+//                                                // TODO: Add this to an isTouch? function of the sprite object
+//                                                // Check if one of the objects is touched
+//                                                if (Geometry.calculateDistance(touch[pointerId], machineSprite.getPosition()) < (machineSprite.boardWidth / 3.0f)) {
+//
+//                                                    // <TOUCH_ACTION>
+//                                                    TouchAction touchAction = new TouchAction(TouchAction.TouchActionType.DRAG);
+//                                                    machineSprite.touch(touchAction);
+//                                                    // </TOUCH_ACTION>
+//
+//                                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
+//
+//                                                    Log.v("MapViewTouch", "\tTouching object at " + machineSprite.getPosition().x + ", " + machineSprite.getPosition().y);
+//                                                    //this.isTouchingSprite[pointerId] = true;
+//                                                    machineSprite2 = machineSprite;
+//
+//                                                    machineSprite2.showPorts();
+//                                                    this.setScale(0.8f);
+//
+//                                                    // TODO: Callback: call Sprite.onTouchDestination (via Sprite.touch())
+//                                                }
+//                                            }
+//                                        }
+//                                    } else if (touchedSprite[pointerId] instanceof PortSprite) {
+//                                        PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+//                                    }
+//                                }
+//                            } else if (destinationChannelScopeIndex == -1) {
+//                                Log.v("MapViewTouch", "\tLooking for destination SCOPE");
+//                                if (touchDestinationSprite != null) {
+//                                    // If no channel source has been touched yet, check if one is dragged over.
+//
+//                                    if (touchSourceSprite instanceof MachineSprite) {
+//                                        MachineSprite machineSprite2 = (MachineSprite) touchDestinationSprite;
+//                                        // TODO: Add this to an onTouch callback for the sprite's channel nodes
+//                                        // Check if the touched board's I/O node is touched
+//                                        for (int i = 0; i < machineSprite2.getChannelCount(); i++) {
+//                                            if (machineSprite2.portSprites.get(i).showFormLayer) {
+//                                                // Check if one of the objects is touched
+//                                                if (Geometry.calculateDistance(touch[pointerId], machineSprite2.portSprites.get(i).getPosition()) < 60.0f) {
+//
+//                                                    // <TOUCH_ACTION>
+//                                                    TouchAction touchAction = new TouchAction(TouchAction.TouchActionType.DRAG);
+//                                                    machineSprite2.getPortSprite(i).touch(touchAction);
+//                                                    // </TOUCH_ACTION>
+//
+//                                                    Log.v("MapViewTouch", "touched node " + (i + 1));
+//                                                    destinationChannelScopeIndex = i;
+//                                                    machineSprite2.getPortSprite(i).portType = PortSprite.PortType.getNextType(machineSprite2.portSprites.get(i).portType); // (boardSprite.channelTypes.get(i) + 1) % boardSprite.channelTypeColors.length
+//                                                }
+//                                            }
+//
+//                                        }
+//                                    } else if (touchedSprite[pointerId] instanceof PortSprite) {
+//                                        PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+//                                    }
+//                                }
+//                            }
+//
+//                        } else if (touchedSprite[pointerId] instanceof PortSprite) {
+//                            PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+//                        }
+//
+//                    } else {
+//
+//                        // TODO: Put into callback
+//                        if (this.isTouchingSprite[pointerId]) {
+//                            if (touchSourceSprite instanceof MachineSprite) {
+//                                MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
+//                                machineSprite.showHighlights = true;
+//                                machineSprite.setPosition(touch[pointerId].x, touch[pointerId].y);
+//                            } else if (touchedSprite[pointerId] instanceof PortSprite) {
+//                                PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+//                            }
+//
+//                        } else if (!isPanningDisabled) {
+//                            currentPosition.offset((int) (touch[pointerId].x - touchStart[pointerId].x), (int) (touch[pointerId].y - touchStart[pointerId].y));
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
@@ -674,60 +833,53 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             this.touchStopTime = java.lang.System.currentTimeMillis ();
         }
 
-        boolean isGestureInProgress = false;
+        boolean isInteractionInProgress = false;
 
         // Classify/Callbacks
         if (touchStopTime - touchStartTime < MAXIMUM_TAP_DURATION) {
 
             // Step 1: Touch source board
-            if (/*sourceDroneSprite == null && */ sourceChannelScopeIndex == -1
-                    && destinationDroneSprite == null && destinationChannelScopeIndex == -1) {
+            if (/*touchSourceSprite == null && */ sourceChannelScopeIndex == -1
+                    && touchDestinationSprite == null && destinationChannelScopeIndex == -1) {
                 Log.v("MapView", "Looking for source board touch.");
 
                 // Hide channel scopes (unless dragging)
 
                 for (SystemSprite systemSprite : this.systemSprites) {
-                    for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
+                    for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
 
                         // TODO: Add this to an onTouch callback for the sprite's channel nodes
                         // Check if the touched board's I/O node is touched
                         // Check if one of the objects is touched
-                        if (Geometry.getDistance(touchStart[pointerId], droneSprite.getPosition()) < 80) {
+                        if (Geometry.calculateDistance(touchStart[pointerId], machineSprite.getPosition()) < 80) {
                             Log.v("MapView", "\tSource board touched.");
 
-                            sourceDroneSprite = droneSprite;
+                            // <TOUCH_ACTION>
+                            TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.TAP);
+                            // TODO: propagate RELEASE before TAP
+                            machineSprite.touch(touchAction);
+                            // </TOUCH_ACTION>
 
-//                                        if (sourceDroneSprite.showFormLayer) {
-//                                            // Touched board that's showing channel scopes.
-//                                            sourceDroneSprite.showFormLayer = false;
-//                                            sourceDroneSprite.showChannelPaths = false;
-//                                            sourceDroneSprite = null;
-//
-//                                            // Reset style and visualization.
-//                                            for (DroneSprite boardSprite2 : this.boardSprites) {
-//                                                boardSprite2.showFormLayer = false;
-//                                                boardSprite2.setTransparency(1.0f);
-//                                            }
-//
-//                                            ApplicationView.getApplicationView().speakPhrase("stopping");
-//                                        } else {
+                            touchSourceSprite = machineSprite;
+
                             // No touch on board or scope. Touch is on map. So hide scopes.
                             for (SystemSprite systemSprite2 : this.systemSprites) {
-                                for (DroneSprite droneSprite2 : systemSprite2.getDroneSprites()) {
-                                    droneSprite2.hideChannelScopes();
-                                    scale = 1.0f;
-                                    droneSprite2.hideChannelPaths();
-                                    droneSprite2.setTransparency(0.1f);
+                                for (MachineSprite machineSprite2 : systemSprite2.getMachineSprites()) {
+                                    machineSprite2.hidePorts();
+                                    this.setScale(1.0f);
+                                    machineSprite2.hidePaths();
+                                    machineSprite2.setTransparency(0.1f);
                                 }
                             }
-                            sourceDroneSprite.showChannelScopes();
+                            machineSprite.showPorts();
                             this.setScale(0.8f);
-                            sourceDroneSprite.showChannelPaths();
-                            sourceDroneSprite.setTransparency(1.0f);
+                            machineSprite.showPaths();
+                            machineSprite.setTransparency(1.0f);
                             ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
-//                                        }
 
-                            isGestureInProgress = true;
+                            isInteractionInProgress = true;
+
+                            isPanningDisabled = true;
 
                             break;
                         }
@@ -736,169 +888,155 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             // Step 2: Touch source channel scope
-            if (!isGestureInProgress) {
-                if (sourceDroneSprite != null /* && sourceChannelScopeIndex == -1 */
-                        && destinationDroneSprite == null && destinationChannelScopeIndex == -1) {
+            if (!isInteractionInProgress) {
+                if (touchSourceSprite != null /* && sourceChannelScopeIndex == -1 */
+                        && touchDestinationSprite == null && destinationChannelScopeIndex == -1) {
                     Log.v("MapView", "Looking for source channel scope touch.");
 
-                    if (!isDragging[pointerId]) {
+                    if (touchSourceSprite instanceof MachineSprite) {
+                        MachineSprite touchSourceMachineSprite = (MachineSprite) touchSourceSprite;
 
-                        for (SystemSprite systemSprite : this.systemSprites) {
-                            for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
+                        if (!isDragging[pointerId]) {
 
-                                // Check if the touched board's chanenl scope is touched
-                                for (int scopeIndex = 0; scopeIndex < droneSprite.getChannelCount(); scopeIndex++) {
-                                    // Check if one of the objects is touched
-                                    // TODO: Create BoardChannelSprite.isTouching()
-                                    if (Geometry.getDistance(touchStart[pointerId], droneSprite.portSprites.get(scopeIndex).getPosition()) < 80) {
-                                        if (droneSprite == sourceDroneSprite) {
+                            for (SystemSprite systemSprite : this.systemSprites) {
+                                for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
 
-                                            if (sourceChannelScopeIndex == -1) {
+                                    // Check if the touched board's chanenl scope is touched
+                                    for (int scopeIndex = 0; scopeIndex < machineSprite.getChannelCount(); scopeIndex++) {
+                                        // Check if one of the objects is touched
+                                        // TODO: Create BoardChannelSprite.isTouching()
+                                        if (Geometry.calculateDistance(touchStart[pointerId], machineSprite.portSprites.get(scopeIndex).getPosition()) < 80) {
 
-                                                // First touch on the source channel scope
+                                            // <TOUCH_ACTION>
+                                            // TODO: RELEASE
+                                            TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.TAP);
+                                            machineSprite.portSprites.get(scopeIndex).touch(touchAction);
+                                            // </TOUCH_ACTION>
 
-                                                if (droneSprite.portSprites.get(scopeIndex).portType == PortSprite.PortType.NONE) {
+                                            if (machineSprite == touchSourceSprite) {
 
-                                                    Log.v("MapView", "\tSource channel scope " + (scopeIndex + 1) + " touched.");
-                                                    sourceChannelScopeIndex = scopeIndex;
-                                                    droneSprite.portSprites.get(scopeIndex).portType = PortSprite.PortType.getNextType(droneSprite.portSprites.get(scopeIndex).portType); // (droneSprite.channelTypes.get(i) + 1) % droneSprite.channelTypeColors.length
+                                                if (sourceChannelScopeIndex == -1) {
 
-                                                    ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
+                                                    // First touch on the source channel scope
 
-                                                    isGestureInProgress = true;
+                                                    if (machineSprite.portSprites.get(scopeIndex).portType == PortSprite.PortType.NONE) {
 
-                                                    break;
+                                                        Log.v("MapView", "\tSource channel scope " + (scopeIndex + 1) + " touched.");
+                                                        sourceChannelScopeIndex = scopeIndex;
+                                                        machineSprite.portSprites.get(scopeIndex).portType = PortSprite.PortType.getNextType(machineSprite.portSprites.get(scopeIndex).portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+
+                                                        ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
+
+                                                        isInteractionInProgress = true;
+
+                                                        break;
+
+                                                    } else {
+
+                                                        // TODO: If second press, change the channel.
+
+                                                        Log.v("MapView", "\tSource channel scope " + (scopeIndex + 1) + " touched.");
+
+                                                        for (SystemSprite systemSprite2 : this.systemSprites) {
+                                                            for (MachineSprite machineSprite2 : systemSprite2.getMachineSprites()) {
+                                                                machineSprite2.hidePorts();
+                                                                this.setScale(1.0f);
+                                                                machineSprite2.hidePaths();
+                                                            }
+                                                        }
+                                                        machineSprite.showPort(scopeIndex);
+                                                        machineSprite.showPath(scopeIndex, true);
+
+                                                        ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
+
+                                                        isInteractionInProgress = true;
+
+                                                        break;
+
+                                                    }
 
                                                 } else {
 
-                                                    // TODO: If second press, change the channel.
+                                                    // TODO: Create BoardChannelSprite.isTouching()
+                                                    if (sourceChannelScopeIndex == scopeIndex) {
+                                                        // Touched already-selected channel scope (for some number repetitions greater than 1, or after the first)
+                                                        Log.v("MapView", "\tSame source channel scope " + (scopeIndex + 1) + " touched.");
+                                                        // sourceChannelScopeIndex = i; // No need to re-select the scope
+                                                        machineSprite.portSprites.get(scopeIndex).portType = PortSprite.PortType.getNextType(machineSprite.portSprites.get(scopeIndex).portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
 
-                                                    Log.v("MapView", "\tSource channel scope " + (scopeIndex + 1) + " touched.");
-                                                /*
-                                                sourceChannelScopeIndex = scopeIndex;
-                                                droneSprite.portSprites.get(scopeIndex).portType = PortSprite.ChannelType.getNextType(droneSprite.portSprites.get(scopeIndex).portType); // (droneSprite.channelTypes.get(i) + 1) % droneSprite.channelTypeColors.length
-                                                */
+                                                        // Narrate
+                                                        // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
 
-                                                    for (SystemSprite systemSprite2 : this.systemSprites) {
-                                                        for (DroneSprite droneSprite2 : systemSprite2.getDroneSprites()) {
-                                                            droneSprite2.hideChannelScopes();
-                                                            scale = 1.0f;
-                                                            droneSprite2.hideChannelPaths();
-                                                        }
+                                                        // TODO: Offer options and propose ways to proceed.
+
+                                                        isInteractionInProgress = true;
+
+                                                        break;
+                                                    } else {
+                                                        //Touched a different node, so update the source...
+
+                                                        // Touched already-selected channel scope (for some number repetitions greater than 1, or after the first)
+                                                        touchSourceMachineSprite.portSprites.get(sourceChannelScopeIndex).portType = PortSprite.PortType.NONE; // TODO: Revert to previous type, if there is a previous type. MachineSprite.ChannelType.getNextType(machineSprite.channelTypes.get(i))
+
+                                                        // Select the just-touched scope as the source.
+                                                        sourceChannelScopeIndex = scopeIndex;
+                                                        machineSprite.portSprites.get(scopeIndex).portType = PortSprite.PortType.getNextType(machineSprite.portSprites.get(scopeIndex).portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                                        Log.v("MapView", "\tDifferent source channel scope " + (scopeIndex + 1) + " touched.");
+
+                                                        // Narrate
+                                                        // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
+
+                                                        // TODO: Offer options and propose ways to proceed.
+
+                                                        isInteractionInProgress = true;
+
+                                                        break;
                                                     }
-                                                    droneSprite.showChannelScope(scopeIndex);
-                                                    droneSprite.showChannelPath(scopeIndex, true);
-//                                                droneSprite.showChannelPaths
-
-                                                    ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
-
-                                                    isGestureInProgress = true;
-
-                                                    break;
-
                                                 }
 
                                             } else {
 
-                                                // TODO: Create BoardChannelSprite.isTouching()
-                                                if (sourceChannelScopeIndex == scopeIndex) {
-                                                    // Touched already-selected channel scope (for some number repetitions greater than 1, or after the first)
-                                                    Log.v("MapView", "\tSame source channel scope " + (scopeIndex + 1) + " touched.");
-                                                    // sourceChannelScopeIndex = i; // No need to re-select the scope
-                                                    droneSprite.portSprites.get(scopeIndex).portType = PortSprite.PortType.getNextType(droneSprite.portSprites.get(scopeIndex).portType); // (droneSprite.channelTypes.get(i) + 1) % droneSprite.channelTypeColors.length
-
-                                                    // Narrate
-                                                    // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
-
-                                                    // TODO: Offer options and propose ways to proceed.
-
-                                                    isGestureInProgress = true;
-
-                                                    break;
-                                                } else {
-                                                    //Touched a different node, so update the source...
-
-                                                    // Touched already-selected channel scope (for some number repetitions greater than 1, or after the first)
-                                                    // if (sourceDroneSprite.channelTypes.get(sourceChannelScopeIndex) != DroneSprite.ChannelType.NONE) {
-//                                                if (droneSprite.portSprites.get(scopeIndex).portType != PortSprite.ChannelType.NONE) {
-                                                    sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).portType = PortSprite.PortType.NONE; // TODO: Revert to previous type, if there is a previous type. DroneSprite.ChannelType.getNextType(droneSprite.channelTypes.get(i))
-//                                                }
-                                                    // }
-
-                                                    // Select the just-touched scope as the source.
-                                                    sourceChannelScopeIndex = scopeIndex;
-                                                    droneSprite.portSprites.get(scopeIndex).portType = PortSprite.PortType.getNextType(droneSprite.portSprites.get(scopeIndex).portType); // (droneSprite.channelTypes.get(i) + 1) % droneSprite.channelTypeColors.length
-                                                    Log.v("MapView", "\tDifferent source channel scope " + (scopeIndex + 1) + " touched.");
-
-                                                    // Narrate
-                                                    // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
-
-                                                    // TODO: Offer options and propose ways to proceed.
-
-                                                    isGestureInProgress = true;
-
-                                                    break;
-                                                }
                                             }
-
-                                        } else {
-
                                         }
-
-
                                     }
                                 }
                             }
                         }
-
+                    } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                        PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
                     }
                 }
-
-//                    } else {
-//                        // Repeated touch on the source channel scope
-//
-//                        if (!isDragging[pointerId]) {
-//
-//                            for (DroneSprite boardSprite : this.boardSprites) {
-//
-//                                // Check if the touched board's channel node is touched
-//                                for (int scopeIndex = 0; scopeIndex < boardSprite.getChannelCount(); scopeIndex++) {
-//                                    // Check if one of the objects is touched
-//                                    if (Geometry.getDistance(touchStart[pointerId], boardSprite.portSprites.get(scopeIndex).getPosition()) < 80) {
-//
-//                                    }
-//                                }
-//
-//                            }
-//                        }
-//
-//                    }
-//
-//                }
             }
 
             // Step 3: Touch destination board
-            if (!isGestureInProgress) {
-                if (sourceDroneSprite != null && sourceChannelScopeIndex != -1
-                        && destinationDroneSprite == null && destinationChannelScopeIndex == -1) {
+            if (!isInteractionInProgress) {
+                if (touchSourceSprite != null && sourceChannelScopeIndex != -1
+                        && touchDestinationSprite == null && destinationChannelScopeIndex == -1) {
                     Log.v("MapView", "Looking for destination board touch.");
 
                     // Hide channel scopes (unless dragging)
                     if (!isDragging[pointerId]) {
 
                         for (SystemSprite systemSprite : this.systemSprites) {
-                            for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
+                            for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
 
                                 // Check if one of the objects is touched
-                                if (Geometry.getDistance(touchStart[pointerId], droneSprite.getPosition()) < 80) {
+                                if (Geometry.calculateDistance(touchStart[pointerId], machineSprite.getPosition()) < 80) {
+
+                                    // <TOUCH_ACTION>
+                                    // TODO: RELEASE
+                                    TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.TAP);
+                                    machineSprite.touch(touchAction);
+                                    // </TOUCH_ACTION>
+
                                     Log.v("MapView", "\tDestination board touched.");
-                                    destinationDroneSprite = droneSprite;
-                                    droneSprite.showChannelScopes();
+                                    touchDestinationSprite = machineSprite;
+                                    machineSprite.showPorts();
                                     this.setScale(0.8f);
 
                                     ApplicationView.getApplicationView().speakPhrase("that board will be the destination. now choose the output channel.");
 
-                                    isGestureInProgress = true;
+                                    isInteractionInProgress = true;
 
                                     break;
                                 }
@@ -912,63 +1050,75 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             // Step 4: Touch destination channel scope
-            if (!isGestureInProgress) {
-                if (sourceDroneSprite != null && sourceChannelScopeIndex != -1
-                        && destinationDroneSprite != null && destinationChannelScopeIndex == -1) {
+            if (!isInteractionInProgress) {
+                if (touchSourceSprite != null && sourceChannelScopeIndex != -1
+                        && touchDestinationSprite != null && destinationChannelScopeIndex == -1) {
                     Log.v("MapView", "Looking for destination channel scope touch.");
 
-                    // Hide channel scopes (unless dragging)
-                    if (!isDragging[pointerId]) {
+                    if (touchSourceSprite instanceof MachineSprite && touchDestinationSprite instanceof MachineSprite) {
+                        MachineSprite touchSourceMachineSprite = (MachineSprite) touchSourceSprite;
+                        MachineSprite touchDestinationMachineSprite = (MachineSprite) touchDestinationSprite;
 
-                        for (SystemSprite systemSprite : this.systemSprites) {
-                            for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
+                        // Hide channel scopes (unless dragging)
+                        if (!isDragging[pointerId]) {
 
-                                // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                                // Check if the touched board's I/O node is touched
-                                for (int i = 0; i < droneSprite.getChannelCount(); i++) {
-                                    // Check if one of the objects is touched
-                                    if (Geometry.getDistance(touchStart[pointerId], droneSprite.portSprites.get(i).getPosition()) < 80) {
+                            for (SystemSprite systemSprite : this.systemSprites) {
+                                for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
 
-                                        if (droneSprite == destinationDroneSprite) {
-                                            Log.v("MapView", "\tDestination channel scope " + (i + 1) + " touched.");
-                                            destinationChannelScopeIndex = i;
-                                            droneSprite.portSprites.get(i).portType = PortSprite.PortType.getNextType(droneSprite.portSprites.get(i).portType); // (droneSprite.channelTypes.get(i) + 1) % droneSprite.channelTypeColors.length
+                                    // TODO: Add this to an onTouch callback for the sprite's channel nodes
+                                    // Check if the touched board's I/O node is touched
+                                    for (int i = 0; i < machineSprite.getChannelCount(); i++) {
+                                        // Check if one of the objects is touched
+                                        if (Geometry.calculateDistance(touchStart[pointerId], machineSprite.portSprites.get(i).getPosition()) < 80) {
 
+                                            // <TOUCH_ACTION>
+                                            // TODO: RELEASE
+                                            TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.TAP);
+                                            machineSprite.getPortSprite(i).touch(touchAction);
+                                            // </TOUCH_ACTION>
 
-                                            ApplicationView.getApplicationView().speakPhrase("got it. the channel is set up. you can connect components to it now and start using them.");
-                                            ApplicationView.getApplicationView().speakPhrase("do you want me to help you connect the components?"); // i.e., start interactive assembly... start by showing component browser. then choose component and get instructions for connecting it. show "okay, done" button.
-
-                                            Log.v("MapViewLink", "Created data path.");
-
-                                            sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).addPath(
-                                                    sourceDroneSprite,
-                                                    sourceChannelScopeIndex,
-                                                    destinationDroneSprite,
-                                                    destinationChannelScopeIndex
-                                            );
-
-                                            sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).portDirection = PortSprite.PortDirection.INPUT;
-
-                                            destinationDroneSprite.portSprites.get(destinationChannelScopeIndex).portDirection = PortSprite.PortDirection.OUTPUT;
-
-                                            // Reset connection state
-                                            sourceDroneSprite = null;
-                                            destinationDroneSprite = null;
-                                            sourceChannelScopeIndex = -1;
-                                            destinationChannelScopeIndex = -1;
+                                            if (machineSprite == touchDestinationSprite) {
+                                                Log.v("MapView", "\tDestination channel scope " + (i + 1) + " touched.");
+                                                destinationChannelScopeIndex = i;
+                                                machineSprite.portSprites.get(i).portType = PortSprite.PortType.getNextType(machineSprite.portSprites.get(i).portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
 
 
-                                            isGestureInProgress = true;
+                                                ApplicationView.getApplicationView().speakPhrase("got it. the channel is set up. you can connect components to it now and start using them.");
+                                                ApplicationView.getApplicationView().speakPhrase("do you want me to help you connect the components?"); // i.e., start interactive assembly... start by showing component browser. then choose component and get instructions for connecting it. show "okay, done" button.
 
-                                            break;
+                                                Log.v("MapViewLink", "Created data path.");
+
+                                                touchSourceMachineSprite.portSprites.get(sourceChannelScopeIndex).addPath(
+                                                        touchSourceMachineSprite,
+                                                        sourceChannelScopeIndex,
+                                                        touchDestinationMachineSprite,
+                                                        destinationChannelScopeIndex
+                                                );
+
+                                                touchSourceMachineSprite.portSprites.get(sourceChannelScopeIndex).portDirection = PortSprite.PortDirection.INPUT;
+
+                                                touchDestinationMachineSprite.portSprites.get(destinationChannelScopeIndex).portDirection = PortSprite.PortDirection.OUTPUT;
+
+                                                // Reset connection state
+                                                touchSourceSprite = null;
+                                                touchDestinationSprite = null;
+                                                sourceChannelScopeIndex = -1;
+                                                destinationChannelScopeIndex = -1;
+
+                                                isInteractionInProgress = true;
+
+                                                break;
+                                            }
                                         }
                                     }
-                                }
 
+                                }
                             }
                         }
-                    }
 
+                    } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                        PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+                    }
                 }
             }
 
@@ -976,118 +1126,212 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
             if (isDragging[pointerId]) {
 
-                // Connection: A complete connection made.
-                if (sourceDroneSprite != null && sourceChannelScopeIndex != -1
-                        && destinationDroneSprite != null && destinationChannelScopeIndex != -1) {
+                if (touchSourceSprite instanceof MachineSprite && touchDestinationSprite instanceof MachineSprite) {
+                    MachineSprite touchSourceMachineSprite = (MachineSprite) touchSourceSprite;
+                    MachineSprite touchDestinationMachineSprite = (MachineSprite) touchDestinationSprite;
 
-                    Log.v("MapViewLink", "Created data path.");
+                    // Connection: A complete connection made.
+                    if (touchSourceSprite != null && sourceChannelScopeIndex != -1
+                            && touchDestinationSprite != null && destinationChannelScopeIndex != -1) {
 
-                    sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).addPath(
-                            sourceDroneSprite,
-                            sourceChannelScopeIndex,
-                            destinationDroneSprite,
-                            destinationChannelScopeIndex
-                    );
+                        Log.v("MapViewLink", "Created data path.");
 
-                    sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).portDirection = PortSprite.PortDirection.INPUT;
+                        touchSourceMachineSprite.portSprites.get(sourceChannelScopeIndex).addPath(
+                                touchSourceMachineSprite,
+                                sourceChannelScopeIndex,
+                                touchDestinationMachineSprite,
+                                destinationChannelScopeIndex
+                        );
 
-                    destinationDroneSprite.portSprites.get(destinationChannelScopeIndex).portDirection = PortSprite.PortDirection.OUTPUT;
+                        touchSourceMachineSprite.portSprites.get(sourceChannelScopeIndex).portDirection = PortSprite.PortDirection.INPUT;
 
-                    // Reset connection state
-                    sourceDroneSprite = null;
-                    destinationDroneSprite = null;
-                    sourceChannelScopeIndex = -1;
-                    destinationChannelScopeIndex = -1;
+                        touchDestinationMachineSprite.portSprites.get(destinationChannelScopeIndex).portDirection = PortSprite.PortDirection.OUTPUT;
 
-                } else if (sourceDroneSprite != null) {
+                        // Reset connection state
+                        touchSourceSprite = null;
+                        touchDestinationSprite = null;
+                        sourceChannelScopeIndex = -1;
+                        destinationChannelScopeIndex = -1;
 
-                    Log.v("MapViewLink", "Partial data path was abandoned.");
+                    } else if (touchSourceSprite != null) {
 
-                    // Reset selected source channel scope
-                    if (sourceChannelScopeIndex != -1) {
-                        sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).portType = PortSprite.PortType.NONE;
-                    }
+                        Log.v("MapViewLink", "Partial data path was abandoned.");
 
-                    // Reset selected destination channel scope
-                    if (destinationChannelScopeIndex != -1) {
-                        sourceDroneSprite.portSprites.get(destinationChannelScopeIndex).portType = PortSprite.PortType.NONE;
-                    }
-
-                    // Hide scopes.
-                    for (SystemSprite systemSprite : this.systemSprites) {
-                        for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
-                            droneSprite.hideChannelScopes();
-                            scale = 1.0f;
-                            droneSprite.hideChannelPaths();
+                        // Reset selected source channel scope
+                        if (sourceChannelScopeIndex != -1) {
+                            touchSourceMachineSprite.portSprites.get(sourceChannelScopeIndex).portType = PortSprite.PortType.NONE;
                         }
+
+                        // Reset selected destination channel scope
+                        if (destinationChannelScopeIndex != -1) {
+                            touchSourceMachineSprite.portSprites.get(destinationChannelScopeIndex).portType = PortSprite.PortType.NONE;
+                        }
+
+                        // Hide scopes.
+                        for (SystemSprite systemSprite : this.systemSprites) {
+                            for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
+                                machineSprite.hidePorts();
+                                this.setScale(1.0f);
+                                machineSprite.hidePaths();
+                            }
+                        }
+
+                        // Reset connection state
+                        touchSourceSprite = null;
+                        touchDestinationSprite = null;
+                        sourceChannelScopeIndex = -1;
+                        destinationChannelScopeIndex = -1;
+
                     }
 
-                    // Reset connection state
-                    sourceDroneSprite = null;
-                    destinationDroneSprite = null;
-                    sourceChannelScopeIndex = -1;
-                    destinationChannelScopeIndex = -1;
+                } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                    PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+                }
+            }
+        }
 
+        if (!isInteractionInProgress) {
+
+            Log.v("MapViewTouch", "Partial data path was abandoned...");
+
+            if (touchedSprite[pointerId] instanceof MachineSprite) {
+                MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
+            } else if (touchedSprite[pointerId] instanceof PortSprite) {
+                PortSprite portSprite = (PortSprite) touchedSprite[pointerId];
+                TouchAction touchAction = new TouchAction(touch[pointerId], TouchAction.TouchActionType.RELEASE);
+                portSprite.touch(touchAction);
+
+
+                // Show ports of nearby machines
+                for (SystemSprite systemSprite: this.systemSprites) {
+                    for (MachineSprite nearbyMachineSprite: systemSprite.getMachineSprites()) {
+
+                        // Update style of nearby machines
+                        float distanceToMachineSprite = (float) Geometry.calculateDistance(
+                                touch[pointerId],
+                                nearbyMachineSprite.getPosition()
+                        );
+                        Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
+                        if (distanceToMachineSprite < nearbyMachineSprite.boardWidth + 50) {
+//                            nearbyMachineSprite.setTransparency(1.0f);
+//                            nearbyMachineSprite.showPorts();
+
+
+
+                            // TODO: use overlappedSprite instanceof PortSprite
+
+
+
+                            for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
+                                // Scaffold interaction to connect path to with nearby ports
+                                float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
+                                        touch[pointerId],
+                                        nearbyPortSprite.getPosition()
+                                );
+                                if (nearbyPortSprite != portSprite) {
+                                    if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
+                                        portSprite.setPosition(touch[pointerId]);
+
+                                        portSprite.portDirection = PortSprite.PortDirection.INPUT;
+                                        // portSprite.portType = PortSprite.PortType.getNextType(portSprite.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+
+                                        nearbyPortSprite.portDirection = PortSprite.PortDirection.OUTPUT;
+                                        nearbyPortSprite.portType = PortSprite.PortType.getNextType(nearbyPortSprite.portType);
+
+                                        // Create and add path to port
+                                        portSprite.addPath(
+                                                portSprite.getMachineSprite(),
+                                                portSprite.getIndex(),
+                                                nearbyPortSprite.getMachineSprite(),
+                                                nearbyPortSprite.getIndex()
+                                        );
+
+
+                                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                                        // Vibrate for 500 milliseconds
+                                        v.vibrate(50);
+                                        //v.vibrate(50); off
+                                        //v.vibrate(50); // second tap
+                                        overlappedSprite = null;
+                                        break;
+                                    }
+                                }
+                            }
+
+                        }
+
+//                            else if (distanceToMachineSprite < nearbyMachineSprite.boardWidth + 80) {
+//                                nearbyMachineSprite.setTransparency(0.5f);
+//                            } else {
+//                                nearbyMachineSprite.setTransparency(0.1f);
+//                                nearbyMachineSprite.hidePorts();
+//                            }
+                    }
                 }
             }
 
-        }
-
-        if (!isGestureInProgress) {
-
-            Log.v("MapViewTouch", "Partial data path was abandoned.");
-
-            if (sourceDroneSprite != null && sourceChannelScopeIndex != -1 && destinationDroneSprite != null) {
+            if (touchSourceSprite != null && sourceChannelScopeIndex != -1 && touchDestinationSprite != null) {
                 ApplicationView.getApplicationView().speakPhrase("the channel was interrupted.");
             }
 
-//            // Reset selected source channel scope
-//            if (sourceChannelScopeIndex != -1) {
-//                sourceDroneSprite.portSprites.get(sourceChannelScopeIndex).portType = PortSprite.ChannelType.NONE;
-//            }
-
             // Reset selected destination channel scope
             if (destinationChannelScopeIndex != -1) {
-                destinationDroneSprite.portSprites.get(destinationChannelScopeIndex).portType = PortSprite.PortType.NONE;
+                if (touchDestinationSprite instanceof MachineSprite) {
+                    MachineSprite touchDestinationMachineSprite = (MachineSprite) touchDestinationSprite;
+
+                    touchDestinationMachineSprite.getPortSprite(destinationChannelScopeIndex).portType = PortSprite.PortType.NONE;
+                }
             }
 
             // No touch on board or scope. Touch is on map. So hide scopes.
             for (SystemSprite systemSprite : this.systemSprites) {
-                for (DroneSprite droneSprite : systemSprite.getDroneSprites()) {
-                    droneSprite.hideChannelScopes();
-                    scale = 1.0f;
-                    droneSprite.hideChannelPaths();
-                    droneSprite.setTransparency(1.0f);
+                for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
+                    machineSprite.hidePorts();
+                    machineSprite.setScale(1.0f);
+                    machineSprite.hidePaths();
+                    machineSprite.setTransparency(1.0f);
                 }
             }
 
             // Reset connection state
-            sourceDroneSprite = null;
-            destinationDroneSprite = null;
+            touchSourceSprite = null;
+            touchDestinationSprite = null;
             sourceChannelScopeIndex = -1;
             destinationChannelScopeIndex = -1;
 
             // Reset map interactivity
             isPanningDisabled = false;
+
+            this.setScale(1.0f);
+
         }
 
         // Stop touching sprite
         // Style. Reset the style of touched boards.
         if (isTouching[pointerId] || touchedSprite[pointerId] != null) {
             isTouching[pointerId] = false;
-            if (touchedSprite[pointerId] != null) {
-                touchedSprite[pointerId].showHighlights = false;
-                touchedSprite[pointerId].setScale(1.0f);
+            if (touchedSprite[pointerId] instanceof MachineSprite) {
+                MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
+
+                machineSprite.showHighlights = false;
+                machineSprite.setScale(1.0f);
                 touchedSprite[pointerId] = null;
             }
         }
 
         // Stop dragging
         this.isDragging[pointerId] = false;
-
     }
 
     public float getScale() {
         return scale;
+    }
+
+    public Canvas getCanvas() {
+        return this.canvas;
+    }
+
+    public Paint getPaint() {
+        return this.paint;
     }
 }

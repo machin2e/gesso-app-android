@@ -2,11 +2,17 @@ package camp.computer.clay.sprite;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import camp.computer.clay.designer.MapView;
+import camp.computer.clay.model.TouchAction;
+import camp.computer.clay.sprite.util.Geometry;
 
 public class PortSprite extends Sprite {
 
@@ -26,6 +32,10 @@ public class PortSprite extends Sprite {
     boolean showChannelLabel = false;
     float labelTextSize = 30.0f;
     private int uniqueColor = Color.BLACK;
+
+    public int getIndex() {
+        return this.machineSprite.getPortSpriteIndex(this);
+    }
     // ^^^ STYLE ^^^
 
     // <MODEL>
@@ -82,7 +92,10 @@ public class PortSprite extends Sprite {
     private float scale = 1.0f; // Sprite scale factor
     private float angle = 0.0f; // Sprite heading angle
 
-    public PortSprite() {
+    private MachineSprite machineSprite;
+
+    public PortSprite(MachineSprite machineSprite) {
+        this.machineSprite = machineSprite;
         this.uniqueColor = updateUniqueColor();
         initialize();
     }
@@ -97,17 +110,26 @@ public class PortSprite extends Sprite {
         }
     }
 
+    public MachineSprite getMachineSprite() {
+        return this.machineSprite;
+    }
+
     public PointF getPosition() {
         return this.position;
     }
 
+    // TODO: Remove this method and replace with one below.
     public void setPosition(float x, float y) {
         this.position.x = x;
         this.position.y = y;
 //        this.updateChannelScopePositions();
     }
 
-    public void addPath(DroneSprite sourceDrone, int sourcePort, DroneSprite destinationDrone, int destinationPort) {
+    public void setPosition(PointF position) {
+        this.setPosition(position.x, position.y);
+    }
+
+    public void addPath(MachineSprite sourceDrone, int sourcePort, MachineSprite destinationDrone, int destinationPort) {
         PathSprite path = new PathSprite(sourceDrone, sourcePort, destinationDrone, destinationPort);
         destinationDrone.getPortSprite(destinationPort).setUniqueColor(this.uniqueColor);
         pathSprites.add(path);
@@ -139,24 +161,28 @@ public class PortSprite extends Sprite {
     }
 
     @Override
-    public void draw(Canvas mapCanvas, Paint paint) {
-        drawShapeLayer(mapCanvas, paint);
-        drawStyleLayer(mapCanvas, paint);
-        drawDataLayer(mapCanvas, paint);
-        drawAnnotationLayer(mapCanvas, paint);
+    public void draw(MapView mapView) {
+
+        drawShapeLayer(mapView);
+        drawStyleLayer(mapView);
+        drawDataLayer(mapView);
+        drawAnnotationLayer(mapView);
 
         // draw pathSprites
+        //drawCandidatePath(mapView);
     }
 
     /**
      * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
      * placeholder for the sprite.
-     * @param mapCanvas
-     * @param paint
+     * @param mapView
      */
-    public void drawShapeLayer(Canvas mapCanvas, Paint paint) {
+    public void drawShapeLayer(MapView mapView) {
 
         if (showFormLayer) {
+
+            Canvas mapCanvas = mapView.getCanvas();
+            Paint paint = mapView.getPaint();
 
             mapCanvas.save();
 
@@ -189,12 +215,14 @@ public class PortSprite extends Sprite {
 
     /**
      * Draws the sprite's detail front layer.
-     * @param mapCanvas
-     * @param paint
+     * @param mapView
      */
-    public void drawStyleLayer(Canvas mapCanvas, Paint paint) {
+    public void drawStyleLayer(MapView mapView) {
 
         if (showStyleLayer) {
+
+            Canvas mapCanvas = mapView.getCanvas();
+            Paint paint = mapView.getPaint();
 
             if (portType != PortSprite.PortType.NONE) {
 
@@ -229,12 +257,14 @@ public class PortSprite extends Sprite {
 
     /**
      * Draws the sprite's data layer.
-     * @param mapCanvas
-     * @param paint
+     * @param mapView
      */
-    private void drawDataLayer(Canvas mapCanvas, Paint paint) {
+    private void drawDataLayer(MapView mapView) {
 
         if (showDataLayer) {
+
+            Canvas mapCanvas = mapView.getCanvas();
+            Paint paint = mapView.getPaint();
 
             if (portType != PortSprite.PortType.NONE) {
 
@@ -273,12 +303,14 @@ public class PortSprite extends Sprite {
 
     /**
      * Draws the sprite's annotation layer. Contains labels and other text.
-     * @param mapCanvas
-     * @param paint
+     * @param mapView
      */
-    public void drawAnnotationLayer(Canvas mapCanvas, Paint paint) {
+    public void drawAnnotationLayer(MapView mapView) {
 
         if (showAnnotationLayer) {
+
+            Canvas mapCanvas = mapView.getCanvas();
+            Paint paint = mapView.getPaint();
 
             if (portType != PortSprite.PortType.NONE) {
 
@@ -376,6 +408,131 @@ public class PortSprite extends Sprite {
 
     @Override
     public boolean isTouching(PointF point) {
-        return false;
+        return (Geometry.calculateDistance(point, this.getPosition()) < 80);
+    }
+
+    public static final String CLASS_NAME = "PORT_SPRITE";
+
+    @Override
+    public void onTouchAction(TouchAction touchAction) {
+
+        if (touchAction.getType() == TouchAction.TouchActionType.NONE) {
+            Log.v("onTouchAction", "TouchAction.NONE to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.TOUCH) {
+            Log.v("onTouchAction", "TouchAction.TOUCH to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.TAP) {
+            Log.v("onTouchAction", "TouchAction.TAP to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchAction.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.HOLD) {
+            Log.v("onTouchAction", "TouchAction.HOLD to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.MOVE) {
+            Log.v("onTouchAction", "TouchAction.MOVE to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchAction.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.DRAG) {
+            Log.v("onTouchAction", "TouchAction.DRAG to " + CLASS_NAME);
+            this.setCandidatePathDestinationPosition(touchAction.getPosition());
+            this.setCandidatePathVisibility(true);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.RELEASE) {
+            Log.v("onTouchAction", "TouchAction.RELEASE to " + CLASS_NAME);
+
+            this.setCandidatePathVisibility(false);
+        }
+    }
+
+    private boolean isCandidatePathVisible = false;
+    private PointF candidatePathDestinationPosition = new PointF(40, 80);
+
+    public void setCandidatePathVisibility(boolean isVisible) {
+        this.isCandidatePathVisible = isVisible;
+    }
+
+    public boolean getCandidatePathVisibility() {
+        return this.isCandidatePathVisible;
+    }
+
+    public void setCandidatePathDestinationPosition(PointF position) {
+        this.candidatePathDestinationPosition.x = position.x;
+        this.candidatePathDestinationPosition.y = position.y;
+    }
+
+    public void drawCandidatePath(MapView mapView) {
+        if (isCandidatePathVisible) {
+
+            if (this.portType != PortType.NONE) {
+
+                Canvas mapCanvas = mapView.getCanvas();
+                Paint paint = mapView.getPaint();
+
+
+                mapCanvas.save();
+
+                // TODO: Replace this with PointF transformed for the Perspective in the Map/Simulation.
+//            mapCanvas.setMatrix(mapView.getOriginMatrix(true));
+                Matrix originMatrix = mapView.getOriginMatrix(false);
+                mapCanvas.setMatrix(originMatrix);
+
+//            mapCanvas.translate(
+//                    candidatePathDestinationPosition.x,
+//                    candidatePathDestinationPosition.y
+//            );
+
+//            mapCanvas.save();
+                // Color
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(15.0f);
+                paint.setColor(this.getUniqueColor());
+
+                mapCanvas.drawLine(
+                        this.getPosition().x * mapView.getScale(),
+                        this.getPosition().y * mapView.getScale(),
+                        candidatePathDestinationPosition.x * mapView.getScale(),
+                        candidatePathDestinationPosition.y * mapView.getScale(),
+                        paint
+                );
+
+                mapCanvas.restore();
+
+
+                mapCanvas.save();
+
+                // TODO: Replace this with PointF transformed for the Perspective in the Map/Simulation.
+//            mapCanvas.setMatrix(mapView.getOriginMatrix(true));
+                Matrix originMatrix2 = mapView.getOriginMatrix(false);
+                mapCanvas.setMatrix(originMatrix2);
+
+                mapCanvas.translate(
+                        candidatePathDestinationPosition.x * mapView.getScale(),
+                        candidatePathDestinationPosition.y * mapView.getScale()
+                );
+
+                // Color
+                float radius = this.shapeRadius;
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(this.getUniqueColor());
+                mapCanvas.drawCircle(
+                        0,
+                        0,
+                        radius,
+                        paint
+                );
+
+//        // Outline
+//        if (showShapeOutline) {
+//            paint.setStyle(Paint.Style.STROKE);
+//            paint.setStrokeWidth(3);
+//            paint.setColor(Color.BLACK);
+//            mapCanvas.drawCircle(
+//                    0,
+//                    0,
+//                    radius,
+//                    paint
+//            );
+//        }
+
+                mapCanvas.restore();
+            }
+        }
     }
 }

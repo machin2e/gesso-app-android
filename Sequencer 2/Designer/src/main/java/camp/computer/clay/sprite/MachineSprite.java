@@ -4,13 +4,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.util.Log;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.designer.MapView;
+import camp.computer.clay.model.TouchAction;
 import camp.computer.clay.sprite.util.Animation;
 import camp.computer.clay.sprite.util.Geometry;
 
-public class DroneSprite extends Sprite {
+public class MachineSprite extends Sprite {
 
     private int channelCount = 12;
 
@@ -32,20 +35,28 @@ public class DroneSprite extends Sprite {
         return this.scale;
     }
 
+    private float targetTransparency = 1.0f;
+
     public void setTransparency (final float transparency) {
-        Animation.scaleValue(255.0f, 255.0f * transparency, 80, new Animation.OnScaleCallback() {
-            @Override
-            public void onScale(float currentScale) {
-                int transparencyInteger = (int) currentScale;
-                String transparencyString = String.format("%02x", transparencyInteger);
-                // Drone color
-                boardColor = Color.parseColor("#" + transparencyString + boardColorString);
-                boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
-                // Header color
-                headerColor = Color.parseColor("#" + transparencyString + headerColorString);
-                headerOutlineColor = Color.parseColor("#" + transparencyString + headerOutlineColorString);
-            }
-        });
+
+        if (this.targetTransparency != transparency) {
+
+            Animation.scaleValue(255.0f * targetTransparency, 255.0f * transparency, 200, new Animation.OnScaleListener() {
+                @Override
+                public void onScale(float currentScale) {
+                    int transparencyInteger = (int) currentScale;
+                    String transparencyString = String.format("%02x", transparencyInteger);
+                    // Machine color
+                    boardColor = Color.parseColor("#" + transparencyString + boardColorString);
+                    boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+                    // Header color
+                    headerColor = Color.parseColor("#" + transparencyString + headerColorString);
+                    headerOutlineColor = Color.parseColor("#" + transparencyString + headerOutlineColorString);
+                }
+            });
+
+            this.targetTransparency = transparency;
+        }
     }
 
     // --- STYLE ---
@@ -88,7 +99,7 @@ public class DroneSprite extends Sprite {
         }
     }
 
-    public DroneSprite(float x, float y, float angle) {
+    public MachineSprite(float x, float y, float angle) {
 
         this.position.set(x, y);
         this.angle = angle;
@@ -109,7 +120,7 @@ public class DroneSprite extends Sprite {
 
         // Port scopes
         for (int i = 0; i < channelCount; i++) {
-            PortSprite portSprite = new PortSprite();
+            PortSprite portSprite = new PortSprite(this);
             portSprite.setPosition(this.position.x, this.position.y);
             portSprites.add(portSprite);
         }
@@ -123,7 +134,7 @@ public class DroneSprite extends Sprite {
 //                channelScopePositions.add(point);
 //            }
 //        }
-        updateChannelScopePositions();
+//        updatePortScopePositions(MapView);
     }
 
     public int getChannelCount() {
@@ -134,7 +145,14 @@ public class DroneSprite extends Sprite {
         return this.portSprites.get(index);
     }
 
-    private void updateChannelScopePositions() {
+    public int getPortSpriteIndex(PortSprite portSprite) {
+        if (this.portSprites.contains(portSprite)) {
+            return this.portSprites.indexOf(portSprite);
+        }
+        return -1;
+    }
+
+    private void updatePortScopePositions(MapView mapView) {
 
         double boardAngleRadians = Math.toRadians(this.angle);
         float sinBoardAngle = (float) Math.sin(boardAngleRadians);
@@ -163,15 +181,19 @@ public class DroneSprite extends Sprite {
                         portScopeSpritePosition.x * sinBoardFacingAngle + portScopeSpritePosition.y * cosBoardFacingAngle
                 );
 
-                // Rotate (Drone)
+                // Rotate (Machine)
                 portScopeSpritePosition.set(
                         portScopeSpritePosition.x * cosBoardAngle - portScopeSpritePosition.y * sinBoardAngle,
                         portScopeSpritePosition.x * sinBoardAngle + portScopeSpritePosition.y * cosBoardAngle
                 );
 
-                // Translate (Drone)
+                // Translate (Machine)
                 portScopeSpritePosition.x = portScopeSpritePosition.x + this.position.x;
                 portScopeSpritePosition.y = portScopeSpritePosition.y + this.position.y;
+
+//                // Scale (Map)
+//                portScopeSpritePosition.x = portScopeSpritePosition.x * mapView.getScale();
+//                portScopeSpritePosition.y = portScopeSpritePosition.y * mapView.getScale();
 
             }
         }
@@ -183,35 +205,38 @@ public class DroneSprite extends Sprite {
         }
     }
 
-    public void draw(Canvas mapCanvas, Paint paint) {
+    public void draw(MapView mapView) {
 
-        DroneSprite droneSprite = this;
+        Canvas mapCanvas = mapView.getCanvas();
+        Paint paint = mapView.getPaint();
+
+        MachineSprite machineSprite = this;
 
         mapCanvas.save();
 
-        mapCanvas.translate(droneSprite.getPosition().x, droneSprite.getPosition().y);
-        mapCanvas.rotate(droneSprite.getAngle());
+        mapCanvas.translate(machineSprite.getPosition().x, machineSprite.getPosition().y);
+        mapCanvas.rotate(machineSprite.getAngle());
 
-        mapCanvas.scale(droneSprite.getScale(), droneSprite.getScale());
+        mapCanvas.scale(machineSprite.getScale(), machineSprite.getScale());
 
         // --- BOARD HIGHLIGHT ---
-        if (droneSprite.showHighlights) {
+        if (machineSprite.showHighlights) {
             mapCanvas.save();
             // Color
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(droneSprite.boardHighlightColor);
+            paint.setColor(machineSprite.boardHighlightColor);
             mapCanvas.drawRect(
-                    0 - (droneSprite.boardWidth / 2.0f) - droneSprite.boardHighlightThickness,
-                    0 - (droneSprite.boardHeight / 2.0f) - droneSprite.boardHighlightThickness,
-                    0 + (droneSprite.boardWidth / 2.0f) + droneSprite.boardHighlightThickness,
-                    0 + (droneSprite.boardHeight / 2.0f) + droneSprite.boardHighlightThickness,
+                    0 - (machineSprite.boardWidth / 2.0f) - machineSprite.boardHighlightThickness,
+                    0 - (machineSprite.boardHeight / 2.0f) - machineSprite.boardHighlightThickness,
+                    0 + (machineSprite.boardWidth / 2.0f) + machineSprite.boardHighlightThickness,
+                    0 + (machineSprite.boardHeight / 2.0f) + machineSprite.boardHighlightThickness,
                     paint);
             mapCanvas.restore();
         }
         // ^^^ BOARD HIGHLIGHT ^^^
 
         // --- HEADER HIGLIGHT ---
-        if (droneSprite.showHighlights) {
+        if (machineSprite.showHighlights) {
             for (int i = 0; i < 4; i++) {
 
                 mapCanvas.save();
@@ -222,18 +247,18 @@ public class DroneSprite extends Sprite {
                 mapCanvas.save();
                 mapCanvas.translate(
                         0,
-                        (droneSprite.boardHeight / 2.0f) + (droneSprite.headerHeight / 2.0f)
+                        (machineSprite.boardHeight / 2.0f) + (machineSprite.headerHeight / 2.0f)
                 );
                 mapCanvas.rotate(0);
 
                 mapCanvas.save();
                 paint.setStyle(Paint.Style.FILL);
-                paint.setColor(droneSprite.boardHighlightColor);
+                paint.setColor(machineSprite.boardHighlightColor);
                 mapCanvas.drawRect(
-                        0 - (droneSprite.headerWidth / 2.0f) - droneSprite.boardHighlightThickness,
-                        0 - (droneSprite.headerHeight / 2.0f) - droneSprite.boardHighlightThickness,
-                        0 + (droneSprite.headerWidth / 2.0f) + droneSprite.boardHighlightThickness,
-                        0 + (droneSprite.headerHeight / 2.0f) + droneSprite.boardHighlightThickness,
+                        0 - (machineSprite.headerWidth / 2.0f) - machineSprite.boardHighlightThickness,
+                        0 - (machineSprite.headerHeight / 2.0f) - machineSprite.boardHighlightThickness,
+                        0 + (machineSprite.headerWidth / 2.0f) + machineSprite.boardHighlightThickness,
+                        0 + (machineSprite.headerHeight / 2.0f) + machineSprite.boardHighlightThickness,
                         paint
                 );
                 mapCanvas.restore();
@@ -250,24 +275,24 @@ public class DroneSprite extends Sprite {
         mapCanvas.save();
         // Color
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(droneSprite.boardColor);
+        paint.setColor(machineSprite.boardColor);
         mapCanvas.drawRect(
-                0 - (droneSprite.boardWidth / 2.0f),
-                0 - (droneSprite.boardHeight / 2.0f),
-                0 + (droneSprite.boardWidth / 2.0f),
-                0 + (droneSprite.boardHeight / 2.0f),
+                0 - (machineSprite.boardWidth / 2.0f),
+                0 - (machineSprite.boardHeight / 2.0f),
+                0 + (machineSprite.boardWidth / 2.0f),
+                0 + (machineSprite.boardHeight / 2.0f),
                 paint
         );
         // Outline
-        if (droneSprite.showBoardOutline) {
+        if (machineSprite.showBoardOutline) {
             paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(droneSprite.boardOutlineColor);
-            paint.setStrokeWidth(droneSprite.boardOutlineThickness);
+            paint.setColor(machineSprite.boardOutlineColor);
+            paint.setStrokeWidth(machineSprite.boardOutlineThickness);
             mapCanvas.drawRect(
-                    0 - (droneSprite.boardWidth / 2.0f),
-                    0 - (droneSprite.boardHeight / 2.0f),
-                    0 + (droneSprite.boardWidth / 2.0f),
-                    0 + (droneSprite.boardHeight / 2.0f),
+                    0 - (machineSprite.boardWidth / 2.0f),
+                    0 - (machineSprite.boardHeight / 2.0f),
+                    0 + (machineSprite.boardWidth / 2.0f),
+                    0 + (machineSprite.boardHeight / 2.0f),
                     paint
             );
         }
@@ -285,31 +310,31 @@ public class DroneSprite extends Sprite {
             mapCanvas.save();
             mapCanvas.translate(
                     0,
-                    (droneSprite.boardHeight / 2.0f) + (droneSprite.headerHeight / 2.0f)
+                    (machineSprite.boardHeight / 2.0f) + (machineSprite.headerHeight / 2.0f)
             );
             mapCanvas.rotate(0);
 
             mapCanvas.save();
             // Color
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(droneSprite.headerColor);
+            paint.setColor(machineSprite.headerColor);
             mapCanvas.drawRect(
-                    0 - (droneSprite.headerWidth / 2.0f),
-                    0 - (droneSprite.headerHeight / 2.0f),
-                    0 + (droneSprite.headerWidth / 2.0f),
-                    0 + (droneSprite.headerHeight / 2.0f),
+                    0 - (machineSprite.headerWidth / 2.0f),
+                    0 - (machineSprite.headerHeight / 2.0f),
+                    0 + (machineSprite.headerWidth / 2.0f),
+                    0 + (machineSprite.headerHeight / 2.0f),
                     paint
             );
             // Outline
-            if (droneSprite.showHeaderOutline) {
+            if (machineSprite.showHeaderOutline) {
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(droneSprite.headerOutlineThickness);
-                paint.setColor(droneSprite.headerOutlineColor);
+                paint.setStrokeWidth(machineSprite.headerOutlineThickness);
+                paint.setColor(machineSprite.headerOutlineColor);
                 mapCanvas.drawRect(
-                        0 - (droneSprite.headerWidth / 2.0f),
-                        0 - (droneSprite.headerHeight / 2.0f),
-                        0 + (droneSprite.headerWidth / 2.0f),
-                        0 + (droneSprite.headerHeight / 2.0f),
+                        0 - (machineSprite.headerWidth / 2.0f),
+                        0 - (machineSprite.headerHeight / 2.0f),
+                        0 + (machineSprite.headerWidth / 2.0f),
+                        0 + (machineSprite.headerHeight / 2.0f),
                         paint
                 );
             }
@@ -335,7 +360,7 @@ public class DroneSprite extends Sprite {
                 mapCanvas.save();
                 mapCanvas.translate(
                         -20 + j * 20,
-                        (droneSprite.boardWidth / 2.0f) - (droneSprite.lightHeight / 2.0f) - droneSprite.distanceLightsToEdge
+                        (machineSprite.boardWidth / 2.0f) - (machineSprite.lightHeight / 2.0f) - machineSprite.distanceLightsToEdge
                 );
                 mapCanvas.rotate(0);
 
@@ -343,31 +368,31 @@ public class DroneSprite extends Sprite {
                 // Color
                 paint.setStyle(Paint.Style.FILL);
                 paint.setStrokeWidth(3);
-                //paint.setColor(droneSprite.channelTypeColors.get(droneSprite.channelTypes.get(3 * i + j)));
-                if (droneSprite.portSprites.get(3 * i + j).portType != PortSprite.PortType.NONE) {
-                    paint.setColor(droneSprite.getPortSprite(3 * i + j).getUniqueColor());
+                //paint.setColor(machineSprite.channelTypeColors.get(machineSprite.channelTypes.get(3 * i + j)));
+                if (machineSprite.portSprites.get(3 * i + j).portType != PortSprite.PortType.NONE) {
+                    paint.setColor(machineSprite.getPortSprite(3 * i + j).getUniqueColor());
                 } else {
                     paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
                 }
                 mapCanvas.drawRoundRect(
-                        0 - (droneSprite.lightWidth / 2.0f),
-                        0 - (droneSprite.lightHeight / 2.0f),
-                        0 + (droneSprite.lightWidth / 2.0f),
-                        0 + (droneSprite.lightHeight / 2.0f),
+                        0 - (machineSprite.lightWidth / 2.0f),
+                        0 - (machineSprite.lightHeight / 2.0f),
+                        0 + (machineSprite.lightWidth / 2.0f),
+                        0 + (machineSprite.lightHeight / 2.0f),
                         5.0f,
                         5.0f,
                         paint
                 );
                 // Outline
-                if (droneSprite.showLightOutline) {
+                if (machineSprite.showLightOutline) {
                     paint.setStyle(Paint.Style.STROKE);
-                    paint.setStrokeWidth(droneSprite.lightOutlineThickness);
-                    paint.setColor(droneSprite.lightOutlineColor);
+                    paint.setStrokeWidth(machineSprite.lightOutlineThickness);
+                    paint.setColor(machineSprite.lightOutlineColor);
                     mapCanvas.drawRoundRect(
-                            0 - (droneSprite.lightWidth / 2.0f),
-                            0 - (droneSprite.lightHeight / 2.0f),
-                            0 + (droneSprite.lightWidth / 2.0f),
-                            0 + (droneSprite.lightHeight / 2.0f),
+                            0 - (machineSprite.lightWidth / 2.0f),
+                            0 - (machineSprite.lightHeight / 2.0f),
+                            0 + (machineSprite.lightWidth / 2.0f),
+                            0 + (machineSprite.lightHeight / 2.0f),
                             5.0f,
                             5.0f,
                             paint
@@ -389,10 +414,10 @@ public class DroneSprite extends Sprite {
 
         mapCanvas.save();
 
-        mapCanvas.translate(droneSprite.getPosition().x, droneSprite.getPosition().y);
-        mapCanvas.rotate(droneSprite.getAngle());
+        mapCanvas.translate(machineSprite.getPosition().x, machineSprite.getPosition().y);
+        mapCanvas.rotate(machineSprite.getAngle());
 
-        mapCanvas.scale(droneSprite.getScale(), droneSprite.getScale());
+        mapCanvas.scale(machineSprite.getScale(), machineSprite.getScale());
 
         for (int i = 0; i < 4; i++) {
 
@@ -408,25 +433,25 @@ public class DroneSprite extends Sprite {
 //                mapCanvas.save();
 //                mapCanvas.translate(
 //                        -((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2),
-//                        (droneSprite.boardWidth / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
+//                        (machineSprite.boardWidth / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
 //                );
 //                mapCanvas.rotate(0);
 
                 mapCanvas.save();
                 mapCanvas.translate(
                         -((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2),
-                        (droneSprite.boardWidth / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
+                        (machineSprite.boardWidth / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
                 );
-                if (droneSprite.portSprites.get(3 * i + j).portDirection == PortSprite.PortDirection.OUTPUT) {
+                if (machineSprite.portSprites.get(3 * i + j).portDirection == PortSprite.PortDirection.OUTPUT) {
                     mapCanvas.rotate(180.0f);
                 } else {
                     mapCanvas.rotate(0.0f);
                 }
 
-                droneSprite.updateChannelScopePositions(); // TODO: Move this into step()/updateState()
+                machineSprite.updatePortScopePositions(mapView); // TODO: Move this into step()/updateState()
 
 
-                portSprite.draw(mapCanvas, paint);
+                portSprite.draw(mapView);
 
                 mapCanvas.restore();
             }
@@ -434,77 +459,81 @@ public class DroneSprite extends Sprite {
             mapCanvas.restore();
         }
 
+        // TODO: Put this in/under PortSprite
+
         mapCanvas.restore();
         // ^^^ PORT SCOPES ^^^
 
-        drawPaths(mapCanvas, paint);
+        // TODO: Put this under PortSprite
+        drawPaths(mapView);
+
+        for (PortSprite portSprite : portSprites) {
+            portSprite.drawCandidatePath(mapView);
+        }
     }
 
-    public void drawPaths(Canvas mapCanvas, Paint paint) {
-        // --- PATH ---
-
+    public void drawPaths(MapView mapView) {
         for (int j = 0; j < channelCount; j++) {
             for (int i = 0; i < portSprites.get(j).pathSprites.size(); i++) {
                 if (this.showChannelPaths[j]) {
                     PathSprite pathSprite = portSprites.get(j).pathSprites.get(i);
 
-                    pathSprite.draw(mapCanvas, paint);
+                    pathSprite.draw(mapView);
                 }
             }
         }
-        // ^^^ PATH ^^^
     }
 
-    public void showChannelScopes() {
+    public void showPorts() {
         for (int i = 0; i < portSprites.size(); i++) {
             portSprites.get(i).setVisibility(true);
             this.portSprites.get(i).setPathVisibility(true);
         }
     }
 
-    public void showChannelScope (int channelIndex) {
+    public void showPort(int channelIndex) {
         portSprites.get(channelIndex).setVisibility(true);
         this.portSprites.get(channelIndex).setPathVisibility(true);
     }
 
-    public void hideChannelScopes() {
+    public void hidePorts() {
         for (int i = 0; i < portSprites.size(); i++) {
             portSprites.get(i).setVisibility(false);
             this.portSprites.get(i).setPathVisibility(false);
         }
     }
 
-    private void hideChannelScope (int channelIndex) {
+    private void hidePort(int channelIndex) {
         portSprites.get(channelIndex).setVisibility(false);
         this.portSprites.get(channelIndex).setPathVisibility(false);
     }
 
-    public void showChannelPaths() {
+    public void showPaths() {
         for (int i = 0; i < this.showChannelPaths.length; i++) {
             this.showChannelPaths[i] = true;
         }
     }
 
-    public void hideChannelPaths() {
+    public void hidePaths() {
         for (int i = 0; i < this.showChannelPaths.length; i++) {
             this.showChannelPaths[i] = false;
             this.portSprites.get(i).showPathDocks();
         }
     }
 
-    public void showChannelPath(int destinationChannel, boolean showFullPath) {
-        this.showChannelPaths[destinationChannel] = true;
-        if (showFullPath) {
-            this.portSprites.get(destinationChannel).showPaths();
+    public void showPath(int pathIndex, boolean isFullPathVisible) {
+        this.showChannelPaths[pathIndex] = true;
+        if (isFullPathVisible) {
+            this.portSprites.get(pathIndex).showPaths();
         } else {
-            this.portSprites.get(destinationChannel).showPathDocks();
+            this.portSprites.get(pathIndex).showPathDocks();
         }
     }
 
     public void setPosition(float x, float y) {
         this.position.x = x;
         this.position.y = y;
-        this.updateChannelScopePositions();
+//        this.updatePortScopePositions();
     }
 
     public void setScale(float scale) {
@@ -516,7 +545,33 @@ public class DroneSprite extends Sprite {
     //-------------------------
 
     public boolean isTouching (PointF point) {
-        return Geometry.getDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardWidth / 2.0f);
+        return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardWidth / 2.0f);
+    }
+
+    public static final String CLASS_NAME = "MACHINE_SPRITE";
+
+    @Override
+    public void onTouchAction(TouchAction touchAction) {
+
+        if (touchAction.getType() == TouchAction.TouchActionType.NONE) {
+            Log.v("onTouchAction", "TouchAction.NONE to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.TOUCH) {
+            Log.v("onTouchAction", "TouchAction.TOUCH to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.TAP) {
+            Log.v("onTouchAction", "TouchAction.TAP to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchAction.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.HOLD) {
+            Log.v("onTouchAction", "TouchAction.HOLD to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.MOVE) {
+            Log.v("onTouchAction", "TouchAction.MOVE to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchAction.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.DRAG) {
+            Log.v("onTouchAction", "TouchAction.DRAG to " + CLASS_NAME);
+        } else if (touchAction.getType() == TouchAction.TouchActionType.RELEASE) {
+            Log.v("onTouchAction", "TouchAction.RELEASE to " + CLASS_NAME);
+        }
     }
 }
 

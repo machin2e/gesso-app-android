@@ -5,11 +5,15 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 
 import java.util.ArrayList;
+import java.util.Random;
+
+import camp.computer.clay.designer.MapView;
+import camp.computer.clay.model.TouchAction;
 
 public class SystemSprite extends Sprite {
 
     // Sprites
-    private ArrayList<DroneSprite> droneSprites = new ArrayList<DroneSprite>();
+    private ArrayList<MachineSprite> machineSprites = new ArrayList<MachineSprite>();
 
     public SystemSprite() {
         initialize();
@@ -20,35 +24,23 @@ public class SystemSprite extends Sprite {
     }
 
     public void initializeSprites() {
-        droneSprites.add(new DroneSprite(0, 0, 0));
-        droneSprites.add(new DroneSprite(300, 400, 30));
-        droneSprites.add(new DroneSprite(-200, -440, -55));
+        Random random = new Random();
+        machineSprites.add(new MachineSprite(random.nextInt(30) - 15, random.nextInt(30) - 15, random.nextInt(360)));
+        machineSprites.add(new MachineSprite(340, 400, random.nextInt(360)));
+        machineSprites.add(new MachineSprite(-200, -440, random.nextInt(360)));
     }
 
-    public ArrayList<DroneSprite> getDroneSprites() {
-        return this.droneSprites;
+    public ArrayList<MachineSprite> getMachineSprites() {
+        return this.machineSprites;
     }
 
     @Override
-    public void draw(Canvas mapCanvas, Paint paint) {
+    public void draw(MapView mapView) {
         // drawTitle();
 
-        for (DroneSprite droneSprite : droneSprites) {
-            droneSprite.draw(mapCanvas, paint);
+        for (MachineSprite machineSprite : machineSprites) {
+            machineSprite.draw(mapView);
         }
-
-//        for (DroneSprite boardSprite : droneSprites) {
-//            boardSprite.drawShapeLayer(mapCanvas, paint);
-//        }
-
-//        for (DroneSprite boardSprite : droneSprites) {
-            // boardSprite.drawPaths(mapCanvas, paint);
-//            boardSprite.drawTrianglePath(mapCanvas, paint);
-//        }
-
-//        for (DroneSprite boardSprite : droneSprites) {
-//            boardSprite.drawStyleLayer(mapCanvas, paint);
-//        }
     }
 
     @Override
@@ -56,10 +48,15 @@ public class SystemSprite extends Sprite {
         return false;
     }
 
+    @Override
+    public void onTouchAction(TouchAction touchAction) {
+
+    }
+
     public void updateState () {
 
-        for (DroneSprite droneSprite : droneSprites) {
-            droneSprite.updateChannelData();
+        for (MachineSprite machineSprite : machineSprites) {
+            machineSprite.updateChannelData();
         }
     }
 }
