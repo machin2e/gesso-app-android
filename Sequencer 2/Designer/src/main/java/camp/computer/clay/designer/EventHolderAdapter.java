@@ -806,7 +806,7 @@ public class EventHolderAdapter extends BaseAdapter {
         final TextView messageTypeLabel = getTextSubFieldView(messageTypeString);
         linearLayout.addView(messageTypeLabel);
 
-        // Action: Message destination
+        // Action: Message destinationMachine
         final TextView messageDestinationLabel = getTextSubFieldView(messageDestinationString);
         linearLayout.addView(messageDestinationLabel);
 

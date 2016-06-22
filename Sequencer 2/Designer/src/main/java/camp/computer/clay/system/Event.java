@@ -119,7 +119,7 @@ public class Event {
                 child.put("valid").from("true", "false").set("false");
                 child.put("type");
                 child.put("device").set(this.getTimeline().getDevice().getUuid().toString());
-                    child.put("source");
+                    child.put("sourceMachine");
                 child.put("provider");
                 child.put("value");
             }

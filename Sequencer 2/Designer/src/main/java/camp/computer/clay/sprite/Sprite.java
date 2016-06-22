@@ -3,7 +3,7 @@ package camp.computer.clay.sprite;
 import android.graphics.PointF;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.TouchArticulation;
 
 public abstract class Sprite {
 
@@ -12,30 +12,32 @@ public abstract class Sprite {
     // TODO: Model model;
     // TODO: Sprite(Model model) --- Constructor
 
+    private boolean isVisible = true;
+
+    public void setVisibility (boolean isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public boolean getVisibility () {
+        return this.isVisible;
+    }
+
     public abstract void draw (MapView mapView);
 
     public abstract boolean isTouching (PointF point);
 
     public interface TouchActionListener {
-//        void onTouch(TouchInteraction touchAction);
-//        void onTap(TouchInteraction touchAction);
-//        void onDoubleTap(TouchInteraction touchAction);
-//        void onHold(TouchInteraction touchAction);
-//        void onMove(TouchInteraction touchAction);
-//        void onPreDrag(TouchInteraction touchAction);
-//        void onDrag(TouchInteraction touchAction);
-//        void onRelease(TouchInteraction touchAction);
     }
 
-    public abstract void onTouchAction(TouchInteraction touchInteraction);
+    public abstract void onTouchAction(TouchArticulation touchArticulation);
 
     // TODO: change this to addOnTouchListener (since have abstract onTouchAction)... and call at end of that
     public void setOnTouchActionListener(TouchActionListener touchActionListener) {
         this.touchActionListener = touchActionListener;
     }
 
-    public void touch (TouchInteraction touchInteraction) {
-        onTouchAction(touchInteraction);
+    public void touch (TouchArticulation touchArticulation) {
+        onTouchAction(touchArticulation);
     }
 
 }

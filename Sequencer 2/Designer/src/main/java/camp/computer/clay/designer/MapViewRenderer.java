@@ -5,7 +5,7 @@ package camp.computer.clay.designer;
  */
 public class MapViewRenderer extends Thread {
 
-    static final long FRAMES_PER_SECOND = 30;
+    final public static long FRAMES_PER_SECOND = 30;
 
     private MapView mapView;
 

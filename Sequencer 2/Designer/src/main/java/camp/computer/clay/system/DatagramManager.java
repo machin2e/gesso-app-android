@@ -113,7 +113,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
                     int computedChecksum = crc16.calculate(incomingMessageContent.getBytes("UTF-8"), 0);
 
                     if (computedChecksum == incomingChecksum) {
-                        // String destination = null;
+                        // String destinationMachine = null;
 
                         // ...and create a serialized object...
                         Message incomingMessage = new Message("udp", source, null, incomingMessageContent);

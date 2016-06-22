@@ -2,19 +2,21 @@ package camp.computer.clay.model;
 
 import android.graphics.PointF;
 
-public class TouchInteraction {
+public class TouchArticulation {
+
+    final public static long DEFAULT_TIMESTAMP = 0L;
 
     public enum TouchInteractionType {
 
         NONE(0),
         TOUCH(1),
-        TAP(2),
-        DOUBLE_DAP(3),
-        HOLD(4),
-        MOVE(5),
-        PRE_DRAG(6),
-        DRAG(7),
-        RELEASE(8);
+        HOLD(2),
+        MOVE(3),
+        PRE_DRAG(4),
+        DRAG(5),
+        RELEASE(6),
+        TAP(7),
+        DOUBLE_DAP(8);
 
         // TODO: Change the index to a UUID?
         int index;
@@ -28,14 +30,21 @@ public class TouchInteraction {
 
     private Body body;
     // TODO: targetSprite? or is the state of body containing this info (e.g., hand occupied with model <M>)
+
     private PointF position;
+
+    // <CONTEXT>
+    private long timestamp = DEFAULT_TIMESTAMP;
+    // TODO: Sensor data (inc. 3D orienetation, brightness)
+    // </CONTEXT>
 
     // touchedSprite
     // overlappedSprite (not needed, probably, because can look in history, or look at first action in interaction)
 
-    public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
+    public TouchArticulation(PointF position, TouchInteractionType touchInteractionType) {
         this.position = position;
         this.touchInteractionType = touchInteractionType;
+        this.timestamp = java.lang.System.currentTimeMillis ();
     }
 
     public Body getBody() {

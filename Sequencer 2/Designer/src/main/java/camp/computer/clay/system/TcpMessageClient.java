@@ -194,7 +194,7 @@ public class TcpMessageClient {
 
                     /*
                     // Create message
-                    Message message = new Message("tcp", source, destination, content);
+                    Message message = new Message("tcp", sourceMachine, destinationMachine, content);
                     message.setDeliveryGuaranteed(true);
 
                     // Enqueue message

@@ -8,7 +8,7 @@ import android.util.Log;
 
 import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.Path;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.TouchArticulation;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class PathSprite extends Sprite {
@@ -42,9 +42,11 @@ public class PathSprite extends Sprite {
 
     // --- STYLE ---
 
+    private boolean isVisible = false;
     public boolean showLinePaths = false;
     public boolean showDirectedPaths = true;
     public boolean showPathDocks = true;
+    private boolean isEditorVisible = false;
     float pathTerminalLength = 100.0f;
     float triangleWidth = 25;
     float triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
@@ -93,12 +95,16 @@ public class PathSprite extends Sprite {
     // TODO: Physical dimensions
     // </MODEL>
 
-    public PathSprite(MachineSprite touchedMachineSpriteSource, int touchedChannelScopeSource, MachineSprite touchedMachineSpriteDestination, int touchedChannelScopeDestination) {
-        Path path = new Path();
-        path.source = touchedMachineSpriteSource;
-        path.sourcePort = touchedChannelScopeSource;
-        path.destination = touchedMachineSpriteDestination;
-        path.destinationPort = touchedChannelScopeDestination;
+    //public PathSprite(MachineSprite sourceMachineSprite, int sourcePortIndex, MachineSprite destinationMachineSprite, int destinationPortIndex) {
+    public PathSprite(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
+
+        // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
+        Path path = new Path(
+                sourceMachineSprite,
+                sourcePortSprite,
+                destinationMachineSprite,
+                destinationPortSprite
+        );
         this.path = path;
 
         initialize();
@@ -120,18 +126,24 @@ public class PathSprite extends Sprite {
     @Override
     public void draw(MapView mapView) {
 
-        Canvas mapCanvas = mapView.getCanvas();
-        Paint paint = mapView.getPaint();
+        if (getVisibility()) {
+            Canvas mapCanvas = mapView.getCanvas();
+            Paint paint = mapView.getPaint();
 
 //        drawStyleLayer(mapCanvas, paint);
 //        drawDataLayer(mapCanvas, paint);
-        drawAnnotationLayer(mapCanvas, paint);
+            drawAnnotationLayer(mapCanvas, paint);
 
-        if (this.showDirectedPaths) {
-            drawTrianglePath(mapCanvas, paint);
-        } else {
-            drawLinePath(mapCanvas, paint);
+            if (this.showDirectedPaths) {
+                drawTrianglePath(mapCanvas, paint);
+            } else {
+                drawLinePath(mapCanvas, paint);
+            }
         }
+    }
+
+    public Path getPath() {
+        return this.path;
     }
 
     /**
@@ -294,19 +306,23 @@ public class PathSprite extends Sprite {
     private void drawLinePath (Canvas mapCanvas, Paint paint) {
 
         if (showLinePaths) {
-            path.destination.showPort(path.destinationPort);
+
+            // Show destination port
+            path.getDestinationPort().setVisibility(true);
+            path.getDestinationPort().setPathVisibility(true);
 
             mapCanvas.save();
+
             // Color
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(15.0f);
-            paint.setColor(path.source.getPortSprite(path.sourcePort).getUniqueColor());
+            paint.setColor(path.getSourcePort().getUniqueColor());
 
             mapCanvas.drawLine(
-                    path.source.portSprites.get(path.sourcePort).getPosition().x,
-                    path.source.portSprites.get(path.sourcePort).getPosition().y,
-                    path.destination.portSprites.get(path.destinationPort).getPosition().x,
-                    path.destination.portSprites.get(path.destinationPort).getPosition().y,
+                    path.getSourcePort().getPosition().x,
+                    path.getSourcePort().getPosition().y,
+                    path.getDestinationPort().getPosition().x,
+                    path.getDestinationPort().getPosition().y,
                     paint
             );
 
@@ -316,30 +332,32 @@ public class PathSprite extends Sprite {
 
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
 
-        path.destination.showPort(path.destinationPort);
+        // Show destination port
+        path.getDestinationPort().setVisibility(true);
+        path.getDestinationPort().setPathVisibility(true);
 
         mapCanvas.save();
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
-        paint.setColor(path.source.getPortSprite(path.sourcePort).getUniqueColor());
+        paint.setColor(path.getSourcePort().getUniqueColor());
 
         if (showDirectedPaths) {
             float rotationAngle = Geometry.calculateRotationAngle(
-                    path.source.portSprites.get(path.sourcePort).getPosition(),
-                    path.destination.portSprites.get(path.destinationPort).getPosition()
+                    path.getSourcePort().getPosition(),
+                    path.getDestinationPort().getPosition()
             );
 
             if (showPathDocks) {
 
                 float distance = (float) Geometry.calculateDistance(
-                        path.source.portSprites.get(path.sourcePort).getPosition(),
-                        path.destination.portSprites.get(path.destinationPort).getPosition()
+                        path.getSourcePort().getPosition(),
+                        path.getDestinationMachine().getPosition()
                 );
 
                 PointF triangleCenterPosition = Geometry.calculatePoint(
-                        path.source.portSprites.get(path.sourcePort).getPosition(),
+                        path.getSourcePort().getPosition(),
                         rotationAngle,
                         2 * triangleSpacing
                 );
@@ -354,7 +372,7 @@ public class PathSprite extends Sprite {
                 );
 
                 PointF triangleCenterPositionDestination = Geometry.calculatePoint(
-                        path.source.portSprites.get(path.sourcePort).getPosition(),
+                        path.getSourcePort().getPosition(),
                         rotationAngle,
                         distance - 2 * triangleSpacing
                 );
@@ -371,14 +389,14 @@ public class PathSprite extends Sprite {
             } else {
 
                 float pathDistance = (float) Geometry.calculateDistance(
-                        path.source.portSprites.get(path.sourcePort).getPosition(),
-                        path.destination.portSprites.get(path.destinationPort).getPosition()
+                        path.getSourcePort().getPosition(),
+                        path.getDestinationPort().getPosition()
                 );
 
                 for (int k = 0; ; k++) {
 
                     PointF triangleCenterPosition = Geometry.calculatePoint(
-                            path.source.portSprites.get(path.sourcePort).getPosition(),
+                            path.getSourcePort().getPosition(),
                             rotationAngle,
                             k * triangleSpacing
                     );
@@ -401,29 +419,31 @@ public class PathSprite extends Sprite {
                     }
                 }
 
-                // <SPREADSHEET>
-                mapCanvas.save();
+                if (isEditorVisible) {
+                    // <SPREADSHEET>
+                    mapCanvas.save();
 
-                PointF pathMidpoint = Geometry.calculateMidpoint(
-                        path.source.portSprites.get(path.sourcePort).getPosition(),
-                        path.destination.portSprites.get(path.destinationPort).getPosition()
-                );
+                    PointF pathMidpoint = Geometry.calculateMidpoint(
+                            path.getSourcePort().getPosition(),
+                            path.getDestinationPort().getPosition()
+                    );
 
-                paint.setStyle(Paint.Style.FILL);
-                mapCanvas.translate(pathMidpoint.x, pathMidpoint.y);
-                mapCanvas.rotate(rotationAngle + 180);
-                paint.setColor(path.source.getPortSprite(path.sourcePort).getUniqueColor());
-                float spreadsheetSpriteWidth = 50.0f;
-                mapCanvas.drawRect(
-                        -(spreadsheetSpriteWidth / 2.0f),
-                        -(spreadsheetSpriteWidth / 2.0f),
-                        (spreadsheetSpriteWidth / 2.0f),
-                        (spreadsheetSpriteWidth / 2.0f),
-                        paint
-                );
+                    paint.setStyle(Paint.Style.FILL);
+                    mapCanvas.translate(pathMidpoint.x, pathMidpoint.y);
+                    mapCanvas.rotate(rotationAngle + 180);
+                    paint.setColor(path.getSourcePort().getUniqueColor());
+                    float spreadsheetSpriteWidth = 50.0f;
+                    mapCanvas.drawRect(
+                            -(spreadsheetSpriteWidth / 2.0f),
+                            -(spreadsheetSpriteWidth / 2.0f),
+                            (spreadsheetSpriteWidth / 2.0f),
+                            (spreadsheetSpriteWidth / 2.0f),
+                            paint
+                    );
 
-                mapCanvas.restore();
-                // </SPREADSHEET>
+                    mapCanvas.restore();
+                    // </SPREADSHEET>
+                }
             }
         }
 
@@ -459,10 +479,23 @@ public class PathSprite extends Sprite {
     }
 
     public void setVisibility(boolean isVisible) {
+        this.isVisible = isVisible;
         showFormLayer = isVisible;
         showStyleLayer = isVisible;
         showDataLayer = isVisible;
         showAnnotationLayer = isVisible;
+    }
+
+    public boolean getVisibility() {
+        return this.isVisible;
+    }
+
+    public void setEditorVisibility(boolean isVisible) {
+        this.isEditorVisible = isVisible;
+    }
+
+    public boolean getEditorVisibility() {
+        return this.isEditorVisible;
     }
 
     @Override
@@ -473,26 +506,26 @@ public class PathSprite extends Sprite {
     public static final String CLASS_NAME = "PATH_SPRITE";
 
     @Override
-    public void onTouchAction(TouchInteraction touchInteraction) {
+    public void onTouchAction(TouchArticulation touchArticulation) {
 
-        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
-            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
-            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
-            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
-            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
-            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+        if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.NONE) {
+            Log.v("onTouchAction", "TouchArticulation.NONE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.TOUCH) {
+            Log.v("onTouchAction", "TouchArticulation.TOUCH to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.TAP) {
+            Log.v("onTouchAction", "TouchArticulation.TAP to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchArticulation.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.HOLD) {
+            Log.v("onTouchAction", "TouchArticulation.HOLD to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.MOVE) {
+            Log.v("onTouchAction", "TouchArticulation.MOVE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchArticulation.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.DRAG) {
+            Log.v("onTouchAction", "TouchArticulation.DRAG to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.RELEASE) {
+            Log.v("onTouchAction", "TouchArticulation.RELEASE to " + CLASS_NAME);
         }
     }
 }

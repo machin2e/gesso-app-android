@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.TouchArticulation;
 import camp.computer.clay.sprite.util.Animation;
 import camp.computer.clay.sprite.util.Geometry;
 
@@ -90,13 +90,13 @@ public class MachineSprite extends Sprite {
     float lightOutlineThickness = 1.0f;
     int lightOutlineColor = Color.parseColor("#e7e7e7");
 
-    public boolean[] showChannelPaths = new boolean[channelCount];
+//    public boolean[] showPorts = new boolean[channelCount];
     // ^^^ STYLE ^^^
 
     private void initializeStyle () {
-        for (int i = 0; i < channelCount; i++) {
-            showChannelPaths[i] = false;
-        }
+//        for (int i = 0; i < channelCount; i++) {
+//            showPorts[i] = false;
+//        }
     }
 
     public MachineSprite(float x, float y, float angle) {
@@ -105,36 +105,14 @@ public class MachineSprite extends Sprite {
         this.angle = angle;
         this.scale = 1.0f;
 
-//        initializeChannelTypes();
-//        initializeChannelDirections();
-//        initializeChannelData();
         initializeStyle();
 
-        //public String[] channelTypeColors = new String[] { "#efefef", "#1467f1", "#62df42", "#cc0033", "#ff9900" };
-//        channelTypeColors.put(ChannelType.NONE, Color.parseColor("#efefef"));
-//        channelTypeColors.put(ChannelType.SWITCH, Color.parseColor("#1467f1"));
-//        channelTypeColors.put(ChannelType.PULSE, Color.parseColor("#62df42"));
-//        channelTypeColors.put(ChannelType.WAVE, Color.parseColor("#cc0033"));
-//        channelTypeColors.put(ChannelType.POWER, Color.parseColor("#ff9900"));
-//        channelTypeColors.put(ChannelType.GROUND, Color.parseColor("#acacac"));
-
-        // Port scopes
+        // Ports
         for (int i = 0; i < channelCount; i++) {
             PortSprite portSprite = new PortSprite(this);
             portSprite.setPosition(this.position.x, this.position.y);
             portSprites.add(portSprite);
         }
-
-//        // Channel node points
-//        if (channelScopePositions.size() == 0) {
-//            for (int i = 0; i < channelCount; i++) {
-//                PointF point = new PointF();
-//                point.x = this.position.x;
-//                point.y = this.position.y;
-//                channelScopePositions.add(point);
-//            }
-//        }
-//        updatePortScopePositions(MapView);
     }
 
     public int getChannelCount() {
@@ -152,7 +130,7 @@ public class MachineSprite extends Sprite {
         return -1;
     }
 
-    private void updatePortScopePositions(MapView mapView) {
+    private void updatePortPositions(MapView mapView) {
 
         double boardAngleRadians = Math.toRadians(this.angle);
         float sinBoardAngle = (float) Math.sin(boardAngleRadians);
@@ -168,32 +146,32 @@ public class MachineSprite extends Sprite {
             for (int j = 0; j < 3; j++) {
 
                 PortSprite portSprite = portSprites.get(3 * i + j);
-                PointF portScopeSpritePosition = portSprites.get(3 * i + j).getPosition();
+                PointF portSpritePosition = portSprites.get(3 * i + j).getPosition();
 
                 // Translate (Nodes)
                 float nodeRadiusPlusPadding = portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES;
-                portScopeSpritePosition.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
-                portScopeSpritePosition.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + portSprite.shapeRadius;
+                portSpritePosition.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
+                portSpritePosition.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + portSprite.shapeRadius;
 
                 // Rotate (Nodes)
-                portScopeSpritePosition.set(
-                        portScopeSpritePosition.x * cosBoardFacingAngle - portScopeSpritePosition.y * sinBoardFacingAngle,
-                        portScopeSpritePosition.x * sinBoardFacingAngle + portScopeSpritePosition.y * cosBoardFacingAngle
+                portSpritePosition.set(
+                        portSpritePosition.x * cosBoardFacingAngle - portSpritePosition.y * sinBoardFacingAngle,
+                        portSpritePosition.x * sinBoardFacingAngle + portSpritePosition.y * cosBoardFacingAngle
                 );
 
                 // Rotate (Machine)
-                portScopeSpritePosition.set(
-                        portScopeSpritePosition.x * cosBoardAngle - portScopeSpritePosition.y * sinBoardAngle,
-                        portScopeSpritePosition.x * sinBoardAngle + portScopeSpritePosition.y * cosBoardAngle
+                portSpritePosition.set(
+                        portSpritePosition.x * cosBoardAngle - portSpritePosition.y * sinBoardAngle,
+                        portSpritePosition.x * sinBoardAngle + portSpritePosition.y * cosBoardAngle
                 );
 
                 // Translate (Machine)
-                portScopeSpritePosition.x = portScopeSpritePosition.x + this.position.x;
-                portScopeSpritePosition.y = portScopeSpritePosition.y + this.position.y;
+                portSpritePosition.x = portSpritePosition.x + this.position.x;
+                portSpritePosition.y = portSpritePosition.y + this.position.y;
 
 //                // Scale (Map)
-//                portScopeSpritePosition.x = portScopeSpritePosition.x * mapView.getScale();
-//                portScopeSpritePosition.y = portScopeSpritePosition.y * mapView.getScale();
+//                portSpritePosition.x = portSpritePosition.x * mapView.getScale();
+//                portSpritePosition.y = portSpritePosition.y * mapView.getScale();
 
             }
         }
@@ -409,7 +387,7 @@ public class MachineSprite extends Sprite {
         }
         // ^^^ LIGHTS ^^^
 
-        // --- PORT SCOPES ---
+        // --- PORTS ---
         mapCanvas.restore();
 
         mapCanvas.save();
@@ -448,7 +426,7 @@ public class MachineSprite extends Sprite {
                     mapCanvas.rotate(0.0f);
                 }
 
-                machineSprite.updatePortScopePositions(mapView); // TODO: Move this into step()/updateState()
+                machineSprite.updatePortPositions(mapView); // TODO: Move this into step()/updateState()
 
 
                 portSprite.draw(mapView);
@@ -462,7 +440,7 @@ public class MachineSprite extends Sprite {
         // TODO: Put this in/under PortSprite
 
         mapCanvas.restore();
-        // ^^^ PORT SCOPES ^^^
+        // ^^^ PORTS ^^^
 
         // TODO: Put this under PortSprite
         drawPaths(mapView);
@@ -475,24 +453,21 @@ public class MachineSprite extends Sprite {
     public void drawPaths(MapView mapView) {
         for (int j = 0; j < channelCount; j++) {
             for (int i = 0; i < portSprites.get(j).pathSprites.size(); i++) {
-                if (this.showChannelPaths[j]) {
-                    PathSprite pathSprite = portSprites.get(j).pathSprites.get(i);
-
-                    pathSprite.draw(mapView);
-                }
+                PathSprite pathSprite = portSprites.get(j).pathSprites.get(i);
+                pathSprite.draw(mapView);
             }
         }
     }
 
     public void showPorts() {
         for (int i = 0; i < portSprites.size(); i++) {
-            portSprites.get(i).setVisibility(true);
+            this.portSprites.get(i).setVisibility(true);
             this.portSprites.get(i).setPathVisibility(true);
         }
     }
 
     public void showPort(int channelIndex) {
-        portSprites.get(channelIndex).setVisibility(true);
+        this.portSprites.get(channelIndex).setVisibility(true);
         this.portSprites.get(channelIndex).setPathVisibility(true);
     }
 
@@ -509,20 +484,20 @@ public class MachineSprite extends Sprite {
     }
 
     public void showPaths() {
-        for (int i = 0; i < this.showChannelPaths.length; i++) {
-            this.showChannelPaths[i] = true;
+        for (int i = 0; i < portSprites.size(); i++) {
+            this.portSprites.get(i).setPathVisibility(true);
         }
     }
 
     public void hidePaths() {
-        for (int i = 0; i < this.showChannelPaths.length; i++) {
-            this.showChannelPaths[i] = false;
+        for (int i = 0; i < portSprites.size(); i++) {
+            this.portSprites.get(i).setVisibility(false);
             this.portSprites.get(i).showPathDocks();
         }
     }
 
     public void showPath(int pathIndex, boolean isFullPathVisible) {
-        this.showChannelPaths[pathIndex] = true;
+        this.portSprites.get(pathIndex).setVisibility(true);
         if (isFullPathVisible) {
             this.portSprites.get(pathIndex).showPaths();
         } else {
@@ -533,7 +508,7 @@ public class MachineSprite extends Sprite {
     public void setPosition(float x, float y) {
         this.position.x = x;
         this.position.y = y;
-//        this.updatePortScopePositions();
+//        this.updatePortPositions();
     }
 
     public void setScale(float scale) {
@@ -545,32 +520,36 @@ public class MachineSprite extends Sprite {
     //-------------------------
 
     public boolean isTouching (PointF point) {
-        return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardWidth / 2.0f);
+        if (getVisibility()) {
+            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardWidth / 2.0f);
+        } else {
+            return false;
+        }
     }
 
     public static final String CLASS_NAME = "MACHINE_SPRITE";
 
     @Override
-    public void onTouchAction(TouchInteraction touchInteraction) {
+    public void onTouchAction(TouchArticulation touchArticulation) {
 
-        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
-            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
-            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
-            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
-            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
-            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+        if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.NONE) {
+            Log.v("onTouchAction", "TouchArticulation.NONE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.TOUCH) {
+            Log.v("onTouchAction", "TouchArticulation.TOUCH to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.TAP) {
+            Log.v("onTouchAction", "TouchArticulation.TAP to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchArticulation.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.HOLD) {
+            Log.v("onTouchAction", "TouchArticulation.HOLD to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.MOVE) {
+            Log.v("onTouchAction", "TouchArticulation.MOVE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchArticulation.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.DRAG) {
+            Log.v("onTouchAction", "TouchArticulation.DRAG to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.RELEASE) {
+            Log.v("onTouchAction", "TouchArticulation.RELEASE to " + CLASS_NAME);
         }
     }
 }

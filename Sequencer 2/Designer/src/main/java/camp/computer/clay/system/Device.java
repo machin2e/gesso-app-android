@@ -141,7 +141,7 @@ public class Device {
     public void enqueueMessage(String content) {
         Log.v("TCP_Server", "enqueueMessage");
 
-        // Get source and destination addresses
+        // Get sourceMachine and destinationMachine addresses
         String source = null; // TODO: getClay().getCurrentDevice().getInternetAddress()
         String destination = getInternetAddress();
 

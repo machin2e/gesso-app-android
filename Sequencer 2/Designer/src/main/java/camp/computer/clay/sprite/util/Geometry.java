@@ -71,4 +71,60 @@ public abstract class Geometry {
         midpoint.y = ((from.y + to.y) / 2.0f);
         return midpoint;
     }
+
+    //Compute the dot product AB . AC
+    public static double DotProduct(PointF pointA, PointF pointB, PointF pointC)
+    {
+        PointF AB = new PointF();
+        PointF BC = new PointF();
+        AB.x = pointB.x - pointA.x;
+        AB.y = pointB.y - pointA.y;
+        BC.x = pointC.x - pointB.x;
+        BC.y = pointC.y - pointB.y;
+        double dot = AB.x * BC.x + AB.y * BC.y;
+
+        return dot;
+    }
+
+    //Compute the cross product AB x AC
+    public static double CrossProduct(PointF pointA, PointF pointB, PointF pointC)
+    {
+        PointF AB = new PointF();
+        PointF AC = new PointF();
+        AB.x = pointB.x - pointA.x;
+        AB.y = pointB.y - pointA.y;
+        AC.x = pointC.x - pointA.x;
+        AC.y = pointC.y - pointA.y;
+        double cross = AB.x * AC.y - AB.y * AC.x;
+
+        return cross;
+    }
+
+//    //Compute the distance from A to B
+//    double Distance(PointF pointA, PointF pointB)
+//    {
+//        float d1 = pointA[0] - pointB[0];
+//        float d2 = pointA[1] - pointB[1];
+//
+//        return Math.sqrt(d1 * d1 + d2 * d2);
+//    }
+
+    //Compute the distance from AB to C
+    //if isSegment is true, AB is a segment, not a line.
+    public static double LineToPointDistance2D(PointF pointA, PointF pointB, PointF pointC,
+                                 boolean isSegment)
+    {
+        double dist = CrossProduct(pointA, pointB, pointC) / Geometry.calculateDistance(pointA, pointB);
+        if (isSegment)
+        {
+            double dot1 = DotProduct(pointA, pointB, pointC);
+            if (dot1 > 0)
+                return Geometry.calculateDistance(pointB, pointC);
+
+            double dot2 = DotProduct(pointB, pointA, pointC);
+            if (dot2 > 0)
+                return Geometry.calculateDistance(pointA, pointC);
+        }
+        return Math.abs(dist);
+    }
 }

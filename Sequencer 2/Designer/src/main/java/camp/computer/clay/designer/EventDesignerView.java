@@ -485,7 +485,7 @@ public class EventDesignerView {
         // <HACK>
         final EditText sourceChannelContentEntryView = new EditText(getContext());
         // <HACK>
-        // TODO: Set the input type based on the type of the source observable
+        // TODO: Set the input type based on the type of the sourceMachine observable
         sourceChannelContentEntryView.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         sourceChannelContentEntryView.setHint("0.02");
         // </HACK>
@@ -848,9 +848,9 @@ public class EventDesignerView {
 
                     }
 
-                    // Save the channel source observable (<HACK /> via channel/provider/source...)
+                    // Save the channel sourceMachine observable (<HACK /> via channel/provider/sourceMachine...)
 
-                    // Save the channel source
+                    // Save the channel sourceMachine
                     if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceDeviceSourceLayout.hasSelection()) {
                         ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                         String destinationObservable = destinationChannelObservableLayout.getSelection();
@@ -914,7 +914,7 @@ public class EventDesignerView {
             public void onSelectOption(View dynamicLayout) {
                 Log.v("onSelect", "channelDataSourceChannelLayout.onSelectOption");
 
-                // Save the channel source observable (<HACK /> via channel/provider/source...)
+                // Save the channel sourceMachine observable (<HACK /> via channel/provider/sourceMachine...)
 
                 // Save the channel provider
                 if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelNumberLayout.hasSelection()) {
@@ -1108,13 +1108,13 @@ public class EventDesignerView {
                 // Hide and show dependent layouts (dependencies via channel type)
                 if (destinationChannelDirectionLayout.getSelection().equals("output")) {
 
-                    // Save the channel source observable (<HACK /> via channel/provider/source...)
+                    // Save the channel sourceMachine observable (<HACK /> via channel/provider/sourceMachine...)
 
-                    // Save the channel source
+                    // Save the channel sourceMachine
                     if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelObservableLayout.hasSelection()) {
                         ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                         String destinationObservable = destinationChannelObservableLayout.getSelection();
-                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("source").set(sourceChannelObservableLayout.getSelection());
+                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("sourceMachine").set(sourceChannelObservableLayout.getSelection());
                         // channelDirectionLayout.setSelection(portDirection);
                     }
 
@@ -1246,11 +1246,11 @@ public class EventDesignerView {
                         // channelDirectionLayout.setSelection(portDirection);
                     }
 
-                    // Save the channel source
+                    // Save the channel sourceMachine
                     if (destinationChannelNumberLayout.hasSelection() && destinationChannelObservableLayout.hasSelection() && sourceChannelObservableLayout.hasSelection()) {
                         ContentEntry channelContent = eventContent.get("channels").get(destinationChannelNumberLayout.getSelection());
                         String destinationObservable = destinationChannelObservableLayout.getSelection();
-                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("source").set(sourceChannelContent);
+                        ContentEntry sourceChannel = channelContent.get("content").get(destinationObservable).get("sourceMachine").set(sourceChannelContent);
                         // channelDirectionLayout.setSelection(portDirection);
                     }
 
@@ -1348,9 +1348,9 @@ public class EventDesignerView {
                 String destinationStateString = "";
                 for (ContentEntry channelContentEntry : eventContent.get("channels").getChildren()) {
 
-                    Log.v ("Content_Editor", "destination.number: " + channelContentEntry.getKey());
-                    Log.v ("Content_Editor", "destination.type: " + channelContentEntry.get("type").getContent());
-                    Log.v ("Content_Editor", "destination.direction: " + channelContentEntry.get("direction").getContent());
+                    Log.v ("Content_Editor", "destinationMachine.number: " + channelContentEntry.getKey());
+                    Log.v ("Content_Editor", "destinationMachine.type: " + channelContentEntry.get("type").getContent());
+                    Log.v ("Content_Editor", "destinationMachine.direction: " + channelContentEntry.get("direction").getContent());
 
                     Log.v ("Content_Editor", " ");
 
@@ -1388,22 +1388,22 @@ public class EventDesignerView {
                             String contentDevice = channelContentEntry.get("content").get(destinationObservable).get("device").getContent();
                             String contentType = channelContentEntry.get("content").get(destinationObservable).get("type").getContent();
                             String contentProvider = channelContentEntry.get("content").get(destinationObservable).get("provider").getContent();
-                            String contentSource = channelContentEntry.get("content").get(destinationObservable).get("source").getContent();
+                            String contentSource = channelContentEntry.get("content").get(destinationObservable).get("sourceMachine").getContent();
                             String contentValue = channelContentEntry.get("content").get(destinationObservable).get("value").getContent();
 
                             Log.v("Content_Editor", "\tcontent." + destinationObservable + ":");
                             Log.v("Content_Editor", "\tcontent." + destinationObservable + ".type: " + contentType);
                             Log.v("Content_Editor", "\tcontent." + destinationObservable + ".provider: " + contentProvider);
                             Log.v("Content_Editor", "\tcontent." + destinationObservable + ".device: " + contentDevice);
-                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".source: " + contentSource);
+                            Log.v("Content_Editor", "\tcontent." + destinationObservable + ".sourceMachine: " + contentSource);
                             Log.v("Content_Editor", "\tcontent." + destinationObservable + ".value: " + contentValue);
 
                             Log.v("Content_Editor", " ");
 
-                            // TODO: loop through destination channel's content
-                            Log.v("Content_Editor", "\tdestination.content: " + destinationObservable);
-                            Log.v("Content_Editor", "\tsource.number: " + sourceChannelNumber);
-                            Log.v("Content_Editor", "\tsource.content: " + sourceObservable);
+                            // TODO: loop through destinationMachine channel's content
+                            Log.v("Content_Editor", "\tdestinationMachine.content: " + destinationObservable);
+                            Log.v("Content_Editor", "\tsourceMachine.number: " + sourceChannelNumber);
+                            Log.v("Content_Editor", "\tsourceMachine.content: " + sourceObservable);
 
                             Log.v("Content_Editor", " ");
 
@@ -1423,7 +1423,7 @@ public class EventDesignerView {
                                     //destinationChannelStateString += hackDest + "," + contentProvider + ",'" + contentSource + "'|'" + destinationObservable + "'" + ";";
 
                                     // <HACK>
-                                    // Set source device state!
+                                    // Set sourceMachine device state!
                                     if (sourceDeviceUuid.equals(destinationDeviceUuid)) {
                                         Log.v ("ContentEntry2", "SAME devices");
                                     } else {
@@ -1435,7 +1435,7 @@ public class EventDesignerView {
 
 
                                         // <HACK>
-                                        // TODO: Request Clay to add to the source timeline and fire these as a side-effect of adding an event to that timeline
+                                        // TODO: Request Clay to add to the sourceMachine timeline and fire these as a side-effect of adding an event to that timeline
                                         getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage("start event be46e943-d035-4c50-bf5d-9840c7ecd773");
                                         getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage("set event be46e943-d035-4c50-bf5d-9840c7ecd773 action bdb49750-9ead-466e-96a0-3aa88e7d246c");
                                         getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage("set event be46e943-d035-4c50-bf5d-9840c7ecd773 state \"TIT:none TIT:none TIW:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none\"");
@@ -1465,7 +1465,7 @@ public class EventDesignerView {
 
 
                                         // Create propagator
-                                        // e.g., "propagate 3,'waveform_sample_value' to <destination-device-uuid>,4,'pulse_duty_cycle'
+                                        // e.g., "propagate 3,'waveform_sample_value' to <destinationMachine-device-uuid>,4,'pulse_duty_cycle'
                                         //String propagatorMessage = "propagate " + contentProvider + ",'" + contentSource + "' to " + destinationDeviceUuid + "," + channelContentEntry.getKey() + ",'" + destinationObservable + "'";
                                         String[] channelProviderUuids = new String[] {
                                                 "00000000-0000-0000-0000-000000000001",
@@ -1535,7 +1535,7 @@ public class EventDesignerView {
                 // "set event TIT:none TIT:none TIT:none TOP:none ..."
 
                 // GET OUTPUT MESSAGE WITH "none" SOURCE IF SOURCE DEVICE IS NOT W. THE CURRENT TIMELINE
-                // in that case, send messages to both devices, accordingly, for the source and destination
+                // in that case, send messages to both devices, accordingly, for the sourceMachine and destinationMachine
 
 
 
@@ -1556,7 +1556,7 @@ public class EventDesignerView {
 
 //                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".type: " + contentType);
 //                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".provider: " + contentProvider);
-//                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".source: " + contentSource);
+//                Log.v("Content_Editor", "channel." + number + ".content." + destinationObservable + ".sourceMachine: " + contentSource);
 
                 // Save configuration options to object
 //                item.phrase = input.getText().toString();
@@ -1771,14 +1771,14 @@ public class EventDesignerView {
                 String number = contentEntry.choice().get("number").getContent();
                 String contentType = contentEntry.choice().get("content").get(selectedObservable).get("type").getContent();
                 String contentProvider = contentEntry.choice().get("content").get(selectedObservable).get("provider").getContent();
-                String contentSource = contentEntry.choice().get("content").get(selectedObservable).get("source").getContent();
+                String contentSource = contentEntry.choice().get("content").get(selectedObservable).get("sourceMachine").getContent();
 
                 // TODO: Add contentEntry to each event (since it could change on a per-event level)
                 // TODO: Iterate through the observables and print the state for each one!
 
                 Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".type: " + contentType);
                 Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".provider: " + contentProvider);
-                Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".source: " + contentSource);
+                Log.v("Content_Editor", "channel." + number + ".content." + selectedObservable + ".sourceMachine: " + contentSource);
 
                 // Save configuration options to object
 //                item.phrase = input.getText().toString();
@@ -2066,7 +2066,7 @@ public class EventDesignerView {
                 textView.setTypeface(null, Typeface.BOLD);
 
                 // Data.
-                contentEntry.choice().get("content").get(selectedObservable).put("source", textView.getText().toString());
+                contentEntry.choice().get("content").get(selectedObservable).put("sourceMachine", textView.getText().toString());
 
                 // TODO: if (enableMultipleContentProviders) {
             }
@@ -2832,7 +2832,7 @@ public class EventDesignerView {
         messageTypeSelector.setAdapter(messageTypeDataAdapter);
         designerViewLayout.addView(messageTypeSelector);
 
-        /* Message destination address */
+        /* Message destinationMachine address */
 
         // Destination label
         final TextView messageDestinationTitle = new TextView(getContext());
@@ -2840,21 +2840,21 @@ public class EventDesignerView {
         messageDestinationTitle.setPadding(70, 20, 70, 20);
         designerViewLayout.addView(messageDestinationTitle);
 
-        // Set destination of message
+        // Set destinationMachine of message
         final Spinner messageDestinationSelector = new Spinner(getContext());
         final ArrayAdapter<String> messageDestinationDataAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, messageDestinationData); //selected item will look like a spinner set from XML
         messageDestinationDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         messageDestinationSelector.setAdapter(messageDestinationDataAdapter);
         designerViewLayout.addView(messageDestinationSelector);
 
-        // "Other" destination address, specified by user
+        // "Other" destinationMachine address, specified by user
         final TextView messageCustomDestinationTitle = new TextView(getContext());
         messageCustomDestinationTitle.setText("Other");
         messageCustomDestinationTitle.setPadding(70, 20, 70, 20);
         messageCustomDestinationTitle.setVisibility(View.GONE);
         designerViewLayout.addView(messageCustomDestinationTitle);
 
-        // "Other" destination input field
+        // "Other" destinationMachine input field
         final EditText messageCustomDestinationEditor = new EditText(getContext());
         messageCustomDestinationEditor.setInputType(InputType.TYPE_CLASS_TEXT);
         messageCustomDestinationEditor.setVisibility(View.GONE);
@@ -2957,7 +2957,7 @@ public class EventDesignerView {
         int messageTypeIndex = messageTypeDataAdapter.getPosition(currentTypeString);
         messageTypeSelector.setSelection(messageTypeIndex);
 
-        // Message destination
+        // Message destinationMachine
         int messageDestinationIndex = messageDestinationDataAdapter.getPosition(currentDestinationAddressString);
         messageDestinationSelector.setSelection(messageDestinationIndex);
 

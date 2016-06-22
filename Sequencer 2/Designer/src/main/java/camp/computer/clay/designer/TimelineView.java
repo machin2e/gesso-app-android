@@ -325,11 +325,11 @@ public class TimelineView extends DragSortListView {
      */
 
     /**
-     * Set up the eventHolders source and populate the list of eventHolders to show in this ListView.
+     * Set up the eventHolders sourceMachine and populate the list of eventHolders to show in this ListView.
      *
-     * TODO: Initialize eventHolders from cache or from remote source in this function.
+     * TODO: Initialize eventHolders from cache or from remote sourceMachine in this function.
      * TODO:    Do this because ViewPager will destroy this object when moving between pages.
-     * TODO: Observe remote eventHolders source and update cached source and notify ListView...
+     * TODO: Observe remote eventHolders sourceMachine and update cached sourceMachine and notify ListView...
      * TODO: ...when eventHolders set changes.
      */
     private void setUpData() {

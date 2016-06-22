@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.Path;
+import camp.computer.clay.model.TouchArticulation;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class PortSprite extends Sprite {
@@ -122,17 +123,34 @@ public class PortSprite extends Sprite {
     public void setPosition(float x, float y) {
         this.position.x = x;
         this.position.y = y;
-//        this.updateChannelScopePositions();
+//        this.updatePortPositions();
     }
 
     public void setPosition(PointF position) {
         this.setPosition(position.x, position.y);
     }
 
-    public void addPath(MachineSprite sourceDrone, int sourcePort, MachineSprite destinationDrone, int destinationPort) {
-        PathSprite path = new PathSprite(sourceDrone, sourcePort, destinationDrone, destinationPort);
-        destinationDrone.getPortSprite(destinationPort).setUniqueColor(this.uniqueColor);
-        pathSprites.add(path);
+    // TODO: Move into Port
+    public PortType getType() {
+        return this.portType;
+    }
+
+    // TODO: Move into Port
+    public void setPortType(PortType portType) {
+        this.portType = portType;
+    }
+
+    // TODO: Move into Port
+    public PathSprite addPath(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
+        PathSprite pathSprite = new PathSprite(
+                sourceMachineSprite,
+                sourcePortSprite,
+                destinationMachineSprite,
+                destinationPortSprite
+        );
+        destinationPortSprite.setUniqueColor(this.uniqueColor);
+        this.pathSprites.add(pathSprite);
+        return pathSprite;
     }
 
     public int getUniqueColor() {
@@ -162,14 +180,16 @@ public class PortSprite extends Sprite {
 
     @Override
     public void draw(MapView mapView) {
+        if (getVisibility()) {
 
-        drawShapeLayer(mapView);
-        drawStyleLayer(mapView);
-        drawDataLayer(mapView);
-        drawAnnotationLayer(mapView);
+            drawShapeLayer(mapView);
+            drawStyleLayer(mapView);
+            drawDataLayer(mapView);
+            drawAnnotationLayer(mapView);
 
-        // draw pathSprites
-        //drawCandidatePath(mapView);
+            // draw pathSprites
+            //drawCandidatePath(mapView);
+        }
     }
 
     /**
@@ -406,36 +426,59 @@ public class PortSprite extends Sprite {
         }
     }
 
+    public boolean hasVisiblePaths () {
+        for (PathSprite pathSprite: pathSprites) {
+            if (pathSprite.getVisibility() && !pathSprite.showPathDocks) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<PathSprite> getVisiblePaths() {
+        ArrayList<PathSprite> visiblePathSprites = new ArrayList<PathSprite>();
+        for (PathSprite pathSprite: pathSprites) {
+            if (pathSprite.getVisibility()) {
+                visiblePathSprites.add(pathSprite);
+            }
+        }
+        return visiblePathSprites;
+    }
+
     @Override
     public boolean isTouching(PointF point) {
-        return (Geometry.calculateDistance(point, this.getPosition()) < 80);
+        if (getVisibility()) {
+            return (Geometry.calculateDistance(point, this.getPosition()) < 80);
+        } else {
+            return false;
+        }
     }
 
     public static final String CLASS_NAME = "PORT_SPRITE";
 
     @Override
-    public void onTouchAction(TouchInteraction touchInteraction) {
+    public void onTouchAction(TouchArticulation touchArticulation) {
 
-        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
-            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
-            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
-            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
-            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
-            this.setCandidatePathDestinationPosition(touchInteraction.getPosition());
+        if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.NONE) {
+            Log.v("onTouchAction", "TouchArticulation.NONE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.TOUCH) {
+            Log.v("onTouchAction", "TouchArticulation.TOUCH to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.TAP) {
+            Log.v("onTouchAction", "TouchArticulation.TAP to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.DOUBLE_DAP) {
+            Log.v("onTouchAction", "TouchArticulation.DOUBLE_TAP to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.HOLD) {
+            Log.v("onTouchAction", "TouchArticulation.HOLD to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.MOVE) {
+            Log.v("onTouchAction", "TouchArticulation.MOVE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.PRE_DRAG) {
+            Log.v("onTouchAction", "TouchArticulation.PRE_DRAG to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.DRAG) {
+            Log.v("onTouchAction", "TouchArticulation.DRAG to " + CLASS_NAME);
+            this.setCandidatePathDestinationPosition(touchArticulation.getPosition());
             this.setCandidatePathVisibility(true);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
-            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+        } else if (touchArticulation.getType() == TouchArticulation.TouchInteractionType.RELEASE) {
+            Log.v("onTouchAction", "TouchArticulation.RELEASE to " + CLASS_NAME);
 
             this.setCandidatePathVisibility(false);
         }
