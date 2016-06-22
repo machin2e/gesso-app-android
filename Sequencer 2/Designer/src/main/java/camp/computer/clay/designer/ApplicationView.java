@@ -4,7 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -14,13 +14,16 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
@@ -152,7 +155,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         cursorView = new CursorView();
         cursorView.hide(false);
 
-        Button contextButton = (Button) findViewById (R.id.context_button);
+        final Button contextButton = (Button) findViewById (R.id.context_button);
         contextButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -303,41 +306,198 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         getClay().getCache().populate();
         // getClay().simulateSession(true, 10, false);
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+
         // --- Timeline Button ---
-        final Button timelineButton = (Button) findViewById(R.id.timeline_button);
+        final EditText timelineButton = (EditText) findViewById(R.id.chat_entry);
         final RelativeLayout timelineView = (RelativeLayout) findViewById(R.id.timeline_view);
+
+        timelineButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                int pointerId = motionEvent.getPointerId (pointerIndex);
+                //int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+                int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+                int pointCount = motionEvent.getPointerCount ();
+
+                // Update the state of the touched object based on the current touch interaction state.
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+                    timelineButton.performClick();
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                int inType = timelineButton.getInputType(); // backup the input type
+//                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
+//                timelineButton.onTouchEvent(event); // call native handler
+//                timelineButton.setInputType(inType); // restore input type
+//                return true; // consume touch even
+//            }
+        });
+
         timelineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (timelineView.getVisibility() == View.GONE) {
-                    timelineView.setVisibility(View.VISIBLE);
-                    timelineView.setBackgroundColor(Color.parseColor("#9a000000"));
-                    timelineButton.setText("Map");
-                } else {
-                    timelineView.setVisibility(View.GONE);
-                    timelineView.setBackgroundColor(Color.TRANSPARENT);
-                    timelineButton.setText("Timeline");
+
+                final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+                ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
+
+                final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
+
+                final RelativeLayout chatKeyboardLayout = (RelativeLayout) findViewById(R.id.chat_keyboard_layout);
+                ViewGroup.MarginLayoutParams chatKeyboardLayoutParams = (ViewGroup.MarginLayoutParams) chatKeyboardLayout.getLayoutParams();
+
+//                if (chatLayoutParams.bottomMargin < 800) {
+//
+////                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+//
+//                    // Reposition chat layout
+////                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
+////                    params.rightMargin = w - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+//                    chatLayoutParams.bottomMargin = 800; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+//
+////                    chatLayout.requestLayout();
+////                    chatLayout.invalidate();
+//
+////                    timelineView.setVisibility(View.VISIBLE);
+////                    timelineView.setBackgroundColor(Color.parseColor("#9a000000"));
+////                    timelineButton.setText("Map");
+//                } else {
+
+//                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+
+                    /// Converts 14 dip into its equivalent px
+
+                    Resources r = getResources();
+                    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
+                    //float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 14, r.getDisplayMetrics());
+
+                    // Reposition chat layout
+//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
+//                    params.rightMargin = w - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+                    chatKeyboardLayoutParams.bottomMargin = chatLayoutParams.bottomMargin + chatEntry.getLayoutParams().height + 15; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+
+//                    chatLayout.requestLayout();
+//                    chatLayout.invalidate();
+
+//                    timelineView.setVisibility(View.GONE);
+//                    timelineView.setBackgroundColor(Color.TRANSPARENT);
+//                    timelineButton.setText("Timeline");
+//                }
+
+                if (chatKeyboardLayout.getVisibility() == View.GONE) {
+                    chatKeyboardLayout.setVisibility(View.VISIBLE);
+                } else if (chatKeyboardLayout.getVisibility() == View.VISIBLE) {
+                    chatKeyboardLayout.setVisibility(View.GONE);
                 }
+
+                chatKeyboardLayout.requestLayout();
+                chatKeyboardLayout.invalidate();
             }
         });
 
-        final RelativeLayout oldTimelineView = (RelativeLayout) findViewById(R.id.old_timeline_view);
-        timelineButton.setOnLongClickListener(new View.OnLongClickListener() {
+        final Button chatKeyboard = (Button) findViewById(R.id.chat_keyboard);
+        chatKeyboard.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                if (oldTimelineView.getVisibility() == View.GONE) {
-                    oldTimelineView.setVisibility(View.VISIBLE);
-                    timelineButton.setText("Map");
-                    cursorView.show(true);
-                } else {
-                    oldTimelineView.setVisibility(View.GONE);
-                    timelineButton.setText("Timeline");
-                    cursorView.hide(true);
-                }
-                return true;
+            public void onClick(View v) {
+                final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
+                chatEntry.append(chatKeyboard.getText());
+                contextButton.setText("✓");
             }
         });
+
+//        final RelativeLayout oldTimelineView = (RelativeLayout) findViewById(R.id.old_timeline_view);
+//        timelineButton.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if (oldTimelineView.getVisibility() == View.GONE) {
+//                    oldTimelineView.setVisibility(View.VISIBLE);
+//                    timelineButton.setText("Map");
+//                    cursorView.show(true);
+//                } else {
+//                    oldTimelineView.setVisibility(View.GONE);
+//                    timelineButton.setText("Timeline");
+//                    cursorView.hide(true);
+//                }
+//                return true;
+//            }
+//        });
         // ^^^ Timeline Button ^^^
+
+
+
+//        mapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//
+//                Rect r = new Rect();
+//
+//                //final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+//
+//
+//
+//                mapView.getRootView().getWindowVisibleDisplayFrame(r);
+//                int screenHeight = mapView.getRootView().getHeight();
+//
+//                // r.bottom is the position above soft keypad or device button.
+//                // if keypad is shown, the r.bottom is smaller than that before.
+//                int keypadHeight = screenHeight - r.bottom;
+//
+//                Log.d("Keyboard", "keypadHeight = " + keypadHeight);
+//
+//                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+//                    // keyboard is opened
+//
+//                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+//
+//                    // Reposition chat layout
+//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
+////                    params.rightMargin = w - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+//                    params.bottomMargin = keypadHeight;//h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+//
+//                }
+//                else {
+//                    // keyboard is closed
+//                }
+//
+//
+//
+//                // Obtain layout data from view...
+//                int w = mapView.getWidth();
+//                int h = mapView.getHeight();
+//                // ...etc.
+//
+//                // Once data has been obtained, this listener is no longer needed, so remove it...
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//                    mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//
+//                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+//                    chatLayout.getRootView();
+//
+//
+//                }
+//                else {
+//                    mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                }
+//            }
+//        });
 
         // Start the initial worker thread (runnable task) by posting through the handler
         handler.post(runnableCode);

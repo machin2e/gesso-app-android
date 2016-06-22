@@ -50,22 +50,47 @@
         fab:fab_colorRipple="@color/app_ripple" />
 
     <RelativeLayout
+        android:id="@+id/chat_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp">
-        <Button
-            android:id="@+id/timeline_button"
-            android:text="Timeline"
+        <EditText
+            android:id="@+id/chat_entry"
+            android:text=""
             android:textColor="#FFFFFFFF"
             android:textSize="14sp"
-            android:textAlignment="textStart"
             android:padding="15dp"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/timeline_button" />
+            android:background="@drawable/timeline_button"
+            android:inputType="text"
+            android:maxLines="1"
+            android:hint="I want to..."
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/chat_keyboard_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:visibility="gone">
+        <Button
+            android:id="@+id/chat_keyboard"
+            android:text="settings"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp"
+            android:padding="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/timeline_button"
+            />
     </RelativeLayout>
 
     <RelativeLayout

@@ -308,6 +308,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     // Interactivity state
     private boolean isPanningEnabled = true;
+    private boolean isPathFocus = false; // TODO: Infer this from interaction history/perspective
 
     // TODO: In the queue, store the touch actions persistently after exceeding maximum number for immediate interactions.
     //private ArrayList<TouchArticulation> touchActionHistory = new ArrayList<TouchArticulation>();
@@ -320,7 +321,6 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     // Gesture Envelope for Making a Wireless Channel
     // Gestural language. Grammar for the gestures composing it. Think of these as templates for
     // gestures that Clay attempts to evaluate and cleans up after, following each touch action.
-
 
 
     private Handler timerHandler = new Handler();
