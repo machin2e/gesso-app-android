@@ -2,7 +2,7 @@ package camp.computer.clay.model;
 
 import android.graphics.PointF;
 
-public class TouchArticulation {
+public class TouchInteraction {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
@@ -38,10 +38,13 @@ public class TouchArticulation {
     // TODO: Sensor data (inc. 3D orienetation, brightness)
     // </CONTEXT>
 
+    //public int touches[];
+    public int pointerId = -1;
+
     // touchedSprite
     // overlappedSprite (not needed, probably, because can look in history, or look at first action in interaction)
 
-    public TouchArticulation(PointF position, TouchInteractionType touchInteractionType) {
+    public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
         this.position = position;
         this.touchInteractionType = touchInteractionType;
         this.timestamp = java.lang.System.currentTimeMillis ();
@@ -57,5 +60,9 @@ public class TouchArticulation {
 
     public PointF getPosition() {
         return this.position;
+    }
+
+    public long getTimestamp() {
+        return this.timestamp;
     }
 }

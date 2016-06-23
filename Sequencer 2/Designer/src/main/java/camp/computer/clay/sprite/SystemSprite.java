@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchArticulation;
+import camp.computer.clay.model.TouchInteraction;
 
 public class SystemSprite extends Sprite {
 
@@ -47,7 +47,7 @@ public class SystemSprite extends Sprite {
     }
 
     @Override
-    public void onTouchAction(TouchArticulation touchArticulation) {
+    public void onTouchAction(TouchInteraction touchInteraction) {
 
     }
 

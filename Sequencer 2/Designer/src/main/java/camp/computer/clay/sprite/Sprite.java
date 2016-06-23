@@ -3,7 +3,7 @@ package camp.computer.clay.sprite;
 import android.graphics.PointF;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.TouchArticulation;
+import camp.computer.clay.model.TouchInteraction;
 
 public abstract class Sprite {
 
@@ -29,15 +29,15 @@ public abstract class Sprite {
     public interface TouchActionListener {
     }
 
-    public abstract void onTouchAction(TouchArticulation touchArticulation);
+    public abstract void onTouchAction(TouchInteraction touchInteraction);
 
     // TODO: change this to addOnTouchListener (since have abstract onTouchAction)... and call at end of that
     public void setOnTouchActionListener(TouchActionListener touchActionListener) {
         this.touchActionListener = touchActionListener;
     }
 
-    public void touch (TouchArticulation touchArticulation) {
-        onTouchAction(touchArticulation);
+    public void touch (TouchInteraction touchInteraction) {
+        onTouchAction(touchInteraction);
     }
 
 }
