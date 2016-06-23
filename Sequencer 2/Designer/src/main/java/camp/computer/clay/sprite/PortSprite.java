@@ -11,8 +11,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import camp.computer.clay.designer.MapView;
+import camp.computer.clay.model.Path;
+import camp.computer.clay.model.Port;
 import camp.computer.clay.model.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
+import camp.computer.clay.sprite.util.Shape;
 
 public class PortSprite extends Sprite {
 
@@ -34,7 +37,7 @@ public class PortSprite extends Sprite {
     private int uniqueColor = Color.BLACK;
 
     public int getIndex() {
-        return this.machineSprite.getPortSpriteIndex(this);
+        return getMachineSprite().getPortSpriteIndex(this);
     }
     // ^^^ STYLE ^^^
 
@@ -88,19 +91,13 @@ public class PortSprite extends Sprite {
 
     public ArrayList<PathSprite> pathSprites = new ArrayList<PathSprite>();
 
-    private PointF position = new PointF(0, 0); // Sprite position
-    private float scale = 1.0f; // Sprite scale factor
-    private float angle = 0.0f; // Sprite heading angle
-
-    private MachineSprite machineSprite;
-
-    public PortSprite(MachineSprite machineSprite) {
-        this.machineSprite = machineSprite;
-        this.uniqueColor = updateUniqueColor();
+    public PortSprite(Port port) {
+        super(port);
         initialize();
     }
 
     private void initialize() {
+        this.uniqueColor = updateUniqueColor();
         initializeData();
     }
 
@@ -111,23 +108,14 @@ public class PortSprite extends Sprite {
     }
 
     public MachineSprite getMachineSprite() {
-        return this.machineSprite;
+        return (MachineSprite) getParentSprite();
     }
 
-    public PointF getPosition() {
-        return this.position;
-    }
-
-    // TODO: Remove this method and replace with one below.
-    public void setPosition(float x, float y) {
-        this.position.x = x;
-        this.position.y = y;
-//        this.updatePortPositions();
-    }
-
-    public void setPosition(PointF position) {
-        this.setPosition(position.x, position.y);
-    }
+//    public void setAbsolutePosition(PointF position) {
+//        this.setPosition(
+//                position.x,
+//                position.y);
+//    }
 
     // TODO: Move into Port
     public PortType getType() {
@@ -141,12 +129,18 @@ public class PortSprite extends Sprite {
 
     // TODO: Move into Port
     public PathSprite addPath(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
-        PathSprite pathSprite = new PathSprite(
+
+
+        // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
+        Path path = new Path(
                 sourceMachineSprite,
                 sourcePortSprite,
                 destinationMachineSprite,
                 destinationPortSprite
         );
+        PathSprite pathSprite = new PathSprite(path);
+        pathSprite.setParentSprite(this);
+
         destinationPortSprite.setUniqueColor(this.uniqueColor);
         this.pathSprites.add(pathSprite);
         return pathSprite;
@@ -205,6 +199,8 @@ public class PortSprite extends Sprite {
 
             mapCanvas.save();
 
+            mapCanvas.translate(this.position.x, this.position.y);
+
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
@@ -246,6 +242,9 @@ public class PortSprite extends Sprite {
             if (portType != PortSprite.PortType.NONE) {
 
                 mapCanvas.save();
+
+                mapCanvas.translate(this.position.x, this.position.y);
+
                 // Color
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(this.uniqueColor); // [3 * i + j]);
@@ -288,6 +287,8 @@ public class PortSprite extends Sprite {
             if (portType != PortSprite.PortType.NONE) {
 
                 mapCanvas.save();
+
+                mapCanvas.translate(this.position.x, this.position.y);
 
                 // Outline
                 paint.setStyle(Paint.Style.STROKE);
@@ -334,6 +335,8 @@ public class PortSprite extends Sprite {
             if (portType != PortSprite.PortType.NONE) {
 
                 mapCanvas.save();
+
+                mapCanvas.translate(this.position.x, this.position.y);
 
                 /*
                 // Label
@@ -447,7 +450,7 @@ public class PortSprite extends Sprite {
     @Override
     public boolean isTouching(PointF point) {
         if (getVisibility()) {
-            return (Geometry.calculateDistance(point, this.getPosition()) < 80);
+            return (Geometry.calculateDistance(point, this.getAbsolutePosition()) < 80);
         } else {
             return false;
         }
@@ -527,8 +530,8 @@ public class PortSprite extends Sprite {
                 paint.setColor(this.getUniqueColor());
 
                 mapCanvas.drawLine(
-                        this.getPosition().x * mapView.getScale(),
-                        this.getPosition().y * mapView.getScale(),
+                        this.getAbsolutePosition().x * mapView.getScale(),
+                        this.getAbsolutePosition().y * mapView.getScale(),
                         candidatePathDestinationPosition.x * mapView.getScale(),
                         candidatePathDestinationPosition.y * mapView.getScale(),
                         paint

@@ -9,31 +9,18 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import camp.computer.clay.designer.MapView;
+import camp.computer.clay.model.Machine;
+import camp.computer.clay.model.Port;
 import camp.computer.clay.model.TouchInteraction;
 import camp.computer.clay.sprite.util.Animation;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class MachineSprite extends Sprite {
 
-    private int channelCount = 12;
+    private int portCount = 12;
 
-    private PointF position = new PointF(); // Sprite position
-    private float scale = 1.0f; // Sprite scale factor
-    private float angle; // Sprite heading angle
-
+    // TODO: Delete this? Could do reverse lookup through the model.
     public ArrayList<PortSprite> portSprites = new ArrayList<PortSprite>();
-
-    public PointF getPosition() {
-        return this.position;
-    }
-
-    public float getAngle() {
-        return this.angle;
-    }
-
-    public float getScale() {
-        return this.scale;
-    }
 
     private float targetTransparency = 1.0f;
 
@@ -61,8 +48,8 @@ public class MachineSprite extends Sprite {
 
     // --- STYLE ---
     // TODO: Make these private once the map is working well and the sprite is working well.
-    public float boardWidth = 250;
-    float boardHeight = 250;
+    public float dimensionHeight = 250.0f;
+    public float dimensionWidth = 250.0f;
     private String boardColorString = "f7f7f7"; // "414141";
     private int boardColor = Color.parseColor("#ff" + boardColorString); // Color.parseColor("#212121");
     boolean showBoardOutline = true;
@@ -90,33 +77,87 @@ public class MachineSprite extends Sprite {
     float lightOutlineThickness = 1.0f;
     int lightOutlineColor = Color.parseColor("#e7e7e7");
 
-//    public boolean[] showPorts = new boolean[channelCount];
+//    public boolean[] showPorts = new boolean[portCount];
     // ^^^ STYLE ^^^
 
     private void initializeStyle () {
-//        for (int i = 0; i < channelCount; i++) {
+//        for (int i = 0; i < portCount; i++) {
 //            showPorts[i] = false;
 //        }
     }
 
-    public MachineSprite(float x, float y, float angle) {
-
-        this.position.set(x, y);
-        this.angle = angle;
-        this.scale = 1.0f;
+    // TODO: Replace with SpriteHolder: public MachineSprite(float x, float y, float angle) {
+    public MachineSprite(Machine machine) {
+        super(machine);
 
         initializeStyle();
 
         // Ports
-        for (int i = 0; i < channelCount; i++) {
-            PortSprite portSprite = new PortSprite(this);
-            portSprite.setPosition(this.position.x, this.position.y);
+        float portRadius = 40.0f;
+        PointF[] relativePortPositions = new PointF[portCount];
+        relativePortPositions[0] = new PointF(
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                +1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[1] = new PointF(
+                0,
+                +1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[2] = new PointF(
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                +1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[3] = new PointF(
+                +1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+        relativePortPositions[4] = new PointF(
+                +1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                0
+        );
+        relativePortPositions[5] = new PointF(
+                +1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+        relativePortPositions[6] = new PointF(
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                -1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[7] = new PointF(
+                0,
+                -1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[8] = new PointF(
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                -1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[9] = new PointF(
+                -1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+        relativePortPositions[10] = new PointF(
+                -1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                0
+        );
+        relativePortPositions[11] = new PointF(
+                -1 * ((this.dimensionWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+
+        // Add a port sprite for each of the associated machine's ports
+        int i = 0;
+        Machine machineModel = (Machine) this.getModel();
+        for (Port port: machineModel.getPorts()) {
+            PortSprite portSprite = new PortSprite(port);
+            portSprite.setParentSprite(this);
+            portSprite.setPosition(relativePortPositions[i]);
             portSprites.add(portSprite);
+            i++;
         }
     }
 
-    public int getChannelCount() {
-        return channelCount;
+    public int getPortCount() {
+        return portCount;
     }
 
     public PortSprite getPortSprite (int index) {
@@ -130,55 +171,55 @@ public class MachineSprite extends Sprite {
         return -1;
     }
 
-    private void updatePortPositions(MapView mapView) {
-
-        double boardAngleRadians = Math.toRadians(this.angle);
-        float sinBoardAngle = (float) Math.sin(boardAngleRadians);
-        float cosBoardAngle = (float) Math.cos(boardAngleRadians);
-
-        for (int i = 0; i < 4; i++) {
-
-            // Cache calculations
-            double boardFacingAngleRadians = Math.toRadians(-90.0 * i);
-            float sinBoardFacingAngle = (float) Math.sin(boardFacingAngleRadians);
-            float cosBoardFacingAngle = (float) Math.cos(boardFacingAngleRadians);
-
-            for (int j = 0; j < 3; j++) {
-
-                PortSprite portSprite = portSprites.get(3 * i + j);
-                PointF portSpritePosition = portSprites.get(3 * i + j).getPosition();
-
-                // Translate (Nodes)
-                float nodeRadiusPlusPadding = portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES;
-                portSpritePosition.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
-                portSpritePosition.y = (((boardWidth / 2.0f) + nodeRadiusPlusPadding)) + portSprite.shapeRadius;
-
-                // Rotate (Nodes)
-                portSpritePosition.set(
-                        portSpritePosition.x * cosBoardFacingAngle - portSpritePosition.y * sinBoardFacingAngle,
-                        portSpritePosition.x * sinBoardFacingAngle + portSpritePosition.y * cosBoardFacingAngle
-                );
-
-                // Rotate (Machine)
-                portSpritePosition.set(
-                        portSpritePosition.x * cosBoardAngle - portSpritePosition.y * sinBoardAngle,
-                        portSpritePosition.x * sinBoardAngle + portSpritePosition.y * cosBoardAngle
-                );
-
-                // Translate (Machine)
-                portSpritePosition.x = portSpritePosition.x + this.position.x;
-                portSpritePosition.y = portSpritePosition.y + this.position.y;
-
-//                // Scale (Map)
-//                portSpritePosition.x = portSpritePosition.x * mapView.getScale();
-//                portSpritePosition.y = portSpritePosition.y * mapView.getScale();
-
-            }
-        }
-    }
+//    private void updatePortPositions(MapView mapView) {
+//
+//        double boardAngleRadians = Math.toRadians(this.angle);
+//        float sinBoardAngle = (float) Math.sin(boardAngleRadians);
+//        float cosBoardAngle = (float) Math.cos(boardAngleRadians);
+//
+//        for (int i = 0; i < 4; i++) {
+//
+//            // Cache calculations
+//            double boardFacingAngleRadians = Math.toRadians(-90.0 * i);
+//            float sinBoardFacingAngle = (float) Math.sin(boardFacingAngleRadians);
+//            float cosBoardFacingAngle = (float) Math.cos(boardFacingAngleRadians);
+//
+//            for (int j = 0; j < 3; j++) {
+//
+//                PortSprite portSprite = portSprites.get(3 * i + j);
+//                PointF portSpritePosition = portSprites.get(3 * i + j).getPosition();
+//
+//                // Translate (Nodes)
+//                float nodeRadiusPlusPadding = portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES;
+//                portSpritePosition.x = ((-(nodeRadiusPlusPadding * 2.0f) + j * (nodeRadiusPlusPadding * 2.0f)));
+//                portSpritePosition.y = (((dimensionHeight / 2.0f) + nodeRadiusPlusPadding)) + portSprite.shapeRadius;
+//
+//                // Rotate (Nodes)
+//                portSpritePosition.set(
+//                        portSpritePosition.x * cosBoardFacingAngle - portSpritePosition.y * sinBoardFacingAngle,
+//                        portSpritePosition.x * sinBoardFacingAngle + portSpritePosition.y * cosBoardFacingAngle
+//                );
+//
+//                // Rotate (Machine)
+//                portSpritePosition.set(
+//                        portSpritePosition.x * cosBoardAngle - portSpritePosition.y * sinBoardAngle,
+//                        portSpritePosition.x * sinBoardAngle + portSpritePosition.y * cosBoardAngle
+//                );
+//
+//                // Translate (Machine)
+//                portSpritePosition.x = portSpritePosition.x + this.position.x;
+//                portSpritePosition.y = portSpritePosition.y + this.position.y;
+//
+////                // Scale (Map)
+////                portSpritePosition.x = portSpritePosition.x * mapView.getScale();
+////                portSpritePosition.y = portSpritePosition.y * mapView.getScale();
+//
+//            }
+//        }
+//    }
 
     public void updateChannelData () {
-        for (int j = 0; j < this.channelCount; j++) {
+        for (int j = 0; j < this.portCount; j++) {
             this.portSprites.get(j).updateChannelData();
         }
     }
@@ -193,7 +234,7 @@ public class MachineSprite extends Sprite {
         mapCanvas.save();
 
         mapCanvas.translate(machineSprite.getPosition().x, machineSprite.getPosition().y);
-        mapCanvas.rotate(machineSprite.getAngle());
+        mapCanvas.rotate(machineSprite.getRotation());
 
         mapCanvas.scale(machineSprite.getScale(), machineSprite.getScale());
 
@@ -204,10 +245,10 @@ public class MachineSprite extends Sprite {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(machineSprite.boardHighlightColor);
             mapCanvas.drawRect(
-                    0 - (machineSprite.boardWidth / 2.0f) - machineSprite.boardHighlightThickness,
-                    0 - (machineSprite.boardHeight / 2.0f) - machineSprite.boardHighlightThickness,
-                    0 + (machineSprite.boardWidth / 2.0f) + machineSprite.boardHighlightThickness,
-                    0 + (machineSprite.boardHeight / 2.0f) + machineSprite.boardHighlightThickness,
+                    0 - (machineSprite.dimensionHeight / 2.0f) - machineSprite.boardHighlightThickness,
+                    0 - (machineSprite.dimensionWidth / 2.0f) - machineSprite.boardHighlightThickness,
+                    0 + (machineSprite.dimensionHeight / 2.0f) + machineSprite.boardHighlightThickness,
+                    0 + (machineSprite.dimensionWidth / 2.0f) + machineSprite.boardHighlightThickness,
                     paint);
             mapCanvas.restore();
         }
@@ -225,7 +266,7 @@ public class MachineSprite extends Sprite {
                 mapCanvas.save();
                 mapCanvas.translate(
                         0,
-                        (machineSprite.boardHeight / 2.0f) + (machineSprite.headerHeight / 2.0f)
+                        (machineSprite.dimensionWidth / 2.0f) + (machineSprite.headerHeight / 2.0f)
                 );
                 mapCanvas.rotate(0);
 
@@ -255,10 +296,10 @@ public class MachineSprite extends Sprite {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(machineSprite.boardColor);
         mapCanvas.drawRect(
-                0 - (machineSprite.boardWidth / 2.0f),
-                0 - (machineSprite.boardHeight / 2.0f),
-                0 + (machineSprite.boardWidth / 2.0f),
-                0 + (machineSprite.boardHeight / 2.0f),
+                0 - (machineSprite.dimensionHeight / 2.0f),
+                0 - (machineSprite.dimensionWidth / 2.0f),
+                0 + (machineSprite.dimensionHeight / 2.0f),
+                0 + (machineSprite.dimensionWidth / 2.0f),
                 paint
         );
         // Outline
@@ -267,10 +308,10 @@ public class MachineSprite extends Sprite {
             paint.setColor(machineSprite.boardOutlineColor);
             paint.setStrokeWidth(machineSprite.boardOutlineThickness);
             mapCanvas.drawRect(
-                    0 - (machineSprite.boardWidth / 2.0f),
-                    0 - (machineSprite.boardHeight / 2.0f),
-                    0 + (machineSprite.boardWidth / 2.0f),
-                    0 + (machineSprite.boardHeight / 2.0f),
+                    0 - (machineSprite.dimensionHeight / 2.0f),
+                    0 - (machineSprite.dimensionWidth / 2.0f),
+                    0 + (machineSprite.dimensionHeight / 2.0f),
+                    0 + (machineSprite.dimensionWidth / 2.0f),
                     paint
             );
         }
@@ -288,7 +329,7 @@ public class MachineSprite extends Sprite {
             mapCanvas.save();
             mapCanvas.translate(
                     0,
-                    (machineSprite.boardHeight / 2.0f) + (machineSprite.headerHeight / 2.0f)
+                    (machineSprite.dimensionWidth / 2.0f) + (machineSprite.headerHeight / 2.0f)
             );
             mapCanvas.rotate(0);
 
@@ -338,7 +379,7 @@ public class MachineSprite extends Sprite {
                 mapCanvas.save();
                 mapCanvas.translate(
                         -20 + j * 20,
-                        (machineSprite.boardWidth / 2.0f) - (machineSprite.lightHeight / 2.0f) - machineSprite.distanceLightsToEdge
+                        (machineSprite.dimensionHeight / 2.0f) - (machineSprite.lightHeight / 2.0f) - machineSprite.distanceLightsToEdge
                 );
                 mapCanvas.rotate(0);
 
@@ -387,13 +428,15 @@ public class MachineSprite extends Sprite {
         }
         // ^^^ LIGHTS ^^^
 
-        // --- PORTS ---
         mapCanvas.restore();
 
+        // --- PORTS ---
+
+        /*
         mapCanvas.save();
 
         mapCanvas.translate(machineSprite.getPosition().x, machineSprite.getPosition().y);
-        mapCanvas.rotate(machineSprite.getAngle());
+        mapCanvas.rotate(machineSprite.getRotation());
 
         mapCanvas.scale(machineSprite.getScale(), machineSprite.getScale());
 
@@ -411,14 +454,14 @@ public class MachineSprite extends Sprite {
 //                mapCanvas.save();
 //                mapCanvas.translate(
 //                        -((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2),
-//                        (machineSprite.boardWidth / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
+//                        (machineSprite.dimensionHeight / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
 //                );
 //                mapCanvas.rotate(0);
 
                 mapCanvas.save();
                 mapCanvas.translate(
                         -((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2.0f) + j * ((portSprite.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES) * 2),
-                        (machineSprite.boardWidth / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
+                        (machineSprite.dimensionHeight / 2.0f) + portSprite.shapeRadius + PortSprite.DISTANCE_FROM_BOARD
                 );
                 if (machineSprite.portSprites.get(3 * i + j).portDirection == PortSprite.PortDirection.OUTPUT) {
                     mapCanvas.rotate(180.0f);
@@ -441,6 +484,40 @@ public class MachineSprite extends Sprite {
 
         mapCanvas.restore();
         // ^^^ PORTS ^^^
+        */
+
+        for (PortSprite portSprite: this.portSprites) {
+
+            mapCanvas.save();
+
+            mapCanvas.translate(machineSprite.getPosition().x, machineSprite.getPosition().y);
+            mapCanvas.rotate(machineSprite.getRotation());
+
+            mapCanvas.scale(machineSprite.getScale(), machineSprite.getScale());
+
+
+            portSprite.draw(mapView);
+
+
+//            mapCanvas.save();
+//
+//            // Color
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setColor(portSprite.getUniqueColor()); // paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
+//            mapCanvas.drawCircle(
+//                    portPositions[portSprite.getIndex()].x,
+//                    portPositions[portSprite.getIndex()].y,
+//                    portSprite.shapeRadius,
+//                    paint
+//            );
+//
+//            mapCanvas.restore();
+
+
+
+            mapCanvas.restore();
+
+        }
 
         // TODO: Put this under PortSprite
         drawPaths(mapView);
@@ -451,7 +528,7 @@ public class MachineSprite extends Sprite {
     }
 
     public void drawPaths(MapView mapView) {
-        for (int j = 0; j < channelCount; j++) {
+        for (int j = 0; j < portCount; j++) {
             for (int i = 0; i < portSprites.get(j).pathSprites.size(); i++) {
                 PathSprite pathSprite = portSprites.get(j).pathSprites.get(i);
                 pathSprite.draw(mapView);
@@ -505,23 +582,13 @@ public class MachineSprite extends Sprite {
         }
     }
 
-    public void setPosition(float x, float y) {
-        this.position.x = x;
-        this.position.y = y;
-//        this.updatePortPositions();
-    }
-
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
-
     //-------------------------
     // Interaction
     //-------------------------
 
     public boolean isTouching (PointF point) {
         if (getVisibility()) {
-            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardWidth / 2.0f);
+            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.dimensionHeight / 2.0f);
         } else {
             return false;
         }

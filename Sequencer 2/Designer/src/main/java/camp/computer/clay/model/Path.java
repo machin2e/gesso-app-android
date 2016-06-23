@@ -3,7 +3,7 @@ package camp.computer.clay.model;
 import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PortSprite;
 
-public class Path {
+public class Path extends Model {
     private MachineSprite sourceMachine; // (Input)
     private PortSprite sourcePort; // (Input) // TODO: Make ArrayList<Port> sourcePorts
     private MachineSprite destinationMachine;
@@ -35,5 +35,13 @@ public class Path {
 
     public PortSprite getDestinationPort() {
         return this.destinationPort;
+    }
+
+    public boolean contains(PortSprite portSprite) {
+        if (portSprite == sourcePort || portSprite == destinationPort) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -1,4 +1,4 @@
 package camp.computer.clay.model;
 
-public class Body extends Actor {
+public abstract class Model {
 }

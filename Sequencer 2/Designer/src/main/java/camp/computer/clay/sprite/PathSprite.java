@@ -10,10 +10,9 @@ import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.Path;
 import camp.computer.clay.model.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
+import camp.computer.clay.sprite.util.Shape;
 
 public class PathSprite extends Sprite {
-
-    private Path path;
 
     // TODO: private Channel channel;
 
@@ -96,16 +95,9 @@ public class PathSprite extends Sprite {
     // </MODEL>
 
     //public PathSprite(MachineSprite sourceMachineSprite, int sourcePortIndex, MachineSprite destinationMachineSprite, int destinationPortIndex) {
-    public PathSprite(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
-
-        // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
-        Path path = new Path(
-                sourceMachineSprite,
-                sourcePortSprite,
-                destinationMachineSprite,
-                destinationPortSprite
-        );
-        this.path = path;
+    //public PathSprite(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
+    public PathSprite(Path path) {
+        super(path);
 
         initialize();
     }
@@ -143,7 +135,7 @@ public class PathSprite extends Sprite {
     }
 
     public Path getPath() {
-        return this.path;
+        return (Path) getModel();
     }
 
     /**
@@ -307,6 +299,8 @@ public class PathSprite extends Sprite {
 
         if (showLinePaths) {
 
+            Path path = (Path) getModel();
+
             // Show destination port
             path.getDestinationPort().setVisibility(true);
             path.getDestinationPort().setPathVisibility(true);
@@ -319,10 +313,10 @@ public class PathSprite extends Sprite {
             paint.setColor(path.getSourcePort().getUniqueColor());
 
             mapCanvas.drawLine(
-                    path.getSourcePort().getPosition().x,
-                    path.getSourcePort().getPosition().y,
-                    path.getDestinationPort().getPosition().x,
-                    path.getDestinationPort().getPosition().y,
+                    path.getSourcePort().getAbsolutePosition().x,
+                    path.getSourcePort().getAbsolutePosition().y,
+                    path.getDestinationPort().getAbsolutePosition().x,
+                    path.getDestinationPort().getAbsolutePosition().y,
                     paint
             );
 
@@ -331,6 +325,8 @@ public class PathSprite extends Sprite {
     }
 
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
+
+        Path path = (Path) getModel();
 
         // Show destination port
         path.getDestinationPort().setVisibility(true);
@@ -345,24 +341,25 @@ public class PathSprite extends Sprite {
 
         if (showDirectedPaths) {
             float rotationAngle = Geometry.calculateRotationAngle(
-                    path.getSourcePort().getPosition(),
-                    path.getDestinationPort().getPosition()
+                    path.getSourcePort().getAbsolutePosition(),
+                    path.getDestinationPort().getAbsolutePosition()
             );
 
             if (showPathDocks) {
 
                 float distance = (float) Geometry.calculateDistance(
-                        path.getSourcePort().getPosition(),
-                        path.getDestinationMachine().getPosition()
+                        path.getSourcePort().getAbsolutePosition(),
+                        path.getDestinationMachine().getAbsolutePosition()
                 );
 
                 PointF triangleCenterPosition = Geometry.calculatePoint(
-                        path.getSourcePort().getPosition(),
+                        path.getSourcePort().getAbsolutePosition(),
                         rotationAngle,
                         2 * triangleSpacing
                 );
 
-                drawTriangle(
+                paint.setStyle(Paint.Style.FILL);
+                Shape.drawTriangle(
                         triangleCenterPosition,
                         rotationAngle + 180,
                         triangleWidth,
@@ -372,12 +369,13 @@ public class PathSprite extends Sprite {
                 );
 
                 PointF triangleCenterPositionDestination = Geometry.calculatePoint(
-                        path.getSourcePort().getPosition(),
+                        path.getSourcePort().getAbsolutePosition(),
                         rotationAngle,
                         distance - 2 * triangleSpacing
                 );
 
-                drawTriangle(
+                paint.setStyle(Paint.Style.FILL);
+                Shape.drawTriangle(
                         triangleCenterPositionDestination,
                         rotationAngle + 180,
                         triangleWidth,
@@ -389,14 +387,14 @@ public class PathSprite extends Sprite {
             } else {
 
                 float pathDistance = (float) Geometry.calculateDistance(
-                        path.getSourcePort().getPosition(),
-                        path.getDestinationPort().getPosition()
+                        path.getSourcePort().getAbsolutePosition(),
+                        path.getDestinationPort().getAbsolutePosition()
                 );
 
                 for (int k = 0; ; k++) {
 
                     PointF triangleCenterPosition = Geometry.calculatePoint(
-                            path.getSourcePort().getPosition(),
+                            path.getSourcePort().getAbsolutePosition(),
                             rotationAngle,
                             k * triangleSpacing
                     );
@@ -408,7 +406,8 @@ public class PathSprite extends Sprite {
                     if ((k * triangleSpacing) >= (2 * triangleSpacing)
                             && (k * triangleSpacing) <= (pathDistance - 2 * triangleSpacing)) {
 
-                        drawTriangle(
+                        paint.setStyle(Paint.Style.FILL);
+                        Shape.drawTriangle(
                                 triangleCenterPosition,
                                 rotationAngle + 180,
                                 triangleWidth,
@@ -424,8 +423,8 @@ public class PathSprite extends Sprite {
                     mapCanvas.save();
 
                     PointF pathMidpoint = Geometry.calculateMidpoint(
-                            path.getSourcePort().getPosition(),
-                            path.getDestinationPort().getPosition()
+                            path.getSourcePort().getAbsolutePosition(),
+                            path.getDestinationPort().getAbsolutePosition()
                     );
 
                     paint.setStyle(Paint.Style.FILL);
@@ -448,34 +447,6 @@ public class PathSprite extends Sprite {
         }
 
         mapCanvas.restore();
-    }
-
-    private void drawTriangle(PointF position, float angle, float width, float height, Canvas canvas, Paint paint) {
-
-        canvas.save();
-
-        canvas.translate(position.x, position.y);
-        canvas.rotate(angle);
-
-        PointF p1 = new PointF(-(width / 2.0f), -(height / 2.0f));
-        PointF p2 = new PointF(0, (height / 2.0f));
-        PointF p3 = new PointF((width / 2.0f), -(height / 2.0f));
-
-//        paint.setStrokeWidth(0);
-//        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL);
-        // paint.setAntiAlias(true);
-
-        android.graphics.Path path = new android.graphics.Path();
-        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-        path.moveTo(p1.x, p1.y);
-        path.lineTo(p2.x, p2.y);
-        path.lineTo(p3.x, p3.y);
-        path.close();
-
-        canvas.drawPath(path, paint);
-
-        canvas.restore();
     }
 
     public void setVisibility(boolean isVisible) {
