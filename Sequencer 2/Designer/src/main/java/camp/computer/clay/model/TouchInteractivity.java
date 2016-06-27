@@ -2,12 +2,18 @@ package camp.computer.clay.model;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.sprite.Sprite;
+
 // An interactivity is a temporal sequence of one or more interactions.
 //
 // Model this with a "touch interaction envelope" or "interaction envelope".
 
 public class TouchInteractivity {
     private ArrayList<TouchInteraction> touchInteractions = new ArrayList<TouchInteraction>();
+
+    // TODO: Classify these!
+    public boolean[] isTouchingSprite = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public Sprite[] touchedSprite = new Sprite[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
 
     public TouchInteractivity() {
     }
@@ -34,6 +40,15 @@ public class TouchInteractivity {
         } else {
             return null;
         }
+    }
+
+    public TouchInteraction getPreviousInteraction(TouchInteraction touchInteraction) {
+        for (int i = 0; i < touchInteractions.size() - 1; i++) {
+            if (touchInteractions.get(i + 1) == touchInteraction) {
+                return touchInteractions.get(i);
+            }
+        }
+        return null;
     }
 
     // TODO: getStartTime()

@@ -1,8 +1,82 @@
 package camp.computer.clay.model;
 
 import android.graphics.PointF;
+import android.os.Handler;
+
+import camp.computer.clay.sprite.Sprite;
 
 public class TouchInteraction {
+
+
+    public static int MAXIMUM_TOUCH_POINT_COUNT = 5;
+
+    public static int MAXIMUM_TAP_DURATION = 200;
+    public static int MAXIMUM_DOUBLE_TAP_DURATION = 400;
+    public static int MINIMUM_HOLD_DURATION = 600;
+
+    public static int MINIMUM_DRAG_DISTANCE = 35;
+
+    public PointF[] touch = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
+    public long[] touchTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
+    public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
+    public boolean[] isDragging = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
+    public double[] dragDistance = new double[MAXIMUM_TOUCH_POINT_COUNT];
+
+//    public PointF[] touchPrevious = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
+//    public long[] touchPreviousTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
+//    public boolean[] isTouchingPrevious = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
+//    public boolean[] isTouchingActionPrevious = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
+
+    // Point where the touch started.
+//    public PointF[] touchStart = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
+//    public long touchStartTime = java.lang.System.currentTimeMillis ();
+
+    // Point where the touch ended.
+//    public PointF[] touchStop = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
+//    public long touchStopTime = java.lang.System.currentTimeMillis ();
+
+    // Touch state
+    public boolean hasTouches = false; // i.e., At least one touch is detected.
+    public int touchCount = 0; // i.e., The total number of touch points detected.
+
+    public Handler timerHandler = new Handler();
+    public Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            /* do what you need to do */
+            //foobar();
+            int pointerId = 0;
+            if (isTouching[pointerId])
+                if (dragDistance[pointerId] < MINIMUM_DRAG_DISTANCE) {
+//                    onHoldListener(pointerId);
+                }
+
+            // Uncomment this for periodic callback
+            // timerHandler.postDelayed(this, 100);
+        }
+    };
+
+    private void initialize() {
+
+        for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
+            touch[i] = new PointF();
+//            touchPrevious[i] = new PointF();
+//            touchStart[i] = new PointF();
+//            touchStop[i] = new PointF();
+        }
+    }
+
+    public boolean hasTouches () {
+        for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
+            if (isTouching[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
@@ -44,10 +118,13 @@ public class TouchInteraction {
     // touchedSprite
     // overlappedSprite (not needed, probably, because can look in history, or look at first action in interaction)
 
-    public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
-        this.position = position;
+    //public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
+    public TouchInteraction(TouchInteractionType touchInteractionType) {
+//        this.position = position;
         this.touchInteractionType = touchInteractionType;
         this.timestamp = java.lang.System.currentTimeMillis ();
+
+        initialize();
     }
 
     public Body getBody() {
@@ -56,6 +133,10 @@ public class TouchInteraction {
 
     public TouchInteractionType getType() {
         return this.touchInteractionType;
+    }
+
+    public void setType(TouchInteractionType touchInteractionType) {
+        this.touchInteractionType = touchInteractionType;
     }
 
     public PointF getPosition() {
