@@ -22,7 +22,7 @@ public class Visualization extends Sprite {
     }
 
     private void initialize() {
-        initializeSprites();
+        // initializeSprites();
     }
 
     public void initializeSprites() {

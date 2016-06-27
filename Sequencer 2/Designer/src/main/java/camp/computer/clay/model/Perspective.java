@@ -3,6 +3,7 @@ package camp.computer.clay.model;
 import android.graphics.PointF;
 
 import camp.computer.clay.sprite.Sprite;
+import camp.computer.clay.sprite.Visualization;
 
 public class Perspective {
     // TODO: Move position into Body, so can share Perspective among different bodies
@@ -10,6 +11,8 @@ public class Perspective {
 
     float width; // Width of perspective --- interactions (e.g., touches) are interpreted relative to this point
     float height; // Height of perspective
+
+    public Visualization visualization;
 
     // Focus in Perspective
 //    private boolean isMapPerspective = false;

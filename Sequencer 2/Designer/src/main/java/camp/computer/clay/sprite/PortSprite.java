@@ -513,8 +513,6 @@ public class PortSprite extends Sprite {
             Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
             Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
-            this.setCandidatePathDestinationPosition(touchInteraction.getPosition());
-            this.setCandidatePathVisibility(true);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
             Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
 

@@ -67,25 +67,25 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     Simulation simulation = new Simulation();
+    Visualization visualization = new Visualization(simulation);
 
     private void initialize() {
 
         initializeSimulation();
 
         initializeSprites();
-    }
-
-    private void initializeSimulation() {
 
         // Create body and set perspective
         Body body = new Body();
-        body.setPerspective(new Perspective());
+        Perspective perspective = new Perspective();
+        perspective.visualization = visualization;
+        body.setPerspective(perspective);
 
         // Add body to simulation
         simulation.addBody(body);
     }
 
-    private void initializeSprites() {
+    private void initializeSimulation() {
 
         // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
         for (int i = 0; i < 3; i++) {
@@ -95,8 +95,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             }
             simulation.addMachine(machine);
         }
+    }
 
-        Visualization visualization = new Visualization(simulation);
+    private void initializeSprites() {
+
+        visualization.initializeSprites();
+
         visualization.setParentSprite(null);
         visualization.setPosition(new PointF(0, 0));
         visualization.setRotation(0);
@@ -296,7 +300,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //    private long[] touchInteraction.touchTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
 //    private boolean[] touchInteraction.isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 //    private boolean[] isDragging = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
-//    private double[] touchInteraction.dragDistance = new double[MAXIMUM_TOUCH_POINT_COUNT];
+//    private double[] touchInteractivity.dragDistance = new double[MAXIMUM_TOUCH_POINT_COUNT];
 //
 //    private PointF[] touchInteraction.touchPrevious = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
 //    private long[] touchInteraction.touchPreviousTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
@@ -364,7 +368,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //            //foobar();
 //            int pointerId = 0;
 //            if (touchInteraction.isTouching[touchInteraction.pointerId])
-//                if (touchInteraction.dragDistance[touchInteraction.pointerId] < MINIMUM_DRAG_DISTANCE) {
+//                if (touchInteractivity.dragDistance[touchInteraction.pointerId] < MINIMUM_DRAG_DISTANCE) {
 //                    onHoldListener(touchInteraction.pointerId);
 //                }
 //
@@ -417,6 +421,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         Log.v("InteractionHistory", "Started touch composition.");
 
         TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.NONE);
+        touchInteraction.setBody(simulation.getBody(0));
 
         if (pointCount <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT) {
             if (pointerIndex <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT - 1) {
@@ -428,7 +433,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     PointF perspectivePosition = simulation.getBody(0).getPerspective().getPosition();
                     touchInteraction.touch[id].x = (motionEvent.getX (i) - perspectivePosition.x) / scale;
                     touchInteraction.touch[id].y = (motionEvent.getY (i) - perspectivePosition.y) / scale;
-                    // touchInteraction.touchTime[id] = java.lang.System.currentTimeMillis ();
+                     touchInteraction.touchTime[id] = java.lang.System.currentTimeMillis ();
                 }
 
                 // Update the state of the touched object based on the current touch interaction state.
@@ -437,7 +442,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.TOUCH);
                     touchInteraction.pointerId = pointerId;
                     touchInteractivity.addInteraction(touchInteraction);
-                    onTouchListener(touchInteractivity, touchInteraction);
+                    Body body = simulation.getBody(0);
+                    body.onTouchListener(touchInteractivity, touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
@@ -463,223 +469,173 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    //private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-    private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-        Log.v("MapViewEvent", "onTouchListener");
-
-//        // TODO: Encapsulate TouchInteraction in TouchEvent
-//        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
-//        touchInteractivity.addInteraction(touchInteraction);
-
-        int pointerId = touchInteraction.pointerId;
-
-        // Previous
-//        touchInteraction.isTouchingPrevious[touchInteraction.pointerId] = touchInteraction.isTouching[touchInteraction.pointerId]; // (or) touchInteraction.isTouchingPrevious[touchInteraction.pointerId] = false;
-//        touchInteraction.touchPrevious[touchInteraction.pointerId].x = touchInteraction.touch[touchInteraction.pointerId].x;
-//        touchInteraction.touchPrevious[touchInteraction.pointerId].y = touchInteraction.touch[touchInteraction.pointerId].y;
-//        touchInteraction.touchPreviousTime[touchInteraction.pointerId] = java.lang.System.currentTimeMillis ();
-
-        // Current
-        touchInteraction.isTouching[touchInteraction.pointerId] = true;
-
-        // Initialize touched sprite to none
-        touchInteractivity.touchedSprite[touchInteraction.pointerId] = null;
-
-        Perspective currentPerspective = this.simulation.getBody(0).getPerspective();
-
-        // First
-//        if (touchInteraction.isTouching[touchInteraction.pointerId] == true && touchInteraction.isTouchingPrevious[touchInteraction.pointerId] == false) {
-        if (touchInteraction == touchInteractivity.getFirstInteraction()) {
-
-            Log.v("Toucher", "1");
-
-            // Set the first point of touch
-//            touchInteraction.touchStart[touchInteraction.pointerId].x = touchInteraction.touch[touchInteraction.pointerId].x;
-//            touchInteraction.touchStart[touchInteraction.pointerId].y = touchInteraction.touch[touchInteraction.pointerId].y;
-//            touchInteraction.touchStartTime = java.lang.System.currentTimeMillis ();
-
-            // Reset dragging state
-            touchInteraction.isDragging[touchInteraction.pointerId] = false;
-            touchInteraction.dragDistance[touchInteraction.pointerId] = 0;
-
-            // Reset object interaction state
-            for (Visualization visualization : visualizationSprites) {
-                for (MachineSprite machineSprite : visualization.getMachineSprites()) {
-                    // Log.v ("MapViewTouch", "Object at " + machineSprite.x + ", " + machineSprite.y);
-                    if (simulation.getBody(0).getPerspective().focusSprite == null || simulation.getBody(0).getPerspective().focusSprite instanceof MachineSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite) {
-                        // Check if one of the objects is touched
-                        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
-                            if (machineSprite.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
-
-                                Log.v("Toucher", "Machine");
-
-//                                // <TOUCH_ACTION>
-//                                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
-//                                machineSprite.touch(touchInteraction);
-//                                // </TOUCH_ACTION>
-
-                                // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                                // TODO: i.e., callback Sprite.onTouch (via Sprite.touch())
-
-                                touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = true;
-                                touchInteractivity.touchedSprite[touchInteraction.pointerId] = machineSprite;
-
-                                // <PERSPECTIVE>
-                                currentPerspective.focusSprite = machineSprite;
-                                currentPerspective.disablePanning();
-                                // </PERSPECTIVE>
-
-                                // Break to limit the number of objects that can be touch by a finger to one (1:1 finger:touch relationship).
-                                break;
-
-                            }
-                        }
-                    }
-
-                    if (simulation.getBody(0).getPerspective().focusSprite instanceof MachineSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
-
-                        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
-                            for (PortSprite portSprite : machineSprite.portSprites) {
-
-                                // If perspective is on path, then constraint interactions to ports in the path
-                                if (simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
-                                    PathSprite focusedPathSprite = (PathSprite) simulation.getBody(0).getPerspective().focusSprite;
-                                    if (!focusedPathSprite.getPath().contains(portSprite)) {
-                                        Log.v("InteractionHistory", "Skipping port not in path.");
-                                        continue;
-                                    }
-                                }
-
-                                if (portSprite.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
-                                    Log.v("PortTouch", "start touch on port " + portSprite);
-
-//                                    // <TOUCH_ACTION>
-//                                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
-//                                    portSprite.touch(touchInteraction);
-//                                    // </TOUCH_ACTION>
-
-                                    touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = true;
-                                    touchInteractivity.touchedSprite[touchInteraction.pointerId] = portSprite;
-
-                                    // <PERSPECTIVE>
-                                    currentPerspective.focusSprite = portSprite;
-                                    currentPerspective.disablePanning();
-                                    // </PERSPECTIVE>
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
-                        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
-                            for (PortSprite portSprite : machineSprite.portSprites) {
-                                for (PathSprite pathSprite : portSprite.pathSprites) {
-
-                                    float distanceToLine = (float) Geometry.calculateLineToPointDistance(
-                                            pathSprite.getPath().getSourcePort().getPosition(),
-                                            pathSprite.getPath().getDestinationPort().getPosition(),
-                                            touchInteraction.touch[touchInteraction.pointerId],
-                                            true
-                                    );
-
-                                    //Log.v("DistanceToLine", "distanceToLine: " + distanceToLine);
-
-                                    if (distanceToLine < 60) {
-
-                                        Log.v("PathTouch", "start touch on path " + pathSprite);
-
-//                                        // <TOUCH_ACTION>
-//                                        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
-//                                        pathSprite.touch(touchInteraction);
-//                                        // </TOUCH_ACTION>
-
-                                        touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = true;
-                                        touchInteractivity.touchedSprite[touchInteraction.pointerId] = pathSprite;
-
-                                        // <PERSPECTIVE>
-                                        currentPerspective.focusSprite = pathSprite;
-                                        currentPerspective.disablePanning();
-                                        // </PERSPECTIVE>
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // TODO: Check for touch on path flow editor (i.e., spreadsheet or JS editors)
-                }
-            }
-
-            if (simulation.getBody(0).getPerspective().focusSprite == null || simulation.getBody(0).getPerspective().focusSprite instanceof MachineSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
-                // Touch the canvas
-                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
-
-                    // <INTERACTION>
-                    touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = false;
-                    // </INTERACTION>
-
-                    // <PERSPECTIVE>
-                    this.simulation.getBody(0).getPerspective().focusSprite = null;
-                    // this.isPanningEnabled = false;
-                    // </PERSPECTIVE>
-                }
-            }
-
-            // Start timer to check for hold
-            touchInteraction.timerHandler.removeCallbacks(touchInteraction.timerRunnable);
-            touchInteraction.timerHandler.postDelayed(touchInteraction.timerRunnable, TouchInteraction.MINIMUM_HOLD_DURATION);
-        }
-    }
-
-    private void onHoldListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-        Log.v("MapViewEvent", "onHoldListener");
-
-        if (touchInteraction.dragDistance[touchInteraction.pointerId] < TouchInteraction.MINIMUM_DRAG_DISTANCE) {
-            // Holding but not (yet) dragging.
-
-            /*
-            // Disable panning
-            isPanningEnabled = true;
-
-            // Hide ports
-            if (sourcePortIndex == -1) {
-                for (Visualization systemSprite : this.visualizationSprites) {
-                    for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
-                        machineSprite.hidePorts();
-                        machineSprite.hidePaths();
-                    }
-                }
-                this.setScale(1.0f);
-            }
-            */
-
-            // Show ports for sourceMachine board
-            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
-                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
-                    MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.HOLD);
-                    machineSprite.touch(touchInteraction);
-
-                    //machineSprite.showPorts();
-                    //machineSprite.showPaths();
-                    //touchSourceSprite = machineSprite;
-                    this.setScale(0.8f);
-                } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
-                    PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.HOLD);
-                    portSprite.touch(touchInteraction);
-
-//                    portSprite.showPorts();
-//                    portSprite.showPaths();
-                    this.setScale(0.8f);
-                }
-            }
-        }
-    }
+//    //private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+//    private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+//        Log.v("MapViewEvent", "onTouchListener");
+//
+////        // TODO: Encapsulate TouchInteraction in TouchEvent
+////        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
+////        touchInteractivity.addInteraction(touchInteraction);
+//
+//        int pointerId = touchInteraction.pointerId;
+//
+//        // Previous
+////        touchInteraction.isTouchingPrevious[touchInteraction.pointerId] = touchInteraction.isTouching[touchInteraction.pointerId]; // (or) touchInteraction.isTouchingPrevious[touchInteraction.pointerId] = false;
+////        touchInteraction.touchPrevious[touchInteraction.pointerId].x = touchInteraction.touch[touchInteraction.pointerId].x;
+////        touchInteraction.touchPrevious[touchInteraction.pointerId].y = touchInteraction.touch[touchInteraction.pointerId].y;
+////        touchInteraction.touchPreviousTime[touchInteraction.pointerId] = java.lang.System.currentTimeMillis ();
+//
+//        // Current
+//        touchInteraction.isTouching[touchInteraction.pointerId] = true;
+//
+//        // Initialize touched sprite to none
+//        touchInteractivity.touchedSprite[touchInteraction.pointerId] = null;
+//
+//        Perspective currentPerspective = this.simulation.getBody(0).getPerspective();
+//
+//        // First
+////        if (touchInteraction.isTouching[touchInteraction.pointerId] == true && touchInteraction.isTouchingPrevious[touchInteraction.pointerId] == false) {
+//        if (touchInteraction == touchInteractivity.getFirstInteraction()) {
+//
+//            Log.v("Toucher", "1");
+//
+//            // Set the first point of touch
+////            touchInteraction.touchStart[touchInteraction.pointerId].x = touchInteraction.touch[touchInteraction.pointerId].x;
+////            touchInteraction.touchStart[touchInteraction.pointerId].y = touchInteraction.touch[touchInteraction.pointerId].y;
+////            touchInteraction.touchStartTime = java.lang.System.currentTimeMillis ();
+//
+//            // Reset dragging state
+//            touchInteractivity.isDragging[touchInteraction.pointerId] = false;
+//            touchInteractivity.dragDistance[touchInteraction.pointerId] = 0;
+//
+//            // Reset object interaction state
+//            for (Visualization visualization : visualizationSprites) {
+//                for (MachineSprite machineSprite : visualization.getMachineSprites()) {
+//                    // Log.v ("MapViewTouch", "Object at " + machineSprite.x + ", " + machineSprite.y);
+//                    if (simulation.getBody(0).getPerspective().focusSprite == null || simulation.getBody(0).getPerspective().focusSprite instanceof MachineSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite) {
+//                        // Check if one of the objects is touched
+//                        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
+//                            if (machineSprite.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
+//
+//                                Log.v("Toucher", "Machine");
+//
+////                                // <TOUCH_ACTION>
+////                                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
+////                                machineSprite.touch(touchInteraction);
+////                                // </TOUCH_ACTION>
+//
+//                                // TODO: Add this to an onTouch callback for the sprite's channel nodes
+//                                // TODO: i.e., callback Sprite.onTouch (via Sprite.touch())
+//
+//                                touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = true;
+//                                touchInteractivity.touchedSprite[touchInteraction.pointerId] = machineSprite;
+//
+//                                // <PERSPECTIVE>
+//                                currentPerspective.focusSprite = machineSprite;
+//                                currentPerspective.disablePanning();
+//                                // </PERSPECTIVE>
+//
+//                                // Break to limit the number of objects that can be touch by a finger to one (1:1 finger:touch relationship).
+//                                break;
+//
+//                            }
+//                        }
+//                    }
+//
+//                    if (simulation.getBody(0).getPerspective().focusSprite instanceof MachineSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
+//
+//                        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
+//                            for (PortSprite portSprite : machineSprite.portSprites) {
+//
+//                                // If perspective is on path, then constraint interactions to ports in the path
+//                                if (simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
+//                                    PathSprite focusedPathSprite = (PathSprite) simulation.getBody(0).getPerspective().focusSprite;
+//                                    if (!focusedPathSprite.getPath().contains(portSprite)) {
+//                                        Log.v("InteractionHistory", "Skipping port not in path.");
+//                                        continue;
+//                                    }
+//                                }
+//
+//                                if (portSprite.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
+//                                    Log.v("PortTouch", "start touch on port " + portSprite);
+//
+////                                    // <TOUCH_ACTION>
+////                                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
+////                                    portSprite.touch(touchInteraction);
+////                                    // </TOUCH_ACTION>
+//
+//                                    touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = true;
+//                                    touchInteractivity.touchedSprite[touchInteraction.pointerId] = portSprite;
+//
+//                                    // <PERSPECTIVE>
+//                                    currentPerspective.focusSprite = portSprite;
+//                                    currentPerspective.disablePanning();
+//                                    // </PERSPECTIVE>
+//
+//                                    break;
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    if (simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
+//                        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
+//                            for (PortSprite portSprite : machineSprite.portSprites) {
+//                                for (PathSprite pathSprite : portSprite.pathSprites) {
+//
+//                                    float distanceToLine = (float) Geometry.calculateLineToPointDistance(
+//                                            pathSprite.getPath().getSourcePort().getPosition(),
+//                                            pathSprite.getPath().getDestinationPort().getPosition(),
+//                                            touchInteraction.touch[touchInteraction.pointerId],
+//                                            true
+//                                    );
+//
+//                                    //Log.v("DistanceToLine", "distanceToLine: " + distanceToLine);
+//
+//                                    if (distanceToLine < 60) {
+//
+//                                        Log.v("PathTouch", "start touch on path " + pathSprite);
+//
+////                                        // <TOUCH_ACTION>
+////                                        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TOUCH);
+////                                        pathSprite.touch(touchInteraction);
+////                                        // </TOUCH_ACTION>
+//
+//                                        touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = true;
+//                                        touchInteractivity.touchedSprite[touchInteraction.pointerId] = pathSprite;
+//
+//                                        // <PERSPECTIVE>
+//                                        currentPerspective.focusSprite = pathSprite;
+//                                        currentPerspective.disablePanning();
+//                                        // </PERSPECTIVE>
+//
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    // TODO: Check for touch on path flow editor (i.e., spreadsheet or JS editors)
+//                }
+//            }
+//
+//            if (simulation.getBody(0).getPerspective().focusSprite == null || simulation.getBody(0).getPerspective().focusSprite instanceof MachineSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PortSprite || simulation.getBody(0).getPerspective().focusSprite instanceof PathSprite) {
+//                // Touch the canvas
+//                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
+//
+//                    // <INTERACTION>
+//                    touchInteractivity.isTouchingSprite[touchInteraction.pointerId] = false;
+//                    // </INTERACTION>
+//
+//                    // <PERSPECTIVE>
+//                    this.simulation.getBody(0).getPerspective().focusSprite = null;
+//                    // this.isPanningEnabled = false;
+//                    // </PERSPECTIVE>
+//                }
+//            }
+//        }
+//    }
 
     //private void onMoveListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
     private void onMoveListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
@@ -696,15 +652,15 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         touchInteraction.isTouching[touchInteraction.pointerId] = true;
 
         // Calculate drag distance
-        touchInteraction.dragDistance[touchInteraction.pointerId] = Geometry.calculateDistance(touchInteraction.touch[touchInteraction.pointerId], touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId]);
+        touchInteractivity.dragDistance[touchInteraction.pointerId] = Geometry.calculateDistance(touchInteraction.touch[touchInteraction.pointerId], touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId]);
 
         // Classify/Callback
-        if (touchInteraction.dragDistance[touchInteraction.pointerId] < TouchInteraction.MINIMUM_DRAG_DISTANCE) {
+        if (touchInteractivity.dragDistance[touchInteraction.pointerId] < TouchInteraction.MINIMUM_DRAG_DISTANCE) {
             // Pre-dragging
             onPreDragListener(touchInteractivity, touchInteraction);
         } else {
             // Dragging
-            touchInteraction.isDragging[touchInteraction.pointerId] = true;
+            touchInteractivity.isDragging[touchInteraction.pointerId] = true;
             onDragListener(touchInteractivity, touchInteraction);
         }
     }
@@ -731,13 +687,16 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         // TODO: Put into callback
 
         // Dragging and holding.
-        if (touchInteraction.touchTime[touchInteraction.pointerId] - touchInteractivity.getFirstInteraction().touchTime[touchInteraction.pointerId] < TouchInteraction.MINIMUM_HOLD_DURATION) {
+        if (touchInteractivity.getFirstInteraction().touchTime[touchInteraction.pointerId] - touchInteraction.touchTime[touchInteraction.pointerId] < TouchInteraction.MINIMUM_HOLD_DURATION) {
+
+            Log.v("Toucher2", "A");
 
             // Dragging only (not holding)
 
             // TODO: Put into callback
             //if (touchInteractivity.isTouchingSprite[touchInteraction.pointerId]) {
             if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
+                Log.v("Toucher2", "B");
                 if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
                     /*
                     MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
@@ -747,9 +706,13 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                         machineSprite.setPosition(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y);
                     */
                 } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
+                    Log.v("Toucher2", "C");
                     PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
 //                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
 //                    portSprite.touch(touchInteraction);
+                    portSprite.setCandidatePathDestinationPosition(touchInteraction.touch[touchInteraction.pointerId]);
+                    //portSprite.setCandidatePathDestinationPosition(touchInteraction.getPosition());
+                    portSprite.setCandidatePathVisibility(true);
 
 
                     // Initialize port type and flow direction
@@ -810,7 +773,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                 }
             } else {
+                Log.v("Toucher", "Pan 2a");
                 if (currentPerspective.isPanningEnabled()) {
+                    Log.v("Toucher", "Pan 2");
                     this.setScale(0.8f);
                     simulation.getBody(0).getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
                 }
@@ -890,7 +855,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                 }
             } else {
+                Log.v("Toucher", "Pan 1a");
                 if (currentPerspective.isPanningEnabled()) {
+                    Log.v("Toucher", "Pan 1");
                     simulation.getBody(0).getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
                 }
             }
@@ -899,6 +866,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     //private void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
     private void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+
+        touchInteractivity.timerHandler.removeCallbacks(touchInteractivity.timerRunnable);
 
         int pointerId = touchInteraction.pointerId;
 
@@ -931,14 +900,16 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         // Classify/Callbacks
-        if (touchInteractivity.getFirstInteraction().touchTime[pointerId] - touchInteractivity.getFirstInteraction().touchTime[pointerId] < TouchInteraction.MAXIMUM_TAP_DURATION) {
-            Log.v("Toucher", "3");
+        if (touchInteraction.touchTime[pointerId] - touchInteractivity.getFirstInteraction().touchTime[pointerId] < TouchInteraction.MAXIMUM_TAP_DURATION) {
+            Log.v("Toucher2", "3");
             onTapListener(touchInteractivity, touchInteraction);
 
         } else {
 
+            Log.v("Toucher2", "-1");
+
             if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
-                Log.v("Toucher", "4");
+                Log.v("Toucher2", "0");
                 MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
 
 
@@ -955,12 +926,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //                    // </TOUCH_ACTION>
 
                     // No touch on board or port. Touch is on map. So hide ports.
-                    for (Visualization visualization2 : this.visualizationSprites) {
-                        for (MachineSprite machineSprite2 : visualization2.getMachineSprites()) {
-                            machineSprite2.hidePorts();
-//                            this.setScale(1.0f);
-                            machineSprite2.hidePaths();
-                            machineSprite2.setTransparency(0.1f);
+                    for (Visualization visualization : this.visualizationSprites) {
+                        for (MachineSprite otherMachineSprite : visualization.getMachineSprites()) {
+                            otherMachineSprite.hidePorts();
+                            otherMachineSprite.hidePaths();
+                            otherMachineSprite.setTransparency(0.1f);
                         }
                     }
                     machineSprite.showPorts();
@@ -976,6 +946,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
 //                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.RELEASE);
                 portSprite.touch(touchInteraction);
+                Log.v("Toucher2", "1");
 
 
                 // Show ports of nearby machines
@@ -989,6 +960,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                         );
                         Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
                         if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
+
+                            Log.v("Toucher2", "2");
 
 
 
@@ -1106,7 +1079,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         // Stop dragging
-        touchInteraction.isDragging[touchInteraction.pointerId] = false;
+        touchInteractivity.isDragging[touchInteraction.pointerId] = false;
     }
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
@@ -1153,6 +1126,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
             PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+
+            Log.v("Toucher", "A");
 
             Log.v("MapView", "\tPort " + (portSprite.getIndex() + 1) + " touched.");
 
@@ -1226,6 +1201,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PathSprite) {
             PathSprite pathSprite = (PathSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
 
+            Log.v("Toucher", "B");
+
             if (pathSprite.getEditorVisibility()) {
                 pathSprite.setEditorVisibility(false);
             } else {
@@ -1233,6 +1210,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
         } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
+
+            Log.v("Toucher", "C");
+
             // No touch on board or port. Touch is on map. So hide ports.
             for (Visualization visualization : this.visualizationSprites) {
                 for (MachineSprite machineSprite : visualization.getMachineSprites()) {
@@ -1243,7 +1223,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
             this.setScale(1.0f);
+
+            // Reset map interactivity
+            currentPerspective.enablePanning();
         }
+
+        Log.v("Toucher", "D");
 
     }
 

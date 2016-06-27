@@ -19,8 +19,6 @@ public class TouchInteraction {
     public PointF[] touch = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
     public long[] touchTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
-    public boolean[] isDragging = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
-    public double[] dragDistance = new double[MAXIMUM_TOUCH_POINT_COUNT];
 
 //    public PointF[] touchPrevious = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
 //    public long[] touchPreviousTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
@@ -38,23 +36,6 @@ public class TouchInteraction {
     // Touch state
     public boolean hasTouches = false; // i.e., At least one touch is detected.
     public int touchCount = 0; // i.e., The total number of touch points detected.
-
-    public Handler timerHandler = new Handler();
-    public Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            /* do what you need to do */
-            //foobar();
-            int pointerId = 0;
-            if (isTouching[pointerId])
-                if (dragDistance[pointerId] < MINIMUM_DRAG_DISTANCE) {
-//                    onHoldListener(pointerId);
-                }
-
-            // Uncomment this for periodic callback
-            // timerHandler.postDelayed(this, 100);
-        }
-    };
 
     private void initialize() {
 
@@ -125,6 +106,10 @@ public class TouchInteraction {
         this.timestamp = java.lang.System.currentTimeMillis ();
 
         initialize();
+    }
+
+    public void setBody(Body body) {
+        this.body = body;
     }
 
     public Body getBody() {
