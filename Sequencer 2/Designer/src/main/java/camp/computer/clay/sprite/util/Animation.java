@@ -17,7 +17,8 @@ import camp.computer.clay.designer.ApplicationView;
 
 public class Animation {
 
-    // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
+    // References:
+    // - http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
     public void moveToPoint (final View view, final Point destinationPoint, int translateDuration)
     {
         FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
@@ -25,21 +26,14 @@ public class Animation {
         ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics( dm );
         int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
 
-        int originalPos[] = new int[2];
-        view.getLocationOnScreen( originalPos );
-
-        /*
-        int xDest = dm.widthPixels/2;
-        xDest -= (view.getMeasuredWidth()/2);
-        int yDest = dm.heightPixels/2 - (view.getMeasuredHeight()/2) - statusBarOffset;
-        */
+        int originalPosition[] = new int[2];
+        view.getLocationOnScreen(originalPosition);
 
         int xDest = destinationPoint.x;
         int yDest = destinationPoint.y;
 
-
-        final int amountToMoveRight = xDest - originalPos[0] - (int) (view.getWidth() / 2.0f);
-        final int amountToMoveDown = yDest - originalPos[1] - (int) (view.getHeight() / 2.0f);
+        final int amountToMoveRight = xDest - originalPosition[0] - (int) (view.getWidth() / 2.0f);
+        final int amountToMoveDown = yDest - originalPosition[1] - (int) (view.getHeight() / 2.0f);
 
         TranslateAnimation animation = new TranslateAnimation(0, amountToMoveRight, 0, amountToMoveDown);
         animation.setDuration(translateDuration);
@@ -53,10 +47,6 @@ public class Animation {
 
             @Override
             public void onAnimationEnd(android.view.animation.Animation animation) {
-//                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-//                params.topMargin += amountToMoveDown;
-//                params.leftMargin += amountToMoveRight;
-//                view.setLayoutParams(params);
 
                 // Get button holder
                 RelativeLayout relativeLayout = (RelativeLayout) ApplicationView.getApplicationView().findViewById(R.id.context_button_holder);
@@ -71,10 +61,6 @@ public class Animation {
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
                 int buttonWidth = relativeLayout.getWidth();
                 int buttonHeight = relativeLayout.getHeight();
-
-                // Reposition button
-//                params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-//                params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
 
                 params.bottomMargin = screenWidth - (int) destinationPoint.x - (int) (buttonWidth / 2.0f); // amountToMoveDown;
                 params.rightMargin = screenHeight - (int) destinationPoint.y - (int) (buttonHeight / 2.0f); // amountToMoveRight;

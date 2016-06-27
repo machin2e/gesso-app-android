@@ -17,4 +17,57 @@ public class Port extends Model {
     public ArrayList<Path> getPaths() {
         return this.paths;
     }
+
+    // <MODEL>
+    public enum PortDirection {
+
+        NONE(0),
+        OUTPUT(1),
+        INPUT(2),
+        BOTH(3); // i.e., for I2C, etc.
+
+        // TODO: Change the index to a UUID?
+        int index;
+
+        PortDirection(int index) {
+            this.index = index;
+        }
+    }
+
+    public enum PortType {
+
+        NONE(0),
+        SWITCH(1),
+        PULSE(2),
+        WAVE(3);
+//        POWER(4),
+//        GROUND(5);
+
+        // TODO: Change the index to a UUID?
+        int index;
+
+        PortType(int index) {
+            this.index = index;
+        }
+
+        public static PortType getNextType(PortType currentPortType) {
+            return PortType.values()[(currentPortType.index + 1) % PortType.values().length];
+        }
+    }
+
+    public PortType portType = PortType.NONE;
+    public PortDirection portDirection = PortDirection.NONE;
+
+    // TODO: Physical dimensions
+    // </MODEL>
+
+    // TODO: Move into Port
+    public PortType getType() {
+        return this.portType;
+    }
+
+    // TODO: Move into Port
+    public void setPortType(PortType portType) {
+        this.portType = portType;
+    }
 }

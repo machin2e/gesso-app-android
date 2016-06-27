@@ -115,16 +115,14 @@ public class PathSprite extends Sprite {
         channelDirection = ChannelDirection.NONE; // 0 for "none" (disabled)
     }
 
-    @Override
+    public void update() {
+    }
+
     public void draw(MapView mapView) {
 
         if (getVisibility()) {
             Canvas mapCanvas = mapView.getCanvas();
             Paint paint = mapView.getPaint();
-
-//        drawStyleLayer(mapCanvas, paint);
-//        drawDataLayer(mapCanvas, paint);
-            drawAnnotationLayer(mapCanvas, paint);
 
             if (this.showDirectedPaths) {
                 drawTrianglePath(mapCanvas, paint);
@@ -136,161 +134,6 @@ public class PathSprite extends Sprite {
 
     public Path getPath() {
         return (Path) getModel();
-    }
-
-    /**
-     * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
-     * placeholder for the sprite.
-     * @param mapCanvas
-     * @param paint
-     */
-    public void drawShapeLayer(Canvas mapCanvas, Paint paint) {
-
-        if (showFormLayer) {
-
-            mapCanvas.save();
-
-            // Color
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
-            mapCanvas.drawCircle(
-                    0,
-                    0,
-                    shapeRadius,
-                    paint
-            );
-
-            // Outline
-            if (showShapeOutline) {
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(3);
-                paint.setColor(Color.BLACK);
-                mapCanvas.drawCircle(
-                        0,
-                        0,
-                        shapeRadius,
-                        paint
-                );
-            }
-
-            mapCanvas.restore();
-        }
-    }
-
-//    /**
-//     * Draws the sprite's detail front layer.
-//     * @param mapCanvas
-//     * @param paint
-//     */
-//    public void drawStyleLayer(Canvas mapCanvas, Paint paint) {
-//
-//        if (showStyleLayer) {
-//
-//            if (channelType != ChannelType.NONE) {
-//
-//                mapCanvas.save();
-//                // Color
-//                paint.setStyle(Paint.Style.FILL);
-//                paint.setColor(PathSprite.PATH_COLOR_PALETTE[1]); // [3 * i + j]);
-//                mapCanvas.drawCircle(
-//                        0,
-//                        0,
-//                        shapeRadius,
-//                        paint
-//                );
-//
-//                // Outline
-//                if (showShapeOutline) {
-//                    paint.setStyle(Paint.Style.STROKE);
-//                    paint.setStrokeWidth(3);
-//                    paint.setColor(Color.BLACK);
-//                    mapCanvas.drawCircle(
-//                            0,
-//                            0,
-//                            shapeRadius,
-//                            paint
-//                    );
-//                }
-//
-//                mapCanvas.restore();
-//            }
-//        }
-//    }
-
-//    /**
-//     * Draws the sprite's data layer.
-//     * @param mapCanvas
-//     * @param paint
-//     */
-//    private void drawDataLayer(Canvas mapCanvas, Paint paint) {
-//
-//        if (showDataLayer) {
-//
-//            if (channelType != ChannelType.NONE) {
-//
-//                mapCanvas.save();
-//
-//                // Outline
-//                paint.setStyle(Paint.Style.STROKE);
-//                paint.setStrokeWidth(2.0f);
-//                paint.setColor(Color.WHITE);
-////                int step = 1;
-////                for (int k = 0; k + step < dataSamples.length - 1; k += step) {
-////                    mapCanvas.drawLine(
-////                            dataSamples[k],
-////                            -shapeRadius + k,
-////                            dataSamples[k + step],
-////                            -shapeRadius + k + step,
-////                            paint
-////                    );
-////                }
-//                int step = 1;
-//                float plotStep = (float) ((2.0f * (float) shapeRadius) / (float) dataSamples.length);
-//                for (int k = 0; k < dataSamples.length - 1; k++) {
-//                    mapCanvas.drawLine(
-//                            dataSamples[k],
-//                            -shapeRadius + k * plotStep,
-//                            dataSamples[k + 1],
-//                            -shapeRadius + (k + 1) * plotStep,
-//                            paint
-//                    );
-//                }
-//
-//                mapCanvas.restore();
-//            }
-//        }
-//    }
-
-    /**
-     * Draws the sprite's annotation layer. Contains labels and other text.
-     * @param mapCanvas
-     * @param paint
-     */
-    public void drawAnnotationLayer(Canvas mapCanvas, Paint paint) {
-
-        if (showAnnotationLayer) {
-
-            if (channelType != ChannelType.NONE) {
-
-                mapCanvas.save();
-
-                /*
-                // Label
-                if (showChannelLabel) {
-                    paint.setTextSize(labelTextSize);
-                    Rect textBounds = new Rect();
-                    String channelNumberText = String.valueOf(3 * i + j + 1);
-                    paint.getTextBounds(channelNumberText, 0, channelNumberText.length(), textBounds);
-                    paint.setStyle(Paint.Style.FILL);
-                    paint.setStrokeWidth(3);
-                    paint.setColor(Color.BLACK);
-                    mapCanvas.drawText(channelNumberText, -(textBounds.width() / 2.0f), textBounds.height() / 2.0f, paint);
-                }
-                */
-
-                mapCanvas.restore();
-            }
-        }
     }
 
     //-------
@@ -313,10 +156,10 @@ public class PathSprite extends Sprite {
             paint.setColor(path.getSourcePort().getUniqueColor());
 
             mapCanvas.drawLine(
-                    path.getSourcePort().getAbsolutePosition().x,
-                    path.getSourcePort().getAbsolutePosition().y,
-                    path.getDestinationPort().getAbsolutePosition().x,
-                    path.getDestinationPort().getAbsolutePosition().y,
+                    path.getSourcePort().getPosition().x,
+                    path.getSourcePort().getPosition().y,
+                    path.getDestinationPort().getPosition().x,
+                    path.getDestinationPort().getPosition().y,
                     paint
             );
 
@@ -332,36 +175,36 @@ public class PathSprite extends Sprite {
         path.getDestinationPort().setVisibility(true);
         path.getDestinationPort().setPathVisibility(true);
 
-        mapCanvas.save();
-
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
         paint.setColor(path.getSourcePort().getUniqueColor());
 
         if (showDirectedPaths) {
-            float rotationAngle = Geometry.calculateRotationAngle(
-                    path.getSourcePort().getAbsolutePosition(),
-                    path.getDestinationPort().getAbsolutePosition()
+            float pathRotationAngle = Geometry.calculateRotationAngle(
+                    path.getSourcePort().getPosition(),
+                    path.getDestinationPort().getPosition()
             );
+
+            float triangleRotationAngle = pathRotationAngle + 90.0f;
 
             if (showPathDocks) {
 
-                float distance = (float) Geometry.calculateDistance(
-                        path.getSourcePort().getAbsolutePosition(),
-                        path.getDestinationMachine().getAbsolutePosition()
+                float pathDistance = (float) Geometry.calculateDistance(
+                        path.getSourcePort().getPosition(),
+                        path.getDestinationMachine().getPosition()
                 );
 
                 PointF triangleCenterPosition = Geometry.calculatePoint(
-                        path.getSourcePort().getAbsolutePosition(),
-                        rotationAngle,
+                        path.getSourcePort().getPosition(),
+                        pathRotationAngle,
                         2 * triangleSpacing
                 );
 
                 paint.setStyle(Paint.Style.FILL);
                 Shape.drawTriangle(
                         triangleCenterPosition,
-                        rotationAngle + 180,
+                        triangleRotationAngle,
                         triangleWidth,
                         triangleHeight,
                         mapCanvas,
@@ -369,15 +212,15 @@ public class PathSprite extends Sprite {
                 );
 
                 PointF triangleCenterPositionDestination = Geometry.calculatePoint(
-                        path.getSourcePort().getAbsolutePosition(),
-                        rotationAngle,
-                        distance - 2 * triangleSpacing
+                        path.getDestinationPort().getPosition(),
+                        pathRotationAngle + 180,
+                        2 * triangleSpacing
                 );
 
                 paint.setStyle(Paint.Style.FILL);
                 Shape.drawTriangle(
                         triangleCenterPositionDestination,
-                        rotationAngle + 180,
+                        triangleRotationAngle,
                         triangleWidth,
                         triangleHeight,
                         mapCanvas,
@@ -387,15 +230,15 @@ public class PathSprite extends Sprite {
             } else {
 
                 float pathDistance = (float) Geometry.calculateDistance(
-                        path.getSourcePort().getAbsolutePosition(),
-                        path.getDestinationPort().getAbsolutePosition()
+                        path.getSourcePort().getPosition(),
+                        path.getDestinationPort().getPosition()
                 );
 
                 for (int k = 0; ; k++) {
 
                     PointF triangleCenterPosition = Geometry.calculatePoint(
-                            path.getSourcePort().getAbsolutePosition(),
-                            rotationAngle,
+                            path.getSourcePort().getPosition(),
+                            pathRotationAngle,
                             k * triangleSpacing
                     );
 
@@ -409,7 +252,7 @@ public class PathSprite extends Sprite {
                         paint.setStyle(Paint.Style.FILL);
                         Shape.drawTriangle(
                                 triangleCenterPosition,
-                                rotationAngle + 180,
+                                triangleRotationAngle,
                                 triangleWidth,
                                 triangleHeight,
                                 mapCanvas,
@@ -420,33 +263,25 @@ public class PathSprite extends Sprite {
 
                 if (isEditorVisible) {
                     // <SPREADSHEET>
-                    mapCanvas.save();
-
                     PointF pathMidpoint = Geometry.calculateMidpoint(
-                            path.getSourcePort().getAbsolutePosition(),
-                            path.getDestinationPort().getAbsolutePosition()
+                            path.getSourcePort().getPosition(),
+                            path.getDestinationPort().getPosition()
                     );
 
                     paint.setStyle(Paint.Style.FILL);
-                    mapCanvas.translate(pathMidpoint.x, pathMidpoint.y);
-                    mapCanvas.rotate(rotationAngle + 180);
                     paint.setColor(path.getSourcePort().getUniqueColor());
                     float spreadsheetSpriteWidth = 50.0f;
                     mapCanvas.drawRect(
-                            -(spreadsheetSpriteWidth / 2.0f),
-                            -(spreadsheetSpriteWidth / 2.0f),
-                            (spreadsheetSpriteWidth / 2.0f),
-                            (spreadsheetSpriteWidth / 2.0f),
+                            pathMidpoint.x + -(spreadsheetSpriteWidth / 2.0f),
+                            pathMidpoint.y + -(spreadsheetSpriteWidth / 2.0f),
+                            pathMidpoint.x + (spreadsheetSpriteWidth / 2.0f),
+                            pathMidpoint.y + (spreadsheetSpriteWidth / 2.0f),
                             paint
                     );
-
-                    mapCanvas.restore();
                     // </SPREADSHEET>
                 }
             }
         }
-
-        mapCanvas.restore();
     }
 
     public void setVisibility(boolean isVisible) {

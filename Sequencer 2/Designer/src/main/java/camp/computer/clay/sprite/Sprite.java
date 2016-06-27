@@ -1,25 +1,24 @@
 package camp.computer.clay.sprite;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.sprite.util.Geometry;
 
 public abstract class Sprite {
 
-    protected PointF position = new PointF(); // Sprite position
-    protected float scale = 1.0f; // Sprite scale factor
-    protected float rotation = 0.0f; // Sprite heading rotation
+    private Sprite parentSprite;
 
-    private TouchActionListener touchActionListener;
+    private PointF position = new PointF(); // Sprite position
+    private float scale = 1.0f; // Sprite scale factor
+    private float rotation = 0.0f; // Sprite heading rotation
 
     private Model model;
 
-    // TODO: Model model;
-    // TODO: Sprite(Model model) --- Constructor
-
-    private Sprite parentSprite;
+    private TouchActionListener touchActionListener;
 
     public Sprite(Model model) {
         this.model = model;
@@ -41,24 +40,6 @@ public abstract class Sprite {
         return this.position;
     }
 
-    // TODO: Account for rotation of (parent) Sprites!
-    public PointF getAbsolutePosition() {
-        PointF absolutePosition = new PointF();
-        if (parentSprite != null) {
-            absolutePosition.x
-                    = this.parentSprite.getAbsolutePosition().x
-                    + (this.getPosition().x * this.getScale()); // TODO: this.machineSprite.getAbsolutePosition()
-            absolutePosition.y
-                    = this.parentSprite.getAbsolutePosition().y
-                    + (this.getPosition().y * this.getScale());
-        } else {
-            // TODO: This should get the absolute position of the root sprite relative to the origin point on the coordinate system/canvas
-            absolutePosition.x = this.getPosition().x * this.getScale();
-            absolutePosition.y = this.getPosition().y * this.getScale();
-        }
-        return absolutePosition;
-    }
-
     public float getRotation() {
         return this.rotation;
     }
@@ -70,11 +51,29 @@ public abstract class Sprite {
     public void setPosition(PointF position) {
         this.position.x = position.x;
         this.position.y = position.y;
-//        this.updatePortPositions();
     }
 
-    public void setRotation(float angle) {
-        this.rotation = angle;
+    public void setRelativePosition(PointF position) {
+        PointF absolutePositionFromRelativePosition = new PointF();
+        if (parentSprite != null) {
+            PointF relativePositionFromRelativePosition
+                    = Geometry.calculatePoint(
+                        parentSprite.getPosition(),
+                        Geometry.calculateRotationAngle(parentSprite.getPosition(), position),
+                        (float) Geometry.calculateDistance(parentSprite.getPosition(), position));
+            absolutePositionFromRelativePosition.x = parentSprite.getPosition().x + relativePositionFromRelativePosition.x;
+            absolutePositionFromRelativePosition.y = parentSprite.getPosition().y + relativePositionFromRelativePosition.y;
+        } else {
+            // TODO: This should get the absolute position of the root sprite relative to the origin point on the coordinate system/canvas
+            absolutePositionFromRelativePosition.x = position.x;
+            absolutePositionFromRelativePosition.y = position.y;
+        }
+        this.position.x = absolutePositionFromRelativePosition.x;
+        this.position.y = absolutePositionFromRelativePosition.y;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
     }
 
     public void setScale(float scale) {
@@ -91,6 +90,8 @@ public abstract class Sprite {
     public boolean getVisibility () {
         return this.isVisible;
     }
+
+    public abstract void update ();
 
     public abstract void draw (MapView mapView);
 

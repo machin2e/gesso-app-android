@@ -11,78 +11,33 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import camp.computer.clay.designer.MapView;
+import camp.computer.clay.model.Machine;
 import camp.computer.clay.model.Path;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
-import camp.computer.clay.sprite.util.Shape;
 
 public class PortSprite extends Sprite {
 
     // --- STYLE ---
     public static float DISTANCE_FROM_BOARD = 45.0f;
-    public static float DISTANCE_BETWEEN_NODES = 5.0f;
+    public static float DISTANCE_BETWEEN_NODES = 10.0f;
     public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
 
-    public boolean showFormLayer = false;
-    public boolean showStyleLayer = true;
-    public boolean showDataLayer = true;
+    private boolean showFormLayer = true;
+    private boolean showStyleLayer = true;
+    private boolean showDataLayer = true;
     private boolean showAnnotationLayer = false;
 
     public float shapeRadius = 40.0f;
-    boolean showShapeOutline = false;
+    private boolean showShapeOutline = false;
 
-    boolean showChannelLabel = false;
-    float labelTextSize = 30.0f;
     private int uniqueColor = Color.BLACK;
 
     public int getIndex() {
         return getMachineSprite().getPortSpriteIndex(this);
     }
     // ^^^ STYLE ^^^
-
-    // <MODEL>
-    public enum PortDirection {
-
-        NONE(0),
-        OUTPUT(1),
-        INPUT(2),
-        BOTH(3); // i.e., for I2C, etc.
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        PortDirection(int index) {
-            this.index = index;
-        }
-    }
-
-    public enum PortType {
-
-        NONE(0),
-        SWITCH(1),
-        PULSE(2),
-        WAVE(3);
-//        POWER(4),
-//        GROUND(5);
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        PortType(int index) {
-            this.index = index;
-        }
-
-        public static PortType getNextType(PortType currentPortType) {
-            return PortType.values()[(currentPortType.index + 1) % PortType.values().length];
-        }
-    }
-
-    public PortType portType = PortType.NONE;
-    public PortDirection portDirection = PortDirection.NONE;
-
-    // TODO: Physical dimensions
-    // </MODEL>
 
     // --- DATA ---
     private int dataSampleCount = 40;
@@ -99,6 +54,7 @@ public class PortSprite extends Sprite {
     private void initialize() {
         this.uniqueColor = updateUniqueColor();
         initializeData();
+        setVisibility(false);
     }
 
     private void initializeData () {
@@ -111,21 +67,11 @@ public class PortSprite extends Sprite {
         return (MachineSprite) getParentSprite();
     }
 
-//    public void setAbsolutePosition(PointF position) {
+//    public void setPosition(PointF position) {
 //        this.setPosition(
 //                position.x,
 //                position.y);
 //    }
-
-    // TODO: Move into Port
-    public PortType getType() {
-        return this.portType;
-    }
-
-    // TODO: Move into Port
-    public void setPortType(PortType portType) {
-        this.portType = portType;
-    }
 
     // TODO: Move into Port
     public PathSprite addPath(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
@@ -171,8 +117,9 @@ public class PortSprite extends Sprite {
         }
     }
 
-    @Override
     public void draw(MapView mapView) {
+        this.mapView = mapView;
+
         if (getVisibility()) {
 
             drawShapeLayer(mapView);
@@ -197,16 +144,16 @@ public class PortSprite extends Sprite {
             Canvas mapCanvas = mapView.getCanvas();
             Paint paint = mapView.getPaint();
 
-            mapCanvas.save();
-
-            mapCanvas.translate(this.position.x, this.position.y);
+//            mapCanvas.save();
+//
+//            mapCanvas.translate(this.getPosition().x, this.getPosition().y);
 
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
             mapCanvas.drawCircle(
-                    0,
-                    0,
+                    getPosition().x,
+                    getPosition().y,
                     shapeRadius,
                     paint
             );
@@ -217,14 +164,14 @@ public class PortSprite extends Sprite {
                 paint.setStrokeWidth(3);
                 paint.setColor(Color.BLACK);
                 mapCanvas.drawCircle(
-                        0,
-                        0,
+                        getPosition().x,
+                        getPosition().y,
                         shapeRadius,
                         paint
                 );
             }
 
-            mapCanvas.restore();
+//            mapCanvas.restore();
         }
     }
 
@@ -239,18 +186,20 @@ public class PortSprite extends Sprite {
             Canvas mapCanvas = mapView.getCanvas();
             Paint paint = mapView.getPaint();
 
-            if (portType != PortSprite.PortType.NONE) {
+            Port port = (Port) getModel();
+
+            if (port.getType() != Port.PortType.NONE) {
 
                 mapCanvas.save();
 
-                mapCanvas.translate(this.position.x, this.position.y);
+//                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
 
                 // Color
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(this.uniqueColor); // [3 * i + j]);
                 mapCanvas.drawCircle(
-                        0,
-                        0,
+                        this.getPosition().x,
+                        this.getPosition().y,
                         shapeRadius,
                         paint
                 );
@@ -261,8 +210,8 @@ public class PortSprite extends Sprite {
                     paint.setStrokeWidth(3);
                     paint.setColor(Color.BLACK);
                     mapCanvas.drawCircle(
-                            0,
-                            0,
+                            this.getPosition().x,
+                            this.getPosition().y,
                             shapeRadius,
                             paint
                     );
@@ -284,11 +233,13 @@ public class PortSprite extends Sprite {
             Canvas mapCanvas = mapView.getCanvas();
             Paint paint = mapView.getPaint();
 
-            if (portType != PortSprite.PortType.NONE) {
+            Port port = (Port) getModel();
+
+            if (port.getType() != Port.PortType.NONE) {
 
                 mapCanvas.save();
 
-                mapCanvas.translate(this.position.x, this.position.y);
+                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
 
                 // Outline
                 paint.setStyle(Paint.Style.STROKE);
@@ -332,11 +283,13 @@ public class PortSprite extends Sprite {
             Canvas mapCanvas = mapView.getCanvas();
             Paint paint = mapView.getPaint();
 
-            if (portType != PortSprite.PortType.NONE) {
+            Port port = (Port) getModel();
+
+            if (port.getType() != Port.PortType.NONE) {
 
                 mapCanvas.save();
 
-                mapCanvas.translate(this.position.x, this.position.y);
+                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
 
                 /*
                 // Label
@@ -365,9 +318,10 @@ public class PortSprite extends Sprite {
     private int pulsePeriodSampleCount = 0;
     private int previousPulseState = 0;
     private float xWaveStart = 0;
-    public void updateChannelData () {
+    public void update() {
         Random random = new Random();
-        if (portType == PortType.SWITCH) {
+        Port port = (Port) getModel();
+        if (port.getType() == Port.PortType.SWITCH) {
             // Shift data to make room for new samples
             for (int k = 0; k < dataSamples.length - 1; k++) {
                 dataSamples[k] = dataSamples[k + 1];
@@ -379,7 +333,7 @@ public class PortSprite extends Sprite {
             if (switchHalfPeriodSampleCount == 0) {
                 previousSwitchState = (previousSwitchState + 1) % 2;
             }
-        } else if (portType == PortType.PULSE) {
+        } else if (port.getType() == Port.PortType.PULSE) {
             // Shift data to make room for new samples
             for (int k = 0; k < dataSamples.length - 1; k++) {
                 dataSamples[k] = dataSamples[k + 1];
@@ -393,7 +347,7 @@ public class PortSprite extends Sprite {
                 pulseDutyCycle = random.nextFloat();
                 previousPulseState = (previousPulseState + 1) % 2;
             }
-        } else if (portType == PortType.WAVE) {
+        } else if (port.getType() == Port.PortType.WAVE) {
             // Add new sample for the channel type
             for (int k = 0; k < dataSamples.length; k++) {
                 dataSamples[k] = getSyntheticWaveSample(k);
@@ -401,6 +355,71 @@ public class PortSprite extends Sprite {
             //xWaveStart = (xWaveStart + ((2.0f * (float) Math.PI) / ((float) this.dataSamples[j].length))) % (2.0f * (float) Math.PI);
             xWaveStart = (xWaveStart + 0.5f) % ((float) Math.PI * 2.0f);
         }
+
+        updatePosition();
+    }
+
+    private void updatePosition() {
+
+        // <TODO>
+        // TODO: Replace this with getParentSpriteBounds() -- get bounding box based on parent sprite's shape and orientation (to get width and height)
+        MachineSprite machineSprite = (MachineSprite) getParentSprite();
+        Machine machine = (Machine) machineSprite.getModel();
+        // </TODO>
+
+        // Ports
+        float portRadius = 40.0f;
+        PointF[] relativePortPositions = new PointF[machine.getPorts().size()];
+        relativePortPositions[0] = new PointF(
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                +1 * ((machineSprite.boardWidth/ 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[1] = new PointF(
+                0,
+                +1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[2] = new PointF(
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                +1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[3] = new PointF(
+                +1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+        relativePortPositions[4] = new PointF(
+                +1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                0
+        );
+        relativePortPositions[5] = new PointF(
+                +1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+        relativePortPositions[6] = new PointF(
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[7] = new PointF(
+                0,
+                -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[8] = new PointF(
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES),
+                -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius)
+        );
+        relativePortPositions[9] = new PointF(
+                -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+        relativePortPositions[10] = new PointF(
+                -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                0
+        );
+        relativePortPositions[11] = new PointF(
+                -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+
+        setRelativePosition(relativePortPositions[getIndex()]);
     }
 
     private float getSyntheticSwitchSample() {
@@ -447,10 +466,27 @@ public class PortSprite extends Sprite {
         return visiblePathSprites;
     }
 
+    public MapView mapView = null;
+
     @Override
     public boolean isTouching(PointF point) {
         if (getVisibility()) {
-            return (Geometry.calculateDistance(point, this.getAbsolutePosition()) < 80);
+
+//            boolean touching = (Geometry.calculateDistance(point, this.getRelativePosition()) < (this.shapeRadius + 10));
+//            if (touching) {
+//                Matrix m = new Matrix();
+//                mapView.canvasMatrix.invert(m);
+//
+//                float[] touch2 = new float[]{this.getPosition().x, this.getPosition().y};
+//                m.mapPoints(touch2);
+//
+//                int X = (int) touch2[0];
+//                int Y = (int) touch2[1];
+//
+//                Log.v("mtouch", "X: " + X + ", Y: " + Y);
+//            }
+
+            return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + 10));
         } else {
             return false;
         }
@@ -505,51 +541,24 @@ public class PortSprite extends Sprite {
     public void drawCandidatePath(MapView mapView) {
         if (isCandidatePathVisible) {
 
-            if (this.portType != PortType.NONE) {
+            Port port = (Port) getModel();
+
+            if (port.portType != Port.PortType.NONE) {
 
                 Canvas mapCanvas = mapView.getCanvas();
                 Paint paint = mapView.getPaint();
 
-
-                mapCanvas.save();
-
-                // TODO: Replace this with PointF transformed for the Perspective in the Map/Simulation.
-//            mapCanvas.setMatrix(mapView.getOriginMatrix(true));
-                Matrix originMatrix = mapView.getOriginMatrix(false);
-                mapCanvas.setMatrix(originMatrix);
-
-//            mapCanvas.translate(
-//                    candidatePathDestinationPosition.x,
-//                    candidatePathDestinationPosition.y
-//            );
-
-//            mapCanvas.save();
                 // Color
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(15.0f);
                 paint.setColor(this.getUniqueColor());
 
                 mapCanvas.drawLine(
-                        this.getAbsolutePosition().x * mapView.getScale(),
-                        this.getAbsolutePosition().y * mapView.getScale(),
-                        candidatePathDestinationPosition.x * mapView.getScale(),
-                        candidatePathDestinationPosition.y * mapView.getScale(),
+                        this.getPosition().x,
+                        this.getPosition().y,
+                        candidatePathDestinationPosition.x,
+                        candidatePathDestinationPosition.y,
                         paint
-                );
-
-                mapCanvas.restore();
-
-
-                mapCanvas.save();
-
-                // TODO: Replace this with PointF transformed for the Perspective in the Map/Simulation.
-//            mapCanvas.setMatrix(mapView.getOriginMatrix(true));
-                Matrix originMatrix2 = mapView.getOriginMatrix(false);
-                mapCanvas.setMatrix(originMatrix2);
-
-                mapCanvas.translate(
-                        candidatePathDestinationPosition.x * mapView.getScale(),
-                        candidatePathDestinationPosition.y * mapView.getScale()
                 );
 
                 // Color
@@ -557,26 +566,11 @@ public class PortSprite extends Sprite {
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(this.getUniqueColor());
                 mapCanvas.drawCircle(
-                        0,
-                        0,
+                        candidatePathDestinationPosition.x,
+                        candidatePathDestinationPosition.y,
                         radius,
                         paint
                 );
-
-//        // Outline
-//        if (showShapeOutline) {
-//            paint.setStyle(Paint.Style.STROKE);
-//            paint.setStrokeWidth(3);
-//            paint.setColor(Color.BLACK);
-//            mapCanvas.drawCircle(
-//                    0,
-//                    0,
-//                    radius,
-//                    paint
-//            );
-//        }
-
-                mapCanvas.restore();
             }
         }
     }

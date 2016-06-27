@@ -1,6 +1,5 @@
 package camp.computer.clay.designer;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -20,9 +19,10 @@ import java.util.ArrayList;
 
 import camp.computer.clay.model.Machine;
 import camp.computer.clay.model.Port;
+import camp.computer.clay.model.Simulation;
 import camp.computer.clay.model.TouchInteraction;
 import camp.computer.clay.model.TouchInteractivity;
-import camp.computer.clay.sprite.Delete_SystemSprite;
+import camp.computer.clay.sprite.Visualization;
 import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PathSprite;
 import camp.computer.clay.sprite.PortSprite;
@@ -41,14 +41,14 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     private Canvas canvas = null;
     private int canvasWidth, canvasHeight;
     private Paint paint = new Paint (Paint.ANTI_ALIAS_FLAG);
-    private Matrix identityMatrix;
-    private Matrix originMatrix;
+    public Matrix identityMatrix;
+    public Matrix canvasMatrix;
 
     // Map
     private PointF originPosition = new PointF ();
     private PointF currentPosition = new PointF ();
 
-    ArrayList<Delete_SystemSprite> deleteSystemSprites = new ArrayList<Delete_SystemSprite>();
+    ArrayList<Visualization> visualizationSprites = new ArrayList<Visualization>();
 
     public MapView(Context context) {
         super(context);
@@ -72,17 +72,22 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void initializeSprites() {
 
-        // TODO: Move System/Machine this into Simulation or Ecology (in System) --- maybe combine Simulation+Ecology
-        camp.computer.clay.model.System system = new camp.computer.clay.model.System();
+        Simulation simulation = new Simulation();
+
+        // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
         for (int i = 0; i < 3; i++) {
             Machine machine = new Machine();
             for (int j = 0; j < 12; j++) {
                 machine.addPort(new Port());
             }
-            system.addMachine(machine);
+            simulation.addMachine(machine);
         }
 
-        deleteSystemSprites.add(new Delete_SystemSprite(system));
+        Visualization visualization = new Visualization(simulation);
+        visualization.setParentSprite(null);
+        visualization.setPosition(new PointF(0, 0));
+        visualization.setRotation(0);
+        visualizationSprites.add(visualization);
     }
 
     @Override
@@ -96,13 +101,14 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         identityMatrix = new Matrix ();
 
-        originMatrix = new Matrix ();
-        originMatrix.setTranslate(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
-//
-//        canvas.setMatrix(originMatrix);
+//        canvasMatrix = new Matrix ();
+//        canvasMatrix.reset();
+//        canvas.setMatrix(canvasMatrix);
+//        canvasMatrix.setTranslate(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
 
         // TODO: Move setPosition to a better location!
 //        getClay().getPerspective ().setPosition(canvas.getWidth() / 2, canvas.getHeight() / 2);
+        //originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
 //        originPosition.set(0, 0);
 
@@ -158,13 +164,13 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //----------------------------------------------------------------------------------------------
-    // Coordinate System
+    // Coordinate Simulation
     //----------------------------------------------------------------------------------------------
 
     public Matrix getOriginMatrix(boolean scale) {
         Matrix originMatrixCopy = new Matrix();
         float[] v = new float[9];
-        this.originMatrix.getValues(v);
+        this.canvasMatrix.getValues(v);
 //        if (scale) {
 //            originMatrixCopy.setScale(this.scale, this.scale);
 //        }
@@ -214,9 +220,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     // Layout
     //----------------------------------------------------------------------------------------------
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    protected void doDraw(Canvas canvas) {
+//        super.onDraw(canvas);
 
         // <PERSPECTIVE>
         // Move the perspective
@@ -239,21 +244,20 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap (canvasBitmap, identityMatrix, null);
+//        canvas.save();
+//        canvas.concat(identityMatrix);
+//        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
+//        canvas.restore();
 
         this.canvas.restore();
     }
 
     private void drawScene (MapView mapView) {
-        for (Delete_SystemSprite deleteSystemSprite : deleteSystemSprites) {
-            drawSprite(deleteSystemSprite);
+        for (Visualization visualization : visualizationSprites) {
+            visualization.draw(mapView);
         }
     }
 
-    private void drawSprite(Sprite sprite) {
-        sprite.draw(this);
-    }
-
-    @SuppressLint("WrongCall")
     public void updateSurfaceView () {
         // The function run in background thread, not UI thread.
 
@@ -265,7 +269,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             synchronized (surfaceHolder) {
                 updateState();
                 if (canvas != null) {
-                    onDraw(canvas);
+                    doDraw(canvas);
                 }
             }
         } finally {
@@ -277,8 +281,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void updateState() {
         if (!hasTouches()) {
-            for (Delete_SystemSprite deleteSystemSprite : deleteSystemSprites) {
-                deleteSystemSprite.updateState();
+            for (Visualization deleteSystemSprite : visualizationSprites) {
+                deleteSystemSprite.update();
             }
         }
     }
@@ -439,6 +443,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
 //                    xTouch[id] = (motionEvent.getX (i) - currentPosition.x) / scale + canvas.getClipBounds().left;
 //                    yTouch[id] = (motionEvent.getY (i) - currentPosition.y) / scale + canvas.getClipBounds().top;
+
+                    Log.v("TouchPoint", "x: " + touch[id].x + ", y: " + touch[id].y);
                 }
 
                 // Update the state of the touched object based on the current touch interaction state.
@@ -495,7 +501,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             this.dragDistance[pointerId] = 0;
 
             // Reset object interaction state
-            for (Delete_SystemSprite deleteSystemSprite : deleteSystemSprites) {
+            for (Visualization deleteSystemSprite : visualizationSprites) {
                 for (MachineSprite machineSprite : deleteSystemSprite.getMachineSprites()) {
                     // Log.v ("MapViewTouch", "Object at " + machineSprite.x + ", " + machineSprite.y);
 
@@ -568,9 +574,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                             for (PortSprite portSprite : machineSprite.portSprites) {
                                 for (PathSprite pathSprite : portSprite.pathSprites) {
 
-                                    float distanceToLine = (float) Geometry.LineToPointDistance2D(
-                                            pathSprite.getPath().getSourcePort().getAbsolutePosition(),
-                                            pathSprite.getPath().getDestinationPort().getAbsolutePosition(),
+                                    float distanceToLine = (float) Geometry.calculateLineToPointDistance(
+                                            pathSprite.getPath().getSourcePort().getPosition(),
+                                            pathSprite.getPath().getDestinationPort().getPosition(),
                                             this.touch[pointerId],
                                             true
                                     );
@@ -638,7 +644,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
             // Hide ports
             if (sourcePortIndex == -1) {
-                for (Delete_SystemSprite systemSprite : this.deleteSystemSprites) {
+                for (Visualization systemSprite : this.visualizationSprites) {
                     for (MachineSprite machineSprite : systemSprite.getMachineSprites()) {
                         machineSprite.hidePorts();
                         machineSprite.hidePaths();
@@ -735,22 +741,23 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
 
                     // Initialize port type and flow direction
-                    portSprite.portDirection = PortSprite.PortDirection.INPUT;
-                    if (portSprite.portType == PortSprite.PortType.NONE) {
-                        portSprite.portType = PortSprite.PortType.getNextType(portSprite.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                    Port port = (Port) portSprite.getModel();
+                    port.portDirection = Port.PortDirection.INPUT;
+                    if (port.portType == Port.PortType.NONE) {
+                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
                     }
 
                     // Show ports of nearby machines
-                    for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
-                        for (MachineSprite nearbyMachineSprite: deleteSystemSprite.getMachineSprites()) {
+                    for (Visualization visualizationSprites: this.visualizationSprites) {
+                        for (MachineSprite nearbyMachineSprite: visualizationSprites.getMachineSprites()) {
 
                             // Update style of nearby machines
                             float distanceToMachineSprite = (float) Geometry.calculateDistance(
                                     touch[pointerId],
-                                    nearbyMachineSprite.getAbsolutePosition()
+                                    nearbyMachineSprite.getPosition()
                             );
                             Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
-                            if (distanceToMachineSprite < nearbyMachineSprite.dimensionHeight + 50) {
+                            if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
                                 nearbyMachineSprite.setTransparency(1.0f);
                                 nearbyMachineSprite.showPorts();
 
@@ -759,10 +766,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                         // Scaffold interaction to connect path to with nearby ports
                                         float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
                                                 touch[pointerId],
-                                                nearbyPortSprite.getAbsolutePosition()
+                                                nearbyPortSprite.getPosition()
                                         );
                                         if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
-                                            // portSprite.setPosition(nearbyPortSprite.getAbsolutePosition());
+                                            /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
                                             if (nearbyPortSprite != overlappedSprite) {
                                                 overlappedSprite = nearbyPortSprite;
                                                 Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -776,7 +783,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                     }
                                 }
 
-                            } else if (distanceToMachineSprite < nearbyMachineSprite.dimensionHeight + 80) {
+                            } else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 80) {
                                 if (nearbyMachineSprite != portSprite.getMachineSprite()) {
                                     nearbyMachineSprite.setTransparency(0.5f);
                                 }
@@ -813,24 +820,24 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     TouchInteraction touchInteraction = new TouchInteraction(touch[pointerId], TouchInteraction.TouchInteractionType.DRAG);
                     portSprite.touch(touchInteraction);
 
-
                     // Initialize port type and flow direction
-                    portSprite.portDirection = PortSprite.PortDirection.INPUT;
-                    if (portSprite.portType == PortSprite.PortType.NONE) {
-                        portSprite.portType = PortSprite.PortType.getNextType(portSprite.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                    Port port = (Port) portSprite.getModel();
+                    port.portDirection = Port.PortDirection.INPUT;
+                    if (port.portType == Port.PortType.NONE) {
+                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
                     }
 
                     // Show ports of nearby machines
-                    for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
-                        for (MachineSprite nearbyMachineSprite: deleteSystemSprite.getMachineSprites()) {
+                    for (Visualization visualization : this.visualizationSprites) {
+                        for (MachineSprite nearbyMachineSprite: visualization.getMachineSprites()) {
 
                             // Update style of nearby machines
                             float distanceToMachineSprite = (float) Geometry.calculateDistance(
                                     touch[pointerId],
-                                    nearbyMachineSprite.getAbsolutePosition()
+                                    nearbyMachineSprite.getPosition()
                             );
                             Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
-                            if (distanceToMachineSprite < nearbyMachineSprite.dimensionHeight + 50) {
+                            if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
                                 nearbyMachineSprite.setTransparency(1.0f);
                                 nearbyMachineSprite.showPorts();
 
@@ -839,10 +846,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                         // Scaffold interaction to connect path to with nearby ports
                                         float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
                                                 touch[pointerId],
-                                                nearbyPortSprite.getAbsolutePosition()
+                                                nearbyPortSprite.getPosition()
                                         );
                                         if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
-                                            //portSprite.setPosition(nearbyPortSprite.getAbsolutePosition());
+                                            /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
                                             if (nearbyPortSprite != overlappedSprite) {
                                                 overlappedSprite = nearbyPortSprite;
                                                 Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
@@ -856,7 +863,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                     }
                                 }
 
-                            } else if (distanceToMachineSprite < nearbyMachineSprite.dimensionHeight + 80) {
+                            } else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 80) {
                                 if (nearbyMachineSprite != portSprite.getMachineSprite()) {
                                     nearbyMachineSprite.setTransparency(0.5f);
                                 }
@@ -917,7 +924,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 // TODO: Add this to an onTouch callback for the sprite's channel nodes
                 // Check if the touched board's I/O node is touched
                 // Check if one of the objects is touched
-                if (Geometry.calculateDistance(touchStart[pointerId], machineSprite.getAbsolutePosition()) < 80) {
+                if (Geometry.calculateDistance(touchStart[pointerId], machineSprite.getPosition()) < 80) {
                     Log.v("MapView", "\tSource board touched.");
 
                     // <TOUCH_ACTION>
@@ -927,7 +934,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     // </TOUCH_ACTION>
 
                     // No touch on board or port. Touch is on map. So hide ports.
-                    for (Delete_SystemSprite deleteSystemSprite2 : this.deleteSystemSprites) {
+                    for (Visualization deleteSystemSprite2 : this.visualizationSprites) {
                         for (MachineSprite machineSprite2 : deleteSystemSprite2.getMachineSprites()) {
                             machineSprite2.hidePorts();
 //                            this.setScale(1.0f);
@@ -941,8 +948,6 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     machineSprite.setTransparency(1.0f);
                     ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
 
-//                    isInteractionInProgress = true;
-
                     isPanningEnabled = false;
                 }
 
@@ -953,16 +958,16 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
 
                 // Show ports of nearby machines
-                for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
+                for (Visualization deleteSystemSprite : this.visualizationSprites) {
                     for (MachineSprite nearbyMachineSprite: deleteSystemSprite.getMachineSprites()) {
 
                         // Update style of nearby machines
                         float distanceToMachineSprite = (float) Geometry.calculateDistance(
                                 touch[pointerId],
-                                nearbyMachineSprite.getAbsolutePosition()
+                                nearbyMachineSprite.getPosition()
                         );
                         Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
-                        if (distanceToMachineSprite < nearbyMachineSprite.dimensionHeight + 50) {
+                        if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
 //                            nearbyMachineSprite.setTransparency(1.0f);
 //                            nearbyMachineSprite.showPorts();
 
@@ -976,19 +981,22 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                 // Scaffold interaction to connect path to with nearby ports
                                 float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
                                         touch[pointerId],
-                                        nearbyPortSprite.getAbsolutePosition()
+                                        nearbyPortSprite.getPosition()
                                 );
                                 if (nearbyPortSprite != portSprite) {
                                     if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
-                                        //portSprite.setPosition(touch[pointerId]);
+                                        /* portSprite.setPosition(touch[pointerId]); */
 
-                                        portSprite.portDirection = PortSprite.PortDirection.INPUT;
-                                        if (portSprite.portType == PortSprite.PortType.NONE) {
-                                            portSprite.portType = PortSprite.PortType.getNextType(portSprite.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                        Port port = (Port) portSprite.getModel();
+                                        Port nearbyPort = (Port) nearbyPortSprite.getModel();
+
+                                        port.portDirection = Port.PortDirection.INPUT;
+                                        if (port.portType == Port.PortType.NONE) {
+                                            port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
                                         }
 
-                                        nearbyPortSprite.portDirection = PortSprite.PortDirection.OUTPUT;
-                                        nearbyPortSprite.portType = PortSprite.PortType.getNextType(nearbyPortSprite.portType);
+                                        nearbyPort.portDirection = Port.PortDirection.OUTPUT;
+                                        nearbyPort.portType = Port.PortType.getNextType(nearbyPort.portType);
 
                                         // Create and add path to port
                                         PathSprite pathSprite = portSprite.addPath(
@@ -999,8 +1007,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                                         );
 
 
-                                        pathSprite.showDirectedPaths = true;
                                         pathSprite.showPathDocks = false;
+                                        pathSprite.showDirectedPaths = true;
+                                        pathSprite.setVisibility(true);
+//                                        pathSprite.showDirectedPaths = true;
+//                                        pathSprite.showPathDocks = false;
 
 
 
@@ -1018,7 +1029,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                         }
 
-//                            else if (distanceToMachineSprite < nearbyMachineSprite.dimensionHeight + 80) {
+//                            else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 80) {
 //                                nearbyMachineSprite.setTransparency(0.5f);
 //                            } else {
 //                                nearbyMachineSprite.setTransparency(0.1f);
@@ -1039,7 +1050,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             } else {
                 if (touchedSprite[pointerId] == null) {
                     // No touch on board or port. Touch is on map. So hide ports.
-                    for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
+                    for (Visualization deleteSystemSprite : this.visualizationSprites) {
                         for (MachineSprite machineSprite : deleteSystemSprite.getMachineSprites()) {
                             machineSprite.hidePorts();
                             machineSprite.setScale(1.0f);
@@ -1077,7 +1088,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 MachineSprite machineSprite = (MachineSprite) touchedSprite[pointerId];
 
                 machineSprite.showHighlights = false;
-                machineSprite.setScale(1.0f);
+//                machineSprite.setScale(1.0f);
                 touchedSprite[pointerId] = null;
             }
         }
@@ -1105,8 +1116,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 // </TOUCH_ACTION>
 
                 // Remove focus from other machines.
-                for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
-                    for (MachineSprite otherMachineSprite: deleteSystemSprite.getMachineSprites()) {
+                for (Visualization visualization : this.visualizationSprites) {
+                    for (MachineSprite otherMachineSprite: visualization.getMachineSprites()) {
                         otherMachineSprite.hidePorts();
                         otherMachineSprite.hidePaths();
                         otherMachineSprite.setTransparency(0.1f);
@@ -1137,9 +1148,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
                 Log.v("MapView", "\tSource port " + (portSprite.getIndex() + 1) + " touched.");
 
-                if (portSprite.getType() == PortSprite.PortType.NONE) {
+                Port port = (Port) portSprite.getModel();
 
-                    portSprite.portType = PortSprite.PortType.getNextType(portSprite.getType());
+                if (port.getType() == Port.PortType.NONE) {
+
+                    port.portType = Port.PortType.getNextType(port.getType());
 
                     ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
 
@@ -1148,12 +1161,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
                     if (portSprite.pathSprites.size() == 0) {
 
-                        PortSprite.PortType nextPortType = portSprite.getType();
-                        while ((nextPortType == PortSprite.PortType.NONE)
-                                || (nextPortType == portSprite.getType())) {
-                            nextPortType = PortSprite.PortType.getNextType(nextPortType);
+                        Port.PortType nextPortType = port.getType();
+                        while ((nextPortType == Port.PortType.NONE)
+                                || (nextPortType == port.getType())) {
+                            nextPortType = Port.PortType.getNextType(nextPortType);
                         }
-                        portSprite.setPortType(nextPortType);
+                        port.setPortType(nextPortType);
 
                     } else {
 
@@ -1163,12 +1176,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                             ArrayList<PathSprite> visiblePathSprites = portSprite.getVisiblePaths();
                             if (visiblePathSprites.size() == 1) {
 
-                                PortSprite.PortType nextPortType = portSprite.portType;
-                                while ((nextPortType == PortSprite.PortType.NONE)
-                                        || (nextPortType == portSprite.getType())) {
-                                    nextPortType = PortSprite.PortType.getNextType(nextPortType);
+                                Port.PortType nextPortType = port.portType;
+                                while ((nextPortType == Port.PortType.NONE)
+                                        || (nextPortType == port.getType())) {
+                                    nextPortType = Port.PortType.getNextType(nextPortType);
                                 }
-                                portSprite.setPortType(nextPortType);
+                                port.setPortType(nextPortType);
 
                             }
 
@@ -1177,7 +1190,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                             // TODO: If second press, change the channel.
 
                             // Remove focus from other machines and their ports.
-                            for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
+                            for (Visualization deleteSystemSprite : this.visualizationSprites) {
                                 for (MachineSprite machineSprite : deleteSystemSprite.getMachineSprites()) {
                                     machineSprite.hidePorts();
                                     machineSprite.hidePaths();
@@ -1205,19 +1218,17 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 pathSprite.setEditorVisibility(true);
             }
 
-        } else {
-            if (touchedSprite[pointerId] == null) {
-                // No touch on board or port. Touch is on map. So hide ports.
-                for (Delete_SystemSprite deleteSystemSprite : this.deleteSystemSprites) {
-                    for (MachineSprite machineSprite : deleteSystemSprite.getMachineSprites()) {
-                        machineSprite.hidePorts();
-                        machineSprite.setScale(1.0f);
-                        machineSprite.hidePaths();
-                        machineSprite.setTransparency(1.0f);
-                    }
+        } else if (touchedSprite[pointerId] == null) {
+            // No touch on board or port. Touch is on map. So hide ports.
+            for (Visualization deleteSystemSprite : this.visualizationSprites) {
+                for (MachineSprite machineSprite : deleteSystemSprite.getMachineSprites()) {
+                    machineSprite.hidePorts();
+                    machineSprite.setScale(1.0f);
+                    machineSprite.hidePaths();
+                    machineSprite.setTransparency(1.0f);
                 }
-                this.setScale(1.0f);
             }
+            this.setScale(1.0f);
         }
 
     }

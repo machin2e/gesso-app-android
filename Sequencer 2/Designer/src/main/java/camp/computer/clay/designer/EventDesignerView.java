@@ -368,7 +368,7 @@ public class EventDesignerView {
 //                // <HACK>
 //                eventHolder.getEvent().setTimeline(device.getTimeline());
 //                // </HACK>
-//                eventHolder.updateState (updatedStateString);
+//                eventHolder.update (updatedStateString);
 
                 // Store: Store the new behavior state and update the event.
 //                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState().get(0));
@@ -1455,7 +1455,7 @@ public class EventDesignerView {
                                         sourceDeviceTimelineView.addEventHolder(eventHolder2);
                                         //sourceDeviceTimelineView.replaceEventHolder(eventHolder2, sourceTimelineSignalAction);
 
-                                        eventHolder2.updateState("TIT:none TIT:none TIW:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none");
+                                        eventHolder2.update("TIT:none TIT:none TIW:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none");
                                         getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage("set event " + eventHolder2.getEvent().getUuid() + " state \"" + "TIT:none TIT:none TIW:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none TIT:none" + "\"");
 
                                         */
@@ -1569,7 +1569,7 @@ public class EventDesignerView {
 //                // <HACK>
 //                eventHolder.getEvent().setTimeline(device.getTimeline());
 //                // </HACK>
-//                eventHolder.updateState (updatedStateString);
+//                eventHolder.update (updatedStateString);
 //
 //                // Store: Store the new behavior state and update the event.
 ////                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());
@@ -1791,7 +1791,7 @@ public class EventDesignerView {
 //                // <HACK>
 //                eventHolder.getEvent().setTimeline(device.getTimeline());
 //                // </HACK>
-//                eventHolder.updateState (updatedStateString);
+//                eventHolder.update (updatedStateString);
 //
 //                // Store: Store the new behavior state and update the event.
 ////                getClay().getStore().storeState(eventHolder.getEvent(), eventHolder.getEvent().getState());

@@ -1,6 +1,20 @@
 package camp.computer.clay.model;
 
-public class Simulation {
-    // TODO: step
-    // TODO: attach Visualization for the simulation, where drawing sprites happens
+import java.util.ArrayList;
+
+public class Simulation extends Model {
+
+    private ArrayList<Machine> machines = new ArrayList<Machine>();
+
+    public void addMachine(Machine path) {
+        this.machines.add(path);
+    }
+
+    public Machine getMachine(int index) {
+        return this.machines.get(index);
+    }
+
+    public ArrayList<Machine> getMachines() {
+        return this.machines;
+    }
 }

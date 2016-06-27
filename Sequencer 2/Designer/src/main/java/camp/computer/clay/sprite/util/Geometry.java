@@ -41,7 +41,7 @@ public abstract class Geometry {
         // (this makes 0 point NORTH)
         // NOTE: adding to an angle rotates it clockwise.
         // subtracting would rotate it counter-clockwise
-        theta += Math.PI/2.0;
+//        theta += Math.PI / 2.0;
 
         // convert from radians to degrees
         // this will give you an angle from [0->270],[-180,0]
@@ -51,17 +51,17 @@ public abstract class Geometry {
         // since we want to prevent negative angles, adjust them now.
         // we can assume that atan2 will not return a negative value
         // greater than one partial rotation
-        if (angle < 0) {
-            angle += 360;
-        }
+//        if (angle < 0) {
+//            angle += 360;
+//        }
 
         return (float) angle;
     }
 
-    public static PointF calculatePoint(PointF from, float angle, float distance) {
+    public static PointF calculatePoint(PointF origin, float rotation, float distance) {
         PointF point = new PointF();
-        point.x = from.x + distance * (float) Math.cos(Math.toRadians(angle - 90));
-        point.y = from.y + distance * (float) Math.sin(Math.toRadians(angle - 90));
+        point.x = origin.x + distance * (float) Math.cos(Math.toRadians(rotation));
+        point.y = origin.y + distance * (float) Math.sin(Math.toRadians(rotation));
         return point;
     }
 
@@ -73,57 +73,48 @@ public abstract class Geometry {
     }
 
     //Compute the dot product AB . AC
-    public static double DotProduct(PointF pointA, PointF pointB, PointF pointC)
+    public static double calculateDotProduct(PointF linePointA, PointF linePointB, PointF pointC)
     {
         PointF AB = new PointF();
         PointF BC = new PointF();
-        AB.x = pointB.x - pointA.x;
-        AB.y = pointB.y - pointA.y;
-        BC.x = pointC.x - pointB.x;
-        BC.y = pointC.y - pointB.y;
+        AB.x = linePointB.x - linePointA.x;
+        AB.y = linePointB.y - linePointA.y;
+        BC.x = pointC.x - linePointB.x;
+        BC.y = pointC.y - linePointB.y;
         double dot = AB.x * BC.x + AB.y * BC.y;
 
         return dot;
     }
 
     //Compute the cross product AB x AC
-    public static double CrossProduct(PointF pointA, PointF pointB, PointF pointC)
+    public static double calculuateCrossProduct(PointF linePointA, PointF linePointB, PointF pointC)
     {
         PointF AB = new PointF();
         PointF AC = new PointF();
-        AB.x = pointB.x - pointA.x;
-        AB.y = pointB.y - pointA.y;
-        AC.x = pointC.x - pointA.x;
-        AC.y = pointC.y - pointA.y;
+        AB.x = linePointB.x - linePointA.x;
+        AB.y = linePointB.y - linePointA.y;
+        AC.x = pointC.x - linePointA.x;
+        AC.y = pointC.y - linePointA.y;
         double cross = AB.x * AC.y - AB.y * AC.x;
 
         return cross;
     }
 
-//    //Compute the distance from A to B
-//    double Distance(PointF pointA, PointF pointB)
-//    {
-//        float d1 = pointA[0] - pointB[0];
-//        float d2 = pointA[1] - pointB[1];
-//
-//        return Math.sqrt(d1 * d1 + d2 * d2);
-//    }
-
     //Compute the distance from AB to C
     //if isSegment is true, AB is a segment, not a line.
-    public static double LineToPointDistance2D(PointF pointA, PointF pointB, PointF pointC,
-                                 boolean isSegment)
+    public static double calculateLineToPointDistance(PointF linePointA, PointF linePointB, PointF pointC,
+                                                      boolean isSegment)
     {
-        double dist = CrossProduct(pointA, pointB, pointC) / Geometry.calculateDistance(pointA, pointB);
+        double dist = calculuateCrossProduct(linePointA, linePointB, pointC) / Geometry.calculateDistance(linePointA, linePointB);
         if (isSegment)
         {
-            double dot1 = DotProduct(pointA, pointB, pointC);
+            double dot1 = calculateDotProduct(linePointA, linePointB, pointC);
             if (dot1 > 0)
-                return Geometry.calculateDistance(pointB, pointC);
+                return Geometry.calculateDistance(linePointB, pointC);
 
-            double dot2 = DotProduct(pointB, pointA, pointC);
+            double dot2 = calculateDotProduct(linePointB, linePointA, pointC);
             if (dot2 > 0)
-                return Geometry.calculateDistance(pointA, pointC);
+                return Geometry.calculateDistance(linePointA, pointC);
         }
         return Math.abs(dist);
     }
