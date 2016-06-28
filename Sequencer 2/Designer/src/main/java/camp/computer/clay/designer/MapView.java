@@ -88,7 +88,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     private void initializeSimulation() {
 
         // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             Machine machine = new Machine();
             for (int j = 0; j < 12; j++) {
                 machine.addPort(new Port());
@@ -222,8 +222,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         this.canvas.save ();
         //canvas.translate (originPosition.x, originPosition.y);
         this.canvas.translate (
-                simulation.getBody(0).getPerspective().getPosition().x + (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationY(),
-                simulation.getBody(0).getPerspective().getPosition().y + (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationX()
+                simulation.getBody(0).getPerspective().getPosition().x - (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationY(),
+                simulation.getBody(0).getPerspective().getPosition().y - (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationX()
         );
         // this.canvas.rotate((float) ApplicationView.getApplicationView().getSensorAdapter().getRotationZ());
         this.canvas.scale (scale, scale);
@@ -699,13 +699,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
                 Log.v("Toucher2", "B");
                 if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
-                    /*
                     MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
+//                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
                     machineSprite.touch(touchInteraction);
                         machineSprite.showHighlights = true;
-                        machineSprite.setPosition(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y);
-                    */
+                        machineSprite.setPosition(new PointF(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y));
                 } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
                     Log.v("Toucher2", "C");
                     PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
