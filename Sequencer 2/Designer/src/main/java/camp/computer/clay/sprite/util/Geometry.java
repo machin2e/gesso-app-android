@@ -58,10 +58,19 @@ public abstract class Geometry {
         return (float) angle;
     }
 
-    public static PointF calculatePoint(PointF origin, float rotation, float distance) {
+    /**
+     * Calculates new point coordinates for a given point rotated by an angle about another origin
+     * point.
+     * @return
+     */
+    public static PointF calculateRotatedPoint(PointF originPoint, float angle, PointF point) {
+        return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), (float) Geometry.calculateDistance(originPoint, point));
+    }
+
+    public static PointF calculatePoint(PointF originPoint, float rotation, float distance) {
         PointF point = new PointF();
-        point.x = origin.x + distance * (float) Math.cos(Math.toRadians(rotation));
-        point.y = origin.y + distance * (float) Math.sin(Math.toRadians(rotation));
+        point.x = originPoint.x + distance * (float) Math.cos(Math.toRadians(rotation));
+        point.y = originPoint.y + distance * (float) Math.sin(Math.toRadians(rotation));
         return point;
     }
 

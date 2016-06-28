@@ -44,6 +44,16 @@ public abstract class Sprite {
         return this.rotation;
     }
 
+    public float getAbsoluteRotation() {
+        float absoluteRotation = 0.0f;
+        if (parentSprite != null) {
+            absoluteRotation = parentSprite.getAbsoluteRotation() + getRotation();
+        } else {
+            return getRotation();
+        }
+        return absoluteRotation;
+    }
+
     public float getScale() {
         return this.scale;
     }

@@ -37,21 +37,6 @@ public abstract class Shape {
 
     public static void drawRectangle(PointF position, float angle, float width, float height, Canvas canvas, Paint paint) {
 
-//        canvas.save();
-
-//        canvas.translate(position.x, position.y);
-//        canvas.rotate(angle);
-
-//        PointF p1 = new PointF(-(width / 2.0f), -(height / 2.0f));
-//        PointF p2 = new PointF(0, (height / 2.0f));
-//        PointF p3 = new PointF((width / 2.0f), -(height / 2.0f));
-//        PointF p4 = new PointF((width / 2.0f), -(height / 2.0f));
-
-//        PointF p1 = Geometry.calculatePoint(position, angle -135, (width / 2.0f));
-//        PointF p2 = Geometry.calculatePoint(position, angle - 45, (height / 2.0f));
-//        PointF p3 = Geometry.calculatePoint(position, angle + 45, (width / 2.0f));
-//        PointF p4 = Geometry.calculatePoint(position, angle + 135, (height / 2.0f));
-
         // Calculate points before rotation
         PointF p1 = new PointF(position.x - (width / 2.0f), position.y - (height / 2.0f));
         PointF p2 = new PointF(position.x + (width / 2.0f), position.y - (height / 2.0f));
@@ -64,6 +49,7 @@ public abstract class Shape {
         PointF rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (float) Geometry.calculateDistance(position, p3));
         PointF rp4 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p4), (float) Geometry.calculateDistance(position, p4));
 
+        // Draw points in shape
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
         path.moveTo(rp1.x, rp1.y);
@@ -73,8 +59,6 @@ public abstract class Shape {
         path.close();
 
         canvas.drawPath(path, paint);
-
-//        canvas.restore();
     }
 
 }

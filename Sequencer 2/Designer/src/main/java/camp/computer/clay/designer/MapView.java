@@ -222,9 +222,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         this.canvas.save ();
         //canvas.translate (originPosition.x, originPosition.y);
         this.canvas.translate (
-                simulation.getBody(0).getPerspective().getPosition().x,
-                simulation.getBody(0).getPerspective().getPosition().y
+                simulation.getBody(0).getPerspective().getPosition().x + (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationY(),
+                simulation.getBody(0).getPerspective().getPosition().y + (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationX()
         );
+        // this.canvas.rotate((float) ApplicationView.getApplicationView().getSensorAdapter().getRotationZ());
         this.canvas.scale (scale, scale);
 //        canvas.translate (getClay ().getPerspective ().getPosition ().x, getClay ().getPerspective ().getPosition ().y);
 //        canvas.scale (getClay ().getPerspective ().getScaleFactor (), getClay ().getPerspective ().getScaleFactor ());

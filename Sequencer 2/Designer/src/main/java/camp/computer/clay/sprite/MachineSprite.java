@@ -104,31 +104,13 @@ public class MachineSprite extends Sprite {
     public void draw(MapView mapView) {
 
         if (getVisibility()) {
-            Canvas mapCanvas = mapView.getCanvas();
-            Paint paint = mapView.getPaint();
 
             drawStyleLayer(mapView);
 
             // <PORT_SPRITE>
             // TODO: Put this under PortSprite
             for (PortSprite portSprite : this.portSprites) {
-
-                mapCanvas.save();
-
-//                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
-//                mapCanvas.rotate(this.getRotation());
-//                mapCanvas.scale(this.getScale(), this.getScale());
-
                 portSprite.draw(mapView);
-
-                mapCanvas.restore();
-
-            }
-
-            drawPaths(mapView);
-
-            for (PortSprite portSprite : portSprites) {
-                portSprite.drawCandidatePath(mapView);
             }
             // </PORT_SPRITE>
         }
@@ -167,6 +149,8 @@ public class MachineSprite extends Sprite {
 
         // <SHAPE>
         PointF[] portGroupCenterPositions = new PointF[PORT_GROUP_COUNT];
+
+        // Positions before rotation
         portGroupCenterPositions[0] = new PointF(
                 getPosition().x + 0,
                 getPosition().y + ((boardHeight / 2.0f) + (portGroupHeight / 2.0f))
@@ -183,14 +167,18 @@ public class MachineSprite extends Sprite {
                 getPosition().x - ((boardWidth / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().y + 0
         );
+
         // </SHAPE>
 
         for (int i = 0; i < PORT_GROUP_COUNT; i++) {
 
+            // Calculate rotated position
+            portGroupCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation() + (((i - 1) * 90) - 90) + ((i - 1) * 90), portGroupCenterPositions[i]);
+
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            Shape.drawRectangle(portGroupCenterPositions[i], getRotation() + (i * (-90)), portGroupWidth, portGroupHeight, mapCanvas, paint);
+            Shape.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, mapCanvas, paint);
 
             // Outline
             if (this.showPortGroupOutline) {
@@ -265,18 +253,21 @@ public class MachineSprite extends Sprite {
         lightRotationAngle[0]  = 0;
         lightRotationAngle[1]  = 0;
         lightRotationAngle[2]  = 0;
-        lightRotationAngle[3]  = -90;
-        lightRotationAngle[4]  = -90;
-        lightRotationAngle[5]  = -90;
-        lightRotationAngle[6]  = -180;
-        lightRotationAngle[7]  = -180;
-        lightRotationAngle[8]  = -180;
-        lightRotationAngle[9]  = -270;
-        lightRotationAngle[10] = -270;
-        lightRotationAngle[11] = -270;
+        lightRotationAngle[3]  = 90;
+        lightRotationAngle[4]  = 90;
+        lightRotationAngle[5]  = 90;
+        lightRotationAngle[6]  = 180;
+        lightRotationAngle[7]  = 180;
+        lightRotationAngle[8]  = 180;
+        lightRotationAngle[9]  = 270;
+        lightRotationAngle[10] = 270;
+        lightRotationAngle[11] = 270;
         // </SHAPE>
 
         for (int i = 0; i < PORT_COUNT; i++) {
+
+            // Calculate rotated position
+            lightCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation(), lightCenterPositions[i]);
 
             // Color
             paint.setStyle(Paint.Style.FILL);
@@ -320,15 +311,6 @@ public class MachineSprite extends Sprite {
             });
 
             this.targetTransparency = transparency;
-        }
-    }
-
-    private void drawPaths(MapView mapView) {
-        for (int j = 0; j < this.portSprites.size(); j++) {
-            for (int i = 0; i < portSprites.get(j).pathSprites.size(); i++) {
-                PathSprite pathSprite = portSprites.get(j).pathSprites.get(i);
-                pathSprite.draw(mapView);
-            }
         }
     }
 

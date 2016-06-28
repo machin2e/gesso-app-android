@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.hardware.SensorManager;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -43,6 +44,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     private MapView mapView;
 
     private SpeechGenerator speechGenerator;
+
+    private SensorAdapter sensorAdapter;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -144,6 +147,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         super.onCreate(savedInstanceState);
 
         ApplicationView.context = getApplicationContext();
+
+        // <SENSOR>
+        sensorAdapter = new SensorAdapter(getApplicationContext());
+        // </SENSOR>
 
         ApplicationView.applicationView = this;
 
@@ -718,4 +725,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 audioTrack.release();           // Track play done. Release track.
         }
     }
+
+    // <SENSOR>
+    public SensorAdapter getSensorAdapter() {
+        return this.sensorAdapter;
+    }
+    // </SENSOR>
 }

@@ -2,7 +2,6 @@ package camp.computer.clay.sprite;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.Log;
@@ -41,7 +40,7 @@ public class PortSprite extends Sprite {
 
     // --- DATA ---
     private int dataSampleCount = 40;
-    private float[] dataSamples = new float[dataSampleCount];
+    private float[] portDataSamples = new float[dataSampleCount];
     // ^^^ DATA ^^^
 
     public ArrayList<PathSprite> pathSprites = new ArrayList<PathSprite>();
@@ -58,8 +57,8 @@ public class PortSprite extends Sprite {
     }
 
     private void initializeData () {
-        for (int i = 0; i < this.dataSamples.length; i++) {
-            this.dataSamples[i] = -(this.shapeRadius / 2.0f) + 0;
+        for (int i = 0; i < this.portDataSamples.length; i++) {
+            this.portDataSamples[i] = -(this.shapeRadius / 2.0f) + 0;
         }
     }
 
@@ -127,10 +126,19 @@ public class PortSprite extends Sprite {
             drawDataLayer(mapView);
             drawAnnotationLayer(mapView);
 
-            // draw pathSprites
-            //drawCandidatePath(mapView);
+            // Draw children sprites
+            drawPathSprites(mapView);
+            drawCandidatePathSprite(mapView);
         }
     }
+
+    private void drawPathSprites(MapView mapView) {
+        for (int i = 0; i < this.pathSprites.size(); i++) {
+            PathSprite pathSprite = this.pathSprites.get(i);
+            pathSprite.draw(mapView);
+        }
+    }
+
 
     /**
      * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
@@ -246,22 +254,22 @@ public class PortSprite extends Sprite {
                 paint.setStrokeWidth(2.0f);
                 paint.setColor(Color.WHITE);
 //                int step = 1;
-//                for (int k = 0; k + step < dataSamples.length - 1; k += step) {
+//                for (int k = 0; k + step < portDataSamples.length - 1; k += step) {
 //                    mapCanvas.drawLine(
-//                            dataSamples[k],
+//                            portDataSamples[k],
 //                            -shapeRadius + k,
-//                            dataSamples[k + step],
+//                            portDataSamples[k + step],
 //                            -shapeRadius + k + step,
 //                            paint
 //                    );
 //                }
                 int step = 1;
-                float plotStep = (float) ((2.0f * (float) shapeRadius) / (float) dataSamples.length);
-                for (int k = 0; k < dataSamples.length - 1; k++) {
+                float plotStep = (float) ((2.0f * (float) shapeRadius) / (float) portDataSamples.length);
+                for (int k = 0; k < portDataSamples.length - 1; k++) {
                     mapCanvas.drawLine(
-                            dataSamples[k],
+                            portDataSamples[k],
                             -shapeRadius + k * plotStep,
-                            dataSamples[k + 1],
+                            portDataSamples[k + 1],
                             -shapeRadius + (k + 1) * plotStep,
                             paint
                     );
@@ -323,24 +331,24 @@ public class PortSprite extends Sprite {
         Port port = (Port) getModel();
         if (port.getType() == Port.PortType.SWITCH) {
             // Shift data to make room for new samples
-            for (int k = 0; k < dataSamples.length - 1; k++) {
-                dataSamples[k] = dataSamples[k + 1];
+            for (int k = 0; k < portDataSamples.length - 1; k++) {
+                portDataSamples[k] = portDataSamples[k + 1];
             }
             // Add new samples for the channel type
             float sample = getSyntheticSwitchSample();
-            dataSamples[dataSamples.length - 1] = sample;
+            portDataSamples[portDataSamples.length - 1] = sample;
             switchHalfPeriodSampleCount = (switchHalfPeriodSampleCount + 1) % ((int) switchPeriod / 2);
             if (switchHalfPeriodSampleCount == 0) {
                 previousSwitchState = (previousSwitchState + 1) % 2;
             }
         } else if (port.getType() == Port.PortType.PULSE) {
             // Shift data to make room for new samples
-            for (int k = 0; k < dataSamples.length - 1; k++) {
-                dataSamples[k] = dataSamples[k + 1];
+            for (int k = 0; k < portDataSamples.length - 1; k++) {
+                portDataSamples[k] = portDataSamples[k + 1];
             }
             // Add new samples for the channel type
             float sample = getSyntheticPulseSample();
-            dataSamples[dataSamples.length - 1] = sample;
+            portDataSamples[portDataSamples.length - 1] = sample;
             //pulsePeriodSampleCount = (pulsePeriodSampleCount + 1) % ((int) (pulseDutyCycle * pulsePeriod) / 2);
             pulsePeriodSampleCount = (pulsePeriodSampleCount + 1) % (1 + (int) (pulseDutyCycle * pulsePeriod));
             if (pulsePeriodSampleCount == 0) {
@@ -349,10 +357,10 @@ public class PortSprite extends Sprite {
             }
         } else if (port.getType() == Port.PortType.WAVE) {
             // Add new sample for the channel type
-            for (int k = 0; k < dataSamples.length; k++) {
-                dataSamples[k] = getSyntheticWaveSample(k);
+            for (int k = 0; k < portDataSamples.length; k++) {
+                portDataSamples[k] = getSyntheticWaveSample(k);
             }
-            //xWaveStart = (xWaveStart + ((2.0f * (float) Math.PI) / ((float) this.dataSamples[j].length))) % (2.0f * (float) Math.PI);
+            //xWaveStart = (xWaveStart + ((2.0f * (float) Math.PI) / ((float) this.portDataSamples[j].length))) % (2.0f * (float) Math.PI);
             xWaveStart = (xWaveStart + 0.5f) % ((float) Math.PI * 2.0f);
         }
 
@@ -417,6 +425,24 @@ public class PortSprite extends Sprite {
         relativePortPositions[11] = new PointF(
                 -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
                 +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
+        );
+
+        // Calculate rotated position
+        float rot = 0;
+        if (getIndex() >= 0 && getIndex() < 3) {
+            rot = 0;
+        } else if (getIndex() >= 3 && getIndex() < 6) {
+            rot = 1;
+        } else if (getIndex() >= 6 && getIndex() < 9) {
+            rot = 2;
+        } else if (getIndex() >= 9 && getIndex() < 12) {
+            rot = 3;
+        }
+
+        relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
+                new PointF(0, 0), //getParentSprite().getPosition(),
+                getParentSprite().getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
+                relativePortPositions[getIndex()]
         );
 
         setRelativePosition(relativePortPositions[getIndex()]);
@@ -536,7 +562,7 @@ public class PortSprite extends Sprite {
         this.candidatePathDestinationPosition.y = position.y;
     }
 
-    public void drawCandidatePath(MapView mapView) {
+    public void drawCandidatePathSprite(MapView mapView) {
         if (isCandidatePathVisible) {
 
             Port port = (Port) getModel();

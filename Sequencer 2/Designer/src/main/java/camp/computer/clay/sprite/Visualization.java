@@ -35,16 +35,16 @@ public class Visualization extends Sprite {
 
         Log.v("Rot", "-----");
         machineSprites.get(0).setRelativePosition(new PointF(0, 0));
-        machineSprites.get(0).setRotation(Number.getRandom().nextInt(1));
+        machineSprites.get(0).setRotation(Number.getRandom().nextInt(360));
         machineSprites.get(0).initializePortSprites();
 
         //machineSprites.get(1).setRelativePosition(new PointF(340, 400));
         machineSprites.get(1).setRelativePosition(new PointF(400, 400));
-        machineSprites.get(1).setRotation(Number.getRandom().nextInt(1));
+        machineSprites.get(1).setRotation(Number.getRandom().nextInt(360));
         machineSprites.get(1).initializePortSprites();
 
         machineSprites.get(2).setRelativePosition(new PointF(-200, -400));
-        machineSprites.get(2).setRotation(Number.getRandom().nextInt(1));
+        machineSprites.get(2).setRotation(Number.getRandom().nextInt(360));
         machineSprites.get(2).initializePortSprites();
         Log.v("Rot", "-----");
     }
