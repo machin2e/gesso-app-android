@@ -12,7 +12,7 @@ public class Perspective {
     float width; // Width of perspective --- interactions (e.g., touches) are interpreted relative to this point
     float height; // Height of perspective
 
-    public Visualization visualization;
+    private Visualization visualization;
 
     // Focus in Perspective
 //    private boolean isMapPerspective = false;
@@ -24,6 +24,11 @@ public class Perspective {
     private boolean isPanningEnabled = true;
 
     private PointF currentPosition = new PointF (); // Center position --- interactions (e.g., touches) are interpreted relative to this point
+    private float scale = 1.0f;
+
+    public Perspective(Visualization visualization) {
+        this.visualization = visualization;
+    }
 
     public PointF getPosition() {
         return this.currentPosition;
@@ -38,6 +43,14 @@ public class Perspective {
         this.currentPosition.offset(xOffset, yOffset);
     }
 
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    public float getScale() {
+        return this.scale;
+    }
+
     public void disablePanning() {
         this.isPanningEnabled = false;
     }
@@ -48,5 +61,9 @@ public class Perspective {
 
     public boolean isPanningEnabled() {
         return isPanningEnabled;
+    }
+
+    public Visualization getVisualization() {
+        return this.visualization;
     }
 }

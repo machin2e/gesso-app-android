@@ -37,6 +37,7 @@ public class MachineSprite extends Sprite {
     private float boardOutlineThickness = 3.0f;
 
     private float targetTransparency = 1.0f;
+    private float currentTransparency = targetTransparency;
 
     private float portGroupWidth = 50;
     private float portGroupHeight = 13;
@@ -274,9 +275,9 @@ public class MachineSprite extends Sprite {
             paint.setStrokeWidth(3);
             Port port = (Port) this.portSprites.get(i).getModel();
             if (port.portType != Port.PortType.NONE) {
-                paint.setColor(this.getPortSprite(i).getUniqueColor());
+                paint.setColor(camp.computer.clay.sprite.util.Color.setTransparency(this.getPortSprite(i).getUniqueColor(), currentTransparency));
             } else {
-                paint.setColor(PortSprite.FLOW_PATH_COLOR_NONE);
+                paint.setColor(camp.computer.clay.sprite.util.Color.setTransparency(PortSprite.FLOW_PATH_COLOR_NONE, currentTransparency));
             }
             Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, mapCanvas, paint);
 
@@ -297,8 +298,8 @@ public class MachineSprite extends Sprite {
             Animation.scaleValue(255.0f * targetTransparency, 255.0f * transparency, 200, new Animation.OnScaleListener() {
                 @Override
                 public void onScale(float currentScale) {
-                    int transparencyInteger = (int) currentScale;
-                    String transparencyString = String.format("%02x", transparencyInteger);
+                    currentTransparency = currentScale / 255.0f;
+                    String transparencyString = String.format("%02x", (int) currentScale);
 
                     // Machine color
                     boardColor = Color.parseColor("#" + transparencyString + boardColorString);

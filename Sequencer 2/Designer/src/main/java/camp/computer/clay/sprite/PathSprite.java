@@ -167,6 +167,8 @@ public class PathSprite extends Sprite {
         }
     }
 
+    float startK = 0.0f;
+
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
 
         Path path = (Path) getModel();
@@ -234,14 +236,40 @@ public class PathSprite extends Sprite {
                         path.getDestinationPort().getPosition()
                 );
 
+                PointF pathMidpoint = Geometry.calculateMidpoint(
+                        path.getSourcePort().getPosition(),
+                        path.getDestinationPort().getPosition()
+                );
+
                 for (int k = 0; ; k++) {
 
+                    // Calculate triangle position
                     PointF triangleCenterPosition = Geometry.calculatePoint(
                             path.getSourcePort().getPosition(),
                             pathRotationAngle,
                             k * triangleSpacing
                     );
 
+                    /*
+                    // Offset position based on port type
+                    triangleCenterPosition = Geometry.calculatePoint(
+                            triangleCenterPosition,
+                            pathRotationAngle + (-90 + (k % 2) * 180),
+                            15
+                    );
+                    */
+
+                    /*
+                    // Offset position based on port type
+                    triangleCenterPosition = Geometry.calculatePoint(
+                            triangleCenterPosition,
+                            pathRotationAngle + (-90 + (k % 2) * 180),
+                            15 * (float) Math.sin((((startK + k) * triangleSpacing) / pathDistance) * (2 * Math.PI))
+                    );
+                    startK = startK + 0.01f;
+                    */
+
+                    // Stop drawing if the entire path has been drawn
                     if (k * triangleSpacing > pathDistance) {
                         break;
                     }
@@ -263,11 +291,6 @@ public class PathSprite extends Sprite {
 
                 if (isEditorVisible) {
                     // <SPREADSHEET>
-                    PointF pathMidpoint = Geometry.calculateMidpoint(
-                            path.getSourcePort().getPosition(),
-                            path.getDestinationPort().getPosition()
-                    );
-
                     paint.setStyle(Paint.Style.FILL);
                     paint.setColor(path.getSourcePort().getUniqueColor());
                     float spreadsheetSpriteWidth = 50.0f;

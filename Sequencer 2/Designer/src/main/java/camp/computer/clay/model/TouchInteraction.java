@@ -99,6 +99,8 @@ public class TouchInteraction {
     // touchedSprite
     // overlappedSprite (not needed, probably, because can look in history, or look at first action in interaction)
 
+    public Sprite overlappedSprite = null;
+
     //public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
     public TouchInteraction(TouchInteractionType touchInteractionType) {
 //        this.position = position;

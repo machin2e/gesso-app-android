@@ -245,14 +245,10 @@ public class PortSprite extends Sprite {
 
             if (port.getType() != Port.PortType.NONE) {
 
-                mapCanvas.save();
-
-                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
-
                 // Outline
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(2.0f);
-                paint.setColor(Color.WHITE);
+                paint.setColor(Color.GREEN);
 //                int step = 1;
 //                for (int k = 0; k + step < portDataSamples.length - 1; k += step) {
 //                    mapCanvas.drawLine(
@@ -263,19 +259,73 @@ public class PortSprite extends Sprite {
 //                            paint
 //                    );
 //                }
-                int step = 1;
+
                 float plotStep = (float) ((2.0f * (float) shapeRadius) / (float) portDataSamples.length);
-                for (int k = 0; k < portDataSamples.length - 1; k++) {
-                    mapCanvas.drawLine(
-                            portDataSamples[k],
-                            -shapeRadius + k * plotStep,
-                            portDataSamples[k + 1],
-                            -shapeRadius + (k + 1) * plotStep,
-                            paint
+
+                PointF[] rotatedPortDataSamplePoints = new PointF[portDataSamples.length];
+
+                float[] portGroupRotation = new float[] {
+                        0,
+                        0,
+                        0,
+                        -90,
+                        -90,
+                        -90,
+                        -180,
+                        -180,
+                        -180,
+                        -270,
+                        -270,
+                        -270
+                };
+
+                for (int k = 0; k < portDataSamples.length; k++) {
+
+                    PointF samplePoint = null;
+
+                    if (port.portDirection == Port.PortDirection.INPUT) {
+                        // Set position before rotation adjustment
+                        samplePoint = new PointF(
+                                this.getPosition().x + portDataSamples[k],
+                                this.getPosition().y + -shapeRadius + k * plotStep
+                        );
+                    } else if (port.portDirection == Port.PortDirection.OUTPUT) {
+                        samplePoint = new PointF(
+                                this.getPosition().x + portDataSamples[k],
+                                this.getPosition().y + shapeRadius - k * plotStep
+                        );
+                    }
+
+                    // Rotate point
+                    rotatedPortDataSamplePoints[k] = Geometry.calculateRotatedPoint(
+                            this.getPosition(),
+                            getAbsoluteRotation() + portGroupRotation[getIndex()],
+                            samplePoint
                     );
                 }
 
-                mapCanvas.restore();
+                if (port.portDirection == Port.PortDirection.INPUT) {
+
+                    for (int k = 0; k < portDataSamples.length - 1; k++) {
+                        mapCanvas.drawLine(
+                                rotatedPortDataSamplePoints[k].x,
+                                rotatedPortDataSamplePoints[k].y,
+                                rotatedPortDataSamplePoints[k + 1].x,
+                                rotatedPortDataSamplePoints[k + 1].y,
+                                paint
+                        );
+                    }
+                } else if (port.portDirection == Port.PortDirection.OUTPUT) {
+                    for (int k = 0; k < portDataSamples.length - 1; k++) {
+                        mapCanvas.drawLine(
+                                rotatedPortDataSamplePoints[k].x,
+                                rotatedPortDataSamplePoints[k].y,
+                                rotatedPortDataSamplePoints[k + 1].x,
+                                rotatedPortDataSamplePoints[k + 1].y,
+                                paint
+                        );
+                    }
+                }
             }
         }
     }
@@ -426,18 +476,6 @@ public class PortSprite extends Sprite {
                 -1 * ((machineSprite.boardWidth / 2.0f) + PortSprite.DISTANCE_FROM_BOARD + portRadius),
                 +1 * ((portRadius * 2) + PortSprite.DISTANCE_BETWEEN_NODES)
         );
-
-        // Calculate rotated position
-        float rot = 0;
-        if (getIndex() >= 0 && getIndex() < 3) {
-            rot = 0;
-        } else if (getIndex() >= 3 && getIndex() < 6) {
-            rot = 1;
-        } else if (getIndex() >= 6 && getIndex() < 9) {
-            rot = 2;
-        } else if (getIndex() >= 9 && getIndex() < 12) {
-            rot = 3;
-        }
 
         relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
                 new PointF(0, 0), //getParentSprite().getPosition(),

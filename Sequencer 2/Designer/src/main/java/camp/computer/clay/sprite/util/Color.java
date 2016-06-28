@@ -48,4 +48,12 @@ public abstract class Color {
             }
         }
     }
+
+    public static int setTransparency(int color, float factor) {
+        int alpha = Math.round(android.graphics.Color.alpha(color) * factor);
+        int red = android.graphics.Color.red(color);
+        int green = android.graphics.Color.green(color);
+        int blue = android.graphics.Color.blue(color);
+        return android.graphics.Color.argb(alpha, red, green, blue);
+    }
 }
