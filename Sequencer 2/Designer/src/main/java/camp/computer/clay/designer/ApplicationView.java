@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.hardware.SensorManager;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -15,7 +14,6 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -24,7 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
@@ -148,11 +147,13 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
         ApplicationView.context = getApplicationContext();
 
-        // <SENSOR>
+        // <SENSORS>
         sensorAdapter = new SensorAdapter(getApplicationContext());
-        // </SENSOR>
+        // </SENSORS>
 
+        // <DISPLAY>
         ApplicationView.applicationView = this;
+        // </DISPLAY>
 
         clay = new Clay();
 
@@ -161,84 +162,6 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // Hide the action buttons
         cursorView = new CursorView();
         cursorView.hide(false);
-
-        final Button contextButton = (Button) findViewById (R.id.context_button);
-        contextButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-
-                    // Get button holder
-                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
-
-                    // Get screen width and height of the device
-                    DisplayMetrics metrics = new DisplayMetrics();
-                    ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                    int screenWidth = metrics.widthPixels;
-                    int screenHeight = metrics.heightPixels;
-
-                    // Get button width and height
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
-                    int buttonWidth = relativeLayout.getWidth();
-                    int buttonHeight = relativeLayout.getHeight();
-
-                    // Reposition button
-                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-
-                    relativeLayout.requestLayout();
-                    relativeLayout.invalidate();
-
-
-
-
-
-//                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) relativeLayout.getLayoutParams();
-//                    params.bottomMargin = screenHeight - (int) event.getY();
-//                    params.rightMargin = screenWidth - (int) event.getX();
-//                    relativeLayout.setLayoutParams(params);
-
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                    // Get button holder
-                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
-
-                    // TODO: Compute relative to dependant sprite position
-                    Point originPoint = new Point(955, 1655);
-
-                    Animation animation = new Animation();
-                    animation.moveToPoint(relativeLayout, originPoint, 300);
-
-
-
-
-
-//                    // Get screen width and height of the device
-//                    DisplayMetrics metrics = new DisplayMetrics();
-//                    ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-//                    int screenWidth = metrics.widthPixels;
-//                    int screenHeight = metrics.heightPixels;
-//
-//                    // Get button width and height
-//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
-//                    int buttonWidth = relativeLayout.getWidth();
-//                    int buttonHeight = relativeLayout.getHeight();
-//
-//                    // Reposition button
-//                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-//                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-//
-//                    relativeLayout.requestLayout();
-//                    relativeLayout.invalidate();
-
-                }
-
-                return false;
-            }
-        });
 
         // <MAP>
         mapView = (MapView) findViewById (R.id.app_surface_view);
@@ -313,13 +236,33 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         getClay().getCache().populate();
         // getClay().simulateSession(true, 10, false);
 
+        // Prevent on-screen keyboard from pushing up content
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
-        // --- Timeline Button ---
-        final EditText timelineButton = (EditText) findViewById(R.id.chat_entry);
-        final RelativeLayout timelineView = (RelativeLayout) findViewById(R.id.timeline_view);
+        // <CHAT_AND_CONTEXT_SCOPE>
+        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
+        final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
+        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
+        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
+        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
+        final Button contextScope = (Button) findViewById (R.id.context_button);
+        // </CHAT_AND_CONTEXT_SCOPE>
 
-        timelineButton.setOnTouchListener(new View.OnTouchListener() {
+        // <CHAT>
+
+        // Hide scrollbars in keyboard
+        messageKeyboardLayoutPerspective.setVerticalScrollBarEnabled(false);
+        messageKeyboardLayoutPerspective.setHorizontalScrollBarEnabled(false);
+
+        // Hide scrollbars in message content
+        messageContentLayoutPerspective.setVerticalScrollBarEnabled(false);
+        messageContentLayoutPerspective.setHorizontalScrollBarEnabled(false);
+
+        generateKeyboard();
+
+        // Set up interactivity
+        messageContentLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent motionEvent) {
 
@@ -337,7 +280,25 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
-                    timelineButton.performClick();
+                    ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
+
+                    ViewGroup.MarginLayoutParams chatKeyboardLayoutParams = (ViewGroup.MarginLayoutParams) messageKeyboardLayout.getLayoutParams();
+
+                    Resources r = getResources();
+                    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
+                    //float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 14, r.getDisplayMetrics());
+
+                    // Reposition chat layout
+                    chatKeyboardLayoutParams.bottomMargin = chatLayoutParams.bottomMargin + messageContentLayout.getLayoutParams().height + 20; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+
+                    if (messageKeyboardLayout.getVisibility() == View.GONE) {
+                        messageKeyboardLayout.setVisibility(View.VISIBLE);
+                    } else if (messageKeyboardLayout.getVisibility() == View.VISIBLE) {
+                        messageKeyboardLayout.setVisibility(View.GONE);
+                    }
+
+                    messageKeyboardLayout.requestLayout();
+                    messageKeyboardLayout.invalidate();
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
@@ -359,77 +320,68 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 //            }
         });
 
-        timelineButton.setOnClickListener(new View.OnClickListener() {
+        messageContentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
-                ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
 
-                final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
+            }
+        });
+        // </CHAT>
 
-                final RelativeLayout chatKeyboardLayout = (RelativeLayout) findViewById(R.id.chat_keyboard_layout);
-                ViewGroup.MarginLayoutParams chatKeyboardLayoutParams = (ViewGroup.MarginLayoutParams) chatKeyboardLayout.getLayoutParams();
+        // </CONTEXT_SCOPE>
+        contextScope.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
 
-//                if (chatLayoutParams.bottomMargin < 800) {
-//
-////                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
-//
-//                    // Reposition chat layout
-////                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
-////                    params.rightMargin = w - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-//                    chatLayoutParams.bottomMargin = 800; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-//
-////                    chatLayout.requestLayout();
-////                    chatLayout.invalidate();
-//
-////                    timelineView.setVisibility(View.VISIBLE);
-////                    timelineView.setBackgroundColor(Color.parseColor("#9a000000"));
-////                    timelineButton.setText("Map");
-//                } else {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-//                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
+                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 
-                    /// Converts 14 dip into its equivalent px
+                    // Get button holder
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
 
-                    Resources r = getResources();
-                    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
-                    //float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 14, r.getDisplayMetrics());
+                    // Get screen width and height of the device
+                    DisplayMetrics metrics = new DisplayMetrics();
+                    ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    int screenWidth = metrics.widthPixels;
+                    int screenHeight = metrics.heightPixels;
 
-                    // Reposition chat layout
-//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
-//                    params.rightMargin = w - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-                    chatKeyboardLayoutParams.bottomMargin = chatLayoutParams.bottomMargin + chatEntry.getLayoutParams().height + 15; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+                    // Get button width and height
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
+                    int buttonWidth = relativeLayout.getWidth();
+                    int buttonHeight = relativeLayout.getHeight();
 
-//                    chatLayout.requestLayout();
-//                    chatLayout.invalidate();
+                    // Reposition button
+                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
 
-//                    timelineView.setVisibility(View.GONE);
-//                    timelineView.setBackgroundColor(Color.TRANSPARENT);
-//                    timelineButton.setText("Timeline");
-//                }
+                    relativeLayout.requestLayout();
+                    relativeLayout.invalidate();
 
-                if (chatKeyboardLayout.getVisibility() == View.GONE) {
-                    chatKeyboardLayout.setVisibility(View.VISIBLE);
-                } else if (chatKeyboardLayout.getVisibility() == View.VISIBLE) {
-                    chatKeyboardLayout.setVisibility(View.GONE);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                    // Get button holder
+                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
+
+                    // TODO: Compute relative to dependant sprite position
+                    Point originPoint = new Point(959, 1655);
+
+                    Animation animation = new Animation();
+                    animation.moveToPoint(relativeLayout, originPoint, 300);
+
+                    // Reset the message envelope
+                    messageContent.removeAllViews();
+                    messageKeyboardLayout.setVisibility(View.GONE);
                 }
 
-                chatKeyboardLayout.requestLayout();
-                chatKeyboardLayout.invalidate();
+                return false;
             }
         });
+        // </CONTEXT_SCOPE>
 
-        final Button chatKeyboard = (Button) findViewById(R.id.chat_keyboard);
-        chatKeyboard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-                chatEntry.append(chatKeyboard.getText());
-                contextButton.setText("✓");
-            }
-        });
-
+        // <TIMELINE>
+//        final RelativeLayout timelineView = (RelativeLayout) findViewById(R.id.timeline_view);
 //        final RelativeLayout oldTimelineView = (RelativeLayout) findViewById(R.id.old_timeline_view);
 //        timelineButton.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
@@ -447,69 +399,140 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 //            }
 //        });
         // ^^^ Timeline Button ^^^
-
-
-
-//        mapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//
-//                Rect r = new Rect();
-//
-//                //final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
-//
-//
-//
-//                mapView.getRootView().getWindowVisibleDisplayFrame(r);
-//                int screenHeight = mapView.getRootView().getHeight();
-//
-//                // r.bottom is the position above soft keypad or device button.
-//                // if keypad is shown, the r.bottom is smaller than that before.
-//                int keypadHeight = screenHeight - r.bottom;
-//
-//                Log.d("Keyboard", "keypadHeight = " + keypadHeight);
-//
-//                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
-//                    // keyboard is opened
-//
-//                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
-//
-//                    // Reposition chat layout
-//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) chatLayout.getLayoutParams();
-////                    params.rightMargin = w - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-//                    params.bottomMargin = keypadHeight;//h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-//
-//                }
-//                else {
-//                    // keyboard is closed
-//                }
-//
-//
-//
-//                // Obtain layout data from view...
-//                int w = mapView.getWidth();
-//                int h = mapView.getHeight();
-//                // ...etc.
-//
-//                // Once data has been obtained, this listener is no longer needed, so remove it...
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//                    mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//
-//                    final RelativeLayout chatLayout = (RelativeLayout) findViewById(R.id.chat_layout);
-//                    chatLayout.getRootView();
-//
-//
-//                }
-//                else {
-//                    mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-//                }
-//            }
-//        });
+        // </TIMELINE>
 
         // Start the initial worker thread (runnable task) by posting through the handler
         handler.post(runnableCode);
 
         checkTTS();
+    }
+
+    private void generateKeyboard() {
+        generateKeys();
+    }
+
+    private void generateKeys() {
+
+        //final EditText messageContent = (EditText) findViewById(R.id.message_content);
+
+        generateKey("settings");
+        generateKey("\uD83D\uDD0D");
+//        generateKey("zoom/in");
+//        generateKey("zoom/out");
+        generateKey("camera");
+        generateKey("vibrate");
+        generateKey("timeline");
+        generateKey("help");
+        generateKey("chat");
+    }
+
+    private void generateKey(String settings) {
+
+        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
+        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
+        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
+        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
+        final Button contextScope = (Button) findViewById (R.id.context_button);
+
+        // <CHAT>
+
+        // Add keys to keyboard
+        final Button messageKey = new Button(getContext());
+        messageKey.setText(settings);
+        messageKey.setTextSize(12.0f);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(5, 0, 5, 0);
+        messageKey.setPadding(0, 0, 0, 0);
+        messageKey.setLayoutParams(layoutParams);
+        messageKey.getLayoutParams().height = 100;
+        messageKey.setBackgroundResource(R.drawable.chat_message_key);
+
+        messageKey.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
+                appendToMessage(messageKey.getText().toString());
+
+                validateMessage();
+            }
+        });
+
+        messageKeyboard.addView(messageKey);
+    }
+
+    private void validateMessage() {
+
+        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
+        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
+        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
+        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
+        final Button contextScope = (Button) findViewById (R.id.context_button);
+
+        contextScope.setText("✓");
+    }
+
+    private void appendToMessage(String text) {
+        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
+        final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
+        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
+        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
+        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
+        final Button contextScope = (Button) findViewById (R.id.context_button);
+        // </CHAT_AND_CONTEXT_SCOPE>
+
+        // <CHAT>
+
+        // Add keys to keyboard
+        final Button messageWord = new Button(getContext());
+        messageWord.setText(text);
+        messageWord.setTextSize(12.0f);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(10, 0, 10, 0);
+        messageWord.setPadding(0, 0, 0, 0);
+        messageWord.setLayoutParams(layoutParams);
+        messageWord.getLayoutParams().height = 100;
+        messageWord.setBackgroundResource(R.drawable.chat_message_key);
+
+        messageWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                messageContent.removeView(messageWord);
+
+                // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
+//                messageContent.addView(messageKey);
+//                contextScope.setText("✓");
+//                contextScope.setText("☉");
+                //contextScope.setText("☌"); // When dragging to connect path
+                //contextScope.setText("☍"); // Just after connected path
+                // ☉ // Just after tapping a node
+                // ☐ // Just after tapping machine
+                // ☊
+                // ☋
+                // ☝
+                // ☜
+                // ☞
+                // ☟
+                // ☺ // Smile
+                // ☹ // Frown
+            }
+        });
+
+        messageContent.addView(messageWord);
+
+        messageContentLayoutPerspective.postDelayed(new Runnable() {
+            public void run() {
+                messageContentLayoutPerspective.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+            }
+        }, 100L);
     }
 
     @Override
@@ -627,6 +650,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     public static ApplicationView getApplicationView () { return ApplicationView.applicationView; }
 
+    // <SPEECH>
     private void checkTTS(){
         Intent check = new Intent();
         check.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
@@ -642,7 +666,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             }
         }
     }
+    // </SPEECH>
 
+    // <SOUND>
     /**
      * Reference: http://stackoverflow.com/questions/2413426/playing-an-arbitrary-tone-with-android
      */
@@ -725,10 +751,11 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 audioTrack.release();           // Track play done. Release track.
         }
     }
+    // </SOUND>
 
-    // <SENSOR>
+    // <SENSORS>
     public SensorAdapter getSensorAdapter() {
         return this.sensorAdapter;
     }
-    // </SENSOR>
+    // </SENSORS>
 }

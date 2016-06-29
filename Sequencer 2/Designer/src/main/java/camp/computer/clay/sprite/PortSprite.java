@@ -107,12 +107,18 @@ public class PortSprite extends Sprite {
     public void showPaths() {
         for (PathSprite pathSprite : pathSprites) {
             pathSprite.showPathDocks = false;
+
+            // Deep
+            pathSprite.getPath().getDestinationPort().showPaths();
         }
     }
 
     public void showPathDocks() {
         for (PathSprite pathSprite : pathSprites) {
             pathSprite.showPathDocks = true;
+
+            // Deep
+            pathSprite.getPath().getDestinationPort().showPathDocks();
         }
     }
 
@@ -248,17 +254,7 @@ public class PortSprite extends Sprite {
                 // Outline
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(2.0f);
-                paint.setColor(Color.GREEN);
-//                int step = 1;
-//                for (int k = 0; k + step < portDataSamples.length - 1; k += step) {
-//                    mapCanvas.drawLine(
-//                            portDataSamples[k],
-//                            -shapeRadius + k,
-//                            portDataSamples[k + step],
-//                            -shapeRadius + k + step,
-//                            paint
-//                    );
-//                }
+                paint.setColor(Color.WHITE);
 
                 float plotStep = (float) ((2.0f * (float) shapeRadius) / (float) portDataSamples.length);
 
@@ -508,6 +504,9 @@ public class PortSprite extends Sprite {
     public void setPathVisibility (boolean isVisible) {
         for (PathSprite pathSprite : this.pathSprites) {
             pathSprite.setVisibility(isVisible);
+
+            // Deep
+            pathSprite.getPath().getDestinationPort().setVisibility(isVisible);
         }
     }
 

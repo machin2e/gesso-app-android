@@ -180,10 +180,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     // Perspective
     //----------------------------------------------------------------------------------------------
 
-    public static float DEFAULT_SCALE_FACTOR = 1.0f;
-    public static int DEFAULT_SCALE_DURATION = 50;
-
-    // private Point originPosition = new Point (0, 0);
+//    public static float DEFAULT_SCALE_FACTOR = 1.0f;
+//    public static int DEFAULT_SCALE_DURATION = 50;
+//
+//     private Point originPosition = new Point (0, 0);
 //    private float targetScale = DEFAULT_SCALE_FACTOR;
 //    public float scale = targetScale;
 //    private int scaleDuration = DEFAULT_SCALE_DURATION;

@@ -50,48 +50,83 @@
         fab:fab_colorRipple="@color/app_ripple" />
 
     <RelativeLayout
-        android:id="@+id/chat_layout"
+        android:id="@+id/message_keyboard_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp">
-        <EditText
-            android:id="@+id/chat_entry"
-            android:text=""
-            android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
-            android:padding="15dp"
+        android:layout_marginBottom="90dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:padding="0dp"
+        android:visibility="gone">
+        <HorizontalScrollView
+            android:id="@+id/message_keyboard_layout_perspective"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/timeline_button"
-            android:inputType="text"
-            android:maxLines="1"
-            android:hint="I want to..."
-            />
+            android:layout_height="wrap_content"
+            android:padding="0dp"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp">
+            <LinearLayout
+                android:id="@+id/message_keyboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:padding="0dp">
+            </LinearLayout>
+        </HorizontalScrollView>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/chat_keyboard_layout"
+        android:id="@+id/message_content_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:visibility="gone">
-        <Button
-            android:id="@+id/chat_keyboard"
-            android:text="settings"
-            android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
-            android:padding="15dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="50dp"
+        android:background="@drawable/timeline_button">
+        <HorizontalScrollView
+            android:id="@+id/message_content_layout_perspective"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/timeline_button"
-            />
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+            <LinearLayout
+                android:id="@+id/message_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerVertical="true">
+            </LinearLayout>
+        </HorizontalScrollView>
     </RelativeLayout>
+
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/message_content_layout"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|center_horizontal"-->
+        <!--android:layout_marginBottom="15dp"-->
+        <!--android:layout_marginLeft="15dp"-->
+        <!--android:layout_marginRight="15dp">-->
+        <!--<EditText-->
+            <!--android:id="@+id/message_content"-->
+            <!--android:text=""-->
+            <!--android:textColor="#FFFFFFFF"-->
+            <!--android:textSize="14sp"-->
+            <!--android:padding="15dp"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:background="@drawable/timeline_button"-->
+            <!--android:inputType="text"-->
+            <!--android:maxLines="1"-->
+            <!--android:hint="I want to..."-->
+            <!--/>-->
+    <!--</RelativeLayout>-->
 
     <RelativeLayout
         android:id="@+id/context_button_holder"
@@ -112,23 +147,23 @@
             android:background="@drawable/context_button" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="40dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="60dp">
-        <Button
-            android:id="@+id/info_cue"
-            android:text="!"
-            android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
-            android:padding="0dp"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="@drawable/context_button" />
-    </RelativeLayout>
+    <!--<RelativeLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|right"-->
+        <!--android:layout_marginBottom="40dp"-->
+        <!--android:layout_marginLeft="40dp"-->
+        <!--android:layout_marginRight="60dp">-->
+        <!--<Button-->
+            <!--android:id="@+id/info_cue"-->
+            <!--android:text="!"-->
+            <!--android:textColor="#FFFFFFFF"-->
+            <!--android:textSize="14sp"-->
+            <!--android:padding="0dp"-->
+            <!--android:layout_width="20dp"-->
+            <!--android:layout_height="20dp"-->
+            <!--android:background="@drawable/context_button" />-->
+    <!--</RelativeLayout>-->
 
     <!--<Button-->
         <!--android:id="@+id/timeline_button"-->

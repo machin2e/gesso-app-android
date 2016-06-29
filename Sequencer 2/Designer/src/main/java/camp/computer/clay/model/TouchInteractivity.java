@@ -14,7 +14,7 @@ import camp.computer.clay.sprite.Sprite;
 public class TouchInteractivity {
     private ArrayList<TouchInteraction> touchInteractions = new ArrayList<TouchInteraction>();
 
-    // TODO: Classify these!
+    // TODO: Classify these! Every time an Interaction is added!
     public boolean[] isTouchingSprite = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public Sprite[] touchedSprite = new Sprite[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
@@ -25,14 +25,12 @@ public class TouchInteractivity {
     public Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.v("Toucher", "runner");
             /* do what you need to do */
             //foobar();
             int pointerId = 0;
-            if (touchInteractions.get(0).isTouching[pointerId])
+            if (getFirstInteraction().isTouching[pointerId])
                 if (dragDistance[pointerId] < TouchInteraction.MINIMUM_DRAG_DISTANCE) {
-                    Log.v("Toucher", "holding");
-                    touchInteractions.get(0).getBody().onHoldListener(touchInteractivity, touchInteractions.get(0));
+                    getFirstInteraction().getBody().onHoldListener(touchInteractivity, getFirstInteraction());
                 }
 
             // Uncomment this for periodic callback

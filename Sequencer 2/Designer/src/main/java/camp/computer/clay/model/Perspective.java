@@ -1,9 +1,15 @@
 package camp.computer.clay.model;
 
+import android.content.Context;
 import android.graphics.PointF;
+import android.os.Vibrator;
 
+import java.util.ArrayList;
+
+import camp.computer.clay.designer.ApplicationView;
 import camp.computer.clay.sprite.Sprite;
 import camp.computer.clay.sprite.Visualization;
+import camp.computer.clay.sprite.util.Animation;
 
 public class Perspective {
     // TODO: Move position into Body, so can share Perspective among different bodies
@@ -12,6 +18,7 @@ public class Perspective {
     float width; // Width of perspective --- interactions (e.g., touches) are interpreted relative to this point
     float height; // Height of perspective
 
+    // The visualization displayed from this perspective
     private Visualization visualization;
 
     // Focus in Perspective
@@ -19,12 +26,11 @@ public class Perspective {
 //    private boolean isMachinePerspective = false;
 //    private boolean isPortPerspective = false;
 //    private boolean isPathPerspective = false; // TODO: Infer this from interaction history/perspective
-    public Sprite focusSprite = null;
+    private Sprite focusSprite = null;
 
     private boolean isPanningEnabled = true;
 
     private PointF currentPosition = new PointF (); // Center position --- interactions (e.g., touches) are interpreted relative to this point
-    private float scale = 1.0f;
 
     public Perspective(Visualization visualization) {
         this.visualization = visualization;
@@ -43,14 +49,39 @@ public class Perspective {
         this.currentPosition.offset(xOffset, yOffset);
     }
 
-    public void setScale(float scale) {
-        this.scale = scale;
+    public static float DEFAULT_SCALE_FACTOR = 1.0f;
+    public static int DEFAULT_SCALE_DURATION = 200;
+
+    private float targetScale = DEFAULT_SCALE_FACTOR;
+    public float scale = targetScale;
+    private int scaleDuration = DEFAULT_SCALE_DURATION;
+
+    public void setScale (float targetScale) {
+
+        if (this.targetScale != targetScale) {
+
+            if (this.scale != targetScale) {
+                Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleListener() {
+                    @Override
+                    public void onScale(float currentScale) {
+                        scale = currentScale;
+                    }
+                });
+            }
+
+            Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 500 milliseconds
+            v.vibrate(50);
+
+            this.targetScale = targetScale;
+        }
     }
 
     public float getScale() {
         return this.scale;
     }
 
+    // TODO: setMovability(boolean isMovable)
     public void disablePanning() {
         this.isPanningEnabled = false;
     }
@@ -66,4 +97,17 @@ public class Perspective {
     public Visualization getVisualization() {
         return this.visualization;
     }
+
+    public Sprite getFocus() {
+        return this.focusSprite;
+    }
+
+    public void setFocus(Sprite sprite) {
+        this.focusSprite = sprite;
+    }
+
+//    public void setFocus(ArrayList<Sprite> sprites) {
+//        // TODO: Get bounding box of sprites.
+//        // TODO: Zoom to fit bounding box plus some padding.
+//    }
 }

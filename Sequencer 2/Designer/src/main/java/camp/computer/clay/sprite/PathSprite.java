@@ -308,6 +308,12 @@ public class PathSprite extends Sprite {
     }
 
     public void setVisibility(boolean isVisible) {
+
+        // Hide the path editor by default
+        if (this.isVisible == false) {
+            setEditorVisibility(false);
+        }
+
         this.isVisible = isVisible;
         showFormLayer = isVisible;
         showStyleLayer = isVisible;
