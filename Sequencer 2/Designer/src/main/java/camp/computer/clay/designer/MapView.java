@@ -7,8 +7,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
-import android.os.Handler;
-import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,20 +15,14 @@ import android.view.SurfaceView;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.model.Body;
-import camp.computer.clay.model.Machine;
-import camp.computer.clay.model.Perspective;
-import camp.computer.clay.model.Port;
-import camp.computer.clay.model.Simulation;
-import camp.computer.clay.model.TouchInteraction;
-import camp.computer.clay.model.TouchInteractivity;
+import camp.computer.clay.model.simulation.Body;
+import camp.computer.clay.model.simulation.Machine;
+import camp.computer.clay.model.interaction.Perspective;
+import camp.computer.clay.model.simulation.Port;
+import camp.computer.clay.model.simulation.Simulation;
+import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.interaction.TouchInteractivity;
 import camp.computer.clay.sprite.Visualization;
-import camp.computer.clay.sprite.MachineSprite;
-import camp.computer.clay.sprite.PathSprite;
-import camp.computer.clay.sprite.PortSprite;
-import camp.computer.clay.sprite.Sprite;
-import camp.computer.clay.sprite.util.Animation;
-import camp.computer.clay.sprite.util.Geometry;
 
 public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -87,10 +79,14 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     private void initializeSimulation() {
 
         // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int letterIndex = 0;
         for (int i = 0; i < 5; i++) {
             Machine machine = new Machine();
             for (int j = 0; j < 12; j++) {
                 machine.addPort(new Port());
+                machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
+                letterIndex = letterIndex % alphabet.length();
             }
             simulation.addMachine(machine);
         }
@@ -121,7 +117,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
 
         // Update perspective on visualization
-        simulation.getBody(0).getPerspective().setPosition(new PointF(originPosition.x, originPosition.y));
+        simulation.getBody(0).getPerspective().setPosition(new PointF(0, 0));
+//        simulation.getBody(0).getPerspective().width
     }
 
     @Override
@@ -220,8 +217,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         // Move the perspective
         this.canvas.save ();
         this.canvas.translate (
-                simulation.getBody(0).getPerspective().getPosition().x - (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationY(),
-                simulation.getBody(0).getPerspective().getPosition().y - (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationX()
+                originPosition.x + simulation.getBody(0).getPerspective().getPosition().x + (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationY(),
+                originPosition.y + simulation.getBody(0).getPerspective().getPosition().y - (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationX()
         );
         // this.canvas.rotate((float) ApplicationView.getApplicationView().getSensorAdapter().getRotationZ());
         this.canvas.scale (
@@ -350,9 +347,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     int id = motionEvent.getPointerId (i);
                     PointF perspectivePosition = simulation.getBody(0).getPerspective().getPosition();
                     float perspectiveScale = simulation.getBody(0).getPerspective().getScale();
-                    touchInteraction.touch[id].x = (motionEvent.getX (i) - perspectivePosition.x) / perspectiveScale;
-                    touchInteraction.touch[id].y = (motionEvent.getY (i) - perspectivePosition.y) / perspectiveScale;
-                     touchInteraction.touchTime[id] = java.lang.System.currentTimeMillis ();
+                    touchInteraction.touch[id].x = (motionEvent.getX (i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+                    touchInteraction.touch[id].y = (motionEvent.getY (i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                    touchInteraction.touchTime[id] = java.lang.System.currentTimeMillis ();
                 }
 
                 // Update the state of the touched object based on the current touch interaction state.

@@ -101,6 +101,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_centerVertical="true">
+                <TextView
+                    android:id="@+id/message_content_hint"
+                    android:text="I want to..."
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="14sp"
+                    android:padding="15dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:background="@drawable/timeline_button" />
             </LinearLayout>
         </HorizontalScrollView>
     </RelativeLayout>

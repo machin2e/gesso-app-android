@@ -1,7 +1,6 @@
-package camp.computer.clay.model;
+package camp.computer.clay.model.interaction;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.ArrayList;
 

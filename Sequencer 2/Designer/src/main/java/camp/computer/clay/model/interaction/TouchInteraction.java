@@ -1,8 +1,8 @@
-package camp.computer.clay.model;
+package camp.computer.clay.model.interaction;
 
 import android.graphics.PointF;
-import android.os.Handler;
 
+import camp.computer.clay.model.simulation.Body;
 import camp.computer.clay.sprite.Sprite;
 
 public class TouchInteraction {

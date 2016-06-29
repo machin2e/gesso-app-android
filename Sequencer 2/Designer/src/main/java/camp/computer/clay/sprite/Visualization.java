@@ -6,9 +6,9 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.Machine;
-import camp.computer.clay.model.Simulation;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.simulation.Machine;
+import camp.computer.clay.model.simulation.Simulation;
+import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
 import camp.computer.clay.sprite.util.Number;
 

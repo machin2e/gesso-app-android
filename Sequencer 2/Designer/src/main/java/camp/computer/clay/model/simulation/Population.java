@@ -1,4 +1,4 @@
-package camp.computer.clay.model;
+package camp.computer.clay.model.simulation;
 
 public class Population {
     // ArrayList<Body>

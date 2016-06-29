@@ -1,4 +1,4 @@
-package camp.computer.clay.model;
+package camp.computer.clay.model.simulation;
 
 import android.content.Context;
 import android.graphics.PointF;
@@ -8,6 +8,9 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.model.interaction.Perspective;
+import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.interaction.TouchInteractivity;
 import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PathSprite;
 import camp.computer.clay.sprite.PortSprite;
@@ -604,6 +607,32 @@ public class Body extends Actor {
 
         // Stop dragging
         touchInteractivity.isDragging[touchInteraction.pointerId] = false;
+
+        // Auto-adjust the perspective
+        ArrayList<PointF> machineCenterPoints = new ArrayList<PointF>();
+        for (MachineSprite machineSprite: getPerspective().getVisualization().getMachineSprites()) {
+            machineCenterPoints.add(machineSprite.getPosition());
+        }
+        PointF centroidPoint = Geometry.calculateCentroid(machineCenterPoints);
+        centroidPoint.x = -centroidPoint.x;
+        centroidPoint.y = -centroidPoint.y;
+//        centroidPoint.x = centroidPoint.x - getPerspective().getPosition().x;
+//        centroidPoint.y = centroidPoint.y - getPerspective().getPosition().y;
+        getPerspective().setPosition(centroidPoint);
+
+
+
+        // Adjust scale
+        float[] bounds = Geometry.calculateBoundingBox(machineCenterPoints);
+        PointF boundCenter = new PointF(((bounds[2] - bounds[0]) / 2.0f), ((bounds[3] - bounds[1]) / 2.0f));
+        float boundWidth = bounds[2] - bounds[1];
+        float boundHeight = bounds[3] - bounds[0];
+
+        //float boundToScaleRatio = ;
+        float currentWidthSpan = getPerspective().getScale() * getPerspective().getWidth() /* screen width */;
+        float boundWidthSpan = getPerspective().getScale() * boundWidth;
+
+
     }
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
@@ -617,6 +646,11 @@ public class Body extends Actor {
             // Check if one of the objects is touched
             if (machineSprite.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
                 Log.v("MapView", "\tTouched machine.");
+
+                // Machine
+                Machine machine = (Machine) machineSprite.getModel();
+
+                ApplicationView.getApplicationView().speakPhrase(machine.getNameTag());
 
                 // <TOUCH_ACTION>
 //                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TAP);

@@ -2,6 +2,8 @@ package camp.computer.clay.sprite.util;
 
 import android.graphics.PointF;
 
+import java.util.ArrayList;
+
 public abstract class Geometry {
 
     public static double calculateDistance(PointF from, PointF to) {
@@ -126,5 +128,53 @@ public abstract class Geometry {
                 return Geometry.calculateDistance(linePointA, pointC);
         }
         return Math.abs(dist);
+    }
+
+    public static PointF calculateCentroid(ArrayList<PointF> points)  {
+        float centroidX = 0.0f;
+        float centroidY = 0.0f;
+
+        for(PointF point : points) {
+            centroidX += point.x;
+            centroidY += point.y;
+        }
+        return new PointF(centroidX / points.size(), centroidY / points.size());
+    }
+
+    public static float[] calculateBoundingBox(ArrayList<PointF> points) {
+        float[] boundaryPoints = new float[4]; // left, top, right, bottom
+        // TODO: center, width, height
+
+        float minX = Float.MAX_VALUE;
+        float maxX = Float.MIN_VALUE;
+        float minY = Float.MAX_VALUE;
+        float maxY = Float.MIN_VALUE;
+
+        for (PointF point: points) {
+            if (point.x < minX) {
+                minX = point.x;
+            }
+            if (point.y < minY) {
+                minY = point.x;
+            }
+            if (point.x > maxX) {
+                maxX = point.x;
+            }
+            if (point.y > minY) {
+                minY = point.y;
+            }
+        }
+
+        float left = minX;
+        float top = minY;
+        float right = maxX;
+        float bottom = maxY;
+
+        boundaryPoints[0] = left;
+        boundaryPoints[1] = top;
+        boundaryPoints[2] = right;
+        boundaryPoints[3] = bottom;
+
+        return boundaryPoints;
     }
 }

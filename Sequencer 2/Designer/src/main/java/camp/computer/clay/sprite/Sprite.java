@@ -1,11 +1,10 @@
 package camp.computer.clay.sprite;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.Model;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.simulation.Model;
+import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
 
 public abstract class Sprite {

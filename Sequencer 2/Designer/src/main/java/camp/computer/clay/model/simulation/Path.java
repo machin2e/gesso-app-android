@@ -1,4 +1,4 @@
-package camp.computer.clay.model;
+package camp.computer.clay.model.simulation;
 
 import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PortSprite;

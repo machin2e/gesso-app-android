@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.mobeta.android.sequencer.R;
 
@@ -243,6 +244,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final TextView messageContentHint = (TextView) findViewById(R.id.message_content_hint);
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
@@ -250,6 +252,16 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
+
+        messageContentHint.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                messageContentHint.setVisibility(View.GONE);
+                showMessageKeyboard();
+                return false;
+            }
+        });
 
         // Hide scrollbars in keyboard
         messageKeyboardLayoutPerspective.setVerticalScrollBarEnabled(false);
@@ -280,25 +292,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 } else if (touchActionType == MotionEvent.ACTION_MOVE) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
-                    ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
-
-                    ViewGroup.MarginLayoutParams chatKeyboardLayoutParams = (ViewGroup.MarginLayoutParams) messageKeyboardLayout.getLayoutParams();
-
-                    Resources r = getResources();
-                    float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
-                    //float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 14, r.getDisplayMetrics());
-
-                    // Reposition chat layout
-                    chatKeyboardLayoutParams.bottomMargin = chatLayoutParams.bottomMargin + messageContentLayout.getLayoutParams().height + 20; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-
-                    if (messageKeyboardLayout.getVisibility() == View.GONE) {
-                        messageKeyboardLayout.setVisibility(View.VISIBLE);
-                    } else if (messageKeyboardLayout.getVisibility() == View.VISIBLE) {
-                        messageKeyboardLayout.setVisibility(View.GONE);
-                    }
-
-                    messageKeyboardLayout.requestLayout();
-                    messageKeyboardLayout.invalidate();
+                    showMessageKeyboard();
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
@@ -373,6 +367,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                     // Reset the message envelope
                     messageContent.removeAllViews();
                     messageKeyboardLayout.setVisibility(View.GONE);
+
+                    // Replace the hint
+                    messageContent.addView(messageContentHint);
+                    messageContentHint.setVisibility(View.VISIBLE);
                 }
 
                 return false;
@@ -405,6 +403,36 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         handler.post(runnableCode);
 
         checkTTS();
+    }
+
+    private void showMessageKeyboard() {
+
+        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
+        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
+        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
+        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
+        final Button contextScope = (Button) findViewById (R.id.context_button);
+
+        ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
+
+        ViewGroup.MarginLayoutParams chatKeyboardLayoutParams = (ViewGroup.MarginLayoutParams) messageKeyboardLayout.getLayoutParams();
+
+        Resources r = getResources();
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 14, r.getDisplayMetrics());
+        //float dp = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, 14, r.getDisplayMetrics());
+
+        // Reposition chat layout
+        chatKeyboardLayoutParams.bottomMargin = chatLayoutParams.bottomMargin + messageContentLayout.getLayoutParams().height + 20; //h - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+
+        if (messageKeyboardLayout.getVisibility() == View.GONE) {
+            messageKeyboardLayout.setVisibility(View.VISIBLE);
+        } else if (messageKeyboardLayout.getVisibility() == View.VISIBLE) {
+            messageKeyboardLayout.setVisibility(View.GONE);
+        }
+
+        messageKeyboardLayout.requestLayout();
+        messageKeyboardLayout.invalidate();
     }
 
     private void generateKeyboard() {
@@ -506,6 +534,8 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
             public void onClick(View v) {
 
                 messageContent.removeView(messageWord);
+
+                // Unicode arrow symbols: https://en.wikipedia.org/wiki/Template:Unicode_chart_Arrows
 
                 // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
 //                messageContent.addView(messageKey);

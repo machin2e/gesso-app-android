@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.Machine;
-import camp.computer.clay.model.Path;
-import camp.computer.clay.model.Port;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.simulation.Machine;
+import camp.computer.clay.model.simulation.Path;
+import camp.computer.clay.model.simulation.Port;
+import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class PortSprite extends Sprite {
@@ -112,6 +112,9 @@ public class PortSprite extends Sprite {
             pathSprite.getPath().getDestinationPort().showPaths();
         }
     }
+
+    // TODO: showIncomingPath
+    // TODO: showOutgoingPath
 
     public void showPathDocks() {
         for (PathSprite pathSprite : pathSprites) {
@@ -549,7 +552,7 @@ public class PortSprite extends Sprite {
 //                Log.v("mtouch", "X: " + X + ", Y: " + Y);
 //            }
 
-            return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + 10));
+            return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + PortSprite.DISTANCE_BETWEEN_NODES));
         } else {
             return false;
         }

@@ -19,10 +19,10 @@ public class SensorAdapter implements SensorEventListener {
 
         // Register this class as a listener for the accelerometer sensor
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME); // SensorManager.SENSOR_DELAY_NORMAL
         // ...and the orientation sensor
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME);
     }
 
     //...

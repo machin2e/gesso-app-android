@@ -7,8 +7,8 @@ import android.graphics.PointF;
 import android.util.Log;
 
 import camp.computer.clay.designer.MapView;
-import camp.computer.clay.model.Path;
-import camp.computer.clay.model.TouchInteraction;
+import camp.computer.clay.model.simulation.Path;
+import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
 import camp.computer.clay.sprite.util.Shape;
 
