@@ -80,6 +80,10 @@ public class TouchInteractivity {
         return null;
     }
 
+    public long getDuration() {
+        return getLatestInteraction().getTimestamp() - getFirstInteraction().getTimestamp();
+    }
+
     // TODO: getStartTime()
     // TODO: getStopTime()
     // TODO: getDuration()

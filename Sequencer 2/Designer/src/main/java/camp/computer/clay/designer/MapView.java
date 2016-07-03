@@ -6,15 +6,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.WindowManager;
 
 import java.util.ArrayList;
 
@@ -248,10 +245,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         // TODO: Get Simulation's selected Visualization
 
         // Draw the background
-        this.canvas.drawColor (Color.WHITE);
+        this.canvas.drawColor(Color.WHITE);
 
         // Scene
-        drawScene(this);
+        drawVisualization(this);
 
         // Paint the bitmap to the "primary" canvas.
 //        canvas.drawBitmap (canvasBitmap, identityMatrix, null);
@@ -263,7 +260,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         this.canvas.restore();
     }
 
-    private void drawScene (MapView mapView) {
+    private void drawVisualization(MapView mapView) {
         for (Visualization visualization : visualizationSprites) {
             visualization.draw(mapView);
         }
@@ -366,7 +363,6 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     float perspectiveScale = simulation.getBody(0).getPerspective().getScale();
                     touchInteraction.touch[id].x = (motionEvent.getX (i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     touchInteraction.touch[id].y = (motionEvent.getY (i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-                    touchInteraction.touchTime[id] = java.lang.System.currentTimeMillis ();
                 }
 
                 // Update the state of the touched object based on the current touch interaction state.
@@ -375,19 +371,19 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.TOUCH);
                     touchInteraction.pointerId = pointerId;
                     touchInteractivity.addInteraction(touchInteraction);
-                    currentBody.onTouchListener(touchInteractivity, touchInteraction);
+                    currentBody.onStartInteractivity(touchInteractivity, touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.MOVE);
                     touchInteraction.pointerId = pointerId;
                     touchInteractivity.addInteraction(touchInteraction);
-                    currentBody.onMoveListener(touchInteractivity, touchInteraction);
+                    currentBody.onContinueInteractivity(touchInteractivity, touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.RELEASE);
                     touchInteraction.pointerId = pointerId;
                     touchInteractivity.addInteraction(touchInteraction);
-                    currentBody.onReleaseListener(touchInteractivity, touchInteraction);
+                    currentBody.onCompleteInteractivity(touchInteractivity, touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {

@@ -73,16 +73,11 @@ public class PortSprite extends Sprite {
 //    }
 
     // TODO: Move into Port
-    public PathSprite addPath(Machine sourceMachine, Port sourcePort, Machine destinationMachine, Port destinationPort) {
+    public PathSprite addPath(Port sourcePort, Port destinationPort) {
 
 
         // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
-        Path path = new Path(
-                sourceMachine,
-                sourcePort,
-                destinationMachine,
-                destinationPort
-        );
+        Path path = new Path(sourcePort, destinationPort);
 
         PathSprite pathSprite = new PathSprite(path);
         pathSprite.setParentSprite(this);

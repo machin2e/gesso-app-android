@@ -403,6 +403,23 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         handler.post(runnableCode);
 
         checkTTS();
+
+        hideChat();
+    }
+
+    public void hideChat() {
+        // <CHAT_AND_CONTEXT_SCOPE>
+        final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
+        final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
+        final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
+        final TextView messageContentHint = (TextView) findViewById(R.id.message_content_hint);
+        final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
+        final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
+        final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
+        final Button contextScope = (Button) findViewById (R.id.context_button);
+        // </CHAT_AND_CONTEXT_SCOPE>
+
+        messageContentLayout.setVisibility(View.GONE);
     }
 
     private void showMessageKeyboard() {

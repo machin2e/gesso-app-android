@@ -30,8 +30,35 @@ public class Body extends Actor {
         return this.perspective;
     }
 
-    public void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-        Log.v("MapViewEvent", "onTouchListener");
+    private void adjustPerspectiveScale() {
+
+        // Adjust scale
+        ArrayList<PointF> machinePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineSprites());
+        float[] spriteBoundingBox = Geometry.calculateBoundingBox(machinePositions);
+        PointF spriteBoundingBoxCenter = new PointF(((spriteBoundingBox[2] - spriteBoundingBox[0]) / 2.0f), ((spriteBoundingBox[3] - spriteBoundingBox[1]) / 2.0f));
+        float spriteBoundingBoxWidth = spriteBoundingBox[2] - spriteBoundingBox[0];
+        float spriteBoundingBoxHeight = spriteBoundingBox[3] - spriteBoundingBox[1];
+
+        float widthDifference = spriteBoundingBoxWidth - getPerspective().getWidth();
+        float heightDifference = spriteBoundingBoxHeight - getPerspective().getHeight();
+
+        float widthPadding = 0;
+        float newWidthScale = getPerspective().getWidth() / (spriteBoundingBoxWidth + widthPadding);
+        float newHeightScale = getPerspective().getHeight() / (spriteBoundingBoxHeight + widthPadding);
+
+        if (widthDifference > 0 /* || heightDifference > 0 */) {
+//            if (newWidthScale > newHeightScale) {
+            getPerspective().setScale(newWidthScale);
+//            } else {
+//                getPerspective().setScale(newHeightScale);
+//            }
+        } else {
+            getPerspective().setScale(1.0f);
+        }
+    }
+
+    public void onStartInteractivity(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+        Log.v("MapViewEvent", "onStartInteractivity");
 
         // Current
         touchInteraction.isTouching[touchInteraction.pointerId] = true;
@@ -61,7 +88,7 @@ public class Body extends Actor {
                             if (getPerspective().getFocus() instanceof PathSprite) {
                                 PathSprite focusedPathSprite = (PathSprite) getPerspective().getFocus();
                                 if (!focusedPathSprite.getPath().contains((Port) portSprite.getModel())) {
-                                    Log.v("InteractionHistory", "Skipping port not in path.");
+                                    // Log.v("InteractionHistory", "Skipping port not in path.");
                                     continue;
                                 }
                             }
@@ -203,11 +230,9 @@ public class Body extends Actor {
         }
     }
 
-    //private void onMoveListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-    public void onMoveListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-        Log.v("MapViewEvent", "onMoveListener");
-
-        int pointerId = touchInteraction.pointerId;
+    //private void onContinueInteractivity(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    public void onContinueInteractivity(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+        Log.v("MapViewEvent", "onContinueInteractivity");
 
         // Current
         touchInteraction.isTouching[touchInteraction.pointerId] = true;
@@ -221,265 +246,18 @@ public class Body extends Actor {
             onPreDragListener(touchInteractivity, touchInteraction);
         } else {
             // Dragging
-            touchInteractivity.isDragging[touchInteraction.pointerId] = true;
             onDragListener(touchInteractivity, touchInteraction);
         }
     }
 
-    private void onPreDragListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-
-        // TODO: Encapsulate TouchInteraction in TouchEvent
-//        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.PRE_DRAG);
-//        touchInteractivity.addInteraction(touchInteraction);
-
-    }
-
-    private void onDragListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-
-        //Log.v("MapViewEvent", "onDragListener");
-
-//        // TODO: Encapsulate TouchInteraction in TouchEvent
-//        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
-//        touchInteractivity.addInteraction(touchInteraction);
-
-        // Process
-        // TODO: Put into callback
-
-        // Dragging and holding.
-        if (touchInteractivity.getFirstInteraction().touchTime[touchInteraction.pointerId] - touchInteraction.touchTime[touchInteraction.pointerId] < TouchInteraction.MINIMUM_HOLD_DURATION) {
-
-            // Dragging only (not holding)
-
-            // TODO: Put into callback
-            //if (touchInteractivity.isTouchingSprite[touchInteraction.pointerId]) {
-            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
-
-                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
-
-                    MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
-                    machineSprite.touch(touchInteraction);
-                    machineSprite.showHighlights = true;
-                    machineSprite.setPosition(new PointF(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y));
-
-                    // Zoom out to show overview
-                    getPerspective().setScale(0.8f);
-
-                } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
-
-                    PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
-//                    portSprite.touch(touchInteraction);
-                    portSprite.setCandidatePathDestinationPosition(touchInteraction.touch[touchInteraction.pointerId]);
-                    portSprite.setCandidatePathVisibility(true);
-
-                    // Initialize port type and flow direction
-                    Port port = (Port) portSprite.getModel();
-                    if (port.portDirection == Port.PortDirection.NONE) {
-                        port.portDirection = Port.PortDirection.INPUT;
-                    }
-                    if (port.portType == Port.PortType.NONE) {
-                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                    }
-
-                    // Show ports of nearby machines
-                    MachineSprite nearestMachineSprite = null;
-                    for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
-
-                        // Update style of nearby machines
-                        float distanceToMachineSprite = (float) Geometry.calculateDistance(
-                                touchInteraction.touch[touchInteraction.pointerId],
-                                nearbyMachineSprite.getPosition()
-                        );
-
-                        if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 60) {
-                            nearbyMachineSprite.setTransparency(1.0f);
-                            nearbyMachineSprite.showPorts();
-
-                            for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
-                                if (nearbyPortSprite != portSprite) {
-                                    // Scaffold interaction to connect path to with nearby ports
-                                    float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
-                                            touchInteraction.touch[touchInteraction.pointerId],
-                                            nearbyPortSprite.getPosition()
-                                    );
-                                    if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 40) {
-                                        /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
-                                        if (nearbyPortSprite != touchInteraction.overlappedSprite) {
-                                            nearestMachineSprite = nearbyMachineSprite;
-                                        }
-                                        break;
-                                    }
-                                } else {
-                                    // TODO: Vibrate twice for "NO"
-                                }
-                            }
-
-                        } else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 100) {
-                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
-                                nearbyMachineSprite.setTransparency(0.5f);
-                            }
-                        } else {
-                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
-                                nearbyMachineSprite.setTransparency(0.1f);
-                                nearbyMachineSprite.hidePorts();
-                            }
-                        }
-                    }
-
-                    // Check if a machine sprite was nearby
-                    if (nearestMachineSprite != null) {
-
-                        touchInteraction.overlappedSprite = nearestMachineSprite;
-
-
-                        /*
-                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                        // Vibrate for 500 milliseconds
-                        v.vibrate(50); // Vibrate once for "YES"
-                        */
-
-                    } else {
-
-                        portSprite.setVisibility(true);
-                        portSprite.showPaths();
-
-                        // Auto-adjust the perspective
-//                        PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
-//                        getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
-                        getPerspective().setScale(0.6f); // Zoom out to show overview
-
-                    }
-
-//                    if (nearestMachineSprite != null) {
-//                        // Auto-adjust the perspective
-//                        getPerspective().setPosition(touchInteraction.overlappedSprite.getPosition());
-//                        getPerspective().setScale(1.1f); // Zoom out to show overview
-//                    }
-
-                }
-            } else {
-                if (getPerspective().isPanningEnabled()) {
-                    getPerspective().setScale(0.9f);
-                    getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
-                }
-            }
-
-        } else {
-
-            // TODO: Put into callback
-            //if (touchInteractivity.isTouchingSprite[touchInteraction.pointerId]) {
-            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
-                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
-                    MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
-                    machineSprite.touch(touchInteraction);
-                    machineSprite.showHighlights = true;
-                    machineSprite.setPosition(touchInteraction.touch[touchInteraction.pointerId]);
-                } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
-                    PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
-                    portSprite.touch(touchInteraction);
-
-                    // Initialize port type and flow direction
-                    Port port = (Port) portSprite.getModel();
-                    if (port.portDirection == Port.PortDirection.NONE) {
-                        port.portDirection = Port.PortDirection.INPUT;
-                    }
-                    if (port.portType == Port.PortType.NONE) {
-                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                    }
-
-                    // Show ports of nearby machines
-                    MachineSprite nearestMachineSprite = null;
-                    for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
-
-                        // Update style of nearby machines
-                        float distanceToMachineSprite = (float) Geometry.calculateDistance(
-                                touchInteraction.touch[touchInteraction.pointerId],
-                                nearbyMachineSprite.getPosition()
-                        );
-                        Log.v("DistanceToSprite", "distanceToMachineSprite: " + distanceToMachineSprite);
-                        if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
-                            nearbyMachineSprite.setTransparency(1.0f);
-                            nearbyMachineSprite.showPorts();
-
-                            for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
-                                if (nearbyPortSprite != portSprite) {
-                                    // Scaffold interaction to connect path to with nearby ports
-                                    float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
-                                            touchInteraction.touch[touchInteraction.pointerId],
-                                            nearbyPortSprite.getPosition()
-                                    );
-                                    if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
-                                        /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
-                                        nearestMachineSprite = nearbyMachineSprite;
-                                        break;
-                                    }
-                                } else {
-                                    // TODO: Vibrate twice for "NO"
-                                }
-                            }
-
-                        } else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 80) {
-                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
-                                nearbyMachineSprite.setTransparency(0.5f);
-                            }
-                        } else {
-                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
-                                nearbyMachineSprite.setTransparency(0.1f);
-                                nearbyMachineSprite.hidePorts();
-                            }
-                        }
-                    }
-
-                    // Check if a machine sprite was nearby
-                    if (nearestMachineSprite != null) {
-
-                        touchInteraction.overlappedSprite = nearestMachineSprite;
-
-
-                        /*
-                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                        // Vibrate for 500 milliseconds
-                        v.vibrate(50); // Vibrate once for "YES"
-                        */
-
-                    } else {
-
-                        portSprite.setVisibility(true);
-                        portSprite.showPaths();
-
-                        // Auto-adjust the perspective
-//                        PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
-//                        getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
-                        getPerspective().setScale(0.8f); // Zoom out to show overview
-
-                    }
-
-//                    if (nearestMachineSprite != null) {
-//                        // Auto-adjust the perspective
-//                        getPerspective().setPosition(touchInteraction.overlappedSprite.getPosition());
-//                        getPerspective().setScale(1.1f); // Zoom out to show overview
-//                    }
-
-                }
-            } else {
-                if (getPerspective().isPanningEnabled()) {
-                    getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
-                }
-            }
-        }
-    }
-
-    //private void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-    public void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    //private void onCompleteInteractivity(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    public void onCompleteInteractivity(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
         touchInteractivity.timerHandler.removeCallbacks(touchInteractivity.timerRunnable);
 
         int pointerId = touchInteraction.pointerId;
 
-        Log.v("MapViewEvent", "onReleaseListener");
+        Log.v("MapViewEvent", "onCompleteInteractivity");
 
         // TODO: Encapsulate TouchInteraction in TouchEvent
 //        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.RELEASE);
@@ -495,176 +273,13 @@ public class Body extends Actor {
         touchInteraction.isTouching[touchInteraction.pointerId] = false;
 
         // Classify/Callbacks
-        if (touchInteraction.touchTime[pointerId] - touchInteractivity.getFirstInteraction().touchTime[pointerId] < TouchInteraction.MAXIMUM_TAP_DURATION) {
+        if (touchInteractivity.getDuration() < TouchInteraction.MAXIMUM_TAP_DURATION) {
 
             onTapListener(touchInteractivity, touchInteraction);
 
         } else {
 
-            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
-                MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-
-                // TODO: Add this to an onTouch callback for the sprite's channel nodes
-                // Check if the touched board's I/O node is touched
-                // Check if one of the objects is touched
-                if (Geometry.calculateDistance(touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId], machineSprite.getPosition()) < 80) {
-                    Log.v("MapView", "\tSource board touched.");
-
-//                    // <TOUCH_ACTION>
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TAP);
-//                    // TODO: propagate RELEASE before TAP
-//                    machineSprite.touch(touchInteraction);
-//                    // </TOUCH_ACTION>
-
-                    // No touch on board or port. Touch is on map. So hide ports.
-                    for (MachineSprite otherMachineSprite : getPerspective().getVisualization().getMachineSprites()) {
-                        otherMachineSprite.hidePorts();
-                        otherMachineSprite.hidePaths();
-                        otherMachineSprite.setTransparency(0.1f);
-                    }
-                    machineSprite.showPorts();
-                    getPerspective().setScale(0.8f);
-                    machineSprite.showPaths();
-                    machineSprite.setTransparency(1.0f);
-                    ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
-
-                    getPerspective().disablePanning();
-                }
-
-                // Zoom out to show overview
-                getPerspective().setScale(1.0f);
-
-            } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
-                PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-//                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.RELEASE);
-                portSprite.touch(touchInteraction);
-
-                // Show ports of nearby machines
-                boolean useNearbyPortSprite = false;
-                    for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
-
-                        // Update style of nearby machines
-                        float distanceToMachineSprite = (float) Geometry.calculateDistance(
-                                touchInteraction.touch[touchInteraction.pointerId],
-                                nearbyMachineSprite.getPosition()
-                        );
-                        if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
-
-
-
-                        // TODO: use overlappedSprite instanceof PortSprite
-
-
-
-                        for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
-                            // Scaffold interaction to connect path to with nearby ports
-                            float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
-                                    touchInteraction.touch[touchInteraction.pointerId],
-                                    nearbyPortSprite.getPosition()
-                            );
-                            if (nearbyPortSprite != portSprite) {
-                                if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
-                                    /* portSprite.setPosition(touchInteraction.touch[touchInteraction.pointerId]); */
-
-                                    useNearbyPortSprite = true;
-
-                                    Port port = (Port) portSprite.getModel();
-                                    Port nearbyPort = (Port) nearbyPortSprite.getModel();
-
-                                    if (port.portDirection == Port.PortDirection.NONE) {
-                                        port.portDirection = Port.PortDirection.INPUT;
-                                    }
-                                    if (port.portType == Port.PortType.NONE) {
-                                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                                    }
-
-                                    nearbyPort.portDirection = Port.PortDirection.OUTPUT;
-                                    nearbyPort.portType = Port.PortType.getNextType(nearbyPort.portType);
-
-                                    // Create and add path to port
-                                    Machine sourceMachine = (Machine) getPerspective().getVisualization().getModel(portSprite.getMachineSprite());
-                                    Port sourcePort = (Port) getPerspective().getVisualization().getModel(portSprite);
-                                    Machine destinationMachine = (Machine) getPerspective().getVisualization().getModel(nearbyPortSprite.getMachineSprite());
-                                    Port destinationPort = (Port) getPerspective().getVisualization().getModel(nearbyPortSprite);
-                                    Log.v("Nearby", "" + sourceMachine);
-                                    Log.v("Nearby", "" + sourcePort);
-                                    Log.v("Nearby", "" + destinationMachine);
-                                    Log.v("Nearby", "" + destinationPort);
-                                    PathSprite pathSprite = portSprite.addPath(
-                                            sourceMachine,
-                                            sourcePort,
-                                            destinationMachine,
-                                            destinationPort
-                                    );
-
-                                    portSprite.showPaths();
-                                    pathSprite.setVisibility(true);
-//                                        pathSprite.showDirectedPaths = true;
-//                                        pathSprite.showPathDocks = false;
-
-
-
-
-                                    /*
-                                    Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                                    // Vibrate for 500 milliseconds
-                                    v.vibrate(50);
-                                    //v.vibrate(50); off
-                                    //v.vibrate(50); // second tap
-                                    */
-
-                                    touchInteraction.overlappedSprite = null;
-                                    break;
-                                }
-
-                            }
-                        }
-                    }
-                }
-
-                Log.v("TouchPort", "Touched port");
-
-                if (!useNearbyPortSprite) {
-
-                    Port port = (Port) portSprite.getModel();
-
-                    port.portDirection = Port.PortDirection.INPUT;
-
-                    if (port.portType == Port.PortType.NONE) {
-                        port.portType = Port.PortType.getNextType(port.portType);
-                    }
-                }
-
-            } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PathSprite) {
-                PathSprite pathSprite = (PathSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
-
-                if (pathSprite.getEditorVisibility()) {
-                    pathSprite.setEditorVisibility(false);
-                } else {
-                    pathSprite.setEditorVisibility(true);
-                }
-
-            } else {
-                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
-                    // No touch on board or port. Touch is on map. So hide ports.
-                    for (MachineSprite machineSprite: getPerspective().getVisualization().getMachineSprites()) {
-                        machineSprite.hidePorts();
-                        machineSprite.setScale(1.0f);
-                        machineSprite.hidePaths();
-                        machineSprite.setTransparency(1.0f);
-                    }
-
-                    // Adjust panning
-                    // Auto-adjust the perspective
-                    PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
-                    getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
-
-                    adjustScale();
-                }
-            }
-
-            // Reset map interactivity
-            getPerspective().enablePanning();
+            onPressListener(touchInteractivity, touchInteraction);
 
         }
 
@@ -718,36 +333,6 @@ public class Body extends Actor {
             this.getPerspective().setPosition(new PointF(-getPerspective().getPosition().x, spriteBoundingBox[3]));
         }
         */
-
-
-
-    }
-
-    private void adjustScale() {
-
-        // Adjust scale
-        ArrayList<PointF> machinePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineSprites());
-        float[] spriteBoundingBox = Geometry.calculateBoundingBox(machinePositions);
-        PointF spriteBoundingBoxCenter = new PointF(((spriteBoundingBox[2] - spriteBoundingBox[0]) / 2.0f), ((spriteBoundingBox[3] - spriteBoundingBox[1]) / 2.0f));
-        float spriteBoundingBoxWidth = spriteBoundingBox[2] - spriteBoundingBox[0];
-        float spriteBoundingBoxHeight = spriteBoundingBox[3] - spriteBoundingBox[1];
-
-        float widthDifference = spriteBoundingBoxWidth - getPerspective().getWidth();
-        float heightDifference = spriteBoundingBoxHeight - getPerspective().getHeight();
-
-        float widthPadding = 0;
-        float newWidthScale = getPerspective().getWidth() / (spriteBoundingBoxWidth + widthPadding);
-        float newHeightScale = getPerspective().getHeight() / (spriteBoundingBoxHeight + widthPadding);
-
-        if (widthDifference > 0 /* || heightDifference > 0 */) {
-//            if (newWidthScale > newHeightScale) {
-                getPerspective().setScale(newWidthScale);
-//            } else {
-//                getPerspective().setScale(newHeightScale);
-//            }
-        } else {
-            getPerspective().setScale(1.0f);
-        }
     }
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
@@ -884,11 +469,175 @@ public class Body extends Actor {
                 machineSprite.setTransparency(1.0f);
             }
 
-            adjustScale();
+            adjustPerspectiveScale();
 
             // Reset map interactivity
             getPerspective().enablePanning();
         }
+
+    }
+
+    private void onPressListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+
+        if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
+            MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+
+            // TODO: Add this to an onTouch callback for the sprite's channel nodes
+            // Check if the touched board's I/O node is touched
+            // Check if one of the objects is touched
+            if (Geometry.calculateDistance(touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId], machineSprite.getPosition()) < 80) {
+                Log.v("MapView", "\tSource board touched.");
+
+//                    // <TOUCH_ACTION>
+//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TAP);
+//                    // TODO: propagate RELEASE before TAP
+//                    machineSprite.touch(touchInteraction);
+//                    // </TOUCH_ACTION>
+
+                // No touch on board or port. Touch is on map. So hide ports.
+                for (MachineSprite otherMachineSprite : getPerspective().getVisualization().getMachineSprites()) {
+                    otherMachineSprite.hidePorts();
+                    otherMachineSprite.hidePaths();
+                    otherMachineSprite.setTransparency(0.1f);
+                }
+                machineSprite.showPorts();
+                getPerspective().setScale(0.8f);
+                machineSprite.showPaths();
+                machineSprite.setTransparency(1.0f);
+                ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
+
+                getPerspective().disablePanning();
+            }
+
+            // Zoom out to show overview
+            getPerspective().setScale(1.0f);
+
+        } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
+            PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+//                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.RELEASE);
+            portSprite.touch(touchInteraction);
+
+            // Show ports of nearby machines
+            boolean useNearbyPortSprite = false;
+            for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
+
+                // Update style of nearby machines
+                float distanceToMachineSprite = (float) Geometry.calculateDistance(
+                        touchInteraction.touch[touchInteraction.pointerId],
+                        nearbyMachineSprite.getPosition()
+                );
+                if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 50) {
+
+
+
+                    // TODO: use overlappedSprite instanceof PortSprite
+
+
+
+                    for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
+                        // Scaffold interaction to connect path to with nearby ports
+                        float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
+                                touchInteraction.touch[touchInteraction.pointerId],
+                                nearbyPortSprite.getPosition()
+                        );
+                        if (nearbyPortSprite != portSprite) {
+                            if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
+                                    /* portSprite.setPosition(touchInteraction.touch[touchInteraction.pointerId]); */
+
+                                useNearbyPortSprite = true;
+
+                                Port port = (Port) portSprite.getModel();
+                                Port nearbyPort = (Port) nearbyPortSprite.getModel();
+
+                                if (port.portDirection == Port.PortDirection.NONE) {
+                                    port.portDirection = Port.PortDirection.INPUT;
+                                }
+                                if (port.portType == Port.PortType.NONE) {
+                                    port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                }
+
+                                nearbyPort.portDirection = Port.PortDirection.OUTPUT;
+                                nearbyPort.portType = Port.PortType.getNextType(nearbyPort.portType);
+
+                                // Create and add path to port
+                                Machine sourceMachine = (Machine) getPerspective().getVisualization().getModel(portSprite.getMachineSprite());
+                                Port sourcePort = (Port) getPerspective().getVisualization().getModel(portSprite);
+                                Machine destinationMachine = (Machine) getPerspective().getVisualization().getModel(nearbyPortSprite.getMachineSprite());
+                                Port destinationPort = (Port) getPerspective().getVisualization().getModel(nearbyPortSprite);
+                                Log.v("Nearby", "" + sourceMachine);
+                                Log.v("Nearby", "" + sourcePort);
+                                Log.v("Nearby", "" + destinationMachine);
+                                Log.v("Nearby", "" + destinationPort);
+                                PathSprite pathSprite = portSprite.addPath(sourcePort, destinationPort);
+
+                                portSprite.showPaths();
+                                pathSprite.setVisibility(true);
+//                                        pathSprite.showDirectedPaths = true;
+//                                        pathSprite.showPathDocks = false;
+
+
+
+
+                                    /*
+                                    Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                                    // Vibrate for 500 milliseconds
+                                    v.vibrate(50);
+                                    //v.vibrate(50); off
+                                    //v.vibrate(50); // second tap
+                                    */
+
+                                touchInteraction.overlappedSprite = null;
+                                break;
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            Log.v("TouchPort", "Touched port");
+
+            if (!useNearbyPortSprite) {
+
+                Port port = (Port) portSprite.getModel();
+
+                port.portDirection = Port.PortDirection.INPUT;
+
+                if (port.portType == Port.PortType.NONE) {
+                    port.portType = Port.PortType.getNextType(port.portType);
+                }
+            }
+
+        } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PathSprite) {
+            PathSprite pathSprite = (PathSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+
+            if (pathSprite.getEditorVisibility()) {
+                pathSprite.setEditorVisibility(false);
+            } else {
+                pathSprite.setEditorVisibility(true);
+            }
+
+        } else {
+            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] == null) {
+                // No touch on board or port. Touch is on map. So hide ports.
+                for (MachineSprite machineSprite: getPerspective().getVisualization().getMachineSprites()) {
+                    machineSprite.hidePorts();
+                    machineSprite.setScale(1.0f);
+                    machineSprite.hidePaths();
+                    machineSprite.setTransparency(1.0f);
+                }
+
+                // Adjust panning
+                // Auto-adjust the perspective
+                PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
+                getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
+
+                adjustPerspectiveScale();
+            }
+        }
+
+        // Reset map interactivity
+        getPerspective().enablePanning();
 
     }
 
@@ -923,6 +672,255 @@ public class Body extends Actor {
                     getPerspective().setScale(0.8f);
                 }
             }
+        }
+    }
+
+    private void onPreDragListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+
+        // TODO: Encapsulate TouchInteraction in TouchEvent
+//        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.PRE_DRAG);
+//        touchInteractivity.addInteraction(touchInteraction);
+
+    }
+
+    private void onDragListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+
+        //Log.v("MapViewEvent", "onDragListener");
+
+//        // TODO: Encapsulate TouchInteraction in TouchEvent
+//        TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
+//        touchInteractivity.addInteraction(touchInteraction);
+
+        // Process
+        // TODO: Put into callback
+
+        touchInteractivity.isDragging[touchInteraction.pointerId] = true;
+
+        // Dragging and holding.
+        if (touchInteractivity.getDuration() < TouchInteraction.MINIMUM_HOLD_DURATION) {
+
+            // Dragging only (not holding)
+
+            // TODO: Put into callback
+            //if (touchInteractivity.isTouchingSprite[touchInteraction.pointerId]) {
+            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
+
+                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
+
+                    MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+//                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
+                    machineSprite.touch(touchInteraction);
+                    machineSprite.showHighlights = true;
+                    machineSprite.setPosition(new PointF(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y));
+
+                    // Zoom out to show overview
+                    getPerspective().setScale(0.8f);
+
+                } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
+
+                    PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
+//                    portSprite.touch(touchInteraction);
+                    portSprite.setCandidatePathDestinationPosition(touchInteraction.touch[touchInteraction.pointerId]);
+                    portSprite.setCandidatePathVisibility(true);
+
+                    // Initialize port type and flow direction
+                    Port port = (Port) portSprite.getModel();
+                    if (port.portDirection == Port.PortDirection.NONE) {
+                        port.portDirection = Port.PortDirection.INPUT;
+                    }
+                    if (port.portType == Port.PortType.NONE) {
+                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                    }
+
+                    // Show ports of nearby machines
+                    MachineSprite nearestMachineSprite = null;
+                    for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
+
+                        // Update style of nearby machines
+                        float distanceToMachineSprite = (float) Geometry.calculateDistance(
+                                touchInteraction.touch[touchInteraction.pointerId],
+                                nearbyMachineSprite.getPosition()
+                        );
+
+                        if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 60) {
+                            nearbyMachineSprite.setTransparency(1.0f);
+                            nearbyMachineSprite.showPorts();
+
+                            for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
+                                if (nearbyPortSprite != portSprite) {
+                                    // Scaffold interaction to connect path to with nearby ports
+                                    float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
+                                            touchInteraction.touch[touchInteraction.pointerId],
+                                            nearbyPortSprite.getPosition()
+                                    );
+                                    if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 40) {
+                                        /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
+                                        if (nearbyPortSprite != touchInteraction.overlappedSprite) {
+                                            nearestMachineSprite = nearbyMachineSprite;
+                                        }
+                                        break;
+                                    }
+                                } else {
+                                    // TODO: Vibrate twice for "NO"
+                                }
+                            }
+
+                        } else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 100) {
+                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
+                                nearbyMachineSprite.setTransparency(0.5f);
+                            }
+                        } else {
+                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
+                                nearbyMachineSprite.setTransparency(0.1f);
+                                nearbyMachineSprite.hidePorts();
+                            }
+                        }
+                    }
+
+                    // Check if a machine sprite was nearby
+                    if (nearestMachineSprite != null) {
+
+                        touchInteraction.overlappedSprite = nearestMachineSprite;
+
+                        /*
+                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                        // Vibrate for 500 milliseconds
+                        v.vibrate(50); // Vibrate once for "YES"
+                        */
+
+                    } else {
+
+                        // Show ports and paths
+                        portSprite.setVisibility(true);
+                        portSprite.showPaths();
+
+                        // Adjust perspective
+                        getPerspective().setScale(0.6f); // Zoom out to show overview
+
+                    }
+
+                }
+            } else {
+                if (getPerspective().isPanningEnabled()) {
+                    getPerspective().setScale(0.9f);
+                    getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
+                }
+            }
+
+        } else {
+
+            // Dragging only (not holding)
+
+            // TODO: Put into callback
+            //if (touchInteractivity.isTouchingSprite[touchInteraction.pointerId]) {
+            if (touchInteractivity.touchedSprite[touchInteraction.pointerId] != null) {
+
+                if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof MachineSprite) {
+
+                    MachineSprite machineSprite = (MachineSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+//                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
+                    machineSprite.touch(touchInteraction);
+                    machineSprite.showHighlights = true;
+                    machineSprite.setPosition(new PointF(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y));
+
+                    // Zoom out to show overview
+                    getPerspective().setScale(0.8f);
+
+                } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
+
+                    PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
+//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
+//                    portSprite.touch(touchInteraction);
+                    portSprite.setCandidatePathDestinationPosition(touchInteraction.touch[touchInteraction.pointerId]);
+                    portSprite.setCandidatePathVisibility(true);
+
+                    // Initialize port type and flow direction
+                    Port port = (Port) portSprite.getModel();
+                    if (port.portDirection == Port.PortDirection.NONE) {
+                        port.portDirection = Port.PortDirection.INPUT;
+                    }
+                    if (port.portType == Port.PortType.NONE) {
+                        port.portType = Port.PortType.getNextType(port.portType); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                    }
+
+                    // Show ports of nearby machines
+                    MachineSprite nearestMachineSprite = null;
+                    for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
+
+                        // Update style of nearby machines
+                        float distanceToMachineSprite = (float) Geometry.calculateDistance(
+                                touchInteraction.touch[touchInteraction.pointerId],
+                                nearbyMachineSprite.getPosition()
+                        );
+
+                        if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 60) {
+                            nearbyMachineSprite.setTransparency(1.0f);
+                            nearbyMachineSprite.showPorts();
+
+                            for (PortSprite nearbyPortSprite: nearbyMachineSprite.portSprites) {
+                                if (nearbyPortSprite != portSprite) {
+                                    // Scaffold interaction to connect path to with nearby ports
+                                    float distanceToNearbyPortSprite = (float) Geometry.calculateDistance(
+                                            touchInteraction.touch[touchInteraction.pointerId],
+                                            nearbyPortSprite.getPosition()
+                                    );
+                                    if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 40) {
+                                        /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
+                                        if (nearbyPortSprite != touchInteraction.overlappedSprite) {
+                                            nearestMachineSprite = nearbyMachineSprite;
+                                        }
+                                        break;
+                                    }
+                                } else {
+                                    // TODO: Vibrate twice for "NO"
+                                }
+                            }
+
+                        } else if (distanceToMachineSprite < nearbyMachineSprite.boardHeight + 100) {
+                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
+                                nearbyMachineSprite.setTransparency(0.5f);
+                            }
+                        } else {
+                            if (nearbyMachineSprite != portSprite.getMachineSprite()) {
+                                nearbyMachineSprite.setTransparency(0.1f);
+                                nearbyMachineSprite.hidePorts();
+                            }
+                        }
+                    }
+
+                    // Check if a machine sprite was nearby
+                    if (nearestMachineSprite != null) {
+
+                        touchInteraction.overlappedSprite = nearestMachineSprite;
+
+                        /*
+                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                        // Vibrate for 500 milliseconds
+                        v.vibrate(50); // Vibrate once for "YES"
+                        */
+
+                    } else {
+
+                        // Show ports and paths
+                        portSprite.setVisibility(true);
+                        portSprite.showPaths();
+
+                        // Adjust perspective
+                        getPerspective().setScale(0.6f); // Zoom out to show overview
+
+                    }
+
+                }
+
+            } else {
+
+                if (getPerspective().isPanningEnabled()) {
+                    getPerspective().setScale(0.9f);
+                    getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
+                }
+            }
+
         }
     }
 }

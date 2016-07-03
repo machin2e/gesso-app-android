@@ -17,7 +17,6 @@ public class TouchInteraction {
     public static int MINIMUM_DRAG_DISTANCE = 35;
 
     public PointF[] touch = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
-    public long[] touchTime = new long[MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 
 //    public PointF[] touchPrevious = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
