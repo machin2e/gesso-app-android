@@ -73,19 +73,23 @@ public class PortSprite extends Sprite {
 //    }
 
     // TODO: Move into Port
-    public PathSprite addPath(MachineSprite sourceMachineSprite, PortSprite sourcePortSprite, MachineSprite destinationMachineSprite, PortSprite destinationPortSprite) {
+    public PathSprite addPath(Machine sourceMachine, Port sourcePort, Machine destinationMachine, Port destinationPort) {
 
 
         // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
         Path path = new Path(
-                sourceMachineSprite,
-                sourcePortSprite,
-                destinationMachineSprite,
-                destinationPortSprite
+                sourceMachine,
+                sourcePort,
+                destinationMachine,
+                destinationPort
         );
+
         PathSprite pathSprite = new PathSprite(path);
         pathSprite.setParentSprite(this);
+        pathSprite.setVisualization(getVisualization());
+        getVisualization().addSprite(path, pathSprite);
 
+        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getDestinationPort());
         destinationPortSprite.setUniqueColor(this.uniqueColor);
         this.pathSprites.add(pathSprite);
         return pathSprite;
@@ -109,7 +113,8 @@ public class PortSprite extends Sprite {
             pathSprite.showPathDocks = false;
 
             // Deep
-            pathSprite.getPath().getDestinationPort().showPaths();
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+            destinationPortSprite.showPaths();
         }
     }
 
@@ -121,7 +126,8 @@ public class PortSprite extends Sprite {
             pathSprite.showPathDocks = true;
 
             // Deep
-            pathSprite.getPath().getDestinationPort().showPathDocks();
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+            destinationPortSprite.showPathDocks();
         }
     }
 
@@ -237,6 +243,11 @@ public class PortSprite extends Sprite {
                 mapCanvas.restore();
             }
         }
+    }
+
+    public Port getPort() {
+        Port port = (Port) getModel();
+        return port;
     }
 
     /**
@@ -509,7 +520,8 @@ public class PortSprite extends Sprite {
             pathSprite.setVisibility(isVisible);
 
             // Deep
-            pathSprite.getPath().getDestinationPort().setVisibility(isVisible);
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+            destinationPortSprite.setVisibility(isVisible);
         }
     }
 

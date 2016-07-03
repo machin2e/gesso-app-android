@@ -155,7 +155,7 @@ public abstract class Geometry {
                 minX = point.x;
             }
             if (point.y < minY) {
-                minY = point.x;
+                minY = point.y;
             }
             if (point.x > maxX) {
                 maxX = point.x;
@@ -176,5 +176,144 @@ public abstract class Geometry {
         boundaryPoints[3] = bottom;
 
         return boundaryPoints;
+    }
+
+    public static PointF calculateNearestPoint(PointF sourcePoint, ArrayList<PointF> points) {
+
+        // Initialize point
+        PointF nearestPoint = points.get(0);
+        float nearestDistance = (float) Geometry.calculateDistance(sourcePoint, nearestPoint);
+
+        // Search for the nearest point
+        for (PointF point: points) {
+            float distance = (float) Geometry.calculateDistance(sourcePoint, point);
+            if (distance < nearestDistance) {
+                nearestPoint.set(point);
+            }
+        }
+
+        return nearestPoint;
+    }
+
+    public static ArrayList<PointF> quickHull(ArrayList<PointF> points)
+    {
+        ArrayList<PointF> convexHull = new ArrayList<PointF>();
+        if (points.size() < 3)
+            return (ArrayList) points.clone();
+
+        int minPoint = -1, maxPoint = -1;
+        float minX = Integer.MAX_VALUE;
+        float maxX = Integer.MIN_VALUE;
+        for (int i = 0; i < points.size(); i++)
+        {
+            if (points.get(i).x < minX)
+            {
+                minX = points.get(i).x;
+                minPoint = i;
+            }
+            if (points.get(i).x > maxX)
+            {
+                maxX = points.get(i).x;
+                maxPoint = i;
+            }
+        }
+        PointF A = points.get(minPoint);
+        PointF B = points.get(maxPoint);
+        convexHull.add(A);
+        convexHull.add(B);
+        points.remove(A);
+        points.remove(B);
+
+        ArrayList<PointF> leftSet = new ArrayList<PointF>();
+        ArrayList<PointF> rightSet = new ArrayList<PointF>();
+
+        for (int i = 0; i < points.size(); i++)
+        {
+            PointF p = points.get(i);
+            if (pointLocation(A, B, p) == -1)
+                leftSet.add(p);
+            else if (pointLocation(A, B, p) == 1)
+                rightSet.add(p);
+        }
+        hullSet(A, B, rightSet, convexHull);
+        hullSet(B, A, leftSet, convexHull);
+
+        return convexHull;
+    }
+
+    public static float distance(PointF A, PointF B, PointF C)
+    {
+        float ABx = B.x - A.x;
+        float ABy = B.y - A.y;
+        float num = ABx * (A.y - C.y) - ABy * (A.x - C.x);
+        if (num < 0)
+            num = -num;
+        return num;
+    }
+
+    public static void hullSet(PointF A, PointF B, ArrayList<PointF> set,
+                        ArrayList<PointF> hull)
+    {
+        int insertPosition = hull.indexOf(B);
+        if (set.size() == 0)
+            return;
+        if (set.size() == 1)
+        {
+            PointF p = set.get(0);
+            set.remove(p);
+            hull.add(insertPosition, p);
+            return;
+        }
+        float dist = Integer.MIN_VALUE;
+        int furthestPoint = -1;
+        for (int i = 0; i < set.size(); i++)
+        {
+            PointF p = set.get(i);
+            float distance = distance(A, B, p);
+            if (distance > dist)
+            {
+                dist = distance;
+                furthestPoint = i;
+            }
+        }
+        PointF P = set.get(furthestPoint);
+        set.remove(furthestPoint);
+        hull.add(insertPosition, P);
+
+        // Determine who's to the left of AP
+        ArrayList<PointF> leftSetAP = new ArrayList<PointF>();
+        for (int i = 0; i < set.size(); i++)
+        {
+            PointF M = set.get(i);
+            if (pointLocation(A, P, M) == 1)
+            {
+                leftSetAP.add(M);
+            }
+        }
+
+        // Determine who's to the left of PB
+        ArrayList<PointF> leftSetPB = new ArrayList<PointF>();
+        for (int i = 0; i < set.size(); i++)
+        {
+            PointF M = set.get(i);
+            if (pointLocation(P, B, M) == 1)
+            {
+                leftSetPB.add(M);
+            }
+        }
+        hullSet(A, P, leftSetAP, hull);
+        hullSet(P, B, leftSetPB, hull);
+
+    }
+
+    public static int pointLocation(PointF A, PointF B, PointF P)
+    {
+        float cp1 = (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x);
+        if (cp1 > 0)
+            return 1;
+        else if (cp1 == 0)
+            return 0;
+        else
+            return -1;
     }
 }

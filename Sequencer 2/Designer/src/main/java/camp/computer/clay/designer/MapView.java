@@ -6,12 +6,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 
@@ -70,6 +73,17 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         // Create body and set perspective
         Body body = new Body();
         Perspective perspective = new Perspective(visualization);
+
+//        WindowManager wm = (WindowManager) ApplicationView.getContext().getSystemService(Context.WINDOW_SERVICE);
+//        Display display = wm.getDefaultDisplay();
+//        Point size = new Point();
+//        display.getSize(size);
+//        int displayWidth = size.x;
+//        int displayHeight = size.y;
+//
+//        perspective.setWidth(displayWidth);
+//        perspective.setHeight(displayHeight);
+
         body.setPerspective(perspective);
 
         // Add body to simulation
@@ -110,6 +124,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         canvasBitmap = Bitmap.createBitmap (canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
         canvas = new Canvas ();
         canvas.setBitmap(canvasBitmap);
+
+        simulation.getBody(0).getPerspective().setWidth(canvasWidth);
+        simulation.getBody(0).getPerspective().setHeight(canvasHeight);
 
         identityMatrix = new Matrix ();
 

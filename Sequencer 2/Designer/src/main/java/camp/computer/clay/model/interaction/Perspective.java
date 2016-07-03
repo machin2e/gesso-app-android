@@ -22,7 +22,7 @@ public class Perspective {
     }
 
     public float getWidth() {
-        return getWidth();
+        return this.width;
     }
 
     public void setHeight(float height) {
@@ -62,21 +62,16 @@ public class Perspective {
     private PointF position = new PointF(targetPosition.x, targetPosition.y);
     private int panningDuration = DEFAULT_PANNING_DURATION;
 
-//    public void setPosition(PointF position) {
-//        this.position.x = position.x;
-//        this.position.y = position.y;
-//    }
-
     public void setPosition (PointF targetPosition) {
         Log.v("Position", "setPosition");
 
-        if (this.position.x != targetPosition.x) {
+        if (this.position.x != -targetPosition.x) {
 
             Log.v("Position", "setPosition.x");
 
             // Pan to x position
-            if (this.position.x != targetPosition.x) {
-                Animation.scaleValue(position.x, targetPosition.x, panningDuration, new Animation.OnScaleListener() {
+            if (this.position.x != -targetPosition.x) {
+                Animation.scaleValue(position.x, -targetPosition.x, panningDuration, new Animation.OnScaleListener() {
                     @Override
                     public void onScale(float currentScale) {
                         position.x = currentScale;
@@ -84,16 +79,16 @@ public class Perspective {
                 });
             }
 
-            this.targetPosition.x = targetPosition.x;
+            this.targetPosition.x = -targetPosition.x;
         }
 
-        if (this.position.y != targetPosition.y) {
+        if (this.position.y != -targetPosition.y) {
 
             Log.v("Position", "setPosition.y");
 
             // Pan to y position
-            if (this.position.y != targetPosition.y) {
-                Animation.scaleValue(position.y, targetPosition.y, panningDuration, new Animation.OnScaleListener() {
+            if (this.position.y != -targetPosition.y) {
+                Animation.scaleValue(position.y, -targetPosition.y, panningDuration, new Animation.OnScaleListener() {
                     @Override
                     public void onScale(float currentScale) {
                         position.y = currentScale;
@@ -101,7 +96,7 @@ public class Perspective {
                 });
             }
 
-            this.targetPosition.y = targetPosition.y;
+            this.targetPosition.y = -targetPosition.y;
         }
     }
 

@@ -4,16 +4,16 @@ import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PortSprite;
 
 public class Path extends Model {
-    private MachineSprite sourceMachine; // (Input)
-    private PortSprite sourcePort; // (Input) // TODO: Make ArrayList<Port> sourcePorts
-    private MachineSprite destinationMachine;
-    private PortSprite destinationPort; // TODO: Make ArrayList<Port> destinationPorts
+    private Machine sourceMachine; // (Input)
+    private Port sourcePort; // (Input) // TODO: Make ArrayList<Port> sourcePorts
+    private Machine destinationMachine;
+    private Port destinationPort; // TODO: Make ArrayList<Port> destinationPorts
 
     public Path(
-            MachineSprite sourceMachine,
-            PortSprite sourcePort,
-            MachineSprite destinationMachine,
-            PortSprite destinationPort
+            Machine sourceMachine,
+            Port sourcePort,
+            Machine destinationMachine,
+            Port destinationPort
             ) {
         this.sourceMachine = sourceMachine;
         this.sourcePort = sourcePort;
@@ -21,24 +21,24 @@ public class Path extends Model {
         this.destinationPort = destinationPort;
     }
 
-    public MachineSprite getSourceMachine() {
+    public Machine getSourceMachine() {
         return this.sourceMachine;
     }
 
-    public MachineSprite getDestinationMachine() {
+    public Machine getDestinationMachine() {
         return this.destinationMachine;
     }
 
-    public PortSprite getSourcePort() {
+    public Port getSourcePort() {
         return this.sourcePort;
     }
 
-    public PortSprite getDestinationPort() {
+    public Port getDestinationPort() {
         return this.destinationPort;
     }
 
-    public boolean contains(PortSprite portSprite) {
-        if (portSprite == sourcePort || portSprite == destinationPort) {
+    public boolean contains(Port port) {
+        if (port == sourcePort || port == destinationPort) {
             return true;
         } else {
             return false;

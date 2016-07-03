@@ -147,9 +147,9 @@
         android:layout_marginRight="20dp">
         <Button
             android:id="@+id/context_button"
-            android:text="+"
+            android:text="\u21BA"
             android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
+            android:textSize="20sp"
             android:padding="0dp"
             android:layout_width="40dp"
             android:layout_height="40dp"

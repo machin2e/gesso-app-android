@@ -80,6 +80,9 @@ public class MachineSprite extends Sprite {
         for (Port port: machineModel.getPorts()) {
             PortSprite portSprite = new PortSprite(port);
             portSprite.setParentSprite(this);
+            portSprite.setVisualization(getVisualization());
+            getVisualization().addSprite(port, portSprite);
+
             portSprites.add(portSprite);
             i++;
         }

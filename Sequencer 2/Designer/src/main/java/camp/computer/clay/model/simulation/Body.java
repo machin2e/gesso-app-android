@@ -1,8 +1,6 @@
 package camp.computer.clay.model.simulation;
 
-import android.content.Context;
 import android.graphics.PointF;
-import android.os.Vibrator;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import camp.computer.clay.model.interaction.TouchInteractivity;
 import camp.computer.clay.sprite.MachineSprite;
 import camp.computer.clay.sprite.PathSprite;
 import camp.computer.clay.sprite.PortSprite;
+import camp.computer.clay.sprite.Visualization;
 import camp.computer.clay.sprite.util.Geometry;
 
 public class Body extends Actor {
@@ -61,7 +60,7 @@ public class Body extends Actor {
                             // If perspective is on path, then constraint interactions to ports in the path
                             if (getPerspective().getFocus() instanceof PathSprite) {
                                 PathSprite focusedPathSprite = (PathSprite) getPerspective().getFocus();
-                                if (!focusedPathSprite.getPath().contains(portSprite)) {
+                                if (!focusedPathSprite.getPath().contains((Port) portSprite.getModel())) {
                                     Log.v("InteractionHistory", "Skipping port not in path.");
                                     continue;
                                 }
@@ -81,7 +80,7 @@ public class Body extends Actor {
                                 if (getPerspective().getFocus() instanceof PathSprite) {
                                     PathSprite focusedPathSprite = (PathSprite) getPerspective().getFocus();
                                     Path path = (Path) focusedPathSprite.getModel();
-                                    if (path.getSourcePort() == portSprite) {
+                                    if (path.getSourcePort() == portSprite.getPort()) {
                                         // <PERSPECTIVE>
                                         getPerspective().setFocus(portSprite);
                                         getPerspective().disablePanning();
@@ -110,9 +109,13 @@ public class Body extends Actor {
                         for (PortSprite portSprite : machineSprite.portSprites) {
                             for (PathSprite pathSprite : portSprite.pathSprites) {
 
+                                PortSprite sourcePortSprite = (PortSprite) getPerspective().getVisualization().getSprite(pathSprite.getPath().getSourcePort());
+                                PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+
                                 float distanceToLine = (float) Geometry.calculateLineToPointDistance(
-                                        pathSprite.getPath().getSourcePort().getPosition(),
-                                        pathSprite.getPath().getDestinationPort().getPosition(),
+                                        // TODO: getPerspective().getVisualization().getSprite(<Port/Model>)
+                                        sourcePortSprite.getPosition(),
+                                        destinationPortSprite.getPosition(),
                                         touchInteraction.touch[touchInteraction.pointerId],
                                         true
                                 );
@@ -259,6 +262,9 @@ public class Body extends Actor {
                     machineSprite.showHighlights = true;
                     machineSprite.setPosition(new PointF(touchInteraction.touch[touchInteraction.pointerId].x, touchInteraction.touch[touchInteraction.pointerId].y));
 
+                    // Zoom out to show overview
+                    getPerspective().setScale(0.8f);
+
                 } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
 
                     PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
@@ -277,6 +283,7 @@ public class Body extends Actor {
                     }
 
                     // Show ports of nearby machines
+                    MachineSprite nearestMachineSprite = null;
                     for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
 
                         // Update style of nearby machines
@@ -299,10 +306,7 @@ public class Body extends Actor {
                                     if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 40) {
                                         /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
                                         if (nearbyPortSprite != touchInteraction.overlappedSprite) {
-                                            touchInteraction.overlappedSprite = nearbyPortSprite;
-                                            Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                                            // Vibrate for 500 milliseconds
-                                            v.vibrate(50); // Vibrate once for "YES"
+                                            nearestMachineSprite = nearbyMachineSprite;
                                         }
                                         break;
                                     }
@@ -323,13 +327,40 @@ public class Body extends Actor {
                         }
                     }
 
-                    portSprite.setVisibility(true);
-                    portSprite.showPaths();
+                    // Check if a machine sprite was nearby
+                    if (nearestMachineSprite != null) {
+
+                        touchInteraction.overlappedSprite = nearestMachineSprite;
+
+
+                        /*
+                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                        // Vibrate for 500 milliseconds
+                        v.vibrate(50); // Vibrate once for "YES"
+                        */
+
+                    } else {
+
+                        portSprite.setVisibility(true);
+                        portSprite.showPaths();
+
+                        // Auto-adjust the perspective
+//                        PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
+//                        getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
+                        getPerspective().setScale(0.6f); // Zoom out to show overview
+
+                    }
+
+//                    if (nearestMachineSprite != null) {
+//                        // Auto-adjust the perspective
+//                        getPerspective().setPosition(touchInteraction.overlappedSprite.getPosition());
+//                        getPerspective().setScale(1.1f); // Zoom out to show overview
+//                    }
 
                 }
             } else {
                 if (getPerspective().isPanningEnabled()) {
-                    getPerspective().setScale(0.8f);
+                    getPerspective().setScale(0.9f);
                     getPerspective().setOffset((int) (touchInteraction.touch[touchInteraction.pointerId].x - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].x), (int) (touchInteraction.touch[touchInteraction.pointerId].y - touchInteractivity.getFirstInteraction().touch[touchInteraction.pointerId].y));
                 }
             }
@@ -360,6 +391,7 @@ public class Body extends Actor {
                     }
 
                     // Show ports of nearby machines
+                    MachineSprite nearestMachineSprite = null;
                     for (MachineSprite nearbyMachineSprite: getPerspective().getVisualization().getMachineSprites()) {
 
                         // Update style of nearby machines
@@ -381,12 +413,7 @@ public class Body extends Actor {
                                     );
                                     if (distanceToNearbyPortSprite < nearbyPortSprite.shapeRadius + 20) {
                                         /* portSprite.setPosition(nearbyPortSprite.getRelativePosition()); */
-                                        if (nearbyPortSprite != touchInteraction.overlappedSprite) {
-                                            touchInteraction.overlappedSprite = nearbyPortSprite;
-                                            Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                                            // Vibrate for 500 milliseconds
-                                            v.vibrate(50); // Vibrate once for "YES"
-                                        }
+                                        nearestMachineSprite = nearbyMachineSprite;
                                         break;
                                     }
                                 } else {
@@ -405,6 +432,36 @@ public class Body extends Actor {
                             }
                         }
                     }
+
+                    // Check if a machine sprite was nearby
+                    if (nearestMachineSprite != null) {
+
+                        touchInteraction.overlappedSprite = nearestMachineSprite;
+
+
+                        /*
+                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                        // Vibrate for 500 milliseconds
+                        v.vibrate(50); // Vibrate once for "YES"
+                        */
+
+                    } else {
+
+                        portSprite.setVisibility(true);
+                        portSprite.showPaths();
+
+                        // Auto-adjust the perspective
+//                        PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
+//                        getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
+                        getPerspective().setScale(0.8f); // Zoom out to show overview
+
+                    }
+
+//                    if (nearestMachineSprite != null) {
+//                        // Auto-adjust the perspective
+//                        getPerspective().setPosition(touchInteraction.overlappedSprite.getPosition());
+//                        getPerspective().setScale(1.1f); // Zoom out to show overview
+//                    }
 
                 }
             } else {
@@ -474,6 +531,9 @@ public class Body extends Actor {
                     getPerspective().disablePanning();
                 }
 
+                // Zoom out to show overview
+                getPerspective().setScale(1.0f);
+
             } else if (touchInteractivity.touchedSprite[touchInteraction.pointerId] instanceof PortSprite) {
                 PortSprite portSprite = (PortSprite) touchInteractivity.touchedSprite[touchInteraction.pointerId];
 //                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touch[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.RELEASE);
@@ -522,15 +582,22 @@ public class Body extends Actor {
                                     nearbyPort.portType = Port.PortType.getNextType(nearbyPort.portType);
 
                                     // Create and add path to port
+                                    Machine sourceMachine = (Machine) getPerspective().getVisualization().getModel(portSprite.getMachineSprite());
+                                    Port sourcePort = (Port) getPerspective().getVisualization().getModel(portSprite);
+                                    Machine destinationMachine = (Machine) getPerspective().getVisualization().getModel(nearbyPortSprite.getMachineSprite());
+                                    Port destinationPort = (Port) getPerspective().getVisualization().getModel(nearbyPortSprite);
+                                    Log.v("Nearby", "" + sourceMachine);
+                                    Log.v("Nearby", "" + sourcePort);
+                                    Log.v("Nearby", "" + destinationMachine);
+                                    Log.v("Nearby", "" + destinationPort);
                                     PathSprite pathSprite = portSprite.addPath(
-                                            portSprite.getMachineSprite(),
-                                            portSprite,
-                                            nearbyPortSprite.getMachineSprite(),
-                                            nearbyPortSprite
+                                            sourceMachine,
+                                            sourcePort,
+                                            destinationMachine,
+                                            destinationPort
                                     );
 
-
-                                    pathSprite.getPath().getSourcePort().showPaths();
+                                    portSprite.showPaths();
                                     pathSprite.setVisibility(true);
 //                                        pathSprite.showDirectedPaths = true;
 //                                        pathSprite.showPathDocks = false;
@@ -538,11 +605,14 @@ public class Body extends Actor {
 
 
 
+                                    /*
                                     Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
                                     // Vibrate for 500 milliseconds
                                     v.vibrate(50);
                                     //v.vibrate(50); off
                                     //v.vibrate(50); // second tap
+                                    */
+
                                     touchInteraction.overlappedSprite = null;
                                     break;
                                 }
@@ -583,7 +653,13 @@ public class Body extends Actor {
                         machineSprite.hidePaths();
                         machineSprite.setTransparency(1.0f);
                     }
-                    getPerspective().setScale(1.0f);
+
+                    // Adjust panning
+                    // Auto-adjust the perspective
+                    PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
+                    getPerspective().setPosition(new PointF(centroidPosition.x, centroidPosition.y));
+
+                    adjustScale();
                 }
             }
 
@@ -608,31 +684,70 @@ public class Body extends Actor {
         // Stop dragging
         touchInteractivity.isDragging[touchInteraction.pointerId] = false;
 
-        // Auto-adjust the perspective
-        ArrayList<PointF> machineCenterPoints = new ArrayList<PointF>();
-        for (MachineSprite machineSprite: getPerspective().getVisualization().getMachineSprites()) {
-            machineCenterPoints.add(machineSprite.getPosition());
+        /*
+        // Adjust panning
+//                    getPerspective().setScale(1.0f);
+        ArrayList<PointF> machinePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineSprites());
+        float[] spriteBoundingBox = Geometry.calculateBoundingBox(machinePositions);
+
+        float minVisibleX = (-getPerspective().getPosition().x - ((getPerspective().getWidth() / 2.0f) * getPerspective().getScale()));
+        float maxVisibleX = (-getPerspective().getPosition().x + ((getPerspective().getWidth() / 2.0f) * getPerspective().getScale()));
+        float minVisibleY = (getPerspective().getPosition().y - ((getPerspective().getHeight() / 2.0f) * getPerspective().getScale()));
+        float maxVisibleY = (getPerspective().getPosition().y + ((getPerspective().getHeight() / 2.0f) * getPerspective().getScale()));
+
+        Log.v("Bounds", "minVisibleX: " + minVisibleX);
+        Log.v("Bounds", "maxVisibleX: " + maxVisibleX);
+        Log.v("Bounds", "spriteBoundingBox[0]: " + spriteBoundingBox[0]);
+        Log.v("Bounds", "spriteBoundingBox[2]: " + spriteBoundingBox[2]);
+
+        PointF centroidPosition = getPerspective().getVisualization().getCentroidPosition();
+
+        if (minVisibleX < (spriteBoundingBox[0] - (getPerspective().getWidth() / 2.0f))) {
+            this.getPerspective().setPosition(new PointF(spriteBoundingBox[0], getPerspective().getPosition().y));
         }
-        PointF centroidPoint = Geometry.calculateCentroid(machineCenterPoints);
-        centroidPoint.x = -centroidPoint.x;
-        centroidPoint.y = -centroidPoint.y;
-//        centroidPoint.x = centroidPoint.x - getPerspective().getPosition().x;
-//        centroidPoint.y = centroidPoint.y - getPerspective().getPosition().y;
-        getPerspective().setPosition(centroidPoint);
+
+        if (maxVisibleX > (spriteBoundingBox[2] + (getPerspective().getWidth() / 2.0f))) {
+            this.getPerspective().setPosition(new PointF(spriteBoundingBox[2], getPerspective().getPosition().y));
+        }
+
+        if (minVisibleY < (spriteBoundingBox[1] - (getPerspective().getHeight() / 2.0f))) {
+            this.getPerspective().setPosition(new PointF(-getPerspective().getPosition().x, spriteBoundingBox[1]));
+        }
+
+        if (maxVisibleY > (spriteBoundingBox[3] + (getPerspective().getHeight() / 2.0f))) {
+            this.getPerspective().setPosition(new PointF(-getPerspective().getPosition().x, spriteBoundingBox[3]));
+        }
+        */
 
 
+
+    }
+
+    private void adjustScale() {
 
         // Adjust scale
-        float[] bounds = Geometry.calculateBoundingBox(machineCenterPoints);
-        PointF boundCenter = new PointF(((bounds[2] - bounds[0]) / 2.0f), ((bounds[3] - bounds[1]) / 2.0f));
-        float boundWidth = bounds[2] - bounds[1];
-        float boundHeight = bounds[3] - bounds[0];
+        ArrayList<PointF> machinePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineSprites());
+        float[] spriteBoundingBox = Geometry.calculateBoundingBox(machinePositions);
+        PointF spriteBoundingBoxCenter = new PointF(((spriteBoundingBox[2] - spriteBoundingBox[0]) / 2.0f), ((spriteBoundingBox[3] - spriteBoundingBox[1]) / 2.0f));
+        float spriteBoundingBoxWidth = spriteBoundingBox[2] - spriteBoundingBox[0];
+        float spriteBoundingBoxHeight = spriteBoundingBox[3] - spriteBoundingBox[1];
 
-        //float boundToScaleRatio = ;
-        float currentWidthSpan = getPerspective().getScale() * getPerspective().getWidth() /* screen width */;
-        float boundWidthSpan = getPerspective().getScale() * boundWidth;
+        float widthDifference = spriteBoundingBoxWidth - getPerspective().getWidth();
+        float heightDifference = spriteBoundingBoxHeight - getPerspective().getHeight();
 
+        float widthPadding = 0;
+        float newWidthScale = getPerspective().getWidth() / (spriteBoundingBoxWidth + widthPadding);
+        float newHeightScale = getPerspective().getHeight() / (spriteBoundingBoxHeight + widthPadding);
 
+        if (widthDifference > 0 /* || heightDifference > 0 */) {
+//            if (newWidthScale > newHeightScale) {
+                getPerspective().setScale(newWidthScale);
+//            } else {
+//                getPerspective().setScale(newHeightScale);
+//            }
+        } else {
+            getPerspective().setScale(1.0f);
+        }
     }
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
@@ -672,7 +787,8 @@ public class Body extends Actor {
                 ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
 
                 // Scale map.
-                getPerspective().setScale(0.8f);
+                getPerspective().setScale(1.2f);
+                getPerspective().setPosition(machineSprite.getPosition());
 
                 getPerspective().disablePanning();
             }
@@ -764,11 +880,11 @@ public class Body extends Actor {
             // No touch on board or port. Touch is on map. So hide ports.
             for (MachineSprite machineSprite : getPerspective().getVisualization().getMachineSprites()) {
                 machineSprite.hidePorts();
-                machineSprite.setScale(1.0f);
                 machineSprite.hidePaths();
                 machineSprite.setTransparency(1.0f);
             }
-            getPerspective().setScale(1.0f);
+
+            adjustScale();
 
             // Reset map interactivity
             getPerspective().enablePanning();

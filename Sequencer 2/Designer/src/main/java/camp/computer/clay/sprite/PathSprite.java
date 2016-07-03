@@ -144,22 +144,25 @@ public class PathSprite extends Sprite {
 
             Path path = (Path) getModel();
 
+            PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getSourcePort());
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getDestinationPort());
+
             // Show destination port
-            path.getDestinationPort().setVisibility(true);
-            path.getDestinationPort().setPathVisibility(true);
+            destinationPortSprite.setVisibility(true);
+            destinationPortSprite.setPathVisibility(true);
 
             mapCanvas.save();
 
             // Color
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(15.0f);
-            paint.setColor(path.getSourcePort().getUniqueColor());
+            paint.setColor(sourcePortSprite.getUniqueColor());
 
             mapCanvas.drawLine(
-                    path.getSourcePort().getPosition().x,
-                    path.getSourcePort().getPosition().y,
-                    path.getDestinationPort().getPosition().x,
-                    path.getDestinationPort().getPosition().y,
+                    sourcePortSprite.getPosition().x,
+                    sourcePortSprite.getPosition().y,
+                    destinationPortSprite.getPosition().x,
+                    destinationPortSprite.getPosition().y,
                     paint
             );
 
@@ -173,19 +176,22 @@ public class PathSprite extends Sprite {
 
         Path path = (Path) getModel();
 
+        PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getSourcePort());
+        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getDestinationPort());
+
         // Show destination port
-        path.getDestinationPort().setVisibility(true);
-        path.getDestinationPort().setPathVisibility(true);
+        destinationPortSprite.setVisibility(true);
+        destinationPortSprite.setPathVisibility(true);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
-        paint.setColor(path.getSourcePort().getUniqueColor());
+        paint.setColor(sourcePortSprite.getUniqueColor());
 
         if (showDirectedPaths) {
             float pathRotationAngle = Geometry.calculateRotationAngle(
-                    path.getSourcePort().getPosition(),
-                    path.getDestinationPort().getPosition()
+                    sourcePortSprite.getPosition(),
+                    destinationPortSprite.getPosition()
             );
 
             float triangleRotationAngle = pathRotationAngle + 90.0f;
@@ -193,12 +199,12 @@ public class PathSprite extends Sprite {
             if (showPathDocks) {
 
                 float pathDistance = (float) Geometry.calculateDistance(
-                        path.getSourcePort().getPosition(),
-                        path.getDestinationMachine().getPosition()
+                        sourcePortSprite.getPosition(),
+                        destinationPortSprite.getPosition()
                 );
 
                 PointF triangleCenterPosition = Geometry.calculatePoint(
-                        path.getSourcePort().getPosition(),
+                        sourcePortSprite.getPosition(),
                         pathRotationAngle,
                         2 * triangleSpacing
                 );
@@ -214,7 +220,7 @@ public class PathSprite extends Sprite {
                 );
 
                 PointF triangleCenterPositionDestination = Geometry.calculatePoint(
-                        path.getDestinationPort().getPosition(),
+                        destinationPortSprite.getPosition(),
                         pathRotationAngle + 180,
                         2 * triangleSpacing
                 );
@@ -232,20 +238,20 @@ public class PathSprite extends Sprite {
             } else {
 
                 float pathDistance = (float) Geometry.calculateDistance(
-                        path.getSourcePort().getPosition(),
-                        path.getDestinationPort().getPosition()
+                        sourcePortSprite.getPosition(),
+                        destinationPortSprite.getPosition()
                 );
 
                 PointF pathMidpoint = Geometry.calculateMidpoint(
-                        path.getSourcePort().getPosition(),
-                        path.getDestinationPort().getPosition()
+                        sourcePortSprite.getPosition(),
+                        destinationPortSprite.getPosition()
                 );
 
                 for (int k = 0; ; k++) {
 
                     // Calculate triangle position
                     PointF triangleCenterPosition = Geometry.calculatePoint(
-                            path.getSourcePort().getPosition(),
+                            sourcePortSprite.getPosition(),
                             pathRotationAngle,
                             k * triangleSpacing
                     );
@@ -292,7 +298,7 @@ public class PathSprite extends Sprite {
                 if (isEditorVisible) {
                     // <SPREADSHEET>
                     paint.setStyle(Paint.Style.FILL);
-                    paint.setColor(path.getSourcePort().getUniqueColor());
+                    paint.setColor(sourcePortSprite.getUniqueColor());
                     float spreadsheetSpriteWidth = 50.0f;
                     mapCanvas.drawRect(
                             pathMidpoint.x + -(spreadsheetSpriteWidth / 2.0f),

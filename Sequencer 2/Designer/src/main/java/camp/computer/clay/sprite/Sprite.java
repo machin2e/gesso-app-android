@@ -17,6 +17,16 @@ public abstract class Sprite {
 
     private Model model;
 
+    private Visualization visualization;
+
+    public void setVisualization(Visualization visualization) {
+        this.visualization = visualization;
+    }
+
+    public Visualization getVisualization() {
+        return this.visualization;
+    }
+
     private TouchActionListener touchActionListener;
 
     public Sprite(Model model) {
