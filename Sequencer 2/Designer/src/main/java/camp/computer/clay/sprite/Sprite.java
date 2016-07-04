@@ -106,7 +106,7 @@ public abstract class Sprite {
         this.isVisible = isVisible;
     }
 
-    public boolean getVisibility () {
+    public boolean isVisible() {
         return this.isVisible;
     }
 

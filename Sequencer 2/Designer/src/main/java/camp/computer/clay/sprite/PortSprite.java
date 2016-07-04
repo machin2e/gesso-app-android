@@ -82,9 +82,9 @@ public class PortSprite extends Sprite {
         PathSprite pathSprite = new PathSprite(path);
         pathSprite.setParentSprite(this);
         pathSprite.setVisualization(getVisualization());
-        getVisualization().addSprite(path, pathSprite);
+        getVisualization().getLayer(0).addSprite(path, pathSprite);
 
-        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getPort(1));
+        PortSprite destinationPortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(path.getPort(1));
         destinationPortSprite.setUniqueColor(this.uniqueColor);
         this.pathSprites.add(pathSprite);
         return pathSprite;
@@ -108,7 +108,7 @@ public class PortSprite extends Sprite {
             pathSprite.showPathDocks = false;
 
             // Deep
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getPort(1));
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
             destinationPortSprite.showPaths();
         }
     }
@@ -121,7 +121,7 @@ public class PortSprite extends Sprite {
             pathSprite.showPathDocks = true;
 
             // Deep
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getPort(1));
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
             destinationPortSprite.showPathDocks();
         }
     }
@@ -129,7 +129,7 @@ public class PortSprite extends Sprite {
     public void draw(MapView mapView) {
         this.mapView = mapView;
 
-        if (getVisibility()) {
+        if (isVisible()) {
 
             drawShapeLayer(mapView);
             drawStyleLayer(mapView);
@@ -515,14 +515,14 @@ public class PortSprite extends Sprite {
             pathSprite.setVisibility(isVisible);
 
             // Deep
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getPort(1));
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
             destinationPortSprite.setVisibility(isVisible);
         }
     }
 
     public boolean hasVisiblePaths () {
         for (PathSprite pathSprite: pathSprites) {
-            if (pathSprite.getVisibility() && !pathSprite.showPathDocks) {
+            if (pathSprite.isVisible() && !pathSprite.showPathDocks) {
                 return true;
             }
         }
@@ -532,7 +532,7 @@ public class PortSprite extends Sprite {
     public ArrayList<PathSprite> getVisiblePaths() {
         ArrayList<PathSprite> visiblePathSprites = new ArrayList<PathSprite>();
         for (PathSprite pathSprite: pathSprites) {
-            if (pathSprite.getVisibility()) {
+            if (pathSprite.isVisible()) {
                 visiblePathSprites.add(pathSprite);
             }
         }
@@ -543,7 +543,7 @@ public class PortSprite extends Sprite {
 
     @Override
     public boolean isTouching(PointF point) {
-        if (getVisibility()) {
+        if (isVisible()) {
 
 //            boolean touching = (Geometry.calculateDistance(point, this.getRelativePosition()) < (this.shapeRadius + 10));
 //            if (touching) {

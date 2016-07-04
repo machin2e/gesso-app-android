@@ -120,7 +120,7 @@ public class PathSprite extends Sprite {
 
     public void draw(MapView mapView) {
 
-        if (getVisibility()) {
+        if (isVisible()) {
             Canvas mapCanvas = mapView.getCanvas();
             Paint paint = mapView.getPaint();
 
@@ -144,8 +144,8 @@ public class PathSprite extends Sprite {
 
             Path path = (Path) getModel();
 
-            PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getPort(0));
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getPort(1));
+            PortSprite sourcePortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(path.getPort(0));
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(path.getPort(1));
 
             // Show destination port
             destinationPortSprite.setVisibility(true);
@@ -176,8 +176,8 @@ public class PathSprite extends Sprite {
 
         Path path = (Path) getModel();
 
-        PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getPort(0));
-        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getPort(1));
+        PortSprite sourcePortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(path.getPort(0));
+        PortSprite destinationPortSprite = (PortSprite) getVisualization().getLayer(0).getSprite(path.getPort(1));
 
         // Show destination port
         destinationPortSprite.setVisibility(true);
@@ -327,7 +327,7 @@ public class PathSprite extends Sprite {
         showAnnotationLayer = isVisible;
     }
 
-    public boolean getVisibility() {
+    public boolean isVisible() {
         return this.isVisible;
     }
 

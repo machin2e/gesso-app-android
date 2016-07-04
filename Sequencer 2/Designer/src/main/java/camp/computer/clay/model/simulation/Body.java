@@ -136,11 +136,11 @@ public class Body extends Actor {
                         for (PortSprite portSprite : machineSprite.portSprites) {
                             for (PathSprite pathSprite : portSprite.pathSprites) {
 
-                                PortSprite sourcePortSprite = (PortSprite) getPerspective().getVisualization().getSprite(pathSprite.getPath().getPort(0));
-                                PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getSprite(pathSprite.getPath().getPort(1));
+                                PortSprite sourcePortSprite = (PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(0));
+                                PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
 
                                 float distanceToLine = (float) Geometry.calculateLineToPointDistance(
-                                        // TODO: getPerspective().getVisualization().getSprite(<Port/Model>)
+                                        // TODO: getPerspective().getVisualization().getLayer(0).getSprite(<Port/Model>)
                                         sourcePortSprite.getPosition(),
                                         destinationPortSprite.getPosition(),
                                         touchInteraction.touch[touchInteraction.pointerId],
@@ -375,12 +375,12 @@ public class Body extends Actor {
                     ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(portSprite.getPort());
                     for (Path connectedPath : paths) {
                         // Show ports
-                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).setVisibility(true);
-//                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).showPaths();
-                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).setVisibility(true);
-//                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).showPaths();
+                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).setVisibility(true);
+//                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).showPaths();
+                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).setVisibility(true);
+//                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).showPaths();
                         // Show path
-                        getPerspective().getVisualization().getSprite(connectedPath).setVisibility(true);
+                        getPerspective().getVisualization().getLayer(0).getSprite(connectedPath).setVisibility(true);
                     }
                 }
 
@@ -461,12 +461,12 @@ public class Body extends Actor {
                             ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(portSprite.getPort());
                             for (Path connectedPath: paths) {
                                 // Show ports
-                                ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).setVisibility(true);
-                                ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).showPaths();
-                                ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).setVisibility(true);
-                                ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).showPaths();
+                                ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).setVisibility(true);
+                                ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).showPaths();
+                                ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).setVisibility(true);
+                                ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).showPaths();
                                 // Show path
-                                getPerspective().getVisualization().getSprite(connectedPath).setVisibility(true);
+                                getPerspective().getVisualization().getLayer(0).getSprite(connectedPath).setVisibility(true);
                             }
 
                             // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
@@ -584,8 +584,8 @@ public class Body extends Actor {
                                 nearbyPort.portType = Port.PortType.getNextType(nearbyPort.portType);
 
                                 // Create and add path to port
-                                Port sourcePort = (Port) getPerspective().getVisualization().getModel(portSprite);
-                                Port destinationPort = (Port) getPerspective().getVisualization().getModel(nearbyPortSprite);
+                                Port sourcePort = (Port) getPerspective().getVisualization().getLayer(0).getModel(portSprite);
+                                Port destinationPort = (Port) getPerspective().getVisualization().getLayer(0).getModel(nearbyPortSprite);
 
                                 if (sourcePort.getPaths().size() == 0) {
 
@@ -595,9 +595,9 @@ public class Body extends Actor {
                                     PathSprite pathSprite = new PathSprite(path);
                                     pathSprite.setParentSprite(portSprite);
                                     pathSprite.setVisualization(getPerspective().getVisualization());
-                                    getPerspective().getVisualization().addSprite(path, pathSprite);
+                                    getPerspective().getVisualization().getLayer(0).addSprite(path, pathSprite);
 
-                                    PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getSprite(path.getPort(1));
+                                    PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(path.getPort(1));
                                     if (destinationPort.getPaths().size() == 0) {
                                         destinationPortSprite.setUniqueColor(portSprite.getUniqueColor());
                                     }
@@ -612,12 +612,12 @@ public class Body extends Actor {
                                     ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
                                     for (Path connectedPath: paths) {
                                         // Show ports
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).setVisibility(true);
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).showPaths();
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).setVisibility(true);
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).showPaths();
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).setVisibility(true);
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).showPaths();
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).setVisibility(true);
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).showPaths();
                                         // Show path
-                                        getPerspective().getVisualization().getSprite(connectedPath).setVisibility(true);
+                                        getPerspective().getVisualization().getLayer(0).getSprite(connectedPath).setVisibility(true);
                                     }
 
                                 } else {
@@ -631,9 +631,9 @@ public class Body extends Actor {
                                     PathSprite pathSprite = new PathSprite(path);
                                     pathSprite.setParentSprite(portSprite);
                                     pathSprite.setVisualization(getPerspective().getVisualization());
-                                    getPerspective().getVisualization().addSprite(path, pathSprite);
+                                    getPerspective().getVisualization().getLayer(0).addSprite(path, pathSprite);
 
-                                    PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getSprite(path.getPort(1));
+                                    PortSprite destinationPortSprite = (PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(path.getPort(1));
                                     destinationPortSprite.setUniqueColor(portSprite.getUniqueColor());
                                     portSprite.pathSprites.add(pathSprite);
 
@@ -646,12 +646,12 @@ public class Body extends Actor {
                                     ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
                                     for (Path connectedPath: paths) {
                                         // Show ports
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).setVisibility(true);
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(0))).showPaths();
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).setVisibility(true);
-                                        ((PortSprite) getPerspective().getVisualization().getSprite(connectedPath.getPort(1))).showPaths();
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).setVisibility(true);
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(0))).showPaths();
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).setVisibility(true);
+                                        ((PortSprite) getPerspective().getVisualization().getLayer(0).getSprite(connectedPath.getPort(1))).showPaths();
                                         // Show path
-                                        getPerspective().getVisualization().getSprite(connectedPath).setVisibility(true);
+                                        getPerspective().getVisualization().getLayer(0).getSprite(connectedPath).setVisibility(true);
                                     }
 
                                 }

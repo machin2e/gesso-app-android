@@ -81,7 +81,7 @@ public class MachineSprite extends Sprite {
             PortSprite portSprite = new PortSprite(port);
             portSprite.setParentSprite(this);
             portSprite.setVisualization(getVisualization());
-            getVisualization().addSprite(port, portSprite);
+            getVisualization().getLayer(0).addSprite(port, portSprite);
 
             portSprites.add(portSprite);
             i++;
@@ -107,7 +107,7 @@ public class MachineSprite extends Sprite {
 
     public void draw(MapView mapView) {
 
-        if (getVisibility()) {
+        if (isVisible()) {
 
             drawStyleLayer(mapView);
 
@@ -369,7 +369,7 @@ public class MachineSprite extends Sprite {
     //-------------------------
 
     public boolean isTouching (PointF point) {
-        if (getVisibility()) {
+        if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardHeight / 2.0f);
         } else {
             return false;

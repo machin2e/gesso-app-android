@@ -384,7 +384,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 //        timelineButton.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
 //            public boolean onLongClick(View v) {
-//                if (oldTimelineView.getVisibility() == View.GONE) {
+//                if (oldTimelineView.isVisible() == View.GONE) {
 //                    oldTimelineView.setVisibility(View.VISIBLE);
 //                    timelineButton.setText("Map");
 //                    cursorView.show(true);

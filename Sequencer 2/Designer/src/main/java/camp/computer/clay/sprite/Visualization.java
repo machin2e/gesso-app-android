@@ -1,14 +1,11 @@
 package camp.computer.clay.sprite;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.simulation.Machine;
-import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.sprite.util.Geometry;
@@ -30,7 +27,9 @@ public class Visualization extends Sprite {
     }
 
     // Sprites
-    private HashMap<Model, Sprite> sprites = new HashMap<Model, Sprite>();
+//    private HashMap<Model, Sprite> sprites = new HashMap<Model, Sprite>();
+
+    private ArrayList<Layer> layers = new ArrayList<Layer>();
 
     public Visualization(Simulation simulation) {
         super(simulation);
@@ -41,7 +40,14 @@ public class Visualization extends Sprite {
         // initializeSprites();
     }
 
+    public Layer getLayer(int index) {
+        return this.layers.get(index);
+    }
+
     public void initializeSprites() {
+
+        Layer defaultLayer = new Layer(this);
+        this.layers.add(defaultLayer);
 
         Simulation simulation = (Simulation) getModel();
 
@@ -51,7 +57,7 @@ public class Visualization extends Sprite {
             machineSprite.setParentSprite(this);
             machineSprite.setVisualization(this);
 
-            addSprite(machine, machineSprite);
+            defaultLayer.addSprite(machine, machineSprite);
         }
 
         // Calculate random positions separated by minimum distance
@@ -90,7 +96,7 @@ public class Visualization extends Sprite {
 
         for (int i = 0; i < simulation.getMachines().size(); i++) {
 
-            MachineSprite machineSprite = (MachineSprite) getSprite(simulation.getMachine(i));
+            MachineSprite machineSprite = (MachineSprite) defaultLayer.getSprite(simulation.getMachine(i));
 
             machineSprite.setRelativePosition(machineSpriteCenterPoints.get(i));
             machineSprite.setRotation(Number.getRandom().nextInt(360));
@@ -99,30 +105,30 @@ public class Visualization extends Sprite {
         }
     }
 
-    public void addSprite(Model model, Sprite sprite) {
-//        if (!this.sprites.containsKey(model)) {
-            this.sprites.put(model, sprite);
+//    public void addSprite(Model model, Sprite sprite) {
+////        if (!this.sprites.containsKey(model)) {
+//            this.sprites.put(model, sprite);
+////        }
+//    }
+//
+//    public Sprite getSprite(Model model) {
+//        return this.sprites.get(model);
+//    }
+//
+//    public Model getModel(Sprite sprite) {
+//        for (Model model: this.sprites.keySet()) {
+//            if (this.sprites.get(model) == sprite) {
+//                return model;
+//            }
 //        }
-    }
+//        return null;
+//    }
 
-    public Sprite getSprite(Model model) {
-        return this.sprites.get(model);
-    }
-
-    public Model getModel(Sprite sprite) {
-        for (Model model: this.sprites.keySet()) {
-            if (this.sprites.get(model) == sprite) {
-                return model;
-            }
-        }
-        return null;
-    }
-
-    public void removeSprite(Model model, Sprite sprite) {
-        if (this.sprites.containsKey(model)) {
-            this.sprites.remove(model);
-        }
-    }
+//    public void removeSprite(Model model, Sprite sprite) {
+//        if (this.sprites.containsKey(model)) {
+//            this.sprites.remove(model);
+//        }
+//    }
 
 //    public ArrayList<Sprite> getSprites() {
 //        return this.sprites;
@@ -145,9 +151,11 @@ public class Visualization extends Sprite {
 
         ArrayList<MachineSprite> sprites = new ArrayList<MachineSprite>();
 
-        for (Sprite sprite: this.sprites.values()) {
-            if (sprite instanceof MachineSprite) {
-                sprites.add((MachineSprite) sprite);
+        for (Layer layer: this.layers) {
+            for (Sprite sprite: layer.getSprites()) {
+                if (sprite instanceof MachineSprite) {
+                    sprites.add((MachineSprite) sprite);
+                }
             }
         }
 
@@ -163,8 +171,10 @@ public class Visualization extends Sprite {
 
         Simulation simulation = getSimulation();
 
-        for (Machine machine: simulation.getMachines()) {
-            getSprite(machine).draw(mapView);
+        for (Layer layer: this.layers) {
+            for (Sprite sprite: layer.getSprites()) {
+                sprite.draw(mapView);
+            }
         }
     }
 
@@ -181,8 +191,10 @@ public class Visualization extends Sprite {
     public void update() {
         Simulation simulation = getSimulation();
 
-        for (Machine machine: simulation.getMachines()) {
-            getSprite(machine).update();
+        for (Layer layer: this.layers) {
+            for (Sprite sprite: layer.getSprites()) {
+                sprite.update();
+            }
         }
     }
 
@@ -192,9 +204,12 @@ public class Visualization extends Sprite {
 
         Simulation simulation = getSimulation();
 
-        for (Machine machine: simulation.getMachines()) {
-            Sprite sprite = getSprite(machine);
-            spritePositions.add(sprite.getPosition());
+        for (Layer layer: this.layers) {
+            for (Sprite sprite: layer.getSprites()) {
+                if (sprite.isVisible()) {
+                    spritePositions.add(sprite.getPosition());
+                }
+            }
         }
 
         PointF centroidPosition = Geometry.calculateCentroid(spritePositions);
