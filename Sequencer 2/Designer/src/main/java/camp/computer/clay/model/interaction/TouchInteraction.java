@@ -3,7 +3,7 @@ package camp.computer.clay.model.interaction;
 import android.graphics.PointF;
 
 import camp.computer.clay.model.simulation.Body;
-import camp.computer.clay.sprite.Sprite;
+import camp.computer.clay.visualization.Image;
 
 public class TouchInteraction {
 
@@ -95,10 +95,10 @@ public class TouchInteraction {
     //public int touches[];
     public int pointerId = -1;
 
-    // touchedSprite
-    // overlappedSprite (not needed, probably, because can look in history, or look at first action in interaction)
+    // touchedImage
+    // overlappedImage (not needed, probably, because can look in history, or look at first action in interaction)
 
-    public Sprite overlappedSprite = null;
+    public Image overlappedImage = null;
 
     //public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
     public TouchInteraction(TouchInteractionType touchInteractionType) {

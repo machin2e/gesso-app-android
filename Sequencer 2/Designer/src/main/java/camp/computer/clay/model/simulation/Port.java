@@ -19,7 +19,7 @@ public class Port extends Model {
     }
 
     // <MODEL>
-    public enum PortDirection {
+    public enum Direction {
 
         NONE(0),
         OUTPUT(1),
@@ -29,12 +29,12 @@ public class Port extends Model {
         // TODO: Change the index to a UUID?
         int index;
 
-        PortDirection(int index) {
+        Direction(int index) {
             this.index = index;
         }
     }
 
-    public enum PortType {
+    public enum Type {
 
         NONE(0),
         SWITCH(1),
@@ -46,28 +46,34 @@ public class Port extends Model {
         // TODO: Change the index to a UUID?
         int index;
 
-        PortType(int index) {
+        Type(int index) {
             this.index = index;
         }
 
-        public static PortType getNextType(PortType currentPortType) {
-            return PortType.values()[(currentPortType.index + 1) % PortType.values().length];
+        public static Type getNextType(Type currentType) {
+            return Type.values()[(currentType.index + 1) % Type.values().length];
         }
     }
 
-    public PortType portType = PortType.NONE;
-    public PortDirection portDirection = PortDirection.NONE;
+    private Type type = Type.NONE;
+    private Direction direction = Direction.NONE;
 
     // TODO: Physical dimensions (of actual physical object)
 
-    // TODO: Move into Port
-    public PortType getType() {
-        return this.portType;
+    public Type getType() {
+        return this.type;
     }
 
-    // TODO: Move into Port
-    public void setPortType(PortType portType) {
-        this.portType = portType;
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Direction getDirection() {
+        return this.direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public boolean hasPaths() {

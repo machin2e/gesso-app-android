@@ -32,7 +32,7 @@ import com.mobeta.android.sequencer.R;
 import java.util.ArrayList;
 
 import camp.computer.clay.resource.NetworkResource;
-import camp.computer.clay.sprite.util.Animation;
+import camp.computer.clay.visualization.util.Animation;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.DatagramManager;
 import camp.computer.clay.system.Device;

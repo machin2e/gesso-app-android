@@ -1,4 +1,4 @@
-package camp.computer.clay.sprite.util;
+package camp.computer.clay.visualization.util;
 
 import java.util.Random;
 

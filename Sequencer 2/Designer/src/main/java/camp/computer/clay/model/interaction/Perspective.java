@@ -1,14 +1,11 @@
 package camp.computer.clay.model.interaction;
 
-import android.content.Context;
 import android.graphics.PointF;
-import android.os.Vibrator;
 import android.util.Log;
 
-import camp.computer.clay.designer.ApplicationView;
-import camp.computer.clay.sprite.Sprite;
-import camp.computer.clay.sprite.Visualization;
-import camp.computer.clay.sprite.util.Animation;
+import camp.computer.clay.visualization.Image;
+import camp.computer.clay.visualization.Visualization;
+import camp.computer.clay.visualization.util.Animation;
 
 public class Perspective {
     // TODO: Move position into Body, so can share Perspective among different bodies
@@ -41,7 +38,7 @@ public class Perspective {
 //    private boolean isMachinePerspective = false;
 //    private boolean isPortPerspective = false;
 //    private boolean isPathPerspective = false; // TODO: Infer this from interaction history/perspective
-    private Sprite focusSprite = null;
+    private Image focusImage = null;
 
     private boolean isPanningEnabled = true;
 
@@ -155,15 +152,15 @@ public class Perspective {
         return this.visualization;
     }
 
-    public Sprite getFocus() {
-        return this.focusSprite;
+    public Image getFocus() {
+        return this.focusImage;
     }
 
-    public void setFocus(Sprite sprite) {
-        this.focusSprite = sprite;
+    public void setFocus(Image image) {
+        this.focusImage = image;
     }
 
-//    public void setFocus(ArrayList<Sprite> sprites) {
+//    public void setFocus(ArrayList<Image> sprites) {
 //        // TODO: Get bounding box of sprites.
 //        // TODO: Zoom to fit bounding box plus some padding.
 //    }

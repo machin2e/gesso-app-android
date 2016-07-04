@@ -4,7 +4,7 @@ import android.os.Handler;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.sprite.Sprite;
+import camp.computer.clay.visualization.Image;
 
 // An interactivity is a temporal sequence of one or more interactions.
 //
@@ -15,7 +15,7 @@ public class TouchInteractivity {
 
     // TODO: Classify these! Every time an Interaction is added!
     public boolean[] isTouchingSprite = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
-    public Sprite[] touchedSprite = new Sprite[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
 

@@ -1,4 +1,4 @@
-package camp.computer.clay.sprite;
+package camp.computer.clay.visualization;
 
 import android.graphics.PointF;
 
@@ -8,10 +8,10 @@ import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.sprite.util.Geometry;
-import camp.computer.clay.sprite.util.Number;
+import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.Number;
 
-public class Visualization extends Sprite {
+public class Visualization extends Image {
 
 //    private <T> ArrayList<T> getModel(Class<T> type) {
 //        ArrayList<T> arrayList = new ArrayList<T>();
@@ -21,13 +21,13 @@ public class Visualization extends Sprite {
     public static <T> ArrayList<PointF> getPositions(ArrayList<T> sprites) {
         ArrayList<PointF> positions = new ArrayList<PointF>();
         for (T sprite: sprites) {
-            positions.add(new PointF(((Sprite) sprite).getPosition().x, ((Sprite) sprite).getPosition().y));
+            positions.add(new PointF(((Image) sprite).getPosition().x, ((Image) sprite).getPosition().y));
         }
         return positions;
     }
 
     // Sprites
-//    private HashMap<Model, Sprite> sprites = new HashMap<Model, Sprite>();
+//    private HashMap<Model, Image> sprites = new HashMap<Model, Image>();
 
     private ArrayList<Layer> layers = new ArrayList<Layer>();
 
@@ -53,8 +53,8 @@ public class Visualization extends Sprite {
 
         // Create machine sprites
         for (Machine machine: simulation.getMachines()) {
-            MachineSprite machineSprite = new MachineSprite(machine);
-            machineSprite.setParentSprite(this);
+            MachineImage machineSprite = new MachineImage(machine);
+            machineSprite.setParentImage(this);
             machineSprite.setVisualization(this);
 
             defaultLayer.addSprite(machine, machineSprite);
@@ -96,7 +96,7 @@ public class Visualization extends Sprite {
 
         for (int i = 0; i < simulation.getMachines().size(); i++) {
 
-            MachineSprite machineSprite = (MachineSprite) defaultLayer.getSprite(simulation.getMachine(i));
+            MachineImage machineSprite = (MachineImage) defaultLayer.getSprite(simulation.getMachine(i));
 
             machineSprite.setRelativePosition(machineSpriteCenterPoints.get(i));
             machineSprite.setRotation(Number.getRandom().nextInt(360));
@@ -105,17 +105,17 @@ public class Visualization extends Sprite {
         }
     }
 
-//    public void addSprite(Model model, Sprite sprite) {
+//    public void addSprite(Model model, Image sprite) {
 ////        if (!this.sprites.containsKey(model)) {
 //            this.sprites.put(model, sprite);
 ////        }
 //    }
 //
-//    public Sprite getSprite(Model model) {
+//    public Image getSprite(Model model) {
 //        return this.sprites.get(model);
 //    }
 //
-//    public Model getModel(Sprite sprite) {
+//    public Model getModel(Image sprite) {
 //        for (Model model: this.sprites.keySet()) {
 //            if (this.sprites.get(model) == sprite) {
 //                return model;
@@ -124,21 +124,21 @@ public class Visualization extends Sprite {
 //        return null;
 //    }
 
-//    public void removeSprite(Model model, Sprite sprite) {
+//    public void removeSprite(Model model, Image sprite) {
 //        if (this.sprites.containsKey(model)) {
 //            this.sprites.remove(model);
 //        }
 //    }
 
-//    public ArrayList<Sprite> getSprites() {
+//    public ArrayList<Image> getSprites() {
 //        return this.sprites;
 //    }
 
-//    public ArrayList<Sprite> getSprites(Class<?> type) {
+//    public ArrayList<Image> getSprites(Class<?> type) {
 //
-//        ArrayList<Sprite> sprites = new ArrayList<Sprite>();
+//        ArrayList<Image> sprites = new ArrayList<Image>();
 //
-//        for (Sprite sprite: this.sprites.values()) {
+//        for (Image sprite: this.sprites.values()) {
 //            if (sprite.getClass() == type) {
 //                sprites.add(sprite);
 //            }
@@ -147,14 +147,14 @@ public class Visualization extends Sprite {
 //        return sprites;
 //    }
 
-    public ArrayList<MachineSprite> getMachineSprites() {
+    public ArrayList<MachineImage> getMachineSprites() {
 
-        ArrayList<MachineSprite> sprites = new ArrayList<MachineSprite>();
+        ArrayList<MachineImage> sprites = new ArrayList<MachineImage>();
 
         for (Layer layer: this.layers) {
-            for (Sprite sprite: layer.getSprites()) {
-                if (sprite instanceof MachineSprite) {
-                    sprites.add((MachineSprite) sprite);
+            for (Image image : layer.getSprites()) {
+                if (image instanceof MachineImage) {
+                    sprites.add((MachineImage) image);
                 }
             }
         }
@@ -172,8 +172,8 @@ public class Visualization extends Sprite {
         Simulation simulation = getSimulation();
 
         for (Layer layer: this.layers) {
-            for (Sprite sprite: layer.getSprites()) {
-                sprite.draw(mapView);
+            for (Image image : layer.getSprites()) {
+                image.draw(mapView);
             }
         }
     }
@@ -192,8 +192,8 @@ public class Visualization extends Sprite {
         Simulation simulation = getSimulation();
 
         for (Layer layer: this.layers) {
-            for (Sprite sprite: layer.getSprites()) {
-                sprite.update();
+            for (Image image : layer.getSprites()) {
+                image.update();
             }
         }
     }
@@ -205,9 +205,9 @@ public class Visualization extends Sprite {
         Simulation simulation = getSimulation();
 
         for (Layer layer: this.layers) {
-            for (Sprite sprite: layer.getSprites()) {
-                if (sprite.isVisible()) {
-                    spritePositions.add(sprite.getPosition());
+            for (Image image : layer.getSprites()) {
+                if (image.isVisible()) {
+                    spritePositions.add(image.getPosition());
                 }
             }
         }

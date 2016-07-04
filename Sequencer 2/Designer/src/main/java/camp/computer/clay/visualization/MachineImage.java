@@ -1,4 +1,4 @@
-package camp.computer.clay.sprite;
+package camp.computer.clay.visualization;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,18 +12,18 @@ import camp.computer.clay.designer.MapView;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.sprite.util.Animation;
-import camp.computer.clay.sprite.util.Geometry;
-import camp.computer.clay.sprite.util.Shape;
+import camp.computer.clay.visualization.util.Animation;
+import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.Shape;
 
-public class MachineSprite extends Sprite {
+public class MachineImage extends Image {
 
     // TODO: Replace these with dynamic counts.
     final static int PORT_GROUP_COUNT = 4;
     final static int PORT_COUNT = 12;
 
     // TODO: Delete this? Could do reverse lookup through the model.
-    public ArrayList<PortSprite> portSprites = new ArrayList<PortSprite>();
+    public ArrayList<PortImage> portSprites = new ArrayList<PortImage>();
 
     // --- STYLE ---
     // TODO: Make these private once the map is working well and the sprite is working well.
@@ -63,8 +63,8 @@ public class MachineSprite extends Sprite {
     private void initializeStyle () {
     }
 
-    // TODO: Replace with SpriteHolder: public MachineSprite(float x, float y, float angle) {
-    public MachineSprite(Machine machine) {
+    // TODO: Replace with SpriteHolder: public MachineImage(float x, float y, float angle) {
+    public MachineImage(Machine machine) {
         super(machine);
 
         initializeStyle();
@@ -78,8 +78,8 @@ public class MachineSprite extends Sprite {
         int i = 0;
         Machine machineModel = (Machine) this.getModel();
         for (Port port: machineModel.getPorts()) {
-            PortSprite portSprite = new PortSprite(port);
-            portSprite.setParentSprite(this);
+            PortImage portSprite = new PortImage(port);
+            portSprite.setParentImage(this);
             portSprite.setVisualization(getVisualization());
             getVisualization().getLayer(0).addSprite(port, portSprite);
 
@@ -88,11 +88,11 @@ public class MachineSprite extends Sprite {
         }
     }
 
-    public PortSprite getPortSprite (int index) {
+    public PortImage getPortSprite (int index) {
         return this.portSprites.get(index);
     }
 
-    public int getPortSpriteIndex(PortSprite portSprite) {
+    public int getPortSpriteIndex(PortImage portSprite) {
         if (this.portSprites.contains(portSprite)) {
             return this.portSprites.indexOf(portSprite);
         }
@@ -112,8 +112,8 @@ public class MachineSprite extends Sprite {
             drawStyleLayer(mapView);
 
             // <PORT_SPRITE>
-            // TODO: Put this under PortSprite
-            for (PortSprite portSprite : this.portSprites) {
+            // TODO: Put this under PortImage
+            for (PortImage portSprite : this.portSprites) {
                 portSprite.draw(mapView);
             }
             // </PORT_SPRITE>
@@ -277,10 +277,10 @@ public class MachineSprite extends Sprite {
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
             Port port = (Port) this.portSprites.get(i).getModel();
-            if (port.portType != Port.PortType.NONE) {
-                paint.setColor(camp.computer.clay.sprite.util.Color.setTransparency(this.getPortSprite(i).getUniqueColor(), currentTransparency));
+            if (port.getType() != Port.Type.NONE) {
+                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortSprite(i).getUniqueColor(), currentTransparency));
             } else {
-                paint.setColor(camp.computer.clay.sprite.util.Color.setTransparency(PortSprite.FLOW_PATH_COLOR_NONE, currentTransparency));
+                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, currentTransparency));
             }
             Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, mapCanvas, paint);
 

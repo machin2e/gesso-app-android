@@ -22,7 +22,7 @@ import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.model.interaction.TouchInteractivity;
-import camp.computer.clay.sprite.Visualization;
+import camp.computer.clay.visualization.Visualization;
 
 public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -107,7 +107,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         visualization.initializeSprites();
 
-        visualization.setParentSprite(null);
+        visualization.setParentImage(null);
         visualization.setPosition(new PointF(0, 0));
         visualization.setRotation(0);
         visualizationSprites.add(visualization);
