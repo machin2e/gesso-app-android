@@ -40,8 +40,8 @@ public class TouchInteractivity {
     public TouchInteractivity() {
     }
 
-    public ArrayList<TouchInteraction> getInteractions() {
-        return this.touchInteractions;
+    public int getCardinality() {
+        return this.touchInteractions.size();
     }
 
     public void addInteraction (TouchInteraction touchInteraction) {
@@ -53,6 +53,10 @@ public class TouchInteractivity {
             timerHandler.removeCallbacks(timerRunnable);
             timerHandler.postDelayed(timerRunnable, TouchInteraction.MINIMUM_HOLD_DURATION);
         }
+    }
+
+    public TouchInteraction getInteraction(int index) {
+        return this.touchInteractions.get(index);
     }
 
     public TouchInteraction getFirstInteraction() {
@@ -84,9 +88,14 @@ public class TouchInteractivity {
         return getLatestInteraction().getTimestamp() - getFirstInteraction().getTimestamp();
     }
 
-    // TODO: getStartTime()
-    // TODO: getStopTime()
-    // TODO: getDuration()
+    public long getStartTime() {
+        return getFirstInteraction().getTimestamp();
+    }
+
+    public long getStopTime() {
+        return getLatestInteraction().getTimestamp();
+    }
+
     // TODO: getTouchPath()
 
     // <CLASSIFIER>

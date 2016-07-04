@@ -58,8 +58,7 @@ public class Port extends Model {
     public PortType portType = PortType.NONE;
     public PortDirection portDirection = PortDirection.NONE;
 
-    // TODO: Physical dimensions
-    // </MODEL>
+    // TODO: Physical dimensions (of actual physical object)
 
     // TODO: Move into Port
     public PortType getType() {
@@ -69,5 +68,13 @@ public class Port extends Model {
     // TODO: Move into Port
     public void setPortType(PortType portType) {
         this.portType = portType;
+    }
+
+    public boolean hasPaths() {
+        if (this.paths.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

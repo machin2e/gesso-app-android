@@ -144,8 +144,8 @@ public class PathSprite extends Sprite {
 
             Path path = (Path) getModel();
 
-            PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getSourcePort());
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getDestinationPort());
+            PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getPort(0));
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getPort(1));
 
             // Show destination port
             destinationPortSprite.setVisibility(true);
@@ -176,8 +176,8 @@ public class PathSprite extends Sprite {
 
         Path path = (Path) getModel();
 
-        PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getSourcePort());
-        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getDestinationPort());
+        PortSprite sourcePortSprite = (PortSprite) getVisualization().getSprite(path.getPort(0));
+        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getPort(1));
 
         // Show destination port
         destinationPortSprite.setVisibility(true);

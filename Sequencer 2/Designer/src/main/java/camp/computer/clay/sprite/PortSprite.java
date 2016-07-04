@@ -84,7 +84,7 @@ public class PortSprite extends Sprite {
         pathSprite.setVisualization(getVisualization());
         getVisualization().addSprite(path, pathSprite);
 
-        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getDestinationPort());
+        PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(path.getPort(1));
         destinationPortSprite.setUniqueColor(this.uniqueColor);
         this.pathSprites.add(pathSprite);
         return pathSprite;
@@ -94,7 +94,7 @@ public class PortSprite extends Sprite {
         return this.uniqueColor;
     }
 
-    private void setUniqueColor(int uniqueColor) {
+    public void setUniqueColor(int uniqueColor) {
         this.uniqueColor = uniqueColor;
     }
 
@@ -108,7 +108,7 @@ public class PortSprite extends Sprite {
             pathSprite.showPathDocks = false;
 
             // Deep
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getPort(1));
             destinationPortSprite.showPaths();
         }
     }
@@ -121,7 +121,7 @@ public class PortSprite extends Sprite {
             pathSprite.showPathDocks = true;
 
             // Deep
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getPort(1));
             destinationPortSprite.showPathDocks();
         }
     }
@@ -515,7 +515,7 @@ public class PortSprite extends Sprite {
             pathSprite.setVisibility(isVisible);
 
             // Deep
-            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getDestinationPort());
+            PortSprite destinationPortSprite = (PortSprite) getVisualization().getSprite(pathSprite.getPath().getPort(1));
             destinationPortSprite.setVisibility(isVisible);
         }
     }
