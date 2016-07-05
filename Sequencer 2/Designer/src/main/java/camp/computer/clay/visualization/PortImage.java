@@ -34,7 +34,7 @@ public class PortImage extends Image {
     private int uniqueColor = Color.BLACK;
 
     public int getIndex() {
-        return getMachineImages().getPortImageIndex(this);
+        return getMachineImage().getPortImageIndex(this);
     }
     // ^^^ STYLE ^^^
 
@@ -62,7 +62,7 @@ public class PortImage extends Image {
         }
     }
 
-    public MachineImage getMachineImages() {
+    public MachineImage getMachineImage() {
         return (MachineImage) getParentImage();
     }
 
@@ -373,6 +373,13 @@ public class PortImage extends Image {
         }
     }
 
+    public void update() {
+        if (this.isVisible()) {
+            updatePosition();
+            updateData();
+        }
+    }
+
     private int previousSwitchState = 0;
     private float switchPeriod = 20.0f;
     private int switchHalfPeriodSampleCount = 0;
@@ -381,7 +388,7 @@ public class PortImage extends Image {
     private int pulsePeriodSampleCount = 0;
     private int previousPulseState = 0;
     private float xWaveStart = 0;
-    public void update() {
+    private void updateData() {
         Random random = new Random();
         Port port = (Port) getModel();
         if (port.getType() == Port.Type.SWITCH) {
@@ -418,8 +425,6 @@ public class PortImage extends Image {
             //xWaveStart = (xWaveStart + ((2.0f * (float) Math.PI) / ((float) this.portDataSamples[j].length))) % (2.0f * (float) Math.PI);
             xWaveStart = (xWaveStart + 0.5f) % ((float) Math.PI * 2.0f);
         }
-
-        updatePosition();
     }
 
     private void updatePosition() {
@@ -521,8 +526,19 @@ public class PortImage extends Image {
     }
 
     public boolean hasVisiblePaths () {
-        for (PathImage pathImages: this.pathImages) {
-            if (pathImages.isVisible() && !pathImages.showPathDocks) {
+        for (PathImage pathImage: this.pathImages) {
+            if (pathImage.isVisible() && !pathImage.showPathDocks) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasVisibleAncestorPaths() {
+        ArrayList<Path> ancestorPaths = getVisualization().getSimulation().getAncestorPathsByPort(getPort());
+        for (Path ancestorPath: ancestorPaths) {
+            PathImage pathImage = (PathImage) getVisualization().getLayer(0).getImage(ancestorPath);
+            if (pathImage.isVisible() && !pathImage.showPathDocks) {
                 return true;
             }
         }

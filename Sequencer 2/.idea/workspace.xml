@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="Bounds" />
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="PathProcedure" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
@@ -44,16 +44,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="MapView.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="184" column="0" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
+              <folding>
+                <element signature="e#1458#1473#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Body.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Body.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="653" column="0" selection-start-line="653" selection-start-column="0" selection-end-line="653" selection-end-column="0" />
+            <state relative-caret-position="366">
+              <caret line="430" column="60" selection-start-line="430" selection-start-column="60" selection-end-line="430" selection-end-column="60" />
               <folding>
                 <element signature="e#739#740#0" expanded="true" />
                 <element signature="e#785#786#0" expanded="true" />
                 <element signature="e#828#829#0" expanded="true" />
                 <element signature="e#867#868#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PortImage.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PortImage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="123">
+              <caret line="486" column="74" selection-start-line="486" selection-start-column="74" selection-end-line="486" selection-end-column="74" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1429#1440#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -81,69 +106,21 @@
       <file leaf-file-name="Simulation.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Simulation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="467">
-              <caret line="67" column="0" selection-start-line="67" selection-start-column="0" selection-end-line="67" selection-end-column="0" />
-              <folding>
-                <element signature="e#166#172#0" expanded="true" />
-                <element signature="e#588#594#0" expanded="true" />
-                <element signature="e#815#821#0" expanded="true" />
-                <element signature="e#1181#1187#0" expanded="true" />
-                <element signature="e#1246#1252#0" expanded="true" />
-                <element signature="e#1311#1317#0" expanded="true" />
-                <element signature="e#2527#2533#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PortImage.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PortImage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="174">
-              <caret line="238" column="13" selection-start-line="238" selection-start-column="13" selection-end-line="238" selection-end-column="13" />
+            <state relative-caret-position="240">
+              <caret line="101" column="43" selection-start-line="101" selection-start-column="43" selection-end-line="101" selection-end-column="43" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1430#1441#0" expanded="true" />
-                <element signature="e#2888#2889#0" expanded="true" />
-                <element signature="e#2927#2928#0" expanded="true" />
-                <element signature="e#2978#2979#0" expanded="true" />
-                <element signature="e#3024#3025#0" expanded="true" />
-                <marker date="1467689826000" expanded="false" signature="19246:19257" ph="&lt;~&gt;" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PathImage.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PathImage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="135" column="85" selection-start-line="135" selection-start-column="85" selection-end-line="135" selection-end-column="85" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Model.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Model.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="92" selection-start-line="5" selection-start-column="92" selection-end-line="5" selection-end-column="92" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Image.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/Image.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="17" column="60" selection-start-line="17" selection-start-column="60" selection-end-line="17" selection-end-column="60" />
-              <folding>
-                <element signature="e#915#916#0" expanded="true" />
-                <element signature="e#949#950#0" expanded="true" />
-                <element signature="e#2078#2079#0" expanded="true" />
-                <element signature="e#2111#2112#0" expanded="true" />
+                <element signature="e#192#198#0" expanded="true" />
+                <element signature="e#614#620#0" expanded="true" />
+                <element signature="e#841#847#0" expanded="true" />
+                <element signature="e#1207#1213#0" expanded="true" />
+                <element signature="e#1272#1278#0" expanded="true" />
+                <element signature="e#1337#1343#0" expanded="true" />
+                <element signature="e#2551#2557#0" expanded="true" />
+                <element signature="e#2861#2867#0" expanded="true" />
+                <element signature="e#2926#2932#0" expanded="true" />
+                <element signature="e#3871#3877#0" expanded="true" />
+                <element signature="e#3936#3942#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -194,8 +171,18 @@
       <file leaf-file-name="MachineImage.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/MachineImage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="543">
-              <caret line="345" column="54" selection-start-line="345" selection-start-column="54" selection-end-line="345" selection-end-column="54" />
+            <state relative-caret-position="120">
+              <caret line="77" column="35" selection-start-line="77" selection-start-column="35" selection-end-line="77" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PathImage.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PathImage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="198">
+              <caret line="201" column="78" selection-start-line="201" selection-start-column="78" selection-end-line="201" selection-end-column="78" />
               <folding />
             </state>
           </provider>
@@ -2679,10 +2666,10 @@
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/Image.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/util/CRC16.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/util/Number.java" />
-        <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/MachineImage.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Path.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Simulation.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Body.java" />
+        <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/MachineImage.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PortImage.java" />
         <option value="$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PathImage.java" />
       </list>
@@ -3365,8 +3352,8 @@
     <layout>
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27204302" sideWeight="0.509768" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27204302" sideWeight="0.490232" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27204302" sideWeight="0.51221" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27204302" sideWeight="0.48779" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -3436,7 +3423,7 @@
         <state relative-caret-position="240">
           <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
           <folding>
-            <element signature="e#166#172#0" expanded="true" />
+            <element signature="e#192#198#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3637,16 +3624,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="364" column="138" selection-start-line="364" selection-start-column="138" selection-end-line="364" selection-end-column="138" />
-          <folding>
-            <element signature="e#1458#1473#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Path.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -3718,19 +3695,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/Image.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="17" column="60" selection-start-line="17" selection-start-column="60" selection-end-line="17" selection-end-column="60" />
-          <folding>
-            <element signature="e#915#916#0" expanded="true" />
-            <element signature="e#949#950#0" expanded="true" />
-            <element signature="e#2078#2079#0" expanded="true" />
-            <element signature="e#2111#2112#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/Layer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -3797,14 +3761,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/MachineImage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="345" column="54" selection-start-line="345" selection-start-column="54" selection-end-line="345" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Port.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
@@ -3839,26 +3795,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Simulation.java">
+    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/designer/MapView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="467">
-          <caret line="67" column="0" selection-start-line="67" selection-start-column="0" selection-end-line="67" selection-end-column="0" />
+        <state relative-caret-position="60">
+          <caret line="184" column="0" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
           <folding>
-            <element signature="e#166#172#0" expanded="true" />
-            <element signature="e#588#594#0" expanded="true" />
-            <element signature="e#815#821#0" expanded="true" />
-            <element signature="e#1181#1187#0" expanded="true" />
-            <element signature="e#1246#1252#0" expanded="true" />
-            <element signature="e#1311#1317#0" expanded="true" />
-            <element signature="e#2527#2533#0" expanded="true" />
+            <element signature="e#1458#1473#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Body.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="653" column="0" selection-start-line="653" selection-start-column="0" selection-end-line="653" selection-end-column="0" />
+        <state relative-caret-position="366">
+          <caret line="430" column="60" selection-start-line="430" selection-start-column="60" selection-end-line="430" selection-end-column="60" />
           <folding>
             <element signature="e#739#740#0" expanded="true" />
             <element signature="e#785#786#0" expanded="true" />
@@ -3868,26 +3818,65 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PortImage.java">
+    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/MachineImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="238" column="13" selection-start-line="238" selection-start-column="13" selection-end-line="238" selection-end-column="13" />
+        <state relative-caret-position="120">
+          <caret line="77" column="35" selection-start-line="77" selection-start-column="35" selection-end-line="77" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/Image.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="497">
+          <caret line="114" column="19" selection-start-line="114" selection-start-column="19" selection-end-line="114" selection-end-column="19" />
+          <folding>
+            <element signature="e#915#916#0" expanded="true" />
+            <element signature="e#949#950#0" expanded="true" />
+            <element signature="e#2078#2079#0" expanded="true" />
+            <element signature="e#2111#2112#0" expanded="true" />
+            <element signature="e#3633#3634#0" expanded="true" />
+            <element signature="e#3670#3671#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/simulation/Simulation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="101" column="43" selection-start-line="101" selection-start-column="43" selection-end-line="101" selection-end-column="43" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1430#1441#0" expanded="true" />
-            <element signature="e#2888#2889#0" expanded="true" />
-            <element signature="e#2927#2928#0" expanded="true" />
-            <element signature="e#2978#2979#0" expanded="true" />
-            <element signature="e#3024#3025#0" expanded="true" />
-            <marker date="1467689826000" expanded="false" signature="19246:19257" ph="&lt;~&gt;" />
+            <element signature="e#192#198#0" expanded="true" />
+            <element signature="e#614#620#0" expanded="true" />
+            <element signature="e#841#847#0" expanded="true" />
+            <element signature="e#1207#1213#0" expanded="true" />
+            <element signature="e#1272#1278#0" expanded="true" />
+            <element signature="e#1337#1343#0" expanded="true" />
+            <element signature="e#2551#2557#0" expanded="true" />
+            <element signature="e#2861#2867#0" expanded="true" />
+            <element signature="e#2926#2932#0" expanded="true" />
+            <element signature="e#3871#3877#0" expanded="true" />
+            <element signature="e#3936#3942#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PortImage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="486" column="74" selection-start-line="486" selection-start-column="74" selection-end-line="486" selection-end-column="74" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1429#1440#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/visualization/PathImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="135" column="85" selection-start-line="135" selection-start-column="85" selection-end-line="135" selection-end-column="85" />
+        <state relative-caret-position="198">
+          <caret line="201" column="78" selection-start-line="201" selection-start-column="78" selection-end-line="201" selection-end-column="78" />
           <folding />
         </state>
       </provider>

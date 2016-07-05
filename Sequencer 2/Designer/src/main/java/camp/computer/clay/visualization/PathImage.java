@@ -47,7 +47,7 @@ public class PathImage extends Image {
     public boolean showPathDocks = true;
     private boolean isEditorVisible = false;
     float pathTerminalLength = 100.0f;
-    float triangleWidth = 25;
+    float triangleWidth = 20;
     float triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
     float triangleSpacing = 35;
 
@@ -153,17 +153,23 @@ public class PathImage extends Image {
 
             float triangleRotationAngle = pathRotationAngle + 90.0f;
 
+            PointF triangleCenterPosition = Geometry.calculatePoint(
+                    sourcePortImage.getPosition(),
+                    pathRotationAngle,
+                    2 * triangleSpacing
+            );
+
+            PointF triangleCenterPositionDestination = Geometry.calculatePoint(
+                    destinationPortImage.getPosition(),
+                    pathRotationAngle + 180,
+                    2 * triangleSpacing
+            );
+
             if (showPathDocks) {
 
                 float pathDistance = (float) Geometry.calculateDistance(
                         sourcePortImage.getPosition(),
                         destinationPortImage.getPosition()
-                );
-
-                PointF triangleCenterPosition = Geometry.calculatePoint(
-                        sourcePortImage.getPosition(),
-                        pathRotationAngle,
-                        2 * triangleSpacing
                 );
 
                 paint.setStyle(Paint.Style.FILL);
@@ -174,12 +180,6 @@ public class PathImage extends Image {
                         triangleHeight,
                         mapCanvas,
                         paint
-                );
-
-                PointF triangleCenterPositionDestination = Geometry.calculatePoint(
-                        destinationPortImage.getPosition(),
-                        pathRotationAngle + 180,
-                        2 * triangleSpacing
                 );
 
                 paint.setStyle(Paint.Style.FILL);
@@ -195,22 +195,25 @@ public class PathImage extends Image {
             } else {
 
                 float pathDistance = (float) Geometry.calculateDistance(
-                        sourcePortImage.getPosition(),
-                        destinationPortImage.getPosition()
+                        triangleCenterPosition,
+                        triangleCenterPositionDestination
                 );
+
+                int triangleCount = (int) (pathDistance / (triangleHeight + 15));
+                float triangleSpacing2 = pathDistance / triangleCount;
 
                 PointF pathMidpoint = Geometry.calculateMidpoint(
                         sourcePortImage.getPosition(),
                         destinationPortImage.getPosition()
                 );
 
-                for (int k = 0; ; k++) {
+                for (int k = 0; k <= triangleCount; k++) {
 
                     // Calculate triangle position
-                    PointF triangleCenterPosition = Geometry.calculatePoint(
-                            sourcePortImage.getPosition(),
+                    PointF triangleCenterPosition2 = Geometry.calculatePoint(
+                            triangleCenterPosition,
                             pathRotationAngle,
-                            k * triangleSpacing
+                            triangleSpacing2 * k // k * triangleSpacing
                     );
 
                     /*
@@ -232,24 +235,24 @@ public class PathImage extends Image {
                     startK = startK + 0.01f;
                     */
 
-                    // Stop drawing if the entire path has been drawn
-                    if (k * triangleSpacing > pathDistance) {
-                        break;
-                    }
+//                    // Stop drawing if the entire path has been drawn
+//                    if (k * triangleSpacing > pathDistance) {
+//                        break;
+//                    }
 
-                    if ((k * triangleSpacing) >= (2 * triangleSpacing)
-                            && (k * triangleSpacing) <= (pathDistance - 2 * triangleSpacing)) {
+//                    if ((k * triangleSpacing) >= (2 * triangleSpacing)
+//                            && (k * triangleSpacing) <= (pathDistance - 2 * triangleSpacing)) {
 
                         paint.setStyle(Paint.Style.FILL);
                         Shape.drawTriangle(
-                                triangleCenterPosition,
+                                triangleCenterPosition2,
                                 triangleRotationAngle,
                                 triangleWidth,
                                 triangleHeight,
                                 mapCanvas,
                                 paint
                         );
-                    }
+//                    }
                 }
 
                 if (isEditorVisible) {

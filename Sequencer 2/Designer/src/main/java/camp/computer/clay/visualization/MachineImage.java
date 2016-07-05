@@ -97,9 +97,6 @@ public class MachineImage extends Image {
     }
 
     public void update() {
-        for (int j = 0; j < this.portImages.size(); j++) {
-            this.portImages.get(j).update();
-        }
     }
 
     public void draw(MapView mapView) {

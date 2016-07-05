@@ -301,7 +301,7 @@ public class Body extends Actor {
         /*
         // Adjust panning
 //                    getPerspective().setScale(1.0f);
-        ArrayList<PointF> machinePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineImages());
+        ArrayList<PointF> machinePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineImage());
         float[] spriteBoundingBox = Geometry.calculateBoundingBox(machinePositions);
 
         float minVisibleX = (-getPerspective().getPosition().x - ((getPerspective().getWidth() / 2.0f) * getPerspective().getScale()));
@@ -345,9 +345,6 @@ public class Body extends Actor {
             // Check if one of the objects is touched
             if (machineImage.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
                 Log.v("MapView", "\tTouched machine.");
-
-                // Machine
-                Machine machine = (Machine) machineImage.getModel();
 
                 // ApplicationView.getApplicationView().speakPhrase(machine.getNameTag());
 
@@ -394,6 +391,8 @@ public class Body extends Actor {
         } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
             PortImage portImage = (PortImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
 
+//          //
+
             Log.v("MapView", "\tPort " + (portImage.getIndex() + 1) + " touched.");
 
             if (portImage.isTouching(touchInteraction.touch[touchInteraction.pointerId])) {
@@ -411,66 +410,60 @@ public class Body extends Actor {
 
                     // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
 
-                } else {
+                } else if (!port.hasPath() && getPerspective().getVisualization().getSimulation().getAncestorPathsByPort(port).size() == 0) {
 
                     // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
-                    if (portImage.pathImages.size() == 0) {
 
-                        Port.Type nextType = port.getType();
-                        while ((nextType == Port.Type.NONE)
-                                || (nextType == port.getType())) {
-                            nextType = Port.Type.getNextType(nextType);
-                        }
-                        port.setType(nextType);
-
-                    } else {
-
-                        // TODO: Replace hasVisiblePaths() with check for focusedSprite/Path
-                        if (portImage.hasVisiblePaths()) {
-
-                            // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
-                            ArrayList<PathImage> visiblePathImages = portImage.getVisiblePaths();
-                            if (visiblePathImages.size() == 1) {
-
-                                Port.Type nextType = port.getType();
-                                while ((nextType == Port.Type.NONE)
-                                        || (nextType == port.getType())) {
-                                    nextType = Port.Type.getNextType(nextType);
-                                }
-                                port.setType(nextType);
-
-                            }
-
-                        } else {
-
-                            // TODO: If second press, change the channel.
-
-                            // Remove focus from other machines and their ports.
-                            for (MachineImage machineImage : getPerspective().getVisualization().getMachineImages()) {
-                                machineImage.hidePorts();
-                                machineImage.hidePaths();
-                            }
-
-                            // Focus on the port
-                            portImage.getMachineImages().showPath(portImage.getIndex(), true);
-                            portImage.setVisibility(true);
-                            portImage.setPathVisibility(true);
-
-                            ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(portImage.getPort());
-                            for (Path connectedPath: paths) {
-                                // Show ports
-                                ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).setVisibility(true);
-                                ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).showPaths();
-                                ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).setVisibility(true);
-                                ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).showPaths();
-                                // Show path
-                                getPerspective().getVisualization().getLayer(0).getImage(connectedPath).setVisibility(true);
-                            }
-
-                            // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
-                        }
-
+                    Port.Type nextType = port.getType();
+                    while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+                        nextType = Port.Type.getNextType(nextType);
                     }
+                    port.setType(nextType);
+
+                } else if (!portImage.hasVisiblePaths() && !portImage.hasVisibleAncestorPaths()) {
+
+                    // TODO: Replace hasVisiblePaths() with check for focusedSprite/Path
+
+                    // TODO: If second press, change the channel.
+
+                    // Remove focus from other machines and their ports.
+                    for (MachineImage machineImage : getPerspective().getVisualization().getMachineImages()) {
+                        machineImage.setTransparency(0.05f);
+                        machineImage.hidePorts();
+                        machineImage.hidePaths();
+                    }
+
+                    // Focus on the port
+                    portImage.getMachineImage().showPath(portImage.getIndex(), true);
+                    portImage.setVisibility(true);
+                    portImage.setPathVisibility(true);
+
+                    ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(portImage.getPort());
+                    for (Path connectedPath: paths) {
+                        // Show ports
+                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).setVisibility(true);
+                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).showPaths();
+                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).setVisibility(true);
+                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).showPaths();
+                        // Show path
+                        getPerspective().getVisualization().getLayer(0).getImage(connectedPath).setVisibility(true);
+                    }
+
+                    // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touch another board.");
+
+                } else if (portImage.hasVisiblePaths() || portImage.hasVisibleAncestorPaths()) {
+
+                    // Paths are being shown. Touching a port changes the port type. This will also
+                    // updates the corresponding path requirement.
+
+                    // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
+
+                    Port.Type nextType = port.getType();
+                    while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+                        nextType = Port.Type.getNextType(nextType);
+                    }
+                    port.setType(nextType);
+
                 }
             }
 
@@ -585,73 +578,76 @@ public class Body extends Actor {
                                 Port sourcePort = (Port) getPerspective().getVisualization().getLayer(0).getModel(portImage);
                                 Port destinationPort = (Port) getPerspective().getVisualization().getLayer(0).getModel(nearbyPortImage);
 
-                                if (sourcePort.getPaths().size() == 0) {
+                                if (!getPerspective().getVisualization().getSimulation().hasAncestor(sourcePort, destinationPort)) {
 
-                                    Path path = new Path(sourcePort, destinationPort);
-                                    sourcePort.addPath(path);
+                                    if (sourcePort.getPaths().size() == 0) {
 
-                                    PathImage pathImage = new PathImage(path);
-                                    pathImage.setParentImage(portImage);
-                                    pathImage.setVisualization(getPerspective().getVisualization());
-                                    getPerspective().getVisualization().getLayer(0).addImage(path, pathImage);
+                                        Path path = new Path(sourcePort, destinationPort);
+                                        sourcePort.addPath(path);
 
-                                    PortImage destinationPortImage = (PortImage) getPerspective().getVisualization().getLayer(0).getImage(path.getDestination());
-                                    if (destinationPort.getPaths().size() == 0) {
-                                        destinationPortImage.setUniqueColor(portImage.getUniqueColor());
-                                    }
-                                    portImage.pathImages.add(pathImage);
+                                        PathImage pathImage = new PathImage(path);
+                                        pathImage.setParentImage(portImage);
+                                        pathImage.setVisualization(getPerspective().getVisualization());
+                                        getPerspective().getVisualization().getLayer(0).addImage(path, pathImage);
 
-                                    portImage.setVisibility(true);
-                                    portImage.showPaths();
-                                    destinationPortImage.setVisibility(true);
-                                    destinationPortImage.showPaths();
-                                    pathImage.setVisibility(true);
+                                        PortImage destinationPortImage = (PortImage) getPerspective().getVisualization().getLayer(0).getImage(path.getDestination());
+                                        if (destinationPort.getPaths().size() == 0) {
+                                            destinationPortImage.setUniqueColor(portImage.getUniqueColor());
+                                        }
+                                        portImage.pathImages.add(pathImage);
 
-                                    ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
-                                    for (Path connectedPath: paths) {
-                                        // Show ports
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).setVisibility(true);
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).showPaths();
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).setVisibility(true);
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).showPaths();
-                                        // Show path
-                                        getPerspective().getVisualization().getLayer(0).getImage(connectedPath).setVisibility(true);
-                                    }
+                                        portImage.setVisibility(true);
+                                        portImage.showPaths();
+                                        destinationPortImage.setVisibility(true);
+                                        destinationPortImage.showPaths();
+                                        pathImage.setVisibility(true);
 
-                                } else {
+                                        ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
+                                        for (Path connectedPath : paths) {
+                                            // Show ports
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).setVisibility(true);
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).showPaths();
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).setVisibility(true);
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).showPaths();
+                                            // Show path
+                                            getPerspective().getVisualization().getLayer(0).getImage(connectedPath).setVisibility(true);
+                                        }
+
+                                    } else {
 
 //                                    Path path = sourcePort.getPath(0);
 //                                    path.addPort(destinationPort);
 
-                                    Path path = new Path(sourcePort, destinationPort);
-                                    sourcePort.addPath(path);
+                                        Path path = new Path(sourcePort, destinationPort);
+                                        sourcePort.addPath(path);
 
-                                    PathImage pathImage = new PathImage(path);
-                                    pathImage.setParentImage(portImage);
-                                    pathImage.setVisualization(getPerspective().getVisualization());
-                                    getPerspective().getVisualization().getLayer(0).addImage(path, pathImage);
+                                        PathImage pathImage = new PathImage(path);
+                                        pathImage.setParentImage(portImage);
+                                        pathImage.setVisualization(getPerspective().getVisualization());
+                                        getPerspective().getVisualization().getLayer(0).addImage(path, pathImage);
 
-                                    PortImage destinationPortImage = (PortImage) getPerspective().getVisualization().getLayer(0).getImage(path.getDestination());
-                                    destinationPortImage.setUniqueColor(portImage.getUniqueColor());
-                                    portImage.pathImages.add(pathImage);
+                                        PortImage destinationPortImage = (PortImage) getPerspective().getVisualization().getLayer(0).getImage(path.getDestination());
+                                        destinationPortImage.setUniqueColor(portImage.getUniqueColor());
+                                        portImage.pathImages.add(pathImage);
 
-                                    portImage.setVisibility(true);
-                                    portImage.showPaths();
-                                    destinationPortImage.setVisibility(true);
-                                    destinationPortImage.showPaths();
-                                    pathImage.setVisibility(true);
+                                        portImage.setVisibility(true);
+                                        portImage.showPaths();
+                                        destinationPortImage.setVisibility(true);
+                                        destinationPortImage.showPaths();
+                                        pathImage.setVisibility(true);
 
-                                    ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
-                                    for (Path connectedPath: paths) {
-                                        // Show ports
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).setVisibility(true);
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).showPaths();
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).setVisibility(true);
-                                        ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).showPaths();
-                                        // Show path
-                                        getPerspective().getVisualization().getLayer(0).getImage(connectedPath).setVisibility(true);
+                                        ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
+                                        for (Path connectedPath : paths) {
+                                            // Show ports
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).setVisibility(true);
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getSource())).showPaths();
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).setVisibility(true);
+                                            ((PortImage) getPerspective().getVisualization().getLayer(0).getImage(connectedPath.getDestination())).showPaths();
+                                            // Show path
+                                            getPerspective().getVisualization().getLayer(0).getImage(connectedPath).setVisibility(true);
+                                        }
+
                                     }
-
                                 }
 
                                 /*
@@ -842,11 +838,11 @@ public class Body extends Actor {
                             }
 
                         } else if (distanceToMachineImage < nearbyMachineImage.boardHeight + 100) {
-                            if (nearbyMachineImage != portImage.getMachineImages()) {
+                            if (nearbyMachineImage != portImage.getMachineImage()) {
                                 nearbyMachineImage.setTransparency(0.5f);
                             }
                         } else {
-                            if (nearbyMachineImage != portImage.getMachineImages()) {
+                            if (nearbyMachineImage != portImage.getMachineImage()) {
                                 nearbyMachineImage.setTransparency(0.1f);
                                 nearbyMachineImage.hidePorts();
                             }
@@ -953,11 +949,11 @@ public class Body extends Actor {
                             }
 
                         } else if (distanceToMachineImage < nearbyMachineImage.boardHeight + 100) {
-                            if (nearbyMachineImage != portImage.getMachineImages()) {
+                            if (nearbyMachineImage != portImage.getMachineImage()) {
                                 nearbyMachineImage.setTransparency(0.5f);
                             }
                         } else {
-                            if (nearbyMachineImage != portImage.getMachineImages()) {
+                            if (nearbyMachineImage != portImage.getMachineImage()) {
                                 nearbyMachineImage.setTransparency(0.1f);
                                 nearbyMachineImage.hidePorts();
                             }
