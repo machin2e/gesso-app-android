@@ -3,7 +3,7 @@ package camp.computer.clay.designer;
 /**
  * Maintenance/worker thread to periodically redraw the MapView.
  */
-public class MapViewRenderer extends Thread {
+public class MapViewGenerator extends Thread {
 
     final public static long FRAMES_PER_SECOND = 30;
 
@@ -11,7 +11,7 @@ public class MapViewRenderer extends Thread {
 
     volatile boolean isRunning = false;
 
-    MapViewRenderer (MapView surfaceView) {
+    MapViewGenerator(MapView surfaceView) {
         super ();
         this.mapView = surfaceView;
     }

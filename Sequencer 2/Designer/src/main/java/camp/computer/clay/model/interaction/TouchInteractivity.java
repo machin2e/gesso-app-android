@@ -14,7 +14,7 @@ public class TouchInteractivity {
     private ArrayList<TouchInteraction> touchInteractions = new ArrayList<TouchInteraction>();
 
     // TODO: Classify these! Every time an Interaction is added!
-    public boolean[] isTouchingSprite = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public boolean[] isTouchingImage = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];

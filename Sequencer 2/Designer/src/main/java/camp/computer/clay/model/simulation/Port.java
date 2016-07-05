@@ -4,27 +4,12 @@ import java.util.ArrayList;
 
 public class Port extends Model {
 
-    private ArrayList<Path> paths = new ArrayList<Path>();
-
-    public void addPath(Path path) {
-        this.paths.add(path);
-    }
-
-    public Path getPath(int index) {
-        return this.paths.get(index);
-    }
-
-    public ArrayList<Path> getPaths() {
-        return this.paths;
-    }
-
-    // <MODEL>
     public enum Direction {
 
         NONE(0),
         OUTPUT(1),
         INPUT(2),
-        BOTH(3); // i.e., for I2C, etc.
+        BOTH(3); // e.g., I2C, etc.
 
         // TODO: Change the index to a UUID?
         int index;
@@ -40,8 +25,8 @@ public class Port extends Model {
         SWITCH(1),
         PULSE(2),
         WAVE(3);
-//        POWER(4),
-//        GROUND(5);
+        // POWER(4),
+        // GROUND(5);
 
         // TODO: Change the index to a UUID?
         int index;
@@ -55,10 +40,22 @@ public class Port extends Model {
         }
     }
 
+    private ArrayList<Path> paths = new ArrayList<Path>();
+
+    public void addPath(Path path) {
+        this.paths.add(path);
+    }
+
+    public Path getPath(int index) {
+        return this.paths.get(index);
+    }
+
+    public ArrayList<Path> getPaths() {
+        return this.paths;
+    }
+
     private Type type = Type.NONE;
     private Direction direction = Direction.NONE;
-
-    // TODO: Physical dimensions (of actual physical object)
 
     public Type getType() {
         return this.type;
@@ -76,7 +73,7 @@ public class Port extends Model {
         this.direction = direction;
     }
 
-    public boolean hasPaths() {
+    public boolean hasPath() {
         if (this.paths.size() > 0) {
             return true;
         } else {

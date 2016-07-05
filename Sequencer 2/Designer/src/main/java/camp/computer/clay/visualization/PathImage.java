@@ -53,8 +53,6 @@ public class PathImage extends Image {
 
     // ^^^ STYLE ^^^
 
-    //public PathImage(MachineImage sourceMachineSprite, int sourcePortIndex, MachineImage destinationMachineSprite, int destinationPortIndex) {
-    //public PathImage(MachineImage sourceMachineSprite, PortImage sourcePortSprite, MachineImage destinationMachineSprite, PortImage destinationPortSprite) {
     public PathImage(Path path) {
         super(path);
 
@@ -103,8 +101,8 @@ public class PathImage extends Image {
 
             Path path = (Path) getModel();
 
-            PortImage sourcePortImage = (PortImage) getVisualization().getLayer(0).getSprite(path.getPort(0));
-            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getSprite(path.getPort(1));
+            PortImage sourcePortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getSource());
+            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getDestination());
 
             // Show destination port
             destinationPortImage.setVisibility(true);
@@ -135,8 +133,8 @@ public class PathImage extends Image {
 
         Path path = (Path) getModel();
 
-        PortImage sourcePortImage = (PortImage) getVisualization().getLayer(0).getSprite(path.getPort(0));
-        PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getSprite(path.getPort(1));
+        PortImage sourcePortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getSource());
+        PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getDestination());
 
         // Show destination port
         destinationPortImage.setVisibility(true);
@@ -258,12 +256,12 @@ public class PathImage extends Image {
                     // <SPREADSHEET>
                     paint.setStyle(Paint.Style.FILL);
                     paint.setColor(sourcePortImage.getUniqueColor());
-                    float spreadsheetSpriteWidth = 50.0f;
+                    float spreadsheetImageWidth = 50.0f;
                     mapCanvas.drawRect(
-                            pathMidpoint.x + -(spreadsheetSpriteWidth / 2.0f),
-                            pathMidpoint.y + -(spreadsheetSpriteWidth / 2.0f),
-                            pathMidpoint.x + (spreadsheetSpriteWidth / 2.0f),
-                            pathMidpoint.y + (spreadsheetSpriteWidth / 2.0f),
+                            pathMidpoint.x + -(spreadsheetImageWidth / 2.0f),
+                            pathMidpoint.y + -(spreadsheetImageWidth / 2.0f),
+                            pathMidpoint.x + (spreadsheetImageWidth / 2.0f),
+                            pathMidpoint.y + (spreadsheetImageWidth / 2.0f),
                             paint
                     );
                     // </SPREADSHEET>

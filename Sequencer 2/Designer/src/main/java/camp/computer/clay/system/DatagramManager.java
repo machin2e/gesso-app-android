@@ -11,7 +11,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import camp.computer.clay.designer.ApplicationView;
-import camp.computer.clay.util.Crc16;
+import camp.computer.clay.util.CRC16;
 
 public class DatagramManager extends Thread implements MessageManagerInterface {
 
@@ -109,8 +109,8 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
                     String incomingMessageContent = terms[3];
 
                     // Compute checksum from received message
-                    Crc16 crc16 = new Crc16();
-                    int computedChecksum = crc16.calculate(incomingMessageContent.getBytes("UTF-8"), 0);
+                    CRC16 CRC16 = new CRC16();
+                    int computedChecksum = CRC16.calculate(incomingMessageContent.getBytes("UTF-8"), 0);
 
                     if (computedChecksum == incomingChecksum) {
                         // String destinationMachine = null;

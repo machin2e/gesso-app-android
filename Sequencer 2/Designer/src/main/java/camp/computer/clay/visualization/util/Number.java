@@ -9,7 +9,7 @@ public abstract class Number {
         return Number.random;
     }
 
-    public static int getRandomInteger(int minimum, int maximum) {
+    public static int generateRandomInteger(int minimum, int maximum) {
         return (Number.random.nextInt(maximum - minimum) - minimum);
     }
 }

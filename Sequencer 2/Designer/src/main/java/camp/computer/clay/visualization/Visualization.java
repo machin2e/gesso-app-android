@@ -26,9 +26,6 @@ public class Visualization extends Image {
         return positions;
     }
 
-    // Sprites
-//    private HashMap<Model, Image> sprites = new HashMap<Model, Image>();
-
     private ArrayList<Layer> layers = new ArrayList<Layer>();
 
     public Visualization(Simulation simulation) {
@@ -37,14 +34,14 @@ public class Visualization extends Image {
     }
 
     private void initialize() {
-        // initializeSprites();
+        // initializeImages();
     }
 
     public Layer getLayer(int index) {
         return this.layers.get(index);
     }
 
-    public void initializeSprites() {
+    public void initializeImages() {
 
         Layer defaultLayer = new Layer(this);
         this.layers.add(defaultLayer);
@@ -53,33 +50,33 @@ public class Visualization extends Image {
 
         // Create machine sprites
         for (Machine machine: simulation.getMachines()) {
-            MachineImage machineSprite = new MachineImage(machine);
-            machineSprite.setParentImage(this);
-            machineSprite.setVisualization(this);
+            MachineImage machineImage = new MachineImage(machine);
+            machineImage.setParentImage(this);
+            machineImage.setVisualization(this);
 
-            defaultLayer.addSprite(machine, machineSprite);
+            defaultLayer.addImage(machine, machineImage);
         }
 
         // Calculate random positions separated by minimum distance
         float minimumDistance = 550;
-        ArrayList<PointF> machineSpriteCenterPoints = new ArrayList<PointF>();
-        while (machineSpriteCenterPoints.size() < simulation.getMachines().size()) {
+        ArrayList<PointF> machineImageCenterPoints = new ArrayList<PointF>();
+        while (machineImageCenterPoints.size() < simulation.getMachines().size()) {
             boolean foundPoint = false;
-            if (machineSpriteCenterPoints.size() == 0) {
-                machineSpriteCenterPoints.add(new PointF(0, 0));
+            if (machineImageCenterPoints.size() == 0) {
+                machineImageCenterPoints.add(new PointF(0, 0));
             } else {
-                for (int i = 0; i < machineSpriteCenterPoints.size(); i++) {
+                for (int i = 0; i < machineImageCenterPoints.size(); i++) {
                     for (int tryCount = 0; tryCount < 360; tryCount++) {
                         boolean fail = false;
-                        PointF candidatePoint = Geometry.calculatePoint(machineSpriteCenterPoints.get(i), Number.getRandomInteger(0, 360), minimumDistance);
-                        for (int j = 0; j < machineSpriteCenterPoints.size(); j++) {
-                            if (Geometry.calculateDistance(machineSpriteCenterPoints.get(j), candidatePoint) < minimumDistance) {
+                        PointF candidatePoint = Geometry.calculatePoint(machineImageCenterPoints.get(i), Number.generateRandomInteger(0, 360), minimumDistance);
+                        for (int j = 0; j < machineImageCenterPoints.size(); j++) {
+                            if (Geometry.calculateDistance(machineImageCenterPoints.get(j), candidatePoint) < minimumDistance) {
                                 fail = true;
                                 break;
                             }
                         }
                         if (fail == false) {
-                            machineSpriteCenterPoints.add(candidatePoint);
+                            machineImageCenterPoints.add(candidatePoint);
                             foundPoint = true;
                             break;
                         }
@@ -96,63 +93,21 @@ public class Visualization extends Image {
 
         for (int i = 0; i < simulation.getMachines().size(); i++) {
 
-            MachineImage machineSprite = (MachineImage) defaultLayer.getSprite(simulation.getMachine(i));
+            MachineImage machineImage = (MachineImage) defaultLayer.getImage(simulation.getMachine(i));
 
-            machineSprite.setRelativePosition(machineSpriteCenterPoints.get(i));
-            machineSprite.setRotation(Number.getRandom().nextInt(360));
+            machineImage.setRelativePosition(machineImageCenterPoints.get(i));
+            machineImage.setRotation(Number.getRandom().nextInt(360));
 
-            machineSprite.initializePortSprites();
+            machineImage.initializePortImages();
         }
     }
 
-//    public void addSprite(Model model, Image sprite) {
-////        if (!this.sprites.containsKey(model)) {
-//            this.sprites.put(model, sprite);
-////        }
-//    }
-//
-//    public Image getSprite(Model model) {
-//        return this.sprites.get(model);
-//    }
-//
-//    public Model getModel(Image sprite) {
-//        for (Model model: this.sprites.keySet()) {
-//            if (this.sprites.get(model) == sprite) {
-//                return model;
-//            }
-//        }
-//        return null;
-//    }
-
-//    public void removeSprite(Model model, Image sprite) {
-//        if (this.sprites.containsKey(model)) {
-//            this.sprites.remove(model);
-//        }
-//    }
-
-//    public ArrayList<Image> getSprites() {
-//        return this.sprites;
-//    }
-
-//    public ArrayList<Image> getSprites(Class<?> type) {
-//
-//        ArrayList<Image> sprites = new ArrayList<Image>();
-//
-//        for (Image sprite: this.sprites.values()) {
-//            if (sprite.getClass() == type) {
-//                sprites.add(sprite);
-//            }
-//        }
-//
-//        return sprites;
-//    }
-
-    public ArrayList<MachineImage> getMachineSprites() {
+    public ArrayList<MachineImage> getMachineImages() {
 
         ArrayList<MachineImage> sprites = new ArrayList<MachineImage>();
 
         for (Layer layer: this.layers) {
-            for (Image image : layer.getSprites()) {
+            for (Image image : layer.getImages()) {
                 if (image instanceof MachineImage) {
                     sprites.add((MachineImage) image);
                 }
@@ -168,11 +123,8 @@ public class Visualization extends Image {
 
     @Override
     public void draw(MapView mapView) {
-
-        Simulation simulation = getSimulation();
-
         for (Layer layer: this.layers) {
-            for (Image image : layer.getSprites()) {
+            for (Image image : layer.getImages()) {
                 image.draw(mapView);
             }
         }
@@ -189,10 +141,8 @@ public class Visualization extends Image {
     }
 
     public void update() {
-        Simulation simulation = getSimulation();
-
         for (Layer layer: this.layers) {
-            for (Image image : layer.getSprites()) {
+            for (Image image : layer.getImages()) {
                 image.update();
             }
         }
@@ -202,10 +152,8 @@ public class Visualization extends Image {
         // Auto-adjust the perspective
         ArrayList<PointF> spritePositions = new ArrayList<PointF>();
 
-        Simulation simulation = getSimulation();
-
         for (Layer layer: this.layers) {
-            for (Image image : layer.getSprites()) {
+            for (Image image : layer.getImages()) {
                 if (image.isVisible()) {
                     spritePositions.add(image.getPosition());
                 }

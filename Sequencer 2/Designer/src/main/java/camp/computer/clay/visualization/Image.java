@@ -9,24 +9,21 @@ import camp.computer.clay.visualization.util.Geometry;
 
 public abstract class Image {
 
+    // TODO: List of points to represent geometric objects, even circles. Helper functions for common shapes. Gives generality.
+
     private Image parentImage;
 
     private PointF position = new PointF(); // Image position
     private float scale = 1.0f; // Image scale factor
     private float rotation = 0.0f; // Image heading rotation
 
+    private boolean isVisible = true;
+
     private Model model;
 
     private Visualization visualization;
 
-    public void setVisualization(Visualization visualization) {
-        this.visualization = visualization;
-    }
-
-    public Visualization getVisualization() {
-        return this.visualization;
-    }
-
+    // TODO: Make this an interface? Move interface out of class.
     private TouchActionListener touchActionListener;
 
     public Image(Model model) {
@@ -37,6 +34,15 @@ public abstract class Image {
         return this.model;
     }
 
+    public void setVisualization(Visualization visualization) {
+        this.visualization = visualization;
+    }
+
+    public Visualization getVisualization() {
+        return this.visualization;
+    }
+
+    // TODO: Remove this. Replace with per-image layers/features and use Visualization with set of images. Don't encode image-relationship hierarchy in images! General, more elegant, easier to use, single way to use.
     public void setParentImage(Image parentImage) {
         this.parentImage = parentImage;
     }
@@ -72,23 +78,26 @@ public abstract class Image {
         this.position.y = position.y;
     }
 
+    /**
+     * Absolute position calculated from relative position.
+     */
     public void setRelativePosition(PointF position) {
-        PointF absolutePositionFromRelativePosition = new PointF();
+        PointF absolutePosition = new PointF();
         if (parentImage != null) {
-            PointF relativePositionFromRelativePosition
-                    = Geometry.calculatePoint(
-                        parentImage.getPosition(),
-                        Geometry.calculateRotationAngle(parentImage.getPosition(), position),
-                        (float) Geometry.calculateDistance(parentImage.getPosition(), position));
-            absolutePositionFromRelativePosition.x = parentImage.getPosition().x + relativePositionFromRelativePosition.x;
-            absolutePositionFromRelativePosition.y = parentImage.getPosition().y + relativePositionFromRelativePosition.y;
+            PointF relativePositionFromRelativePosition = Geometry.calculatePoint(
+                    parentImage.getPosition(),
+                    Geometry.calculateRotationAngle(parentImage.getPosition(), position),
+                    (float) Geometry.calculateDistance(parentImage.getPosition(), position)
+            );
+            absolutePosition.x = parentImage.getPosition().x + relativePositionFromRelativePosition.x;
+            absolutePosition.y = parentImage.getPosition().y + relativePositionFromRelativePosition.y;
         } else {
             // TODO: This should get the absolute position of the root sprite relative to the origin point on the coordinate system/canvas
-            absolutePositionFromRelativePosition.x = position.x;
-            absolutePositionFromRelativePosition.y = position.y;
+            absolutePosition.x = position.x;
+            absolutePosition.y = position.y;
         }
-        this.position.x = absolutePositionFromRelativePosition.x;
-        this.position.y = absolutePositionFromRelativePosition.y;
+        this.position.x = absolutePosition.x;
+        this.position.y = absolutePosition.y;
     }
 
     public void setRotation(float rotation) {
@@ -99,10 +108,7 @@ public abstract class Image {
         this.scale = scale;
     }
 
-
-    private boolean isVisible = true;
-
-    public void setVisibility (boolean isVisible) {
+    public void setVisibility(boolean isVisible) {
         this.isVisible = isVisible;
     }
 
@@ -110,11 +116,11 @@ public abstract class Image {
         return this.isVisible;
     }
 
-    public abstract void update ();
+    public abstract void update();
 
-    public abstract void draw (MapView mapView);
+    public abstract void draw(MapView mapView);
 
-    public abstract boolean isTouching (PointF point);
+    public abstract boolean isTouching(PointF point);
 
     public interface TouchActionListener {
     }
@@ -126,7 +132,7 @@ public abstract class Image {
         this.touchActionListener = touchActionListener;
     }
 
-    public void touch (TouchInteraction touchInteraction) {
+    public void touch(TouchInteraction touchInteraction) {
         onTouchAction(touchInteraction);
     }
 

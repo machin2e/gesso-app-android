@@ -83,7 +83,7 @@ public class TouchInteraction {
     private TouchInteractionType touchInteractionType;
 
     private Body body;
-    // TODO: targetSprite? or is the state of body containing this info (e.g., hand occupied with model <M>)
+    // TODO: targetImage? or is the state of body containing this info (e.g., hand occupied with model <M>)
 
     private PointF position;
 

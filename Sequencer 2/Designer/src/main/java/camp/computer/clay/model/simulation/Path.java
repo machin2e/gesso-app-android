@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 public class Path extends Model {
 
-    // <MODEL>
+    // TODO: Physical dimensions
+
     public enum Direction {
 
         NONE(0),
@@ -45,16 +46,16 @@ public class Path extends Model {
     private Type type = Type.NONE;
     private Direction direction = Direction.NONE;
 
-    // TODO: Physical dimensions
-    // </MODEL>
+//    private ArrayList<Port> ports = new ArrayList<Port>();
 
-    private ArrayList<Port> ports = new ArrayList<Port>();
+    private Port source;
+    private Port destination;
 
     public Path(Port sourcePort, Port destinationPort) {
         this.type = Type.NONE;
         this.direction = Direction.NONE;
-        addPort(sourcePort);
-        addPort(destinationPort);
+        this.source = sourcePort;
+        this.destination = destinationPort;
     }
 
     public Type getType() {
@@ -73,19 +74,27 @@ public class Path extends Model {
         this.direction = direction;
     }
 
-    public void addPort(Port port) {
-        this.ports.add(port);
+    public void setSource(Port port) {
+        this.source = port;
     }
 
-    public Port getPort(int index) {
-        return this.ports.get(index);
+    public Port getSource() {
+        return this.source;
     }
 
-    public int getPortCount() {
-        return this.ports.size();
+    public void setDestination(Port destination) {
+        this.destination = destination;
+    }
+
+    public Port getDestination() {
+        return this.destination;
     }
 
     public boolean contains(Port port) {
-        return this.ports.contains(port);
+        if (this.source == port || this.destination == port) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

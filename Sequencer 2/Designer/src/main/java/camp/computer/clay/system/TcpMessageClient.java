@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import camp.computer.clay.util.Crc16;
+import camp.computer.clay.util.CRC16;
 
 public class TcpMessageClient {
 
@@ -123,11 +123,11 @@ public class TcpMessageClient {
 
 
 
-//                                Crc16 crc16 = new Crc16(Crc16.DEFAULT_POLYNOMIAL);
-                                Crc16 crc16 = new Crc16();
+//                                CRC16 CRC16 = new CRC16(CRC16.DEFAULT_POLYNOMIAL);
+                                CRC16 CRC16 = new CRC16();
                                 int seed = 0;
                                 byte[] outgoingMessageBytes = outgoingMessage.getContent().getBytes();
-                                int check = crc16.calculate(outgoingMessageBytes, seed);
+                                int check = CRC16.calculate(outgoingMessageBytes, seed);
                                 String outmsg =
                                         "\f" +
                                         String.valueOf(outgoingMessage.getContent().length()) + "\t" +

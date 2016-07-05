@@ -26,7 +26,7 @@ import camp.computer.clay.visualization.Visualization;
 
 public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private MapViewRenderer mapViewRenderer;
+    private MapViewGenerator mapViewGenerator;
 
     private SurfaceHolder surfaceHolder;
 
@@ -105,7 +105,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void initializeSprites() {
 
-        visualization.initializeSprites();
+        visualization.initializeImages();
 
         visualization.setParentImage(null);
         visualization.setPosition(new PointF(0, 0));
@@ -152,9 +152,9 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder ().addCallback (this);
 
         // Create and start background Thread
-        mapViewRenderer = new MapViewRenderer(this);
-        mapViewRenderer.setRunning (true);
-        mapViewRenderer.start ();
+        mapViewGenerator = new MapViewGenerator(this);
+        mapViewGenerator.setRunning (true);
+        mapViewGenerator.start ();
 
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
@@ -171,11 +171,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         // Kill the background Thread
         boolean retry = true;
-        mapViewRenderer.setRunning (false);
+        mapViewGenerator.setRunning (false);
 
         while (retry) {
             try {
-                mapViewRenderer.join ();
+                mapViewGenerator.join ();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace ();

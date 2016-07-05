@@ -54,7 +54,7 @@ public class Simulation extends Model {
             Port dequeuedPort = searchablePorts.remove(0);
             for (Path path: dequeuedPort.getPaths()) {
                 descendantPaths.add(path); // Store the path
-                searchablePorts.add(path.getPort(1)); // Queue the destination port in the search
+                searchablePorts.add(path.getDestination()); // Queue the destination port in the search
             }
         }
 
@@ -68,9 +68,9 @@ public class Simulation extends Model {
 
             // Search for direct ancestor paths from port
             for (Path path : systemPaths) {
-                if (path.getPort(1) == dequeuedPort) {
+                if (path.getDestination() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
-                    searchablePorts.add(path.getPort(0)); // Queue the source port in the search
+                    searchablePorts.add(path.getSource()); // Queue the source port in the search
                 }
             }
         }

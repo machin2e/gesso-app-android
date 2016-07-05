@@ -23,7 +23,7 @@ public class MachineImage extends Image {
     final static int PORT_COUNT = 12;
 
     // TODO: Delete this? Could do reverse lookup through the model.
-    public ArrayList<PortImage> portSprites = new ArrayList<PortImage>();
+    public ArrayList<PortImage> portImages = new ArrayList<PortImage>();
 
     // --- STYLE ---
     // TODO: Make these private once the map is working well and the sprite is working well.
@@ -60,70 +60,57 @@ public class MachineImage extends Image {
     private int lightOutlineColor = Color.parseColor("#e7e7e7");
     // ^^^ STYLE ^^^
 
-    private void initializeStyle () {
-    }
-
-    // TODO: Replace with SpriteHolder: public MachineImage(float x, float y, float angle) {
     public MachineImage(Machine machine) {
         super(machine);
 
         initializeStyle();
     }
 
-    public void initializePortSprites() {
+    private void initializeStyle () {
+    }
 
-        Machine machine = (Machine) getModel();
+    public void initializePortImages() {
 
         // Add a port sprite for each of the associated machine's ports
         int i = 0;
         Machine machineModel = (Machine) this.getModel();
         for (Port port: machineModel.getPorts()) {
-            PortImage portSprite = new PortImage(port);
-            portSprite.setParentImage(this);
-            portSprite.setVisualization(getVisualization());
-            getVisualization().getLayer(0).addSprite(port, portSprite);
+            PortImage portImage = new PortImage(port);
+            portImage.setParentImage(this);
+            portImage.setVisualization(getVisualization());
+            getVisualization().getLayer(0).addImage(port, portImage);
 
-            portSprites.add(portSprite);
+            portImages.add(portImage);
             i++;
         }
     }
 
-    public PortImage getPortSprite (int index) {
-        return this.portSprites.get(index);
+    public PortImage getPortImage(int index) {
+        return this.portImages.get(index);
     }
 
-    public int getPortSpriteIndex(PortImage portSprite) {
-        if (this.portSprites.contains(portSprite)) {
-            return this.portSprites.indexOf(portSprite);
+    public int getPortImageIndex(PortImage portImage) {
+        if (this.portImages.contains(portImage)) {
+            return this.portImages.indexOf(portImage);
         }
         return -1;
     }
 
     public void update() {
-        for (int j = 0; j < this.portSprites.size(); j++) {
-            this.portSprites.get(j).update();
+        for (int j = 0; j < this.portImages.size(); j++) {
+            this.portImages.get(j).update();
         }
     }
 
     public void draw(MapView mapView) {
-
         if (isVisible()) {
-
             drawStyleLayer(mapView);
-
-            // <PORT_SPRITE>
-            // TODO: Put this under PortImage
-            for (PortImage portSprite : this.portSprites) {
-                portSprite.draw(mapView);
-            }
-            // </PORT_SPRITE>
         }
     }
 
     private void drawStyleLayer(MapView mapView) {
-
-        drawBoardLayer(mapView);
         drawHeadersLayer(mapView);
+        drawBoardLayer(mapView);
         drawLightsLayer(mapView);
     }
 
@@ -276,9 +263,9 @@ public class MachineImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
-            Port port = (Port) this.portSprites.get(i).getModel();
+            Port port = (Port) this.portImages.get(i).getModel();
             if (port.getType() != Port.Type.NONE) {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortSprite(i).getUniqueColor(), currentTransparency));
+                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), currentTransparency));
             } else {
                 paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, currentTransparency));
             }
@@ -319,48 +306,54 @@ public class MachineImage extends Image {
     }
 
     public void showPorts() {
-        for (int i = 0; i < portSprites.size(); i++) {
-            this.portSprites.get(i).setVisibility(true);
-            this.portSprites.get(i).setPathVisibility(true);
+        for (int i = 0; i < portImages.size(); i++) {
+            this.portImages.get(i).setVisibility(true);
+            this.portImages.get(i).setPathVisibility(true);
         }
     }
 
-    public void showPort(int channelIndex) {
-        this.portSprites.get(channelIndex).setVisibility(true);
-        this.portSprites.get(channelIndex).setPathVisibility(true);
+    public void showPort(int index) {
+        this.portImages.get(index).setVisibility(true);
+        this.portImages.get(index).setPathVisibility(true);
     }
 
     public void hidePorts() {
-        for (int i = 0; i < portSprites.size(); i++) {
-            portSprites.get(i).setVisibility(false);
-            this.portSprites.get(i).setPathVisibility(false);
+        for (int i = 0; i < portImages.size(); i++) {
+            portImages.get(i).setVisibility(false);
+            this.portImages.get(i).setPathVisibility(false);
         }
     }
 
-    private void hidePort(int channelIndex) {
-        portSprites.get(channelIndex).setVisibility(false);
-        this.portSprites.get(channelIndex).setPathVisibility(false);
+    private void hidePort(int index) {
+        portImages.get(index).setVisibility(false);
+        this.portImages.get(index).setPathVisibility(false);
     }
 
     public void showPaths() {
-        for (int i = 0; i < portSprites.size(); i++) {
-            this.portSprites.get(i).setPathVisibility(true);
+        for (int i = 0; i < portImages.size(); i++) {
+            this.portImages.get(i).setPathVisibility(true);
         }
     }
 
     public void hidePaths() {
-        for (int i = 0; i < portSprites.size(); i++) {
-            this.portSprites.get(i).setVisibility(false);
-            this.portSprites.get(i).showPathDocks();
+        for (int i = 0; i < portImages.size(); i++) {
+            this.portImages.get(i).setVisibility(false);
+            this.portImages.get(i).showPathDocks();
         }
     }
 
+    // TODO: Replace setVisibility with show/hide or add enum with states. Clean it up.
+    // TODO: Replace source/destination in Path class.
+    // TODO: Finish interaction refactoring with Body.
+    // TODO: Remove relative Image hierarchy. Just use Visualization as lookup table.
+    // TODO: Update states in update() functions, not in draw functions!
+    // TODO: Add "ImageGroup" class to emulate map() function, for filtering, searching sets, etc.
     public void showPath(int pathIndex, boolean isFullPathVisible) {
-        this.portSprites.get(pathIndex).setVisibility(true);
+        this.portImages.get(pathIndex).setVisibility(true);
         if (isFullPathVisible) {
-            this.portSprites.get(pathIndex).showPaths();
+            this.portImages.get(pathIndex).showPaths();
         } else {
-            this.portSprites.get(pathIndex).showPathDocks();
+            this.portImages.get(pathIndex).showPathDocks();
         }
     }
 

@@ -34,7 +34,7 @@ public class PortImage extends Image {
     private int uniqueColor = Color.BLACK;
 
     public int getIndex() {
-        return getMachineSprite().getPortSpriteIndex(this);
+        return getMachineImages().getPortImageIndex(this);
     }
     // ^^^ STYLE ^^^
 
@@ -43,7 +43,7 @@ public class PortImage extends Image {
     private float[] portDataSamples = new float[dataSampleCount];
     // ^^^ DATA ^^^
 
-    public ArrayList<PathImage> pathSprites = new ArrayList<PathImage>();
+    public ArrayList<PathImage> pathImages = new ArrayList<PathImage>();
 
     public PortImage(Port port) {
         super(port);
@@ -62,7 +62,7 @@ public class PortImage extends Image {
         }
     }
 
-    public MachineImage getMachineSprite() {
+    public MachineImage getMachineImages() {
         return (MachineImage) getParentImage();
     }
 
@@ -79,15 +79,15 @@ public class PortImage extends Image {
         // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
         Path path = new Path(sourcePort, destinationPort);
 
-        PathImage pathSprite = new PathImage(path);
-        pathSprite.setParentImage(this);
-        pathSprite.setVisualization(getVisualization());
-        getVisualization().getLayer(0).addSprite(path, pathSprite);
+        PathImage pathImage = new PathImage(path);
+        pathImage.setParentImage(this);
+        pathImage.setVisualization(getVisualization());
+        getVisualization().getLayer(0).addImage(path, pathImage);
 
-        PortImage destinationPortSprite = (PortImage) getVisualization().getLayer(0).getSprite(path.getPort(1));
-        destinationPortSprite.setUniqueColor(this.uniqueColor);
-        this.pathSprites.add(pathSprite);
-        return pathSprite;
+        PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getDestination());
+        destinationPortImage.setUniqueColor(this.uniqueColor);
+        this.pathImages.add(pathImage);
+        return pathImage;
     }
 
     public int getUniqueColor() {
@@ -104,12 +104,12 @@ public class PortImage extends Image {
     }
 
     public void showPaths() {
-        for (PathImage pathSprite : pathSprites) {
-            pathSprite.showPathDocks = false;
+        for (PathImage pathImage : pathImages) {
+            pathImage.showPathDocks = false;
 
             // Deep
-            PortImage destinationPortSprite = (PortImage) getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
-            destinationPortSprite.showPaths();
+            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(pathImage.getPath().getDestination());
+            destinationPortImage.showPaths();
         }
     }
 
@@ -117,12 +117,12 @@ public class PortImage extends Image {
     // TODO: showOutgoingPath
 
     public void showPathDocks() {
-        for (PathImage pathSprite : pathSprites) {
-            pathSprite.showPathDocks = true;
+        for (PathImage pathImage : pathImages) {
+            pathImage.showPathDocks = true;
 
             // Deep
-            PortImage destinationPortSprite = (PortImage) getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
-            destinationPortSprite.showPathDocks();
+            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(pathImage.getPath().getDestination());
+            destinationPortImage.showPathDocks();
         }
     }
 
@@ -137,15 +137,15 @@ public class PortImage extends Image {
             drawAnnotationLayer(mapView);
 
             // Draw children sprites
-            drawPathSprites(mapView);
-            drawCandidatePathSprite(mapView);
+            drawPathImages(mapView);
+            drawCandidatePathImages(mapView);
         }
     }
 
-    private void drawPathSprites(MapView mapView) {
-        for (int i = 0; i < this.pathSprites.size(); i++) {
-            PathImage pathSprite = this.pathSprites.get(i);
-            pathSprite.draw(mapView);
+    private void drawPathImages(MapView mapView) {
+        for (int i = 0; i < this.pathImages.size(); i++) {
+            PathImage pathImage = this.pathImages.get(i);
+            pathImage.draw(mapView);
         }
     }
 
@@ -426,8 +426,8 @@ public class PortImage extends Image {
 
         // <TODO>
         // TODO: Replace this with getParentSpriteBounds() -- get bounding box based on parent sprite's shape and orientation (to get width and height)
-        MachineImage machineSprite = (MachineImage) getParentImage();
-        Machine machine = (Machine) machineSprite.getModel();
+        MachineImage machineImage = (MachineImage) getParentImage();
+        Machine machine = (Machine) machineImage.getModel();
         // </TODO>
 
         // Ports
@@ -435,50 +435,50 @@ public class PortImage extends Image {
         PointF[] relativePortPositions = new PointF[machine.getPorts().size()];
         relativePortPositions[0] = new PointF(
                 -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                +1 * ((machineSprite.boardWidth/ 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                +1 * ((machineImage.boardWidth/ 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[1] = new PointF(
                 0,
-                +1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                +1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[2] = new PointF(
                 +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                +1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                +1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[3] = new PointF(
-                +1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                 +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
         );
         relativePortPositions[4] = new PointF(
-                +1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                 0
         );
         relativePortPositions[5] = new PointF(
-                +1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                 -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
         );
         relativePortPositions[6] = new PointF(
                 +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                -1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                -1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[7] = new PointF(
                 0,
-                -1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                -1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[8] = new PointF(
                 -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                -1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                -1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[9] = new PointF(
-                -1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                 -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
         );
         relativePortPositions[10] = new PointF(
-                -1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                 0
         );
         relativePortPositions[11] = new PointF(
-                -1 * ((machineSprite.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((machineImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                 +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
         );
 
@@ -511,18 +511,18 @@ public class PortImage extends Image {
     }
 
     public void setPathVisibility (boolean isVisible) {
-        for (PathImage pathSprite : this.pathSprites) {
-            pathSprite.setVisibility(isVisible);
+        for (PathImage pathImage : this.pathImages) {
+            pathImage.setVisibility(isVisible);
 
             // Deep
-            PortImage destinationPortSprite = (PortImage) getVisualization().getLayer(0).getSprite(pathSprite.getPath().getPort(1));
-            destinationPortSprite.setVisibility(isVisible);
+            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(pathImage.getPath().getDestination());
+            destinationPortImage.setVisibility(isVisible);
         }
     }
 
     public boolean hasVisiblePaths () {
-        for (PathImage pathSprite: pathSprites) {
-            if (pathSprite.isVisible() && !pathSprite.showPathDocks) {
+        for (PathImage pathImages: this.pathImages) {
+            if (pathImages.isVisible() && !pathImages.showPathDocks) {
                 return true;
             }
         }
@@ -530,13 +530,13 @@ public class PortImage extends Image {
     }
 
     public ArrayList<PathImage> getVisiblePaths() {
-        ArrayList<PathImage> visiblePathSprites = new ArrayList<PathImage>();
-        for (PathImage pathSprite: pathSprites) {
-            if (pathSprite.isVisible()) {
-                visiblePathSprites.add(pathSprite);
+        ArrayList<PathImage> visiblePathImages = new ArrayList<PathImage>();
+        for (PathImage pathImage: pathImages) {
+            if (pathImage.isVisible()) {
+                visiblePathImages.add(pathImage);
             }
         }
-        return visiblePathSprites;
+        return visiblePathImages;
     }
 
     public MapView mapView = null;
@@ -609,7 +609,7 @@ public class PortImage extends Image {
         this.candidatePathDestinationPosition.y = position.y;
     }
 
-    public void drawCandidatePathSprite(MapView mapView) {
+    public void drawCandidatePathImages(MapView mapView) {
         if (isCandidatePathVisible) {
 
             Port port = (Port) getModel();

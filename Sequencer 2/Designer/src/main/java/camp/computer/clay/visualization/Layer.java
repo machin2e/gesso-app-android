@@ -19,17 +19,17 @@ public class Layer {
         return this.visualization;
     }
 
-    public void addSprite(Model model, Image image) {
+    public void addImage(Model model, Image image) {
         this.sprites.put(model, image);
     }
 
-    public void removeSprite(Model model, Image image) {
+    public void removeImage(Model model, Image image) {
         if (this.sprites.containsKey(model)) {
             this.sprites.remove(model);
         }
     }
 
-    public Image getSprite(Model model) {
+    public Image getImage(Model model) {
         return this.sprites.get(model);
     }
 
@@ -42,7 +42,7 @@ public class Layer {
         return null;
     }
 
-    public ArrayList<Image> getSprites() {
+    public ArrayList<Image> getImages() {
         return new ArrayList<Image>(this.sprites.values());
     }
 

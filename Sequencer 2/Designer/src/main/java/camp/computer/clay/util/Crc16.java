@@ -7,7 +7,7 @@ package camp.computer.clay.util;
 // This implementation is based on "Byte-wise CRC calculation", Aram Perez, IEEE Micro, June 1983,
 // page 40.
 
-public class Crc16 {
+public class CRC16 {
 
     public static int DEFAULT_POLYNOMIAL = 0x8005;
 
@@ -56,30 +56,7 @@ public class Crc16 {
             0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040
     };
 
-//    private short[] crcTable;
-//
-//    public Crc16 (int polynom) {
-//        crcTable = genCrc16Table(polynom); }
-//
-//    public int calculate (byte[] data, int initialCrcValue) {
-//        int crc = initialCrcValue;
-//        for (int p = 0; p < data.length; p++) {
-//            crc = (crc >> 8) ^ (crcTable[(crc & 0xFF) ^ (data[p] & 0xFF)] & 0xFFFF); }
-//        return crc; }
-//
-//    private static short[] genCrc16Table (int polynom) {
-//        short[] table = new short[256];
-//        for (int x = 0; x < 256; x++) {
-//            int w = x;
-//            for (int i = 0; i < 8; i++) {
-//                if ((w & 1) != 0) {
-//                    w = (w >> 1) ^ polynom; }
-//                else {
-//                    w = w >> 1; }}
-//            table[x] = (short)w; }
-//        return table; }
-
-    public Crc16 () { }
+    public CRC16() {}
 
     public int calculate (byte[] data, int initialCrcValue) {
 
