@@ -4,6 +4,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 
+import camp.computer.clay.model.simulation.Path;
+import camp.computer.clay.visualization.PortImage;
+
 public abstract class Shape {
 
     public static void drawTriangle(PointF position, float angle, float width, float height, Canvas canvas, Paint paint) {
@@ -59,6 +62,44 @@ public abstract class Shape {
         path.close();
 
         canvas.drawPath(path, paint);
+    }
+
+    public static void drawTrianglePath(PointF startPosition, PointF stopPosition, float triangleWidth, float triangleHeight, Canvas canvas, Paint paint) {
+
+        float pathRotationAngle = Geometry.calculateRotationAngle(
+                startPosition,
+                stopPosition
+        );
+
+        float triangleRotationAngle = pathRotationAngle + 90.0f;
+
+        float pathDistance = (float) Geometry.calculateDistance(
+                startPosition,
+                stopPosition
+        );
+
+        int triangleCount = (int) (pathDistance / (triangleHeight + 15));
+        float triangleSpacing2 = pathDistance / triangleCount;
+
+        for (int k = 0; k <= triangleCount; k++) {
+
+            // Calculate triangle position
+            PointF triangleCenterPosition2 = Geometry.calculatePoint(
+                    startPosition,
+                    pathRotationAngle,
+                    k * triangleSpacing2
+            );
+
+            paint.setStyle(Paint.Style.FILL);
+            Shape.drawTriangle(
+                    triangleCenterPosition2,
+                    triangleRotationAngle,
+                    triangleWidth,
+                    triangleHeight,
+                    canvas,
+                    paint
+            );
+        }
     }
 
 }

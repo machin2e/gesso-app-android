@@ -127,8 +127,6 @@ public class PathImage extends Image {
         }
     }
 
-    float startK = 0.0f;
-
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
 
         Path path = (Path) getModel();
@@ -153,13 +151,13 @@ public class PathImage extends Image {
 
             float triangleRotationAngle = pathRotationAngle + 90.0f;
 
-            PointF triangleCenterPosition = Geometry.calculatePoint(
+            PointF pathStartPosition = Geometry.calculatePoint(
                     sourcePortImage.getPosition(),
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
-            PointF triangleCenterPositionDestination = Geometry.calculatePoint(
+            PointF pathStopPosition = Geometry.calculatePoint(
                     destinationPortImage.getPosition(),
                     pathRotationAngle + 180,
                     2 * triangleSpacing
@@ -174,7 +172,7 @@ public class PathImage extends Image {
 
                 paint.setStyle(Paint.Style.FILL);
                 Shape.drawTriangle(
-                        triangleCenterPosition,
+                        pathStartPosition,
                         triangleRotationAngle,
                         triangleWidth,
                         triangleHeight,
@@ -184,7 +182,7 @@ public class PathImage extends Image {
 
                 paint.setStyle(Paint.Style.FILL);
                 Shape.drawTriangle(
-                        triangleCenterPositionDestination,
+                        pathStopPosition,
                         triangleRotationAngle,
                         triangleWidth,
                         triangleHeight,
@@ -194,66 +192,19 @@ public class PathImage extends Image {
 
             } else {
 
-                float pathDistance = (float) Geometry.calculateDistance(
-                        triangleCenterPosition,
-                        triangleCenterPositionDestination
+                Shape.drawTrianglePath(
+                        pathStartPosition,
+                        pathStopPosition,
+                        triangleWidth,
+                        triangleHeight,
+                        mapCanvas,
+                        paint
                 );
-
-                int triangleCount = (int) (pathDistance / (triangleHeight + 15));
-                float triangleSpacing2 = pathDistance / triangleCount;
 
                 PointF pathMidpoint = Geometry.calculateMidpoint(
                         sourcePortImage.getPosition(),
                         destinationPortImage.getPosition()
                 );
-
-                for (int k = 0; k <= triangleCount; k++) {
-
-                    // Calculate triangle position
-                    PointF triangleCenterPosition2 = Geometry.calculatePoint(
-                            triangleCenterPosition,
-                            pathRotationAngle,
-                            triangleSpacing2 * k // k * triangleSpacing
-                    );
-
-                    /*
-                    // Offset position based on port type
-                    triangleCenterPosition = Geometry.calculatePoint(
-                            triangleCenterPosition,
-                            pathRotationAngle + (-90 + (k % 2) * 180),
-                            15
-                    );
-                    */
-
-                    /*
-                    // Offset position based on port type
-                    triangleCenterPosition = Geometry.calculatePoint(
-                            triangleCenterPosition,
-                            pathRotationAngle + (-90 + (k % 2) * 180),
-                            15 * (float) Math.sin((((startK + k) * triangleSpacing) / pathDistance) * (2 * Math.PI))
-                    );
-                    startK = startK + 0.01f;
-                    */
-
-//                    // Stop drawing if the entire path has been drawn
-//                    if (k * triangleSpacing > pathDistance) {
-//                        break;
-//                    }
-
-//                    if ((k * triangleSpacing) >= (2 * triangleSpacing)
-//                            && (k * triangleSpacing) <= (pathDistance - 2 * triangleSpacing)) {
-
-                        paint.setStyle(Paint.Style.FILL);
-                        Shape.drawTriangle(
-                                triangleCenterPosition2,
-                                triangleRotationAngle,
-                                triangleWidth,
-                                triangleHeight,
-                                mapCanvas,
-                                paint
-                        );
-//                    }
-                }
 
                 if (isEditorVisible) {
                     // <SPREADSHEET>

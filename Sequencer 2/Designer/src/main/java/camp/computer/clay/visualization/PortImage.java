@@ -15,6 +15,7 @@ import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.Shape;
 
 public class PortImage extends Image {
 
@@ -635,16 +636,38 @@ public class PortImage extends Image {
                 Canvas mapCanvas = mapView.getCanvas();
                 Paint paint = mapView.getPaint();
 
+                float triangleWidth = 20;
+                float triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
+                float triangleSpacing = 35;
+
                 // Color
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(15.0f);
                 paint.setColor(this.getUniqueColor());
 
-                mapCanvas.drawLine(
-                        this.getPosition().x,
-                        this.getPosition().y,
-                        candidatePathDestinationPosition.x,
-                        candidatePathDestinationPosition.y,
+                float pathRotationAngle = Geometry.calculateRotationAngle(
+                        this.getPosition(),
+                        candidatePathDestinationPosition
+                );
+
+                PointF pathStartPosition = Geometry.calculatePoint(
+                        this.getPosition(),
+                        pathRotationAngle,
+                        2 * triangleSpacing
+                );
+
+                PointF pathStopPosition = Geometry.calculatePoint(
+                        candidatePathDestinationPosition,
+                        pathRotationAngle + 180,
+                        2 * triangleSpacing
+                );
+
+                Shape.drawTrianglePath(
+                        pathStartPosition,
+                        pathStopPosition,
+                        triangleWidth,
+                        triangleHeight,
+                        mapCanvas,
                         paint
                 );
 

@@ -1,5 +1,8 @@
 package camp.computer.clay.visualization;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
 
 import java.util.ArrayList;
@@ -123,6 +126,32 @@ public class Visualization extends Image {
 
     @Override
     public void draw(MapView mapView) {
+
+        /*
+        Canvas canvas = mapView.getCanvas();
+        Paint paint = mapView.getPaint();
+
+        // Draw grid
+        float horizontalStep = 50;
+        float verticalStep = 50;
+        float pointRadius = 3;
+        for (int i = -512; i < canvas.getWidth(); i += horizontalStep) {
+            for (int j = -1024; j < canvas.getHeight(); j += verticalStep) {
+
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(Color.LTGRAY);
+                canvas.drawCircle(
+                        i,
+                        j,
+                        pointRadius,
+                        paint
+                );
+
+            }
+        }
+        */
+
+        // Draw images
         for (Layer layer: this.layers) {
             for (Image image : layer.getImages()) {
                 image.draw(mapView);
