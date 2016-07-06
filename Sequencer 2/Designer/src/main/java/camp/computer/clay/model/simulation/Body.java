@@ -434,6 +434,7 @@ public class Body extends Actor {
                     }
 
                     // Focus on the port
+                    portImage.getMachineImage().setTransparency(1.0f);
                     portImage.getMachineImage().showPath(portImage.getIndex(), true);
                     portImage.setVisibility(true);
                     portImage.setPathVisibility(true);
@@ -486,6 +487,8 @@ public class Body extends Actor {
             }
 
             adjustPerspectiveScale();
+
+            getPerspective().setPosition(getPerspective().getVisualization().getCentroidPosition());
 
             // Reset map interactivity
             getPerspective().enablePanning();
@@ -860,6 +863,10 @@ public class Body extends Actor {
                         v.vibrate(50); // Vibrate once for "YES"
                         */
 
+                        // Adjust perspective
+                        getPerspective().setPosition(nearestMachineImage.getPosition());
+                        getPerspective().setScale(0.9f); // Zoom out to show overview
+
                     } else {
 
                         // Show ports and paths
@@ -867,6 +874,7 @@ public class Body extends Actor {
                         portImage.showPaths();
 
                         // Adjust perspective
+                        getPerspective().setPosition(getPerspective().getVisualization().getCentroidPosition());
                         getPerspective().setScale(0.6f); // Zoom out to show overview
 
                     }
@@ -971,6 +979,10 @@ public class Body extends Actor {
                         v.vibrate(50); // Vibrate once for "YES"
                         */
 
+                        // Adjust perspective
+                        //getPerspective().setPosition(nearestMachineImage.getPosition());
+//                        getPerspective().setScale(0.9f); // Zoom out to show overview
+
                     } else {
 
                         // Show ports and paths
@@ -978,6 +990,7 @@ public class Body extends Actor {
                         portImage.showPaths();
 
                         // Adjust perspective
+//                        getPerspective().setPosition(getPerspective().getVisualization().getCentroidPosition());
                         getPerspective().setScale(0.6f); // Zoom out to show overview
 
                     }
