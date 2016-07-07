@@ -10,7 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.Application;
 import camp.computer.clay.util.CRC16;
 
 public class DatagramManager extends Thread implements MessageManagerInterface {
@@ -152,7 +152,7 @@ public class DatagramManager extends Thread implements MessageManagerInterface {
 
         // Acquire a multicast lock to enable receiving broadcast packets
         if (multicastLock == null) {
-            WifiManager wm = (WifiManager) ApplicationView.getContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wm = (WifiManager) Application.getContext().getSystemService(Context.WIFI_SERVICE);
             multicastLock = wm.createMulticastLock ("mydebuginfo");
             multicastLock.acquire ();
         }

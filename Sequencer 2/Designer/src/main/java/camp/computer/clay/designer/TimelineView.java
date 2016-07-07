@@ -59,16 +59,16 @@ public class TimelineView extends DragSortListView {
         // </HACK>
 
         // <HACK>
-        if (ApplicationView.getApplicationView().mViewPager.currentListView == null) {
-            ApplicationView.getApplicationView().mViewPager.currentListView = this;
+        if (Application.getDisplay().mViewPager.currentListView == null) {
+            Application.getDisplay().mViewPager.currentListView = this;
         }
         // </HACK>
 
         // <HACK>
         // Show the action button
-        ApplicationView.getApplicationView().getCursorView().init();
-        ApplicationView.getApplicationView().getCursorView().updatePosition();
-        ApplicationView.getApplicationView().getCursorView().show(true);
+        Application.getDisplay().getCursorView().init();
+        Application.getDisplay().getCursorView().updatePosition();
+        Application.getDisplay().getCursorView().show(true);
         // </HACK>
 
         this.setBackgroundColor(Color.TRANSPARENT);
@@ -137,13 +137,13 @@ public class TimelineView extends DragSortListView {
 
                 if (scrollState == SCROLL_STATE_IDLE) {
                     // Hide the action buttons
-                    FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+                    FloatingActionButton fab = (FloatingActionButton) Application.getDisplay().findViewById(R.id.fab_create);
                     if (fab.isHidden()) {
                         fab.show(true);
                     }
                 } else if (scrollState == SCROLL_STATE_FLING) {
                     // Hide the action buttons
-                    FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+                    FloatingActionButton fab = (FloatingActionButton) Application.getDisplay().findViewById(R.id.fab_create);
                     if (!fab.isHidden()) {
                         fab.hide(true);
                     }
@@ -166,7 +166,7 @@ public class TimelineView extends DragSortListView {
 
                 /*
                 // Auto-hide/auto-show action bar
-                ActionBar mActionBar = ApplicationView.getApplicationView().getActionBar();
+                ActionBar mActionBar = ApplicationView.getDisplay().getActionBar();
                 int mActionBarHeight = 40; // mActionBar.getHeight();
                 Log.v("Scroller", "mActionBarHeight: " + mActionBarHeight);
 
@@ -212,7 +212,7 @@ public class TimelineView extends DragSortListView {
 //
 //                float y = scrollY; // ((ScrollView)FindViewById (Resource.Id.scrollum)).ScrollY;
 //
-//                ActionBar mActionBar = ApplicationView.getApplicationView().getActionBar();
+//                ActionBar mActionBar = ApplicationView.getDisplay().getActionBar();
 //                int mActionBarHeight = mActionBar.getHeight();
 //
 //                if (y >= mActionBarHeight && mActionBar.isShowing()) {
@@ -849,7 +849,7 @@ public class TimelineView extends DragSortListView {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
 //        adapter.notifyDataSetChanged();
         final TimelineView lv = this;
-        ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
+        Application.getDisplay().runOnUiThread(new Runnable() {
             public void run() {
                 //reload content
 //                arraylist.erase();
@@ -871,7 +871,7 @@ public class TimelineView extends DragSortListView {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
 //        adapter.notifyDataSetChanged();
         final TimelineView lv = this;
-        ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
+        Application.getDisplay().runOnUiThread(new Runnable() {
             public void run() {
                 //reload content
 //                arraylist.erase();
@@ -891,7 +891,7 @@ public class TimelineView extends DragSortListView {
         // TODO: Perform callbacks into eventHolders model to propagate changes based on view state and eventHolders item state.
 //        adapter.notifyDataSetChanged();
 //        final TimelineListView lv = this;
-        ApplicationView.getApplicationView().runOnUiThread(new Runnable() {
+        Application.getDisplay().runOnUiThread(new Runnable() {
             public void run() {
                 // Update view's layout
                 view.requestLayout();
@@ -911,7 +911,7 @@ public class TimelineView extends DragSortListView {
                 Log.e("Move_Finger", "Updated timeline layout.");
 
                 // Update position
-                ApplicationView.getApplicationView().getCursorView().updatePosition();
+                Application.getDisplay().getCursorView().updatePosition();
             }
         });
 
@@ -1027,7 +1027,7 @@ public class TimelineView extends DragSortListView {
 //        DisplayMetrics metrics;
 //        int screenWidth = 0, screenHeight = 0;
 //        metrics = new DisplayMetrics();
-//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        ApplicationView.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 //        screenHeight = metrics.heightPixels;
 //        screenWidth = metrics.widthPixels;
 //
@@ -1035,7 +1035,7 @@ public class TimelineView extends DragSortListView {
 //            int width = fab.getWidth();
 //            int height = fab.getHeight();
 //            Point dest = new Point((int) (screenWidth / 2.0)  - (int) (width / 2.0), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-////            ApplicationView.getApplicationView().moveToPoint(fab, dest, 400);
+////            ApplicationView.getDisplay().moveToPoint(fab, dest, 400);
 //
 //            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
 //            params.leftMargin = (int) dest.x;
@@ -1051,13 +1051,13 @@ public class TimelineView extends DragSortListView {
 //        }
 //
 //        if (point != null && point.y < (screenHeight - fab.getHeight())) {
-//            ApplicationView.getApplicationView().moveToPoint(fab, point, 400);
+//            ApplicationView.getDisplay().moveToPoint(fab, point, 400);
 //        } else {
 //            int width = fab.getWidth();
 //            int height = fab.getHeight();
 //            Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
 //
-//            ApplicationView.getApplicationView().moveToPoint(fab, dest, 400);
+//            ApplicationView.getDisplay().moveToPoint(fab, dest, 400);
 //
 //        }
 //    }
@@ -1188,7 +1188,7 @@ public class TimelineView extends DragSortListView {
 
         });
 
-        // alert.getListView().setBackgroundColor(ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+        // alert.getListView().setBackgroundColor(ApplicationView.getDisplay().getResources().getColor(R.color.timeline_segment_color));
 
         alert.show();
     }
@@ -1310,7 +1310,7 @@ public class TimelineView extends DragSortListView {
 
         });
 
-        // alert.getListView().setBackgroundColor(ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+        // alert.getListView().setBackgroundColor(ApplicationView.getDisplay().getResources().getColor(R.color.timeline_segment_color));
 
         alert.show();
     }
@@ -1417,9 +1417,9 @@ public class TimelineView extends DragSortListView {
     // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
     public void expandEventView2 (EventHolder eventHolder, final View view, int translateDuration)
     {
-        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+        FrameLayout root = (FrameLayout) Application.getDisplay().findViewById(R.id.application_view);
         DisplayMetrics dm = new DisplayMetrics();
-        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics( dm );
+        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics( dm );
         int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
 
         int originalPos[] = new int[2];

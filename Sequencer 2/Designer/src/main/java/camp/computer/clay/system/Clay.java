@@ -11,8 +11,13 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.Application;
+import camp.computer.clay.model.interaction.Perspective;
+import camp.computer.clay.model.simulation.Body;
 import camp.computer.clay.model.simulation.Machine;
+import camp.computer.clay.model.simulation.Port;
+import camp.computer.clay.model.simulation.Simulation;
+import camp.computer.clay.visualization.Visualization;
 
 public class Clay {
 
@@ -35,6 +40,8 @@ public class Clay {
     // The calendar used by Clay
     private Calendar calendar = Calendar.getInstance (TimeZone.getTimeZone("GMT"));
 
+    private Simulation simulation;
+
     public Clay() {
 
         this.views = new ArrayList<ViewManagerInterface>(); // Create list to store views.
@@ -47,6 +54,42 @@ public class Clay {
         // TODO: Stream this in from the Internet and devices.
         state = new ContentEntry ("clay", "");
         state.list("devices");
+
+        // Simulation
+        this.simulation = new Simulation();
+
+        // Visualization
+        Visualization visualization = new Visualization(simulation);
+
+        initializeSimulation();
+
+        // Create body and set perspective
+        Body body = new Body();
+        Perspective perspective = new Perspective(visualization);
+        body.setPerspective(perspective);
+
+        // Add body to simulation
+        simulation.addBody(body);
+
+        Application.getDisplay().getVisualizationSurface().setVisualization(visualization);
+
+    }
+
+    private void initializeSimulation() {
+
+        // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int letterIndex = 0;
+        for (int i = 0; i < 5; i++) {
+            Machine machine = new Machine();
+            for (int j = 0; j < 12; j++) {
+                Port port = new Port();
+                machine.addPort(port);
+                machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
+                letterIndex = letterIndex % alphabet.length();
+            }
+            simulation.addMachine(machine);
+        }
     }
 
     public ContentEntry getContent () {
@@ -112,7 +155,7 @@ public class Clay {
 
     // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
     public String getInternetAddress () {
-        Context context = ApplicationView.getContext();
+        Context context = Application.getContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
         Log.v ("Clay", "Internet address: " + ip);
@@ -170,16 +213,16 @@ public class Clay {
         String deviceTag = "";
         if (device.getUuid().toString().equals("001affff-ffff-ffff-4e45-3158200a0027")) {
             deviceTag = "bender";
-            ApplicationView.getApplicationView().speakPhrase("bender");
+            Application.getDisplay().speakPhrase("bender");
         } else if (device.getUuid().toString().equals("002effff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "kitt";
-            ApplicationView.getApplicationView().speakPhrase("kitt");
+            Application.getDisplay().speakPhrase("kitt");
         } else if (device.getUuid().toString().equals("002fffff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "gerty";
-            ApplicationView.getApplicationView().speakPhrase("gerty");
+            Application.getDisplay().speakPhrase("gerty");
         } else if (device.getUuid().toString().equals("0027ffff-ffff-ffff-4e45-36932003000a")) {
             deviceTag = "hal";
-            ApplicationView.getApplicationView().speakPhrase("hal");
+            Application.getDisplay().speakPhrase("hal");
         }
 
         device.setTag(deviceTag);
@@ -238,7 +281,7 @@ public class Clay {
                 this.devices.add (device);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getApplicationView().mapView.getSimulation().addMachine(new Machine());
+//                ApplicationView.getDisplay().mapView.getSimulation().addMachine(new Machine());
 
                 // Add timelines to attached views
                 for (ViewManagerInterface view : this.views) {
@@ -267,7 +310,7 @@ public class Clay {
             */
 
 //            // Show the action button
-//            ApplicationView.getApplicationView().getCursorView().show(true);
+//            ApplicationView.getDisplay().getCursorView().show(true);
 
             // Populate the device's timeline
             // TODO: Populate from scratch only if no timeline has been programmed for the device

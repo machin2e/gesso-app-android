@@ -14,7 +14,7 @@ import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.Application;
 
 public class DynamicHorizontalListLayout extends LinearLayout {
 
@@ -303,7 +303,7 @@ public class DynamicHorizontalListLayout extends LinearLayout {
 
 //                        baseLayout.findViewWithTag("content_editor_view").setVisibility(View.VISIBLE);
 
-            int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+            int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
             selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
             selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
         }

@@ -145,7 +145,7 @@ public class EventHolderAdapter extends BaseAdapter {
     private View getEventView (EventHolder eventHolder) {
 
         // Container
-        RelativeLayout eventView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout eventView = new RelativeLayout (Application.getContext());
 
         // Top
         LinearLayout upperLayout = getTopView(eventHolder);
@@ -186,7 +186,7 @@ public class EventHolderAdapter extends BaseAdapter {
         String durationText = tokens[3] + " ms";
 
         // Action
-        RelativeLayout eventInnerView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout eventInnerView = new RelativeLayout (Application.getContext());
 
         // Tag
         final TextView actionLabel = getEventTagView(eventHolder.getEvent().getAction().getTag());
@@ -199,7 +199,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
         /*
         // Add ImageView for rendering timeline segment
-        final ImageView waveformImageView = new ImageView (ApplicationView.getContext());
+        final ImageView waveformImageView = new ImageView (Application.getContext());
         waveformImageView.setId(R.id.waveform);
         waveformImageView.setBackgroundResource(R.drawable.drag);
         actionView.addView(waveformImageView);
@@ -249,7 +249,7 @@ public class EventHolderAdapter extends BaseAdapter {
     private LinearLayout getMiddleView (EventHolder eventHolder) {
 
         // Middle (content)
-        LinearLayout middleLayout = new LinearLayout(ApplicationView.getContext());
+        LinearLayout middleLayout = new LinearLayout(Application.getContext());
         middleLayout.setId(R.id.event_middle_layout);
         middleLayout.setOrientation(LinearLayout.VERTICAL);
 
@@ -290,7 +290,7 @@ public class EventHolderAdapter extends BaseAdapter {
     private LinearLayout getBottomView (EventHolder eventHolder) {
 
         // Top
-        LinearLayout bottomViewLayout = new LinearLayout(ApplicationView.getContext());
+        LinearLayout bottomViewLayout = new LinearLayout(Application.getContext());
         bottomViewLayout.setId(R.id.event_bottom_layout);
         bottomViewLayout.setOrientation(LinearLayout.VERTICAL);
 
@@ -300,7 +300,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //        params.addRule(RelativeLayout.CENTER_VERTICAL);
         bottomViewLayout.setLayoutParams(params);
 
-        RelativeLayout upperInnerView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout upperInnerView = new RelativeLayout (Application.getContext());
 
         bottomViewLayout.addView(upperInnerView);
 
@@ -325,7 +325,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
 
 
-        RelativeLayout bottomViewSeparatorLayout = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout bottomViewSeparatorLayout = new RelativeLayout (Application.getContext());
 
         bottomViewLayout.addView(bottomViewSeparatorLayout);
 
@@ -351,7 +351,7 @@ public class EventHolderAdapter extends BaseAdapter {
     }
 
     private LinearLayout getActionLayout() {
-        LinearLayout linearLayout = new LinearLayout(ApplicationView.getContext());
+        LinearLayout linearLayout = new LinearLayout(Application.getContext());
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -372,7 +372,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getPauseView (EventHolder eventHolder) {
 
-        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout actionView = new RelativeLayout (Application.getContext());
         RelativeLayout.LayoutParams params = null;
 
         // Extract state
@@ -406,7 +406,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getLightView (EventHolder eventHolder) {
 
-        RelativeLayout eventView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout eventView = new RelativeLayout (Application.getContext());
         RelativeLayout.LayoutParams params = null;
 
         // Extract state
@@ -427,7 +427,7 @@ public class EventHolderAdapter extends BaseAdapter {
         eventView.addView(linearLayout);
 
         // (Second-level horizontal) Linear layout (to the right side of timeline)
-        LinearLayout horizontalLinearLayout = new LinearLayout(ApplicationView.getContext());
+        LinearLayout horizontalLinearLayout = new LinearLayout(Application.getContext());
         horizontalLinearLayout.setId(R.id.preview_layout);
         horizontalLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.addView (horizontalLinearLayout);
@@ -436,13 +436,13 @@ public class EventHolderAdapter extends BaseAdapter {
         for (int i = 0; i < 12; i++) {
 
             // (Third-level vertical) Linear layout (to the right side of timeline)
-            LinearLayout lightLinearLayout = new LinearLayout(ApplicationView.getContext());
+            LinearLayout lightLinearLayout = new LinearLayout(Application.getContext());
             lightLinearLayout.setOrientation(LinearLayout.VERTICAL);
             horizontalLinearLayout.addView(lightLinearLayout);
             lightLinearLayout.getLayoutParams().width = 70;
 
             // Action: Preview 1 label
-            final TextView previewLabel = new TextView(ApplicationView.getContext());
+            final TextView previewLabel = new TextView(Application.getContext());
             previewLabel.setText(String.valueOf(i + 1));
             previewLabel.setTextSize(10.0f);
             previewLabel.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
@@ -450,7 +450,7 @@ public class EventHolderAdapter extends BaseAdapter {
             lightLinearLayout.addView(previewLabel);
 
             // Action: Preview 1
-            final ImageView previewImageView = new ImageView(ApplicationView.getContext());
+            final ImageView previewImageView = new ImageView(Application.getContext());
             previewImageView.setId(previewResourceIds[i]);
             lightLinearLayout.addView(previewImageView);
 
@@ -587,7 +587,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //
 //                    // Color.
 //                    if (selectedButton[0] != null) {
-//                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+//                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
 //                        selectedButton[0].setTextColor(textColor); // Color. Update the color.
 //                        selectedButton[0].setTypeface(null, Typeface.BOLD);
 //                    }
@@ -612,7 +612,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getSignalView (final EventHolder eventHolder) {
 
-        RelativeLayout eventView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout eventView = new RelativeLayout (Application.getContext());
         RelativeLayout.LayoutParams params = null;
 
         // Extract state
@@ -633,7 +633,7 @@ public class EventHolderAdapter extends BaseAdapter {
         eventView.addView(linearLayout);
 
         // (Second-level horizontal) Linear layout (to the right side of timeline)
-        LinearLayout horizontalLinearLayout = new LinearLayout(ApplicationView.getContext());
+        LinearLayout horizontalLinearLayout = new LinearLayout(Application.getContext());
         horizontalLinearLayout.setId(R.id.preview_layout);
         horizontalLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
         // relativeParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -644,7 +644,7 @@ public class EventHolderAdapter extends BaseAdapter {
         for (int i = 0; i < 12; i++) {
 
             // (Third-level vertical) Linear layout (to the right side of timeline)
-            LinearLayout lightLinearLayout = new LinearLayout(ApplicationView.getContext());
+            LinearLayout lightLinearLayout = new LinearLayout(Application.getContext());
             lightLinearLayout.setOrientation(LinearLayout.VERTICAL);
             lightLinearLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
 
@@ -664,7 +664,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
 
             // Create
-            final Button channelNumberButton = new Button (ApplicationView.getContext());
+            final Button channelNumberButton = new Button (Application.getContext());
 
             // Text
             final String channelNumberString = Integer.toString (i + 1);
@@ -703,8 +703,8 @@ public class EventHolderAdapter extends BaseAdapter {
                         Log.v ("Content_View", "contentEntry: " + contentEntry.getKey());
                         Log.v("Content_View", "contentEntry: " + contentEntry.getContent());
 //                        displayUpdateSignalOptions (contentEntry, true, true);
-                        //ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
-                        ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayUpdateSignalOptions(eventHolder);
+                        //Application.getDisplay().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
+                        Application.getDisplay().getTimelineView().getEventDesigner().displayUpdateSignalOptions(eventHolder);
                     }
                 }
             });
@@ -714,7 +714,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
 
 //            // Action: Preview 1 label
-//            final TextView previewLabel = new TextView(ApplicationView.getContext());
+//            final TextView previewLabel = new TextView(Application.getContext());
 ////            previewLabel.setId(R.id.preview_1_label); // TODO: Create new resource dynamically
 //            previewLabel.setText(String.valueOf(i + 1));
 //            previewLabel.setTextSize(10.0f);
@@ -725,7 +725,7 @@ public class EventHolderAdapter extends BaseAdapter {
             // TODO: Add params
 
             // Action: Preview 1
-            final ImageView previewImageView = new ImageView(ApplicationView.getContext());
+            final ImageView previewImageView = new ImageView(Application.getContext());
             previewImageView.setId(previewResourceIds[i]);
             lightLinearLayout.addView(previewImageView);
 
@@ -759,7 +759,7 @@ public class EventHolderAdapter extends BaseAdapter {
                 paint2.setColor(Color.rgb(255, 61, 61));
             }
 
-            canvas2.drawCircle(bmp2.getWidth() / 2, bmp2.getWidth() / 2, convertDpToPixel(3.0f, ApplicationView.getContext()), paint2);
+            canvas2.drawCircle(bmp2.getWidth() / 2, bmp2.getWidth() / 2, convertDpToPixel(3.0f, Application.getContext()), paint2);
 
             previewImageView.setImageBitmap(bmp2);
         }
@@ -774,7 +774,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getMessageView (EventHolder eventHolder) {
 
-        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout actionView = new RelativeLayout (Application.getContext());
 
         // Extract state
         String stateText = eventHolder.getEvent().getState().get(0).getState();
@@ -816,7 +816,7 @@ public class EventHolderAdapter extends BaseAdapter {
     private LinearLayout getTopView (final EventHolder eventHolder) {
 
         // Top
-        LinearLayout topViewLayout = new LinearLayout(ApplicationView.getContext());
+        LinearLayout topViewLayout = new LinearLayout(Application.getContext());
         topViewLayout.setId(R.id.event_top_layout);
         topViewLayout.setOrientation(LinearLayout.VERTICAL);
 
@@ -826,7 +826,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //        params.addRule(RelativeLayout.CENTER_VERTICAL);
         topViewLayout.setLayoutParams(params);
 
-        RelativeLayout topViewSeparatorLayout = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout topViewSeparatorLayout = new RelativeLayout (Application.getContext());
 
         topViewLayout.addView(topViewSeparatorLayout);
 
@@ -849,7 +849,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
 
 
-        RelativeLayout innerTopViewLayout = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout innerTopViewLayout = new RelativeLayout (Application.getContext());
 
         topViewLayout.addView(innerTopViewLayout);
 
@@ -876,14 +876,14 @@ public class EventHolderAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Log.v("Touch", "Trigger Button");
-                ApplicationView.getApplicationView().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
+                Application.getDisplay().getTimelineView().getEventDesigner().displayEventTriggerOptions(eventHolder);
             }
         });
         actionLayout.addView(frequencyLabel);
 
         /*
         // Trigger
-        final EditText triggerMessageText = new EditText(ApplicationView.getContext());
+        final EditText triggerMessageText = new EditText(Application.getContext());
         triggerMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
         triggerMessageText.setVisibility(View.VISIBLE);
         actionLayout.addView(triggerMessageText);
@@ -900,7 +900,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getSayView (EventHolder eventHolder) {
 
-        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout actionView = new RelativeLayout (Application.getContext());
 
         // Extract state
         String stateText = eventHolder.getEvent().getState().get(0).getState();
@@ -926,7 +926,7 @@ public class EventHolderAdapter extends BaseAdapter {
     }
 
     private TextView getTextSubFieldView(String text) {
-        final TextView messageTypeLabel = new TextView (ApplicationView.getContext());
+        final TextView messageTypeLabel = new TextView (Application.getContext());
         messageTypeLabel.setText(text);
         messageTypeLabel.setTextSize(11.0f);
         messageTypeLabel.setTextColor(Color.DKGRAY);
@@ -935,7 +935,7 @@ public class EventHolderAdapter extends BaseAdapter {
     }
 
     private TextView getTextFieldView(String text) {
-        final TextView messageContentLabel = new TextView (ApplicationView.getContext());
+        final TextView messageContentLabel = new TextView (Application.getContext());
         messageContentLabel.setText(text);
         messageContentLabel.setTextSize(12.0f);
         messageContentLabel.setPadding(0, 5, 0, 5);
@@ -943,7 +943,7 @@ public class EventHolderAdapter extends BaseAdapter {
     }
 
     private TextView getTextButtonView(String text) {
-        final TextView textButtonView = new TextView (ApplicationView.getContext());
+        final TextView textButtonView = new TextView (Application.getContext());
         textButtonView.setText(text);
         textButtonView.setTextSize(10.0f);
         textButtonView.setAllCaps(true);
@@ -952,7 +952,7 @@ public class EventHolderAdapter extends BaseAdapter {
     }
 
     private ImageView getEventTimelineView(int height, float thickness, boolean isDashed, View leftView) {
-        final ImageView imageView = new ImageView (ApplicationView.getContext());
+        final ImageView imageView = new ImageView (Application.getContext());
         imageView.setId(R.id.timeline_segment);
 
 //        if (eventHolder.getType().equals("complex")) {
@@ -978,7 +978,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getTextView (EventHolder eventHolder, String tag, String text) {
 
-        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout actionView = new RelativeLayout (Application.getContext());
         RelativeLayout.LayoutParams params = null;
 
         // Tag
@@ -994,7 +994,7 @@ public class EventHolderAdapter extends BaseAdapter {
         actionView.addView(linearLayout);
 
         // Action: Text content
-        final TextView textView = new TextView (ApplicationView.getContext());
+        final TextView textView = new TextView (Application.getContext());
         textView.setText(text);
         textView.setAllCaps(true);
         textView.setTextSize(10.0f);
@@ -1011,7 +1011,7 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getTimelineSegmentView (EventHolder eventHolder, String tag, String text) {
 
-        RelativeLayout actionView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout actionView = new RelativeLayout (Application.getContext());
         RelativeLayout.LayoutParams params = null;
 
         // Tag
@@ -1027,7 +1027,7 @@ public class EventHolderAdapter extends BaseAdapter {
         actionView.addView(linearLayout);
 
         // Action: Text content
-        final TextView textView = new TextView (ApplicationView.getContext());
+        final TextView textView = new TextView (Application.getContext());
         textView.setText(text);
         textView.setAllCaps(true);
         textView.setTextSize(10.0f);
@@ -1044,14 +1044,14 @@ public class EventHolderAdapter extends BaseAdapter {
      */
     private View getHighlightView (EventHolder eventHolder, String tag, String text) {
 
-        RelativeLayout eventView = new RelativeLayout (ApplicationView.getContext());
+        RelativeLayout eventView = new RelativeLayout (Application.getContext());
         RelativeLayout.LayoutParams params = null;
 
         // Tag
         final TextView actionLabel = getEventTagView ("");
         eventView.addView(actionLabel);
 
-        eventView.setBackgroundColor(ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+        eventView.setBackgroundColor(Application.getDisplay().getResources().getColor(R.color.timeline_segment_color));
 
         // Timeline
         final ImageView imageView = getEventTimelineView (15, 3.0f, false, actionLabel);
@@ -1062,7 +1062,7 @@ public class EventHolderAdapter extends BaseAdapter {
         eventView.addView(linearLayout);
 
 //        // Action: Text content
-//        final TextView textView = new TextView (ApplicationView.getContext());
+//        final TextView textView = new TextView (Application.getContext());
 //        textView.setText(text);
 //        textView.setAllCaps(true);
 //        textView.setTextSize(10.0f);
@@ -1075,7 +1075,7 @@ public class EventHolderAdapter extends BaseAdapter {
     private TextView getEventTagView(String tag) {
 
         // Action label
-        TextView actionLabel = new TextView (ApplicationView.getContext());
+        TextView actionLabel = new TextView (Application.getContext());
         if (tag != null && tag.length() > 0) {
             actionLabel.setId(R.id.tag);
             actionLabel.setText(tag);
@@ -1142,7 +1142,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         // paint.setColor(Color.rgb(255, 255, 255));
-        paint.setColor (ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color));
+        paint.setColor (Application.getDisplay().getResources().getColor(R.color.timeline_segment_color));
         paint.setStyle(Paint.Style.STROKE);
 
         paint.setStrokeWidth(strokeWidth);

@@ -1,16 +1,14 @@
 package camp.computer.clay.visualization;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import camp.computer.clay.designer.MapView;
+import camp.computer.clay.designer.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.simulation.Simulation;
@@ -176,7 +174,7 @@ public class Visualization extends Image {
         ArrayList<MachineImage> images = new ArrayList<MachineImage>();
 
         for (Layer layer: getLayers()) {
-            for (Image image : layer.getImages()) {
+            for (Image image: layer.getImages()) {
                 if (image instanceof MachineImage) {
                     images.add((MachineImage) image);
                 }
@@ -275,7 +273,7 @@ public class Visualization extends Image {
     }
 
     @Override
-    public void draw(MapView mapView) {
+    public void draw(VisualizationSurface visualizationSurface) {
 
         /*
         Canvas canvas = mapView.getCanvas();
@@ -308,7 +306,7 @@ public class Visualization extends Image {
                 break;
             }
             for (Image image: layer.getImages()) {
-                image.draw(mapView);
+                image.draw(visualizationSurface);
             }
         }
     }

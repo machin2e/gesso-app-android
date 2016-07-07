@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Random;
 
-import camp.computer.clay.designer.MapView;
+import camp.computer.clay.designer.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;
@@ -131,32 +131,32 @@ public class PortImage extends Image {
         }
     }
 
-    public void draw(MapView mapView) {
-        this.mapView = mapView;
+    public void draw(VisualizationSurface visualizationSurface) {
+        this.visualizationSurface = visualizationSurface;
 
         if (isVisible()) {
 
-            drawShapeLayer(mapView);
-            drawStyleLayer(mapView);
-            drawDataLayer(mapView);
-            drawAnnotationLayer(mapView);
+            drawShapeLayer(visualizationSurface);
+            drawStyleLayer(visualizationSurface);
+            drawDataLayer(visualizationSurface);
+            drawAnnotationLayer(visualizationSurface);
 
             // Draw children sprites
-            drawCandidatePathImages(mapView);
+            drawCandidatePathImages(visualizationSurface);
         }
     }
 
     /**
      * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
      * placeholder for the sprite.
-     * @param mapView
+     * @param visualizationSurface
      */
-    public void drawShapeLayer(MapView mapView) {
+    public void drawShapeLayer(VisualizationSurface visualizationSurface) {
 
         if (showFormLayer) {
 
-            Canvas mapCanvas = mapView.getCanvas();
-            Paint paint = mapView.getPaint();
+            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
 
 //            mapCanvas.save();
 //
@@ -191,14 +191,14 @@ public class PortImage extends Image {
 
     /**
      * Draws the sprite's detail front layer.
-     * @param mapView
+     * @param visualizationSurface
      */
-    public void drawStyleLayer(MapView mapView) {
+    public void drawStyleLayer(VisualizationSurface visualizationSurface) {
 
         if (showStyleLayer) {
 
-            Canvas mapCanvas = mapView.getCanvas();
-            Paint paint = mapView.getPaint();
+            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
 
             Port port = (Port) getModel();
 
@@ -243,14 +243,14 @@ public class PortImage extends Image {
 
     /**
      * Draws the sprite's data layer.
-     * @param mapView
+     * @param visualizationSurface
      */
-    private void drawDataLayer(MapView mapView) {
+    private void drawDataLayer(VisualizationSurface visualizationSurface) {
 
         if (showDataLayer) {
 
-            Canvas mapCanvas = mapView.getCanvas();
-            Paint paint = mapView.getPaint();
+            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
 
             Port port = (Port) getModel();
 
@@ -333,14 +333,14 @@ public class PortImage extends Image {
 
     /**
      * Draws the sprite's annotation layer. Contains labels and other text.
-     * @param mapView
+     * @param visualizationSurface
      */
-    public void drawAnnotationLayer(MapView mapView) {
+    public void drawAnnotationLayer(VisualizationSurface visualizationSurface) {
 
         if (showAnnotationLayer) {
 
-            Canvas mapCanvas = mapView.getCanvas();
-            Paint paint = mapView.getPaint();
+            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
 
             Port port = (Port) getModel();
 
@@ -554,7 +554,7 @@ public class PortImage extends Image {
         return visiblePathImages;
     }
 
-    public MapView mapView = null;
+    public VisualizationSurface visualizationSurface = null;
 
     @Override
     public boolean isTouching(PointF point) {
@@ -647,15 +647,15 @@ public class PortImage extends Image {
         this.candidatePathDestinationPosition.y = position.y;
     }
 
-    public void drawCandidatePathImages(MapView mapView) {
+    public void drawCandidatePathImages(VisualizationSurface visualizationSurface) {
         if (isCandidatePathVisible) {
 
             Port port = (Port) getModel();
 
             if (port.getType() != Port.Type.NONE) {
 
-                Canvas mapCanvas = mapView.getCanvas();
-                Paint paint = mapView.getPaint();
+                Canvas mapCanvas = visualizationSurface.getCanvas();
+                Paint paint = visualizationSurface.getPaint();
 
                 float triangleWidth = 20;
                 float triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);

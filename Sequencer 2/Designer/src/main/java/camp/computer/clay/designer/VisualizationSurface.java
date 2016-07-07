@@ -8,79 +8,92 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import java.util.ArrayList;
-
 import camp.computer.clay.model.simulation.Body;
-import camp.computer.clay.model.simulation.Machine;
-import camp.computer.clay.model.interaction.Perspective;
-import camp.computer.clay.model.simulation.Port;
-import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.Visualization;
 
-public class MapView extends SurfaceView implements SurfaceHolder.Callback {
+public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
 
-    private MapViewGenerator mapViewGenerator;
+    private VisualizationRenderer visualizationRenderer;
 
     private SurfaceHolder surfaceHolder;
 
     // Drawing context
     private Bitmap canvasBitmap = null;
     private Canvas canvas = null;
-    private int canvasWidth, canvasHeight;
+    private int canvasWidth;
+    private int canvasHeight;
     private Paint paint = new Paint (Paint.ANTI_ALIAS_FLAG);
-    public Matrix identityMatrix;
-    public Matrix canvasMatrix;
+    private Matrix identityMatrix;
 
     // Map
     private PointF originPosition = new PointF ();
 
-    ArrayList<Visualization> visualizationSprites = new ArrayList<Visualization>();
+    private Visualization visualization;
 
-    public MapView(Context context) {
+    public VisualizationSurface(Context context) {
         super(context);
         initialize();
     }
 
-    public MapView (Context context, AttributeSet attrs) {
+    public VisualizationSurface(Context context, AttributeSet attrs) {
         super (context, attrs);
         initialize();
     }
 
-    public MapView (Context context, AttributeSet attrs, int defStyle) {
+    public VisualizationSurface(Context context, AttributeSet attrs, int defStyle) {
         super (context, attrs, defStyle);
         initialize();
     }
 
-    Simulation simulation = new Simulation();
-    Visualization visualization = new Visualization(simulation);
-
     public void setVisualization(Visualization visualization) {
         this.visualization = visualization;
+
+//        // Update perspective on visualization
+//        visualization.getSimulation().getBody(0).getPerspective().setWidth(canvasWidth);
+//        visualization.getSimulation().getBody(0).getPerspective().setHeight(canvasHeight);
+
+        // Get screen width and height of the device
+        DisplayMetrics metrics = new DisplayMetrics();
+        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
+
+        visualization.getSimulation().getBody(0).getPerspective().setWidth(screenWidth);
+        visualization.getSimulation().getBody(0).getPerspective().setHeight(screenHeight);
+
+
+        initializeVisualization();
+    }
+
+    private void initializeVisualization() {
+
+        visualization.initializeImages();
+
+        visualization.setPosition(new PointF(0, 0));
+        visualization.setRotation(0);
+//        visualizationSprites.add(visualization);
     }
 
     public Visualization getVisualization() {
         return this.visualization;
     }
 
-    public Simulation getSimulation() {
-        return this.simulation;
-    }
-
     private void initialize() {
 
-        initializeSimulation();
+//        initializeSimulation();
 
-        initializeVisualization();
+//        initializeVisualization();
 
-        // Create body and set perspective
-        Body body = new Body();
-        Perspective perspective = new Perspective(visualization);
+//        // Create body and set perspective
+//        Body body = new Body();
+//        Perspective perspective = new Perspective(visualization);
 
 //        WindowManager wm = (WindowManager) ApplicationView.getContext().getSystemService(Context.WINDOW_SERVICE);
 //        Display display = wm.getDefaultDisplay();
@@ -92,37 +105,28 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //        perspective.setWidth(displayWidth);
 //        perspective.setHeight(displayHeight);
 
-        body.setPerspective(perspective);
+//        body.setPerspective(perspective);
 
-        // Add body to simulation
-        simulation.addBody(body);
+//        // Add body to simulation
+//        simulation.addBody(body);
     }
 
-    private void initializeSimulation() {
-
-        // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int letterIndex = 0;
-        for (int i = 0; i < 5; i++) {
-            Machine machine = new Machine();
-            for (int j = 0; j < 12; j++) {
-                Port port = new Port();
-                machine.addPort(port);
-                machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
-                letterIndex = letterIndex % alphabet.length();
-            }
-            simulation.addMachine(machine);
-        }
-    }
-
-    private void initializeVisualization() {
-
-        visualization.initializeImages();
-
-        visualization.setPosition(new PointF(0, 0));
-        visualization.setRotation(0);
-        visualizationSprites.add(visualization);
-    }
+//    private void initializeSimulation() {
+//
+//        // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
+//        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//        int letterIndex = 0;
+//        for (int i = 0; i < 5; i++) {
+//            Machine machine = new Machine();
+//            for (int j = 0; j < 12; j++) {
+//                Port port = new Port();
+//                machine.addPort(port);
+//                machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
+//                letterIndex = letterIndex % alphabet.length();
+//            }
+//            simulation.addMachine(machine);
+//        }
+//    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -133,8 +137,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         canvas = new Canvas ();
         canvas.setBitmap(canvasBitmap);
 
-        simulation.getBody(0).getPerspective().setWidth(canvasWidth);
-        simulation.getBody(0).getPerspective().setHeight(canvasHeight);
+//        simulation.getBody(0).getPerspective().setWidth(canvasWidth);
+//        simulation.getBody(0).getPerspective().setHeight(canvasHeight);
 
         identityMatrix = new Matrix ();
 
@@ -142,7 +146,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
 
         // Update perspective on visualization
-        simulation.getBody(0).getPerspective().setPosition(new PointF(0, 0));
+//        simulation.getBody(0).getPerspective().setPosition(new PointF(0, 0));
 //        simulation.getBody(0).getPerspective().width
     }
 
@@ -160,12 +164,12 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         Log.v("MapView", "MapView_OnResume");
 
         surfaceHolder = getHolder ();
-        getHolder ().addCallback (this);
+        getHolder().addCallback (this);
 
         // Create and start background Thread
-        mapViewGenerator = new MapViewGenerator(this);
-        mapViewGenerator.setRunning (true);
-        mapViewGenerator.start ();
+        visualizationRenderer = new VisualizationRenderer(this);
+        visualizationRenderer.setRunning (true);
+        visualizationRenderer.start ();
 
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
@@ -182,11 +186,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         // Kill the background Thread
         boolean retry = true;
-        mapViewGenerator.setRunning (false);
+        visualizationRenderer.setRunning (false);
 
         while (retry) {
             try {
-                mapViewGenerator.join ();
+                visualizationRenderer.join ();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace ();
@@ -238,17 +242,21 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     protected void doDraw(Canvas canvas) {
 //        super.onDraw(canvas);
 
+        if (this.visualization == null) {
+            return;
+        }
+
         // <PERSPECTIVE>
         // Move the perspective
         this.canvas.save ();
         this.canvas.translate (
-                originPosition.x + simulation.getBody(0).getPerspective().getPosition().x + (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationY(),
-                originPosition.y + simulation.getBody(0).getPerspective().getPosition().y - (float) ApplicationView.getApplicationView().getSensorAdapter().getRotationX()
+                originPosition.x + visualization.getSimulation().getBody(0).getPerspective().getPosition().x + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+                originPosition.y + visualization.getSimulation().getBody(0).getPerspective().getPosition().y - (float) Application.getDisplay().getSensorAdapter().getRotationX()
         );
-        // this.canvas.rotate((float) ApplicationView.getApplicationView().getSensorAdapter().getRotationZ());
+        // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
         this.canvas.scale (
-                simulation.getBody(0).getPerspective().getScale(),
-                simulation.getBody(0).getPerspective().getScale()
+                visualization.getSimulation().getBody(0).getPerspective().getScale(),
+                visualization.getSimulation().getBody(0).getPerspective().getScale()
         );
         // </PERSPECTIVE>
 
@@ -259,7 +267,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         this.canvas.drawColor(Color.WHITE);
 
         // Scene
-        drawVisualization(this);
+        drawVisualization(visualization);
 
         // Paint the bitmap to the "primary" canvas.
 //        canvas.drawBitmap (canvasBitmap, identityMatrix, null);
@@ -271,14 +279,16 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         this.canvas.restore();
     }
 
-    private void drawVisualization(MapView mapView) {
-        for (Visualization visualization : visualizationSprites) {
-            visualization.draw(mapView);
-        }
+    private void drawVisualization(Visualization visualization) {
+        this.visualization.draw(this);
     }
 
     public void updateSurfaceView () {
         // The function run in background thread, not UI thread.
+
+        if (visualization == null) {
+            return;
+        }
 
         Canvas canvas = null;
 
@@ -286,7 +296,11 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
             canvas = surfaceHolder.lockCanvas ();
 
             synchronized (surfaceHolder) {
-                updateState();
+
+                // Update
+                visualization.update();
+
+                // Draw
                 if (canvas != null) {
                     doDraw(canvas);
                 }
@@ -296,14 +310,6 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 surfaceHolder.unlockCanvasAndPost (canvas);
             }
         }
-    }
-
-    private void updateState() {
-//        if (!hasTouches()) {
-            for (Visualization visualization : visualizationSprites) {
-                visualization.update();
-            }
-//        }
     }
 
     //----------------------------------------------------------------------------------------------
@@ -366,10 +372,14 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         int touchInteractionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
         int pointerCount = motionEvent.getPointerCount ();
 
+        if (this.visualization == null) {
+            return false;
+        }
+
         Log.v("InteractionHistory", "Started touchPositions composition.");
 
         // Get active body
-        Body currentBody = simulation.getBody(0);
+        Body currentBody = visualization.getSimulation().getBody(0);
 
         // Create touchPositions interaction
         TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.NONE);
@@ -382,8 +392,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
                 // Update touchPositions state based the points given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId (i);
-                    PointF perspectivePosition = simulation.getBody(0).getPerspective().getPosition();
-                    float perspectiveScale = simulation.getBody(0).getPerspective().getScale();
+                    PointF perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
+                    float perspectiveScale = visualization.getSimulation().getBody(0).getPerspective().getScale();
                     touchInteraction.touchPositions[id].x = (motionEvent.getX (i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     touchInteraction.touchPositions[id].y = (motionEvent.getY (i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }

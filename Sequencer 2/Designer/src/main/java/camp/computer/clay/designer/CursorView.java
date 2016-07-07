@@ -36,7 +36,7 @@ public class CursorView /* extends FloatingActionButton */ {
     CursorView() {
 
         // Set up FAB
-        fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+        fab = (FloatingActionButton) Application.getDisplay().findViewById(R.id.fab_create);
     }
 
     // <FAB>
@@ -46,7 +46,7 @@ public class CursorView /* extends FloatingActionButton */ {
 //        DisplayMetrics metrics;
 //        int screenWidth = 0, screenHeight = 0;
 //        metrics = new DisplayMetrics();
-//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 //        screenHeight = metrics.heightPixels;
 //        screenWidth = metrics.widthPixels;
 //
@@ -60,7 +60,7 @@ public class CursorView /* extends FloatingActionButton */ {
 //        params.leftMargin = (int) screenWidth - (int) (width * 1.1);
 //        params.topMargin = (int) (screenHeight / 2.0) - (int) (height / 2.0);
 
-        ApplicationView.getApplicationView().getTimelineView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        Application.getDisplay().getTimelineView().addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 
@@ -69,13 +69,13 @@ public class CursorView /* extends FloatingActionButton */ {
                 updatePosition();
 
                 // Remove the layout
-                ApplicationView.getApplicationView().getTimelineView().removeOnLayoutChangeListener(this);
+                Application.getDisplay().getTimelineView().removeOnLayoutChangeListener(this);
 //                TimelineListView.getTimelineListView().removeOnLayoutChangeListener(this);
                 Log.e("Move_Finger", "Updated timeline layout.");
             }
         });
 
-        ApplicationView.getApplicationView().getTimelineView().refreshTimelineView();
+        Application.getDisplay().getTimelineView().refreshTimelineView();
     }
 
 //    private void moveUnderTimeline(FloatingActionButton fab) {
@@ -83,7 +83,7 @@ public class CursorView /* extends FloatingActionButton */ {
 //        DisplayMetrics metrics;
 //        int screenWidth = 0, screenHeight = 0;
 //        metrics = new DisplayMetrics();
-//        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 //        screenHeight = metrics.heightPixels;
 //        screenWidth = metrics.widthPixels;
 //
@@ -109,18 +109,18 @@ public class CursorView /* extends FloatingActionButton */ {
             DisplayMetrics metrics;
             int screenWidth = 0, screenHeight = 0;
             metrics = new DisplayMetrics();
-            ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
             screenHeight = metrics.heightPixels;
             screenWidth = metrics.widthPixels;
 
             int width = fab.getWidth();
             int height = fab.getHeight();
 
-            if (ApplicationView.getApplicationView().getTimelineView() == null || ApplicationView.getApplicationView().getTimelineView().getEventHolders().size() == 0) {
+            if (Application.getDisplay().getTimelineView() == null || Application.getDisplay().getTimelineView().getEventHolders().size() == 0) {
                 int xOffset = 170; // TODO: Make dynamic
                 int yOffset = 55; // TODO: Make dynaimc
                 Point dest = new Point((int) (screenWidth / 2.0) - (int) (width / 2.0) + xOffset, (int) (screenHeight / 2.0) - (int) (height / 2.0) + yOffset);
-//            ApplicationView.getApplicationView().moveToPoint(fab, dest, 400);
+//            Application.getDisplay().moveToPoint(fab, dest, 400);
 
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) fab.getLayoutParams();
                 params.leftMargin = (int) dest.x;
@@ -129,7 +129,7 @@ public class CursorView /* extends FloatingActionButton */ {
             }
 
             // Get point under last event on timeline
-            Point point = ApplicationView.getApplicationView().getTimelineView().getPointUnderTimeline();
+            Point point = Application.getDisplay().getTimelineView().getPointUnderTimeline();
             if (point != null) {
                 point.x = 90; // TODO: Dynamically get x coordinate of timeline
                 point.y = point.y + (int) (0.01 * fab.getHeight());
@@ -154,9 +154,9 @@ public class CursorView /* extends FloatingActionButton */ {
     // Based on: http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
     public void moveToPoint (final View view, Point destinationPoint, int translateDuration)
     {
-        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+        FrameLayout root = (FrameLayout) Application.getDisplay().findViewById(R.id.application_view);
         DisplayMetrics dm = new DisplayMetrics();
-        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics( dm );
+        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics( dm );
         int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
 
         int originalPos[] = new int[2];
@@ -211,7 +211,7 @@ public class CursorView /* extends FloatingActionButton */ {
             public boolean onTouch(View v, MotionEvent event) {
                 boolean returnVal = false;
 
-                final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+                final TimelineView timelineView = Application.getDisplay().getTimelineView();
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
@@ -227,7 +227,7 @@ public class CursorView /* extends FloatingActionButton */ {
                                 fablet.hide(true);
                             }
 
-                            FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+                            FrameLayout root = (FrameLayout) Application.getDisplay().findViewById(R.id.application_view);
                             root.removeView(fablet);
                         }
                         fablets.erase();
@@ -252,14 +252,14 @@ public class CursorView /* extends FloatingActionButton */ {
                         DisplayMetrics metrics;
                         int screenWidth = 0, screenHeight = 0;
                         metrics = new DisplayMetrics();
-                        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                         screenHeight = metrics.heightPixels;
                         screenWidth = metrics.widthPixels;
 
                         int width = fab.getWidth();
                         int height = fab.getHeight();
                         Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
+                        Application.getDisplay().moveToPoint(fab, dest, 100);
                         // </TEST>
                         */
 
@@ -329,16 +329,16 @@ public class CursorView /* extends FloatingActionButton */ {
 //                        int width = fab.getWidth();
 //                        int height = fab.getHeight();
 //                        Point dest = new Point((int) event.getRawX() - (int) (width / 2.0), (int) event.getRawY() - (int) (height / 2.0));
-//                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
+//                        Application.getDisplay().moveToPoint(fab, dest, 100);
 
 //                        if (getDevice().getClay().selectedEventHolder != null) {
 //                            timelineView.removeEventHolder(getDevice().getClay().selectedEventHolder);
 //                        }
 
                         // TODO: Search for nearest/nearby events, actions, states, etc. (i.e., discovery context)
-                        ApplicationView.getApplicationView().getTimelineView().resetViewBackgrounds();
+                        Application.getDisplay().getTimelineView().resetViewBackgrounds();
 //                        TimelineListView.getTimelineListView().findNearbyViews((int) event.getRawX(), (int) event.getRawY());
-                        int nearestViewIndex = ApplicationView.getApplicationView().getTimelineView().findNearestTimelineIndex((int) event.getRawX(), (int) event.getRawY());
+                        int nearestViewIndex = Application.getDisplay().getTimelineView().findNearestTimelineIndex((int) event.getRawX(), (int) event.getRawY());
 
                         Log.v("Dist", "---");
 
@@ -411,7 +411,7 @@ public class CursorView /* extends FloatingActionButton */ {
             @Override
             public void onClick(View v) {
 
-                final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+                final TimelineView timelineView = Application.getDisplay().getTimelineView();
 
                 // Update timeline view
                 timelineView.resetEventViews();
@@ -464,15 +464,15 @@ public class CursorView /* extends FloatingActionButton */ {
 
                 if (fabStatus != FAB_START_DRAGGING) {
 
-                    final TimelineView timelineView = ApplicationView.getApplicationView().getTimelineView();
+                    final TimelineView timelineView = Application.getDisplay().getTimelineView();
 
                     timelineView.displayDeviceBrowser(new TimelineView.DeviceSelectionListener() {
                         @Override
                         public void onSelect(Device device) {
-                            ApplicationView.getApplicationView().setTimelineView(device);
+                            Application.getDisplay().setTimelineView(device);
 
                             // <HACK>
-                            ((TimelineView) ApplicationView.getApplicationView().getTimelineView()).getDevice().enqueueMessage("request blink");
+                            ((TimelineView) Application.getDisplay().getTimelineView()).getDevice().enqueueMessage("request blink");
                             // getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage(propagatorMessage);
                             // </HACK>
                         }

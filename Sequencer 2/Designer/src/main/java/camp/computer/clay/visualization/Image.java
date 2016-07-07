@@ -2,7 +2,7 @@ package camp.computer.clay.visualization;
 
 import android.graphics.PointF;
 
-import camp.computer.clay.designer.MapView;
+import camp.computer.clay.designer.VisualizationSurface;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
@@ -120,7 +120,7 @@ public abstract class Image {
 
     public abstract void update();
 
-    public abstract void draw(MapView mapView);
+    public abstract void draw(VisualizationSurface visualizationSurface);
 
     public abstract boolean isTouching(PointF point);
 

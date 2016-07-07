@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true" >
         <activity
-            android:name="camp.computer.clay.designer.ApplicationView"
+            android:name="camp.computer.clay.designer.Application"
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name" >
             <intent-filter>

@@ -102,15 +102,23 @@ public class Perspective {
     private float targetScale = DEFAULT_SCALE_FACTOR;
     public float scale = targetScale;
     private int scaleDuration = DEFAULT_SCALE_DURATION;
+    private boolean scaleInProgress = false;
 
     public void setScale (float targetScale) {
 
+        Log.v("SetScale", "newScale: " + targetScale);
+        Log.v("SetScale", "this.targetScale: " + this.targetScale);
+        Log.v("SetScale", "this.scale: " + this.scale);
+
         if (this.targetScale != targetScale) {
+
+            Log.v("SetScale", "targetScale: " + this.targetScale);
 
             if (this.scale != targetScale) {
                 Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleListener() {
                     @Override
                     public void onScale(float currentScale) {
+                        Log.v("SetScale", "targetScale: " + currentScale);
                         scale = currentScale;
                     }
                 });

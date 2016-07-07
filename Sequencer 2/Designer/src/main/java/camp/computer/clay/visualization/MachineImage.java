@@ -8,7 +8,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.designer.MapView;
+import camp.computer.clay.designer.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
@@ -116,22 +116,22 @@ public class MachineImage extends Image {
     public void update() {
     }
 
-    public void draw(MapView mapView) {
+    public void draw(VisualizationSurface visualizationSurface) {
         if (isVisible()) {
-            drawStyleLayer(mapView);
+            drawStyleLayer(visualizationSurface);
         }
     }
 
-    private void drawStyleLayer(MapView mapView) {
-        drawHeadersLayer(mapView);
-        drawBoardLayer(mapView);
-        drawLightsLayer(mapView);
+    private void drawStyleLayer(VisualizationSurface visualizationSurface) {
+        drawHeadersLayer(visualizationSurface);
+        drawBoardLayer(visualizationSurface);
+        drawLightsLayer(visualizationSurface);
     }
 
-    public void drawBoardLayer(MapView mapView) {
+    public void drawBoardLayer(VisualizationSurface visualizationSurface) {
 
-        Canvas mapCanvas = mapView.getCanvas();
-        Paint paint = mapView.getPaint();
+        Canvas mapCanvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
 
         // Color
         paint.setStyle(Paint.Style.FILL);
@@ -147,10 +147,10 @@ public class MachineImage extends Image {
         }
     }
 
-    public void drawHeadersLayer(MapView mapView) {
+    public void drawHeadersLayer(VisualizationSurface visualizationSurface) {
 
-        Canvas mapCanvas = mapView.getCanvas();
-        Paint paint = mapView.getPaint();
+        Canvas mapCanvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
         PointF[] portGroupCenterPositions = new PointF[PORT_GROUP_COUNT];
@@ -196,10 +196,10 @@ public class MachineImage extends Image {
         }
     }
 
-    public void drawLightsLayer(MapView mapView) {
+    public void drawLightsLayer(VisualizationSurface visualizationSurface) {
 
-        Canvas mapCanvas = mapView.getCanvas();
-        Paint paint = mapView.getPaint();
+        Canvas mapCanvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
         PointF[] lightCenterPositions = new PointF[PORT_COUNT];

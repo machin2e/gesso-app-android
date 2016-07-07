@@ -47,7 +47,7 @@ public class DeviceViewFragment extends Fragment {
             newFab.hide(false);
         }
 
-        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+        FrameLayout root = (FrameLayout) Application.getDisplay().findViewById(R.id.application_view);
         root.addView(newFab);
 
         // Position
@@ -81,8 +81,8 @@ public class DeviceViewFragment extends Fragment {
         }
 
         // <HACK>
-        if (!ApplicationView.getApplicationView().timelineViews.contains(timelineView)) {
-            ApplicationView.getApplicationView().timelineViews.add(timelineView);
+        if (!Application.getDisplay().timelineViews.contains(timelineView)) {
+            Application.getDisplay().timelineViews.add(timelineView);
         }
         // </HACK>
 
@@ -102,7 +102,7 @@ public class DeviceViewFragment extends Fragment {
 
 //        // <HACK>
 //        // Set up FAB
-//        final FloatingActionButton fab = (FloatingActionButton) ApplicationView.getApplicationView().findViewById(R.id.fab_create);
+//        final FloatingActionButton fab = (FloatingActionButton) Application.getDisplay().findViewById(R.id.fab_create);
 //
 //        final ArrayList<FloatingActionButton> fablets = getDevice().getClay().fablets;
 //
@@ -124,7 +124,7 @@ public class DeviceViewFragment extends Fragment {
 //                                fablet.hide(true);
 //                            }
 //
-//                            FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+//                            FrameLayout root = (FrameLayout) Application.getDisplay().findViewById(R.id.application_view);
 //                            root.removeView(fablet);
 //                        }
 //                        fablets.erase();
@@ -149,14 +149,14 @@ public class DeviceViewFragment extends Fragment {
 //                        DisplayMetrics metrics;
 //                        int screenWidth = 0, screenHeight = 0;
 //                        metrics = new DisplayMetrics();
-//                        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//                        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 //                        screenHeight = metrics.heightPixels;
 //                        screenWidth = metrics.widthPixels;
 //
 //                        int width = fab.getWidth();
 //                        int height = fab.getHeight();
 //                        Point dest = new Point((int) screenWidth - (int) (width * 1.1), (int) (screenHeight / 2.0) - (int) (height / 2.0));
-//                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
+//                        Application.getDisplay().moveToPoint(fab, dest, 100);
 //                        // </TEST>
 //                        */
 //
@@ -221,7 +221,7 @@ public class DeviceViewFragment extends Fragment {
 ////                        int width = fab.getWidth();
 ////                        int height = fab.getHeight();
 ////                        Point dest = new Point((int) event.getRawX() - (int) (width / 2.0), (int) event.getRawY() - (int) (height / 2.0));
-////                        ApplicationView.getApplicationView().moveToPoint(fab, dest, 100);
+////                        Application.getDisplay().moveToPoint(fab, dest, 100);
 //
 ////                        if (getDevice().getClay().selectedEventHolder != null) {
 ////                            timelineView.removeEventHolder(getDevice().getClay().selectedEventHolder);

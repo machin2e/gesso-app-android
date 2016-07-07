@@ -51,7 +51,7 @@ public class EventDesignerView {
     }
 
     public Context getContext() {
-        return ApplicationView.getApplicationView();
+        return Application.getDisplay();
     }
 
     public Clay getClay() {
@@ -352,7 +352,7 @@ public class EventDesignerView {
         triggerMessageText.setText(triggerMessageContent);
         triggerMessageText.setSelection(triggerMessageText.getText().length());
 
-        ApplicationView.getApplicationView().speakPhrase(triggerMessageContent);
+        Application.getDisplay().speakPhrase(triggerMessageContent);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -876,7 +876,7 @@ public class EventDesignerView {
 //        String sourceDeviceUuid = null;
 //        for (int i = 0; i < deviceOptionsList2.size(); i++) {
 //            Log.v("ContentEntry2", "" + deviceOptionsList2.get(i));
-//            //if (deviceOptionsList2.get(i).equals(ApplicationView.getApplicationView().getTimelineView().getDevice().getUuid().toString())) {
+//            //if (deviceOptionsList2.get(i).equals(Application.getDisplay().getTimelineView().getDevice().getUuid().toString())) {
 //            if (deviceOptionsList2.get(i).equals(getDevice().getUuid().toString())) {
 //                deviceSourceLayout.setSelection(deviceOptionsList.get(i));
 //                Log.v("ContentEntry2", "Set the default!");
@@ -1443,7 +1443,7 @@ public class EventDesignerView {
                                         /*
 
                                         Log.v("Device_Timeline", "Looking for timeline for device " + getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).getUuid());
-                                        TimelineView sourceDeviceTimelineView = ApplicationView.getApplicationView().getTimelineView(getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)));
+                                        TimelineView sourceDeviceTimelineView = Application.getDisplay().getTimelineView(getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)));
 
                                         final String signalActionUuid = "bdb49750-9ead-466e-96a0-3aa88e7d246c";
                                         Script selectedScript = getClay().getCache().getScript(UUID.fromString(signalActionUuid));
@@ -1563,7 +1563,7 @@ public class EventDesignerView {
 
 //                String updatedStateString = numberEntryView.getText().toString();
 //
-//                ApplicationView.getApplicationView().speakPhrase(updatedStateString);
+//                Application.getDisplay().speakPhrase(updatedStateString);
 //
 //                // Update the behavior state
 //                // <HACK>
@@ -1785,7 +1785,7 @@ public class EventDesignerView {
 
 //                String updatedStateString = numberEntryView.getText().toString();
 //
-//                ApplicationView.getApplicationView().speakPhrase(updatedStateString);
+//                Application.getDisplay().speakPhrase(updatedStateString);
 //
 //                // Update the behavior state
 //                // <HACK>
@@ -1873,7 +1873,7 @@ public class EventDesignerView {
                 }
 
                 // Select.
-                int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+                int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
                 ((TextView) parent.getChildAt(0)).setTextColor(textColor);
                 ((TextView) parent.getChildAt(0)).setTextSize(12);
                 ((TextView) parent.getChildAt(0)).setAllCaps(true);
@@ -1997,7 +1997,7 @@ public class EventDesignerView {
 
                     // Color.
                     if (selectedButton[0] != null) {
-                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
                         selectedButton[0].setTextColor(textColor); // Color. Update the color.
                         selectedButton[0].setTypeface(null, Typeface.BOLD);
                     }
@@ -2061,7 +2061,7 @@ public class EventDesignerView {
                 TextView textView = (TextView) view;
 
                 // Color.
-                int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+                int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
                 textView.setTextColor(textColor);
                 textView.setTypeface(null, Typeface.BOLD);
 
@@ -2179,7 +2179,7 @@ public class EventDesignerView {
 
                     // Color.
                     if (selectedOptionButton[0] != null) {
-                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
                         selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
                         selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
                     }
@@ -2380,7 +2380,7 @@ public class EventDesignerView {
 //
 ////                        baseLayout.findViewWithTag("content_editor_view").setVisibility(View.VISIBLE);
 //
-//                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+//                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
 //                        selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
 //                        selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
 //                    }
@@ -2487,7 +2487,7 @@ public class EventDesignerView {
 
                     // Color.
                     if (selectedOptionButton[0] != null) {
-                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
                         selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
                         selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
                     }
@@ -2575,7 +2575,7 @@ public class EventDesignerView {
 
                     // Color.
                     if (selectedOptionButton[0] != null) {
-                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
                         selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
                         selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
                     }
@@ -2681,7 +2681,7 @@ public class EventDesignerView {
 //
 //                    // Color.
 //                    if (selectedOptionButton[0] != null) {
-//                        int textColor = ApplicationView.getApplicationView().getResources().getColor(R.color.timeline_segment_color);
+//                        int textColor = Application.getDisplay().getResources().getColor(R.color.timeline_segment_color);
 //                        selectedOptionButton[0].setTextColor(textColor); // Color. Update the color.
 //                        selectedOptionButton[0].setTypeface(null, Typeface.BOLD);
 //                    }
@@ -3088,7 +3088,7 @@ public class EventDesignerView {
 
                             public void run() {
                                 // playSound();
-                                ApplicationView.getApplicationView().playTone(Double.parseDouble(String.valueOf(progress)), 0.2);
+                                Application.getDisplay().playTone(Double.parseDouble(String.valueOf(progress)), 0.2);
                             }
                         });
                     }
@@ -3225,7 +3225,7 @@ public class EventDesignerView {
         input.setText(phrase);
         input.setSelection(input.getText().length());
 
-        ApplicationView.getApplicationView().speakPhrase(phrase);
+        Application.getDisplay().speakPhrase(phrase);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -3237,7 +3237,7 @@ public class EventDesignerView {
 
                 String updatedStateString = input.getText().toString();
 
-                ApplicationView.getApplicationView().speakPhrase(updatedStateString);
+                Application.getDisplay().speakPhrase(updatedStateString);
 
                 // Update the behavior state
                 // <HACK>

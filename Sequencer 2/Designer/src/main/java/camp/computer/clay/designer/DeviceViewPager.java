@@ -67,8 +67,8 @@ public class DeviceViewPager extends ViewPager {
                 currentViewTag = position;
                 currentListView = (TimelineView) findViewWithTag(currentViewTag);
                 // <HACK>
-                ApplicationView.getApplicationView().getCursorView().init();
-                ApplicationView.getApplicationView().getCursorView().updatePosition();
+                Application.getDisplay().getCursorView().init();
+                Application.getDisplay().getCursorView().updatePosition();
                 // </HACK>
             }
 
@@ -130,7 +130,7 @@ public class DeviceViewPager extends ViewPager {
         if (currentListView == null) {
             currentListView = (TimelineView) findViewWithTag (currentViewTag);
             // <HACK>
-            ApplicationView.getApplicationView().getCursorView().init();
+            Application.getDisplay().getCursorView().init();
             // </HACK>
         }
 
@@ -235,7 +235,7 @@ public class DeviceViewPager extends ViewPager {
         if (currentListView == null) {
             currentListView = (TimelineView) findViewWithTag (currentViewTag);
             // <HACK>
-            ApplicationView.getApplicationView().getCursorView().init();
+            Application.getDisplay().getCursorView().init();
             // </HACK>
         }
 
@@ -287,9 +287,9 @@ public class DeviceViewPager extends ViewPager {
                     Log.v ("Touch_Event", "distance: " + distance);
                     if (startTouch.x < 200) {
                         Log.v ("Touch_Event", "startTouch.x < 200");
-                        EventHolder eventHolder = ApplicationView.getApplicationView().getTimelineView().getEventHolderByPosition(currentTouch.x, currentTouch.y);
+                        EventHolder eventHolder = Application.getDisplay().getTimelineView().getEventHolderByPosition(currentTouch.x, currentTouch.y);
                         if (eventHolder != null) {
-                            ApplicationView.getApplicationView().getTimelineView().expandEventView(eventHolder);
+                            Application.getDisplay().getTimelineView().expandEventView(eventHolder);
                         }
 //                        interceptTouches = true;
                     } else {

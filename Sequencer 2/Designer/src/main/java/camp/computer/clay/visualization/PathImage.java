@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.Log;
 
-import camp.computer.clay.designer.MapView;
+import camp.computer.clay.designer.VisualizationSurface;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
@@ -75,11 +75,11 @@ public class PathImage extends Image {
     public void update() {
     }
 
-    public void draw(MapView mapView) {
+    public void draw(VisualizationSurface visualizationSurface) {
 
         if (isVisible()) {
-            Canvas mapCanvas = mapView.getCanvas();
-            Paint paint = mapView.getPaint();
+            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
 
             if (this.showDirectedPaths) {
                 drawTrianglePath(mapCanvas, paint);

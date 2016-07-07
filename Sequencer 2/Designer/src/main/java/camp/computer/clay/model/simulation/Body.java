@@ -32,31 +32,35 @@ public class Body extends Actor {
 
     private void adjustPerspectiveScale() {
 
-        // Adjust scale
-        ArrayList<PointF> machineImagePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineImages());
-        float[] boundingBox = Geometry.calculateBoundingBox(machineImagePositions);
-//        adjustPerspectiveScale(boundingBox);
+        Log.v("SetScale", "adjustPerspectiveScale");
 
-        PointF spriteBoundingBoxCenter = new PointF(((boundingBox[2] - boundingBox[0]) / 2.0f), ((boundingBox[3] - boundingBox[1]) / 2.0f));
-        float spriteBoundingBoxWidth = boundingBox[2] - boundingBox[0];
-        float spriteBoundingBoxHeight = boundingBox[3] - boundingBox[1];
+//        // Adjust scale
+//        ArrayList<PointF> machineImagePositions = Visualization.getPositions(getPerspective().getVisualization().getMachineImages());
+//        if (machineImagePositions.size() > 0) {
+//            float[] boundingBox = Geometry.calculateBoundingBox(machineImagePositions);
+//            adjustPerspectiveScale(boundingBox);
+//        }
 
-        float widthDifference = spriteBoundingBoxWidth - getPerspective().getWidth();
-        float heightDifference = spriteBoundingBoxHeight - getPerspective().getHeight();
-
-        float widthPadding = 0;
-        float newWidthScale = getPerspective().getWidth() / (spriteBoundingBoxWidth + widthPadding);
-        float newHeightScale = getPerspective().getHeight() / (spriteBoundingBoxHeight + widthPadding);
-
-        if (widthDifference > 0 /* || heightDifference > 0 */) {
-//            if (newWidthScale > newHeightScale) {
-            getPerspective().setScale(newWidthScale);
-//            } else {
-//                getPerspective().setScale(newHeightScale);
-//            }
-        } else {
-            getPerspective().setScale(1.0f);
-        }
+//        PointF spriteBoundingBoxCenter = new PointF(((boundingBox[2] - boundingBox[0]) / 2.0f), ((boundingBox[3] - boundingBox[1]) / 2.0f));
+//        float spriteBoundingBoxWidth = boundingBox[2] - boundingBox[0];
+//        float spriteBoundingBoxHeight = boundingBox[3] - boundingBox[1];
+//
+//        float widthDifference = spriteBoundingBoxWidth - getPerspective().getWidth();
+//        float heightDifference = spriteBoundingBoxHeight - getPerspective().getHeight();
+//
+//        float widthPadding = 0;
+//        float newWidthScale = getPerspective().getWidth() / (spriteBoundingBoxWidth + widthPadding);
+//        float newHeightScale = getPerspective().getHeight() / (spriteBoundingBoxHeight + widthPadding);
+//
+//        if (widthDifference > 0 /* || heightDifference > 0 */) {
+////            if (newWidthScale > newHeightScale) {
+//            getPerspective().setScale(newWidthScale);
+////            } else {
+////                getPerspective().setScale(newHeightScale);
+////            }
+//        } else {
+//            getPerspective().setScale(1.0f);
+//        }
     }
 
     public void adjustPerspectiveScale(float[] boundingBox) {
@@ -72,14 +76,14 @@ public class Body extends Actor {
         float newWidthScale = getPerspective().getWidth() / (boundingBoxWidth + widthPadding);
         float newHeightScale = getPerspective().getHeight() / (boundingBoxHeight + widthPadding);
 
-//        Log.v("Perspective", "boundingWidth: " + boundingBoxWidth);
-//        Log.v("Perspective", "perspectiveWidth: " + getPerspective().getWidth());
-//
-//        Log.v("Perspective", "boundingHeight: " + boundingBoxHeight);
-//        Log.v("Perspective", "perspectiveHeight: " + getPerspective().getHeight());
-//
-//        Log.v("Perspective", "widthDifference: " + widthDifference);
-//        Log.v("Perspective", "heightDifference: " + heightDifference);
+        Log.v("Perspective", "boundingWidth: " + boundingBoxWidth);
+        Log.v("Perspective", "perspectiveWidth: " + getPerspective().getWidth());
+
+        Log.v("Perspective", "boundingHeight: " + boundingBoxHeight);
+        Log.v("Perspective", "perspectiveHeight: " + getPerspective().getHeight());
+
+        Log.v("Perspective", "widthDifference: " + widthDifference);
+        Log.v("Perspective", "heightDifference: " + heightDifference);
 
         if (widthDifference > 0 && widthDifference > heightDifference) {
             getPerspective().setScale(newWidthScale);
@@ -324,7 +328,7 @@ public class Body extends Actor {
             if (machineImage.isTouching(touchInteraction.touchPositions[touchInteraction.pointerId])) {
                 Log.v("MapView", "\tTouched machine.");
 
-                // ApplicationView.getApplicationView().speakPhrase(machine.getNameTag());
+                // ApplicationView.getDisplay().speakPhrase(machine.getNameTag());
 
                 // <TOUCH_ACTION>
 //                TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touchPositions[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.TAP);
@@ -343,7 +347,7 @@ public class Body extends Actor {
                 machineImage.showPorts();
                 machineImage.showPaths();
                 machineImage.setTransparency(1.0f);
-                // ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
+                // ApplicationView.getDisplay().speakPhrase("choose a channel to get data.");
 
                 for (PortImage portImage: machineImage.getPortImages()) {
                     ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(portImage.getPort());
@@ -385,7 +389,7 @@ public class Body extends Actor {
 
                     port.setDirection(Port.Direction.INPUT);
                     port.setType(Port.Type.getNextType(port.getType()));
-                    // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                    // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
                 } else if (!port.hasPath() && getPerspective().getVisualization().getSimulation().getAncestorPathsByPort(port).size() == 0) {
 
@@ -428,7 +432,7 @@ public class Body extends Actor {
                         getPerspective().getVisualization().getImage(connectedPath).setVisibility(true);
                     }
 
-                    // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                    // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
                     // Perspective
                     ArrayList<Port> pathPorts = getPerspective().getVisualization().getSimulation().getPortsInPaths(paths);
@@ -510,7 +514,7 @@ public class Body extends Actor {
                 getPerspective().setScale(0.8f);
                 machineImage.showPaths();
                 machineImage.setTransparency(1.0f);
-                // ApplicationView.getApplicationView().speakPhrase("choose a channel to get data.");
+                // ApplicationView.getDisplay().speakPhrase("choose a channel to get data.");
 
                 getPerspective().disablePanning();
             }
@@ -608,7 +612,7 @@ public class Body extends Actor {
                                             getPerspective().getVisualization().getImage(connectedPath).setVisibility(true);
                                         }
 
-                                        // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                                        // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
                                         // Perspective
                                         ArrayList<Port> pathPorts = getPerspective().getVisualization().getSimulation().getPortsInPaths(paths);
@@ -617,12 +621,20 @@ public class Body extends Actor {
                                         getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
                                         float[] boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
+
+                                        Log.v("Images", "pathPortImages.size = " + pathPortImages.size());
+                                        Log.v("Images", "pathPortPositions.size = " + pathPortPositions.size());
+                                        for (PointF pathPortPosition: pathPortPositions) {
+                                            Log.v("Images", "x: " + pathPortPosition.x + ", y: " + pathPortPosition.y);
+                                        }
+                                        Log.v("Images", "boundingBox.length = " + boundingBox.length);
+                                        for (float boundingPosition: boundingBox) {
+                                            Log.v("Images", "bounds: " + boundingPosition);
+                                        }
+
                                         adjustPerspectiveScale(boundingBox);
 
                                     } else {
-
-//                                    Path path = sourcePort.getPath(0);
-//                                    path.addPort(destinationPort);
 
                                         Path path = new Path(sourcePort, destinationPort);
                                         sourcePort.addPath(path);
@@ -651,15 +663,15 @@ public class Body extends Actor {
                                         ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(destinationPort);
                                         for (Path connectedPath : paths) {
                                             // Show ports
-                                            ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getSource())).setVisibility(true);
+                                            (getPerspective().getVisualization().getImage(connectedPath.getSource())).setVisibility(true);
                                             ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getSource())).showPaths();
-                                            ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getDestination())).setVisibility(true);
+                                            (getPerspective().getVisualization().getImage(connectedPath.getDestination())).setVisibility(true);
                                             ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getDestination())).showPaths();
                                             // Show path
                                             getPerspective().getVisualization().getImage(connectedPath).setVisibility(true);
                                         }
 
-                                        // ApplicationView.getApplicationView().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                                        // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
                                         // Perspective
                                         ArrayList<Port> pathPorts = getPerspective().getVisualization().getSimulation().getPortsInPaths(paths);
@@ -668,6 +680,17 @@ public class Body extends Actor {
                                         getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
                                         float[] boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
+
+                                        Log.v("Images", "pathPortImages.size = " + pathPortImages.size());
+                                        Log.v("Images", "pathPortPositions.size = " + pathPortPositions.size());
+                                        for (PointF pathPortPosition: pathPortPositions) {
+                                            Log.v("Images", "x: " + pathPortPosition.x + ", y: " + pathPortPosition.y);
+                                        }
+                                        Log.v("Images", "boundingBox.length = " + boundingBox.length);
+                                        for (float boundingPosition: boundingBox) {
+                                            Log.v("Images", "bounds: " + boundingPosition);
+                                        }
+
                                         adjustPerspectiveScale(boundingBox);
 
                                     }

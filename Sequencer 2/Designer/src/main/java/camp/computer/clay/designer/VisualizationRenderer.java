@@ -1,19 +1,23 @@
 package camp.computer.clay.designer;
 
+import android.graphics.PointF;
+
+import camp.computer.clay.visualization.Visualization;
+
 /**
  * Maintenance/worker thread to periodically redraw the MapView.
  */
-public class MapViewGenerator extends Thread {
+public class VisualizationRenderer extends Thread {
 
     final public static long FRAMES_PER_SECOND = 30;
 
-    private MapView mapView;
+    private VisualizationSurface visualizationSurface;
 
     volatile boolean isRunning = false;
 
-    MapViewGenerator(MapView surfaceView) {
+    VisualizationRenderer(VisualizationSurface visualizationSurface) {
         super ();
-        this.mapView = surfaceView;
+        this.visualizationSurface = visualizationSurface;
     }
 
     public void setRunning (boolean isRunning) {
@@ -31,7 +35,7 @@ public class MapViewGenerator extends Thread {
 
             startTime = java.lang.System.currentTimeMillis ();
 
-            mapView.updateSurfaceView ();
+            visualizationSurface.updateSurfaceView ();
 
             // Sleep until the time remaining in the frame's allocated draw time (for the specified FRAMES_PER_SECOND) is reached.
             sleepTime = ticksPS - (java.lang.System.currentTimeMillis () - startTime);

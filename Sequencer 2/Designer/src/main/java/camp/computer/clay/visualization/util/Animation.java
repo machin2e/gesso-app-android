@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
 
-import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.Application;
 
 public class Animation {
 
@@ -21,9 +21,9 @@ public class Animation {
     // - http://stackoverflow.com/questions/10276251/how-to-animate-a-view-with-translate-animation-in-android
     public void moveToPoint (final View view, final Point destinationPoint, int translateDuration)
     {
-        FrameLayout root = (FrameLayout) ApplicationView.getApplicationView().findViewById(R.id.application_view);
+        FrameLayout root = (FrameLayout) Application.getDisplay().findViewById(R.id.application_view);
         DisplayMetrics dm = new DisplayMetrics();
-        ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics( dm );
+        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics( dm );
         int statusBarOffset = dm.heightPixels - root.getMeasuredHeight();
 
         int originalPosition[] = new int[2];
@@ -49,11 +49,11 @@ public class Animation {
             public void onAnimationEnd(android.view.animation.Animation animation) {
 
                 // Get button holder
-                RelativeLayout relativeLayout = (RelativeLayout) ApplicationView.getApplicationView().findViewById(R.id.context_button_holder);
+                RelativeLayout relativeLayout = (RelativeLayout) Application.getDisplay().findViewById(R.id.context_button_holder);
 
                 // Get screen width and height of the device
                 DisplayMetrics metrics = new DisplayMetrics();
-                ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                 int screenWidth = metrics.widthPixels;
                 int screenHeight = metrics.heightPixels;
 

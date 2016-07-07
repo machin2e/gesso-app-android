@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
-import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.Application;
 import camp.computer.clay.system.NetworkManager;
 import camp.computer.clay.system.NetworkResourceInterface;
 
@@ -21,7 +21,7 @@ public class NetworkResource implements NetworkResourceInterface {
      * @return Internet Protocol (IP) address for the host device.
      */
     public String getInternetAddress () {
-        Context context = ApplicationView.getContext();
+        Context context = Application.getContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
         return ip;

@@ -39,9 +39,9 @@ import camp.computer.clay.system.Device;
 import camp.computer.clay.system.SQLiteContentManager;
 import camp.computer.clay.system.ViewManagerInterface;
 
-public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
+public class Application extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
 
-    public MapView mapView;
+    public VisualizationSurface visualizationSurface;
 
     private SpeechGenerator speechGenerator;
 
@@ -80,7 +80,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
     private static Context context;
 
-    private static ApplicationView applicationView;
+    private static Application applicationView;
 
     private Clay clay;
 
@@ -146,17 +146,15 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ApplicationView.context = getApplicationContext();
+        Application.context = getApplicationContext();
 
         // <SENSORS>
         sensorAdapter = new SensorAdapter(getApplicationContext());
         // </SENSORS>
 
         // <DISPLAY>
-        ApplicationView.applicationView = this;
+        Application.applicationView = this;
         // </DISPLAY>
-
-        clay = new Clay();
 
         setContentView(R.layout.activity_main);
 
@@ -165,9 +163,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         cursorView.hide(false);
 
         // <MAP>
-        mapView = (MapView) findViewById (R.id.app_surface_view);
+        visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
 
-        mapView.MapView_OnResume ();
+        visualizationSurface.MapView_OnResume ();
         // </MAP>
 
         // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
@@ -209,6 +207,10 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 }
             }
         });
+
+
+
+        clay = new Clay();
 
         // Add the view provided by the host device.
         clay.addView(this);
@@ -337,7 +339,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 
                     // Get screen width and height of the device
                     DisplayMetrics metrics = new DisplayMetrics();
-                    ApplicationView.getApplicationView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                     int screenWidth = metrics.widthPixels;
                     int screenHeight = metrics.heightPixels;
 
@@ -587,7 +589,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         super.onPause();
 
         // <MAP>
-        mapView.MapView_OnPause();
+        visualizationSurface.MapView_OnPause();
         // </MAP>
     }
 
@@ -603,7 +605,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         }
 
         // <MAP>
-        mapView.MapView_OnResume ();
+        visualizationSurface.MapView_OnResume ();
         // </MAP>
     }
 
@@ -644,7 +646,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
     }
 
     public static Context getContext() {
-        return ApplicationView.context;
+        return Application.context;
     }
 
     @Override
@@ -684,9 +686,9 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         }
 
 //        // Show the action button
-//        ApplicationView.getApplicationView().getCursorView().init();
-//        ApplicationView.getApplicationView().getCursorView().updatePosition();
-//        ApplicationView.getApplicationView().getCursorView().show(true);
+//        ApplicationView.getDisplay().getCursorView().init();
+//        ApplicationView.getDisplay().getCursorView().updatePosition();
+//        ApplicationView.getDisplay().getCursorView().show(true);
 
     }
 
@@ -695,7 +697,11 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
         // TODO: Update the view to reflect the latest state of the object model
     }
 
-    public static ApplicationView getApplicationView () { return ApplicationView.applicationView; }
+    public static Application getDisplay() { return Application.applicationView; }
+
+    public VisualizationSurface getVisualizationSurface() {
+        return this.visualizationSurface;
+    }
 
     // <SPEECH>
     private void checkTTS(){

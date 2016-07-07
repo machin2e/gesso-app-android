@@ -18,7 +18,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import camp.computer.clay.designer.ApplicationView;
+import camp.computer.clay.designer.Application;
 
 public class SQLiteContentManager {
 
@@ -379,10 +379,10 @@ public class SQLiteContentManager {
 
             String DB_PATH;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                DB_PATH = ApplicationView.getContext().getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
+                DB_PATH = Application.getContext().getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
             }
             else {
-                DB_PATH = ApplicationView.getContext().getFilesDir().getPath() + ApplicationView.getContext().getPackageName() + "/databases/";
+                DB_PATH = Application.getContext().getFilesDir().getPath() + Application.getContext().getPackageName() + "/databases/";
             }
 
             Log.v("Content_Manager", "Trying to write...");
@@ -1656,11 +1656,11 @@ public class SQLiteContentManager {
     public SQLiteContentManager (Clay clay, String type) {
         this.clay = clay;
         this.type = type;
-        this.db = new SQLiteDatabaseHelper(ApplicationView.getContext());
+        this.db = new SQLiteDatabaseHelper(Application.getContext());
     }
 
     public Clay getClay () {
-        return ApplicationView.getApplicationView().getClay();
+        return Application.getDisplay().getClay();
     }
 
     /**
