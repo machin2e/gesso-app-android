@@ -11,9 +11,6 @@ public abstract class Image {
 
     // TODO: List of points to represent geometric objects, even circles. Helper functions for common shapes. Gives generality.
 
-    // TODO: Remove this! Get it through the model.
-    private Image parentImage;
-
     private PointF position = new PointF(); // Image position
     private float scale = 1.0f; // Image scale factor
     private float rotation = 0.0f; // Image heading rotation
@@ -46,13 +43,12 @@ public abstract class Image {
         return this.visualization;
     }
 
-    // TODO: Remove this. Replace with per-image layers/features and use Visualization with set of images. Don't encode image-relationship hierarchy in images! General, more elegant, easier to use, single way to use.
-    public void setParentImage(Image parentImage) {
-        this.parentImage = parentImage;
-    }
-
     public Image getParentImage() {
-        return this.parentImage;
+        if (getModel().hasParent()) {
+            Model parentModel = getModel().getParent();
+            return getVisualization().getImage(parentModel);
+        }
+        return null;
     }
 
     public PointF getPosition() {
@@ -65,6 +61,7 @@ public abstract class Image {
 
     public float getAbsoluteRotation() {
         float absoluteRotation = 0.0f;
+        Image parentImage = getParentImage();
         if (parentImage != null) {
             absoluteRotation = parentImage.getAbsoluteRotation() + getRotation();
         } else {
@@ -87,6 +84,7 @@ public abstract class Image {
      */
     public void setRelativePosition(PointF position) {
         PointF absolutePosition = new PointF();
+        Image parentImage = getParentImage();
         if (parentImage != null) {
             PointF relativePositionFromRelativePosition = Geometry.calculatePoint(
                     parentImage.getPosition(),

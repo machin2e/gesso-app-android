@@ -72,14 +72,14 @@ public class Body extends Actor {
         float newWidthScale = getPerspective().getWidth() / (boundingBoxWidth + widthPadding);
         float newHeightScale = getPerspective().getHeight() / (boundingBoxHeight + widthPadding);
 
-        Log.v("Perspective", "boundingWidth: " + boundingBoxWidth);
-        Log.v("Perspective", "perspectiveWidth: " + getPerspective().getWidth());
-
-        Log.v("Perspective", "boundingHeight: " + boundingBoxHeight);
-        Log.v("Perspective", "perspectiveHeight: " + getPerspective().getHeight());
-
-        Log.v("Perspective", "widthDifference: " + widthDifference);
-        Log.v("Perspective", "heightDifference: " + heightDifference);
+//        Log.v("Perspective", "boundingWidth: " + boundingBoxWidth);
+//        Log.v("Perspective", "perspectiveWidth: " + getPerspective().getWidth());
+//
+//        Log.v("Perspective", "boundingHeight: " + boundingBoxHeight);
+//        Log.v("Perspective", "perspectiveHeight: " + getPerspective().getHeight());
+//
+//        Log.v("Perspective", "widthDifference: " + widthDifference);
+//        Log.v("Perspective", "heightDifference: " + heightDifference);
 
         if (widthDifference > 0 && widthDifference > heightDifference) {
             getPerspective().setScale(newWidthScale);
@@ -576,7 +576,6 @@ public class Body extends Actor {
                                         sourcePort.addPath(path);
 
                                         PathImage pathImage = new PathImage(path);
-                                        pathImage.setParentImage(portImage);
                                         pathImage.setVisualization(getPerspective().getVisualization());
                                         getPerspective().getVisualization().addImage(path, pathImage, "paths");
 
@@ -615,10 +614,10 @@ public class Body extends Actor {
                                         ArrayList<Port> pathPorts = getPerspective().getVisualization().getSimulation().getPortsInPaths(paths);
                                         ArrayList<Image> pathPortImages = getPerspective().getVisualization().getImages(pathPorts);
                                         ArrayList<PointF> pathPortPositions = Visualization.getPositions(pathPortImages);
+                                        getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+
                                         float[] boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
                                         adjustPerspectiveScale(boundingBox);
-
-                                        getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
                                     } else {
 
@@ -629,7 +628,6 @@ public class Body extends Actor {
                                         sourcePort.addPath(path);
 
                                         PathImage pathImage = new PathImage(path);
-                                        pathImage.setParentImage(portImage);
                                         pathImage.setVisualization(getPerspective().getVisualization());
                                         getPerspective().getVisualization().addImage(path, pathImage, "paths");
 
@@ -667,10 +665,10 @@ public class Body extends Actor {
                                         ArrayList<Port> pathPorts = getPerspective().getVisualization().getSimulation().getPortsInPaths(paths);
                                         ArrayList<Image> pathPortImages = getPerspective().getVisualization().getImages(pathPorts);
                                         ArrayList<PointF> pathPortPositions = Visualization.getPositions(pathPortImages);
+                                        getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+
                                         float[] boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
                                         adjustPerspectiveScale(boundingBox);
-
-                                        getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
                                     }
                                 }

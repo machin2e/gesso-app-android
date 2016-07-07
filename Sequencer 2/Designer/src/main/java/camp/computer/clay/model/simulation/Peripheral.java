@@ -1,4 +1,4 @@
 package camp.computer.clay.model.simulation;
 
-public class Action {
+public class Peripheral extends Model {
 }

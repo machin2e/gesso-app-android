@@ -215,7 +215,9 @@ public abstract class Geometry {
         boundaryPoints[2] = right;
         boundaryPoints[3] = bottom;
 
-        return new PointF(minX + (right - left) / 2.0f, minY + (bottom - top) / 2.0f);
+        PointF boundingBoxPosition = new PointF(minX + ((right - left) / 2.0f), minY + ((bottom - top) / 2.0f));
+
+        return boundingBoxPosition;
     }
 
     public static PointF calculateNearestPoint(PointF sourcePoint, ArrayList<PointF> points) {

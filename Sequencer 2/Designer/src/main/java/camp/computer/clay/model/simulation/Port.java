@@ -43,7 +43,16 @@ public class Port extends Model {
     private ArrayList<Path> paths = new ArrayList<Path>();
 
     public void addPath(Path path) {
-        this.paths.add(path);
+        if (!hasPath(path)) {
+            path.setParent(this);
+            this.paths.add(path);
+        }
+    }
+
+    public void removePath(Path path) {
+        if (hasPath(path)) {
+            this.paths.remove(path);
+        }
     }
 
     public Path getPath(int index) {
@@ -79,5 +88,9 @@ public class Port extends Model {
         } else {
             return false;
         }
+    }
+
+    public boolean hasPath(Path path) {
+        return this.paths.contains(path);
     }
 }

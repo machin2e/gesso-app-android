@@ -10,7 +10,10 @@ public class Machine extends Model {
     private String nameTag;
 
     public void addPort(Port port) {
-        this.ports.add(port);
+        if (!this.ports.contains(port)) {
+            port.setParent(this);
+            this.ports.add(port);
+        }
     }
 
     public Port getPort(int index) {

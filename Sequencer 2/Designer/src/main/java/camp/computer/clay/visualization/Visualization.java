@@ -35,6 +35,8 @@ public class Visualization extends Image {
 
     private HashMap<String, Layer> layers = new HashMap<String, Layer>();
 
+    private float gridScale = 1.5f;
+
     public Visualization(Simulation simulation) {
         super(simulation);
         initialize();
@@ -42,6 +44,14 @@ public class Visualization extends Image {
 
     private void initialize() {
         // initializeImages();
+    }
+
+    public void setGridScale(float scale) {
+        this.gridScale = scale;
+    }
+
+    public float getGridScale() {
+        return this.gridScale;
     }
 
     public boolean hasLayer(String name) {
@@ -91,7 +101,6 @@ public class Visualization extends Image {
         // Create machine sprites
         for (Machine machine: simulation.getMachines()) {
             MachineImage machineImage = new MachineImage(machine);
-            machineImage.setParentImage(this);
             machineImage.setVisualization(this);
 
             addImage(machine, machineImage, machineLayerName);

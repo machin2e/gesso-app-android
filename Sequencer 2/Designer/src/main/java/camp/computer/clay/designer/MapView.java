@@ -21,7 +21,6 @@ import camp.computer.clay.model.interaction.Perspective;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.model.interaction.TouchInteractivity;
 import camp.computer.clay.visualization.Visualization;
 
 public class MapView extends SurfaceView implements SurfaceHolder.Callback {
@@ -77,7 +76,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 
         initializeSimulation();
 
-        initializeSprites();
+        initializeVisualization();
 
         // Create body and set perspective
         Body body = new Body();
@@ -107,7 +106,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 0; i < 5; i++) {
             Machine machine = new Machine();
             for (int j = 0; j < 12; j++) {
-                machine.addPort(new Port());
+                Port port = new Port();
+                machine.addPort(port);
                 machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
                 letterIndex = letterIndex % alphabet.length();
             }
@@ -115,11 +115,10 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    private void initializeSprites() {
+    private void initializeVisualization() {
 
         visualization.initializeImages();
 
-        visualization.setParentImage(null);
         visualization.setPosition(new PointF(0, 0));
         visualization.setRotation(0);
         visualizationSprites.add(visualization);

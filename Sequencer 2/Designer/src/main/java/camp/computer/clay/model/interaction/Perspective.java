@@ -60,11 +60,8 @@ public class Perspective {
     private int panningDuration = DEFAULT_PANNING_DURATION;
 
     public void setPosition (PointF targetPosition) {
-        Log.v("Position", "setPosition");
 
         if (this.position.x != -targetPosition.x) {
-
-            Log.v("Position", "setPosition.x");
 
             // Pan to x position
             if (this.position.x != -targetPosition.x) {
@@ -80,8 +77,6 @@ public class Perspective {
         }
 
         if (this.position.y != -targetPosition.y) {
-
-            Log.v("Position", "setPosition.y");
 
             // Pan to y position
             if (this.position.y != -targetPosition.y) {

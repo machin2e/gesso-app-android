@@ -85,7 +85,6 @@ public class PortImage extends Image {
         Path path = new Path(sourcePort, destinationPort);
 
         PathImage pathImage = new PathImage(path);
-        pathImage.setParentImage(this);
         pathImage.setVisualization(getVisualization());
 //        getVisualization().getLayer(0).addImage(path, pathImage);
         getVisualization().addImage(path, pathImage, "paths");

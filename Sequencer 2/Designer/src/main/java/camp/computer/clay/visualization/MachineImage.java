@@ -85,7 +85,6 @@ public class MachineImage extends Image {
         Machine machineModel = (Machine) this.getModel();
         for (Port port: machineModel.getPorts()) {
             PortImage portImage = new PortImage(port);
-            portImage.setParentImage(this);
             portImage.setVisualization(getVisualization());
             //getVisualization().getLayer(0).addImage(port, portImage);
             getVisualization().addImage(port, portImage, "ports");
