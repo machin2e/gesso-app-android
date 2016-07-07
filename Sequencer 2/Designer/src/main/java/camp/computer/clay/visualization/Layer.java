@@ -7,12 +7,24 @@ import camp.computer.clay.model.simulation.Model;
 
 public class Layer {
 
+    private static int LAYER_ID_COUNT = 0;
+
     private Visualization visualization;
 
-    private HashMap<Model, Image> sprites = new HashMap<Model, Image>();
+    private int id = -1;
+
+    private HashMap<Model, Image> images = new HashMap<Model, Image>();
 
     public Layer(Visualization visualization) {
         this.visualization = visualization;
+
+        // Set the layer ID
+        this.id = LAYER_ID_COUNT;
+        LAYER_ID_COUNT++;
+    }
+
+    public int getId() {
+        return this.id;
     }
 
     public Visualization getVisualization() {
@@ -20,22 +32,22 @@ public class Layer {
     }
 
     public void addImage(Model model, Image image) {
-        this.sprites.put(model, image);
+        this.images.put(model, image);
     }
 
     public void removeImage(Model model, Image image) {
-        if (this.sprites.containsKey(model)) {
-            this.sprites.remove(model);
+        if (this.images.containsKey(model)) {
+            this.images.remove(model);
         }
     }
 
-    public Image getImage(Model model) {
-        return this.sprites.get(model);
+    public Image getImage2(Model model) {
+        return this.images.get(model);
     }
 
-    public Model getModel(Image image) {
-        for (Model model: this.sprites.keySet()) {
-            if (this.sprites.get(model) == image) {
+    public Model getModel2(Image image) {
+        for (Model model: this.images.keySet()) {
+            if (this.images.get(model) == image) {
                 return model;
             }
         }
@@ -43,10 +55,10 @@ public class Layer {
     }
 
     public ArrayList<Image> getImages() {
-        return new ArrayList<Image>(this.sprites.values());
+        return new ArrayList<Image>(this.images.values());
     }
 
     public int getCardinality() {
-        return this.sprites.size();
+        return this.images.size();
     }
 }

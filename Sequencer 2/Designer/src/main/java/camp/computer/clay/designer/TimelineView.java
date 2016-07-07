@@ -302,7 +302,7 @@ public class TimelineView extends DragSortListView {
             };
 
     /**
-     * Interface for controlling scroll speed as a function of touch position and time.
+     * Interface for controlling scroll speed as a function of touchPositions position and time.
      * Use setDragScrollProfile(DragScrollProfile) to set custom profile.
      *
      * Source: http://bauerca.github.io/drag-sort-listview/reference/com/mobeta/android/dslv/DragSortListView.DragScrollProfile.html
@@ -737,7 +737,7 @@ public class TimelineView extends DragSortListView {
      * @return
      */
     public EventHolder getEventHolderByPosition(int x, int y) {
-        // Get the list item corresponding to the specified touch point
+        // Get the list item corresponding to the specified touchPositions point
         int position = getViewIndexByPosition(x, y);
         EventHolder item = (EventHolder) getItemAtPosition(position);
         return item;

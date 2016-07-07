@@ -41,7 +41,7 @@ import camp.computer.clay.system.ViewManagerInterface;
 
 public class ApplicationView extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
 
-    private MapView mapView;
+    public MapView mapView;
 
     private SpeechGenerator speechGenerator;
 
@@ -284,7 +284,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
                 int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount ();
 
-                // Update the state of the touched object based on the current touch interaction state.
+                // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -310,7 +310,7 @@ public class ApplicationView extends FragmentActivity implements ActionBar.TabLi
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler
 //                timelineButton.setInputType(inType); // restore input type
-//                return true; // consume touch even
+//                return true; // consume touchPositions even
 //            }
         });
 

@@ -139,7 +139,7 @@ public class DeviceViewPager extends ViewPager {
         final int action = event.getAction() & MotionEventCompat.ACTION_MASK;
         int counter = event.getPointerCount();
 
-        // If onInterceptTouch event returned true, then touch events will be directed here.
+        // If onInterceptTouch event returned true, then touchPositions events will be directed here.
         // Check for that condition.
         if (interceptTouches) {
 
@@ -149,15 +149,15 @@ public class DeviceViewPager extends ViewPager {
                 startTouch.set((int) event.getX(), (int) event.getY());
                 startTime = calendar.getTime();
 
-                // ...and the previous touch...
+                // ...and the previous touchPositions...
                 previousTouch.set((int) event.getX(), (int) event.getY());
                 previousTime = startTime;
 
-                // ...and the current touch.
+                // ...and the current touchPositions.
                 currentTouch.set((int) event.getX(), (int) event.getY());
                 currentTime = startTime;
 
-                // Reset the touch distance
+                // Reset the touchPositions distance
                 touchDistance = 0;
 
 //                // Update the gesture classification
@@ -169,7 +169,7 @@ public class DeviceViewPager extends ViewPager {
 
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 
-                // Update the previous touch...
+                // Update the previous touchPositions...
                 previousTouch.set (currentTouch.x, currentTouch.y);
                 previousTime = currentTime;
 
@@ -192,7 +192,7 @@ public class DeviceViewPager extends ViewPager {
 
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                // Update the previous touch...
+                // Update the previous touchPositions...
                 previousTouch.set (currentTouch.x, currentTouch.y);
                 previousTime = currentTime;
 
@@ -228,7 +228,7 @@ public class DeviceViewPager extends ViewPager {
 
         Log.v ("Touch_Event", "onInterceptTouchEvent");
 
-        // Get the number of touch points
+        // Get the number of touchPositions points
         int touchPointCount = event.getPointerCount();
 
         // Check if interacting with a list item
@@ -240,7 +240,7 @@ public class DeviceViewPager extends ViewPager {
         }
 
 
-        // Handle touch event based on the number of touches detected and the current state
+        // Handle touchPositions event based on the number of touches detected and the current state
         // of the gesture recognition logic.
         if (touchPointCount == 1) {
 
@@ -252,15 +252,15 @@ public class DeviceViewPager extends ViewPager {
                 startTouch.set((int) event.getX(), (int) event.getY());
                 startTime = calendar.getTime();
 
-                // ...and the previous touch...
+                // ...and the previous touchPositions...
                 previousTouch.set((int) event.getX(), (int) event.getY());
                 previousTime = startTime;
 
-                // ...and the current touch.
+                // ...and the current touchPositions.
                 currentTouch.set((int) event.getX(), (int) event.getY());
                 currentTime = startTime;
 
-                // Reset the touch distance
+                // Reset the touchPositions distance
                 touchDistance = 0;
 
                 // Update the gesture classification
@@ -276,11 +276,11 @@ public class DeviceViewPager extends ViewPager {
 
                 Log.v ("Touch_Event", "Released event tag");
 
-                // Save the current touch point...
+                // Save the current touchPositions point...
                 currentTouch.set((int) event.getX(), (int) event.getY());
                 currentTime = startTime;
 
-                // ...and compute the distance between the touch down and up actions...
+                // ...and compute the distance between the touchPositions down and up actions...
                 int distance = (int) Math.sqrt(Math.pow(currentTouch.x - previousTouch.x, 2) + Math.pow (currentTouch.y - previousTouch.y, 2));
 
                 if (distance < 50) {
@@ -301,7 +301,7 @@ public class DeviceViewPager extends ViewPager {
 
         } else if (touchPointCount == 2) {
 
-            // TODO: If there's a single touch, then wait for a second touch for some small amount of time (less than 500 ms) to detect a second touch, to account for timing difference between pointer touches.
+            // TODO: If there's a single touchPositions, then wait for a second touchPositions for some small amount of time (less than 500 ms) to detect a second touchPositions, to account for timing difference between pointer touches.
 
             interceptTouches = false;
 

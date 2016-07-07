@@ -8,7 +8,7 @@ import camp.computer.clay.visualization.Image;
 
 // An interactivity is a temporal sequence of one or more interactions.
 //
-// Model this with a "touch interaction envelope" or "interaction envelope".
+// Model this with a "touchPositions interaction envelope" or "interaction envelope".
 
 public class TouchInteractivity {
     private ArrayList<TouchInteraction> touchInteractions = new ArrayList<TouchInteraction>();
@@ -16,6 +16,7 @@ public class TouchInteractivity {
     // TODO: Classify these! Every time an Interaction is added!
     public boolean[] isTouchingImage = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public boolean[] isHolding = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
 
@@ -38,6 +39,17 @@ public class TouchInteractivity {
     };
 
     public TouchInteractivity() {
+        initialize();
+    }
+
+    private void initialize() {
+        for (int i = 0; i < TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT; i++) {
+            isHolding[i] = false;
+            isDragging[i] = false;
+            dragDistance[i] = 0;
+            isTouchingImage[i] = false;
+            touchedImage[i] = null;
+        }
     }
 
     public int getCardinality() {

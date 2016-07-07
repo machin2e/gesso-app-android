@@ -11,6 +11,7 @@ public abstract class Image {
 
     // TODO: List of points to represent geometric objects, even circles. Helper functions for common shapes. Gives generality.
 
+    // TODO: Remove this! Get it through the model.
     private Image parentImage;
 
     private PointF position = new PointF(); // Image position
@@ -18,6 +19,9 @@ public abstract class Image {
     private float rotation = 0.0f; // Image heading rotation
 
     private boolean isVisible = true;
+
+    // TODO: Replace with Body (touching it) or Body's Finger (or whatever Pointer, whatever).
+    public boolean isTouched = false;
 
     private Model model;
 
@@ -122,18 +126,20 @@ public abstract class Image {
 
     public abstract boolean isTouching(PointF point);
 
+    public abstract boolean isTouching(PointF point, float padding);
+
     public interface TouchActionListener {
     }
 
-    public abstract void onTouchAction(TouchInteraction touchInteraction);
+    public abstract void onTouchInteraction(TouchInteraction touchInteraction);
 
-    // TODO: change this to addOnTouchListener (since have abstract onTouchAction)... and call at end of that
+    // TODO: change this to addOnTouchListener (since have abstract onTouchInteraction)... and call at end of that
     public void setOnTouchActionListener(TouchActionListener touchActionListener) {
         this.touchActionListener = touchActionListener;
     }
 
     public void touch(TouchInteraction touchInteraction) {
-        onTouchAction(touchInteraction);
+        onTouchInteraction(touchInteraction);
     }
 
 }

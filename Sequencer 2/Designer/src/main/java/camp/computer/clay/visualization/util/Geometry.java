@@ -131,14 +131,17 @@ public abstract class Geometry {
     }
 
     public static PointF calculateCentroid(ArrayList<PointF> points)  {
-        float centroidX = 0.0f;
-        float centroidY = 0.0f;
+        PointF centroidPosition = new PointF(0, 0);
 
         for(PointF point : points) {
-            centroidX += point.x;
-            centroidY += point.y;
+            centroidPosition.x += point.x;
+            centroidPosition.y += point.y;
         }
-        return new PointF(centroidX / points.size(), centroidY / points.size());
+
+        centroidPosition.x /= points.size();
+        centroidPosition.y /= points.size();
+
+        return centroidPosition;
     }
 
     public static float[] calculateBoundingBox(ArrayList<PointF> points) {
@@ -176,6 +179,43 @@ public abstract class Geometry {
         boundaryPoints[3] = bottom;
 
         return boundaryPoints;
+    }
+
+    public static PointF calculateCenterPosition(ArrayList<PointF> points) {
+        float[] boundaryPoints = new float[4]; // left, top, right, bottom
+        // TODO: center, width, height
+
+        float minX = Float.MAX_VALUE;
+        float maxX = Float.MIN_VALUE;
+        float minY = Float.MAX_VALUE;
+        float maxY = Float.MIN_VALUE;
+
+        for (PointF point: points) {
+            if (point.x < minX) {
+                minX = point.x;
+            }
+            if (point.y < minY) {
+                minY = point.y;
+            }
+            if (point.x > maxX) {
+                maxX = point.x;
+            }
+            if (point.y > minY) {
+                minY = point.y;
+            }
+        }
+
+        float left = minX;
+        float top = minY;
+        float right = maxX;
+        float bottom = maxY;
+
+        boundaryPoints[0] = left;
+        boundaryPoints[1] = top;
+        boundaryPoints[2] = right;
+        boundaryPoints[3] = bottom;
+
+        return new PointF(minX + (right - left) / 2.0f, minY + (bottom - top) / 2.0f);
     }
 
     public static PointF calculateNearestPoint(PointF sourcePoint, ArrayList<PointF> points) {

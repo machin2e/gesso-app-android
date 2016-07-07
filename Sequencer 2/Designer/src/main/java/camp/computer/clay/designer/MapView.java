@@ -61,6 +61,18 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     Simulation simulation = new Simulation();
     Visualization visualization = new Visualization(simulation);
 
+    public void setVisualization(Visualization visualization) {
+        this.visualization = visualization;
+    }
+
+    public Visualization getVisualization() {
+        return this.visualization;
+    }
+
+    public Simulation getSimulation() {
+        return this.simulation;
+    }
+
     private void initialize() {
 
         initializeSimulation();
@@ -322,8 +334,8 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
 //        }
 //    }
 
-    // TODO: In the queue, store the touch actions persistently after exceeding maximum number for immediate interactions.
-    private TouchInteractivity touchInteractivity = null;
+    // TODO: In the queue, store the touchPositions actions persistently after exceeding maximum number for immediate interactions.
+//    private TouchInteractivity touchInteractivity = null;
 
     // Perspective/Activity:
     //
@@ -331,7 +343,7 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     //    - focus on machine (after touching it)
     //       - focus on one port + all its paths (after touching it)
     //          - focus on one path(s) (after touching it)
-    //          - search for dest. port of those appearing near touch (after dragging from a port)
+    //          - search for dest. port of those appearing near touchPositions (after dragging from a port)
     //    - scan/browse map (after dragging on map/device)
     //    - move machine (after holding it, then/before dragging it)
 
@@ -339,52 +351,81 @@ public class MapView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent (MotionEvent motionEvent) {
 
-        int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+        // - Motion events contain information about all of the pointers that are currently active
+        //   even if some of them have not moved since the last event was delivered.
+        //
+        // - The number of pointers only ever changes by one as individual pointers go up and down,
+        //   except when the gesture is canceled.
+        //
+        // - Use the getPointerId(int) method to obtain the pointer id of a pointer to track it
+        //   across all subsequent motion events in a gesture. Then for successive motion events,
+        //   use the findPointerIndex(int) method to obtain the pointer index for a given pointer
+        //   id in that motion event.
+
+        int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
         int pointerId = motionEvent.getPointerId (pointerIndex);
-        //int touchInteraction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
         int touchInteractionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
-        int pointCount = motionEvent.getPointerCount ();
+        int pointerCount = motionEvent.getPointerCount ();
 
-        Log.v("InteractionHistory", "Started touch composition.");
+        Log.v("InteractionHistory", "Started touchPositions composition.");
 
+        // Get active body
         Body currentBody = simulation.getBody(0);
 
+        // Create touchPositions interaction
         TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.NONE);
         touchInteraction.setBody(currentBody);
 
-        if (pointCount <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT) {
+        if (pointerCount <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT) {
             if (pointerIndex <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT - 1) {
 
                 // Current
-                // Update touch state based the points given by the host OS (e.g., Android).
-                for (int i = 0; i < pointCount; i++) {
+                // Update touchPositions state based the points given by the host OS (e.g., Android).
+                for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId (i);
                     PointF perspectivePosition = simulation.getBody(0).getPerspective().getPosition();
                     float perspectiveScale = simulation.getBody(0).getPerspective().getScale();
-                    touchInteraction.touch[id].x = (motionEvent.getX (i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-                    touchInteraction.touch[id].y = (motionEvent.getY (i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                    touchInteraction.touchPositions[id].x = (motionEvent.getX (i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+                    touchInteraction.touchPositions[id].y = (motionEvent.getY (i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
 
-                // Update the state of the touched object based on the current touch interaction state.
+                // ACTION_DOWN is called only for the first pointer that touches the screen. This
+                // starts the gesture. The pointer data for this pointer is always at index 0 in
+                // the MotionEvent.
+                //
+                // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
+                // the first. The pointer data for this pointer is at the index returned by
+                // getActionIndex().
+                //
+                // ACTION_MOVE is sent when a change has happened during a press gesture for any
+                // pointer.
+                //
+                // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
+                //
+                // ACTION_UP is sent when the last pointer leaves the screen.
+                //
+                // REFERENCES:
+                // - https://developer.android.com/training/gestures/multi.html
+
+                // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    touchInteractivity = new TouchInteractivity(); // Create on first!
+//                    touchInteractivity = new TouchInteractivity(); // Create on first!
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.TOUCH);
                     touchInteraction.pointerId = pointerId;
-                    touchInteractivity.addInteraction(touchInteraction);
-                    currentBody.onStartInteractivity(touchInteractivity, touchInteraction);
+//                    touchInteractivity.addInteraction(touchInteraction);
+                    currentBody.onStartInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
+                    // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.MOVE);
                     touchInteraction.pointerId = pointerId;
-                    touchInteractivity.addInteraction(touchInteraction);
-                    currentBody.onContinueInteractivity(touchInteractivity, touchInteraction);
+                    currentBody.onContinueInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.RELEASE);
                     touchInteraction.pointerId = pointerId;
-                    touchInteractivity.addInteraction(touchInteraction);
-                    currentBody.onCompleteInteractivity(touchInteractivity, touchInteraction);
+                    currentBody.onCompleteInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO: Handle additional pointers after the first touchPositions!
                     // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:

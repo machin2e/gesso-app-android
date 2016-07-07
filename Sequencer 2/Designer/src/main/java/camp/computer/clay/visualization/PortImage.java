@@ -44,8 +44,6 @@ public class PortImage extends Image {
     private float[] portDataSamples = new float[dataSampleCount];
     // ^^^ DATA ^^^
 
-    public ArrayList<PathImage> pathImages = new ArrayList<PathImage>();
-
     public PortImage(Port port) {
         super(port);
         initialize();
@@ -67,11 +65,17 @@ public class PortImage extends Image {
         return (MachineImage) getParentImage();
     }
 
-//    public void setPosition(PointF position) {
-//        this.setPosition(
-//                position.x,
-//                position.y);
-//    }
+    public ArrayList<PathImage> getPathImages() {
+        ArrayList<PathImage> pathImages = new ArrayList<PathImage>();
+        Port machine = getPort();
+
+        for (Path path: getPort().getPaths()) {
+            PathImage pathImage = (PathImage) getVisualization().getImage(path);
+            pathImages.add(pathImage);
+        }
+
+        return pathImages;
+    }
 
     // TODO: Move into Port
     public PathImage addPath(Port sourcePort, Port destinationPort) {
@@ -83,11 +87,12 @@ public class PortImage extends Image {
         PathImage pathImage = new PathImage(path);
         pathImage.setParentImage(this);
         pathImage.setVisualization(getVisualization());
-        getVisualization().getLayer(0).addImage(path, pathImage);
+//        getVisualization().getLayer(0).addImage(path, pathImage);
+        getVisualization().addImage(path, pathImage, "paths");
 
-        PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getDestination());
+        PortImage destinationPortImage = (PortImage) getVisualization().getImage(path.getDestination());
         destinationPortImage.setUniqueColor(this.uniqueColor);
-        this.pathImages.add(pathImage);
+//        this.pathImages.add(pathImage);
         return pathImage;
     }
 
@@ -105,11 +110,11 @@ public class PortImage extends Image {
     }
 
     public void showPaths() {
-        for (PathImage pathImage : pathImages) {
+        for (PathImage pathImage: getPathImages()) {
             pathImage.showPathDocks = false;
 
             // Deep
-            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(pathImage.getPath().getDestination());
+            PortImage destinationPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getDestination());
             destinationPortImage.showPaths();
         }
     }
@@ -118,11 +123,11 @@ public class PortImage extends Image {
     // TODO: showOutgoingPath
 
     public void showPathDocks() {
-        for (PathImage pathImage : pathImages) {
+        for (PathImage pathImage: getPathImages()) {
             pathImage.showPathDocks = true;
 
             // Deep
-            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(pathImage.getPath().getDestination());
+            PortImage destinationPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getDestination());
             destinationPortImage.showPathDocks();
         }
     }
@@ -138,18 +143,9 @@ public class PortImage extends Image {
             drawAnnotationLayer(mapView);
 
             // Draw children sprites
-            drawPathImages(mapView);
             drawCandidatePathImages(mapView);
         }
     }
-
-    private void drawPathImages(MapView mapView) {
-        for (int i = 0; i < this.pathImages.size(); i++) {
-            PathImage pathImage = this.pathImages.get(i);
-            pathImage.draw(mapView);
-        }
-    }
-
 
     /**
      * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
@@ -376,7 +372,9 @@ public class PortImage extends Image {
 
     public void update() {
         if (this.isVisible()) {
-            updatePosition();
+            if (!isTouched) {
+                updatePosition();
+            }
             updateData();
         }
     }
@@ -510,6 +508,7 @@ public class PortImage extends Image {
     }
 
     public void setVisibility(boolean isVisible) {
+        super.setVisibility(isVisible);
         showFormLayer = isVisible;
         showStyleLayer = isVisible;
         showDataLayer = isVisible;
@@ -517,17 +516,17 @@ public class PortImage extends Image {
     }
 
     public void setPathVisibility (boolean isVisible) {
-        for (PathImage pathImage : this.pathImages) {
+        for (PathImage pathImage: getPathImages()) {
             pathImage.setVisibility(isVisible);
 
             // Deep
-            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(pathImage.getPath().getDestination());
+            PortImage destinationPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getDestination());
             destinationPortImage.setVisibility(isVisible);
         }
     }
 
     public boolean hasVisiblePaths () {
-        for (PathImage pathImage: this.pathImages) {
+        for (PathImage pathImage: getPathImages()) {
             if (pathImage.isVisible() && !pathImage.showPathDocks) {
                 return true;
             }
@@ -538,7 +537,7 @@ public class PortImage extends Image {
     public boolean hasVisibleAncestorPaths() {
         ArrayList<Path> ancestorPaths = getVisualization().getSimulation().getAncestorPathsByPort(getPort());
         for (Path ancestorPath: ancestorPaths) {
-            PathImage pathImage = (PathImage) getVisualization().getLayer(0).getImage(ancestorPath);
+            PathImage pathImage = (PathImage) getVisualization().getImage(ancestorPath);
             if (pathImage.isVisible() && !pathImage.showPathDocks) {
                 return true;
             }
@@ -548,7 +547,7 @@ public class PortImage extends Image {
 
     public ArrayList<PathImage> getVisiblePaths() {
         ArrayList<PathImage> visiblePathImages = new ArrayList<PathImage>();
-        for (PathImage pathImage: pathImages) {
+        for (PathImage pathImage: getPathImages()) {
             if (pathImage.isVisible()) {
                 visiblePathImages.add(pathImage);
             }
@@ -582,29 +581,52 @@ public class PortImage extends Image {
         }
     }
 
+    public boolean isTouching (PointF point, float padding) {
+        if (isVisible()) {
+
+//            boolean touching = (Geometry.calculateDistance(point, this.getRelativePosition()) < (this.shapeRadius + 10));
+//            if (touching) {
+//                Matrix m = new Matrix();
+//                mapView.canvasMatrix.invert(m);
+//
+//                float[] touch2 = new float[]{this.getPosition().x, this.getPosition().y};
+//                m.mapPoints(touch2);
+//
+//                int X = (int) touch2[0];
+//                int Y = (int) touch2[1];
+//
+//                Log.v("mtouch", "X: " + X + ", Y: " + Y);
+//            }
+
+            return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + padding));
+        } else {
+            return false;
+        }
+    }
+
     public static final String CLASS_NAME = "PORT_SPRITE";
 
     @Override
-    public void onTouchAction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(TouchInteraction touchInteraction) {
 
         if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
-            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
-            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
-            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
-            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
-            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
 
             this.setCandidatePathVisibility(false);
         }

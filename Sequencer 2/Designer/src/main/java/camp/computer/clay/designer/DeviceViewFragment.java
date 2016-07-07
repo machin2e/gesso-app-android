@@ -131,7 +131,7 @@ public class DeviceViewFragment extends Fragment {
 //                    }
 //                    */
 //
-//                    // Save first touch point
+//                    // Save first touchPositions point
 //                    getDevice().getClay().fabDownPoint = new Point((int) event.getX(), (int) event.getY());
 //                }
 //

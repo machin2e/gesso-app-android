@@ -22,8 +22,17 @@ public class MachineImage extends Image {
     final static int PORT_GROUP_COUNT = 4;
     final static int PORT_COUNT = 12;
 
-    // TODO: Delete this? Could do reverse lookup through the model.
-    public ArrayList<PortImage> portImages = new ArrayList<PortImage>();
+    public ArrayList<PortImage> getPortImages() {
+        ArrayList<PortImage> portImages = new ArrayList<PortImage>();
+        Machine machine = getMachine();
+
+        for (Port port: machine.getPorts()) {
+            PortImage portImage = (PortImage) getVisualization().getImage(port);
+            portImages.add(portImage);
+        }
+
+        return portImages;
+    }
 
     // --- STYLE ---
     // TODO: Make these private once the map is working well and the sprite is working well.
@@ -78,20 +87,29 @@ public class MachineImage extends Image {
             PortImage portImage = new PortImage(port);
             portImage.setParentImage(this);
             portImage.setVisualization(getVisualization());
-            getVisualization().getLayer(0).addImage(port, portImage);
+            //getVisualization().getLayer(0).addImage(port, portImage);
+            getVisualization().addImage(port, portImage, "ports");
 
-            portImages.add(portImage);
+//            portImages.add(portImage);
             i++;
         }
     }
 
-    public PortImage getPortImage(int index) {
-        return this.portImages.get(index);
+    public Machine getMachine() {
+        return (Machine) getModel();
     }
 
+    public PortImage getPortImage(int index) {
+        Machine machine = getMachine();
+        PortImage portImage = (PortImage) getVisualization().getImage(machine.getPort(index));
+        return portImage;
+    }
+
+    // TODO: Remove this! Store Port index/id
     public int getPortImageIndex(PortImage portImage) {
-        if (this.portImages.contains(portImage)) {
-            return this.portImages.indexOf(portImage);
+        Port port = (Port) getVisualization().getModel(portImage);
+        if (getMachine().getPorts().contains(port)) {
+            return this.getMachine().getPorts().indexOf(port);
         }
         return -1;
     }
@@ -260,7 +278,7 @@ public class MachineImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
-            Port port = (Port) this.portImages.get(i).getModel();
+            Port port = (Port) getMachine().getPort(i);
             if (port.getType() != Port.Type.NONE) {
                 paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), currentTransparency));
             } else {
@@ -303,39 +321,41 @@ public class MachineImage extends Image {
     }
 
     public void showPorts() {
-        for (int i = 0; i < portImages.size(); i++) {
-            this.portImages.get(i).setVisibility(true);
-            this.portImages.get(i).setPathVisibility(true);
+        for (PortImage portImage: getPortImages()) {
+            portImage.setVisibility(true);
+            portImage.setPathVisibility(true);
         }
     }
 
     public void showPort(int index) {
-        this.portImages.get(index).setVisibility(true);
-        this.portImages.get(index).setPathVisibility(true);
+        PortImage portImage = getPortImages().get(index);
+        portImage.setVisibility(true);
+        portImage.setPathVisibility(true);
     }
 
     public void hidePorts() {
-        for (int i = 0; i < portImages.size(); i++) {
-            portImages.get(i).setVisibility(false);
-            this.portImages.get(i).setPathVisibility(false);
+        for (PortImage portImage: getPortImages()) {
+            portImage.setVisibility(false);
+            portImage.setPathVisibility(false);
         }
     }
 
     private void hidePort(int index) {
-        portImages.get(index).setVisibility(false);
-        this.portImages.get(index).setPathVisibility(false);
+        PortImage portImage = getPortImages().get(index);
+        portImage.setVisibility(false);
+        portImage.setPathVisibility(false);
     }
 
     public void showPaths() {
-        for (int i = 0; i < portImages.size(); i++) {
-            this.portImages.get(i).setPathVisibility(true);
+        for (PortImage portImage: getPortImages()) {
+            portImage.setPathVisibility(true);
         }
     }
 
     public void hidePaths() {
-        for (int i = 0; i < portImages.size(); i++) {
-            this.portImages.get(i).setVisibility(false);
-            this.portImages.get(i).showPathDocks();
+        for (PortImage portImage: getPortImages()) {
+            portImage.setPathVisibility(false);
+            portImage.showPathDocks();
         }
     }
 
@@ -345,12 +365,13 @@ public class MachineImage extends Image {
     // TODO: Remove relative Image hierarchy. Just use Visualization as lookup table.
     // TODO: Update states in update() functions, not in draw functions!
     // TODO: Add "ImageGroup" class to emulate map() function, for filtering, searching sets, etc.
-    public void showPath(int pathIndex, boolean isFullPathVisible) {
-        this.portImages.get(pathIndex).setVisibility(true);
+    public void showPath(int index, boolean isFullPathVisible) {
+        PortImage portImage = getPortImages().get(index);
+        portImage.setVisibility(true);
         if (isFullPathVisible) {
-            this.portImages.get(pathIndex).showPaths();
+            portImage.showPaths();
         } else {
-            this.portImages.get(pathIndex).showPathDocks();
+            portImage.showPathDocks();
         }
     }
 
@@ -366,29 +387,37 @@ public class MachineImage extends Image {
         }
     }
 
+    public boolean isTouching (PointF point, float padding) {
+        if (isVisible()) {
+            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardHeight / 2.0f + padding);
+        } else {
+            return false;
+        }
+    }
+
     public static final String CLASS_NAME = "MACHINE_SPRITE";
 
     @Override
-    public void onTouchAction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(TouchInteraction touchInteraction) {
 
         if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
-            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
-            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
-            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
-            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
-            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }
 }

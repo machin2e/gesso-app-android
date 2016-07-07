@@ -101,8 +101,8 @@ public class PathImage extends Image {
 
             Path path = (Path) getModel();
 
-            PortImage sourcePortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getSource());
-            PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getDestination());
+            PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
+            PortImage destinationPortImage = (PortImage) getVisualization().getImage(path.getDestination());
 
             // Show destination port
             destinationPortImage.setVisibility(true);
@@ -131,8 +131,8 @@ public class PathImage extends Image {
 
         Path path = (Path) getModel();
 
-        PortImage sourcePortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getSource());
-        PortImage destinationPortImage = (PortImage) getVisualization().getLayer(0).getImage(path.getDestination());
+        PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
+        PortImage destinationPortImage = (PortImage) getVisualization().getImage(path.getDestination());
 
         // Show destination port
         destinationPortImage.setVisibility(true);
@@ -255,29 +255,33 @@ public class PathImage extends Image {
         return false;
     }
 
+    public boolean isTouching (PointF point, float padding) {
+        return false;
+    }
+
     public static final String CLASS_NAME = "PATH_SPRITE";
 
     @Override
-    public void onTouchAction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(TouchInteraction touchInteraction) {
 
         if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
-            Log.v("onTouchAction", "TouchInteraction.NONE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
-            Log.v("onTouchAction", "TouchInteraction.TOUCH to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchAction", "TouchInteraction.TAP to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchAction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
-            Log.v("onTouchAction", "TouchInteraction.HOLD to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
-            Log.v("onTouchAction", "TouchInteraction.MOVE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
-            Log.v("onTouchAction", "TouchInteraction.DRAG to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
-            Log.v("onTouchAction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+            Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }
 }

@@ -234,7 +234,7 @@ public class CursorView /* extends FloatingActionButton */ {
                     }
                     */
 
-                    // Save first touch point
+                    // Save first touchPositions point
                     fabDownPoint = new Point((int) event.getX(), (int) event.getY());
                 }
 
