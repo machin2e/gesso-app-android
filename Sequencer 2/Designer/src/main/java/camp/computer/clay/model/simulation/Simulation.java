@@ -4,6 +4,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.model.interaction.Body;
+
 public class Simulation extends Model {
 
     private ArrayList<Body> bodies = new ArrayList<Body>();

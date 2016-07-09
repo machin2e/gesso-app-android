@@ -1,11 +1,10 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import static android.content.Context.SENSOR_SERVICE;
 

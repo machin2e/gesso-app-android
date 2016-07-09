@@ -12,6 +12,10 @@
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-mdpi/abc_ic_commit_search_api_mtrl_alpha.png"
     },
     {
+        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-mdpi-v4/splash_image.png",
+        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/res/drawable-mdpi/splash_image.png"
+    },
+    {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_tab_indicator_mtrl_alpha.9.png",
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-mdpi/abc_tab_indicator_mtrl_alpha.9.png"
     },

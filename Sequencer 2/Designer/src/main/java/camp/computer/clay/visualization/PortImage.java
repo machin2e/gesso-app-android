@@ -9,7 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Random;
 
-import camp.computer.clay.designer.VisualizationSurface;
+import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;

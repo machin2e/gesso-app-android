@@ -176,6 +176,10 @@
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-hdpi/abc_btn_check_to_on_mtrl_000.png"
     },
     {
+        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-hdpi-v4/splash_image.png",
+        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/res/drawable-hdpi/splash_image.png"
+    },
+    {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-hdpi-v4/abc_list_longpressed_holo.9.png",
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-hdpi/abc_list_longpressed_holo.9.png"
     },

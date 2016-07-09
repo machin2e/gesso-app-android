@@ -1,14 +1,13 @@
 package camp.computer.clay.visualization;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import camp.computer.clay.designer.VisualizationSurface;
+import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.simulation.Simulation;
@@ -199,16 +198,6 @@ public class Visualization extends Image {
         return sprites;
     }
 
-//    public ArrayList<Image> getImages(ArrayList<Model> models) {
-//        ArrayList<Image> images = new ArrayList<Image>();
-//        for (Layer layer: this.layers) {
-//            for (Image image: layer.getImages()) {
-//                images.add(image);
-//            }
-//        }
-//        return images;
-//    }
-
     public <T> ArrayList<Image> getImages(ArrayList<T> models) {
         ArrayList<Image> images = new ArrayList<Image>();
         for (Layer layer: getLayers()) {
@@ -272,9 +261,18 @@ public class Visualization extends Image {
         return (Simulation) getModel();
     }
 
+    public void update() {
+        for (Layer layer: getLayers()) {
+            for (Image image : layer.getImages()) {
+                image.update();
+            }
+        }
+    }
+
     @Override
     public void draw(VisualizationSurface visualizationSurface) {
 
+        // Draw grid
         /*
         Canvas canvas = mapView.getCanvas();
         Paint paint = mapView.getPaint();
@@ -336,15 +334,6 @@ public class Visualization extends Image {
 
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
-
-    }
-
-    public void update() {
-        for (Layer layer: getLayers()) {
-            for (Image image : layer.getImages()) {
-                image.update();
-            }
-        }
     }
 
     public PointF getCentroidPosition() {

@@ -1,14 +1,12 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -45,38 +43,15 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
     private SpeechGenerator speechGenerator;
 
+    private ToneGenerator toneGenerator;
+
     private SensorAdapter sensorAdapter;
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == CHECK_CODE){
-            if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS){
-                speechGenerator = new SpeechGenerator(this);
-            } else {
-                Intent install = new Intent();
-                install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(install);
-            }
-        }
-    }
 
     // <Settings>
     private static final boolean ENABLE_TONE_GENERATOR = false;
     private static final boolean ENABLE_SPEECH_GENERATOR = false;
     private static final long MESSAGE_SEND_FREQUENCY = 10;
     // </Settings>
-
-    // <Settings/Speech>
-    private final int CHECK_CODE = 0x1;
-    private final int LONG_DURATION = 5000;
-    private final int SHORT_DURATION = 1200;
-    // <Settings/Speech>
 
     private static Context context;
 
@@ -111,9 +86,7 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
     private static final boolean HIDE_ACTION_BAR_ON_SCROLL = true;
     private static final boolean FULLSCREEN = true;
 
-    public TimelineView getTimelineView () {
-        return mViewPager.getTimelineView();
-    }
+    private CursorView cursorView;
 
     // <HACK>
     ArrayList<TimelineView> timelineViews = new ArrayList<TimelineView>();
@@ -135,10 +108,31 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         mViewPager.setTimelineView(device);
     }
 
-    private CursorView cursorView;
+    public TimelineView getTimelineView () {
+        return mViewPager.getTimelineView();
+    }
 
     public CursorView getCursorView() {
         return cursorView;
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == SpeechGenerator.CHECK_CODE) {
+            if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                speechGenerator = new SpeechGenerator(this);
+            } else {
+                Intent install = new Intent();
+                install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(install);
+            }
+        }
     }
 
     /** Called when the activity is first created. */
@@ -148,13 +142,11 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
         Application.context = getApplicationContext();
 
-        // <SENSORS>
+        // Sensor Interface
         sensorAdapter = new SensorAdapter(getApplicationContext());
-        // </SENSORS>
 
-        // <DISPLAY>
+        // Display Interface
         Application.applicationView = this;
-        // </DISPLAY>
 
         setContentView(R.layout.activity_main);
 
@@ -162,73 +154,112 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         cursorView = new CursorView();
         cursorView.hide(false);
 
-        // <MAP>
+        // Visualization Surface
         visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
+        visualizationSurface.onResume();
 
-        visualizationSurface.MapView_OnResume ();
-        // </MAP>
+//        // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
+//        // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
+//        // by the ViewPager; additional logic is lower in this file to synchronize the ViewPager
+//        // state with the tab state. (See mViewPager.setOnPageChangeListener() and onTabSelected().)
+//        actionBar = getActionBar();
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//        if (HIDE_ACTION_BAR) {
+//            actionBar.hide();
+//        }
+//
+//        if (HIDE_TITLE) {
+//            actionBar.setDisplayShowTitleEnabled(false);
+//        }
+//
+//        if (FULLSCREEN) {
+//            // Remove notification bar
+//            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        }
+//
+//        // Create the adapter that will return a fragment for each of the three primary sections
+//        // of the app.
+//        mSectionsPagerAdapter = new DeviceViewPagerAdapter(getSupportFragmentManager());
+//        mSectionsPagerAdapter.setClay(getClay());
+//
+//        // Set up the ViewPager with the sections adapter.
+//        mViewPager = (DeviceViewPager) findViewById(R.id.pager);
+//        mViewPager.setPagingEnabled(true); // Disable horizontal paging by swiping left and right
+//        mViewPager.setAdapter(mSectionsPagerAdapter);
+//
+//        // When swiping between different sections, select the corresponding tab. We can also use
+//        // ActionBar.Tab#select() to do this if we have a reference to the Tab.
+//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                if (!HIDE_ACTION_BAR) {
+//                    actionBar.setSelectedNavigationItem(position);
+//                }
+//            }
+//        });
 
-        // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
-        // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
-        // by the ViewPager; additional logic is lower in this file to synchronize the ViewPager
-        // state with the tab state. (See mViewPager.setOnPageChangeListener() and onTabSelected().)
-        actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        if (HIDE_ACTION_BAR) {
-            actionBar.hide();
-        }
-
-        if (HIDE_TITLE) {
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
-
-        if (FULLSCREEN) {
-            // Remove notification bar
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
-
-        // Create the adapter that will return a fragment for each of the three primary sections
-        // of the app.
-        mSectionsPagerAdapter = new DeviceViewPagerAdapter(getSupportFragmentManager());
-        mSectionsPagerAdapter.setClay(getClay());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (DeviceViewPager) findViewById(R.id.pager);
-        mViewPager.setPagingEnabled(true); // Disable horizontal paging by swiping left and right
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        // When swiping between different sections, select the corresponding tab. We can also use
-        // ActionBar.Tab#select() to do this if we have a reference to the Tab.
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        // Path Editor
+        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
+        pathEditor.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onPageSelected(int position) {
-                if (!HIDE_ACTION_BAR) {
-                    actionBar.setSelectedNavigationItem(position);
-                }
+            public boolean onTouch(View v, MotionEvent event) {
+                pathEditor.setVisibility(View.GONE);
+                return true;
             }
         });
 
+        final Button pathEditorAddActionButton = (Button) findViewById (R.id.path_editor_add_action);
+        pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
 
+                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                int pointerId = motionEvent.getPointerId(pointerIndex);
+                //int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                int pointCount = motionEvent.getPointerCount();
 
+                // Update the state of the touched object based on the current touchPositions interaction state.
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    addAction();
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        // Clay
         clay = new Clay();
+        clay.addDisplay(this); // Add the view provided by the host device.
 
-        // Add the view provided by the host device.
-        clay.addView(this);
-
-        // Start UDP server
+        // UDP Datagram Server
         if (datagramServer == null) {
             datagramServer = new DatagramManager ("udp");
             clay.addManager (this.datagramServer);
             datagramServer.startServer ();
         }
 
-        // Create network profile
+        // Internet Network Interface
         if (networkResource == null) {
             networkResource = new NetworkResource();
             clay.addResource(this.networkResource);
         }
 
-        // Create content store
+        // Content Database
         SQLiteContentManager sqliteContentManager = new SQLiteContentManager(getClay(), "sqlite");
         getClay().setStore(sqliteContentManager);
 
@@ -404,7 +435,14 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         // Start the initial worker thread (runnable task) by posting through the handler
         handler.post(runnableCode);
 
-        checkTTS();
+        // Check availability of speech synthesis engine on Android host device.
+        if (ENABLE_SPEECH_GENERATOR) {
+            SpeechGenerator.checkAvailability(this);
+        }
+
+        if (ENABLE_TONE_GENERATOR) {
+            toneGenerator = new ToneGenerator();
+        }
 
         hideChat();
     }
@@ -452,6 +490,12 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
         messageKeyboardLayout.requestLayout();
         messageKeyboardLayout.invalidate();
+    }
+
+    public float convertDipToPx(float dip) {
+        Resources r = getResources();
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.getDisplayMetrics());
+        return px;
     }
 
     private void generateKeyboard() {
@@ -557,7 +601,7 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
                 // Unicode arrow symbols: https://en.wikipedia.org/wiki/Template:Unicode_chart_Arrows
 
                 // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-//                messageContent.addView(messageKey);
+//                messageContent.addDisplay(messageKey);
 //                contextScope.setText("✓");
 //                contextScope.setText("☉");
                 //contextScope.setText("☌"); // When dragging to connect path
@@ -584,12 +628,54 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         }, 100L);
     }
 
+    private void addAction() {
+
+        final TextView actionConstruct = new TextView(getContext());
+        actionConstruct.setText("Action (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
+        int horizontalPadding = (int) convertDipToPx(20);
+        int verticalPadding = (int) convertDipToPx(10);
+        actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+        actionConstruct.setBackgroundColor(Color.parseColor("#44000000"));
+
+        final LinearLayout pathEditorActionList = (LinearLayout) findViewById (R.id.path_editor_action_list);
+
+        actionConstruct.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    pathEditorActionList.removeView(actionConstruct);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        pathEditorActionList.addView(actionConstruct);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
 
         // <MAP>
-        visualizationSurface.MapView_OnPause();
+        visualizationSurface.onPause();
         // </MAP>
     }
 
@@ -605,7 +691,7 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         }
 
         // <MAP>
-        visualizationSurface.MapView_OnResume ();
+        visualizationSurface.onResume();
         // </MAP>
     }
 
@@ -627,6 +713,8 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Stop speech generator
         speechGenerator.destroy();
     }
 
@@ -697,118 +785,23 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         // TODO: Update the view to reflect the latest state of the object model
     }
 
+    // TODO: Rename to something else and make a getDisplay() function specific to the
+    // TODO: (cont'd) display interface.
     public static Application getDisplay() { return Application.applicationView; }
 
     public VisualizationSurface getVisualizationSurface() {
         return this.visualizationSurface;
     }
 
-    // <SPEECH>
-    private void checkTTS(){
-        Intent check = new Intent();
-        check.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-        startActivityForResult(check, CHECK_CODE);
+    public SpeechGenerator getSpeechGenerator() {
+        return this.speechGenerator;
     }
 
-    public void speakPhrase(String phrase) {
-        if (ENABLE_SPEECH_GENERATOR) {
-            if (speechGenerator != null) {
-                speechGenerator.allow(true);
-                speechGenerator.speak(phrase);
-                speechGenerator.allow(false);
-            }
-        }
+    public ToneGenerator getToneGenerator() {
+        return this.toneGenerator;
     }
-    // </SPEECH>
 
-    // <SOUND>
-    /**
-     * Reference: http://stackoverflow.com/questions/2413426/playing-an-arbitrary-tone-with-android
-     */
-    public void playTone(double freqOfTone, double duration) {
-        if (ENABLE_TONE_GENERATOR) {
-            //double duration = 1000;                // seconds
-            //   double freqOfTone = 1000;           // hz
-            int sampleRate = 8000;              // a number
-
-            double dnumSamples = duration * sampleRate;
-            dnumSamples = Math.ceil(dnumSamples);
-            int numSamples = (int) dnumSamples;
-            double sample[] = new double[numSamples];
-            byte generatedSnd[] = new byte[2 * numSamples];
-
-
-            for (int i = 0; i < numSamples; ++i) {      // Fill the sample array
-                sample[i] = Math.sin(freqOfTone * 2 * Math.PI * i / (sampleRate));
-            }
-
-            // convert to 16 bit pcm sound array
-            // assumes the sample buffer is normalized.
-            // convert to 16 bit pcm sound array
-            // assumes the sample buffer is normalised.
-            int idx = 0;
-            int i = 0;
-
-            int ramp = numSamples / 20;                                    // Amplitude ramp as a percent of sample count
-
-
-            for (i = 0; i < ramp; ++i) {                                     // Ramp amplitude up (to avoid clicks)
-                double dVal = sample[i];
-                // Ramp up to maximum
-                final short val = (short) ((dVal * 32767 * i / ramp));
-                // in 16 bit wav PCM, first byte is the low order byte
-                generatedSnd[idx++] = (byte) (val & 0x00ff);
-                generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-            }
-
-
-            for (i = i; i < numSamples - ramp; ++i) {                        // Max amplitude for most of the samples
-                double dVal = sample[i];
-                // scale to maximum amplitude
-                final short val = (short) ((dVal * 32767));
-                // in 16 bit wav PCM, first byte is the low order byte
-                generatedSnd[idx++] = (byte) (val & 0x00ff);
-                generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-            }
-
-            for (i = i; i < numSamples; ++i) {                               // Ramp amplitude down
-                double dVal = sample[i];
-                // Ramp down to zero
-                final short val = (short) ((dVal * 32767 * (numSamples - i) / ramp));
-                // in 16 bit wav PCM, first byte is the low order byte
-                generatedSnd[idx++] = (byte) (val & 0x00ff);
-                generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-            }
-
-            AudioTrack audioTrack = null;                                   // Get audio track
-            try {
-                int bufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-                audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-                        sampleRate, AudioFormat.CHANNEL_OUT_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT, bufferSize,
-                        AudioTrack.MODE_STREAM);
-                audioTrack.play();                                          // Play the track
-                audioTrack.write(generatedSnd, 0, generatedSnd.length);     // Load the track
-            } catch (Exception e) {
-            }
-
-            int x = 0;
-            do {                                                     // Montior playback to find when done
-                if (audioTrack != null)
-                    x = audioTrack.getPlaybackHeadPosition();
-                else
-                    x = numSamples;
-            } while (x < numSamples);
-
-            if (audioTrack != null)
-                audioTrack.release();           // Track play done. Release track.
-        }
-    }
-    // </SOUND>
-
-    // <SENSORS>
     public SensorAdapter getSensorAdapter() {
         return this.sensorAdapter;
     }
-    // </SENSORS>
 }

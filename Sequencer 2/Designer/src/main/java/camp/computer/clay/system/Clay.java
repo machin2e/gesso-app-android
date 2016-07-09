@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import camp.computer.clay.designer.Application;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.model.interaction.Perspective;
-import camp.computer.clay.model.simulation.Body;
+import camp.computer.clay.model.interaction.Body;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
@@ -71,6 +71,8 @@ public class Clay {
         // Add body to simulation
         simulation.addBody(body);
 
+        initializeVisualization(visualization);
+
         Application.getDisplay().getVisualizationSurface().setVisualization(visualization);
 
     }
@@ -90,6 +92,15 @@ public class Clay {
             }
             simulation.addMachine(machine);
         }
+    }
+
+    private void initializeVisualization(Visualization visualization) {
+
+        visualization.initializeImages();
+
+//        visualization.setPosition(new PointF(0, 0));
+//        visualization.setRotation(0);
+//        visualizationSprites.add(visualization);
     }
 
     public ContentEntry getContent () {
@@ -124,7 +135,7 @@ public class Clay {
      * Adds a view to Clay. This makes the view available for use in systems built with Clay.
      * @param view The view to make available to Clay.
      */
-    public void addView (ViewManagerInterface view) {
+    public void addDisplay(ViewManagerInterface view) {
         this.views.add (view);
     }
 
@@ -213,16 +224,16 @@ public class Clay {
         String deviceTag = "";
         if (device.getUuid().toString().equals("001affff-ffff-ffff-4e45-3158200a0027")) {
             deviceTag = "bender";
-            Application.getDisplay().speakPhrase("bender");
+            Application.getDisplay().getSpeechGenerator().speakPhrase("bender");
         } else if (device.getUuid().toString().equals("002effff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "kitt";
-            Application.getDisplay().speakPhrase("kitt");
+            Application.getDisplay().getSpeechGenerator().speakPhrase("kitt");
         } else if (device.getUuid().toString().equals("002fffff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "gerty";
-            Application.getDisplay().speakPhrase("gerty");
+            Application.getDisplay().getSpeechGenerator().speakPhrase("gerty");
         } else if (device.getUuid().toString().equals("0027ffff-ffff-ffff-4e45-36932003000a")) {
             deviceTag = "hal";
-            Application.getDisplay().speakPhrase("hal");
+            Application.getDisplay().getSpeechGenerator().speakPhrase("hal");
         }
 
         device.setTag(deviceTag);

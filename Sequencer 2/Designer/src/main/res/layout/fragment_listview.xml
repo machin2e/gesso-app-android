@@ -9,7 +9,7 @@
     android:background="@color/black"
     tools:context=".MainActivity$DummySectionFragment">
 
-    <camp.computer.clay.designer.TimelineView
+    <camp.computer.clay.application.TimelineView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:dslv="http://schemas.android.com/apk/res/computer.camp.clay.designer"
         android:id="@+id/listview_timeline"

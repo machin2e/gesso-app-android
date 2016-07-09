@@ -18,7 +18,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import camp.computer.clay.designer.Application;
+import camp.computer.clay.application.Application;
 
 public class SQLiteContentManager {
 

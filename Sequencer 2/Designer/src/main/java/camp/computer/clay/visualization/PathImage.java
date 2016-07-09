@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.Log;
 
-import camp.computer.clay.designer.VisualizationSurface;
+import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;

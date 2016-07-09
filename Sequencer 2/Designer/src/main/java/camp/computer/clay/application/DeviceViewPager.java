@@ -1,4 +1,4 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.content.Context;
 import android.graphics.Bitmap;

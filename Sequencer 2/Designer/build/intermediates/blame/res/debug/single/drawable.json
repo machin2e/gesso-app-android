@@ -8,6 +8,10 @@
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/drawable/thumb_white_pressed.xml"
     },
     {
+        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable/background_splash.xml",
+        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/res/drawable/background_splash.xml"
+    },
+    {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable/chat_message_key_disabled.xml",
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/res/drawable/chat_message_key_disabled.xml"
     },

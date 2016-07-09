@@ -1,4 +1,4 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -76,7 +76,7 @@ public class EventDesignerView {
         // final TextView lightLabel = new TextView (getContext());
         // lightLabel.setText("Choose some lights");
         // lightLabel.setPadding(70, 20, 70, 20);
-        // designerViewLayout.addView(lightLabel);
+        // designerViewLayout.addDisplay(lightLabel);
 
         final ColorPickerDialog colorPickerDialog = ColorPickerDialog.createColorPickerDialog(getContext(), ColorPickerDialog.DARK_THEME);
 
@@ -109,9 +109,9 @@ public class EventDesignerView {
             params.setMargins(0, 0, 0, 0);
             toggleButton.setLayoutParams(params);
             lightToggleButtons.add(toggleButton); // Add the button to the list.
-            lightLayout.addView(toggleButton);
+            lightLayout.addDisplay(toggleButton);
         }
-        designerViewLayout.addView(lightLayout);
+        designerViewLayout.addDisplay(lightLayout);
         */
 
         // Select light color
@@ -352,7 +352,7 @@ public class EventDesignerView {
         triggerMessageText.setText(triggerMessageContent);
         triggerMessageText.setSelection(triggerMessageText.getText().length());
 
-        Application.getDisplay().speakPhrase(triggerMessageContent);
+        Application.getDisplay().getSpeechGenerator().speakPhrase(triggerMessageContent);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -1732,16 +1732,16 @@ public class EventDesignerView {
 //            // TODO: final ArrayList<Button> optionButtonList = new ArrayList<Button>(); ...
 //            // TODO: ...add callback to update the selected content key (in the object)
 //            LinearLayout exposedChannelView = (LinearLayout) generateContentInputView(value);
-//            baseView.addView(exposedChannelView);
+//            baseView.addDisplay(exposedChannelView);
 //        }
 //
-//        designerViewLayout.addView(baseView);
+//        designerViewLayout.addDisplay(baseView);
 
         DynamicLinearLayout channelContentView = (DynamicLinearLayout) generateChannelContentChooserView (contentEntry, null);
         designerViewLayout.addView(channelContentView);
 
 //        LinearLayout contentEditorView = (LinearLayout) generateChannelContentEditorView (contentEntry);
-//        designerViewLayout.addView(contentEditorView);
+//        designerViewLayout.addDisplay(contentEditorView);
 
         // </CHANNEL CONTENT>
 
@@ -1756,7 +1756,7 @@ public class EventDesignerView {
 ////        channelEnabledLabel.setTextSize(20);
 ////        channelEnabledLabel.setPadding(70, 20, 70, 20);
 //        dataEntryLabel.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-//        designerViewLayout.addView(dataEntryLabel);
+//        designerViewLayout.addDisplay(dataEntryLabel);
 
         // data editor was here...
 
@@ -2338,7 +2338,7 @@ public class EventDesignerView {
 //            optionButton.setLayoutParams(params);
 //
 //            // Add to view (column)
-//            buttonListView.addView(optionButton);
+//            buttonListView.addDisplay(optionButton);
 //
 //            // Add to button list
 //            optionButtonList.add(optionButton);
@@ -2419,7 +2419,7 @@ public class EventDesignerView {
 //        // params.setMargins(0, 0, 0, 0);
 //        buttonListView.setLayoutParams(params);
 //
-//        baseLayout.addView(buttonListView);
+//        baseLayout.addDisplay(buttonListView);
 
 
         return baseLayout;
@@ -2499,7 +2499,7 @@ public class EventDesignerView {
         }
 
         return baseView;
-        //designerViewLayout.addView (channelSelectionButtonsLayout2);
+        //designerViewLayout.addDisplay (channelSelectionButtonsLayout2);
         // </SECTION: CHANNEL SELECTION BUTTONS>
     }
 
@@ -3088,7 +3088,7 @@ public class EventDesignerView {
 
                             public void run() {
                                 // playSound();
-                                Application.getDisplay().playTone(Double.parseDouble(String.valueOf(progress)), 0.2);
+                                Application.getDisplay().getToneGenerator().play(Double.parseDouble(String.valueOf(progress)), 0.2);
                             }
                         });
                     }
@@ -3225,7 +3225,7 @@ public class EventDesignerView {
         input.setText(phrase);
         input.setSelection(input.getText().length());
 
-        Application.getDisplay().speakPhrase(phrase);
+        Application.getDisplay().getSpeechGenerator().speakPhrase(phrase);
 
         // Set up the buttons
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
@@ -3237,7 +3237,7 @@ public class EventDesignerView {
 
                 String updatedStateString = input.getText().toString();
 
-                Application.getDisplay().speakPhrase(updatedStateString);
+                Application.getDisplay().getSpeechGenerator().speakPhrase(updatedStateString);
 
                 // Update the behavior state
                 // <HACK>

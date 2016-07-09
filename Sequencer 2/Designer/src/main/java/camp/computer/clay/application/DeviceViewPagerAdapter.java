@@ -1,4 +1,4 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

@@ -1,4 +1,4 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -190,7 +190,7 @@ public class EventHolderAdapter extends BaseAdapter {
 
         // Tag
         final TextView actionLabel = getEventTagView(eventHolder.getEvent().getAction().getTag());
-        //eventView.addView(actionLabel);
+        //eventView.addDisplay(actionLabel);
         eventInnerView.addView(actionLabel);
 
         // Timeline segment
@@ -202,7 +202,7 @@ public class EventHolderAdapter extends BaseAdapter {
         final ImageView waveformImageView = new ImageView (Application.getContext());
         waveformImageView.setId(R.id.waveform);
         waveformImageView.setBackgroundResource(R.drawable.drag);
-        actionView.addView(waveformImageView);
+        actionView.addDisplay(waveformImageView);
 
         waveformImageView.getLayoutParams().height = 100;
 
@@ -360,7 +360,7 @@ public class EventHolderAdapter extends BaseAdapter {
         params.addRule(RelativeLayout.CENTER_VERTICAL);
         linearLayout.setLayoutParams(params);
 
-//        actionView.addView (linearLayout);
+//        actionView.addDisplay (linearLayout);
 
         return linearLayout;
     }
@@ -557,7 +557,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //            channelNumberButton.setLayoutParams(params);
 //
 //            // Add to view
-//            channelSelectionButtonsLayout.addView(channelNumberButton);
+//            channelSelectionButtonsLayout.addDisplay(channelNumberButton);
 //
 //            // Add to button list
 //            channelSelectionButtonList.add(channelNumberButton);
@@ -599,7 +599,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //        }
 //
 //
-//        designerViewLayout.addView (channelSelectionButtonsLayout);
+//        designerViewLayout.addDisplay (channelSelectionButtonsLayout);
 //        // </SECTION: CONTENT PROVIDER SELECTION BUTTONS>
 //
 //
@@ -720,7 +720,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //            previewLabel.setTextSize(10.0f);
 //            previewLabel.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 //            previewLabel.setPadding(0, 5, 0, 5);
-//            lightLinearLayout.addView(previewLabel);
+//            lightLinearLayout.addDisplay(previewLabel);
 
             // TODO: Add params
 
@@ -886,7 +886,7 @@ public class EventHolderAdapter extends BaseAdapter {
         final EditText triggerMessageText = new EditText(Application.getContext());
         triggerMessageText.setInputType(InputType.TYPE_CLASS_TEXT);
         triggerMessageText.setVisibility(View.VISIBLE);
-        actionLayout.addView(triggerMessageText);
+        actionLayout.addDisplay(triggerMessageText);
         */
 
         return topViewLayout;
@@ -1067,7 +1067,7 @@ public class EventHolderAdapter extends BaseAdapter {
 //        textView.setAllCaps(true);
 //        textView.setTextSize(10.0f);
 //        textView.setPadding(0, 5, 0, 5);
-//        linearLayout.addView(textView);
+//        linearLayout.addDisplay(textView);
 
         return eventView;
     }

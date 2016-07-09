@@ -1,4 +1,4 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 /*
 * Defines a simple object to be displayed in a list view.

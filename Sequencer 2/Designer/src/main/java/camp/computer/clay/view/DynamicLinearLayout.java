@@ -15,7 +15,7 @@ import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.designer.Application;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.system.ContentEntry;
 
 public class DynamicLinearLayout extends LinearLayout {
@@ -319,7 +319,7 @@ public class DynamicLinearLayout extends LinearLayout {
 //            optionButton.setLayoutParams(params);
 //
 //            // Add to view (column)
-//            buttonListView.addView(optionButton);
+//            buttonListView.addDisplay(optionButton);
 //
 //            // Add to button list
 //            optionButtonList.add(optionButton);
@@ -398,7 +398,7 @@ public class DynamicLinearLayout extends LinearLayout {
 //        // params.setMargins(0, 0, 0, 0);
 //        buttonListView.setLayoutParams(params);
 //
-//        baseLayout.addView(buttonListView);
+//        baseLayout.addDisplay(buttonListView);
 //
 //
 //        return baseLayout;

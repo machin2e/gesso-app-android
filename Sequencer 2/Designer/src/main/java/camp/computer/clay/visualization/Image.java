@@ -2,7 +2,7 @@ package camp.computer.clay.visualization;
 
 import android.graphics.PointF;
 
-import camp.computer.clay.designer.VisualizationSurface;
+import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;

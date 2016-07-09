@@ -10,7 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import camp.computer.clay.designer.Application;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.util.CRC16;
 
 public class DatagramManager extends Thread implements MessageManagerInterface {

@@ -1,13 +1,18 @@
-package camp.computer.clay.model.simulation;
+package camp.computer.clay.model.interaction;
 
 import android.graphics.PointF;
 import android.util.Log;
+import android.view.View;
+import android.widget.RelativeLayout;
+
+import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.model.interaction.Perspective;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.model.interaction.TouchInteractivity;
+import camp.computer.clay.application.Application;
+import camp.computer.clay.model.simulation.Actor;
+import camp.computer.clay.model.simulation.Path;
+import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.visualization.Image;
 import camp.computer.clay.visualization.MachineImage;
 import camp.computer.clay.visualization.PathImage;
@@ -18,6 +23,8 @@ import camp.computer.clay.visualization.util.Geometry;
 public class Body extends Actor {
 
     private Perspective perspective;
+
+    private TouchInteractivity touchInteractivity;
 
     public Body() {
     }
@@ -93,8 +100,6 @@ public class Body extends Actor {
             getPerspective().setScale(1.0f);
         }
     }
-
-    TouchInteractivity touchInteractivity;
 
     public void onStartInteractivity(TouchInteraction touchInteraction) {
         Log.v("MapViewEvent", "onStartInteractivity");
@@ -347,6 +352,7 @@ public class Body extends Actor {
                 machineImage.showPorts();
                 machineImage.showPaths();
                 machineImage.setTransparency(1.0f);
+
                 // ApplicationView.getDisplay().speakPhrase("choose a channel to get data.");
 
                 for (PortImage portImage: machineImage.getPortImages()) {
@@ -373,8 +379,6 @@ public class Body extends Actor {
         } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
             PortImage portImage = (PortImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
 
-//          //
-
             Log.v("MapView", "\tPort " + (portImage.getIndex() + 1) + " touched.");
 
             if (portImage.isTouching(touchInteraction.touchPositions[touchInteraction.pointerId])) {
@@ -389,7 +393,8 @@ public class Body extends Actor {
 
                     port.setDirection(Port.Direction.INPUT);
                     port.setType(Port.Type.getNextType(port.getType()));
-                    // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+
+                    // TODO: Speak ~ "setting as input. you can send the data to another board if you want. touchPositions another board."
 
                 } else if (!port.hasPath() && getPerspective().getVisualization().getSimulation().getAncestorPathsByPort(port).size() == 0) {
 
@@ -414,8 +419,10 @@ public class Body extends Actor {
                         machineImage.hidePaths();
                     }
 
+                    // Reduce focus on the machine
+                    portImage.getMachineImage().setTransparency(0.05f);
+
                     // Focus on the port
-                    portImage.getMachineImage().setTransparency(1.0f);
                     //portImage.getMachineImage().showPath(portImage.getIndex(), true);
                     portImage.showPaths();
                     portImage.setVisibility(true);
@@ -462,11 +469,17 @@ public class Body extends Actor {
         } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PathImage) {
             PathImage pathImage = (PathImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
 
-            if (pathImage.getEditorVisibility()) {
-                pathImage.setEditorVisibility(false);
-            } else {
-                pathImage.setEditorVisibility(true);
-            }
+//            if (pathImage.getEditorVisibility()) {
+//                pathImage.setEditorVisibility(false);
+//            } else {
+//                pathImage.setEditorVisibility(true);
+//            }
+
+            // TODO: Show path programmer (Create and curate actions built in JS by inserting
+            // TODO: (cont'd) exposed ports into action ports. This defines a path)
+            final RelativeLayout timelineView = (RelativeLayout) Application.getDisplay().findViewById(R.id.path_editor_view);
+            timelineView.setVisibility(View.VISIBLE);
+
 
         } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
 
@@ -696,13 +709,7 @@ public class Body extends Actor {
                                     }
                                 }
 
-                                /*
-                                Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                                // Vibrate for 500 milliseconds
-                                v.vibrate(50);
-                                //v.vibrate(50); off
-                                //v.vibrate(50); // second tap
-                                */
+                                // TODO: Vibrate
 
                                 touchInteraction.setOverlappedImage(null);
 
@@ -945,11 +952,7 @@ public class Body extends Actor {
 
                         touchInteraction.setOverlappedImage(nearestMachineImage);
 
-                        /*
-                        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-                        // Vibrate for 500 milliseconds
-                        v.vibrate(50); // Vibrate once for "YES"
-                        */
+                        // TODO: Vibrate
 
                         // Adjust perspective
                         //getPerspective().setPosition(nearestMachineImage.getPosition());

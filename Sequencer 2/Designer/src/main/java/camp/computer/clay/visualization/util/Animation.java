@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 
 import com.mobeta.android.sequencer.R;
 
-import camp.computer.clay.designer.Application;
+import camp.computer.clay.application.Application;
 
 public class Animation {
 

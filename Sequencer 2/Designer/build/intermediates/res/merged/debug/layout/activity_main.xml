@@ -5,22 +5,105 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    tools:context="camp.computer.clay.designer.ApplicationView">
+    tools:context="camp.computer.clay.application.Application">
 
-    <camp.computer.clay.designer.VisualizationSurface
+    <camp.computer.clay.application.VisualizationSurface
         android:id="@+id/app_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <RelativeLayout
-        android:id="@+id/timeline_view"
+        android:id="@+id/path_editor_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#bb000000"
         android:visibility="gone">
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="hi there" />
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Path Action/Script/Logic Editor/Pipeline"
+                android:padding="20dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#44000000"
+                android:text="source wave input"
+                android:paddingLeft="20dp"
+                android:paddingTop="12dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="12dp"/>
+
+            <LinearLayout
+                android:id="@+id/path_editor_action_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#44000000"
+                    android:text="target pulse output"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="12dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="12dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#44000000"
+                    android:text="target set period (source:wave)"
+                    android:layout_marginTop="5dp"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="12dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="12dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#44000000"
+                    android:text="target set duty cycle (number:50%)"
+                    android:paddingLeft="20dp"
+                    android:paddingTop="12dp"
+                    android:paddingRight="20dp"
+                    android:paddingBottom="12dp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/path_editor_add_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#44000000"
+                android:text="add action"
+                android:layout_marginTop="5dp"
+                android:paddingLeft="20dp"
+                android:paddingTop="12dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="12dp" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#44000000"
+                android:text="add todo"
+                android:layout_marginTop="5dp"
+                android:paddingLeft="20dp"
+                android:paddingTop="12dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="12dp" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#44000000"
+                android:text="add idea"
+                android:paddingLeft="20dp"
+                android:paddingTop="12dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="12dp" />
+        </LinearLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -28,7 +111,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone">
-        <camp.computer.clay.designer.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        <camp.computer.clay.application.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
@@ -89,7 +172,8 @@
         android:layout_marginRight="15dp"
         android:paddingLeft="5dp"
         android:paddingRight="50dp"
-        android:background="@drawable/timeline_button">
+        android:background="@drawable/timeline_button"
+        android:visibility="gone">
         <HorizontalScrollView
             android:id="@+id/message_content_layout_perspective"
             android:layout_width="match_parent"
@@ -144,7 +228,8 @@
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginRight="20dp"
+        android:visibility="gone">
         <Button
             android:id="@+id/context_button"
             android:text="\u21BA"

@@ -14,7 +14,7 @@ import com.mobeta.android.sequencer.R;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.designer.Application;
+import camp.computer.clay.application.Application;
 
 public class DynamicHorizontalListLayout extends LinearLayout {
 

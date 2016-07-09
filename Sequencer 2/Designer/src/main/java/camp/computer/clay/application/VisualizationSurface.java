@@ -1,4 +1,4 @@
-package camp.computer.clay.designer;
+package camp.computer.clay.application;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,17 +14,13 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import camp.computer.clay.model.simulation.Body;
+import camp.computer.clay.model.interaction.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.Visualization;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
 
-    private VisualizationRenderer visualizationRenderer;
-
-    private SurfaceHolder surfaceHolder;
-
-    // Drawing context
+    // Visualization Rendering Context
     private Bitmap canvasBitmap = null;
     private Canvas canvas = null;
     private int canvasWidth;
@@ -32,101 +28,27 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
     private Paint paint = new Paint (Paint.ANTI_ALIAS_FLAG);
     private Matrix identityMatrix;
 
-    // Map
+    // Visualization Renderer
+    private SurfaceHolder surfaceHolder;
+    private VisualizationRenderer visualizationRenderer;
+
+    // Coordinate System (Grid)
     private PointF originPosition = new PointF ();
 
+    // Visualization
     private Visualization visualization;
 
     public VisualizationSurface(Context context) {
         super(context);
-        initialize();
     }
 
     public VisualizationSurface(Context context, AttributeSet attrs) {
         super (context, attrs);
-        initialize();
     }
 
     public VisualizationSurface(Context context, AttributeSet attrs, int defStyle) {
         super (context, attrs, defStyle);
-        initialize();
     }
-
-    public void setVisualization(Visualization visualization) {
-        this.visualization = visualization;
-
-//        // Update perspective on visualization
-//        visualization.getSimulation().getBody(0).getPerspective().setWidth(canvasWidth);
-//        visualization.getSimulation().getBody(0).getPerspective().setHeight(canvasHeight);
-
-        // Get screen width and height of the device
-        DisplayMetrics metrics = new DisplayMetrics();
-        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-
-        visualization.getSimulation().getBody(0).getPerspective().setWidth(screenWidth);
-        visualization.getSimulation().getBody(0).getPerspective().setHeight(screenHeight);
-
-
-        initializeVisualization();
-    }
-
-    private void initializeVisualization() {
-
-        visualization.initializeImages();
-
-        visualization.setPosition(new PointF(0, 0));
-        visualization.setRotation(0);
-//        visualizationSprites.add(visualization);
-    }
-
-    public Visualization getVisualization() {
-        return this.visualization;
-    }
-
-    private void initialize() {
-
-//        initializeSimulation();
-
-//        initializeVisualization();
-
-//        // Create body and set perspective
-//        Body body = new Body();
-//        Perspective perspective = new Perspective(visualization);
-
-//        WindowManager wm = (WindowManager) ApplicationView.getContext().getSystemService(Context.WINDOW_SERVICE);
-//        Display display = wm.getDefaultDisplay();
-//        Point size = new Point();
-//        display.getSize(size);
-//        int displayWidth = size.x;
-//        int displayHeight = size.y;
-//
-//        perspective.setWidth(displayWidth);
-//        perspective.setHeight(displayHeight);
-
-//        body.setPerspective(perspective);
-
-//        // Add body to simulation
-//        simulation.addBody(body);
-    }
-
-//    private void initializeSimulation() {
-//
-//        // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
-//        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//        int letterIndex = 0;
-//        for (int i = 0; i < 5; i++) {
-//            Machine machine = new Machine();
-//            for (int j = 0; j < 12; j++) {
-//                Port port = new Port();
-//                machine.addPort(port);
-//                machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
-//                letterIndex = letterIndex % alphabet.length();
-//            }
-//            simulation.addMachine(machine);
-//        }
-//    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -137,17 +59,10 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         canvas = new Canvas ();
         canvas.setBitmap(canvasBitmap);
 
-//        simulation.getBody(0).getPerspective().setWidth(canvasWidth);
-//        simulation.getBody(0).getPerspective().setHeight(canvasHeight);
-
         identityMatrix = new Matrix ();
 
         // Center the visualization coordinate system
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
-
-        // Update perspective on visualization
-//        simulation.getBody(0).getPerspective().setPosition(new PointF(0, 0));
-//        simulation.getBody(0).getPerspective().width
     }
 
     @Override
@@ -160,8 +75,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
     }
 
-    public void MapView_OnResume () {
-        Log.v("MapView", "MapView_OnResume");
+    public void onResume() {
+        Log.v("MapView", "onResume");
 
         surfaceHolder = getHolder ();
         getHolder().addCallback (this);
@@ -178,8 +93,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
     }
 
-    public void MapView_OnPause () {
-        Log.v("MapView", "MapView_OnPause");
+    public void onPause() {
+        Log.v("MapView", "onPause");
 
         // Pause the communications
 //        getClay ().getCommunication ().stopDatagramServer (); // HACK: This was commented out to prevent the server from "crashing" into an invalid state!
@@ -198,51 +113,10 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         }
     }
 
-    //----------------------------------------------------------------------------------------------
-    // Coordinate Simulation
-    //----------------------------------------------------------------------------------------------
-
-    //----------------------------------------------------------------------------------------------
-    // Perspective
-    //----------------------------------------------------------------------------------------------
-
-//    public static float DEFAULT_SCALE_FACTOR = 1.0f;
-//    public static int DEFAULT_SCALE_DURATION = 50;
-//
-//     private Point originPosition = new Point (0, 0);
-//    private float targetScale = DEFAULT_SCALE_FACTOR;
-//    public float scale = targetScale;
-//    private int scaleDuration = DEFAULT_SCALE_DURATION;
-//
-//    public void setScale (float targetScale) {
-//
-//        if (this.targetScale != targetScale) {
-//
-//            if (this.scale != targetScale) {
-//                Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleListener() {
-//                    @Override
-//                    public void onScale(float currentScale) {
-//                        scale = currentScale;
-//                    }
-//                });
-//            }
-//
-//            Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-//            // Vibrate for 500 milliseconds
-//            v.vibrate(50);
-//
-//            this.targetScale = targetScale;
-//        }
-//    }
-
-    //----------------------------------------------------------------------------------------------
-    // Layout
-    //----------------------------------------------------------------------------------------------
-
     protected void doDraw(Canvas canvas) {
 //        super.onDraw(canvas);
 
-        if (this.visualization == null) {
+        if (this.visualization == null || this.canvas == null) {
             return;
         }
 
@@ -283,8 +157,10 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         this.visualization.draw(this);
     }
 
+    /**
+     * The function run in background thread, not UI thread.
+     */
     public void updateSurfaceView () {
-        // The function run in background thread, not UI thread.
 
         if (visualization == null) {
             return;
@@ -312,46 +188,34 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         }
     }
 
+    public Canvas getCanvas() {
+        return this.canvas;
+    }
+
+    public Paint getPaint() {
+        return this.paint;
+    }
+
+    public void setVisualization(Visualization visualization) {
+        this.visualization = visualization;
+
+        // Get screen width and height of the device
+        DisplayMetrics metrics = new DisplayMetrics();
+        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
+
+        visualization.getSimulation().getBody(0).getPerspective().setWidth(screenWidth);
+        visualization.getSimulation().getBody(0).getPerspective().setHeight(screenHeight);
+    }
+
+    public Visualization getVisualization() {
+        return this.visualization;
+    }
+
     //----------------------------------------------------------------------------------------------
     // Interaction Model
     //----------------------------------------------------------------------------------------------
-
-    // Interactivity state
-    // TODO: Add to body (i.e., enable looking around)
-
-//    public enum Focus {
-//
-//        MAP(0),
-//        MACHINE(1),
-//        PORT(2),
-//        PATH(3),
-//        PRE_DRAG(4),
-//        DRAG(5),
-//        RELEASE(6),
-//        TAP(7),
-//        DOUBLE_DAP(8);
-//
-//        // TODO: Change the index to a UUID?
-//        int index;
-//
-//        Focus(int index) {
-//            this.index = index;
-//        }
-//    }
-
-    // TODO: In the queue, store the touchPositions actions persistently after exceeding maximum number for immediate interactions.
-//    private TouchInteractivity touchInteractivity = null;
-
-    // Perspective/Activity:
-    //
-    // - default
-    //    - focus on machine (after touching it)
-    //       - focus on one port + all its paths (after touching it)
-    //          - focus on one path(s) (after touching it)
-    //          - search for dest. port of those appearing near touchPositions (after dragging from a port)
-    //    - scan/browse map (after dragging on map/device)
-    //    - move machine (after holding it, then/before dragging it)
-
 
     @Override
     public boolean onTouchEvent (MotionEvent motionEvent) {
@@ -418,10 +282,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
                 // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-//                    touchInteractivity = new TouchInteractivity(); // Create on first!
                     touchInteraction.setType(TouchInteraction.TouchInteractionType.TOUCH);
                     touchInteraction.pointerId = pointerId;
-//                    touchInteractivity.addInteraction(touchInteraction);
                     currentBody.onStartInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the first touchPositions!
@@ -435,7 +297,6 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                     currentBody.onCompleteInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the first touchPositions!
-                    // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:
                 } else {
@@ -445,13 +306,5 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         }
 
         return true;
-    }
-
-    public Canvas getCanvas() {
-        return this.canvas;
-    }
-
-    public Paint getPaint() {
-        return this.paint;
     }
 }
