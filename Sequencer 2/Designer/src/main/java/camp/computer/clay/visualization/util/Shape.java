@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.util;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.visualization.PortImage;
@@ -10,11 +11,6 @@ import camp.computer.clay.visualization.PortImage;
 public abstract class Shape {
 
     public static void drawTriangle(PointF position, float angle, float width, float height, Canvas canvas, Paint paint) {
-
-//        canvas.save();
-//
-//        canvas.translate(position.x, position.y);
-//        canvas.rotate(angle);
 
         // Calculate points before rotation
         PointF p1 = new PointF(position.x + -(width / 2.0f), position.y + (height / 2.0f));
@@ -34,8 +30,33 @@ public abstract class Shape {
         path.close();
 
         canvas.drawPath(path, paint);
+    }
 
-//        canvas.restore();
+    public static void drawCircle(PointF position, float radius, float angle, Canvas canvas, Paint paint) {
+
+        // Color
+        canvas.drawCircle(
+                position.x,
+                position.y,
+                radius,
+                paint
+        );
+
+    }
+
+    public static void drawText(PointF position, String text, float size, Canvas canvas, Paint paint) {
+
+        // Style
+        paint.setTextSize(size);
+
+        // Style (Guaranteed)
+        text = text.toUpperCase();
+        paint.setStyle(Paint.Style.FILL);
+
+        // Draw
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        canvas.drawText(text, position.x, position.y + bounds.height() / 2.0f, paint);
     }
 
     public static void drawRectangle(PointF position, float angle, float width, float height, Canvas canvas, Paint paint) {

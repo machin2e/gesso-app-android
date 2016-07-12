@@ -96,6 +96,15 @@ public class TouchInteractivity {
         return null;
     }
 
+    public TouchInteraction getPreviousInteraction() {
+        for (int i = 0; i < touchInteractions.size() - 1; i++) {
+            if (touchInteractions.get(i + 1) == getLatestInteraction()) {
+                return touchInteractions.get(i);
+            }
+        }
+        return null;
+    }
+
     public long getDuration() {
         return getLatestInteraction().getTimestamp() - getFirstInteraction().getTimestamp();
     }

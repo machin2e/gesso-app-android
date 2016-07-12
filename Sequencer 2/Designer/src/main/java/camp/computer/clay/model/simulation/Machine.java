@@ -24,6 +24,14 @@ public class Machine extends Model {
         return this.ports;
     }
 
+    public ArrayList<Path> getPaths() {
+        ArrayList<Path> paths = new ArrayList<Path>();
+        for (Port port: getPorts()) {
+            paths.addAll (port.getPaths());
+        }
+        return paths;
+    }
+
     // <TAG_INTERFACE>
     private ArrayList<String> tags = new ArrayList<String>();
 

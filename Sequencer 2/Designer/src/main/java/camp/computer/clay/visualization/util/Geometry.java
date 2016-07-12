@@ -1,8 +1,14 @@
 package camp.computer.clay.visualization.util;
 
 import android.graphics.PointF;
+import android.util.Log;
 
 import java.util.ArrayList;
+
+import camp.computer.clay.model.simulation.Machine;
+import camp.computer.clay.visualization.Image;
+import camp.computer.clay.visualization.MachineImage;
+import camp.computer.clay.visualization.Visualization;
 
 public abstract class Geometry {
 
@@ -144,7 +150,7 @@ public abstract class Geometry {
         return centroidPosition;
     }
 
-    public static float[] calculateBoundingBox(ArrayList<PointF> points) {
+    public static Rectangle calculateBoundingBox(ArrayList<PointF> points) {
         float[] boundaryPoints = new float[4]; // left, top, right, bottom
         // TODO: center, width, height
 
@@ -163,22 +169,26 @@ public abstract class Geometry {
             if (point.x > maxX) {
                 maxX = point.x;
             }
-            if (point.y > minY) {
-                minY = point.y;
+            if (point.y > maxY) {
+                maxY = point.y;
             }
         }
 
-        float left = minX;
-        float top = minY;
-        float right = maxX;
-        float bottom = maxY;
+        Rectangle rectangle = new Rectangle(minX, minY, maxX, maxY);
 
-        boundaryPoints[0] = left;
-        boundaryPoints[1] = top;
-        boundaryPoints[2] = right;
-        boundaryPoints[3] = bottom;
+        return rectangle;
 
-        return boundaryPoints;
+//        float left = minX;
+//        float top = minY;
+//        float right = maxX;
+//        float bottom = maxY;
+//
+//        boundaryPoints[0] = left;
+//        boundaryPoints[1] = top;
+//        boundaryPoints[2] = right;
+//        boundaryPoints[3] = bottom;
+//
+//        return boundaryPoints;
     }
 
     public static PointF calculateCenterPosition(ArrayList<PointF> points) {
@@ -200,8 +210,8 @@ public abstract class Geometry {
             if (point.x > maxX) {
                 maxX = point.x;
             }
-            if (point.y > minY) {
-                minY = point.y;
+            if (point.y > maxY) {
+                maxY = point.y;
             }
         }
 
@@ -215,6 +225,7 @@ public abstract class Geometry {
         boundaryPoints[2] = right;
         boundaryPoints[3] = bottom;
 
+        // PointF boundingBoxPosition = new PointF(minX + ((right - left) / 2.0f), minY + ((bottom - top) / 2.0f));
         PointF boundingBoxPosition = new PointF(minX + ((right - left) / 2.0f), minY + ((bottom - top) / 2.0f));
 
         return boundingBoxPosition;
@@ -358,4 +369,241 @@ public abstract class Geometry {
         else
             return -1;
     }
+
+    /**
+     * Compute list of points that are separated by a minimal distance. Based on circle packing
+     * algorithm.
+     * @param positions
+     * @return
+     */
+    public static ArrayList<MachineImage> packCircles(ArrayList<MachineImage> positions, float distance, PointF packingCenter) {
+
+        // Sort points based on distance from center
+        ArrayList<MachineImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
+        ArrayList<PointF> sortedPositions = Visualization.getPositions(sortedImages);
+
+        float minSeparationSq = distance * distance;
+
+        float iterationCounter = 1000;
+
+        for (int i = 0; i < sortedPositions.size() - 1; i++) {
+            for (int j = i + 1; j < sortedPositions.size(); j++) {
+
+                if (i == j) {
+                    continue;
+                }
+
+                // Vector/Segment connecting a pair of points
+                // TODO: Vector2 AB = mCircles[j].mCenter - mCircles[i].mCenter;
+                PointF vectorAB = new PointF(
+                        sortedPositions.get(j).x - sortedPositions.get(i).x,
+                        sortedPositions.get(j).y - sortedPositions.get(i).y
+                );
+
+                float r = (sortedImages.get(i).boardWidth / 2.0f) + (sortedImages.get(i).boardWidth / 2.0f);
+
+                // Length squared = (dx * dx) + (dy * dy);
+                double vectorABLength = Geometry.calculateDistance(sortedPositions.get(i), sortedPositions.get(j));
+                double d = vectorABLength * vectorABLength - minSeparationSq;
+                double minSepSq = Math.min(d, minSeparationSq);
+                d -= minSepSq;
+
+                if (d < (r * r) - 0.01)
+//                if (d < (r * r) - 500)
+                {
+//                    Log.v("Sort", "r^2 - d = " + ((r * r) - d));
+//                    Log.v("Sort", "--");
+                    // Normalize (transform into unit vector)
+                    // TODO: AB.Normalize();
+                    float magnitude = (float) Geometry.calculateDistance(
+                            sortedPositions.get(i),
+                            sortedPositions.get(j)
+                    );
+                    // (float) Geometry.calculateDistance(packingCenter, vectorAB);
+                    vectorAB.x = vectorAB.x / magnitude;
+                    vectorAB.y = vectorAB.y / magnitude;
+
+                    // TODO: AB *= (float)((r - Math.Sqrt(d)) * 0.5f);
+                    vectorAB.x *= (float)((r - Math.sqrt(d)) * 0.5f);
+                    vectorAB.y *= (float)((r - Math.sqrt(d)) * 0.5f);
+
+//                    if (positions.get(j) != mDraggingCircle)
+                    // TODO: positions.get(j).mCenter += AB;
+                    sortedPositions.get(j).x += vectorAB.x;
+                    sortedPositions.get(j).y += vectorAB.y;
+//                    if (positions.get(i) != mDraggingCircle)
+                    // TODO: positions.get(i).mCenter -= AB;
+                    sortedPositions.get(i).x -= vectorAB.x;
+                    sortedPositions.get(i).y -= vectorAB.y;
+                }
+
+            }
+        }
+
+        float damping = 0.1f / iterationCounter;
+        for (int i = 0; i < sortedPositions.size(); i++)
+        {
+//            if (mCircles[i] != mDraggingCircle)
+//            {
+            // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
+            PointF v = new PointF(
+                    sortedPositions.get(i).x - packingCenter.x,
+                    sortedPositions.get(i).y - packingCenter.y
+            );
+
+            // TODO: v *= damping;
+            v.x *= damping;
+            v.y *= damping;
+
+            // TODO: mCircles[i].mCenter -= v;
+            sortedPositions.get(i).x -= v.x;
+            sortedPositions.get(i).y -= v.y;
+
+            ((MachineImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
+//            }
+        }
+
+        return sortedImages;
+
+    }
+
+    public static ArrayList<MachineImage> sortByDistanceToPoint(ArrayList<MachineImage> positions, PointF point) {
+
+        // Initialize with unsorted list of points
+        ArrayList<MachineImage> sortedList = new ArrayList(positions);
+
+        for (int i = 0; i < sortedList.size(); i++) {
+            for (int j = 1; j < (sortedList.size() - i); j++) {
+
+                MachineImage p1 = sortedList.get(j - 1);
+                MachineImage p2 = sortedList.get(j);
+
+                if (Geometry.calculateDistance(p1.getPosition(), point) > Geometry.calculateDistance(p2.getPosition(), point)) {
+                    sortedList.remove(j - 1);
+                    sortedList.add(j, p1);
+                }
+
+            }
+        }
+
+//        String sortedListResult = "";
+//        for (Image p: sortedList) {
+//            sortedListResult += calculateDistance(p.getPosition(), point) + ", ";
+//        }
+//        Log.v("Sort", sortedListResult);
+
+        return sortedList;
+
+    }
+
+//    /**
+//     * Compute list of points that are separated by a minimal distance. Based on circle packing
+//     * algorithm.
+//     * @param positions
+//     * @return
+//     */
+//    public static ArrayList<PointF> packCircles(ArrayList<PointF> positions, float distance, PointF packingCenter) {
+//
+//        // Sort points based on distance from center
+//        ArrayList<PointF> sortedPoints = sortByDistanceToPoint(positions, packingCenter);
+//
+//        float minSeparationSq = distance * distance;
+//
+//        for (int i = 0; i < sortedPoints.size() - 1; i++) {
+//            for (int j = i + 1; j < sortedPoints.size(); j++) {
+//
+//                if (i == j) {
+//                    continue;
+//                }
+//
+//                PointF vectorAB = new PointF();
+//                vectorAB.x = sortedPoints.get(j).x - sortedPoints.get(i).x;
+//                vectorAB.y = sortedPoints.get(j).y - sortedPoints.get(i).x;
+//
+//                float radiusSum = distance + distance;
+//
+//                // Length squared = (dx * dx) + (dy * dy);
+//                float d = (float) (Geometry.calculateDistance(vectorAB, packingCenter) * Geometry.calculateDistance(vectorAB, packingCenter)) - minSeparationSq;
+//                float minSepSq = Math.min(d, minSeparationSq);
+//                d -= minSepSq;
+//
+//                if (d < (radiusSum * radiusSum) - 0.01 )
+//                {
+//                    // Normalize (transform into unit vector)
+//                    // TODO: AB.Normalize();
+//                    float magnitude = (float) Geometry.calculateDistance(packingCenter, vectorAB);
+//                    PointF unitVectorAB = new PointF(0, 0);
+//                    unitVectorAB.x = vectorAB.x / magnitude;
+//                    unitVectorAB.y = vectorAB.y / magnitude;
+//
+//                    // TODO: AB *= (float)((r - Math.Sqrt(d)) * 0.5f);
+//                    unitVectorAB.x *= (float)((radiusSum - Math.sqrt(d)) * 0.5f);
+//                    unitVectorAB.y *= (float)((radiusSum - Math.sqrt(d)) * 0.5f);
+//
+////                    if (positions.get(j) != mDraggingCircle)
+//                        // TODO: positions.get(j).mCenter += AB;
+//                    sortedPoints.get(j).x += unitVectorAB.x;
+//                    sortedPoints.get(j).y += unitVectorAB.y;
+////                    if (positions.get(i) != mDraggingCircle)
+//                        // TODO: positions.get(i).mCenter -= AB;
+//                    sortedPoints.get(i).x -= unitVectorAB.x;
+//                    sortedPoints.get(i).y -= unitVectorAB.y;
+//                }
+//
+//            }
+//        }
+//
+//        float iterationCounter = 5;
+//        float damping = 0.1f / (float)(iterationCounter);
+//        for (int i = 0; i < sortedPoints.size(); i++)
+//        {
+////            if (mCircles[i] != mDraggingCircle)
+////            {
+//                // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
+//                PointF v = new PointF(0, 0);
+//                v.x = sortedPoints.get(i).x - packingCenter.x;
+//                v.y = sortedPoints.get(i).y - packingCenter.y;
+//
+//                // TODO: v *= damping;
+//                v.x *= damping;
+//                v.y *= damping;
+//
+//                // TODO: mCircles[i].mCenter -= v;
+//                sortedPoints.get(i).x -= v.x;
+//                sortedPoints.get(i).y -= v.y;
+////            }
+//        }
+//
+//        return sortedPoints;
+//
+//    }
+//
+//    public static ArrayList<PointF> sortByDistanceToPoint(ArrayList<PointF> positions, PointF point) {
+//
+//        // Initialize with unsorted list of points
+//        ArrayList<PointF> sortedList = new ArrayList(positions);
+//
+//        for (int i = 0; i < sortedList.size(); i++) {
+//            for (int j = i + 1; j < sortedList.size(); j++) {
+//
+//                PointF p1 = positions.get(i);
+//                PointF p2 = positions.get(j);
+//
+//                if (Geometry.calculateDistance(p1, point) > Geometry.calculateDistance(p2, point)) {
+//                    positions.remove(i);
+//                    positions.add(i + 1, p1);
+//                }
+//
+//            }
+//        }
+//
+//        String sortedListResult = "";
+//        for (PointF p: sortedList) {
+//            sortedListResult += calculateDistance(p, point) + ", ";
+//        }
+//        Log.v("Sort", sortedListResult);
+//
+//        return sortedList;
+//
+//    }
 }

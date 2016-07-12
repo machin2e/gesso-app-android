@@ -1,6 +1,11 @@
 package camp.computer.clay.visualization;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,10 +15,12 @@ import java.util.Set;
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Model;
+import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
+import camp.computer.clay.visualization.util.Shape;
 
 public class Visualization extends Image {
 
@@ -104,7 +111,7 @@ public class Visualization extends Image {
         }
 
         // Calculate random positions separated by minimum distance
-        float minimumDistance = 550;
+        final float minimumDistance = 550;
         ArrayList<PointF> imagePositions = new ArrayList<PointF>();
         while (imagePositions.size() < simulation.getMachines().size()) {
             boolean foundPoint = false;
@@ -142,7 +149,7 @@ public class Visualization extends Image {
             MachineImage machineImage = (MachineImage) defaultLayer.getImage2(simulation.getMachine(i));
 
             machineImage.setRelativePosition(imagePositions.get(i));
-            machineImage.setRotation(Number.getRandom().nextInt(360));
+            machineImage.setRotation(Number.getRandomGenerator().nextInt(360));
 
             machineImage.initializePortImages();
         }
@@ -297,6 +304,13 @@ public class Visualization extends Image {
         }
         */
 
+        // <AXES_ANNOTATION>
+        visualizationSurface.getPaint().setColor(Color.BLUE);
+        visualizationSurface.getPaint().setStrokeWidth(1.0f);
+        visualizationSurface.getCanvas().drawLine(-1000, 0, 1000, 0, visualizationSurface.getPaint());
+        visualizationSurface.getCanvas().drawLine(0, -1000, 0, 1000, visualizationSurface.getPaint());
+        // </AXES_ANNOTATION>
+
         // Draw images
         for (Integer id: getLayerIds()) {
             Layer layer = getLayer(id);
@@ -307,7 +321,76 @@ public class Visualization extends Image {
                 image.draw(visualizationSurface);
             }
         }
+
+        // Draw SYSTEM annotations
+//        drawAnnotation(visualizationSurface);
+
+        // <CENTROID_ANNOTATION>
+        PointF centroidPosition = getCentroidPosition();
+        visualizationSurface.getPaint().setColor(Color.RED);
+        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+        visualizationSurface.getCanvas().drawCircle(centroidPosition.x, centroidPosition.y, 10, visualizationSurface.getPaint());
+
+        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+        visualizationSurface.getPaint().setTextSize(35);
+
+        String text = "CENTROID";
+        Rect bounds = new Rect();
+        visualizationSurface.getPaint().getTextBounds(text, 0, text.length(), bounds);
+        visualizationSurface.getCanvas().drawText(text, centroidPosition.x + 20, centroidPosition.y + bounds.height() / 2.0f, visualizationSurface.getPaint());
+        // </CENTROID_ANNOTATION>
+
+        // <CENTROID_ANNOTATION>
+        ArrayList<PointF> machineImagePoints = Visualization.getPositions(getMachineImages());
+//        String logMessage = "";
+//        logMessage += "length(machinePoints): " + machineImagePoints.size() + ": ";
+//        for (int i = 0; i < machineImagePoints.size(); i++) {
+//            logMessage += "(" + machineImagePoints.get(i).x + ", " + machineImagePoints.get(i).x + "), ";
+//        }
+//        Log.v("Annotation", logMessage);
+        PointF machineImageCenterPosition = Geometry.calculateCenterPosition(machineImagePoints);
+        visualizationSurface.getPaint().setColor(Color.RED);
+        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+        visualizationSurface.getCanvas().drawCircle(machineImageCenterPosition.x, machineImageCenterPosition.y, 10, visualizationSurface.getPaint());
+
+        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+        visualizationSurface.getPaint().setTextSize(35);
+
+        String centerLabeltext = "CENTER";
+        Rect centerLabelTextBounds = new Rect();
+        visualizationSurface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
+        visualizationSurface.getCanvas().drawText(centerLabeltext, machineImageCenterPosition.x + 20, machineImageCenterPosition.y + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+        // </CENTROID_ANNOTATION>
     }
+
+//    /**
+//     * Draws the sprite's annotation layer. Contains labels and other text.
+//     * @param visualizationSurface
+//     */
+//    public void drawAnnotation(VisualizationSurface visualizationSurface) {
+//
+////        if (showAnnotationLayer) {
+//
+//        Canvas canvas = visualizationSurface.getCanvas();
+//        Paint paint = visualizationSurface.getPaint();
+//
+//        // Geometry
+//        PointF labelPosition = new PointF();
+//        labelPosition.set(
+//                getSimulation().getBody(0).getPerspective().getPosition().x,
+//                50.0f - (canvas.getHeight() / 2.0f) + 50.0f
+//        );
+//
+//        // Style
+//        paint.setColor(Color.parseColor("#cccccc"));
+//        float typeLabelTextSize = 35;
+//
+//        String typeLabelText = "my system";
+//
+//        // Draw
+//        Shape.drawText(labelPosition, typeLabelText, typeLabelTextSize, canvas, paint);
+////        }
+//    }
 
     public ArrayList<Integer> getLayerIds() {
         ArrayList<Integer> layers = new ArrayList<Integer>();
@@ -340,11 +423,17 @@ public class Visualization extends Image {
         // Auto-adjust the perspective
         ArrayList<PointF> spritePositions = new ArrayList<PointF>();
 
-        for (Layer layer: getLayers()) {
-            for (Image image : layer.getImages()) {
-                if (image.isVisible()) {
-                    spritePositions.add(image.getPosition());
-                }
+//        for (Layer layer: getLayers()) {
+//            for (Image image : layer.getImages()) {
+//                if (image.isVisible()) {
+//                    spritePositions.add(image.getPosition());
+//                }
+//            }
+//        }
+
+        for (Image image : getMachineImages()) {
+            if (image.isVisible()) {
+                spritePositions.add(image.getPosition());
             }
         }
 

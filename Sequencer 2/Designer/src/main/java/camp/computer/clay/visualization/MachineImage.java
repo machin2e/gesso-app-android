@@ -22,19 +22,7 @@ public class MachineImage extends Image {
     final static int PORT_GROUP_COUNT = 4;
     final static int PORT_COUNT = 12;
 
-    public ArrayList<PortImage> getPortImages() {
-        ArrayList<PortImage> portImages = new ArrayList<PortImage>();
-        Machine machine = getMachine();
-
-        for (Port port: machine.getPorts()) {
-            PortImage portImage = (PortImage) getVisualization().getImage(port);
-            portImages.add(portImage);
-        }
-
-        return portImages;
-    }
-
-    // --- STYLE ---
+    // <STYLE>
     // TODO: Make these private once the map is working well and the sprite is working well.
     public float boardHeight = 250.0f;
     public float boardWidth = 250.0f;
@@ -67,7 +55,7 @@ public class MachineImage extends Image {
     private boolean showLightOutline = true;
     private float lightOutlineThickness = 1.0f;
     private int lightOutlineColor = Color.parseColor("#e7e7e7");
-    // ^^^ STYLE ^^^
+    // </STYLE>
 
     public MachineImage(Machine machine) {
         super(machine);
@@ -81,21 +69,27 @@ public class MachineImage extends Image {
     public void initializePortImages() {
 
         // Add a port sprite for each of the associated machine's ports
-        int i = 0;
-        Machine machineModel = (Machine) this.getModel();
-        for (Port port: machineModel.getPorts()) {
+        for (Port port: getMachine().getPorts()) {
             PortImage portImage = new PortImage(port);
             portImage.setVisualization(getVisualization());
-            //getVisualization().getLayer(0).addImage(port, portImage);
             getVisualization().addImage(port, portImage, "ports");
-
-//            portImages.add(portImage);
-            i++;
         }
     }
 
     public Machine getMachine() {
         return (Machine) getModel();
+    }
+
+    public ArrayList<PortImage> getPortImages() {
+        ArrayList<PortImage> portImages = new ArrayList<PortImage>();
+        Machine machine = getMachine();
+
+        for (Port port: machine.getPorts()) {
+            PortImage portImage = (PortImage) getVisualization().getImage(port);
+            portImages.add(portImage);
+        }
+
+        return portImages;
     }
 
     public PortImage getPortImage(int index) {
@@ -118,38 +112,40 @@ public class MachineImage extends Image {
 
     public void draw(VisualizationSurface visualizationSurface) {
         if (isVisible()) {
-            drawStyleLayer(visualizationSurface);
+//            drawPortPeripheralImages(visualizationSurface);
+            drawPortGroupImages(visualizationSurface);
+            drawBoardImage(visualizationSurface);
+            drawLightImages(visualizationSurface);
+
+//            visualizationSurface.getPaint().setColor(Color.GREEN);
+//            visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
+//            visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth, visualizationSurface.getPaint());
+//            visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth / 2.0f, visualizationSurface.getPaint());
         }
     }
 
-    private void drawStyleLayer(VisualizationSurface visualizationSurface) {
-        drawHeadersLayer(visualizationSurface);
-        drawBoardLayer(visualizationSurface);
-        drawLightsLayer(visualizationSurface);
-    }
+    public void drawBoardImage(VisualizationSurface visualizationSurface) {
 
-    public void drawBoardLayer(VisualizationSurface visualizationSurface) {
-
-        Canvas mapCanvas = visualizationSurface.getCanvas();
+        Canvas canvas = visualizationSurface.getCanvas();
         Paint paint = visualizationSurface.getPaint();
 
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.boardColor);
-        Shape.drawRectangle(getPosition(), getRotation(), boardWidth, boardHeight, mapCanvas, paint);
+        Shape.drawRectangle(getPosition(), getRotation(), boardWidth, boardHeight, canvas, paint);
 
         // Outline
         if (this.showBoardOutline) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.boardOutlineColor);
             paint.setStrokeWidth(this.boardOutlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), boardWidth, boardHeight, mapCanvas, paint);
+            Shape.drawRectangle(getPosition(), getRotation(), boardWidth, boardHeight, canvas, paint);
         }
     }
 
-    public void drawHeadersLayer(VisualizationSurface visualizationSurface) {
+    public void drawPortGroupImages(VisualizationSurface visualizationSurface) {
 
-        Canvas mapCanvas = visualizationSurface.getCanvas();
+        Canvas canvas = visualizationSurface.getCanvas();
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
@@ -172,7 +168,6 @@ public class MachineImage extends Image {
                 getPosition().x - ((boardWidth / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().y + 0
         );
-
         // </SHAPE>
 
         for (int i = 0; i < PORT_GROUP_COUNT; i++) {
@@ -183,22 +178,70 @@ public class MachineImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            Shape.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, mapCanvas, paint);
+            Shape.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, canvas, paint);
 
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(this.portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
-                Shape.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, mapCanvas, paint);
+                Shape.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, canvas, paint);
             }
 
         }
     }
 
-    public void drawLightsLayer(VisualizationSurface visualizationSurface) {
+    public void drawPortPeripheralImages(VisualizationSurface visualizationSurface) {
 
-        Canvas mapCanvas = visualizationSurface.getCanvas();
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
+
+        // <SHAPE>
+        PointF[] portGroupCenterPositions = new PointF[PORT_GROUP_COUNT];
+
+        // Positions before rotation
+        portGroupCenterPositions[0] = new PointF(
+                getPosition().x + 0,
+                getPosition().y + ((boardHeight) + (portGroupHeight / 2.0f))
+        );
+        portGroupCenterPositions[1] = new PointF(
+                getPosition().x + ((boardWidth) + (portGroupHeight / 2.0f)),
+                getPosition().y + 0
+        );
+        portGroupCenterPositions[2] = new PointF(
+                getPosition().x + 0,
+                getPosition().y - ((boardHeight) + (portGroupHeight / 2.0f))
+        );
+        portGroupCenterPositions[3] = new PointF(
+                getPosition().x - ((boardWidth) + (portGroupHeight / 2.0f)),
+                getPosition().y + 0
+        );
+        // </SHAPE>
+
+        for (int i = 0; i < PORT_GROUP_COUNT; i++) {
+
+            // Calculate rotated position
+            portGroupCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation() + (((i - 1) * 90) - 90) + ((i - 1) * 90), portGroupCenterPositions[i]);
+
+            // Color
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(this.portGroupColor);
+            canvas.drawCircle(portGroupCenterPositions[i].x, portGroupCenterPositions[i].y, 20, paint);
+
+            // Outline
+            if (this.showPortGroupOutline) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(this.portGroupOutlineThickness);
+                paint.setColor(this.portGroupOutlineColor);
+                canvas.drawCircle(portGroupCenterPositions[i].x, portGroupCenterPositions[i].y, 20, paint);
+            }
+
+        }
+    }
+
+    public void drawLightImages(VisualizationSurface visualizationSurface) {
+
+        Canvas canvas = visualizationSurface.getCanvas();
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
@@ -283,18 +326,19 @@ public class MachineImage extends Image {
             } else {
                 paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, currentTransparency));
             }
-            Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, mapCanvas, paint);
+            Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
 
             // Outline
             if (this.showLightOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(this.lightOutlineThickness);
                 paint.setColor(this.lightOutlineColor);
-                Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, mapCanvas, paint);
+                Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
             }
         }
     }
 
+    // TODO: Move this into Image (expose to all Images)
     public void setTransparency (final float transparency) {
 
         if (this.targetTransparency != transparency) {
@@ -319,52 +363,46 @@ public class MachineImage extends Image {
         }
     }
 
-    public void showPorts() {
+    public void showPortImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setVisibility(true);
             portImage.setPathVisibility(true);
         }
     }
 
-    public void showPort(int index) {
+    public void showPortImage(int index) {
         PortImage portImage = getPortImages().get(index);
         portImage.setVisibility(true);
         portImage.setPathVisibility(true);
     }
 
-    public void hidePorts() {
+    public void hidePortImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setVisibility(false);
             portImage.setPathVisibility(false);
         }
     }
 
-    private void hidePort(int index) {
+    private void hidePortImage(int index) {
         PortImage portImage = getPortImages().get(index);
         portImage.setVisibility(false);
         portImage.setPathVisibility(false);
     }
 
-    public void showPaths() {
+    public void showPathImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setPathVisibility(true);
         }
     }
 
-    public void hidePaths() {
+    public void hidePathImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setPathVisibility(false);
             portImage.showPathDocks();
         }
     }
 
-    // TODO: Replace setVisibility with show/hide or add enum with states. Clean it up.
-    // TODO: Replace source/destination in Path class.
-    // TODO: Finish interaction refactoring with Body.
-    // TODO: Remove relative Image hierarchy. Just use Visualization as lookup table.
-    // TODO: Update states in update() functions, not in draw functions!
-    // TODO: Add "ImageGroup" class to emulate map() function, for filtering, searching sets, etc.
-    public void showPath(int index, boolean isFullPathVisible) {
+    public void showPathImage(int index, boolean isFullPathVisible) {
         PortImage portImage = getPortImages().get(index);
         portImage.setVisibility(true);
         if (isFullPathVisible) {

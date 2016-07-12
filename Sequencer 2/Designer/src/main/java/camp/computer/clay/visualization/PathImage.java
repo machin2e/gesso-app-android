@@ -99,14 +99,14 @@ public class PathImage extends Image {
 
         if (showLinePaths) {
 
-            Path path = (Path) getModel();
+            Path path = getPath();
 
             PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
-            PortImage destinationPortImage = (PortImage) getVisualization().getImage(path.getDestination());
+            PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
 
-            // Show destination port
-            destinationPortImage.setVisibility(true);
-            destinationPortImage.setPathVisibility(true);
+            // Show target port
+            targetPortImage.setVisibility(true);
+            targetPortImage.setPathVisibility(true);
 
             mapCanvas.save();
 
@@ -118,8 +118,8 @@ public class PathImage extends Image {
             mapCanvas.drawLine(
                     sourcePortImage.getPosition().x,
                     sourcePortImage.getPosition().y,
-                    destinationPortImage.getPosition().x,
-                    destinationPortImage.getPosition().y,
+                    targetPortImage.getPosition().x,
+                    targetPortImage.getPosition().y,
                     paint
             );
 
@@ -129,14 +129,14 @@ public class PathImage extends Image {
 
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
 
-        Path path = (Path) getModel();
+        Path path = getPath();
 
         PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
-        PortImage destinationPortImage = (PortImage) getVisualization().getImage(path.getDestination());
+        PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
 
-        // Show destination port
-        destinationPortImage.setVisibility(true);
-        destinationPortImage.setPathVisibility(true);
+        // Show target port
+        targetPortImage.setVisibility(true);
+        targetPortImage.setPathVisibility(true);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
@@ -146,7 +146,7 @@ public class PathImage extends Image {
         if (showDirectedPaths) {
             float pathRotationAngle = Geometry.calculateRotationAngle(
                     sourcePortImage.getPosition(),
-                    destinationPortImage.getPosition()
+                    targetPortImage.getPosition()
             );
 
             float triangleRotationAngle = pathRotationAngle + 90.0f;
@@ -158,7 +158,7 @@ public class PathImage extends Image {
             );
 
             PointF pathStopPosition = Geometry.calculatePoint(
-                    destinationPortImage.getPosition(),
+                    targetPortImage.getPosition(),
                     pathRotationAngle + 180,
                     2 * triangleSpacing
             );
@@ -167,7 +167,7 @@ public class PathImage extends Image {
 
                 float pathDistance = (float) Geometry.calculateDistance(
                         sourcePortImage.getPosition(),
-                        destinationPortImage.getPosition()
+                        targetPortImage.getPosition()
                 );
 
                 paint.setStyle(Paint.Style.FILL);
@@ -203,7 +203,7 @@ public class PathImage extends Image {
 
                 PointF pathMidpoint = Geometry.calculateMidpoint(
                         sourcePortImage.getPosition(),
-                        destinationPortImage.getPosition()
+                        targetPortImage.getPosition()
                 );
 
                 if (isEditorVisible) {

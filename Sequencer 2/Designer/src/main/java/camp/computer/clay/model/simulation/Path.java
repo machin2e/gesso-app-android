@@ -1,7 +1,5 @@
 package camp.computer.clay.model.simulation;
 
-import java.util.ArrayList;
-
 public class Path extends Model {
 
     // TODO: Physical dimensions
@@ -46,16 +44,14 @@ public class Path extends Model {
     private Type type = Type.NONE;
     private Direction direction = Direction.NONE;
 
-//    private ArrayList<Port> ports = new ArrayList<Port>();
-
     private Port source;
-    private Port destination;
+    private Port target;
 
-    public Path(Port sourcePort, Port destinationPort) {
+    public Path(Port sourcePort, Port targetPort) {
         this.type = Type.NONE;
         this.direction = Direction.NONE;
         this.source = sourcePort;
-        this.destination = destinationPort;
+        this.target = targetPort;
     }
 
     public Type getType() {
@@ -82,16 +78,16 @@ public class Path extends Model {
         return this.source;
     }
 
-    public void setDestination(Port destination) {
-        this.destination = destination;
+    public void setTarget(Port target) {
+        this.target = target;
     }
 
-    public Port getDestination() {
-        return this.destination;
+    public Port getTarget() {
+        return this.target;
     }
 
     public boolean contains(Port port) {
-        if (this.source == port || this.destination == port) {
+        if (this.source == port || this.target == port) {
             return true;
         } else {
             return false;

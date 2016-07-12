@@ -24,10 +24,10 @@ public class PortImage extends Image {
     public static float DISTANCE_BETWEEN_NODES = 10.0f;
     public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
 
-    private boolean showFormLayer = true;
+    private boolean showShapeLayer = true;
     private boolean showStyleLayer = true;
     private boolean showDataLayer = true;
-    private boolean showAnnotationLayer = false;
+    private boolean showAnnotationLayer = true;
 
     public float shapeRadius = 40.0f;
     private boolean showShapeOutline = false;
@@ -78,19 +78,19 @@ public class PortImage extends Image {
     }
 
     // TODO: Move into Port
-    public PathImage addPath(Port sourcePort, Port destinationPort) {
+    public PathImage addPath(Port sourcePort, Port targetPort) {
 
 
         // TODO: Create Path model, then access that model. Don't store the sprites. Look those up in the visualization.
-        Path path = new Path(sourcePort, destinationPort);
+        Path path = new Path(sourcePort, targetPort);
 
         PathImage pathImage = new PathImage(path);
         pathImage.setVisualization(getVisualization());
 //        getVisualization().getLayer(0).addImage(path, pathImage);
         getVisualization().addImage(path, pathImage, "paths");
 
-        PortImage destinationPortImage = (PortImage) getVisualization().getImage(path.getDestination());
-        destinationPortImage.setUniqueColor(this.uniqueColor);
+        PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
+        targetPortImage.setUniqueColor(this.uniqueColor);
 //        this.pathImages.add(pathImage);
         return pathImage;
     }
@@ -113,8 +113,8 @@ public class PortImage extends Image {
             pathImage.showPathDocks = false;
 
             // Deep
-            PortImage destinationPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getDestination());
-            destinationPortImage.showPaths();
+            PortImage targetPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getTarget());
+            targetPortImage.showPaths();
         }
     }
 
@@ -126,8 +126,8 @@ public class PortImage extends Image {
             pathImage.showPathDocks = true;
 
             // Deep
-            PortImage destinationPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getDestination());
-            destinationPortImage.showPathDocks();
+            PortImage targetPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getTarget());
+            targetPortImage.showPathDocks();
         }
     }
 
@@ -136,10 +136,10 @@ public class PortImage extends Image {
 
         if (isVisible()) {
 
-            drawShapeLayer(visualizationSurface);
-            drawStyleLayer(visualizationSurface);
-            drawDataLayer(visualizationSurface);
-            drawAnnotationLayer(visualizationSurface);
+            drawShape(visualizationSurface);
+            drawStyle(visualizationSurface);
+            drawData(visualizationSurface);
+            drawAnnotation(visualizationSurface);
 
             // Draw children sprites
             drawCandidatePathImages(visualizationSurface);
@@ -151,41 +151,27 @@ public class PortImage extends Image {
      * placeholder for the sprite.
      * @param visualizationSurface
      */
-    public void drawShapeLayer(VisualizationSurface visualizationSurface) {
+    public void drawShape(VisualizationSurface visualizationSurface) {
 
-        if (showFormLayer) {
+        if (showShapeLayer) {
 
-            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Canvas canvas = visualizationSurface.getCanvas();
             Paint paint = visualizationSurface.getPaint();
 
-//            mapCanvas.save();
-//
-//            mapCanvas.translate(this.getPosition().x, this.getPosition().y);
-
-            // Color
             paint.setStyle(Paint.Style.FILL);
-            paint.setColor(PortImage.FLOW_PATH_COLOR_NONE);
-            mapCanvas.drawCircle(
-                    getPosition().x,
-                    getPosition().y,
-                    shapeRadius,
-                    paint
-            );
+            paint.setStrokeWidth(3);
+            paint.setColor(FLOW_PATH_COLOR_NONE);
+
+            Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
 
             // Outline
             if (showShapeOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(3);
                 paint.setColor(Color.BLACK);
-                mapCanvas.drawCircle(
-                        getPosition().x,
-                        getPosition().y,
-                        shapeRadius,
-                        paint
-                );
-            }
 
-//            mapCanvas.restore();
+                Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
+            }
         }
     }
 
@@ -193,45 +179,27 @@ public class PortImage extends Image {
      * Draws the sprite's detail front layer.
      * @param visualizationSurface
      */
-    public void drawStyleLayer(VisualizationSurface visualizationSurface) {
+    public void drawStyle(VisualizationSurface visualizationSurface) {
 
         if (showStyleLayer) {
 
-            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Canvas canvas = visualizationSurface.getCanvas();
             Paint paint = visualizationSurface.getPaint();
 
-            Port port = (Port) getModel();
-
-            if (port.getType() != Port.Type.NONE) {
-
-                mapCanvas.save();
-
-//                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
+            if (getPort().getType() != Port.Type.NONE) {
 
                 // Color
                 paint.setStyle(Paint.Style.FILL);
-                paint.setColor(this.uniqueColor); // [3 * i + j]);
-                mapCanvas.drawCircle(
-                        this.getPosition().x,
-                        this.getPosition().y,
-                        shapeRadius,
-                        paint
-                );
+                paint.setColor(this.uniqueColor);
+                Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
 
                 // Outline
                 if (showShapeOutline) {
                     paint.setStyle(Paint.Style.STROKE);
                     paint.setStrokeWidth(3);
                     paint.setColor(Color.BLACK);
-                    mapCanvas.drawCircle(
-                            this.getPosition().x,
-                            this.getPosition().y,
-                            shapeRadius,
-                            paint
-                    );
+                    Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
                 }
-
-                mapCanvas.restore();
             }
         }
     }
@@ -245,7 +213,7 @@ public class PortImage extends Image {
      * Draws the sprite's data layer.
      * @param visualizationSurface
      */
-    private void drawDataLayer(VisualizationSurface visualizationSurface) {
+    private void drawData(VisualizationSurface visualizationSurface) {
 
         if (showDataLayer) {
 
@@ -335,37 +303,35 @@ public class PortImage extends Image {
      * Draws the sprite's annotation layer. Contains labels and other text.
      * @param visualizationSurface
      */
-    public void drawAnnotationLayer(VisualizationSurface visualizationSurface) {
+    public void drawAnnotation(VisualizationSurface visualizationSurface) {
 
         if (showAnnotationLayer) {
 
-            Canvas mapCanvas = visualizationSurface.getCanvas();
+            Canvas canvas = visualizationSurface.getCanvas();
             Paint paint = visualizationSurface.getPaint();
 
-            Port port = (Port) getModel();
+            // Geometry
+            PointF labelPosition = new PointF();
+            labelPosition.set(
+                    getPosition().x + shapeRadius + 25,
+                    getPosition().y
+            );
 
-            if (port.getType() != Port.Type.NONE) {
+            // Style
+            paint.setColor(this.uniqueColor);
+            float typeLabelTextSize = 27;
 
-                mapCanvas.save();
-
-                mapCanvas.translate(this.getPosition().x, this.getPosition().y);
-
-                /*
-                // Label
-                if (showChannelLabel) {
-                    paint.setTextSize(labelTextSize);
-                    Rect textBounds = new Rect();
-                    String channelNumberText = String.valueOf(3 * i + j + 1);
-                    paint.getTextBounds(channelNumberText, 0, channelNumberText.length(), textBounds);
-                    paint.setStyle(Paint.Style.FILL);
-                    paint.setStrokeWidth(3);
-                    paint.setColor(Color.BLACK);
-                    mapCanvas.drawText(channelNumberText, -(textBounds.width() / 2.0f), textBounds.height() / 2.0f, paint);
-                }
-                */
-
-                mapCanvas.restore();
+            String typeLabelText = "";
+            if (getPort().getType() == Port.Type.SWITCH) {
+                typeLabelText = "switch";
+            } else if (getPort().getType() == Port.Type.PULSE) {
+                typeLabelText = "pulse";
+            } else if (getPort().getType() == Port.Type.WAVE) {
+                typeLabelText = "wave";
             }
+
+            // Draw
+            Shape.drawText(labelPosition, typeLabelText, typeLabelTextSize, canvas, paint);
         }
     }
 
@@ -508,7 +474,7 @@ public class PortImage extends Image {
 
     public void setVisibility(boolean isVisible) {
         super.setVisibility(isVisible);
-        showFormLayer = isVisible;
+        showShapeLayer = isVisible;
         showStyleLayer = isVisible;
         showDataLayer = isVisible;
         showAnnotationLayer = isVisible;
@@ -519,8 +485,8 @@ public class PortImage extends Image {
             pathImage.setVisibility(isVisible);
 
             // Deep
-            PortImage destinationPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getDestination());
-            destinationPortImage.setVisibility(isVisible);
+            PortImage targetPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getTarget());
+            targetPortImage.setVisibility(isVisible);
         }
     }
 

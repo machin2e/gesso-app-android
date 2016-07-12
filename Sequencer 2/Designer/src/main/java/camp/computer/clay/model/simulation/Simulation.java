@@ -58,7 +58,7 @@ public class Simulation extends Model {
             Port dequeuedPort = searchablePorts.remove(0);
             for (Path path: dequeuedPort.getPaths()) {
                 descendantPaths.add(path); // Store the path
-                searchablePorts.add(path.getDestination()); // Queue the destination port in the search
+                searchablePorts.add(path.getTarget()); // Queue the target port in the search
             }
         }
 
@@ -72,7 +72,7 @@ public class Simulation extends Model {
 
             // Search for direct ancestor paths from port
             for (Path path : systemPaths) {
-                if (path.getDestination() == dequeuedPort) {
+                if (path.getTarget() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
                     searchablePorts.add(path.getSource()); // Queue the source port in the search
                 }
@@ -102,7 +102,7 @@ public class Simulation extends Model {
 
             // Search for direct ancestor paths from port
             for (Path path: systemPaths) {
-                if (path.getDestination() == dequeuedPort) {
+                if (path.getTarget() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
                     searchablePorts.add(path.getSource()); // Queue the source port in the search
                 }
@@ -129,7 +129,7 @@ public class Simulation extends Model {
             Port dequeuedPort = searchablePorts.remove(0);
             for (Path path: dequeuedPort.getPaths()) {
                 descendantPaths.add(path); // Store the path
-                searchablePorts.add(path.getDestination()); // Queue the destination port in the search
+                searchablePorts.add(path.getTarget()); // Queue the target port in the search
             }
         }
 
@@ -139,7 +139,7 @@ public class Simulation extends Model {
     public boolean hasAncestor(Port port, Port ancestorPort) {
         ArrayList<Path> ancestorPaths = getAncestorPathsByPort(port);
         for (Path ancestorPath: ancestorPaths) {
-            if (ancestorPath.getSource() == ancestorPort || ancestorPath.getDestination() == ancestorPort) {
+            if (ancestorPath.getSource() == ancestorPort || ancestorPath.getTarget() == ancestorPort) {
                 return true;
             }
         }
@@ -149,7 +149,7 @@ public class Simulation extends Model {
     public boolean hasDescendant(Port port, Port descendant) {
         ArrayList<Path> descendantPaths = getDescendantPathsByPort(port);
         for (Path descendantPath: descendantPaths) {
-            if (descendantPath.getSource() == descendant || descendantPath.getDestination() == descendant) {
+            if (descendantPath.getSource() == descendant || descendantPath.getTarget() == descendant) {
                 return true;
             }
         }
@@ -157,13 +157,13 @@ public class Simulation extends Model {
     }
 
     public ArrayList<Port> getPortsInPaths(ArrayList<Path> paths) {
-        ArrayList<Port> ports = new ArrayList<Port>();
+        ArrayList<Port> ports = new ArrayList<>();
         for (Path path: paths) {
             if (!ports.contains(path.getSource())) {
                 ports.add(path.getSource());
             }
-            if (!ports.contains(path.getDestination())) {
-                ports.add(path.getDestination());
+            if (!ports.contains(path.getTarget())) {
+                ports.add(path.getTarget());
             }
         }
         return ports;

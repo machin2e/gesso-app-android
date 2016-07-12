@@ -17,6 +17,7 @@ import android.view.SurfaceView;
 import camp.computer.clay.model.interaction.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.Visualization;
+import camp.computer.clay.visualization.util.Geometry;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -155,6 +156,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
     private void drawVisualization(Visualization visualization) {
         this.visualization.draw(this);
+
+        Geometry.packCircles(getVisualization().getMachineImages(), 200, getVisualization().getCentroidPosition());
     }
 
     /**

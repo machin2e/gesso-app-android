@@ -18,6 +18,7 @@ import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.visualization.Visualization;
+import camp.computer.clay.visualization.util.Number;
 
 public class Clay {
 
@@ -71,7 +72,7 @@ public class Clay {
         // Add body to simulation
         simulation.addBody(body);
 
-        initializeVisualization(visualization);
+        setupVisualization(visualization);
 
         Application.getDisplay().getVisualizationSurface().setVisualization(visualization);
 
@@ -79,14 +80,23 @@ public class Clay {
 
     private void initializeSimulation() {
 
+        final int VIRTUAL_MACHINE_COUNT = Number.generateRandomInteger(5, 20);
+
+        // <MACHINE_CONFIGURATION>
+        // TODO: Read this from the device (or look up from machine UUID). It will be encoded on
+        // TODO: (cont'd) the device.
+        final int PORT_COUNT = 12;
+        // </MACHINE_CONFIGURATION>
+
         // TODO: Move Simulation/Machine this into Simulation or Ecology (in Simulation) --- maybe combine Simulation+Ecology
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int letterIndex = 0;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < VIRTUAL_MACHINE_COUNT; i++) {
             Machine machine = new Machine();
-            for (int j = 0; j < 12; j++) {
+            for (int j = 0; j < PORT_COUNT; j++) {
                 Port port = new Port();
                 machine.addPort(port);
+
                 machine.addTag(alphabet.substring(letterIndex, letterIndex + 1));
                 letterIndex = letterIndex % alphabet.length();
             }
@@ -94,7 +104,7 @@ public class Clay {
         }
     }
 
-    private void initializeVisualization(Visualization visualization) {
+    private void setupVisualization(Visualization visualization) {
 
         visualization.initializeImages();
 
