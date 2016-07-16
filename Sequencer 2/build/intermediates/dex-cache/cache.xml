@@ -1,2 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        jar="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/Sequencer 2/library/unspecified/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="fe0baac415730366222b6859527b9734d75b4e10">
+        <dex dex="/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/pre-dexed/debug/Sequencer 2-library-unspecified_2289f00f39c443438259ae0fefe939626753a711.jar" />
+    </item>
+
+</items>
