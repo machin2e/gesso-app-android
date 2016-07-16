@@ -25,7 +25,7 @@ public class Body extends Actor {
 
     private Perspective perspective;
 
-    private TouchInteractivity touchInteractivity;
+    private ArrayList<TouchInteractivity> touchInteractivities = new ArrayList<TouchInteractivity>();
 
     public Body() {
     }
@@ -80,18 +80,18 @@ public class Body extends Actor {
         float widthDifference = boundingBox.getWidth() - getPerspective().getWidth();
         float heightDifference = boundingBox.getHeight() - getPerspective().getHeight();
 
-        float padding = 200;
+        float padding = 0;
         float newWidthScale = getPerspective().getWidth() / (boundingBox.getWidth() + padding);
         float newHeightScale = getPerspective().getHeight() / (boundingBox.getHeight() + padding);
 
-        Log.v("Perspective", "boundingWidth: " + boundingBox.getWidth());
-        Log.v("Perspective", "perspectiveWidth: " + getPerspective().getWidth());
-
-        Log.v("Perspective", "boundingHeight: " + boundingBox.getHeight());
-        Log.v("Perspective", "perspectiveHeight: " + getPerspective().getHeight());
-
-        Log.v("Perspective", "widthDifference: " + widthDifference);
-        Log.v("Perspective", "heightDifference: " + heightDifference);
+//        Log.v("Perspective", "boundingWidth: " + boundingBox.getWidth());
+//        Log.v("Perspective", "perspectiveWidth: " + getPerspective().getWidth());
+//
+//        Log.v("Perspective", "boundingHeight: " + boundingBox.getHeight());
+//        Log.v("Perspective", "perspectiveHeight: " + getPerspective().getHeight());
+//
+//        Log.v("Perspective", "widthDifference: " + widthDifference);
+//        Log.v("Perspective", "heightDifference: " + heightDifference);
 
         if (widthDifference > 0 && widthDifference > heightDifference) {
             getPerspective().setScale(newWidthScale);
@@ -102,15 +102,25 @@ public class Body extends Actor {
         }
     }
 
+    public TouchInteractivity getLatestTouchInteractivity() {
+        if (touchInteractivities.size() > 0) {
+            return this.touchInteractivities.get(touchInteractivities.size() - 1);
+        } else {
+            return null;
+        }
+    }
+
     public void onStartInteractivity(TouchInteraction touchInteraction) {
         Log.v("MapViewEvent", "onStartInteractivity");
 
         // Having an idea is just accumulating intention. It's a suggestion from your existential
         // controller.
 
-        touchInteractivity = new TouchInteractivity();
+        TouchInteractivity touchInteractivity = new TouchInteractivity();
 
         touchInteractivity.addInteraction(touchInteraction);
+
+        this.touchInteractivities.add(touchInteractivity);
 
         onTouchListener(touchInteractivity, touchInteraction);
     }
@@ -121,6 +131,8 @@ public class Body extends Actor {
 
         // Current
         touchInteraction.isTouching[touchInteraction.pointerId] = true;
+
+        TouchInteractivity touchInteractivity = getLatestTouchInteractivity();
 
         // Calculate drag distance
         touchInteractivity.dragDistance[touchInteraction.pointerId] = Geometry.calculateDistance(touchInteraction.touchPositions[touchInteraction.pointerId], touchInteractivity.getFirstInteraction().touchPositions[touchInteraction.pointerId]);
@@ -141,6 +153,8 @@ public class Body extends Actor {
     public void onCompleteInteractivity(TouchInteraction touchInteraction) {
 
         Log.v("MapViewEvent", "onCompleteInteractivity");
+
+        TouchInteractivity touchInteractivity = getLatestTouchInteractivity();
 
         // Stop listening for a hold interaction
         touchInteractivity.timerHandler.removeCallbacks(touchInteractivity.timerRunnable);
@@ -177,7 +191,7 @@ public class Body extends Actor {
             if (getPerspective().getFocus() instanceof MachineImage || getPerspective().getFocus() instanceof PortImage || getPerspective().getFocus() instanceof PathImage) {
                 for (MachineImage machineImage : getPerspective().getVisualization().getMachineImages()) {
 
-                    if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
+                    if (!touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
                         for (PortImage portImage: machineImage.getPortImages()) {
 
                             // If perspective is on path, then constraint interactions to ports in the path
@@ -192,8 +206,7 @@ public class Body extends Actor {
                             if (portImage.isTouching(touchInteraction.touchPositions[touchInteraction.pointerId], 50)) {
 
                                 // Interactivity
-                                touchInteractivity.isTouchingImage[touchInteraction.pointerId] = true;
-                                touchInteractivity.touchedImage[touchInteraction.pointerId] = portImage;
+                                touchInteractivity.setTouchedImage(touchInteraction.pointerId, portImage);
 
                                 // Perspective
                                 if (getPerspective().getFocus() instanceof PathImage) {
@@ -228,7 +241,7 @@ public class Body extends Actor {
 
             if (getPerspective().getFocus() instanceof PortImage || getPerspective().getFocus() instanceof PathImage) {
                 for (MachineImage machineImage : getPerspective().getVisualization().getMachineImages()) {
-                    if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
+                    if (!touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
                         for (PortImage portImage : machineImage.getPortImages()) {
                             for (PathImage pathImage: portImage.getPathImages()) {
 
@@ -254,8 +267,7 @@ public class Body extends Actor {
 //                                        pathSprite.touchPositions(touchInteraction);
 //                                        // </TOUCH_ACTION>
 
-                                    touchInteractivity.isTouchingImage[touchInteraction.pointerId] = true;
-                                    touchInteractivity.touchedImage[touchInteraction.pointerId] = pathImage;
+                                    touchInteractivity.setTouchedImage(touchInteraction.pointerId, pathImage);
 
                                     // <PERSPECTIVE>
                                     getPerspective().setFocus(pathImage);
@@ -277,7 +289,7 @@ public class Body extends Actor {
                 for (MachineImage machineImage : getPerspective().getVisualization().getMachineImages()) {
                     // Log.v ("MapViewTouch", "Object at " + machineSprite.x + ", " + machineSprite.y);
                     // Check if one of the objects is touched
-                    if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
+                    if (!touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
                         if (machineImage.isTouching(touchInteraction.touchPositions[touchInteraction.pointerId])) {
 
 //                                // <TOUCH_ACTION>
@@ -288,8 +300,7 @@ public class Body extends Actor {
                             // TODO: Add this to an onTouch callback for the sprite's channel nodes
                             // TODO: i.e., callback Image.onTouch (via Image.touchPositions())
 
-                            touchInteractivity.isTouchingImage[touchInteraction.pointerId] = true;
-                            touchInteractivity.touchedImage[touchInteraction.pointerId] = machineImage;
+                            touchInteractivity.setTouchedImage(touchInteraction.pointerId, machineImage);
 
                             // <PERSPECTIVE>
                             getPerspective().setFocus(machineImage);
@@ -306,10 +317,10 @@ public class Body extends Actor {
 
             if (getPerspective().getFocus() == null || getPerspective().getFocus() instanceof MachineImage || getPerspective().getFocus() instanceof PortImage || getPerspective().getFocus() instanceof PathImage) {
                 // Touch the canvas
-                if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
+                if (!touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
 
                     // <INTERACTION>
-                    touchInteractivity.isTouchingImage[touchInteraction.pointerId] = false;
+//                    touchInteractivity.isTouchingImage[touchInteraction.pointerId] = false;
                     // </INTERACTION>
 
                     // <PERSPECTIVE>
@@ -324,8 +335,8 @@ public class Body extends Actor {
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof MachineImage) {
-            MachineImage machineImage = (MachineImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+        if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof MachineImage) {
+            MachineImage machineImage = (MachineImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 
 
             // TODO: Add this to an onTouch callback for the sprite's channel nodes
@@ -359,19 +370,26 @@ public class Body extends Actor {
                 for (PortImage portImage: machineImage.getPortImages()) {
                     ArrayList<Path> paths = getPerspective().getVisualization().getSimulation().getPathsByPort(portImage.getPort());
                     for (Path connectedPath : paths) {
+
                         // Show ports
                         ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getSource())).setVisibility(true);
-//                        ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getSource())).showPathImages();
                         ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getTarget())).setVisibility(true);
-//                        ((PortImage) getPerspective().getVisualization().getImage(connectedPath.getTarget())).showPathImages();
+
                         // Show path
                         getPerspective().getVisualization().getImage(connectedPath).setVisibility(true);
                     }
                 }
 
+                TouchInteractivity previousInteractivity = null;
+                if (touchInteractivities.size() > 1) {
+                    previousInteractivity = touchInteractivities.get(touchInteractivities.size() - 2);
+                    Log.v("PreviousTouch", "Previous: " + previousInteractivity.getTouchedImage(touchInteraction.pointerId));
+                    Log.v("PreviousTouch", "Current: " + touchInteractivity.getTouchedImage(touchInteraction.pointerId));
+                }
+
                 // Perspective
                 if (machineImage.getMachine().getPaths().size() > 0
-                        && touchInteractivity.getPreviousInteraction().getOverlappedImage() != machineImage) {
+                        && (previousInteractivity != null && previousInteractivity.getTouchedImage(touchInteraction.pointerId) != touchInteractivity.getTouchedImage(touchInteraction.pointerId))) {
 
                     // Get ports along every path connected to the ports on the touched machine
                     ArrayList<Port> machinePathPorts = new ArrayList<>();
@@ -391,6 +409,8 @@ public class Body extends Actor {
                             }
                         }
                     }
+
+                    // Perspective
                     ArrayList<Image> machinePathPortImages = getPerspective().getVisualization().getImages(machinePathPorts);
 
                     ArrayList<PointF> machinePortPositions = Visualization.getPositions(machinePathPortImages);
@@ -406,19 +426,26 @@ public class Body extends Actor {
                     // This provides lookahead, so you can be triggered to touch again to recover
                     // the perspective.
 
+                    for (PortImage portImage: machineImage.getPortImages()) {
+                        ArrayList<PathImage> pathImages = portImage.getPathImages();
+                        for (PathImage pathImage: pathImages) {
+                            pathImage.setVisibility(false);
+                        }
+                    }
+
+                    // TODO: (on second press, also hide external ports, expose peripherals) getPerspective().setScale(1.2f);
+                    // TODO: (cont'd) getPerspective().setPosition(machineImage.getPosition());
+
                     getPerspective().setScale(1.2f);
                     getPerspective().setPosition(machineImage.getPosition());
                 }
-
-                // TODO: (on second press, also hide external ports, expose peripherals) getPerspective().setScale(1.2f);
-                // TODO: (cont'd) getPerspective().setPosition(machineImage.getPosition());
 
                 getPerspective().disablePanning();
             }
 
 
-        } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
-            PortImage portImage = (PortImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+        } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PortImage) {
+            PortImage portImage = (PortImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 
             Log.v("MapView", "\tPort " + (portImage.getIndex() + 1) + " touched.");
 
@@ -429,6 +456,31 @@ public class Body extends Actor {
                 Log.v("MapView", "\tSource port " + (portImage.getIndex() + 1) + " touched.");
 
                 Port port = (Port) portImage.getModel();
+
+
+
+
+                TouchInteractivity previousInteractivity = null;
+                if (touchInteractivities.size() > 1) {
+                    previousInteractivity = touchInteractivities.get(touchInteractivities.size() - 2);
+                    Log.v("PreviousTouch", "Previous: " + previousInteractivity.getTouchedImage(touchInteraction.pointerId));
+                    Log.v("PreviousTouch", "Current: " + touchInteractivity.getTouchedImage(touchInteraction.pointerId));
+                }
+
+                TouchInteractivity previousInteractivity2 = null;
+                if (touchInteractivities.size() > 2) {
+                    previousInteractivity2 = touchInteractivities.get(touchInteractivities.size() - 3);
+                    Log.v("PreviousTouch", "Previous: " + previousInteractivity2.getTouchedImage(touchInteraction.pointerId));
+                    Log.v("PreviousTouch", "Current: " + touchInteractivity.getTouchedImage(touchInteraction.pointerId));
+                }
+
+                if (previousInteractivity != null && previousInteractivity.getTouchedImage(touchInteraction.pointerId) == getPerspective().getVisualization().getImage(port.getMachine())
+                        && previousInteractivity2 != null && previousInteractivity2.getTouchedImage(touchInteraction.pointerId) == getPerspective().getVisualization().getImage(port.getMachine())) {
+
+                    Log.v("Interaction_Model", "AUX");
+                }
+
+
 
                 if (port.getType() == Port.Type.NONE) {
 
@@ -507,8 +559,8 @@ public class Body extends Actor {
                 }
             }
 
-        } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PathImage) {
-            PathImage pathImage = (PathImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+        } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PathImage) {
+            PathImage pathImage = (PathImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 
 //            if (pathImage.getEditorVisibility()) {
 //                pathImage.setEditorVisibility(false);
@@ -522,7 +574,7 @@ public class Body extends Actor {
             timelineView.setVisibility(View.VISIBLE);
 
 
-        } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
+        } else if (!touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
 
             // No touchPositions on board or port. Touch is on map. So hide ports.
             for (MachineImage machineImage : getPerspective().getVisualization().getMachineImages()) {
@@ -543,8 +595,8 @@ public class Body extends Actor {
 
     private void onPressListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof MachineImage) {
-            MachineImage machineImage = (MachineImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+        if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof MachineImage) {
+            MachineImage machineImage = (MachineImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 
             // TODO: Add this to an onTouch callback for the sprite's channel nodes
             // Check if the touched board's I/O node is touched
@@ -576,9 +628,9 @@ public class Body extends Actor {
             // Zoom out to show overview
 //            getPerspective().setScale(1.0f);
 
-        } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
+        } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PortImage) {
 
-            PortImage portImage = (PortImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+            PortImage portImage = (PortImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 //            TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touchPositions[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.RELEASE);
             portImage.touch(touchInteraction);
 
@@ -774,9 +826,9 @@ public class Body extends Actor {
                 }
             }
 
-        } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PathImage) {
+        } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PathImage) {
 
-            PathImage pathImage = (PathImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+            PathImage pathImage = (PathImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 
             if (pathImage.getEditorVisibility()) {
                 pathImage.setEditorVisibility(false);
@@ -784,7 +836,7 @@ public class Body extends Actor {
                 pathImage.setEditorVisibility(true);
             }
 
-        } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] == null) {
+        } else if (!touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
 
             // No touchPositions on board or port. Touch is on map. So hide ports.
             for (MachineImage machineImage: getPerspective().getVisualization().getMachineImages()) {
@@ -815,8 +867,8 @@ public class Body extends Actor {
         touchInteractivity.isHolding[touchInteraction.pointerId] = true;
 
         // Show ports for sourceMachine board
-        if (touchInteractivity.touchedImage[touchInteraction.pointerId] != null) {
-            if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof MachineImage) {
+        if (touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
+            if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof MachineImage) {
 
 //                MachineImage machineImage = (MachineImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
 ////                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touchPositions[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.HOLD);
@@ -827,7 +879,7 @@ public class Body extends Actor {
 //                //touchSourceSprite = machineSprite;
 //                getPerspective().setScale(0.8f);
 
-            } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
+            } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PortImage) {
 
                 Log.v("Holding", "Holding port");
 
@@ -877,11 +929,11 @@ public class Body extends Actor {
             // Holding and dragging
 
             // TODO: Put into callback
-            if (touchInteractivity.touchedImage[touchInteraction.pointerId] != null) {
+            if (touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
 
-                if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof MachineImage) {
+                if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof MachineImage) {
 
-                    MachineImage machineImage = (MachineImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+                    MachineImage machineImage = (MachineImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 //                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
                     machineImage.touch(touchInteraction);
                     machineImage.showHighlights = true;
@@ -890,9 +942,9 @@ public class Body extends Actor {
                     // Zoom out to show overview
 //                    getPerspective().setScale(0.8f);
 
-                } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
+                } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PortImage) {
 
-                    PortImage portImage = (PortImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+                    PortImage portImage = (PortImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
                     portImage.isTouched = true;
 //                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touchPositions[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
 //                    portSprite.touchPositions(touchInteraction);
@@ -912,11 +964,11 @@ public class Body extends Actor {
 
             // TODO: Put into callback
             //if (touchInteractivity.isTouchingImage[touchInteraction.pointerId]) {
-            if (touchInteractivity.touchedImage[touchInteraction.pointerId] != null) {
+            if (touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
 
-                if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof MachineImage) {
+                if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof MachineImage) {
 
-                    MachineImage machineImage = (MachineImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+                    MachineImage machineImage = (MachineImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 //                    TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.DRAG);
                     machineImage.touch(touchInteraction);
                     machineImage.showHighlights = true;
@@ -925,9 +977,9 @@ public class Body extends Actor {
                     // Zoom out to show overview
                     getPerspective().setScale(0.8f);
 
-                } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
+                } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PortImage) {
 
-                    PortImage portImage = (PortImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+                    PortImage portImage = (PortImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 //                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.touchPositions[touchInteraction.pointerId], TouchInteraction.TouchInteractionType.DRAG);
 //                    portSprite.touchPositions(touchInteraction);
 
@@ -1038,16 +1090,16 @@ public class Body extends Actor {
 
         // Stop touching sprite
         // Style. Reset the style of touched boards.
-        if (touchInteraction.isTouching[touchInteraction.pointerId] || touchInteractivity.touchedImage[touchInteraction.pointerId] != null) {
+        if (touchInteraction.isTouching[touchInteraction.pointerId] || touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
             touchInteraction.isTouching[touchInteraction.pointerId] = false;
-            if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof MachineImage) {
-                MachineImage machineImage = (MachineImage) touchInteractivity.touchedImage[touchInteraction.pointerId];
+            if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof MachineImage) {
+                MachineImage machineImage = (MachineImage) touchInteractivity.getTouchedImage(touchInteraction.pointerId);
 
                 machineImage.showHighlights = false;
 //                machineSprite.setScale(1.0f);
-                touchInteractivity.touchedImage[touchInteraction.pointerId] = null;
+//                touchInteractivity.touchedImage[touchInteraction.pointerId] = null;
 
-            } else if (touchInteractivity.touchedImage[touchInteraction.pointerId] instanceof PortImage) {
+            } else if (touchInteractivity.getTouchedImage(touchInteraction.pointerId) instanceof PortImage) {
 
                 if (touchInteractivity.isHolding[touchInteraction.pointerId]) {
 
@@ -1115,8 +1167,8 @@ public class Body extends Actor {
             }
         }
 
-        if (touchInteractivity.touchedImage[touchInteraction.pointerId] != null) {
-            touchInteractivity.touchedImage[touchInteraction.pointerId].isTouched = false;
+        if (touchInteractivity.isTouchingImage(touchInteraction.pointerId)) {
+            touchInteractivity.getTouchedImage(touchInteraction.pointerId).isTouched = false;
         }
 
         // Stop dragging

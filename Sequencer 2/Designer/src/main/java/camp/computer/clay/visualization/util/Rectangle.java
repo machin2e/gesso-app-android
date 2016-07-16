@@ -65,4 +65,16 @@ public class Rectangle {
     public float getBottom () {
         return this.position.y + (height / 2.0f);
     }
+
+    public float getArea () {
+        return this.width * this.height;
+    }
+
+    public float getPerimeter () {
+        return 2 * (this.width + this.height);
+    }
+
+    public float getDiagonalLength () {
+        return (float) Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
+    }
 }

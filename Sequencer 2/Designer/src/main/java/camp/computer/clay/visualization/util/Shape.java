@@ -123,4 +123,39 @@ public abstract class Shape {
         }
     }
 
+    /**
+     * Draw regular polygon.
+     *
+     * Reference:
+     * - https://en.wikipedia.org/wiki/Regular_polygon
+     * @param position
+     * @param radius
+     * @param sideCount
+     * @param canvas
+     * @param paint
+     */
+    public static void drawRegularPolygon(PointF position, int radius, int sideCount, Canvas canvas, Paint paint) {
+        android.graphics.Path path = new android.graphics.Path();
+        for (int i = 0; i < sideCount; i++) {
+
+            PointF vertexPosition = new PointF(
+                    (float) (position.x + radius * Math.cos(2.0f * Math.PI * (float) i / (float) sideCount)),
+                    (float) (position.y + radius * Math.sin(2.0f * Math.PI * (float) i / (float) sideCount))
+            );
+
+            // Draw points in shape
+            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+            if (i == 0) {
+                path.moveTo(vertexPosition.x, vertexPosition.y);
+            }
+
+            path.lineTo(vertexPosition.x, vertexPosition.y);
+        }
+
+//        path.lineTo(position.x, position.y);
+        path.close();
+
+        canvas.drawPath(path, paint);
+    }
+
 }

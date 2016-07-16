@@ -55,6 +55,10 @@ public class Port extends Model {
         }
     }
 
+    public Machine getMachine () {
+        return (Machine) getParent();
+    }
+
     public Path getPath(int index) {
         return this.paths.get(index);
     }

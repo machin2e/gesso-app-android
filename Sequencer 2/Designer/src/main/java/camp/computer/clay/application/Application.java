@@ -63,6 +63,8 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
     private NetworkResource networkResource;
 
+    public static boolean ENABLE_DEBUG_ANNOTATIONS = false;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -171,12 +173,23 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 //        if (HIDE_TITLE) {
 //            actionBar.setDisplayShowTitleEnabled(false);
 //        }
-//
-//        if (FULLSCREEN) {
-//            // Remove notification bar
-//            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        }
-//
+
+        if (FULLSCREEN) {
+
+            // Hide the notification bar
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+            // Hide the navigation bar
+
+            View decorView = getWindow().getDecorView();
+            // Hide both the navigation bar and the status bar.
+            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+            // a general rule, you should design your app to hide the status bar whenever you
+            // hide the navigation bar.
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+
 //        // Create the adapter that will return a fragment for each of the three primary sections
 //        // of the app.
 //        mSectionsPagerAdapter = new DeviceViewPagerAdapter(getSupportFragmentManager());

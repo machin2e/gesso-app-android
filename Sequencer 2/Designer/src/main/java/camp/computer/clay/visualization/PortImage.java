@@ -21,7 +21,7 @@ public class PortImage extends Image {
 
     // --- STYLE ---
     public static float DISTANCE_FROM_BOARD = 45.0f;
-    public static float DISTANCE_BETWEEN_NODES = 10.0f;
+    public static float DISTANCE_BETWEEN_NODES = 15.0f;
     public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
 
     private boolean showShapeLayer = true;

@@ -83,48 +83,12 @@ public class PathImage extends Image {
 
             if (this.showDirectedPaths) {
                 drawTrianglePath(mapCanvas, paint);
-            } else {
-                drawLinePath(mapCanvas, paint);
             }
         }
     }
 
     public Path getPath() {
         return (Path) getModel();
-    }
-
-    //-------
-
-    private void drawLinePath (Canvas mapCanvas, Paint paint) {
-
-        if (showLinePaths) {
-
-            Path path = getPath();
-
-            PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
-            PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
-
-            // Show target port
-            targetPortImage.setVisibility(true);
-            targetPortImage.setPathVisibility(true);
-
-            mapCanvas.save();
-
-            // Color
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(15.0f);
-            paint.setColor(sourcePortImage.getUniqueColor());
-
-            mapCanvas.drawLine(
-                    sourcePortImage.getPosition().x,
-                    sourcePortImage.getPosition().y,
-                    targetPortImage.getPosition().x,
-                    targetPortImage.getPosition().y,
-                    paint
-            );
-
-            mapCanvas.restore();
-        }
     }
 
     public void drawTrianglePath(Canvas mapCanvas, Paint paint) {

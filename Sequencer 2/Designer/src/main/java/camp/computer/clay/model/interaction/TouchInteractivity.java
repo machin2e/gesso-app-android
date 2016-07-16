@@ -14,11 +14,22 @@ public class TouchInteractivity {
     private ArrayList<TouchInteraction> touchInteractions = new ArrayList<TouchInteraction>();
 
     // TODO: Classify these! Every time an Interaction is added!
-    public boolean[] isTouchingImage = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
-    public Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    private Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isHolding = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+
+    public boolean isTouchingImage (int fingerIndex) {
+        return (this.touchedImage[fingerIndex] != null);
+    }
+
+    public void setTouchedImage (int fingerIndex, Image image) {
+        this.touchedImage[fingerIndex] = image;
+    }
+
+    public Image getTouchedImage (int fingerIndex) {
+        return this.touchedImage[fingerIndex];
+    }
 
     public Handler timerHandler = new Handler();
     TouchInteractivity touchInteractivity = this;
@@ -47,7 +58,6 @@ public class TouchInteractivity {
             isHolding[i] = false;
             isDragging[i] = false;
             dragDistance[i] = 0;
-            isTouchingImage[i] = false;
             touchedImage[i] = null;
         }
     }

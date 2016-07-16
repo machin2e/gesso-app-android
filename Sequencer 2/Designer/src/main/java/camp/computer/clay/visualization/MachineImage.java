@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Port;
@@ -117,10 +118,12 @@ public class MachineImage extends Image {
             drawBoardImage(visualizationSurface);
             drawLightImages(visualizationSurface);
 
-//            visualizationSurface.getPaint().setColor(Color.GREEN);
-//            visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-//            visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth, visualizationSurface.getPaint());
-//            visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth / 2.0f, visualizationSurface.getPaint());
+            if (Application.ENABLE_DEBUG_ANNOTATIONS) {
+                visualizationSurface.getPaint().setColor(Color.GREEN);
+                visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
+                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth, visualizationSurface.getPaint());
+                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth / 2.0f, visualizationSurface.getPaint());
+            }
         }
     }
 

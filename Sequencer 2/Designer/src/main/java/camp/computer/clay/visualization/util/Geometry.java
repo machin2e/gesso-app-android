@@ -67,8 +67,12 @@ public abstract class Geometry {
     }
 
     /**
-     * Calculates new point coordinates for a given point rotated by an angle about another origin
-     * point.
+     * Calculates coordinates of a point rotated about about another origin point by a given number
+     * of degrees.
+     *
+     * References:
+     * - http://www.gamefromscratch.com/post/2012/11/24/GameDev-math-recipes-Rotating-one-point-around-another-point.aspx
+     *
      * @return
      */
     public static PointF calculateRotatedPoint(PointF originPoint, float angle, PointF point) {
@@ -119,6 +123,8 @@ public abstract class Geometry {
 
     //Compute the distance from AB to C
     //if isSegment is true, AB is a segment, not a line.
+    // References:
+    // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
     public static double calculateLineToPointDistance(PointF linePointA, PointF linePointB, PointF pointC,
                                                       boolean isSegment)
     {
@@ -248,6 +254,8 @@ public abstract class Geometry {
         return nearestPoint;
     }
 
+    // Reference:
+    // - GrahamScan: http://algs4.cs.princeton.edu/99hull/GrahamScan.java.html
     public static ArrayList<PointF> quickHull(ArrayList<PointF> points)
     {
         ArrayList<PointF> convexHull = new ArrayList<PointF>();
@@ -373,6 +381,14 @@ public abstract class Geometry {
     /**
      * Compute list of points that are separated by a minimal distance. Based on circle packing
      * algorithm.
+     *
+     * References:
+     * - http://graphicdna.blogspot.com/2009/09/2d-circle-packing-algorithm-ported-to-c.html
+     * - http://gamedevelopment.tutsplus.com/tutorials/when-worlds-collide-simulating-circle-circle-collisions--gamedev-769
+     * - http://mathematica.stackexchange.com/questions/2594/efficient-way-to-generate-random-points-with-a-predefined-lower-bound-on-their-p
+     * - http://stackoverflow.com/questions/4847269/circle-separation-distance-nearest-neighbor-problem?lq=1
+     * - http://stackoverflow.com/questions/3265986/an-algorithm-to-space-out-overlapping-rectangles
+     *
      * @param positions
      * @return
      */
@@ -606,4 +622,19 @@ public abstract class Geometry {
 //        return sortedList;
 //
 //    }
+
+    // TODO: Detect if a point falls within a polygon defined by list of points.
+    // TODO: (cont'd) - http://alienryderflex.com/polygon/
+    // TODO: (cont'd) - http://stackoverflow.com/questions/8721406/how-to-determine-if-a-point-is-inside-a-2d-convex-polygon
+    // TODO: (cont'd) - http://math.stackexchange.com/questions/193606/detect-when-a-point-belongs-to-a-bounding-box-with-distances?lq=1
+    // TODO: (cont'd) - http://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
+
+    // TODO: Detect minimum bounding box rotating to fit list of points
+    // TODO: (cont'd) - http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points
+
+    // TODO: Classify shape given a list of points (2D point cloud). (Use this rather than instanceof?)
+    // TODO: (cont'd) - http://stat.fsu.edu/~anuj/pdf/papers/Y2012/Su_CSDA_2012_Paper.pdf
+    // TODO: (cont'd) - http://homepages.inf.ed.ac.uk/svijayak/publications/mcneill-IJCAI2005.pdf
+    // TODO: (cont'd) - http://www.cs.umd.edu/~djacobs/pubs_files/ID-pami-8.pdf
+    // TODO: (cont'd) - https://en.wikipedia.org/wiki/Shape_analysis_(digital_geometry)
 }

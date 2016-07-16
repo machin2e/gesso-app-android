@@ -5,17 +5,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Machine;
 import camp.computer.clay.model.simulation.Model;
-import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
@@ -304,12 +303,14 @@ public class Visualization extends Image {
         }
         */
 
-        // <AXES_ANNOTATION>
-        visualizationSurface.getPaint().setColor(Color.BLUE);
-        visualizationSurface.getPaint().setStrokeWidth(1.0f);
-        visualizationSurface.getCanvas().drawLine(-1000, 0, 1000, 0, visualizationSurface.getPaint());
-        visualizationSurface.getCanvas().drawLine(0, -1000, 0, 1000, visualizationSurface.getPaint());
-        // </AXES_ANNOTATION>
+        if (Application.ENABLE_DEBUG_ANNOTATIONS) {
+            // <AXES_ANNOTATION>
+            visualizationSurface.getPaint().setColor(Color.BLUE);
+            visualizationSurface.getPaint().setStrokeWidth(1.0f);
+            visualizationSurface.getCanvas().drawLine(-1000, 0, 1000, 0, visualizationSurface.getPaint());
+            visualizationSurface.getCanvas().drawLine(0, -1000, 0, 1000, visualizationSurface.getPaint());
+            // </AXES_ANNOTATION>
+        }
 
         // Draw images
         for (Integer id: getLayerIds()) {
@@ -325,72 +326,76 @@ public class Visualization extends Image {
         // Draw SYSTEM annotations
 //        drawAnnotation(visualizationSurface);
 
-        // <CENTROID_ANNOTATION>
-        PointF centroidPosition = getCentroidPosition();
-        visualizationSurface.getPaint().setColor(Color.RED);
-        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-        visualizationSurface.getCanvas().drawCircle(centroidPosition.x, centroidPosition.y, 10, visualizationSurface.getPaint());
+        if (Application.ENABLE_DEBUG_ANNOTATIONS) {
 
-        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-        visualizationSurface.getPaint().setTextSize(35);
+            // <CENTROID_ANNOTATION>
+            PointF centroidPosition = getCentroidPosition();
+            visualizationSurface.getPaint().setColor(Color.RED);
+            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+            visualizationSurface.getCanvas().drawCircle(centroidPosition.x, centroidPosition.y, 10, visualizationSurface.getPaint());
 
-        String text = "CENTROID";
-        Rect bounds = new Rect();
-        visualizationSurface.getPaint().getTextBounds(text, 0, text.length(), bounds);
-        visualizationSurface.getCanvas().drawText(text, centroidPosition.x + 20, centroidPosition.y + bounds.height() / 2.0f, visualizationSurface.getPaint());
-        // </CENTROID_ANNOTATION>
+            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+            visualizationSurface.getPaint().setTextSize(35);
 
-        // <CENTROID_ANNOTATION>
-        ArrayList<PointF> machineImagePoints = Visualization.getPositions(getMachineImages());
+            String text = "CENTROID";
+            Rect bounds = new Rect();
+            visualizationSurface.getPaint().getTextBounds(text, 0, text.length(), bounds);
+            visualizationSurface.getCanvas().drawText(text, centroidPosition.x + 20, centroidPosition.y + bounds.height() / 2.0f, visualizationSurface.getPaint());
+            // </CENTROID_ANNOTATION>
+
+            // <CENTROID_ANNOTATION>
+            ArrayList<PointF> machineImagePoints = Visualization.getPositions(getMachineImages());
 //        String logMessage = "";
 //        logMessage += "length(machinePoints): " + machineImagePoints.size() + ": ";
 //        for (int i = 0; i < machineImagePoints.size(); i++) {
 //            logMessage += "(" + machineImagePoints.get(i).x + ", " + machineImagePoints.get(i).x + "), ";
 //        }
 //        Log.v("Annotation", logMessage);
-        PointF machineImageCenterPosition = Geometry.calculateCenterPosition(machineImagePoints);
-        visualizationSurface.getPaint().setColor(Color.RED);
-        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-        visualizationSurface.getCanvas().drawCircle(machineImageCenterPosition.x, machineImageCenterPosition.y, 10, visualizationSurface.getPaint());
+            PointF machineImageCenterPosition = Geometry.calculateCenterPosition(machineImagePoints);
+            visualizationSurface.getPaint().setColor(Color.RED);
+            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+            visualizationSurface.getCanvas().drawCircle(machineImageCenterPosition.x, machineImageCenterPosition.y, 10, visualizationSurface.getPaint());
 
-        visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-        visualizationSurface.getPaint().setTextSize(35);
+            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+            visualizationSurface.getPaint().setTextSize(35);
 
-        String centerLabeltext = "CENTER";
-        Rect centerLabelTextBounds = new Rect();
-        visualizationSurface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-        visualizationSurface.getCanvas().drawText(centerLabeltext, machineImageCenterPosition.x + 20, machineImageCenterPosition.y + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
-        // </CENTROID_ANNOTATION>
+            String centerLabeltext = "CENTER";
+            Rect centerLabelTextBounds = new Rect();
+            visualizationSurface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
+            visualizationSurface.getCanvas().drawText(centerLabeltext, machineImageCenterPosition.x + 20, machineImageCenterPosition.y + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+            // </CENTROID_ANNOTATION>
+        }
     }
 
-//    /**
-//     * Draws the sprite's annotation layer. Contains labels and other text.
-//     * @param visualizationSurface
-//     */
-//    public void drawAnnotation(VisualizationSurface visualizationSurface) {
-//
-////        if (showAnnotationLayer) {
-//
-//        Canvas canvas = visualizationSurface.getCanvas();
-//        Paint paint = visualizationSurface.getPaint();
-//
-//        // Geometry
-//        PointF labelPosition = new PointF();
-//        labelPosition.set(
-//                getSimulation().getBody(0).getPerspective().getPosition().x,
-//                50.0f - (canvas.getHeight() / 2.0f) + 50.0f
-//        );
-//
-//        // Style
-//        paint.setColor(Color.parseColor("#cccccc"));
-//        float typeLabelTextSize = 35;
-//
-//        String typeLabelText = "my system";
-//
-//        // Draw
-//        Shape.drawText(labelPosition, typeLabelText, typeLabelTextSize, canvas, paint);
-////        }
-//    }
+    /**
+     * Draws the sprite's annotation layer. Contains labels and other text.
+     * @param visualizationSurface
+     */
+    public void drawAnnotation(VisualizationSurface visualizationSurface) {
+
+//        if (showAnnotationLayer) {
+
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
+
+        // Geometry
+        PointF labelPosition = new PointF();
+        labelPosition.set(
+                -getSimulation().getBody(0).getPerspective().getPosition().x,
+                -getSimulation().getBody(0).getPerspective().getPosition().y - (canvas.getHeight() / 2.0f) + 30.0f
+        );
+
+        // Style
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.parseColor("#333333"));
+        float typeLabelTextSize = 35;
+
+        String typeLabelText = "my system";
+
+        // Draw
+        Shape.drawText(labelPosition, typeLabelText, typeLabelTextSize, canvas, paint);
+//        }
+    }
 
     public ArrayList<Integer> getLayerIds() {
         ArrayList<Integer> layers = new ArrayList<Integer>();

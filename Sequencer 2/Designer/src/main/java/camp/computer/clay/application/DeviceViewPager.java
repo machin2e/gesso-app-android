@@ -83,25 +83,25 @@ public class DeviceViewPager extends ViewPager {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        DeviceViewPager viewPager = (DeviceViewPager) findViewById(R.id.pager);
+//        DeviceViewPager viewPager = (DeviceViewPager) findViewById(R.id.pager);
 //        Drawable backgroundImage = getDrawable(R.drawable.clay_background_image);
 //        viewPager.setBackground(backgroundImage);
-        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.clay_background_image);
-        BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
-        bitmapDrawable.setGravity(Gravity.CENTER);
-
-//        Canvas canvas = new Canvas(bmp.copy(Bitmap.Config.ARGB_8888, true));
-        Paint p = new Paint();
-        p.setColor(Color.BLACK);
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
-        Bitmap gbmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
-        Canvas canvas = new Canvas(gbmp);
-        canvas.drawRect(0, 0, w, h, p);
-        //canvas.drawBitmap(bmp, viewPager.getWidth() / 2.0f, viewPager.getHeight() / 2.0f, p);
-        canvas.drawBitmap(bmp, (w / 2.0f)  - (bmp.getWidth() / 2.0f), (h / 2.0f) - (bmp.getHeight() / 2.0f), p);
-        BitmapDrawable gbitmapDrawable = new BitmapDrawable(gbmp);
-
-        viewPager.setBackground(gbitmapDrawable);
+//        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.clay_background_image);
+//        BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
+//        bitmapDrawable.setGravity(Gravity.CENTER);
+//
+////        Canvas canvas = new Canvas(bmp.copy(Bitmap.Config.ARGB_8888, true));
+//        Paint p = new Paint();
+//        p.setColor(Color.BLACK);
+//        Bitmap.Config conf = Bitmap.Config.ARGB_8888; // see other conf types
+//        Bitmap gbmp = Bitmap.createBitmap(w, h, conf); // this creates a MUTABLE bitmap
+//        Canvas canvas = new Canvas(gbmp);
+//        canvas.drawRect(0, 0, w, h, p);
+//        //canvas.drawBitmap(bmp, viewPager.getWidth() / 2.0f, viewPager.getHeight() / 2.0f, p);
+//        canvas.drawBitmap(bmp, (w / 2.0f)  - (bmp.getWidth() / 2.0f), (h / 2.0f) - (bmp.getHeight() / 2.0f), p);
+//        BitmapDrawable gbitmapDrawable = new BitmapDrawable(gbmp);
+//
+//        viewPager.setBackground(gbitmapDrawable);
     }
 
     /**
