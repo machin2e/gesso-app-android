@@ -1,4 +1,3 @@
-<!-- BEGIN_INCLUDE (view_pager_layout) -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/application_view"
     xmlns:tools="http://schemas.android.com/tools"
@@ -105,32 +104,6 @@
                 android:paddingBottom="12dp" />
         </LinearLayout>
     </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/old_timeline_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
-        <camp.computer.clay.application.DeviceViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </RelativeLayout>
-
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
-        android:layout_marginBottom="0dp"
-        android:layout_marginRight="0dp"
-        android:src="@drawable/fab_add"
-        fab:fabSize="normal"
-        fab:fab_showAnimation="@anim/fab_scale_up"
-        fab:fab_hideAnimation="@anim/fab_scale_down"
-        fab:fab_colorNormal="@color/app_primary"
-        fab:fab_colorPressed="@color/app_primary_pressed"
-        fab:fab_colorRipple="@color/app_ripple" />
 
     <RelativeLayout
         android:id="@+id/message_keyboard_layout"
@@ -259,15 +232,4 @@
             <!--android:background="@drawable/context_button" />-->
     <!--</RelativeLayout>-->
 
-    <!--<Button-->
-        <!--android:id="@+id/timeline_button"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="60dp"-->
-        <!--android:layout_gravity="bottom|center_horizontal"-->
-        <!--android:text="Timeline"-->
-        <!--android:layout_marginBottom="15dp"-->
-        <!--android:layout_marginLeft="15dp"-->
-        <!--android:layout_marginRight="15dp" />-->
-
 </FrameLayout>
-<!-- END_INCLUDE (view_pager_layout) -->

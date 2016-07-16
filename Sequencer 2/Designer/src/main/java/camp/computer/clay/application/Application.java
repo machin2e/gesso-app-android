@@ -37,7 +37,7 @@ import camp.computer.clay.system.Device;
 import camp.computer.clay.system.SQLiteContentManager;
 import camp.computer.clay.system.ViewManagerInterface;
 
-public class Application extends FragmentActivity implements ActionBar.TabListener, ViewManagerInterface {
+public class Application extends FragmentActivity implements ViewManagerInterface {
 
     public VisualizationSurface visualizationSurface;
 
@@ -65,58 +65,8 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
     public static boolean ENABLE_DEBUG_ANNOTATIONS = false;
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which
-     * will keep every loaded fragment in memory. If this becomes too memory
-     * intensive, it may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private DeviceViewPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    DeviceViewPager mViewPager;
-
-    private ActionBar actionBar;
-
     // Configure the interface settings
-    private static final boolean HIDE_TITLE = true;
-    private static final boolean HIDE_ACTION_BAR = true;
-    private static final boolean HIDE_ACTION_BAR_ON_SCROLL = true;
     private static final boolean FULLSCREEN = true;
-
-    private CursorView cursorView;
-
-    // <HACK>
-    ArrayList<TimelineView> timelineViews = new ArrayList<TimelineView>();
-    public TimelineView getTimelineView (Device device) {
-        Log.v("Device_Timeline", "ApplicationView.getTimelineView");
-        //TODO: return mViewPager.getTimelineView(device);
-
-        for (TimelineView timelineView : timelineViews) {
-            if (timelineView.getDevice().getUuid().toString().equals(device.getUuid().toString())) {
-                return timelineView;
-            }
-        }
-
-        return null;
-    }
-    // </HACK>
-
-    public void setTimelineView (Device device) {
-        mViewPager.setTimelineView(device);
-    }
-
-    public TimelineView getTimelineView () {
-        return mViewPager.getTimelineView();
-    }
-
-    public CursorView getCursorView() {
-        return cursorView;
-    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -152,27 +102,9 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
         setContentView(R.layout.activity_main);
 
-        // Hide the action buttons
-        cursorView = new CursorView();
-        cursorView.hide(false);
-
         // Visualization Surface
         visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
         visualizationSurface.onResume();
-
-//        // Set up the action bar. The navigation mode is set to NAVIGATION_MODE_TABS, which will
-//        // cause the ActionBar to render a set of tabs. Note that these tabs are *not* rendered
-//        // by the ViewPager; additional logic is lower in this file to synchronize the ViewPager
-//        // state with the tab state. (See mViewPager.setOnPageChangeListener() and onTabSelected().)
-//        actionBar = getActionBar();
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//        if (HIDE_ACTION_BAR) {
-//            actionBar.hide();
-//        }
-//
-//        if (HIDE_TITLE) {
-//            actionBar.setDisplayShowTitleEnabled(false);
-//        }
 
         if (FULLSCREEN) {
 
@@ -189,27 +121,6 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
             int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
         }
-
-//        // Create the adapter that will return a fragment for each of the three primary sections
-//        // of the app.
-//        mSectionsPagerAdapter = new DeviceViewPagerAdapter(getSupportFragmentManager());
-//        mSectionsPagerAdapter.setClay(getClay());
-//
-//        // Set up the ViewPager with the sections adapter.
-//        mViewPager = (DeviceViewPager) findViewById(R.id.pager);
-//        mViewPager.setPagingEnabled(true); // Disable horizontal paging by swiping left and right
-//        mViewPager.setAdapter(mSectionsPagerAdapter);
-//
-//        // When swiping between different sections, select the corresponding tab. We can also use
-//        // ActionBar.Tab#select() to do this if we have a reference to the Tab.
-//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                if (!HIDE_ACTION_BAR) {
-//                    actionBar.setSelectedNavigationItem(position);
-//                }
-//            }
-//        });
 
         // Path Editor
         final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
@@ -731,21 +642,6 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
         speechGenerator.destroy();
     }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-    }
-
     public static Context getContext() {
         return Application.context;
     }
@@ -762,34 +658,6 @@ public class Application extends FragmentActivity implements ActionBar.TabListen
 
     @Override
     public void addDeviceView(Device device) {
-
-        // TODO: (?) Add DeviceViewFragment to list here?
-
-        // Increment the number of pages to be the same as the number of discovered units.
-//        mSectionsPagerAdapter.count++;
-        mSectionsPagerAdapter.notifyDataSetChanged();
-
-        // Create a tab with text corresponding to the page tag defined by the adapter. Also
-        // specify this Activity object, which implements the TabListener interface, as the
-        // callback (listener) for when this tab is selected.
-        if (actionBar != null) {
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText("Device") // .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
-
-            // Show action bar if it is hidden (when device count is greater than o or 1)
-            /*
-            if (!actionBar.isShowing()) {
-                actionBar.show();
-            }
-            */
-        }
-
-//        // Show the action button
-//        ApplicationView.getDisplay().getCursorView().init();
-//        ApplicationView.getDisplay().getCursorView().updatePosition();
-//        ApplicationView.getDisplay().getCursorView().show(true);
 
     }
 
