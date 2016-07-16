@@ -8,12 +8,12 @@
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-xxxhdpi/abc_ic_menu_selectall_mtrl_alpha.png"
     },
     {
-        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-xxxhdpi-v4/ic_mode_edit_white_24dp.png",
-        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/drawable-xxxhdpi/ic_mode_edit_white_24dp.png"
-    },
-    {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-xxxhdpi-v4/abc_btn_switch_to_on_mtrl_00012.9.png",
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/drawable-xxxhdpi/abc_btn_switch_to_on_mtrl_00012.9.png"
+    },
+    {
+        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-xxxhdpi-v4/ic_mode_edit_white_24dp.png",
+        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.azeesoft.lib.colorpicker/colorpicker/1.0.9/res/drawable-xxxhdpi/ic_mode_edit_white_24dp.png"
     },
     {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/drawable-xxxhdpi-v4/abc_scrubber_control_to_pressed_mtrl_005.png",

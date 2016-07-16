@@ -11,13 +11,13 @@
                     "endOffset": 112
                 },
                 "from": {
-                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-w480dp/values-w480dp.xml",
+                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/18.0.0/res/values-w480dp/values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
-                        "startOffset": 231,
+                        "startOffset": 175,
                         "endColumn": 61,
-                        "endOffset": 288
+                        "endOffset": 232
                     }
                 }
             },
@@ -30,13 +30,32 @@
                     "endOffset": 184
                 },
                 "from": {
-                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-w480dp/values-w480dp.xml",
+                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/18.0.0/res/values-w480dp/values.xml",
                     "position": {
-                        "startLine": 7,
+                        "startLine": 6,
                         "startColumn": 4,
-                        "startOffset": 470,
+                        "startOffset": 357,
                         "endColumn": 71,
-                        "endOffset": 537
+                        "endOffset": 424
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 189,
+                    "endColumn": 60,
+                    "endOffset": 245
+                },
+                "from": {
+                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/18.0.0/res/values-w480dp/values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 548,
+                        "endColumn": 60,
+                        "endOffset": 604
                     }
                 }
             }

@@ -11,13 +11,13 @@
                     "endOffset": 127
                 },
                 "from": {
-                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/values-w720dp/values-w720dp.xml",
+                    "file": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/18.0.0/res/values-w720dp/values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
-                        "startOffset": 231,
+                        "startOffset": 175,
                         "endColumn": 76,
-                        "endOffset": 303
+                        "endOffset": 247
                     }
                 }
             }

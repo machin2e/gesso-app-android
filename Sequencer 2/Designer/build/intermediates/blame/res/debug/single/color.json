@@ -28,6 +28,10 @@
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/color/abc_primary_text_material_light.xml"
     },
     {
+        "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/color/abc_search_url_text_holo.xml",
+        "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/18.0.0/res/color/abc_search_url_text_holo.xml"
+    },
+    {
         "merged": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/res/merged/debug/color/switch_thumb_material_light.xml",
         "source": "/Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/res/color/switch_thumb_material_light.xml"
     },
