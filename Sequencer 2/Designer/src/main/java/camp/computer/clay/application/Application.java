@@ -1,7 +1,5 @@
 package camp.computer.clay.application;
 
-import android.app.ActionBar;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -11,9 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,10 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import camp.computer.clay.application.R;
-
-import java.util.ArrayList;
-
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.visualization.util.Animation;
 import camp.computer.clay.system.Clay;
@@ -39,6 +31,19 @@ import camp.computer.clay.system.ViewManagerInterface;
 
 public class Application extends FragmentActivity implements ViewManagerInterface {
 
+    // <Settings>
+    private static final boolean ENABLE_TONE_GENERATOR = false;
+    private static final boolean ENABLE_SPEECH_GENERATOR = false;
+    private static final long MESSAGE_SEND_FREQUENCY = 10;
+    // </Settings>
+
+    // <Style>
+    public static boolean ENABLE_DEBUG_ANNOTATIONS = false;
+
+    // Configure the interface settings
+    private static final boolean ENABLE_FULLSCREEN = true;
+    // </Style>
+
     public VisualizationSurface visualizationSurface;
 
     private SpeechGenerator speechGenerator;
@@ -46,12 +51,6 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
     private ToneGenerator toneGenerator;
 
     private SensorAdapter sensorAdapter;
-
-    // <Settings>
-    private static final boolean ENABLE_TONE_GENERATOR = false;
-    private static final boolean ENABLE_SPEECH_GENERATOR = false;
-    private static final long MESSAGE_SEND_FREQUENCY = 10;
-    // </Settings>
 
     private static Context context;
 
@@ -62,11 +61,6 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
     private DatagramManager datagramServer;
 
     private NetworkResource networkResource;
-
-    public static boolean ENABLE_DEBUG_ANNOTATIONS = false;
-
-    // Configure the interface settings
-    private static final boolean FULLSCREEN = true;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -106,7 +100,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
         visualizationSurface.onResume();
 
-        if (FULLSCREEN) {
+        if (ENABLE_FULLSCREEN) {
 
             // Hide the notification bar
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -152,7 +146,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    addAction();
+                    addPathPatchAction();
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
@@ -335,27 +329,6 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         });
         // </CONTEXT_SCOPE>
 
-        // <TIMELINE>
-//        final RelativeLayout timelineView = (RelativeLayout) findViewById(R.id.timeline_view);
-//        final RelativeLayout oldTimelineView = (RelativeLayout) findViewById(R.id.old_timeline_view);
-//        timelineButton.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                if (oldTimelineView.isVisible() == View.GONE) {
-//                    oldTimelineView.setVisibility(View.VISIBLE);
-//                    timelineButton.setText("Map");
-//                    cursorView.show(true);
-//                } else {
-//                    oldTimelineView.setVisibility(View.GONE);
-//                    timelineButton.setText("Timeline");
-//                    cursorView.hide(true);
-//                }
-//                return true;
-//            }
-//        });
-        // ^^^ Timeline Button ^^^
-        // </TIMELINE>
-
         // Start the initial worker thread (runnable task) by posting through the handler
         handler.post(runnableCode);
 
@@ -470,16 +443,16 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
             public void onClick(View v) {
 
                 // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-                appendToMessage(messageKey.getText().toString());
+                appendToChatMessage(messageKey.getText().toString());
 
-                validateMessage();
+                validateChatMessage();
             }
         });
 
         messageKeyboard.addView(messageKey);
     }
 
-    private void validateMessage() {
+    private void validateChatMessage() {
 
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
@@ -491,7 +464,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         contextScope.setText("✓");
     }
 
-    private void appendToMessage(String text) {
+    private void appendToChatMessage(String text) {
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
@@ -552,7 +525,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         }, 100L);
     }
 
-    private void addAction() {
+    private void addPathPatchAction() {
 
         final TextView actionConstruct = new TextView(getContext());
         actionConstruct.setText("Action (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
@@ -561,7 +534,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
         actionConstruct.setBackgroundColor(Color.parseColor("#44000000"));
 
-        final LinearLayout pathEditorActionList = (LinearLayout) findViewById (R.id.path_editor_action_list);
+        final LinearLayout pathPatchActionList = (LinearLayout) findViewById (R.id.path_editor_action_list);
 
         actionConstruct.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -577,7 +550,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    pathEditorActionList.removeView(actionConstruct);
+                    pathPatchActionList.removeView(actionConstruct);
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
@@ -591,7 +564,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
             }
         });
 
-        pathEditorActionList.addView(actionConstruct);
+        pathPatchActionList.addView(actionConstruct);
     }
 
     @Override
