@@ -16,7 +16,7 @@ import android.view.SurfaceView;
 
 import camp.computer.clay.model.interaction.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.Visualization;
+import camp.computer.clay.visualization.arch.Visualization;
 import camp.computer.clay.visualization.util.Geometry;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {

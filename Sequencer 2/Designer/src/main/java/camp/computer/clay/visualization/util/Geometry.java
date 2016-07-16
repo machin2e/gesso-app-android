@@ -1,14 +1,11 @@
 package camp.computer.clay.visualization.util;
 
 import android.graphics.PointF;
-import android.util.Log;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.model.simulation.Machine;
-import camp.computer.clay.visualization.Image;
-import camp.computer.clay.visualization.MachineImage;
-import camp.computer.clay.visualization.Visualization;
+import camp.computer.clay.visualization.images.BaseImage;
+import camp.computer.clay.visualization.arch.Visualization;
 
 public abstract class Geometry {
 
@@ -392,10 +389,10 @@ public abstract class Geometry {
      * @param positions
      * @return
      */
-    public static ArrayList<MachineImage> packCircles(ArrayList<MachineImage> positions, float distance, PointF packingCenter) {
+    public static ArrayList<BaseImage> packCircles(ArrayList<BaseImage> positions, float distance, PointF packingCenter) {
 
         // Sort points based on distance from center
-        ArrayList<MachineImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
+        ArrayList<BaseImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
         ArrayList<PointF> sortedPositions = Visualization.getPositions(sortedImages);
 
         float minSeparationSq = distance * distance;
@@ -475,7 +472,7 @@ public abstract class Geometry {
             sortedPositions.get(i).x -= v.x;
             sortedPositions.get(i).y -= v.y;
 
-            ((MachineImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
+            ((BaseImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
 //            }
         }
 
@@ -483,16 +480,16 @@ public abstract class Geometry {
 
     }
 
-    public static ArrayList<MachineImage> sortByDistanceToPoint(ArrayList<MachineImage> positions, PointF point) {
+    public static ArrayList<BaseImage> sortByDistanceToPoint(ArrayList<BaseImage> positions, PointF point) {
 
         // Initialize with unsorted list of points
-        ArrayList<MachineImage> sortedList = new ArrayList(positions);
+        ArrayList<BaseImage> sortedList = new ArrayList(positions);
 
         for (int i = 0; i < sortedList.size(); i++) {
             for (int j = 1; j < (sortedList.size() - i); j++) {
 
-                MachineImage p1 = sortedList.get(j - 1);
-                MachineImage p2 = sortedList.get(j);
+                BaseImage p1 = sortedList.get(j - 1);
+                BaseImage p2 = sortedList.get(j);
 
                 if (Geometry.calculateDistance(p1.getPosition(), point) > Geometry.calculateDistance(p2.getPosition(), point)) {
                     sortedList.remove(j - 1);

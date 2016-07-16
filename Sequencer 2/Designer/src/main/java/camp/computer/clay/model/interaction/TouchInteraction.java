@@ -2,7 +2,7 @@ package camp.computer.clay.model.interaction;
 
 import android.graphics.PointF;
 
-import camp.computer.clay.visualization.Image;
+import camp.computer.clay.visualization.arch.Image;
 
 public class TouchInteraction {
 

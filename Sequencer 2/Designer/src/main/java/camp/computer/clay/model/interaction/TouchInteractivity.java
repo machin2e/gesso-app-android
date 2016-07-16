@@ -4,7 +4,7 @@ import android.os.Handler;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.visualization.Image;
+import camp.computer.clay.visualization.arch.Image;
 
 // An interactivity is a temporal sequence of one or more interactions.
 //
@@ -20,7 +20,7 @@ public class TouchInteractivity {
     public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
 
     public boolean isTouchingImage (int fingerIndex) {
-        return (this.touchedImage[fingerIndex] != null);
+        return this.touchedImage[fingerIndex] != null;
     }
 
     public void setTouchedImage (int fingerIndex, Image image) {

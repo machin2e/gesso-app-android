@@ -22,14 +22,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import camp.computer.clay.resource.NetworkResource;
+import camp.computer.clay.system.host.DatagramHost;
+import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.visualization.util.Animation;
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.DatagramManager;
-import camp.computer.clay.system.Device;
-import camp.computer.clay.system.SQLiteContentManager;
-import camp.computer.clay.system.ViewManagerInterface;
+import camp.computer.clay.system.old_model.Device;
+import camp.computer.clay.system.host.DisplayHostInterface;
 
-public class Application extends FragmentActivity implements ViewManagerInterface {
+public class Application extends FragmentActivity implements DisplayHostInterface {
 
     // <Settings>
     private static final boolean ENABLE_TONE_GENERATOR = false;
@@ -58,7 +58,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
 
     private Clay clay;
 
-    private DatagramManager datagramServer;
+    private DatagramHost datagramServer;
 
     private NetworkResource networkResource;
 
@@ -160,14 +160,17 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
             }
         });
 
+        // <Cache>
+        // </Cache>
+
         // Clay
         clay = new Clay();
         clay.addDisplay(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
         if (datagramServer == null) {
-            datagramServer = new DatagramManager ("udp");
-            clay.addManager (this.datagramServer);
+            datagramServer = new DatagramHost("udp");
+            clay.addHost(this.datagramServer);
             datagramServer.startServer ();
         }
 
@@ -178,8 +181,8 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         }
 
         // Content Database
-        SQLiteContentManager sqliteContentManager = new SQLiteContentManager(getClay(), "sqlite");
-        getClay().setStore(sqliteContentManager);
+        SQLiteStoreHost sqliteStoreHost = new SQLiteStoreHost(getClay(), "sqlite");
+        getClay().setStore(sqliteStoreHost);
 
         // Initialize content store
         getClay().getStore().erase();
@@ -581,7 +584,7 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         super.onResume();
 
         if (datagramServer == null) {
-            datagramServer = new DatagramManager("udp");
+            datagramServer = new DatagramHost("udp");
         }
         if (!datagramServer.isActive()) {
             datagramServer.startServer();
@@ -612,7 +615,9 @@ public class Application extends FragmentActivity implements ViewManagerInterfac
         super.onDestroy();
 
         // Stop speech generator
-        speechGenerator.destroy();
+        if (speechGenerator != null) {
+            speechGenerator.destroy();
+        }
     }
 
     public static Context getContext() {

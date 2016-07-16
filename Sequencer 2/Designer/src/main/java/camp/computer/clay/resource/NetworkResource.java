@@ -5,12 +5,12 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.system.NetworkManager;
-import camp.computer.clay.system.NetworkResourceInterface;
+import camp.computer.clay.system.host.NetworkHost;
+import camp.computer.clay.system.host.NetworkResourceInterface;
 
 public class NetworkResource implements NetworkResourceInterface {
 
-    private NetworkManager manager;
+    private NetworkHost manager;
 
     public NetworkResource() {
 
@@ -28,7 +28,7 @@ public class NetworkResource implements NetworkResourceInterface {
     }
 
     @Override
-    public void addManager(NetworkManager manager) {
+    public void addHost(NetworkHost manager) {
         this.manager = manager;
     }
 }

@@ -5,9 +5,6 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 
-import camp.computer.clay.model.simulation.Path;
-import camp.computer.clay.visualization.PortImage;
-
 public abstract class Shape {
 
     public static void drawTriangle(PointF position, float angle, float width, float height, Canvas canvas, Paint paint) {

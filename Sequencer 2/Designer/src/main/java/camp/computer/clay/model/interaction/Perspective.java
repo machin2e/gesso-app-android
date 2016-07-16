@@ -1,10 +1,9 @@
 package camp.computer.clay.model.interaction;
 
 import android.graphics.PointF;
-import android.util.Log;
 
-import camp.computer.clay.visualization.Image;
-import camp.computer.clay.visualization.Visualization;
+import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.visualization.arch.Visualization;
 import camp.computer.clay.visualization.util.Animation;
 
 public class Perspective {
@@ -155,8 +154,12 @@ public class Perspective {
         return this.visualization;
     }
 
-    public Image getFocus() {
+    public Image getFocusImage() {
         return this.focusImage;
+    }
+
+    public boolean hasFocusImage() {
+        return this.focusImage != null;
     }
 
     public void setFocus(Image image) {
