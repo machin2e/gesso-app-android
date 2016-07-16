@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.mobeta.android.sequencer.R;
+import camp.computer.clay.application.R;
 
 import java.util.ArrayList;
 

@@ -25,7 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.mobeta.android.sequencer.R;
+import camp.computer.clay.application.R;
 
 import java.util.ArrayList;
 

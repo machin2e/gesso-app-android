@@ -2,7 +2,7 @@
 manifest
 ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:2:1-27:12
 	package
-		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:3:5-43
+		ADDED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml:3:5-45
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
 		INJECTED from /Users/mokogobo/Workspace/Checkouts/Sequencer/Sequencer 2/Designer/src/main/AndroidManifest.xml
 	android:versionName

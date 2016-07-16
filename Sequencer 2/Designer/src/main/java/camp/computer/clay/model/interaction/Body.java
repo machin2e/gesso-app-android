@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.mobeta.android.sequencer.R;
+import camp.computer.clay.application.R;
 
 import java.util.ArrayList;
 

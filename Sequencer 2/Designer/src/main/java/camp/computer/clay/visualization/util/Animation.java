@@ -11,7 +11,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.mobeta.android.sequencer.R;
+import camp.computer.clay.application.R;
 
 import camp.computer.clay.application.Application;
 
