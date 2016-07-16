@@ -503,14 +503,14 @@ public final class R {
 		public static final int design_tab_text_size_2line = 0x7f080060;
 		public static final int disabled_alpha_material_dark = 0x7f080061;
 		public static final int disabled_alpha_material_light = 0x7f080062;
-		public static final int fab_margin = 0x7f080065;
-		public static final int highlight_alpha_material_colored = 0x7f080068;
-		public static final int highlight_alpha_material_dark = 0x7f080069;
-		public static final int highlight_alpha_material_light = 0x7f08006a;
-		public static final int item_touch_helper_max_drag_scroll_per_frame = 0x7f08006c;
-		public static final int notification_large_icon_height = 0x7f080071;
-		public static final int notification_large_icon_width = 0x7f080072;
-		public static final int notification_subtext_size = 0x7f080073;
+		public static final int fab_margin = 0x7f080063;
+		public static final int highlight_alpha_material_colored = 0x7f080066;
+		public static final int highlight_alpha_material_dark = 0x7f080067;
+		public static final int highlight_alpha_material_light = 0x7f080068;
+		public static final int item_touch_helper_max_drag_scroll_per_frame = 0x7f080069;
+		public static final int notification_large_icon_height = 0x7f08006d;
+		public static final int notification_large_icon_width = 0x7f08006e;
+		public static final int notification_subtext_size = 0x7f08006f;
 	}
 	public static final class drawable {
 		public static final int abc_ab_share_pack_mtrl_alpha = 0x7f020000;
@@ -582,23 +582,23 @@ public final class R {
 		public static final int abc_textfield_search_activated_mtrl_alpha = 0x7f020042;
 		public static final int abc_textfield_search_default_mtrl_alpha = 0x7f020043;
 		public static final int abc_textfield_search_material = 0x7f020044;
-		public static final int design_fab_background = 0x7f020051;
-		public static final int design_snackbar_background = 0x7f020052;
-		public static final int ic_mode_edit_white_24dp = 0x7f020055;
-		public static final int notification_template_icon_bg = 0x7f02006a;
-		public static final int opacity_box_bg = 0x7f020056;
-		public static final int opacity_box_bg_land = 0x7f020057;
-		public static final int opacity_gradient_bg = 0x7f020058;
-		public static final int opacity_gradient_bg_land = 0x7f020059;
-		public static final int slider_thumb = 0x7f02005b;
-		public static final int slider_thumb_deprecated = 0x7f02005c;
-		public static final int thumb = 0x7f02005e;
-		public static final int thumb_pressed = 0x7f02005f;
-		public static final int thumb_unpressed = 0x7f020060;
-		public static final int thumb_white = 0x7f020061;
-		public static final int thumb_white_pressed = 0x7f020062;
-		public static final int thumb_white_unpressed = 0x7f020063;
-		public static final int transparent = 0x7f020069;
+		public static final int design_fab_background = 0x7f02004c;
+		public static final int design_snackbar_background = 0x7f02004d;
+		public static final int ic_mode_edit_white_24dp = 0x7f020050;
+		public static final int notification_template_icon_bg = 0x7f020064;
+		public static final int opacity_box_bg = 0x7f020051;
+		public static final int opacity_box_bg_land = 0x7f020052;
+		public static final int opacity_gradient_bg = 0x7f020053;
+		public static final int opacity_gradient_bg_land = 0x7f020054;
+		public static final int slider_thumb = 0x7f020055;
+		public static final int slider_thumb_deprecated = 0x7f020056;
+		public static final int thumb = 0x7f020058;
+		public static final int thumb_pressed = 0x7f020059;
+		public static final int thumb_unpressed = 0x7f02005a;
+		public static final int thumb_white = 0x7f02005b;
+		public static final int thumb_white_pressed = 0x7f02005c;
+		public static final int thumb_white_unpressed = 0x7f02005d;
+		public static final int transparent = 0x7f020063;
 	}
 	public static final class id {
 		public static final int a = 0x7f0c00ba;
@@ -775,7 +775,7 @@ public final class R {
 		public static final int abc_max_action_buttons = 0x7f0a0000;
 		public static final int cancel_button_image_alpha = 0x7f0a0004;
 		public static final int design_snackbar_text_max_lines = 0x7f0a0001;
-		public static final int status_bar_notification_info_maxnum = 0x7f0a0006;
+		public static final int status_bar_notification_info_maxnum = 0x7f0a0005;
 	}
 	public static final class layout {
 		public static final int abc_action_bar_title_item = 0x7f040000;
