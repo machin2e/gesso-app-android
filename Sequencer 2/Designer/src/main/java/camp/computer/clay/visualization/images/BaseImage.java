@@ -16,6 +16,7 @@ import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Animation;
 import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
 
 public class BaseImage extends Image {
@@ -30,6 +31,8 @@ public class BaseImage extends Image {
     // TODO: Make these private once the map is working well and the sprite is working well.
     public float boardHeight = 250.0f;
     public float boardWidth = 250.0f;
+    public Rectangle boardShape = new Rectangle(getPosition(), boardWidth, boardHeight);
+
     private String boardColorString = "f7f7f7"; // "414141";
     private int boardColor = Color.parseColor("#ff" + boardColorString); // Color.parseColor("#212121");
     private boolean showBoardOutline = true;
@@ -63,16 +66,17 @@ public class BaseImage extends Image {
 
     public BaseImage(Base base) {
         super(base);
-
-        this.setType(TYPE);
-
-        initializeStyle();
+        setType(TYPE);
     }
 
-    private void initializeStyle () {
+    private void setup() {
+        setupStyle();
     }
 
-    public void initializePortImages() {
+    private void setupStyle() {
+    }
+
+    public void setupPortImages() {
 
         // Add a port sprite for each of the associated machine's ports
         for (Port port: getMachine().getPorts()) {
@@ -126,8 +130,8 @@ public class BaseImage extends Image {
             if (Application.ENABLE_DEBUG_ANNOTATIONS) {
                 visualizationSurface.getPaint().setColor(Color.GREEN);
                 visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth, visualizationSurface.getPaint());
-                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardWidth / 2.0f, visualizationSurface.getPaint());
+                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardShape.getWidth(), visualizationSurface.getPaint());
+                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardShape.getWidth() / 2.0f, visualizationSurface.getPaint());
             }
         }
     }
@@ -140,14 +144,14 @@ public class BaseImage extends Image {
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.boardColor);
-        Shape.drawRectangle(getPosition(), getRotation(), boardWidth, boardHeight, canvas, paint);
+        Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
 
         // Outline
         if (this.showBoardOutline) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.boardOutlineColor);
             paint.setStrokeWidth(this.boardOutlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), boardWidth, boardHeight, canvas, paint);
+            Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
         }
     }
 
@@ -162,18 +166,18 @@ public class BaseImage extends Image {
         // Positions before rotation
         portGroupCenterPositions[0] = new PointF(
                 getPosition().x + 0,
-                getPosition().y + ((boardHeight / 2.0f) + (portGroupHeight / 2.0f))
+                getPosition().y + ((boardShape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
         portGroupCenterPositions[1] = new PointF(
-                getPosition().x + ((boardWidth / 2.0f) + (portGroupHeight / 2.0f)),
+                getPosition().x + ((boardShape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().y + 0
         );
         portGroupCenterPositions[2] = new PointF(
                 getPosition().x + 0,
-                getPosition().y - ((boardHeight / 2.0f) + (portGroupHeight / 2.0f))
+                getPosition().y - ((boardShape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
         portGroupCenterPositions[3] = new PointF(
-                getPosition().x - ((boardWidth / 2.0f) + (portGroupHeight / 2.0f)),
+                getPosition().x - ((boardShape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().y + 0
         );
         // </SHAPE>
@@ -210,18 +214,18 @@ public class BaseImage extends Image {
         // Positions before rotation
         portGroupCenterPositions[0] = new PointF(
                 getPosition().x + 0,
-                getPosition().y + ((boardHeight) + (portGroupHeight / 2.0f))
+                getPosition().y + ((boardShape.getHeight()) + (portGroupHeight / 2.0f))
         );
         portGroupCenterPositions[1] = new PointF(
-                getPosition().x + ((boardWidth) + (portGroupHeight / 2.0f)),
+                getPosition().x + ((boardShape.getWidth()) + (portGroupHeight / 2.0f)),
                 getPosition().y + 0
         );
         portGroupCenterPositions[2] = new PointF(
                 getPosition().x + 0,
-                getPosition().y - ((boardHeight) + (portGroupHeight / 2.0f))
+                getPosition().y - ((boardShape.getHeight()) + (portGroupHeight / 2.0f))
         );
         portGroupCenterPositions[3] = new PointF(
-                getPosition().x - ((boardWidth) + (portGroupHeight / 2.0f)),
+                getPosition().x - ((boardShape.getWidth()) + (portGroupHeight / 2.0f)),
                 getPosition().y + 0
         );
         // </SHAPE>
@@ -256,53 +260,53 @@ public class BaseImage extends Image {
         PointF[] lightCenterPositions = new PointF[PORT_COUNT];
         lightCenterPositions[0] = new PointF(
                 getPosition().x + (-20),
-                getPosition().y + ((boardHeight / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().y + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[1] = new PointF(
                 getPosition().x + (0),
-                getPosition().y + ((boardHeight / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().y + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[2] = new PointF(
                 getPosition().x + (+20),
-                getPosition().y + ((boardHeight / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().y + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
         lightCenterPositions[3] = new PointF(
-                getPosition().x + ((boardWidth / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().x + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().y + (+20)
         );
         lightCenterPositions[4] = new PointF(
-                getPosition().x + ((boardWidth / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().x + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().y + (0)
         );
         lightCenterPositions[5] = new PointF(
-                getPosition().x + ((boardWidth / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().x + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().y + (-20)
         );
 
         lightCenterPositions[6] = new PointF(
                 getPosition().x + (+20),
-                getPosition().y - ((boardHeight / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().y - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[7] = new PointF(
                 getPosition().x + (0),
-                getPosition().y - ((boardHeight / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().y - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[8] = new PointF(
                 getPosition().x + (-20),
-                getPosition().y - ((boardHeight / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().y - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
         lightCenterPositions[9] = new PointF(
-                getPosition().x - ((boardWidth / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().x - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().y + (-20)
         );
         lightCenterPositions[10] = new PointF(
-                getPosition().x - ((boardWidth / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().x - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().y + (0)
         );
         lightCenterPositions[11] = new PointF(
-                getPosition().x - ((boardWidth / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().x - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().y + (+20)
         );
         float[] lightRotationAngle = new float[12];
@@ -426,7 +430,7 @@ public class BaseImage extends Image {
 
     public boolean isTouching (PointF point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardHeight / 2.0f);
+            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardShape.getHeight() / 2.0f);
         } else {
             return false;
         }
@@ -434,7 +438,7 @@ public class BaseImage extends Image {
 
     public boolean isTouching (PointF point, float padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardHeight / 2.0f + padding);
+            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardShape.getHeight() / 2.0f + padding);
         } else {
             return false;
         }
@@ -445,23 +449,21 @@ public class BaseImage extends Image {
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
-        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
+        if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
             Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
             Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
             Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchInteraction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
             Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
             Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.PRE_DRAG) {
             Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
             Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
             Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }

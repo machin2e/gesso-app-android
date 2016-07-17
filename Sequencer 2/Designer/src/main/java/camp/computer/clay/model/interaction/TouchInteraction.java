@@ -6,7 +6,7 @@ import camp.computer.clay.visualization.arch.Image;
 
 public class TouchInteraction {
 
-    public enum TouchInteractionType {
+    public enum Type {
 
         NONE(0),
         TOUCH(1),
@@ -15,13 +15,12 @@ public class TouchInteraction {
         PRE_DRAG(4),
         DRAG(5),
         RELEASE(6),
-        TAP(7),
-        DOUBLE_DAP(8);
+        TAP(7);
 
         // TODO: Change the index to a UUID?
         int index;
 
-        TouchInteractionType(int index) {
+        Type(int index) {
             this.index = index;
         }
     }
@@ -29,7 +28,7 @@ public class TouchInteraction {
     public static int MAXIMUM_TOUCH_POINT_COUNT = 5;
 
     public static int MAXIMUM_TAP_DURATION = 200;
-//    public static int MAXIMUM_DOUBLE_TAP_DURATION = 400; // Replace with a check if two taps were made in the interaction sequence.
+
     public static int MINIMUM_HOLD_DURATION = 600;
 
     public static int MINIMUM_DRAG_DISTANCE = 35;
@@ -39,40 +38,30 @@ public class TouchInteraction {
     public PointF[] touchPositions = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 
-    // Touch state
-//    public boolean hasTouches = false; // i.e., At least one touchPositions is detected.
-//    public int touchCount = 0; // i.e., The total number of touchPositions points detected.
-
-    private TouchInteractionType touchInteractionType;
+    private Type type;
 
     private Body body;
     // TODO: targetImage? or is the state of body containing this info (e.g., hand occupied with model <M>)
 
-    private PointF position;
-
     // <CONTEXT>
     private long timestamp = DEFAULT_TIMESTAMP;
-    // TODO: Sensor data (inc. 3D orienetation, brightness)
+    // TODO: Link to context, e.g., Sensor data (inc. 3D orienetation, brightness).
     // </CONTEXT>
 
-    //public int touches[];
     public int pointerId = -1;
 
     // touchedImage
     // overlappedImage (not needed, probably, because can look in history, or look at first action in interaction)
     private Image overlappedImage = null;
 
-    //public TouchInteraction(PointF position, TouchInteractionType touchInteractionType) {
-    public TouchInteraction(TouchInteractionType touchInteractionType) {
-//        this.position = position;
-        this.touchInteractionType = touchInteractionType;
+    public TouchInteraction(Type type) {
+        this.type = type;
         this.timestamp = java.lang.System.currentTimeMillis ();
 
-        initialize();
+        setup();
     }
 
-    private void initialize() {
-
+    private void setup() {
         for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
             touchPositions[i] = new PointF(0, 0);
             isTouching[i] = false;
@@ -96,30 +85,29 @@ public class TouchInteraction {
         return this.body;
     }
 
-    public TouchInteractionType getType() {
-        return this.touchInteractionType;
+    public Type getType() {
+        return this.type;
     }
 
-    public void setType(TouchInteractionType touchInteractionType) {
-        this.touchInteractionType = touchInteractionType;
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public PointF getPosition() {
-        return this.position;
+        return this.touchPositions[0];
     }
 
     public long getTimestamp() {
         return this.timestamp;
     }
 
+    // TODO: Move these elsewhere, maybe into Visualization.
     public Image getOverlappedImage() {
         return this.overlappedImage;
     }
-
     public void setOverlappedImage(Image image) {
         this.overlappedImage = image;
     }
-
     public boolean hasOverlappedImage() {
         return (this.overlappedImage != null);
     }

@@ -1,17 +1,20 @@
 package camp.computer.clay.model.interaction;
 
+import android.graphics.PointF;
 import android.os.Handler;
 
 import java.util.ArrayList;
 
 import camp.computer.clay.visualization.arch.Image;
 
-// An interactivity is a temporal sequence of one or more interactions.
-//
-// Model this with a "touchPositions interaction envelope" or "interaction envelope".
-
+/**
+ * An interactivity is a temporal sequence of one or more interactions.
+ */
 public class TouchInteractivity {
-    private ArrayList<TouchInteraction> touchInteractions = new ArrayList<TouchInteraction>();
+
+    // TODO: Model this with a "touchPositions interaction envelope" or "interaction envelope".
+
+    private ArrayList<TouchInteraction> touchInteractions = new ArrayList<>();
 
     // TODO: Classify these! Every time an Interaction is added!
     private Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
@@ -50,10 +53,10 @@ public class TouchInteractivity {
     };
 
     public TouchInteractivity() {
-        initialize();
+        setup();
     }
 
-    private void initialize() {
+    private void setup() {
         for (int i = 0; i < TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT; i++) {
             isHolding[i] = false;
             isDragging[i] = false;
@@ -115,10 +118,6 @@ public class TouchInteractivity {
         return null;
     }
 
-    public long getDuration() {
-        return getLatestInteraction().getTimestamp() - getFirstInteraction().getTimestamp();
-    }
-
     public long getStartTime() {
         return getFirstInteraction().getTimestamp();
     }
@@ -127,9 +126,19 @@ public class TouchInteractivity {
         return getLatestInteraction().getTimestamp();
     }
 
-    // TODO: getTouchPath()
+    public long getDuration() {
+        return getLatestInteraction().getTimestamp() - getFirstInteraction().getTimestamp();
+    }
+
+    public ArrayList<PointF> getTouchPath() {
+        ArrayList<PointF> touchPositions = new ArrayList<>();
+        for (int i = 0; i < touchInteractions.size(); i++) {
+            touchPositions.add(touchInteractions.get(i).getPosition());
+        }
+        return touchPositions;
+    }
 
     // <CLASSIFIER>
-
+    // TODO: Implement classifiers (inc. $1).
     // </CLASSIFIER>
 }

@@ -117,7 +117,7 @@ public class Clay {
 
     private void setupVisualization(Visualization visualization) {
 
-        visualization.initializeImages();
+        visualization.setupImages();
 
 //        visualization.setPosition(new PointF(0, 0));
 //        visualization.setRotation(0);

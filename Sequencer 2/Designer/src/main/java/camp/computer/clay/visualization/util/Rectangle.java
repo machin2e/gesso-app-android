@@ -2,6 +2,9 @@ package camp.computer.clay.visualization.util;
 
 import android.graphics.PointF;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Rectangle {
 
     // TODO: Replace with Point
@@ -32,6 +35,31 @@ public class Rectangle {
     public void setPosition (PointF position) {
         this.position.x = position.x;
         this.position.y = position.y;
+    }
+
+    public PointF getTopLeft () {
+        return new PointF (getLeft(), getTop());
+    }
+
+    public PointF getTopRight () {
+        return new PointF (getRight(), getTop());
+    }
+
+    public PointF getBottomRight () {
+        return new PointF (getRight(), getBottom());
+    }
+
+    public PointF getBottomLeft () {
+        return new PointF (getLeft(), getBottom());
+    }
+
+    public ArrayList<PointF> getVertices () {
+        ArrayList<PointF> vertices = new ArrayList<>();
+        vertices.add(getTopLeft());
+        vertices.add(getTopRight());
+        vertices.add(getBottomRight());
+        vertices.add(getBottomLeft());
+        return vertices;
     }
 
     public float getWidth () {

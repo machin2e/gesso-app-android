@@ -27,7 +27,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
     // UDP server
     private WifiManager.MulticastLock multicastLock = null;
 
-    private boolean bKeepRunning = true;
+    private boolean isRunning = true;
 
     private MessageHost messageHost;
 
@@ -83,7 +83,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
                 Log.v("Clay", "Error: Could not bind to local port " + serverSocket.getLocalPort() + ".");
             }
 
-            while(bKeepRunning) {
+            while(isRunning) {
 
                 // Block the thread until a packet is received or a timeout period has expired.
                 // Note: "This method blocks until a packet is received or a timeout has expired."
@@ -164,7 +164,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
             Log.v("Clay_Threads", "Re-starting datagram server.");
             start();
         }
-        bKeepRunning = true;
+        isRunning = true;
     }
 
     public void stopServer () {
@@ -180,51 +180,20 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
     private void _kill() {
         Log.v("Clay_Messaging", "Killing datagram server.");
-        // bKeepRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP expose message (on a different thread as well) is run! It's something related to that, apparently.
+        // isRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP expose message (on a different thread as well) is run! It's something related to that, apparently.
     }
 
     public boolean isActive () {
-        return bKeepRunning;
+        return isRunning;
     }
 
+    // Send the message.
     public void processMessage (Message outgoingMessage) {
-
-        // Send the message.
-        sendMessageAsync (outgoingMessage);
-
-//        // If the message should be verified but hasn't yet been verified...
-//        if (outgoingMessage.isDeliveryGuaranteed() == true && outgoingMessage.isDelivered() == false) {
-//
-//            // Send the message.
-//            sendMessageAsync (outgoingMessage);
-//
-//        }
-//
-//        /*
-//        // If the message should be verified and has been verified successfully... dequeue it. It doesn't need to be resent, since it has already been sent.
-//        else if (outgoingMessage.verify == true && outgoingMessage.isVerified == true) {
-//
-//            // Dequeue the message
-//            outgoingMessage = dequeueOutgoingMessage ();
-//
-//        }
-//        */
-//
-//        // If the message doesn't need to be verified... dequeue it and expose it.
-//        else if (outgoingMessage.isDeliveryGuaranteed() == false) {
-//
-//            // Dequeue the message
-//            outgoingMessage = dequeueOutgoingMessage();
-//
-//            // Send the message.
-//            sendMessageAsync(outgoingMessage);
-//
-//        }
-
-        // Dequeue the message if it has been verified or if no verifiaction is requested.
+        exposeAsync(outgoingMessage);
     }
 
-    private void sendMessageAsync (Message message) {
+    // formerly "exposeAsync"
+    private void exposeAsync(Message message) {
         UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
         udpDatagramTask.execute(message);
     }
@@ -240,11 +209,12 @@ public class DatagramHost extends Thread implements MessageHostInterface {
             }
 
             // Get the message to expose.
-            Message message = (Message) params[0];
+            Message message = params[0];
 
             // Send the datagram.
-            //sendDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getContent());
-            sendDatagram (message.getTargetAddress(), MESSAGE_PORT, message.getContent());
+            // formerly "sendDatagram(...)"
+            //exposeDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getContent());
+            exposeDatagram(message.getTargetAddress(), MESSAGE_PORT, message.getContent());
             Log.v("UDP", "from: " + message.getSourceAddress());
             Log.v("UDP", "to: " + message.getTargetAddress());
             Log.v("UDP", "port: " + MESSAGE_PORT);
@@ -255,7 +225,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
             return null;
         }
 
-        private void sendDatagram (String ipAddress, int port, String message) {
+        private void exposeDatagram(String ipAddress, int port, String message) {
 
             try {
 

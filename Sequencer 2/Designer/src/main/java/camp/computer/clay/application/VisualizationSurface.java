@@ -17,6 +17,7 @@ import android.view.SurfaceView;
 import camp.computer.clay.model.interaction.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.visualization.images.BaseImage;
 import camp.computer.clay.visualization.util.Geometry;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
@@ -41,6 +42,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
     public VisualizationSurface(Context context) {
         super(context);
+
+        setFocusable(true);
     }
 
     public VisualizationSurface(Context context, AttributeSet attrs) {
@@ -73,7 +76,17 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        // Kill the background Thread
+        boolean retry = true;
+        // visualizationRenderer.setRunning (false);
+        while (retry) {
+            try {
+                visualizationRenderer.join ();
+                retry = false;
+            } catch (InterruptedException e) {
+                e.printStackTrace ();
+            }
+        }
     }
 
     public void onResume() {
@@ -90,7 +103,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
 
-        updateSurfaceView();
+        update();
 
     }
 
@@ -117,19 +130,21 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
     protected void doDraw(Canvas canvas) {
 //        super.onDraw(canvas);
 
+        this.canvas = canvas;
+
         if (this.visualization == null || this.canvas == null) {
             return;
         }
 
         // <PERSPECTIVE>
-        // Move the perspective
-        this.canvas.save ();
-        this.canvas.translate (
+        // Adjust the perspective
+        canvas.save ();
+        canvas.translate (
                 originPosition.x + visualization.getSimulation().getBody(0).getPerspective().getPosition().x + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
                 originPosition.y + visualization.getSimulation().getBody(0).getPerspective().getPosition().y - (float) Application.getDisplay().getSensorAdapter().getRotationX()
         );
         // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
-        this.canvas.scale (
+        canvas.scale (
                 visualization.getSimulation().getBody(0).getPerspective().getScale(),
                 visualization.getSimulation().getBody(0).getPerspective().getScale()
         );
@@ -139,31 +154,33 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         // TODO: Get Simulation's selected Visualization
 
         // Draw the background
-        this.canvas.drawColor(Color.WHITE);
+        canvas.drawColor(Color.WHITE);
 
         // Scene
         drawVisualization(visualization);
 
         // Paint the bitmap to the "primary" canvas.
-//        canvas.drawBitmap (canvasBitmap, identityMatrix, null);
+        canvas.drawBitmap (canvasBitmap, identityMatrix, null);
+        /*
         canvas.save();
         canvas.concat(identityMatrix);
         canvas.drawBitmap(canvasBitmap, 0, 0, paint);
         canvas.restore();
+        */
 
-        this.canvas.restore();
+        canvas.restore();
     }
 
     private void drawVisualization(Visualization visualization) {
         this.visualization.draw(this);
 
-        Geometry.packCircles(getVisualization().getMachineImages(), 200, getVisualization().getCentroidPosition());
+        Geometry.packCircles(getVisualization().getBaseImages(), 200, getVisualization().getImageGroup().filterType(BaseImage.TYPE).calculateCentroid());
     }
 
     /**
      * The function run in background thread, not UI thread.
      */
-    public void updateSurfaceView () {
+    public void update() {
 
         if (visualization == null) {
             return;
@@ -172,21 +189,19 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         Canvas canvas = null;
 
         try {
-            canvas = surfaceHolder.lockCanvas ();
+            canvas = getHolder().lockCanvas();
 
-            synchronized (surfaceHolder) {
+            synchronized (getHolder()) {
 
                 // Update
                 visualization.update();
 
                 // Draw
-                if (canvas != null) {
-                    doDraw(canvas);
-                }
+                doDraw(canvas);
             }
         } finally {
             if (canvas != null) {
-                surfaceHolder.unlockCanvasAndPost (canvas);
+                getHolder().unlockCanvasAndPost(canvas);
             }
         }
     }
@@ -249,7 +264,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         Body currentBody = visualization.getSimulation().getBody(0);
 
         // Create touchPositions interaction
-        TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.TouchInteractionType.NONE);
+        TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.Type.NONE);
         touchInteraction.setBody(currentBody);
 
         if (pointerCount <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT) {
@@ -285,17 +300,17 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
                 // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    touchInteraction.setType(TouchInteraction.TouchInteractionType.TOUCH);
+                    touchInteraction.setType(TouchInteraction.Type.TOUCH);
                     touchInteraction.pointerId = pointerId;
                     currentBody.onStartInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
-                    touchInteraction.setType(TouchInteraction.TouchInteractionType.MOVE);
+                    touchInteraction.setType(TouchInteraction.Type.MOVE);
                     touchInteraction.pointerId = pointerId;
                     currentBody.onContinueInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    touchInteraction.setType(TouchInteraction.TouchInteractionType.RELEASE);
+                    touchInteraction.setType(TouchInteraction.Type.RELEASE);
                     touchInteraction.pointerId = pointerId;
                     currentBody.onCompleteInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {

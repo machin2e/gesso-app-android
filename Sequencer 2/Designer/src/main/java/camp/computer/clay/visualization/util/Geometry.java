@@ -9,14 +9,14 @@ import camp.computer.clay.visualization.arch.Visualization;
 
 public abstract class Geometry {
 
-    public static double calculateDistance(PointF from, PointF to) {
-        return calculateDistance(from.x, from.y, to.x, to.y);
+    public static float calculateDistance(PointF source, PointF target) {
+        return calculateDistance (source.x, source.y, target.x, target.y);
     }
 
-    public static double calculateDistance(float x, float y, float x2, float y2) {
+    public static float calculateDistance(float x, float y, float x2, float y2) {
         double distanceSquare = Math.pow (x - x2, 2) + Math.pow (y - y2, 2);
         double distance = Math.sqrt (distanceSquare);
-        return distance;
+        return (float) distance;
     }
 
     /**
@@ -30,7 +30,7 @@ public abstract class Geometry {
      * on all arguments before passing them  to this function.
      *
      * @param centerPt   Point we are rotating around.
-     * @param targetPt   Point we want to calcuate the angle to.
+     * @param targetPt   Point to which we want to calculate the angle, relative to the center point.
      * @return angle in degrees.  This is the angle from centerPt to targetPt.
      */
     public static float calculateRotationAngle(PointF centerPt, PointF targetPt) {
@@ -83,10 +83,10 @@ public abstract class Geometry {
         return point;
     }
 
-    public static PointF calculateMidpoint(PointF from, PointF to) {
+    public static PointF calculateMidpoint(PointF source, PointF target) {
         PointF midpoint = new PointF();
-        midpoint.x = ((from.x + to.x) / 2.0f);
-        midpoint.y = ((from.y + to.y) / 2.0f);
+        midpoint.x = ((source.x + target.x) / 2.0f);
+        midpoint.y = ((source.y + target.y) / 2.0f);
         return midpoint;
     }
 
@@ -105,7 +105,7 @@ public abstract class Geometry {
     }
 
     //Compute the cross product AB x AC
-    public static double calculuateCrossProduct(PointF linePointA, PointF linePointB, PointF pointC)
+    public static double calculateCrossProduct(PointF linePointA, PointF linePointB, PointF pointC)
     {
         PointF AB = new PointF();
         PointF AC = new PointF();
@@ -122,24 +122,23 @@ public abstract class Geometry {
     //if isSegment is true, AB is a segment, not a line.
     // References:
     // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
-    public static double calculateLineToPointDistance(PointF linePointA, PointF linePointB, PointF pointC,
-                                                      boolean isSegment)
-    {
-        double dist = calculuateCrossProduct(linePointA, linePointB, pointC) / Geometry.calculateDistance(linePointA, linePointB);
-        if (isSegment)
-        {
+    public static double calculateLineToPointDistance(PointF linePointA, PointF linePointB, PointF pointC, boolean isSegment) {
+        double distance = calculateCrossProduct(linePointA, linePointB, pointC) / Geometry.calculateDistance(linePointA, linePointB);
+        if (isSegment) {
             double dot1 = calculateDotProduct(linePointA, linePointB, pointC);
-            if (dot1 > 0)
+            if (dot1 > 0) {
                 return Geometry.calculateDistance(linePointB, pointC);
+            }
 
             double dot2 = calculateDotProduct(linePointB, linePointA, pointC);
-            if (dot2 > 0)
+            if (dot2 > 0) {
                 return Geometry.calculateDistance(linePointA, pointC);
+            }
         }
-        return Math.abs(dist);
+        return Math.abs(distance);
     }
 
-    public static PointF calculateCentroid(ArrayList<PointF> points)  {
+    public static PointF calculateCentroidPosition(ArrayList<PointF> points)  {
         PointF centroidPosition = new PointF(0, 0);
 
         for(PointF point : points) {
@@ -180,18 +179,6 @@ public abstract class Geometry {
         Rectangle rectangle = new Rectangle(minX, minY, maxX, maxY);
 
         return rectangle;
-
-//        float left = minX;
-//        float top = minY;
-//        float right = maxX;
-//        float bottom = maxY;
-//
-//        boundaryPoints[0] = left;
-//        boundaryPoints[1] = top;
-//        boundaryPoints[2] = right;
-//        boundaryPoints[3] = bottom;
-//
-//        return boundaryPoints;
     }
 
     public static PointF calculateCenterPosition(ArrayList<PointF> points) {
@@ -251,89 +238,95 @@ public abstract class Geometry {
         return nearestPoint;
     }
 
-    // Reference:
-    // - GrahamScan: http://algs4.cs.princeton.edu/99hull/GrahamScan.java.html
-    public static ArrayList<PointF> quickHull(ArrayList<PointF> points)
-    {
-        ArrayList<PointF> convexHull = new ArrayList<PointF>();
-        if (points.size() < 3)
-            return (ArrayList) points.clone();
+    /**
+     * Computes the convex hull using the "quick hull" algorithm.
+     *
+     * <strong>References</strong>
+     * - Another implementation is <em>GrahamScan</em> (http://algs4.cs.princeton.edu/99hull/GrahamScan.java.html).
+     *
+     * @param points
+     * @return
+     */
+    public static ArrayList<PointF> computeConvexHull (ArrayList<PointF> points) {
 
-        int minPoint = -1, maxPoint = -1;
+        ArrayList<PointF> convexHull = new ArrayList<>();
+
+        if (points.size() < 3) {
+            return (ArrayList) points.clone();
+        }
+
+        int minPoint = -1;
+        int maxPoint = -1;
+
         float minX = Integer.MAX_VALUE;
         float maxX = Integer.MIN_VALUE;
-        for (int i = 0; i < points.size(); i++)
-        {
-            if (points.get(i).x < minX)
-            {
+
+        for (int i = 0; i < points.size(); i++) {
+
+            if (points.get(i).x < minX) {
                 minX = points.get(i).x;
                 minPoint = i;
             }
-            if (points.get(i).x > maxX)
-            {
+
+            if (points.get(i).x > maxX) {
                 maxX = points.get(i).x;
                 maxPoint = i;
             }
         }
+
         PointF A = points.get(minPoint);
         PointF B = points.get(maxPoint);
+
         convexHull.add(A);
         convexHull.add(B);
+
         points.remove(A);
         points.remove(B);
 
-        ArrayList<PointF> leftSet = new ArrayList<PointF>();
-        ArrayList<PointF> rightSet = new ArrayList<PointF>();
+        ArrayList<PointF> leftSet = new ArrayList<>();
+        ArrayList<PointF> rightSet = new ArrayList<>();
 
-        for (int i = 0; i < points.size(); i++)
-        {
+        for (int i = 0; i < points.size(); i++) {
             PointF p = points.get(i);
-            if (pointLocation(A, B, p) == -1)
+            if (pointLocation(A, B, p) == -1) {
                 leftSet.add(p);
-            else if (pointLocation(A, B, p) == 1)
+            } else if (pointLocation(A, B, p) == 1) {
                 rightSet.add(p);
+            }
         }
+
         hullSet(A, B, rightSet, convexHull);
         hullSet(B, A, leftSet, convexHull);
 
         return convexHull;
     }
 
-    public static float distance(PointF A, PointF B, PointF C)
-    {
-        float ABx = B.x - A.x;
-        float ABy = B.y - A.y;
-        float num = ABx * (A.y - C.y) - ABy * (A.x - C.x);
-        if (num < 0)
-            num = -num;
-        return num;
-    }
-
-    public static void hullSet(PointF A, PointF B, ArrayList<PointF> set,
-                        ArrayList<PointF> hull)
-    {
+    public static void hullSet(PointF A, PointF B, ArrayList<PointF> set, ArrayList<PointF> hull) {
         int insertPosition = hull.indexOf(B);
-        if (set.size() == 0)
+
+        if (set.size() == 0) {
             return;
-        if (set.size() == 1)
-        {
+        }
+
+        if (set.size() == 1) {
             PointF p = set.get(0);
             set.remove(p);
             hull.add(insertPosition, p);
             return;
         }
+
         float dist = Integer.MIN_VALUE;
         int furthestPoint = -1;
-        for (int i = 0; i < set.size(); i++)
-        {
+
+        for (int i = 0; i < set.size(); i++) {
             PointF p = set.get(i);
             float distance = distance(A, B, p);
-            if (distance > dist)
-            {
+            if (distance > dist) {
                 dist = distance;
                 furthestPoint = i;
             }
         }
+
         PointF P = set.get(furthestPoint);
         set.remove(furthestPoint);
         hull.add(insertPosition, P);
@@ -350,18 +343,27 @@ public abstract class Geometry {
         }
 
         // Determine who's to the left of PB
-        ArrayList<PointF> leftSetPB = new ArrayList<PointF>();
-        for (int i = 0; i < set.size(); i++)
-        {
+        ArrayList<PointF> leftSetPB = new ArrayList<>();
+        for (int i = 0; i < set.size(); i++) {
             PointF M = set.get(i);
-            if (pointLocation(P, B, M) == 1)
-            {
+            if (pointLocation(P, B, M) == 1) {
                 leftSetPB.add(M);
             }
         }
+
         hullSet(A, P, leftSetAP, hull);
         hullSet(P, B, leftSetPB, hull);
 
+    }
+
+    public static float distance (PointF A, PointF B, PointF C) {
+        float ABx = B.x - A.x;
+        float ABy = B.y - A.y;
+        float num = ABx * (A.y - C.y) - ABy * (A.x - C.x);
+        if (num < 0) {
+            num = -num;
+        }
+        return num;
     }
 
     public static int pointLocation(PointF A, PointF B, PointF P)

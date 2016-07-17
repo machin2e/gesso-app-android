@@ -27,21 +27,21 @@ public class PortGroup {
         return this.ports.get(index);
     }
 
-    /**
-     * Removes all elements except those with the specified type.
-     * @param type
-     * @return
-     */
-    public PortGroup filterPort(String type) {
-        for (int i = 0; ; i++) {
-            if (!this.ports.get(i).getType().equals(type)) {
-                this.ports.remove(i);
-
-                if ((i + 1) == ports.size()) {
-                    break;
-                }
-            }
-        }
-        return this;
-    }
+//    /**
+//     * Removes all elements except those with the specified type.
+//     * @param type
+//     * @return
+//     */
+//    public PortGroup filterPath(String type) {
+//        for (int i = 0; ; i++) {
+//            if (!this.ports.get(i).getType().equals(type)) {
+//                this.ports.remove(i);
+//
+//                if ((i + 1) == ports.size()) {
+//                    break;
+//                }
+//            }
+//        }
+//        return this;
+//    }
 }

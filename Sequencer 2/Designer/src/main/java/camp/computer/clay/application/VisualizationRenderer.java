@@ -1,18 +1,30 @@
 package camp.computer.clay.application;
 
+import camp.computer.clay.visualization.util.Time;
+
 /**
- * Maintenance/worker thread to periodically redraw the MapView.
+ * VisualizationRenderer is a background thread that periodically updates the visualization state
+ * and renders it. By default, the renderer targets frames per second, each time advancing the
+ * visualization's state then re-rendering it.
  */
 public class VisualizationRenderer extends Thread {
 
-    final public static long FRAMES_PER_SECOND = 30;
+    // <SETTINGS>
+    final public static long DEFAULT_TARGET_FRAMES_PER_SECOND = 30L;
+
+    public static boolean ENABLE_THREAD_SLEEP = true;
+
+    public static boolean ENABLE_STATISTICS = true;
+
+    private long targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
+    // </SETTINGS>
 
     private VisualizationSurface visualizationSurface;
 
-    volatile boolean isRunning = false;
+    private boolean isRunning = false;
 
     VisualizationRenderer(VisualizationSurface visualizationSurface) {
-        super ();
+        super();
         this.visualizationSurface = visualizationSurface;
     }
 
@@ -20,30 +32,56 @@ public class VisualizationRenderer extends Thread {
         this.isRunning = isRunning;
     }
 
+    // <STATISTICS>
+    private float framesPerSecond = 0L;
+    // </STATISTICS>
+
     @Override
     public void run () {
 
-        long ticksPS = 1000 / FRAMES_PER_SECOND;
-        long startTime;
-        long sleepTime;
+        long framePeriod = 1000 / targetFramesPerSecond; // Frame period in milliseconds
+        long frameStartTime;
+        long frameStopTime;
+        long frameSleepTime;
 
         while (isRunning) {
 
-            startTime = java.lang.System.currentTimeMillis ();
+            frameStartTime = Time.getCurrentTime();
 
-            visualizationSurface.updateSurfaceView ();
+            // Advance the visualization state
+            visualizationSurface.update();
 
-            // Sleep until the time remaining in the frame's allocated draw time (for the specified FRAMES_PER_SECOND) is reached.
-            sleepTime = ticksPS - (java.lang.System.currentTimeMillis () - startTime);
-            try {
-                if (sleepTime > 0) {
-                    sleep(sleepTime);
-                } else {
-                    sleep(10);
+            frameStopTime = Time.getCurrentTime();
+
+            if (ENABLE_STATISTICS) {
+                // Store actual frames per second
+                framesPerSecond = (1000.0f / (float) (frameStopTime - frameStartTime));
+            }
+
+            // Sleep the thread until the time remaining in the frame's allocated draw time expires.
+            // This reduces energy consumption thereby increasing battery life.
+            if (ENABLE_THREAD_SLEEP) {
+                frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
+                try {
+                    if (frameSleepTime > 0) {
+                        Thread.sleep(frameSleepTime);
+                    }
+                } catch (Exception e) {
                 }
-            } catch (Exception e) {
             }
 
         }
+    }
+
+    public long getTargetFramesPerSecond () {
+        return targetFramesPerSecond;
+    }
+
+    public void setTargetFramesPerSecond (long framesPerSecond) {
+        this.targetFramesPerSecond = framesPerSecond;
+    }
+
+    public float getFramesPerSecond () {
+        return framesPerSecond;
     }
 }

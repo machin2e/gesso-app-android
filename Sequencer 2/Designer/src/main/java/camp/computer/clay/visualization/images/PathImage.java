@@ -36,19 +36,12 @@ public class PathImage extends Image {
     float labelTextSize = 30.0f;
     // ^^^ STYLE ^^^
 
-    // TODO: Transfer data from in port, run it through the spreadsheet, and transfer it to the out port
-//    // --- DATA ---
-//    public int dataSampleCount = 40;
-//    public float[] dataSamples = new float[dataSampleCount];
-//    // ^^^ DATA ^^^
-
     // --- STYLE ---
 
     private boolean isVisible = false;
     public boolean showLinePaths = false;
     public boolean showDirectedPaths = true;
     public boolean showPathDocks = true;
-    private boolean isEditorVisible = false;
     float pathTerminalLength = 100.0f;
     float triangleWidth = 20;
     float triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
@@ -58,22 +51,20 @@ public class PathImage extends Image {
 
     public PathImage(Path path) {
         super(path);
-
-        this.setType(TYPE);
-
-        initialize();
+        setType(TYPE);
+        setup();
     }
 
-    private void initialize() {
-        initializePathDirections();
-        initializePathTypes();
+    private void setup() {
+        setupPathDirections();
+        setupPathTypes();
     }
 
-    private void initializePathTypes() {
+    private void setupPathTypes() {
         getPath().setType(Path.Type.NONE);
     }
 
-    private void initializePathDirections() {
+    private void setupPathDirections() {
         getPath().setDirection(Path.Direction.NONE);
     }
 
@@ -134,11 +125,6 @@ public class PathImage extends Image {
 
             if (showPathDocks) {
 
-                float pathDistance = (float) Geometry.calculateDistance(
-                        sourcePortImage.getPosition(),
-                        targetPortImage.getPosition()
-                );
-
                 paint.setStyle(Paint.Style.FILL);
                 Shape.drawTriangle(
                         pathStartPosition,
@@ -174,31 +160,11 @@ public class PathImage extends Image {
                         sourcePortImage.getPosition(),
                         targetPortImage.getPosition()
                 );
-
-                if (isEditorVisible) {
-                    // <SPREADSHEET>
-                    paint.setStyle(Paint.Style.FILL);
-                    paint.setColor(sourcePortImage.getUniqueColor());
-                    float spreadsheetImageWidth = 50.0f;
-                    mapCanvas.drawRect(
-                            pathMidpoint.x + -(spreadsheetImageWidth / 2.0f),
-                            pathMidpoint.y + -(spreadsheetImageWidth / 2.0f),
-                            pathMidpoint.x + (spreadsheetImageWidth / 2.0f),
-                            pathMidpoint.y + (spreadsheetImageWidth / 2.0f),
-                            paint
-                    );
-                    // </SPREADSHEET>
-                }
             }
         }
     }
 
     public void setVisibility(boolean isVisible) {
-
-        // Hide the path editor by default
-        if (this.isVisible == false) {
-            setEditorVisibility(false);
-        }
 
         this.isVisible = isVisible;
         showFormLayer = isVisible;
@@ -209,14 +175,6 @@ public class PathImage extends Image {
 
     public boolean isVisible() {
         return this.isVisible;
-    }
-
-    public void setEditorVisibility(boolean isVisible) {
-        this.isEditorVisible = isVisible;
-    }
-
-    public boolean getEditorVisibility() {
-        return this.isEditorVisible;
     }
 
     @Override
@@ -233,23 +191,21 @@ public class PathImage extends Image {
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
-        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
+        if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
             Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
             Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
             Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
-            Log.v("onTouchInteraction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
             Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
             Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.PRE_DRAG) {
             Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
             Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
             Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }

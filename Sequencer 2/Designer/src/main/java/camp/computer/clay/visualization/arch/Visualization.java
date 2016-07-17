@@ -1,6 +1,5 @@
 package camp.computer.clay.visualization.arch;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
@@ -21,7 +20,6 @@ import camp.computer.clay.visualization.images.BaseImage;
 import camp.computer.clay.visualization.images.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
-import camp.computer.clay.visualization.util.Shape;
 
 public class Visualization extends Image {
 
@@ -44,11 +42,11 @@ public class Visualization extends Image {
 
     public Visualization(Simulation simulation) {
         super(simulation);
-        initialize();
+        setup();
     }
 
-    private void initialize() {
-        // initializeImages();
+    private void setup() {
+        // setupImages();
     }
 
     public void setGridScale(float scale) {
@@ -95,7 +93,7 @@ public class Visualization extends Image {
         return null;
     }
 
-    public void initializeImages() {
+    public void setupImages() {
 
         String machineLayerName = "machines";
         addLayer(machineLayerName);
@@ -152,7 +150,7 @@ public class Visualization extends Image {
             baseImage.setRelativePosition(imagePositions.get(i));
             baseImage.setRotation(Number.getRandomGenerator().nextInt(360));
 
-            baseImage.initializePortImages();
+            baseImage.setupPortImages();
         }
     }
 
@@ -176,7 +174,7 @@ public class Visualization extends Image {
         return null;
     }
 
-    public ArrayList<BaseImage> getMachineImages() {
+    public ArrayList<BaseImage> getBaseImages() {
 
         ArrayList<BaseImage> images = new ArrayList<BaseImage>();
 
@@ -229,22 +227,48 @@ public class Visualization extends Image {
         return imageGroup;
     }
 
-    public BaseImage getNearestMachineImage(PointF position) {
+    /**
+     * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     * @param position
+     * @return
+     */
+    public Image getNearestImage (PointF position) {
+
+        float shortestDistance = Float.MAX_VALUE;
+        Image nearestImage = null;
+
+        for (Image image: getImageGroup().getImages()) {
+
+            float currentDistance = (float) Geometry.calculateDistance(
+                    position,
+                    image.getPosition()
+            );
+
+            if (currentDistance < shortestDistance) {
+                shortestDistance = currentDistance;
+                nearestImage = image;
+            }
+        }
+
+        return nearestImage;
+    }
+
+    public BaseImage getNearestBaseImage(PointF position) {
 
         float shortestDistance = Float.MAX_VALUE;
         BaseImage nearestBaseImage = null;
 
-        for (BaseImage baseImage : getVisualization().getMachineImages()) {
+        for (BaseImage baseImage : getBaseImages()) {
 
             // Update style of nearby machines
-            float distanceToMachineImage = (float) Geometry.calculateDistance(
+            float currentDistance = (float) Geometry.calculateDistance(
                     position,
                     baseImage.getPosition()
             );
 
-            if (distanceToMachineImage < shortestDistance) {
+            if (currentDistance < shortestDistance) {
 
-                shortestDistance = distanceToMachineImage;
+                shortestDistance = currentDistance;
                 nearestBaseImage = baseImage;
 
             }
@@ -258,16 +282,16 @@ public class Visualization extends Image {
         float shortestDistance = Float.MAX_VALUE;
         PortImage nearestImage = null;
 
-        for (PortImage image: getVisualization().getPortImages()) {
+        for (PortImage image: getPortImages()) {
 
             // Update style of nearby machines
-            float distanceToImage = (float) Geometry.calculateDistance(
+            float currentDistance = (float) Geometry.calculateDistance(
                     position,
                     image.getPosition()
             );
 
-            if (distanceToImage < shortestDistance) {
-                shortestDistance = distanceToImage;
+            if (currentDistance < shortestDistance) {
+                shortestDistance = currentDistance;
                 nearestImage = image;
             }
         }
@@ -286,6 +310,8 @@ public class Visualization extends Image {
             }
         }
     }
+
+
 
     @Override
     public void draw(VisualizationSurface visualizationSurface) {
@@ -335,13 +361,11 @@ public class Visualization extends Image {
             }
         }
 
-        // Draw SYSTEM annotations
-//        drawAnnotation(visualizationSurface);
-
+        // Draw annotations
         if (Application.ENABLE_DEBUG_ANNOTATIONS) {
 
             // <CENTROID_ANNOTATION>
-            PointF centroidPosition = getCentroidPosition();
+            PointF centroidPosition = getImageGroup().filterType(BaseImage.TYPE).calculateCentroid();
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getCanvas().drawCircle(centroidPosition.x, centroidPosition.y, 10, visualizationSurface.getPaint());
@@ -356,17 +380,11 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            ArrayList<PointF> machineImagePoints = Visualization.getPositions(getMachineImages());
-//        String logMessage = "";
-//        logMessage += "length(machinePoints): " + machineImagePoints.size() + ": ";
-//        for (int i = 0; i < machineImagePoints.size(); i++) {
-//            logMessage += "(" + machineImagePoints.get(i).x + ", " + machineImagePoints.get(i).x + "), ";
-//        }
-//        Log.v("Annotation", logMessage);
-            PointF machineImageCenterPosition = Geometry.calculateCenterPosition(machineImagePoints);
+            ArrayList<PointF> baseImagePositions = getImageGroup().filterType(BaseImage.TYPE).getPositions();
+            PointF baseImagesCenterPosition = Geometry.calculateCenterPosition(baseImagePositions);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getCanvas().drawCircle(machineImageCenterPosition.x, machineImageCenterPosition.y, 10, visualizationSurface.getPaint());
+            visualizationSurface.getCanvas().drawCircle(baseImagesCenterPosition.x, baseImagesCenterPosition.y, 10, visualizationSurface.getPaint());
 
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getPaint().setTextSize(35);
@@ -374,43 +392,28 @@ public class Visualization extends Image {
             String centerLabeltext = "CENTER";
             Rect centerLabelTextBounds = new Rect();
             visualizationSurface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-            visualizationSurface.getCanvas().drawText(centerLabeltext, machineImageCenterPosition.x + 20, machineImageCenterPosition.y + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+            visualizationSurface.getCanvas().drawText(centerLabeltext, baseImagesCenterPosition.x + 20, baseImagesCenterPosition.y + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
             // </CENTROID_ANNOTATION>
+
+            // <CONVEX_HULL>
+            ArrayList<PointF> basePositions = Visualization.getPositions(getBaseImages());
+            ArrayList<PointF> hull = Geometry.computeConvexHull(basePositions);
+
+            visualizationSurface.getPaint().setColor(Color.RED);
+            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
+
+            for (int i = 0; i < hull.size() - 1; i++) {
+                PointF p1 = hull.get(i);
+                PointF p2 = hull.get(i + 1);
+
+                visualizationSurface.getCanvas().drawLine(p1.x, p1.y, p2.x, p2.y, visualizationSurface.getPaint());
+            }
+            // </CONVEX_HULL>
         }
     }
 
-    /**
-     * Draws the sprite's annotation layer. Contains labels and other text.
-     * @param visualizationSurface
-     */
-    public void drawAnnotation(VisualizationSurface visualizationSurface) {
-
-//        if (showAnnotationLayer) {
-
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
-
-        // Geometry
-        PointF labelPosition = new PointF();
-        labelPosition.set(
-                -getSimulation().getBody(0).getPerspective().getPosition().x,
-                -getSimulation().getBody(0).getPerspective().getPosition().y - (canvas.getHeight() / 2.0f) + 30.0f
-        );
-
-        // Style
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.parseColor("#333333"));
-        float typeLabelTextSize = 35;
-
-        String typeLabelText = "my system";
-
-        // Draw
-        Shape.drawText(labelPosition, typeLabelText, typeLabelTextSize, canvas, paint);
-//        }
-    }
-
     public ArrayList<Integer> getLayerIds() {
-        ArrayList<Integer> layers = new ArrayList<Integer>();
+        ArrayList<Integer> layers = new ArrayList<>();
         for (Layer layer: getLayers()) {
             layers.add(layer.getId());
         }
@@ -436,25 +439,17 @@ public class Visualization extends Image {
     public void onTouchInteraction(TouchInteraction touchInteraction) {
     }
 
-    public PointF getCentroidPosition() {
-        // Auto-adjust the perspective
-        ArrayList<PointF> spritePositions = new ArrayList<PointF>();
-
-//        for (Layer layer: getLayers()) {
-//            for (Image image : layer.getImages()) {
-//                if (image.isVisible()) {
-//                    spritePositions.add(image.getPosition());
-//                }
+//    public PointF getCentroidPosition() {
+//
+//        // Auto-adjust the perspective
+//        ArrayList<PointF> spritePositions = new ArrayList<PointF>();
+//
+//        for (Image image: getBaseImages()) {
+//            if (image.isVisible()) {
+//                spritePositions.add(image.getPosition());
 //            }
 //        }
-
-        for (Image image : getMachineImages()) {
-            if (image.isVisible()) {
-                spritePositions.add(image.getPosition());
-            }
-        }
-
-        PointF centroidPosition = Geometry.calculateCentroid(spritePositions);
-        return centroidPosition;
-    }
+//
+//        return Geometry.calculateCentroidPosition(spritePositions);
+//    }
 }

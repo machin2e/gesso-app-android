@@ -52,16 +52,16 @@ public class PortImage extends Image {
 
         this.setType(TYPE);
 
-        initialize();
+        setup();
     }
 
-    private void initialize() {
+    private void setup() {
         this.uniqueColor = updateUniqueColor();
-        initializeData();
+        setupData();
         setVisibility(false);
     }
 
-    private void initializeData () {
+    private void setupData() {
         for (int i = 0; i < this.portDataSamples.length; i++) {
             this.portDataSamples[i] = -(this.shapeRadius / 2.0f) + 0;
         }
@@ -580,23 +580,21 @@ public class PortImage extends Image {
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
-        if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.NONE) {
+        if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
             Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TOUCH) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
             Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.TAP) {
-            Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DOUBLE_DAP) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
             Log.v("onTouchInteraction", "TouchInteraction.DOUBLE_TAP to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.HOLD) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
             Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.MOVE) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
             Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.PRE_DRAG) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.PRE_DRAG) {
             Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.DRAG) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
             Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.TouchInteractionType.RELEASE) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
             Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
 
             this.setCandidatePathVisibility(false);

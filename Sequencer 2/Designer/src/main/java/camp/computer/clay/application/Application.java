@@ -34,7 +34,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // <Settings>
     private static final boolean ENABLE_TONE_GENERATOR = false;
     private static final boolean ENABLE_SPEECH_GENERATOR = false;
-    private static final long MESSAGE_SEND_FREQUENCY = 10;
+
+    private static final long MESSAGE_SEND_FREQUENCY = 100;
     // </Settings>
 
     // <Style>
@@ -99,6 +100,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // Visualization Surface
         visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
         visualizationSurface.onResume();
+
+        // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
+        //setContentView(visualizationSurface);
 
         if (ENABLE_FULLSCREEN) {
 
@@ -574,9 +578,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     protected void onPause() {
         super.onPause();
 
-        // <MAP>
+        // <VISUALIZATION>
         visualizationSurface.onPause();
-        // </MAP>
+        // </VISUALIZATION>
     }
 
     @Override
@@ -590,9 +594,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             datagramServer.startServer();
         }
 
-        // <MAP>
+        // <VISUALIZATION>
         visualizationSurface.onResume();
-        // </MAP>
+        // </VISUALIZATION>
     }
 
     // Create the Handler object. This will be run on the main thread by default.
