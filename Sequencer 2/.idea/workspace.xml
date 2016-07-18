@@ -194,19 +194,19 @@
       <file leaf-file-name="Perspective.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/interaction/Perspective.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="154" column="130" selection-start-line="154" selection-start-column="130" selection-end-line="154" selection-end-column="130" />
+            <state relative-caret-position="640">
+              <caret line="154" column="0" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1468842182000" expanded="false" signature="810:821" ph=" { " />
-                <marker date="1468842182000" expanded="false" signature="876:887" ph=" { " />
-                <marker date="1468842182000" expanded="false" signature="953:964" ph=" { " />
-                <marker date="1468842182000" expanded="false" signature="1022:1033" ph=" { " />
-                <marker date="1468842182000" expanded="false" signature="1376:1387" ph=" { " />
-                <marker date="1468842182000" expanded="false" signature="1422:1428" ph=" }" />
-                <marker date="1468842182000" expanded="false" signature="1466:1477" ph=" { " />
-                <marker date="1468842182000" expanded="false" signature="1498:1504" ph=" }" />
-                <marker date="1468842182000" expanded="false" signature="4186:4197" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="784:795" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="850:861" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="927:938" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="996:1007" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="1350:1361" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="1396:1402" ph=" }" />
+                <marker date="1468843548000" expanded="false" signature="1440:1451" ph=" { " />
+                <marker date="1468843548000" expanded="false" signature="1472:1478" ph=" }" />
+                <marker date="1468843548000" expanded="false" signature="3651:3662" ph=" { " />
               </folding>
             </state>
           </provider>
@@ -2793,7 +2793,7 @@
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.271875" sideWeight="0.52715653" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.271875" sideWeight="0.47284344" order="4" side_tool="false" content_ui="tabs" x="1920" y="0" width="1680" height="1050" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.271875" sideWeight="0.47284344" order="4" side_tool="false" content_ui="tabs" x="1920" y="0" width="1680" height="1050" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -3386,19 +3386,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Designer/src/main/java/camp/computer/clay/model/interaction/Perspective.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="154" column="130" selection-start-line="154" selection-start-column="130" selection-end-line="154" selection-end-column="130" />
+        <state relative-caret-position="640">
+          <caret line="154" column="0" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1468842182000" expanded="false" signature="810:821" ph=" { " />
-            <marker date="1468842182000" expanded="false" signature="876:887" ph=" { " />
-            <marker date="1468842182000" expanded="false" signature="953:964" ph=" { " />
-            <marker date="1468842182000" expanded="false" signature="1022:1033" ph=" { " />
-            <marker date="1468842182000" expanded="false" signature="1376:1387" ph=" { " />
-            <marker date="1468842182000" expanded="false" signature="1422:1428" ph=" }" />
-            <marker date="1468842182000" expanded="false" signature="1466:1477" ph=" { " />
-            <marker date="1468842182000" expanded="false" signature="1498:1504" ph=" }" />
-            <marker date="1468842182000" expanded="false" signature="4186:4197" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="784:795" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="850:861" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="927:938" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="996:1007" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="1350:1361" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="1396:1402" ph=" }" />
+            <marker date="1468843548000" expanded="false" signature="1440:1451" ph=" { " />
+            <marker date="1468843548000" expanded="false" signature="1472:1478" ph=" }" />
+            <marker date="1468843548000" expanded="false" signature="3651:3662" ph=" { " />
           </folding>
         </state>
       </provider>
