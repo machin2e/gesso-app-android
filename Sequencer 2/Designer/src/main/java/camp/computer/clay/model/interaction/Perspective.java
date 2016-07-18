@@ -1,10 +1,13 @@
 package camp.computer.clay.model.interaction;
 
+import android.util.Log;
+
 import camp.computer.clay.application.Application;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.arch.Visualization;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.util.Time;
 
 public class Perspective {
 
@@ -47,81 +50,67 @@ public class Perspective {
         return this.position;
     }
 
-    public static PointHolder DEFAULT_POSITION = new PointHolder(0, 0);
-    public static double DEFAULT_ADJUSTMENT_DURATION = 250;
+    public static final double DEFAULT_SCALE_FACTOR = 1.0f;
+    public static final int DEFAULT_SCALE_DURATION = 250;
+
+    public static final PointHolder DEFAULT_POSITION = new PointHolder(0, 0);
+    public static final double DEFAULT_ADJUSTMENT_DURATION = 250;
+
+    private double targetScale = DEFAULT_SCALE_FACTOR;
+    public double scale = targetScale;
+    private int scaleDuration = DEFAULT_SCALE_DURATION;
 
     private PointHolder targetPosition = DEFAULT_POSITION;
     private PointHolder position = new PointHolder(targetPosition.getX(), targetPosition.getY());
     private double adjustmentDuration = DEFAULT_ADJUSTMENT_DURATION;
-    private double adjustmentPerFrameDistanceX = 0.0f;
-    private double adjustmentPerFrameDistanceY = 0.0f;
+    private double adjustmentFrameDeltaX = 0.0f;
+    private double adjustmentFrameDeltaY = 0.0f;
 
-    private double scalePerFrameDistance = 0.0f;
+    private double scaleFrameDelta = 0.0f;
 
+    int frameCount = 0;
+    int frameIndex = 0;
+
+    PointHolder startPosition = new PointHolder();
+    double distanceToTarget = 0.0f;
+    double distanceToTargetX = 0.0f;
+    double distanceToTargetY = 0.0f;
     public void setPosition (PointHolder targetPosition) {
+
+        // this.targetPosition.setX(-targetPosition.getX() * targetScale);
+        // this.targetPosition.setY(-targetPosition.getY() * targetScale);
+
+        startPosition.set(position);
 
         this.targetPosition.setX(-targetPosition.getX());
         this.targetPosition.setY(-targetPosition.getY());
 
-        double MILLISECONDS_PER_SECOND = 1000.0f;
-        double frameCount = (double) Application.getDisplay().getFramesPerSecond() * (adjustmentDuration / MILLISECONDS_PER_SECOND);
+        distanceToTarget = Geometry.calculateDistance(position, this.targetPosition);
+        distanceToTargetX = this.targetPosition.getX() - this.position.getX();
+        distanceToTargetY = this.targetPosition.getY() - this.position.getY();
+
+        // <PLAN_ANIMATION>
+        frameCount = (int) (Application.getDisplay().getFramesPerSecond() * (adjustmentDuration / Time.MILLISECONDS_PER_SECOND));
         // ^ use frameCount as index into function to change animation by maing stepDistance vary with frameCount
-        double stepDistanceX = Math.abs(this.position.getX() - targetPosition.getX()) / frameCount;
-        double stepDistanceY = Math.abs(this.position.getY() - targetPosition.getY()) / frameCount;
+        frameIndex = 0;
 
-        adjustmentPerFrameDistanceX = stepDistanceX;
-        adjustmentPerFrameDistanceY = stepDistanceY;
-
-//        if (this.position.x != -targetPosition.x) {
-//
-//            // Pan to x position
-//            if (this.position.x != -targetPosition.x) {
-//                Animation.scaleValue(position.x, -targetPosition.x, adjustmentDuration, new Animation.OnScaleListener() {
-//                    @Override
-//                    public void onScale(double currentScale) {
-//                        position.x = currentScale;
-//                    }
-//                });
-//            }
-//
-//            this.targetPosition.x = -targetPosition.x;
-//        }
-//
-//        if (this.position.y != -targetPosition.y) {
-//
-//            // Pan to y position
-//            if (this.position.y != -targetPosition.y) {
-//                Animation.scaleValue(position.y, -targetPosition.y, adjustmentDuration, new Animation.OnScaleListener() {
-//                    @Override
-//                    public void onScale(double currentScale) {
-//                        position.y = currentScale;
-//                    }
-//                });
-//            }
-//
-//            this.targetPosition.y = -targetPosition.y;
-//        }
+        adjustmentFrameDeltaX = Math.abs(targetPosition.getX() - position.getX()) / frameCount;
+        adjustmentFrameDeltaY = Math.abs(targetPosition.getY() - position.getY()) / frameCount;;
+        // </PLAN_ANIMATION>
     }
 
     public void setOffset(double xOffset, double yOffset) {
         this.position.offset(xOffset, yOffset);
     }
 
-    public static double DEFAULT_SCALE_FACTOR = 1.0f;
-    public static int DEFAULT_SCALE_DURATION = 250;
-
-    private double targetScale = DEFAULT_SCALE_FACTOR;
-    public double scale = targetScale;
-    private int scaleDuration = DEFAULT_SCALE_DURATION;
-
     public void setScale (double targetScale) {
 
         this.targetScale = targetScale;
 
-        double MILLISECONDS_PER_SECOND = 1000.0f;
-        double frameCount = (double) Application.getDisplay().getFramesPerSecond() * (scaleDuration / MILLISECONDS_PER_SECOND);
+        double frameCount = Application.getDisplay().getFramesPerSecond() * (scaleDuration / Time.MILLISECONDS_PER_SECOND);
         // ^ use frameCount as index into function to change animation by maing stepDistance vary with frameCount
-        scalePerFrameDistance = Math.abs(this.scale - targetScale) / frameCount;;
+
+        scaleFrameDelta = Math.abs(targetScale - scale) / frameCount;
     }
 
     public double getScale() {
@@ -130,59 +119,157 @@ public class Perspective {
 
     public void update() {
 
-        // Position
+        /*
+        // This works without per-frame adjustment. It's a starting point for that.
+        scale = this.targetScale;
 
-        if (this.position.getX() != targetPosition.getX()) {
+        position.setX(targetPosition.getX());
+        position.setY(targetPosition.getY());
 
-//            double stepDistance = Geometry.calculateDistance(this.position, targetPosition) / adjustmentDuration;
+        position.setX(position.getX() * scale);
+        position.setY(position.getY() * scale);
+        */
 
-            if (position.getX() > targetPosition.getX()) {
-                position.setX(position.getX() - adjustmentPerFrameDistanceX * scale);
-            } else {
-                position.setX(position.getX() + adjustmentPerFrameDistanceX * scale);
-            }
-
-            if (Math.abs(position.getX() * scale - targetPosition.getX() * scale) < adjustmentPerFrameDistanceX * scale) {
-                position.setX(targetPosition.getX());
-            }
-
-        }
-
-        if (this.position.getY() != this.targetPosition.getY()) {
-
-//            double stepDistance = Geometry.calculateDistance(this.position, targetPosition) / adjustmentDuration;
-
-            if (position.getY() > targetPosition.getY()) {
-                position.setY(position.getY() - adjustmentPerFrameDistanceY * scale);
-            } else {
-                position.setY(position.getY() + adjustmentPerFrameDistanceY * scale);
-            }
-
-            if (Math.abs(position.getY() - targetPosition.getY()) < adjustmentPerFrameDistanceY * scale) {
-                position.setY(targetPosition.getY());
-            }
-
-        }
+        double previousFrameScale = scale;
 
         // Scale
-        if (this.scale != this.targetScale) {
+        if (scale != targetScale) {
 
             if (scale > targetScale) {
-                scale -= scalePerFrameDistance;
+                scale -= scaleFrameDelta;
             } else {
-                scale += scalePerFrameDistance;
+                scale += scaleFrameDelta;
             }
 
-            if (Math.abs(scale - targetScale) < scalePerFrameDistance) {
+            if (Math.abs(scale - targetScale) < scaleFrameDelta) {
                 scale = targetScale;
             }
 
         }
 
+        if (frameIndex < frameCount) {
+
+            // double currentDistanceToTarget = Geometry.calculateDistance(position, targetPosition);
+            // double currentDistance = (distanceToTarget - currentDistanceToTarget) / distanceToTarget;
+            double currentDistanceTarget = (((double) (frameIndex + 1) / (double) frameCount) * distanceToTarget) / distanceToTarget;
+            // Log.v("Progress", "frame: " + (frameIndex + 1) + " of " + frameCount + ", done: " + currentDistance + ", target: " + currentDistanceTarget + ", left: " + (1.0 - currentDistance));
+
+            double newX = currentDistanceTarget * distanceToTargetX + startPosition.getX();
+            double newY = currentDistanceTarget * distanceToTargetY + startPosition.getY();
+
+            position.set(
+                    newX * scale,
+                    newY * scale
+            );
+
+            frameIndex++;
+
+        } else if (frameIndex == frameCount) {
+
+            position.setX(targetPosition.getX() * scale);
+            position.setY(targetPosition.getY() * scale);
+
+        }
+
+//        if (position.getX() != targetPosition.getX()) {
+//
+//            if (position.getX() > targetPosition.getX()) {
+//                position.setX((position.getX() - adjustmentFrameDeltaX * (1)) * 1);
+//            } else {
+//                position.setX((position.getX() + adjustmentFrameDeltaX * (1)) * 1);
+//            }
+//
+//            if (Math.abs(targetPosition.getX() - position.getX()) < adjustmentFrameDeltaX) {
+//                position.setX(targetPosition.getX());
+//            }
+//
+//        }
+//
+//        if (position.getY() != this.targetPosition.getY()) {
+//
+//            if (position.getY() > targetPosition.getY()) {
+//                position.setY((position.getY() - adjustmentFrameDeltaY * (1)) * 1);
+//            } else {
+//                position.setY((position.getY() + adjustmentFrameDeltaY * (1)) * 1);
+//            }
+//
+//            if (Math.abs(targetPosition.getY() - position.getY()) < adjustmentFrameDeltaY) {
+//                position.setY(targetPosition.getY());
+//            }
+//
+//            frameIndex++;
+//        }
+
+//        if (position.getX() != targetPosition.getX()) {
+//
+//            if (position.getX() > targetPosition.getX()) {
+//                position.setX((position.getX() - frameDeltaX * (1)) * 1);
+//            } else {
+//                position.setX((position.getX() + frameDeltaX * (1)) * 1);
+//            }
+//
+//            if (Math.abs(targetPosition.getX() - position.getX()) < frameDeltaX) {
+//                position.setX(targetPosition.getX());
+//            }
+//
+//        }
+//
+//        if (position.getY() != this.targetPosition.getY()) {
+//
+//            if (position.getY() > targetPosition.getY()) {
+//                position.setY((position.getY() - frameDeltaY * (1)) * 1);
+//            } else {
+//                position.setY((position.getY() + frameDeltaY * (1)) * 1);
+//            }
+//
+//            if (Math.abs(targetPosition.getY() - position.getY()) < frameDeltaY) {
+//                position.setY(targetPosition.getY());
+//            }
+//
+//            frameIndex++;
+//        }
+
+        // Position
+        /*
+        // Not bad.. but not perfect!
+
+        double frameDeltaX = Math.abs(targetPosition.getX() - position.getX()) / frameCount;
+        double frameDeltaY = Math.abs(targetPosition.getY() - position.getY()) / frameCount;
+
+        if (position.getX() != targetPosition.getX()) {
+
+            if (position.getX() > targetPosition.getX()) {
+                position.setX((position.getX() - frameDeltaX * (1)) * 1);
+            } else {
+                position.setX((position.getX() + frameDeltaX * (1)) * 1);
+            }
+
+            if (Math.abs(targetPosition.getX() - position.getX()) < frameDeltaX) {
+                position.setX(targetPosition.getX());
+            }
+
+        }
+
+        if (position.getY() != this.targetPosition.getY()) {
+
+            if (position.getY() > targetPosition.getY()) {
+                position.setY((position.getY() - frameDeltaY * (1)) * 1);
+            } else {
+                position.setY((position.getY() + frameDeltaY * (1)) * 1);
+            }
+
+            if (Math.abs(targetPosition.getY() - position.getY()) < frameDeltaY) {
+                position.setY(targetPosition.getY());
+            }
+
+            frameIndex++;
+        }
+        */
+
     }
 
-    public void setAdjustability(boolean isMovable) {
-        this.isMovable = isMovable;
+    public void setAdjustability(boolean isAdjustable) {
+        this.isMovable = isAdjustable;
     }
 
     public boolean isAdjustable() {

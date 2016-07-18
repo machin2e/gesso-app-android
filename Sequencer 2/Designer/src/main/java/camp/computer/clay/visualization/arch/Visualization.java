@@ -360,7 +360,7 @@ public class Visualization extends Image {
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getPaint().setTextSize(35);
 
-            String fpsText = "FPS: " + visualizationSurface.getRenderer().getFramesPerSecond();
+            String fpsText = "FPS: " + (int) visualizationSurface.getRenderer().getFramesPerSecond();
             Rect fpsTextBounds = new Rect();
             visualizationSurface.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
             visualizationSurface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20,(float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, visualizationSurface.getPaint());

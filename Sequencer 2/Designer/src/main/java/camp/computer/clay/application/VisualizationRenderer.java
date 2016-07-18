@@ -12,6 +12,8 @@ public class VisualizationRenderer extends Thread {
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
 
+    final public static int DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT = 4;
+
     public static boolean ENABLE_THREAD_SLEEP = true;
 
     public static boolean ENABLE_STATISTICS = true;
@@ -35,7 +37,7 @@ public class VisualizationRenderer extends Thread {
     // <STATISTICS>
     private double currentFramesPerSecond = 0;
     private int fpsSampleIndex = 0;
-    private final int fpsSampleLimit = targetFramesPerSecond; // Moving FPS average for last second.
+    private final int fpsSampleLimit = DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT; // Moving FPS average for last second.
     private double[] fpsSamples = new double[fpsSampleLimit];
     // </STATISTICS>
 
@@ -74,6 +76,7 @@ public class VisualizationRenderer extends Thread {
                         Thread.sleep(frameSleepTime);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace ();
                 }
             }
 
