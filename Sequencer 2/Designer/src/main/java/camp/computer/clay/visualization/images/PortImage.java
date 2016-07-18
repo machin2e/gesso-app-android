@@ -259,23 +259,11 @@ public class PortImage extends Image {
                 if (port.getDirection() == Port.Direction.INPUT) {
 
                     for (int k = 0; k < portDataSamples.length - 1; k++) {
-                        canvas.drawLine(
-                                (float) rotatedPortDataSamplePoints[k].getX(),
-                                (float) rotatedPortDataSamplePoints[k].getY(),
-                                (float) rotatedPortDataSamplePoints[k + 1].getX(),
-                                (float) rotatedPortDataSamplePoints[k + 1].getY(),
-                                paint
-                        );
+                        Shape.drawLine(rotatedPortDataSamplePoints[k], rotatedPortDataSamplePoints[k + 1], canvas, paint);
                     }
                 } else if (port.getDirection() == Port.Direction.OUTPUT) {
                     for (int k = 0; k < portDataSamples.length - 1; k++) {
-                        canvas.drawLine(
-                                (float) rotatedPortDataSamplePoints[k].getX(),
-                                (float) rotatedPortDataSamplePoints[k].getY(),
-                                (float) rotatedPortDataSamplePoints[k + 1].getX(),
-                                (float) rotatedPortDataSamplePoints[k + 1].getY(),
-                                paint
-                        );
+                        Shape.drawLine(rotatedPortDataSamplePoints[k], rotatedPortDataSamplePoints[k + 1], canvas, paint);
                     }
                 }
             }

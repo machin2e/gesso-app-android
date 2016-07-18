@@ -127,8 +127,8 @@ public class BaseImage extends Image {
             if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
                 visualizationSurface.getPaint().setColor(Color.GREEN);
                 visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                visualizationSurface.getCanvas().drawCircle((float) getPosition().getX(), (float) getPosition().getY(), (float) shape.getWidth(), visualizationSurface.getPaint());
-                visualizationSurface.getCanvas().drawCircle((float) getPosition().getX(), (float) getPosition().getY(), (float) shape.getWidth() / 2.0f, visualizationSurface.getPaint());
+                Shape.drawCircle(getPosition(), shape.getWidth(), 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                Shape.drawCircle(getPosition(), shape.getWidth() / 2.0f, 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
             }
         }
     }
@@ -239,14 +239,14 @@ public class BaseImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            canvas.drawCircle((float) portGroupCenterPositions[i].getX(), (float) portGroupCenterPositions[i].getY(), 20, paint);
+            Shape.drawCircle(portGroupCenterPositions[i], 20, 0, canvas, paint);
 
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth((float) portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
-                canvas.drawCircle((float) portGroupCenterPositions[i].getX(), (float) portGroupCenterPositions[i].getY(), 20, paint);
+                Shape.drawCircle(portGroupCenterPositions[i], 20, 0, canvas, paint);
             }
 
         }

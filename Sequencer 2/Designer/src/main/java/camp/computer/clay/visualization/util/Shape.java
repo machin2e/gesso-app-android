@@ -30,6 +30,19 @@ public abstract class Shape {
         canvas.drawPath(path, paint);
     }
 
+    public static void drawLine(PointHolder source, PointHolder target, Canvas canvas, Paint paint) {
+
+        // Color
+        canvas.drawLine(
+                (float) source.getX(),
+                (float) source.getY(),
+                (float) target.getX(),
+                (float) target.getY(),
+                paint
+        );
+
+    }
+
     public static void drawCircle(PointHolder position, double radius, double angle, Canvas canvas, Paint paint) {
 
         // Color
