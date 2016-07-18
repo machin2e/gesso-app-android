@@ -2,59 +2,62 @@ package camp.computer.clay.visualization.util;
 
 import android.graphics.PointF;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class Rectangle {
+public class Rectangle extends Shape {
 
-    // TODO: Replace with Point
-    private PointF position = new PointF(0, 0);
+    // TODO: Replace with PointHolder
+    private PointHolder position = new PointHolder(0, 0);
 
-    private float width = 0;
-    private float height = 0;
+    private double width = 0;
+    private double height = 0;
 
-    public Rectangle(PointF position, float width, float height) {
+    public Rectangle (double width, double height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public Rectangle(PointHolder position, double width, double height) {
         this.position.set(position);
         this.width = width;
         this.height = height;
     }
 
-    public Rectangle (float left, float top, float right, float bottom) {
+    public Rectangle (double left, double top, double right, double bottom) {
         this.width = (right - left);
         this.height = (bottom - top);
-        this.position = new PointF (
-                left + this.width / 2.0f,
-                top + this.height / 2.0f
+        this.position = new PointHolder (
+                (right + left) / 2.0,
+                (top + bottom) / 2.0
         );
     }
 
-    public PointF getPosition () {
+    public PointHolder getPosition () {
         return position;
     }
 
     public void setPosition (PointF position) {
-        this.position.x = position.x;
-        this.position.y = position.y;
+        this.position.set(position.x, position.y);
     }
 
-    public PointF getTopLeft () {
-        return new PointF (getLeft(), getTop());
+    public PointHolder getTopLeft () {
+        return new PointHolder (getLeft(), getTop());
     }
 
-    public PointF getTopRight () {
-        return new PointF (getRight(), getTop());
+    public PointHolder getTopRight () {
+        return new PointHolder (getRight(), getTop());
     }
 
-    public PointF getBottomRight () {
-        return new PointF (getRight(), getBottom());
+    public PointHolder getBottomRight () {
+        return new PointHolder (getRight(), getBottom());
     }
 
-    public PointF getBottomLeft () {
-        return new PointF (getLeft(), getBottom());
+    public PointHolder getBottomLeft () {
+        return new PointHolder (getLeft(), getBottom());
     }
 
-    public ArrayList<PointF> getVertices () {
-        ArrayList<PointF> vertices = new ArrayList<>();
+    public ArrayList<PointHolder> getVertices () {
+        ArrayList<PointHolder> vertices = new ArrayList<>();
         vertices.add(getTopLeft());
         vertices.add(getTopRight());
         vertices.add(getBottomRight());
@@ -62,47 +65,47 @@ public class Rectangle {
         return vertices;
     }
 
-    public float getWidth () {
+    public double getWidth () {
         return this.width;
     }
 
-    public void setWidth (float width) {
+    public void setWidth (double width) {
         this.width = width;
     }
 
-    public float getHeight () {
+    public double getHeight () {
         return this.height;
     }
 
-    public void setHeight (float height) {
+    public void setHeight (double height) {
         this.height = height;
     }
 
-    public float getLeft () {
-        return this.position.x - (width / 2.0f);
+    public double getLeft () {
+        return this.position.getX() - (width / 2.0f);
     }
 
-    public float getTop () {
-        return this.position.y - (height / 2.0f);
+    public double getTop () {
+        return this.position.getY() - (height / 2.0f);
     }
 
-    public float getRight () {
-        return this.position.x + (width / 2.0f);
+    public double getRight () {
+        return this.position.getX() + (width / 2.0f);
     }
 
-    public float getBottom () {
-        return this.position.y + (height / 2.0f);
+    public double getBottom () {
+        return this.position.getY() + (height / 2.0f);
     }
 
-    public float getArea () {
+    public double getArea () {
         return this.width * this.height;
     }
 
-    public float getPerimeter () {
+    public double getPerimeter () {
         return 2 * (this.width + this.height);
     }
 
-    public float getDiagonalLength () {
-        return (float) Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
+    public double getDiagonalLength () {
+        return (double) Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
     }
 }

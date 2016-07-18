@@ -1,31 +1,32 @@
 package camp.computer.clay.model.interaction;
 
-import android.graphics.PointF;
-
+import camp.computer.clay.application.Application;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.arch.Visualization;
-import camp.computer.clay.visualization.util.Animation;
+import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.PointHolder;
 
 public class Perspective {
+
     // TODO: Move position into Body, so can share Perspective among different bodies
     // ^ actually NO, because then a Body couldn't adopt a different Perspective
 
-    private float width; // Width of perspective --- interactions (e.g., touches) are interpreted relative to this point
-    private float height; // Height of perspective
+    private double width; // Width of perspective --- interactions (e.g., touches) are interpreted relative to this point
+    private double height; // Height of perspective
 
-    public void setWidth(float width) {
+    public void setWidth(double width) {
         this.width = width;
     }
 
-    public float getWidth() {
+    public double getWidth() {
         return this.width;
     }
 
-    public void setHeight(float height) {
+    public void setHeight(double height) {
         this.height = height;
     }
 
-    public float getHeight() {
+    public double getHeight() {
         return this.height;
     }
 
@@ -33,121 +34,159 @@ public class Perspective {
     private Visualization visualization;
 
     // Focus in Perspective
-//    private boolean isMapPerspective = false;
-//    private boolean isMachinePerspective = false;
-//    private boolean isPortPerspective = false;
-//    private boolean isPathPerspective = false; // TODO: Infer this from interaction history/perspective
+    // TODO: Infer this from interaction history/perspective
     private Image focusImage = null;
 
-    private boolean isPanningEnabled = true;
-
-//    private PointF position = new PointF (); // Center position --- interactions (e.g., touches) are interpreted relative to this point
+    private boolean isMovable = true;
 
     public Perspective(Visualization visualization) {
         this.visualization = visualization;
     }
 
-    public PointF getPosition() {
+    public PointHolder getPosition() {
         return this.position;
     }
 
-    public static PointF DEFAULT_POSITION = new PointF(0, 0);
-    public static int DEFAULT_PANNING_DURATION = 200;
+    public static PointHolder DEFAULT_POSITION = new PointHolder(0, 0);
+    public static double DEFAULT_ADJUSTMENT_DURATION = 250;
 
-    private PointF targetPosition = DEFAULT_POSITION;
-    private PointF position = new PointF(targetPosition.x, targetPosition.y);
-    private int panningDuration = DEFAULT_PANNING_DURATION;
+    private PointHolder targetPosition = DEFAULT_POSITION;
+    private PointHolder position = new PointHolder(targetPosition.getX(), targetPosition.getY());
+    private double adjustmentDuration = DEFAULT_ADJUSTMENT_DURATION;
+    private double adjustmentPerFrameDistanceX = 0.0f;
+    private double adjustmentPerFrameDistanceY = 0.0f;
 
-    public void setPosition (PointF targetPosition) {
+    private double scalePerFrameDistance = 0.0f;
 
-        if (this.position.x != -targetPosition.x) {
+    public void setPosition (PointHolder targetPosition) {
 
-            // Pan to x position
-            if (this.position.x != -targetPosition.x) {
-                Animation.scaleValue(position.x, -targetPosition.x, panningDuration, new Animation.OnScaleListener() {
-                    @Override
-                    public void onScale(float currentScale) {
-                        position.x = currentScale;
-                    }
-                });
-            }
+        this.targetPosition.setX(-targetPosition.getX());
+        this.targetPosition.setY(-targetPosition.getY());
 
-            this.targetPosition.x = -targetPosition.x;
-        }
+        double MILLISECONDS_PER_SECOND = 1000.0f;
+        double frameCount = (double) Application.getDisplay().getFramesPerSecond() * (adjustmentDuration / MILLISECONDS_PER_SECOND);
+        // ^ use frameCount as index into function to change animation by maing stepDistance vary with frameCount
+        double stepDistanceX = Math.abs(this.position.getX() - targetPosition.getX()) / frameCount;
+        double stepDistanceY = Math.abs(this.position.getY() - targetPosition.getY()) / frameCount;
 
-        if (this.position.y != -targetPosition.y) {
+        adjustmentPerFrameDistanceX = stepDistanceX;
+        adjustmentPerFrameDistanceY = stepDistanceY;
 
-            // Pan to y position
-            if (this.position.y != -targetPosition.y) {
-                Animation.scaleValue(position.y, -targetPosition.y, panningDuration, new Animation.OnScaleListener() {
-                    @Override
-                    public void onScale(float currentScale) {
-                        position.y = currentScale;
-                    }
-                });
-            }
-
-            this.targetPosition.y = -targetPosition.y;
-        }
+//        if (this.position.x != -targetPosition.x) {
+//
+//            // Pan to x position
+//            if (this.position.x != -targetPosition.x) {
+//                Animation.scaleValue(position.x, -targetPosition.x, adjustmentDuration, new Animation.OnScaleListener() {
+//                    @Override
+//                    public void onScale(double currentScale) {
+//                        position.x = currentScale;
+//                    }
+//                });
+//            }
+//
+//            this.targetPosition.x = -targetPosition.x;
+//        }
+//
+//        if (this.position.y != -targetPosition.y) {
+//
+//            // Pan to y position
+//            if (this.position.y != -targetPosition.y) {
+//                Animation.scaleValue(position.y, -targetPosition.y, adjustmentDuration, new Animation.OnScaleListener() {
+//                    @Override
+//                    public void onScale(double currentScale) {
+//                        position.y = currentScale;
+//                    }
+//                });
+//            }
+//
+//            this.targetPosition.y = -targetPosition.y;
+//        }
     }
 
-    public void setOffset(float xOffset, float yOffset) {
+    public void setOffset(double xOffset, double yOffset) {
         this.position.offset(xOffset, yOffset);
     }
 
-    public static float DEFAULT_SCALE_FACTOR = 1.0f;
-    public static int DEFAULT_SCALE_DURATION = 200;
+    public static double DEFAULT_SCALE_FACTOR = 1.0f;
+    public static int DEFAULT_SCALE_DURATION = 250;
 
-    private float targetScale = DEFAULT_SCALE_FACTOR;
-    public float scale = targetScale;
+    private double targetScale = DEFAULT_SCALE_FACTOR;
+    public double scale = targetScale;
     private int scaleDuration = DEFAULT_SCALE_DURATION;
-    private boolean scaleInProgress = false;
 
-    public void setScale (float targetScale) {
+    public void setScale (double targetScale) {
 
-//        Log.v("SetScale", "newScale: " + targetScale);
-//        Log.v("SetScale", "this.targetScale: " + this.targetScale);
-//        Log.v("SetScale", "this.scale: " + this.scale);
+        this.targetScale = targetScale;
 
-        if (this.targetScale != targetScale) {
-
-//            Log.v("SetScale", "targetScale: " + this.targetScale);
-
-            if (this.scale != targetScale) {
-                Animation.scaleValue(scale, targetScale, scaleDuration, new Animation.OnScaleListener() {
-                    @Override
-                    public void onScale(float currentScale) {
-//                        Log.v("SetScale", "targetScale: " + currentScale);
-                        scale = currentScale;
-                    }
-                });
-            }
-
-            /*
-            Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);
-            // Vibrate for 500 milliseconds
-            v.vibrate(50);
-            */
-
-            this.targetScale = targetScale;
-        }
+        double MILLISECONDS_PER_SECOND = 1000.0f;
+        double frameCount = (double) Application.getDisplay().getFramesPerSecond() * (scaleDuration / MILLISECONDS_PER_SECOND);
+        // ^ use frameCount as index into function to change animation by maing stepDistance vary with frameCount
+        scalePerFrameDistance = Math.abs(this.scale - targetScale) / frameCount;;
     }
 
-    public float getScale() {
+    public double getScale() {
         return this.scale;
     }
 
-    // TODO: setMovability(boolean isMovable)
-    public void disablePanning() {
-        this.isPanningEnabled = false;
+    public void update() {
+
+        // Position
+
+        if (this.position.getX() != targetPosition.getX()) {
+
+//            double stepDistance = Geometry.calculateDistance(this.position, targetPosition) / adjustmentDuration;
+
+            if (position.getX() > targetPosition.getX()) {
+                position.setX(position.getX() - adjustmentPerFrameDistanceX * scale);
+            } else {
+                position.setX(position.getX() + adjustmentPerFrameDistanceX * scale);
+            }
+
+            if (Math.abs(position.getX() * scale - targetPosition.getX() * scale) < adjustmentPerFrameDistanceX * scale) {
+                position.setX(targetPosition.getX());
+            }
+
+        }
+
+        if (this.position.getY() != this.targetPosition.getY()) {
+
+//            double stepDistance = Geometry.calculateDistance(this.position, targetPosition) / adjustmentDuration;
+
+            if (position.getY() > targetPosition.getY()) {
+                position.setY(position.getY() - adjustmentPerFrameDistanceY * scale);
+            } else {
+                position.setY(position.getY() + adjustmentPerFrameDistanceY * scale);
+            }
+
+            if (Math.abs(position.getY() - targetPosition.getY()) < adjustmentPerFrameDistanceY * scale) {
+                position.setY(targetPosition.getY());
+            }
+
+        }
+
+        // Scale
+        if (this.scale != this.targetScale) {
+
+            if (scale > targetScale) {
+                scale -= scalePerFrameDistance;
+            } else {
+                scale += scalePerFrameDistance;
+            }
+
+            if (Math.abs(scale - targetScale) < scalePerFrameDistance) {
+                scale = targetScale;
+            }
+
+        }
+
     }
 
-    public void enablePanning() {
-        this.isPanningEnabled = true;
+    public void setAdjustability(boolean isMovable) {
+        this.isMovable = isMovable;
     }
 
-    public boolean isPanningEnabled() {
-        return isPanningEnabled;
+    public boolean isAdjustable() {
+        return isMovable;
     }
 
     public Visualization getVisualization() {
@@ -165,9 +204,4 @@ public class Perspective {
     public void setFocus(Image image) {
         this.focusImage = image;
     }
-
-//    public void setFocus(ArrayList<Image> sprites) {
-//        // TODO: Get bounding box of sprites.
-//        // TODO: Zoom to fit bounding box plus some padding.
-//    }
 }

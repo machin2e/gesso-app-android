@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,6 +18,7 @@ import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.arch.Visualization;
 import camp.computer.clay.visualization.images.BaseImage;
 import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.PointHolder;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -35,7 +35,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
     private VisualizationRenderer visualizationRenderer;
 
     // Coordinate System (Grid)
-    private PointF originPosition = new PointF ();
+    private PointHolder originPosition = new PointHolder ();
 
     // Visualization
     private Visualization visualization;
@@ -128,9 +128,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
     }
 
     protected void doDraw(Canvas canvas) {
-//        super.onDraw(canvas);
-
-        this.canvas = canvas;
+        setCanvas(canvas);
 
         if (this.visualization == null || this.canvas == null) {
             return;
@@ -140,13 +138,15 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         // Adjust the perspective
         canvas.save ();
         canvas.translate (
-                originPosition.x + visualization.getSimulation().getBody(0).getPerspective().getPosition().x + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-                originPosition.y + visualization.getSimulation().getBody(0).getPerspective().getPosition().y - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+//                originPosition.x + visualization.getSimulation().getBody(0).getPerspective().getPosition().x + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+//                originPosition.y + visualization.getSimulation().getBody(0).getPerspective().getPosition().y - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+                (float) originPosition.getX() + (float) visualization.getSimulation().getBody(0).getPerspective().getPosition().getX(),
+                (float) originPosition.getY() + (float) visualization.getSimulation().getBody(0).getPerspective().getPosition().getY()
         );
         // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
         canvas.scale (
-                visualization.getSimulation().getBody(0).getPerspective().getScale(),
-                visualization.getSimulation().getBody(0).getPerspective().getScale()
+                (float) visualization.getSimulation().getBody(0).getPerspective().getScale(),
+                (float) visualization.getSimulation().getBody(0).getPerspective().getScale()
         );
         // </PERSPECTIVE>
 
@@ -157,24 +157,16 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         canvas.drawColor(Color.WHITE);
 
         // Scene
-        drawVisualization(visualization);
+        getVisualization().draw(this);
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap (canvasBitmap, identityMatrix, null);
-        /*
-        canvas.save();
-        canvas.concat(identityMatrix);
-        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
-        canvas.restore();
-        */
+//        canvas.save();
+//        canvas.concat(identityMatrix);
+//        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
+//        canvas.restore();
 
         canvas.restore();
-    }
-
-    private void drawVisualization(Visualization visualization) {
-        this.visualization.draw(this);
-
-        Geometry.packCircles(getVisualization().getBaseImages(), 200, getVisualization().getImageGroup().filterType(BaseImage.TYPE).calculateCentroid());
     }
 
     /**
@@ -191,19 +183,29 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         try {
             canvas = getHolder().lockCanvas();
 
-            synchronized (getHolder()) {
+            if (canvas != null) {
+                synchronized (getHolder()) {
 
-                // Update
-                visualization.update();
+                    // Update
+                    visualization.update();
 
-                // Draw
-                doDraw(canvas);
+                    // Draw
+                    doDraw(canvas);
+                }
             }
         } finally {
             if (canvas != null) {
                 getHolder().unlockCanvasAndPost(canvas);
             }
         }
+    }
+
+    public VisualizationRenderer getRenderer () {
+        return this.visualizationRenderer;
+    }
+
+    private void setCanvas (Canvas canvas) {
+        this.canvas = canvas;
     }
 
     public Canvas getCanvas() {
@@ -274,10 +276,10 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                 // Update touchPositions state based the points given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId (i);
-                    PointF perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
-                    float perspectiveScale = visualization.getSimulation().getBody(0).getPerspective().getScale();
-                    touchInteraction.touchPositions[id].x = (motionEvent.getX (i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-                    touchInteraction.touchPositions[id].y = (motionEvent.getY (i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                    PointHolder perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
+                    double perspectiveScale = visualization.getSimulation().getBody(0).getPerspective().getScale();
+                    touchInteraction.touchPositions[id].setX((motionEvent.getX (i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
+                    touchInteraction.touchPositions[id].setY((motionEvent.getY (i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }
 
                 // ACTION_DOWN is called only for the first pointer that touches the screen. This
@@ -301,17 +303,17 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                 // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
                     touchInteraction.setType(TouchInteraction.Type.TOUCH);
-                    touchInteraction.pointerId = pointerId;
+                    touchInteraction.pointerIndex = pointerId;
                     currentBody.onStartInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     touchInteraction.setType(TouchInteraction.Type.MOVE);
-                    touchInteraction.pointerId = pointerId;
+                    touchInteraction.pointerIndex = pointerId;
                     currentBody.onContinueInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     touchInteraction.setType(TouchInteraction.Type.RELEASE);
-                    touchInteraction.pointerId = pointerId;
+                    touchInteraction.pointerIndex = pointerId;
                     currentBody.onCompleteInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the first touchPositions!

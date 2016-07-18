@@ -1,8 +1,7 @@
 package camp.computer.clay.model.interaction;
 
-import android.graphics.PointF;
-
 import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.visualization.util.PointHolder;
 
 public class TouchInteraction {
 
@@ -35,7 +34,7 @@ public class TouchInteraction {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    public PointF[] touchPositions = new PointF[MAXIMUM_TOUCH_POINT_COUNT];
+    public PointHolder[] touchPositions = new PointHolder[MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 
     private Type type;
@@ -48,7 +47,7 @@ public class TouchInteraction {
     // TODO: Link to context, e.g., Sensor data (inc. 3D orienetation, brightness).
     // </CONTEXT>
 
-    public int pointerId = -1;
+    public int pointerIndex = -1;
 
     // touchedImage
     // overlappedImage (not needed, probably, because can look in history, or look at first action in interaction)
@@ -63,7 +62,7 @@ public class TouchInteraction {
 
     private void setup() {
         for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
-            touchPositions[i] = new PointF(0, 0);
+            touchPositions[i] = new PointHolder(0, 0);
             isTouching[i] = false;
         }
     }
@@ -93,7 +92,7 @@ public class TouchInteraction {
         this.type = type;
     }
 
-    public PointF getPosition() {
+    public PointHolder getPosition() {
         return this.touchPositions[0];
     }
 

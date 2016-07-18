@@ -2,7 +2,7 @@ package camp.computer.clay.model.simulation;
 
 public class Path extends Model {
 
-    // TODO: Physical dimensions
+    // TODO: Physical dimensions (distance between boards)
 
     public enum Direction {
 

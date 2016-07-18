@@ -9,6 +9,7 @@ import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.PointHolder;
 
 public abstract class Image {
 
@@ -47,9 +48,11 @@ public abstract class Image {
 
     // TODO: Group of points to represent geometric objects, even circles. Helper functions for common shapes. Gives generality.
 
-    private PointF position = new PointF(); // Image position
-    private float scale = 1.0f; // Image scale factor
-    private float rotation = 0.0f; // Image heading rotation
+    private PointHolder position = new PointHolder(); // Image position
+
+    // TODO: Move scale into list of points defining shape. Draw on "unit canvas (scale 1.0)", and set scale. Recomputing happens automatically!
+    private double scale = 1.0f; // Image scale factor
+//    private double rotation = 0.0f; // Image heading rotation
 
     private boolean isVisible = true;
 
@@ -87,16 +90,16 @@ public abstract class Image {
         return null;
     }
 
-    public PointF getPosition() {
+    public PointHolder getPosition() {
         return this.position;
     }
 
-    public float getRotation() {
-        return this.rotation;
+    public double getRotation() {
+        return this.position.getAngle();
     }
 
-    public float getAbsoluteRotation() {
-        float absoluteRotation = 0.0f;
+    public double getAbsoluteRotation() {
+        double absoluteRotation = 0;
         Image parentImage = getParentImage();
         if (parentImage != null) {
             absoluteRotation = parentImage.getAbsoluteRotation() + getRotation();
@@ -106,43 +109,42 @@ public abstract class Image {
         return absoluteRotation;
     }
 
-    public float getScale() {
+    public double getScale() {
         return this.scale;
     }
 
-    public void setPosition(PointF position) {
-        this.position.x = position.x;
-        this.position.y = position.y;
+    public void setPosition(PointHolder position) {
+        this.position.set(position.getX(), position.getY());
     }
 
     /**
      * Absolute position calculated from relative position.
      */
-    public void setRelativePosition(PointF position) {
-        PointF absolutePosition = new PointF();
+    public void setRelativePosition(PointHolder position) {
+        PointHolder absolutePosition = new PointHolder();
         Image parentImage = getParentImage();
         if (parentImage != null) {
-            PointF relativePositionFromRelativePosition = Geometry.calculatePoint(
+            PointHolder relativePositionFromRelativePosition = Geometry.calculatePoint(
                     parentImage.getPosition(),
                     Geometry.calculateRotationAngle(parentImage.getPosition(), position),
-                    (float) Geometry.calculateDistance(parentImage.getPosition(), position)
+                    Geometry.calculateDistance(parentImage.getPosition(), position)
             );
-            absolutePosition.x = parentImage.getPosition().x + relativePositionFromRelativePosition.x;
-            absolutePosition.y = parentImage.getPosition().y + relativePositionFromRelativePosition.y;
+            absolutePosition.setX(parentImage.getPosition().getX() + relativePositionFromRelativePosition.getX());
+            absolutePosition.setY(parentImage.getPosition().getY() + relativePositionFromRelativePosition.getY());
         } else {
             // TODO: This should get the absolute position of the root sprite relative to the origin point on the coordinate system/canvas
-            absolutePosition.x = position.x;
-            absolutePosition.y = position.y;
+            absolutePosition.setX(position.getX());
+            absolutePosition.setY(position.getY());
         }
-        this.position.x = absolutePosition.x;
-        this.position.y = absolutePosition.y;
+        this.position.setX(absolutePosition.getX());
+        this.position.setY(absolutePosition.getY());
     }
 
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
+    public void setRotation(double rotation) {
+        this.position.setAngle(rotation);
     }
 
-    public void setScale(float scale) {
+    public void setScale(double scale) {
         this.scale = scale;
     }
 
@@ -158,9 +160,9 @@ public abstract class Image {
 
     public abstract void draw(VisualizationSurface visualizationSurface);
 
-    public abstract boolean isTouching(PointF point);
+    public abstract boolean isTouching(PointHolder point);
 
-    public abstract boolean isTouching(PointF point, float padding);
+    public abstract boolean isTouching(PointHolder point, double padding);
 
     public interface TouchActionListener {
     }

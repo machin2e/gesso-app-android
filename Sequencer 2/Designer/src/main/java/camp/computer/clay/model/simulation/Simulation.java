@@ -12,11 +12,11 @@ public class Simulation extends Model {
 
     private ArrayList<Base> bases = new ArrayList<Base>();
 
-    public void addMachine(Base path) {
+    public void addBase(Base path) {
         this.bases.add(path);
     }
 
-    public Base getMachine(int index) {
+    public Base getBase(int index) {
         return this.bases.get(index);
     }
 

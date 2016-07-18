@@ -1,11 +1,10 @@
 package camp.computer.clay.visualization.arch;
 
-import android.graphics.PointF;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.PointHolder;
 import camp.computer.clay.visualization.util.Rectangle;
 
 /**
@@ -30,8 +29,9 @@ public class ImageGroup {
         return images.contains(image);
     }
 
-    public boolean remove (Image image) {
-        return images.remove(image);
+    public ImageGroup remove (Image image) {
+        images.remove(image);
+        return this;
     }
 
     public Image get (int index) {
@@ -44,16 +44,27 @@ public class ImageGroup {
      * @return
      */
     public ImageGroup filterType (String type) {
-        for (int i = 0; ; i++) {
-            if (!images.get(i).getType().equals(type)) {
-                images.remove(i);
+//        for (int i = 0; i < images.size(); i++) {
+//            Image image = images.get(0);
+//            if (images.remove(image)) {
+//                if (image.isType(type)) {
+//                    images.add(image);
+//                }
+//            }
+//        }
+//        return this;
 
-                if ((i + 1) == images.size()) {
-                    break;
-                }
+        ImageGroup imageGroup = new ImageGroup();
+
+        for (int i = 0; i < this.images.size(); i++) {
+
+            if (this.images.get(i).isType(type)) {
+                imageGroup.add(this.images.get(i));
             }
+
         }
-        return this;
+
+        return imageGroup;
     }
 
 //    /**
@@ -75,23 +86,58 @@ public class ImageGroup {
 //        return imageGroup;
 //    }
 
-    public List<Image> getImages() {
-        return this.images;
+    /**
+     * Filters images to those that are within the specified distance from the specified point.
+     *
+     * @param position
+     * @param distance
+     * @return
+     */
+    public ImageGroup filterDistance(PointHolder position, double distance) {
+
+        ImageGroup imageGroup = new ImageGroup();
+
+        for (int i = 0; i < images.size(); i++) {
+
+//            Image image = images.remove(0);
+
+            double distanceToImage = Geometry.calculateDistance(
+                    position,
+//                    image.getPosition()
+                    images.get(i).getPosition()
+            );
+
+            if (distanceToImage < distance) {
+
+//                images.add(image);
+                imageGroup.add(images.get(i));
+
+            }
+        }
+
+//        this.images = imageGroup;
+
+        return imageGroup;
+
     }
 
-    public ArrayList<PointF> getPositions() {
-        ArrayList<PointF> positions = new ArrayList<PointF>();
+    public List<Image> getList() {
+        return images;
+    }
+
+    public ArrayList<PointHolder> getPositions() {
+        ArrayList<PointHolder> positions = new ArrayList<PointHolder>();
         for (Image image: images) {
-            positions.add(new PointF(image.getPosition().x, image.getPosition().y));
+            positions.add(new PointHolder(image.getPosition().getX(), image.getPosition().getY()));
         }
         return positions;
     }
 
-    public PointF calculateCenter() {
+    public PointHolder calculateCenter() {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
-    public PointF calculateCentroid() {
+    public PointHolder calculateCentroid() {
         return Geometry.calculateCentroidPosition(getPositions());
     }
 
@@ -99,7 +145,7 @@ public class ImageGroup {
         return Geometry.calculateBoundingBox(getPositions());
     }
 
-    public ArrayList<PointF> computeConvexHull() {
+    public ArrayList<PointHolder> computeConvexHull() {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -108,14 +154,14 @@ public class ImageGroup {
      * @param position
      * @return
      */
-    public Image getNearestImage (PointF position) {
+    public Image getNearestImage (PointHolder position) {
 
-        float shortestDistance = Float.MAX_VALUE;
+        double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
 
-        for (Image image: getImages()) {
+        for (Image image: images) {
 
-            float currentDistance = Geometry.calculateDistance(position, image.getPosition());
+            double currentDistance = Geometry.calculateDistance(position, image.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;

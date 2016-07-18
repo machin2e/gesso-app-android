@@ -10,13 +10,13 @@ import camp.computer.clay.visualization.util.Time;
 public class VisualizationRenderer extends Thread {
 
     // <SETTINGS>
-    final public static long DEFAULT_TARGET_FRAMES_PER_SECOND = 30L;
+    final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
 
     public static boolean ENABLE_THREAD_SLEEP = true;
 
     public static boolean ENABLE_STATISTICS = true;
 
-    private long targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
+    private int targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
     // </SETTINGS>
 
     private VisualizationSurface visualizationSurface;
@@ -33,7 +33,10 @@ public class VisualizationRenderer extends Thread {
     }
 
     // <STATISTICS>
-    private float framesPerSecond = 0L;
+    private double currentFramesPerSecond = 0;
+    private int fpsSampleIndex = 0;
+    private final int fpsSampleLimit = targetFramesPerSecond; // Moving FPS average for last second.
+    private double[] fpsSamples = new double[fpsSampleLimit];
     // </STATISTICS>
 
     @Override
@@ -55,7 +58,11 @@ public class VisualizationRenderer extends Thread {
 
             if (ENABLE_STATISTICS) {
                 // Store actual frames per second
-                framesPerSecond = (1000.0f / (float) (frameStopTime - frameStartTime));
+                currentFramesPerSecond = (1000.0f / (float) (frameStopTime - frameStartTime));
+
+                // Store moving average
+                fpsSamples[fpsSampleIndex] = currentFramesPerSecond;
+                fpsSampleIndex = (fpsSampleIndex + 1) % fpsSampleLimit;
             }
 
             // Sleep the thread until the time remaining in the frame's allocated draw time expires.
@@ -77,11 +84,18 @@ public class VisualizationRenderer extends Thread {
         return targetFramesPerSecond;
     }
 
-    public void setTargetFramesPerSecond (long framesPerSecond) {
+    public void setTargetFramesPerSecond (int framesPerSecond) {
         this.targetFramesPerSecond = framesPerSecond;
     }
 
-    public float getFramesPerSecond () {
-        return framesPerSecond;
+    public double getFramesPerSecond() {
+
+        double fpsTotal = 0;
+
+        for (int i = 0; i < fpsSampleLimit; i++) {
+            fpsTotal = fpsTotal + fpsSamples[i];
+        }
+
+        return (fpsTotal / fpsSampleLimit);
     }
 }

@@ -25,7 +25,7 @@ public class Base extends Model {
     }
 
     public ArrayList<Path> getPaths() {
-        ArrayList<Path> paths = new ArrayList<Path>();
+        ArrayList<Path> paths = new ArrayList<>();
         for (Port port: getPorts()) {
             paths.addAll (port.getPaths());
         }

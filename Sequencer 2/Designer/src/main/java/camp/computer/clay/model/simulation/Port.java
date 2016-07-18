@@ -55,7 +55,7 @@ public class Port extends Model {
         }
     }
 
-    public Base getMachine () {
+    public Base getBase() {
         return (Base) getParent();
     }
 

@@ -3,7 +3,6 @@ package camp.computer.clay.visualization.images;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -16,12 +15,13 @@ import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Animation;
 import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.PointHolder;
 import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
 
 public class BaseImage extends Image {
 
-    public final static String TYPE = "machine";
+    public final static String TYPE = "base";
 
     // TODO: Replace these with dynamic counts.
     final static int PORT_GROUP_COUNT = 4;
@@ -29,44 +29,41 @@ public class BaseImage extends Image {
 
     // <STYLE>
     // TODO: Make these private once the map is working well and the sprite is working well.
-    public float boardHeight = 250.0f;
-    public float boardWidth = 250.0f;
-    public Rectangle boardShape = new Rectangle(getPosition(), boardWidth, boardHeight);
+    public double boardHeight = 250.0f;
+    public double boardWidth = 250.0f;
+    public Rectangle shape = new Rectangle(boardWidth, boardHeight);
 
-    private String boardColorString = "f7f7f7"; // "414141";
+    private String boardColorString = "f7f7f7"; // "404040"; // "414141";
     private int boardColor = Color.parseColor("#ff" + boardColorString); // Color.parseColor("#212121");
     private boolean showBoardOutline = true;
     private String boardOutlineColorString = "414141";
     private int boardOutlineColor = Color.parseColor("#ff" + boardOutlineColorString); // Color.parseColor("#737272");
-    private float boardOutlineThickness = 3.0f;
+    private double boardOutlineThickness = 3.0f;
 
-    private float targetTransparency = 1.0f;
-    private float currentTransparency = targetTransparency;
+    private double targetTransparency = 1.0f;
+    private double currentTransparency = targetTransparency;
 
-    private float portGroupWidth = 50;
-    private float portGroupHeight = 13;
+    private double portGroupWidth = 50;
+    private double portGroupHeight = 13;
     private String portGroupColorString = "3b3b3b";
     private int portGroupColor = Color.parseColor("#ff" + portGroupColorString);
     private boolean showPortGroupOutline = false;
     private String portGroupOutlineColorString = "000000";
     private int portGroupOutlineColor = Color.parseColor("#ff" + portGroupOutlineColorString);
-    private float portGroupOutlineThickness = boardOutlineThickness;
+    private double portGroupOutlineThickness = boardOutlineThickness;
 
-    public boolean showHighlights = false;
-    private int boardHighlightColor = Color.parseColor("#1976D2");
-    private float boardHighlightThickness = 20;
-
-    private float distanceLightsToEdge = 12.0f;
-    private float lightWidth = 12;
-    private float lightHeight = 20;
+    private double distanceLightsToEdge = 12.0f;
+    private double lightWidth = 12;
+    private double lightHeight = 20;
     private boolean showLightOutline = true;
-    private float lightOutlineThickness = 1.0f;
+    private double lightOutlineThickness = 1.0f;
     private int lightOutlineColor = Color.parseColor("#e7e7e7");
     // </STYLE>
 
     public BaseImage(Base base) {
         super(base);
         setType(TYPE);
+        setup();
     }
 
     private void setup() {
@@ -78,21 +75,21 @@ public class BaseImage extends Image {
 
     public void setupPortImages() {
 
-        // Add a port sprite for each of the associated machine's ports
-        for (Port port: getMachine().getPorts()) {
+        // Add a port sprite for each of the associated base's ports
+        for (Port port: getBase().getPorts()) {
             PortImage portImage = new PortImage(port);
             portImage.setVisualization(getVisualization());
             getVisualization().addImage(port, portImage, "ports");
         }
     }
 
-    public Base getMachine() {
+    public Base getBase() {
         return (Base) getModel();
     }
 
     public ArrayList<PortImage> getPortImages() {
         ArrayList<PortImage> portImages = new ArrayList<PortImage>();
-        Base base = getMachine();
+        Base base = getBase();
 
         for (Port port: base.getPorts()) {
             PortImage portImage = (PortImage) getVisualization().getImage(port);
@@ -103,7 +100,7 @@ public class BaseImage extends Image {
     }
 
     public PortImage getPortImage(int index) {
-        Base base = getMachine();
+        Base base = getBase();
         PortImage portImage = (PortImage) getVisualization().getImage(base.getPort(index));
         return portImage;
     }
@@ -111,8 +108,8 @@ public class BaseImage extends Image {
     // TODO: Remove this! Store Port index/id
     public int getPortImageIndex(PortImage portImage) {
         Port port = (Port) getVisualization().getModel(portImage);
-        if (getMachine().getPorts().contains(port)) {
-            return this.getMachine().getPorts().indexOf(port);
+        if (getBase().getPorts().contains(port)) {
+            return this.getBase().getPorts().indexOf(port);
         }
         return -1;
     }
@@ -127,13 +124,17 @@ public class BaseImage extends Image {
             drawBoardImage(visualizationSurface);
             drawLightImages(visualizationSurface);
 
-            if (Application.ENABLE_DEBUG_ANNOTATIONS) {
+            if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
                 visualizationSurface.getPaint().setColor(Color.GREEN);
                 visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardShape.getWidth(), visualizationSurface.getPaint());
-                visualizationSurface.getCanvas().drawCircle(getPosition().x, getPosition().y, boardShape.getWidth() / 2.0f, visualizationSurface.getPaint());
+                visualizationSurface.getCanvas().drawCircle((float) getPosition().getX(), (float) getPosition().getY(), (float) shape.getWidth(), visualizationSurface.getPaint());
+                visualizationSurface.getCanvas().drawCircle((float) getPosition().getX(), (float) getPosition().getY(), (float) shape.getWidth() / 2.0f, visualizationSurface.getPaint());
             }
         }
+    }
+
+    public Rectangle getShape() {
+        return this.shape;
     }
 
     public void drawBoardImage(VisualizationSurface visualizationSurface) {
@@ -144,14 +145,14 @@ public class BaseImage extends Image {
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.boardColor);
-        Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
+        Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
 
         // Outline
         if (this.showBoardOutline) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.boardOutlineColor);
-            paint.setStrokeWidth(this.boardOutlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
+            paint.setStrokeWidth((float) boardOutlineThickness);
+            Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
         }
     }
 
@@ -161,24 +162,24 @@ public class BaseImage extends Image {
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
-        PointF[] portGroupCenterPositions = new PointF[PORT_GROUP_COUNT];
+        PointHolder[] portGroupCenterPositions = new PointHolder[PORT_GROUP_COUNT];
 
         // Positions before rotation
-        portGroupCenterPositions[0] = new PointF(
-                getPosition().x + 0,
-                getPosition().y + ((boardShape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
+        portGroupCenterPositions[0] = new PointHolder(
+                getPosition().getX() + 0,
+                getPosition().getY() + ((shape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[1] = new PointF(
-                getPosition().x + ((boardShape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
-                getPosition().y + 0
+        portGroupCenterPositions[1] = new PointHolder(
+                getPosition().getX() + ((shape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
+                getPosition().getY() + 0
         );
-        portGroupCenterPositions[2] = new PointF(
-                getPosition().x + 0,
-                getPosition().y - ((boardShape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
+        portGroupCenterPositions[2] = new PointHolder(
+                getPosition().getX() + 0,
+                getPosition().getY() - ((shape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[3] = new PointF(
-                getPosition().x - ((boardShape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
-                getPosition().y + 0
+        portGroupCenterPositions[3] = new PointHolder(
+                getPosition().getX() - ((shape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
+                getPosition().getY() + 0
         );
         // </SHAPE>
 
@@ -195,7 +196,7 @@ public class BaseImage extends Image {
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(this.portGroupOutlineThickness);
+                paint.setStrokeWidth((float) portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
                 Shape.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, canvas, paint);
             }
@@ -209,24 +210,24 @@ public class BaseImage extends Image {
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
-        PointF[] portGroupCenterPositions = new PointF[PORT_GROUP_COUNT];
+        PointHolder[] portGroupCenterPositions = new PointHolder[PORT_GROUP_COUNT];
 
         // Positions before rotation
-        portGroupCenterPositions[0] = new PointF(
-                getPosition().x + 0,
-                getPosition().y + ((boardShape.getHeight()) + (portGroupHeight / 2.0f))
+        portGroupCenterPositions[0] = new PointHolder(
+                getPosition().getX() + 0,
+                getPosition().getY() + ((shape.getHeight()) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[1] = new PointF(
-                getPosition().x + ((boardShape.getWidth()) + (portGroupHeight / 2.0f)),
-                getPosition().y + 0
+        portGroupCenterPositions[1] = new PointHolder(
+                getPosition().getX() + ((shape.getWidth()) + (portGroupHeight / 2.0f)),
+                getPosition().getY() + 0
         );
-        portGroupCenterPositions[2] = new PointF(
-                getPosition().x + 0,
-                getPosition().y - ((boardShape.getHeight()) + (portGroupHeight / 2.0f))
+        portGroupCenterPositions[2] = new PointHolder(
+                getPosition().getX() + 0,
+                getPosition().getY() - ((shape.getHeight()) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[3] = new PointF(
-                getPosition().x - ((boardShape.getWidth()) + (portGroupHeight / 2.0f)),
-                getPosition().y + 0
+        portGroupCenterPositions[3] = new PointHolder(
+                getPosition().getX() - ((shape.getWidth()) + (portGroupHeight / 2.0f)),
+                getPosition().getY() + 0
         );
         // </SHAPE>
 
@@ -238,14 +239,14 @@ public class BaseImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            canvas.drawCircle(portGroupCenterPositions[i].x, portGroupCenterPositions[i].y, 20, paint);
+            canvas.drawCircle((float) portGroupCenterPositions[i].getX(), (float) portGroupCenterPositions[i].getY(), 20, paint);
 
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(this.portGroupOutlineThickness);
+                paint.setStrokeWidth((float) portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
-                canvas.drawCircle(portGroupCenterPositions[i].x, portGroupCenterPositions[i].y, 20, paint);
+                canvas.drawCircle((float) portGroupCenterPositions[i].getX(), (float) portGroupCenterPositions[i].getY(), 20, paint);
             }
 
         }
@@ -257,59 +258,59 @@ public class BaseImage extends Image {
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
-        PointF[] lightCenterPositions = new PointF[PORT_COUNT];
-        lightCenterPositions[0] = new PointF(
-                getPosition().x + (-20),
-                getPosition().y + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+        PointHolder[] lightCenterPositions = new PointHolder[PORT_COUNT];
+        lightCenterPositions[0] = new PointHolder(
+                getPosition().getX() + (-20),
+                getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[1] = new PointF(
-                getPosition().x + (0),
-                getPosition().y + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+        lightCenterPositions[1] = new PointHolder(
+                getPosition().getX() + (0),
+                getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[2] = new PointF(
-                getPosition().x + (+20),
-                getPosition().y + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-
-        lightCenterPositions[3] = new PointF(
-                getPosition().x + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().y + (+20)
-        );
-        lightCenterPositions[4] = new PointF(
-                getPosition().x + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().y + (0)
-        );
-        lightCenterPositions[5] = new PointF(
-                getPosition().x + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().y + (-20)
+        lightCenterPositions[2] = new PointHolder(
+                getPosition().getX() + (+20),
+                getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
-        lightCenterPositions[6] = new PointF(
-                getPosition().x + (+20),
-                getPosition().y - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+        lightCenterPositions[3] = new PointHolder(
+                getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getY() + (+20)
         );
-        lightCenterPositions[7] = new PointF(
-                getPosition().x + (0),
-                getPosition().y - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+        lightCenterPositions[4] = new PointHolder(
+                getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getY() + (0)
         );
-        lightCenterPositions[8] = new PointF(
-                getPosition().x + (-20),
-                getPosition().y - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+        lightCenterPositions[5] = new PointHolder(
+                getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getY() + (-20)
         );
 
-        lightCenterPositions[9] = new PointF(
-                getPosition().x - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().y + (-20)
+        lightCenterPositions[6] = new PointHolder(
+                getPosition().getX() + (+20),
+                getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[10] = new PointF(
-                getPosition().x - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().y + (0)
+        lightCenterPositions[7] = new PointHolder(
+                getPosition().getX() + (0),
+                getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[11] = new PointF(
-                getPosition().x - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().y + (+20)
+        lightCenterPositions[8] = new PointHolder(
+                getPosition().getX() + (-20),
+                getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        float[] lightRotationAngle = new float[12];
+
+        lightCenterPositions[9] = new PointHolder(
+                getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getY() + (-20)
+        );
+        lightCenterPositions[10] = new PointHolder(
+                getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getY() + (0)
+        );
+        lightCenterPositions[11] = new PointHolder(
+                getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getY() + (+20)
+        );
+        double[] lightRotationAngle = new double[12];
         lightRotationAngle[0]  = 0;
         lightRotationAngle[1]  = 0;
         lightRotationAngle[2]  = 0;
@@ -332,18 +333,18 @@ public class BaseImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
-            Port port = (Port) getMachine().getPort(i);
+            Port port = (Port) getBase().getPort(i);
             if (port.getType() != Port.Type.NONE) {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), currentTransparency));
+                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), (float) currentTransparency));
             } else {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, currentTransparency));
+                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, (float) currentTransparency));
             }
             Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
 
             // Outline
             if (this.showLightOutline) {
                 paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(this.lightOutlineThickness);
+                paint.setStrokeWidth((float) lightOutlineThickness);
                 paint.setColor(this.lightOutlineColor);
                 Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
             }
@@ -351,54 +352,54 @@ public class BaseImage extends Image {
     }
 
     // TODO: Move this into Image (expose to all Images)
-    public void setTransparency (final float transparency) {
+    public void setTransparency (final double transparency) {
 
-        if (this.targetTransparency != transparency) {
+        targetTransparency = transparency;
 
-            Animation.scaleValue(255.0f * targetTransparency, 255.0f * transparency, 200, new Animation.OnScaleListener() {
-                @Override
-                public void onScale(float currentScale) {
-                    currentTransparency = currentScale / 255.0f;
-                    String transparencyString = String.format("%02x", (int) currentScale);
+        currentTransparency = targetTransparency;
+        String transparencyString = String.format("%02x", (int) currentTransparency * 255);
 
-                    // Base color
-                    boardColor = Color.parseColor("#" + transparencyString + boardColorString);
-                    boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+        // Base color
+        boardColor = Color.parseColor("#" + transparencyString + boardColorString);
+        boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
 
-                    // Header color
-                    portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
-                    portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
-                }
-            });
+        // Header color
+        portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
+        portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
 
-            this.targetTransparency = transparency;
-        }
+//        if (this.targetTransparency != transparency) {
+//
+//            Animation.scaleValue(255.0f * targetTransparency, 255.0f * transparency, 200, new Animation.OnScaleListener() {
+//                @Override
+//                public void onScale(double currentScale) {
+//                    currentTransparency = currentScale / 255.0f;
+//                    String transparencyString = String.format("%02x", (int) currentScale);
+//
+//                    // Base color
+//                    boardColor = Color.parseColor("#" + transparencyString + boardColorString);
+//                    boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+//
+//                    // Header color
+//                    portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
+//                    portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
+//                }
+//            });
+//
+//            this.targetTransparency = transparency;
+//        }
     }
 
     public void showPortImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setVisibility(true);
-            portImage.setPathVisibility(true);
+            portImage.showDocks();
         }
-    }
-
-    public void showPortImage(int index) {
-        PortImage portImage = getPortImages().get(index);
-        portImage.setVisibility(true);
-        portImage.setPathVisibility(true);
     }
 
     public void hidePortImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setVisibility(false);
-            portImage.setPathVisibility(false);
         }
-    }
-
-    private void hidePortImage(int index) {
-        PortImage portImage = getPortImages().get(index);
-        portImage.setVisibility(false);
-        portImage.setPathVisibility(false);
     }
 
     public void showPathImages() {
@@ -410,17 +411,7 @@ public class BaseImage extends Image {
     public void hidePathImages() {
         for (PortImage portImage: getPortImages()) {
             portImage.setPathVisibility(false);
-            portImage.showPathDocks();
-        }
-    }
-
-    public void showPathImage(int index, boolean isFullPathVisible) {
-        PortImage portImage = getPortImages().get(index);
-        portImage.setVisibility(true);
-        if (isFullPathVisible) {
-            portImage.showPaths();
-        } else {
-            portImage.showPathDocks();
+            portImage.showDocks();
         }
     }
 
@@ -428,23 +419,23 @@ public class BaseImage extends Image {
     // Interaction
     //-------------------------
 
-    public boolean isTouching (PointF point) {
+    public boolean isTouching (PointHolder point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardShape.getHeight() / 2.0f);
+            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f);
         } else {
             return false;
         }
     }
 
-    public boolean isTouching (PointF point, float padding) {
+    public boolean isTouching (PointHolder point, double padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().x, (int) this.getPosition().y, point.x, point.y) < (this.boardShape.getHeight() / 2.0f + padding);
+            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f + padding);
         } else {
             return false;
         }
     }
 
-    public static final String CLASS_NAME = "MACHINE_SPRITE";
+    public static final String CLASS_NAME = "BASE_SPRITE";
 
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {

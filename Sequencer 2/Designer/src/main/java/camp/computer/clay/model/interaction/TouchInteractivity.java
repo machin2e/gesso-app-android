@@ -1,11 +1,11 @@
 package camp.computer.clay.model.interaction;
 
-import android.graphics.PointF;
 import android.os.Handler;
 
 import java.util.ArrayList;
 
 import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.visualization.util.PointHolder;
 
 /**
  * An interactivity is a temporal sequence of one or more interactions.
@@ -13,10 +13,15 @@ import camp.computer.clay.visualization.arch.Image;
 public class TouchInteractivity {
 
     // TODO: Model this with a "touchPositions interaction envelope" or "interaction envelope".
+    // TODO: Model voice interaction in the same way. Generify to Interactivity<T> or subclass.
+    // TODO: (?) Model data transmissions as interactions in the same way?
 
-    private ArrayList<TouchInteraction> touchInteractions = new ArrayList<>();
+    private ArrayList<TouchInteraction> interactions = new ArrayList<>();
 
     // TODO: Classify these! Every time an Interaction is added!
+    // TODO: (cont'd) Note can have multiple sequences per finger in an interactivity,
+    // TODO: (cont'd) so consider remodeling as per-finger interactivity and treat each finger
+    // TODO: (cont'd) as an individual actor.
     private Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isHolding = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
@@ -34,17 +39,29 @@ public class TouchInteractivity {
         return this.touchedImage[fingerIndex];
     }
 
+    public boolean isTouchingImage () {
+        return isTouchingImage(0);
+    }
+
+    public void setTouchedImage (Image image) {
+        setTouchedImage(0, image);
+    }
+
+    public Image getTouchedImage () {
+        return getTouchedImage(0);
+    }
+
     public Handler timerHandler = new Handler();
     TouchInteractivity touchInteractivity = this;
     public Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            /* do what you need to do */
-            //foobar();
+            // Do what you need to do.
+            // e.g., foobar();
             int pointerId = 0;
-            if (getFirstInteraction().isTouching[pointerId])
+            if (getFirst().isTouching[pointerId])
                 if (dragDistance[pointerId] < TouchInteraction.MINIMUM_DRAG_DISTANCE) {
-                    getFirstInteraction().getBody().onHoldListener(touchInteractivity, getFirstInteraction());
+                    getFirst().getBody().onHoldListener(touchInteractivity, getFirst());
                 }
 
             // Uncomment this for periodic callback
@@ -65,14 +82,14 @@ public class TouchInteractivity {
         }
     }
 
-    public int getCardinality() {
-        return this.touchInteractions.size();
+    public int getSize() {
+        return this.interactions.size();
     }
 
-    public void addInteraction (TouchInteraction touchInteraction) {
-        this.touchInteractions.add(touchInteraction);
+    public void add(TouchInteraction touchInteraction) {
+        this.interactions.add(touchInteraction);
 
-        if (touchInteractions.size() == 1) {
+        if (interactions.size() == 1) {
 
             // Start timer to check for hold
             timerHandler.removeCallbacks(timerRunnable);
@@ -80,60 +97,60 @@ public class TouchInteractivity {
         }
     }
 
-    public TouchInteraction getInteraction(int index) {
-        return this.touchInteractions.get(index);
+    public TouchInteraction get(int index) {
+        return this.interactions.get(index);
     }
 
-    public TouchInteraction getFirstInteraction() {
-        if (touchInteractions.size() > 0) {
-            return touchInteractions.get(0);
+    public TouchInteraction getFirst() {
+        if (interactions.size() > 0) {
+            return interactions.get(0);
         } else {
             return null;
         }
     }
 
-    public TouchInteraction getLatestInteraction() {
-        if (touchInteractions.size() > 0) {
-            return touchInteractions.get(touchInteractions.size() - 1);
+    public TouchInteraction getLatest() {
+        if (interactions.size() > 0) {
+            return interactions.get(interactions.size() - 1);
         } else {
             return null;
         }
     }
 
-    public TouchInteraction getPreviousInteraction(TouchInteraction touchInteraction) {
-        for (int i = 0; i < touchInteractions.size() - 1; i++) {
-            if (touchInteractions.get(i + 1) == touchInteraction) {
-                return touchInteractions.get(i);
+    public TouchInteraction getPrevious(TouchInteraction touchInteraction) {
+        for (int i = 0; i < interactions.size() - 1; i++) {
+            if (interactions.get(i + 1) == touchInteraction) {
+                return interactions.get(i);
             }
         }
         return null;
     }
 
-    public TouchInteraction getPreviousInteraction() {
-        for (int i = 0; i < touchInteractions.size() - 1; i++) {
-            if (touchInteractions.get(i + 1) == getLatestInteraction()) {
-                return touchInteractions.get(i);
+    public TouchInteraction getPrevious() {
+        for (int i = 0; i < interactions.size() - 1; i++) {
+            if (interactions.get(i + 1) == getLatest()) {
+                return interactions.get(i);
             }
         }
         return null;
     }
 
     public long getStartTime() {
-        return getFirstInteraction().getTimestamp();
+        return getFirst().getTimestamp();
     }
 
     public long getStopTime() {
-        return getLatestInteraction().getTimestamp();
+        return getLatest().getTimestamp();
     }
 
     public long getDuration() {
-        return getLatestInteraction().getTimestamp() - getFirstInteraction().getTimestamp();
+        return getLatest().getTimestamp() - getFirst().getTimestamp();
     }
 
-    public ArrayList<PointF> getTouchPath() {
-        ArrayList<PointF> touchPositions = new ArrayList<>();
-        for (int i = 0; i < touchInteractions.size(); i++) {
-            touchPositions.add(touchInteractions.get(i).getPosition());
+    public ArrayList<PointHolder> getTouchPath() {
+        ArrayList<PointHolder> touchPositions = new ArrayList<>();
+        for (int i = 0; i < interactions.size(); i++) {
+            touchPositions.add(interactions.get(i).getPosition());
         }
         return touchPositions;
     }

@@ -111,7 +111,7 @@ public class Clay {
                 base.addTag(alphabet.substring(letterIndex, letterIndex + 1));
                 letterIndex = letterIndex % alphabet.length();
             }
-            simulation.addMachine(base);
+            simulation.addBase(base);
         }
     }
 
@@ -317,7 +317,7 @@ public class Clay {
                 this.devices.add (device);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getDisplay().mapView.getSimulation().addMachine(new Base());
+//                ApplicationView.getDisplay().mapView.getSimulation().addBase(new Base());
 
                 // Add timelines to attached displays
                 for (DisplayHostInterface view : this.displays) {

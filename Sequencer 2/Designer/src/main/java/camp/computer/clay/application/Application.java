@@ -39,7 +39,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // </Settings>
 
     // <Style>
-    public static boolean ENABLE_DEBUG_ANNOTATIONS = false;
+    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
 
     // Configure the interface settings
     private static final boolean ENABLE_FULLSCREEN = true;
@@ -319,8 +319,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                     // TODO: Compute relative to dependant sprite position
                     Point originPoint = new Point(959, 1655);
 
-                    Animation animation = new Animation();
-                    animation.moveToPoint(relativeLayout, originPoint, 300);
+//                    Animation animation = new Animation();
+//                    animation.moveToPoint(relativeLayout, originPoint, 300);
 
                     // Reset the message envelope
                     messageContent.removeAllViews();
@@ -654,6 +654,10 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     public VisualizationSurface getVisualizationSurface() {
         return this.visualizationSurface;
+    }
+
+    public double getFramesPerSecond () {
+        return getVisualizationSurface().getRenderer().getFramesPerSecond();
     }
 
     public SpeechGenerator getSpeechGenerator() {
