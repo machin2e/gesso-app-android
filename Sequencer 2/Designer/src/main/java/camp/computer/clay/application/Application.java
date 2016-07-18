@@ -21,10 +21,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
-import camp.computer.clay.visualization.util.Animation;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.host.DisplayHostInterface;
@@ -106,18 +106,19 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         if (ENABLE_FULLSCREEN) {
 
-            // Hide the notification bar
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            startFullscreenService();
 
-            // Hide the navigation bar
-
-            View decorView = getWindow().getDecorView();
-            // Hide both the navigation bar and the status bar.
-            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-            // a general rule, you should design your app to hide the status bar whenever you
-            // hide the navigation bar.
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
+//            // Hide the notification bar
+//            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//
+//            // Hide the navigation bar
+//
+//            View decorView = getWindow().getDecorView();
+//            // Hide both the navigation bar and the status bar.
+//            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+//            // a general rule, you should design your app to hide the status bar whenever you
+//            // hide the navigation bar.
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
 
         // Path Editor
@@ -573,6 +574,52 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         pathPatchActionList.addView(actionConstruct);
     }
+
+    // <FULLSCREEN_SERVICE>
+    public static final int FULLSCREEN_SERVICE_PERIOD = 2000;
+
+    private boolean enableFullscreenService = false;
+
+    private Handler fullscreenServiceHandler = new Handler();
+    private Runnable fullscreenServiceRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // Do what you need to do.
+            // e.g., foobar();
+            hideSystemUI();
+
+            // Uncomment this for periodic callback
+            if (enableFullscreenService) {
+                fullscreenServiceHandler.postDelayed(this, FULLSCREEN_SERVICE_PERIOD);
+            }
+        }
+    };
+
+    private void startFullscreenService() {
+        enableFullscreenService = true;
+        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, TouchInteraction.MINIMUM_HOLD_DURATION);
+    }
+
+    public void stopFullscreenService() {
+        enableFullscreenService = false;
+    }
+
+    /**
+     * References:
+     * - http://stackoverflow.com/questions/9926767/is-there-a-way-to-hide-the-system-navigation-bar-in-android-ics
+     */
+    private void hideSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LOW_PROFILE
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    }
+    // </FULLSCREEN_SERVICE>
 
     @Override
     protected void onPause() {
