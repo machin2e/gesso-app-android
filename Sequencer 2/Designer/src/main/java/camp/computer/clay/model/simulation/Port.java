@@ -55,8 +55,8 @@ public class Port extends Model {
         }
     }
 
-    public Base getBase() {
-        return (Base) getParent();
+    public Form getForm() {
+        return (Form) getParent();
     }
 
     public Path getPath(int index) {

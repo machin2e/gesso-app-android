@@ -1,10 +1,10 @@
-package camp.computer.clay.visualization.arch;
+package camp.computer.clay.visualization.architecture;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
 
 /**
@@ -44,11 +44,22 @@ public class ImageGroup {
      * @return
      */
     public ImageGroup filterType (String type) {
-//        for (int i = 0; i < images.size(); i++) {
-//            Image image = images.get(0);
-//            if (images.remove(image)) {
+
+//        for (int i = 0; i < this.images.size(); i++) {
+//            Image image = this.images.get(0);
+//            if (this.images.remove(image)) {
 //                if (image.isType(type)) {
-//                    images.add(image);
+//                    this.images.add(image);
+//                }
+//            }
+//        }
+//        return this;
+
+//        for (int i = 0; i < this.images.size(); i++) {
+//            Image image = this.images.get(0);
+//            if (this.images.remove(image)) {
+//                if (image.isType(type)) {
+//                    this.images.add(image);
 //                }
 //            }
 //        }
@@ -93,7 +104,7 @@ public class ImageGroup {
      * @param distance
      * @return
      */
-    public ImageGroup filterDistance(PointHolder position, double distance) {
+    public ImageGroup filterDistance(Point position, double distance) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -125,19 +136,19 @@ public class ImageGroup {
         return images;
     }
 
-    public ArrayList<PointHolder> getPositions() {
-        ArrayList<PointHolder> positions = new ArrayList<PointHolder>();
+    public ArrayList<Point> getPositions() {
+        ArrayList<Point> positions = new ArrayList<Point>();
         for (Image image: images) {
-            positions.add(new PointHolder(image.getPosition().getX(), image.getPosition().getY()));
+            positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
         }
         return positions;
     }
 
-    public PointHolder calculateCenter() {
+    public Point calculateCenter() {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
-    public PointHolder calculateCentroid() {
+    public Point calculateCentroid() {
         return Geometry.calculateCentroidPosition(getPositions());
     }
 
@@ -145,7 +156,7 @@ public class ImageGroup {
         return Geometry.calculateBoundingBox(getPositions());
     }
 
-    public ArrayList<PointHolder> computeConvexHull() {
+    public ArrayList<Point> computeConvexHull() {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -154,7 +165,7 @@ public class ImageGroup {
      * @param position
      * @return
      */
-    public Image getNearestImage (PointHolder position) {
+    public Image getNearestImage (Point position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;

@@ -90,7 +90,7 @@ public class MessageHost {
         // TODO: Make this handle both incoming and outgoing messages... right now it only does incoming!
 
         // Serialize the message so it can be passed to the main thread...
-        //String serializedMessage = getIpAsString (message.getSourceAddress()) + ":" + message.getContent();
+        //String serializedMessage = getIpAsString (message.getSourceAddress()) + ":" + message.getDescriptor();
         String serializedMessage = message.getSourceAddress() + ":" + message.getContent ();
 
         // ...prepare the serialized message to be passed to the main thread...
@@ -218,7 +218,7 @@ public class MessageHost {
 
         } else if (message.getContent().startsWith("say ")) {
 
-//            Log.v("Clay_Verbalizer", message.getContent());
+//            Log.v("Clay_Verbalizer", message.getDescriptor());
 
             String phrase = message.getContent().split(" ")[1];
 
@@ -284,7 +284,7 @@ public class MessageHost {
             // Get the next outgoing message.
             Message outgoingMessage = peekOutgoingMessage ();
 
-//            Log.v("UDP", "                 Message: " + outgoingMessage.getContent());
+//            Log.v("UDP", "                 Message: " + outgoingMessage.getDescriptor());
 //            Log.v("UDP", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
 //            Log.v("UDP", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
 //            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
@@ -307,9 +307,9 @@ public class MessageHost {
 
 //                Log.v("UDP", "\tProcessing outgoing message queue (" + outgoingMessages.size() + " messages)");
 //                for (Message queuedOutgoingMessage : outgoingMessages) {
-//                    Log.v("UDP", "\t\t" + queuedOutgoingMessage.getContent());
+//                    Log.v("UDP", "\t\t" + queuedOutgoingMessage.getDescriptor());
 //                }
-//                Log.v("UDP", "\tSending outgoing message \"" + outgoingMessage.getContent() + "\" to " + outgoingMessage.getTargetAddress());
+//                Log.v("UDP", "\tSending outgoing message \"" + outgoingMessage.getDescriptor() + "\" to " + outgoingMessage.getTargetAddress());
 
                 outgoingMessage.setTimeLastSent(currentCalendar.getTime());
                 outgoingMessage.increaseRetryCount();

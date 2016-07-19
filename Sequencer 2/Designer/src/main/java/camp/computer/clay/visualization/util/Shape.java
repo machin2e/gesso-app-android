@@ -8,17 +8,17 @@ import java.util.ArrayList;
 
 public abstract class Shape {
 
-    public static void drawTriangle(PointHolder position, double angle, double width, double height, Canvas canvas, Paint paint) {
+    public static void drawTriangle(Point position, double angle, double width, double height, Canvas canvas, Paint paint) {
 
         // Calculate points before rotation
-        PointHolder p1 = new PointHolder(position.getX() + -(width / 2.0f), position.getY() + (height / 2.0f));
-        PointHolder p2 = new PointHolder(position.getX() + 0, position.getY() - (height / 2.0f));
-        PointHolder p3 = new PointHolder(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
+        Point p1 = new Point(position.getX() + -(width / 2.0f), position.getY() + (height / 2.0f));
+        Point p2 = new Point(position.getX() + 0, position.getY() - (height / 2.0f));
+        Point p3 = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
 
         // Calculate points after rotation
-        PointHolder rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), (double) Geometry.calculateDistance(position, p1));
-        PointHolder rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), (double) Geometry.calculateDistance(position, p2));
-        PointHolder rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (double) Geometry.calculateDistance(position, p3));
+        Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), (double) Geometry.calculateDistance(position, p1));
+        Point rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), (double) Geometry.calculateDistance(position, p2));
+        Point rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (double) Geometry.calculateDistance(position, p3));
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
@@ -30,7 +30,7 @@ public abstract class Shape {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawLine(PointHolder source, PointHolder target, Canvas canvas, Paint paint) {
+    public static void drawLine(Point source, Point target, Canvas canvas, Paint paint) {
 
         // Color
         canvas.drawLine(
@@ -43,7 +43,7 @@ public abstract class Shape {
 
     }
 
-    public static void drawCircle(PointHolder position, double radius, double angle, Canvas canvas, Paint paint) {
+    public static void drawCircle(Point position, double radius, double angle, Canvas canvas, Paint paint) {
 
         // Color
         canvas.drawCircle(
@@ -55,7 +55,7 @@ public abstract class Shape {
 
     }
 
-    public static void drawText(PointHolder position, String text, double size, Canvas canvas, Paint paint) {
+    public static void drawText(Point position, String text, double size, Canvas canvas, Paint paint) {
 
         // Style
         paint.setTextSize((float) size);
@@ -70,33 +70,33 @@ public abstract class Shape {
         canvas.drawText(text, (float) position.getX(), (float) position.getY() + bounds.height() / 2.0f, paint);
     }
 
-    public static void drawRectangle(PointHolder position, double angle, double width, double height, Canvas canvas, Paint paint) {
+    public static void drawRectangle(Point position, double angle, double width, double height, Canvas canvas, Paint paint) {
 
         // Calculate points before rotation
-        PointHolder p1 = new PointHolder(position.getX() - (width / 2.0f), position.getY() - (height / 2.0f));
-        PointHolder p2 = new PointHolder(position.getX() + (width / 2.0f), position.getY() - (height / 2.0f));
-        PointHolder p3 = new PointHolder(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
-        PointHolder p4 = new PointHolder(position.getX() - (width / 2.0f), position.getY() + (height / 2.0f));
+        Point topLeft = new Point(position.getX() - (width / 2.0f), position.getY() - (height / 2.0f));
+        Point topRight = new Point(position.getX() + (width / 2.0f), position.getY() - (height / 2.0f));
+        Point bottomRight = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
+        Point bottomLeft = new Point(position.getX() - (width / 2.0f), position.getY() + (height / 2.0f));
 
         // Calculate points after rotation
-        PointHolder rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), (double) Geometry.calculateDistance(position, p1));
-        PointHolder rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), (double) Geometry.calculateDistance(position, p2));
-        PointHolder rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (double) Geometry.calculateDistance(position, p3));
-        PointHolder rp4 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p4), (double) Geometry.calculateDistance(position, p4));
+        Point rotatedTopLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topLeft), (double) Geometry.calculateDistance(position, topLeft));
+        Point rotatedTopRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topRight), (double) Geometry.calculateDistance(position, topRight));
+        Point rotatedBottomRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomRight), (double) Geometry.calculateDistance(position, bottomRight));
+        Point rotatedBottomLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomLeft), (double) Geometry.calculateDistance(position, bottomLeft));
 
         // Draw points in shape
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-        path.moveTo((float) rp1.getX(), (float) rp1.getY());
-        path.lineTo((float) rp2.getX(), (float) rp2.getY());
-        path.lineTo((float) rp3.getX(), (float) rp3.getY());
-        path.lineTo((float) rp4.getX(), (float) rp4.getY());
+        path.moveTo((float) rotatedTopLeft.getX(), (float) rotatedTopLeft.getY());
+        path.lineTo((float) rotatedTopRight.getX(), (float) rotatedTopRight.getY());
+        path.lineTo((float) rotatedBottomRight.getX(), (float) rotatedBottomRight.getY());
+        path.lineTo((float) rotatedBottomLeft.getX(), (float) rotatedBottomLeft.getY());
         path.close();
 
         canvas.drawPath(path, paint);
     }
 
-    public static void drawTrianglePath(PointHolder startPosition, PointHolder stopPosition, double triangleWidth, double triangleHeight, Canvas canvas, Paint paint) {
+    public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Canvas canvas, Paint paint) {
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
                 startPosition,
@@ -105,7 +105,7 @@ public abstract class Shape {
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
-        double pathDistance = (double) Geometry.calculateDistance(
+        double pathDistance = Geometry.calculateDistance(
                 startPosition,
                 stopPosition
         );
@@ -116,7 +116,7 @@ public abstract class Shape {
         for (int k = 0; k <= triangleCount; k++) {
 
             // Calculate triangle position
-            PointHolder triangleCenterPosition2 = Geometry.calculatePoint(
+            Point triangleCenterPosition2 = Geometry.calculatePoint(
                     startPosition,
                     pathRotationAngle,
                     k * triangleSpacing2
@@ -145,11 +145,11 @@ public abstract class Shape {
      * @param canvas
      * @param paint
      */
-    public static void drawRegularPolygon(PointHolder position, int radius, int sideCount, Canvas canvas, Paint paint) {
+    public static void drawRegularPolygon(Point position, int radius, int sideCount, Canvas canvas, Paint paint) {
         android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < sideCount; i++) {
 
-            PointHolder vertexPosition = new PointHolder(
+            Point vertexPosition = new Point(
                     (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) sideCount)),
                     (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) sideCount))
             );
@@ -169,7 +169,7 @@ public abstract class Shape {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawPolygon(ArrayList<PointHolder> vertices, Canvas canvas, Paint paint) {
+    public static void drawPolygon(ArrayList<Point> vertices, Canvas canvas, Paint paint) {
         android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < vertices.size(); i++) {
 

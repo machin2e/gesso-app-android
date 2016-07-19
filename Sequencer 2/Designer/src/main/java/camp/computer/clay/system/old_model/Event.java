@@ -18,7 +18,7 @@ public class Event {
 
 
     // <HACK>
-    private Content content; // Content entry for the event (replaces state)
+    private Descriptor descriptor; // Descriptor entry for the event (replaces state)
     // </HACK>
 
     public Event (UUID uuid, Timeline timeline) {
@@ -80,44 +80,44 @@ public class Event {
 
 
 
-    public Content getContent() {
-        return this.content;
+    public Descriptor getDescriptor() {
+        return this.descriptor;
     }
 
     private void initializeContent() {
         // <HACK>
         // TODO: Update this from a list of the observables received from the boards.
-        Content eventContent = new Content("event");
-        Content channelsContent = eventContent.list("channels");
-        //Content channelsContent = eventContent.list("channels").each(12).has("number", "direction", );
+        Descriptor eventDescriptor = new Descriptor("event");
+        Descriptor channelsDescriptor = eventDescriptor.list("channels");
+        //Descriptor channelsDescriptor = eventDescriptor.list("channels").each(12).has("number", "direction", );
         for (int i = 0; i < 12; i++) {
 
             // device/<uuid>/channels/<number>
-            Content channelContent = channelsContent.put(String.valueOf(i + 1));
+            Descriptor channelDescriptor = channelsDescriptor.put(String.valueOf(i + 1));
 
             // device/<uuid>/channels/<number>/enable
-            channelContent.put("enable").from("true", "false").set("false");
+            channelDescriptor.put("enable").from("true", "false").set("false");
 
             // device/<uuid>/channels/<number>/number
-            channelContent.put("number", String.valueOf(i + 1));
+            channelDescriptor.put("number", String.valueOf(i + 1));
 
             // device/<uuid>/channels/<number>/direction
-            channelContent.put("direction").from("input", "output").set("input");
+            channelDescriptor.put("direction").from("input", "output").set("input");
 
             // device/<uuid>/channels/<number>/type
-            channelContent.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
+            channelDescriptor.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
 
-            // device/<uuid>/channels/<number>/content
-            Content channelContentContent = channelContent.put("content");
+            // device/<uuid>/channels/<number>/descriptor
+            Descriptor channelContentDescriptor = channelDescriptor.put("descriptor");
 
-            // device/<uuid>/channels/<number>/content/<observable>
+            // device/<uuid>/channels/<number>/descriptor/<observable>
             // TODO: Retreive the "from" values and the "default" value from the exposed observables on the actual hardware (or the hardware profile)
-            channelContentContent.put("toggle_value").from("on", "off").set("off");
-            channelContentContent.put("waveform_sample_value", "none");
-            channelContentContent.put("pulse_period_seconds", "0");
-            channelContentContent.put("pulse_duty_cycle", "0");
+            channelContentDescriptor.put("toggle_value").from("on", "off").set("off");
+            channelContentDescriptor.put("waveform_sample_value", "none");
+            channelContentDescriptor.put("pulse_period_seconds", "0");
+            channelContentDescriptor.put("pulse_duty_cycle", "0");
 
-            for (Content child : channelContentContent.getChildren()) {
+            for (Descriptor child : channelContentDescriptor.getChildren()) {
                 child.put("valid").from("true", "false").set("false");
                 child.put("type");
                 child.put("device").set(this.getTimeline().getDevice().getUuid().toString());
@@ -126,7 +126,7 @@ public class Event {
                 child.put("value");
             }
         }
-        this.content = eventContent;
+        this.descriptor = eventDescriptor;
         // </HACK>
     }
 

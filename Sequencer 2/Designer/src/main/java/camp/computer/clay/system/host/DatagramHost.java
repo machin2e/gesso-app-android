@@ -213,7 +213,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
             // Send the datagram.
             // formerly "sendDatagram(...)"
-            //exposeDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getContent());
+            //exposeDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getDescriptor());
             exposeDatagram(message.getTargetAddress(), MESSAGE_PORT, message.getContent());
             Log.v("UDP", "from: " + message.getSourceAddress());
             Log.v("UDP", "to: " + message.getTargetAddress());

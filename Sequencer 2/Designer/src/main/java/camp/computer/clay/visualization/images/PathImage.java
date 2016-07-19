@@ -2,14 +2,13 @@ package camp.computer.clay.visualization.images;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;
 
 public class PathImage extends Image {
@@ -80,13 +79,13 @@ public class PathImage extends Image {
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
-        PointHolder pathStartPosition = Geometry.calculatePoint(
+        Point pathStartPosition = Geometry.calculatePoint(
                 sourcePortImage.getPosition(),
                 pathRotationAngle,
                 2 * triangleSpacing
         );
 
-        PointHolder pathStopPosition = Geometry.calculatePoint(
+        Point pathStopPosition = Geometry.calculatePoint(
                 targetPortImage.getPosition(),
                 pathRotationAngle + 180,
                 2 * triangleSpacing
@@ -141,11 +140,11 @@ public class PathImage extends Image {
     }
 
     @Override
-    public boolean isTouching(PointHolder point) {
+    public boolean isTouching(Point point) {
         return false;
     }
 
-    public boolean isTouching (PointHolder point, double padding) {
+    public boolean isTouching (Point point, double padding) {
         return false;
     }
 
@@ -155,21 +154,21 @@ public class PathImage extends Image {
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
         if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
-            Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
-            Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
-            Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
-            Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
-            Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.PRE_DRAG) {
-            Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TWITCH) {
+            // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
-            Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
-            Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }
 }

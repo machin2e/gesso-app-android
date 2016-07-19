@@ -11,7 +11,7 @@
     <item name="list_item_type_wait" type="id" />
     <item name="list_item_type_say" type="id" />
 
-    <item name="content" type="id" />
+    <item name="descriptor" type="id" />
 
     <item name="preview_layout" type="id" />
 
@@ -30,7 +30,7 @@
     <item name="event_top_layout" type="id" />
     <item name="event_middle_layout" type="id" />
     <item name="event_bottom_layout" type="id" />
-    <item name="event_label" type="id" />
+    <item name="event_name" type="id" />
     <item name="timeline_segment" type="id" />
     <item name="timeline_bottom_segment" type="id" />
     <item name="timeline_top_segment" type="id" />

@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,11 +22,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
+
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
+import camp.computer.clay.system.host.util.CRC16;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.host.DisplayHostInterface;
 
@@ -34,8 +43,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // <Settings>
     private static final boolean ENABLE_TONE_GENERATOR = false;
     private static final boolean ENABLE_SPEECH_GENERATOR = false;
+    private static final boolean ENABLE_MOTION_SENSOR = false;
 
-    private static final long MESSAGE_SEND_FREQUENCY = 100;
+    private static final long MESSAGE_SEND_FREQUENCY = 500;
     // </Settings>
 
     // <Style>
@@ -90,10 +100,31 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         Application.context = getApplicationContext();
 
         // Sensor Interface
-        sensorAdapter = new SensorAdapter(getApplicationContext());
+        if (ENABLE_MOTION_SENSOR) {
+            sensorAdapter = new SensorAdapter(getApplicationContext());
+        }
+
+        if (ENABLE_FULLSCREEN) {
+            startFullscreenService();
+        }
 
         // Display Interface
         Application.applicationView = this;
+
+//        for (int i = 0; i < 100; i++) {
+//            String outgoingMessage = "announce device " + UUID.randomUUID();
+//            CRC16 CRC16 = new CRC16();
+//            int seed = 0;
+//            byte[] outgoingMessageBytes = outgoingMessage.getBytes();
+//            int check = CRC16.calculate(outgoingMessageBytes, seed);
+//            String outmsg =
+//                    "\f" +
+//                            String.valueOf(outgoingMessage.length()) + "\t" +
+//                            String.valueOf(check) + "\t" +
+//                            "text" + "\t" +
+//                            outgoingMessage;
+//            Log.v("CRC_Demo", "" + outmsg);
+//        }
 
         setContentView(R.layout.activity_main);
 
@@ -103,23 +134,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
-
-        if (ENABLE_FULLSCREEN) {
-
-            startFullscreenService();
-
-//            // Hide the notification bar
-//            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//
-//            // Hide the navigation bar
-//
-//            View decorView = getWindow().getDecorView();
-//            // Hide both the navigation bar and the status bar.
-//            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-//            // a general rule, you should design your app to hide the status bar whenever you
-//            // hide the navigation bar.
-//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
 
         // Path Editor
         final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
@@ -168,6 +182,36 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // <Cache>
         // </Cache>
 
+        // Read default form profiles
+        String jsonString = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open("forms.json");
+            int fileSize = inputStream.available();
+            byte[] fileBuffer = new byte[fileSize];
+            inputStream.read(fileBuffer);
+            inputStream.close();
+            jsonString = new String(fileBuffer, "UTF-8");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create JSON object
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+
+            JSONObject formObject = jsonObject.getJSONObject("form");
+
+            String formName = formObject.getString("name");
+
+            Log.v("Configuration", "reading JSON name: " + formName);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
         // Clay
         clay = new Clay();
         clay.addDisplay(this); // Add the view provided by the host device.
@@ -185,7 +229,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             clay.addResource(this.networkResource);
         }
 
-        // Content Database
+        // Descriptor Database
         SQLiteStoreHost sqliteStoreHost = new SQLiteStoreHost(getClay(), "sqlite");
         getClay().setStore(sqliteStoreHost);
 

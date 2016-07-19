@@ -3,23 +3,21 @@ package camp.computer.clay.visualization.images;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 
 import java.util.ArrayList;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Base;
+import camp.computer.clay.model.simulation.Form;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.arch.Image;
-import camp.computer.clay.visualization.util.Animation;
+import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
 
-public class BaseImage extends Image {
+public class FormImage extends Image {
 
     public final static String TYPE = "base";
 
@@ -60,14 +58,15 @@ public class BaseImage extends Image {
     private int lightOutlineColor = Color.parseColor("#e7e7e7");
     // </STYLE>
 
-    public BaseImage(Base base) {
-        super(base);
+    public FormImage(Form form) {
+        super(form);
         setType(TYPE);
         setup();
     }
 
     private void setup() {
         setupStyle();
+//        setupPortImages();
     }
 
     private void setupStyle() {
@@ -76,22 +75,22 @@ public class BaseImage extends Image {
     public void setupPortImages() {
 
         // Add a port sprite for each of the associated base's ports
-        for (Port port: getBase().getPorts()) {
+        for (Port port: getForm().getPorts()) {
             PortImage portImage = new PortImage(port);
             portImage.setVisualization(getVisualization());
             getVisualization().addImage(port, portImage, "ports");
         }
     }
 
-    public Base getBase() {
-        return (Base) getModel();
+    public Form getForm() {
+        return (Form) getModel();
     }
 
     public ArrayList<PortImage> getPortImages() {
         ArrayList<PortImage> portImages = new ArrayList<PortImage>();
-        Base base = getBase();
+        Form form = getForm();
 
-        for (Port port: base.getPorts()) {
+        for (Port port: form.getPorts()) {
             PortImage portImage = (PortImage) getVisualization().getImage(port);
             portImages.add(portImage);
         }
@@ -100,16 +99,16 @@ public class BaseImage extends Image {
     }
 
     public PortImage getPortImage(int index) {
-        Base base = getBase();
-        PortImage portImage = (PortImage) getVisualization().getImage(base.getPort(index));
+        Form form = getForm();
+        PortImage portImage = (PortImage) getVisualization().getImage(form.getPort(index));
         return portImage;
     }
 
     // TODO: Remove this! Store Port index/id
     public int getPortImageIndex(PortImage portImage) {
         Port port = (Port) getVisualization().getModel(portImage);
-        if (getBase().getPorts().contains(port)) {
-            return this.getBase().getPorts().indexOf(port);
+        if (getForm().getPorts().contains(port)) {
+            return this.getForm().getPorts().indexOf(port);
         }
         return -1;
     }
@@ -119,7 +118,7 @@ public class BaseImage extends Image {
 
     public void draw(VisualizationSurface visualizationSurface) {
         if (isVisible()) {
-//            drawPortPeripheralImages(visualizationSurface);
+            // drawPortPeripheralImages(visualizationSurface);
             drawPortGroupImages(visualizationSurface);
             drawBoardImage(visualizationSurface);
             drawLightImages(visualizationSurface);
@@ -162,22 +161,22 @@ public class BaseImage extends Image {
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
-        PointHolder[] portGroupCenterPositions = new PointHolder[PORT_GROUP_COUNT];
+        Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
 
         // Positions before rotation
-        portGroupCenterPositions[0] = new PointHolder(
+        portGroupCenterPositions[0] = new Point(
                 getPosition().getX() + 0,
                 getPosition().getY() + ((shape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[1] = new PointHolder(
+        portGroupCenterPositions[1] = new Point(
                 getPosition().getX() + ((shape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().getY() + 0
         );
-        portGroupCenterPositions[2] = new PointHolder(
+        portGroupCenterPositions[2] = new Point(
                 getPosition().getX() + 0,
                 getPosition().getY() - ((shape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[3] = new PointHolder(
+        portGroupCenterPositions[3] = new Point(
                 getPosition().getX() - ((shape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().getY() + 0
         );
@@ -210,22 +209,22 @@ public class BaseImage extends Image {
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
-        PointHolder[] portGroupCenterPositions = new PointHolder[PORT_GROUP_COUNT];
+        Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
 
         // Positions before rotation
-        portGroupCenterPositions[0] = new PointHolder(
+        portGroupCenterPositions[0] = new Point(
                 getPosition().getX() + 0,
                 getPosition().getY() + ((shape.getHeight()) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[1] = new PointHolder(
+        portGroupCenterPositions[1] = new Point(
                 getPosition().getX() + ((shape.getWidth()) + (portGroupHeight / 2.0f)),
                 getPosition().getY() + 0
         );
-        portGroupCenterPositions[2] = new PointHolder(
+        portGroupCenterPositions[2] = new Point(
                 getPosition().getX() + 0,
                 getPosition().getY() - ((shape.getHeight()) + (portGroupHeight / 2.0f))
         );
-        portGroupCenterPositions[3] = new PointHolder(
+        portGroupCenterPositions[3] = new Point(
                 getPosition().getX() - ((shape.getWidth()) + (portGroupHeight / 2.0f)),
                 getPosition().getY() + 0
         );
@@ -258,55 +257,55 @@ public class BaseImage extends Image {
         Paint paint = visualizationSurface.getPaint();
 
         // <SHAPE>
-        PointHolder[] lightCenterPositions = new PointHolder[PORT_COUNT];
-        lightCenterPositions[0] = new PointHolder(
+        Point[] lightCenterPositions = new Point[PORT_COUNT];
+        lightCenterPositions[0] = new Point(
                 getPosition().getX() + (-20),
                 getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[1] = new PointHolder(
+        lightCenterPositions[1] = new Point(
                 getPosition().getX() + (0),
                 getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[2] = new PointHolder(
+        lightCenterPositions[2] = new Point(
                 getPosition().getX() + (+20),
                 getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
-        lightCenterPositions[3] = new PointHolder(
+        lightCenterPositions[3] = new Point(
                 getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (+20)
         );
-        lightCenterPositions[4] = new PointHolder(
+        lightCenterPositions[4] = new Point(
                 getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (0)
         );
-        lightCenterPositions[5] = new PointHolder(
+        lightCenterPositions[5] = new Point(
                 getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (-20)
         );
 
-        lightCenterPositions[6] = new PointHolder(
+        lightCenterPositions[6] = new Point(
                 getPosition().getX() + (+20),
                 getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[7] = new PointHolder(
+        lightCenterPositions[7] = new Point(
                 getPosition().getX() + (0),
                 getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
-        lightCenterPositions[8] = new PointHolder(
+        lightCenterPositions[8] = new Point(
                 getPosition().getX() + (-20),
                 getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
-        lightCenterPositions[9] = new PointHolder(
+        lightCenterPositions[9] = new Point(
                 getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (-20)
         );
-        lightCenterPositions[10] = new PointHolder(
+        lightCenterPositions[10] = new Point(
                 getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (0)
         );
-        lightCenterPositions[11] = new PointHolder(
+        lightCenterPositions[11] = new Point(
                 getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (+20)
         );
@@ -333,7 +332,7 @@ public class BaseImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
-            Port port = (Port) getBase().getPort(i);
+            Port port = (Port) getForm().getPort(i);
             if (port.getType() != Port.Type.NONE) {
                 paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), (float) currentTransparency));
             } else {
@@ -359,7 +358,7 @@ public class BaseImage extends Image {
         currentTransparency = targetTransparency;
         String transparencyString = String.format("%02x", (int) currentTransparency * 255);
 
-        // Base color
+        // Form color
         boardColor = Color.parseColor("#" + transparencyString + boardColorString);
         boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
 
@@ -367,6 +366,7 @@ public class BaseImage extends Image {
         portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
         portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
 
+        // TODO: Replace this with manual translation through colorspace.
 //        if (this.targetTransparency != transparency) {
 //
 //            Animation.scaleValue(255.0f * targetTransparency, 255.0f * transparency, 200, new Animation.OnScaleListener() {
@@ -375,7 +375,7 @@ public class BaseImage extends Image {
 //                    currentTransparency = currentScale / 255.0f;
 //                    String transparencyString = String.format("%02x", (int) currentScale);
 //
-//                    // Base color
+//                    // Form color
 //                    boardColor = Color.parseColor("#" + transparencyString + boardColorString);
 //                    boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
 //
@@ -419,7 +419,7 @@ public class BaseImage extends Image {
     // Interaction
     //-------------------------
 
-    public boolean isTouching (PointHolder point) {
+    public boolean isTouching (Point point) {
         if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f);
         } else {
@@ -427,7 +427,7 @@ public class BaseImage extends Image {
         }
     }
 
-    public boolean isTouching (PointHolder point, double padding) {
+    public boolean isTouching (Point point, double padding) {
         if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f + padding);
         } else {
@@ -441,21 +441,21 @@ public class BaseImage extends Image {
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
         if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
-            Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
-            Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
-            Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
-            Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
-            Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.PRE_DRAG) {
-            Log.v("onTouchInteraction", "TouchInteraction.PRE_DRAG to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TWITCH) {
+            // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
-            Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
-            Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+            // Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
     }
 }

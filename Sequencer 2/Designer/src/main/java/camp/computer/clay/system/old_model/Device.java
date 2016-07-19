@@ -11,7 +11,7 @@ import java.util.UUID;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.host.TcpMessageClientHost;
 
-// TODO: Integrate with Base in new model. Also separate the model (descriptive information that
+// TODO: Integrate with Form in new model. Also separate the model (descriptive information that
 // TODO: (cont'd) provides a lookup table of sorts, and the simulation (includes virtual
 // TODO: (cont'd) communications interfaces such as TCP).
 

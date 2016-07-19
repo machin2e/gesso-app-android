@@ -1,6 +1,6 @@
 package camp.computer.clay.visualization.util;
 
-public class PointHolder {
+public class Point {
     // TODO: Add subscriber/publisher to automate geometry updates!
 
     // TODO: Update to use numbers that can be composed and given dependencies (used in
@@ -9,24 +9,17 @@ public class PointHolder {
     // TODO: Refactor to support N dimensions, including rotation angles accordingly.
     private double x = 0;
     private double y = 0;
-    // double z;
 
     /** Rotation angle in degrees */
     // TODO: Refactor so 0 degrees faces upward, not right.
-    private double angle = 0;
 
-    public PointHolder() {
+    public Point() {
         this(0, 0);
     }
 
-    public PointHolder(double x, double y) {
-        this(x, y, 0);
-    }
-
-    public PointHolder(double x, double y, double angle) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
-        this.angle = angle;
     }
 
     public double getX() {
@@ -35,10 +28,6 @@ public class PointHolder {
 
     public double getY() {
         return y;
-    }
-
-    public double getAngle() {
-        return angle;
     }
 
     public void set (double x, double y) {
@@ -51,9 +40,9 @@ public class PointHolder {
         this.y = this.y + dy;
     }
 
-    public void set (PointHolder pointHolder) {
-        this.x = pointHolder.x;
-        this.y = pointHolder.y;
+    public void set (Point point) {
+        this.x = point.x;
+        this.y = point.y;
     }
 
     public void setX(double x) {
@@ -62,10 +51,6 @@ public class PointHolder {
 
     public void setY(double y) {
         this.y = y;
-    }
-
-    public void setAngle(double angle) {
-        this.angle = angle;
     }
 
 }

@@ -2,9 +2,9 @@ package camp.computer.clay.model.simulation;
 
 import java.util.ArrayList;
 
-public class Base extends Model {
+public class Form extends Model {
 
-    // has Script (i.e., Base runs a Script)
+    // has Script (i.e., Form runs a Script)
 
     private ArrayList<Port> ports = new ArrayList<Port>();
     private String nameTag;

@@ -1349,7 +1349,7 @@ public class SQLiteStoreHost {
 //                    String existingBehaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(ActionEntry.COLUMN_NAME_UUID));
 //                    UUID existingBehaviorUuid = UUID.fromString (existingBehaviorUuidString);
 //                    action.setUuid (existingBehaviorUuid);
-                    // TODO: PointHolder to existing reference! OR error?
+                    // TODO: Point to existing reference! OR error?
                 }
                 return true;
             } else {

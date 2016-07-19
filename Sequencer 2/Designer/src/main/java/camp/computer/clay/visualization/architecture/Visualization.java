@@ -1,26 +1,27 @@
-package camp.computer.clay.visualization.arch;
+package camp.computer.clay.visualization.architecture;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Base;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.images.BaseImage;
+import camp.computer.clay.visualization.images.FormImage;
 import camp.computer.clay.visualization.images.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
 
@@ -31,17 +32,15 @@ public class Visualization extends Image {
 //        return arrayList;
 //    }
 
-    public static <T> ArrayList<PointHolder> getPositions(ArrayList<T> images) {
-        ArrayList<PointHolder> positions = new ArrayList<>();
-        for (T image: images) {
-            positions.add(new PointHolder(((Image) image).getPosition().getX(), ((Image) image).getPosition().getY()));
+    public static <T> ArrayList<Point> getPositions(ArrayList<T> images) {
+        ArrayList<Point> positions = new ArrayList<>();
+        for (T image : images) {
+            positions.add(new Point(((Image) image).getPosition().getX(), ((Image) image).getPosition().getY()));
         }
         return positions;
     }
 
-    private HashMap<String, Layer> layers = new HashMap<String, Layer>();
-
-    private float gridScale = 1.5f;
+    private ConcurrentHashMap<String, Layer> layers = new ConcurrentHashMap<>();
 
     public Visualization(Simulation simulation) {
         super(simulation);
@@ -49,15 +48,6 @@ public class Visualization extends Image {
     }
 
     private void setup() {
-        // setupImages();
-    }
-
-    public void setGridScale(float scale) {
-        this.gridScale = scale;
-    }
-
-    public float getGridScale() {
-        return this.gridScale;
     }
 
     public boolean hasLayer(String name) {
@@ -72,11 +62,20 @@ public class Visualization extends Image {
     }
 
     // TODO: Remove Image parameter. Create that and return it.
-    public void addImage (Model model, Image image, String layerName) {
+    public void addImage(Model model, Image image, String layerName) {
+
+        // Position image
+        findImagePosition(image);
+
+        // Add image
         if (!hasLayer(layerName)) {
             addLayer(layerName);
         }
-        getLayer(layerName).addImage(model, image);
+        getLayer(layerName).add(model, image);
+
+//        // Update perspective
+//        getSimulation().getBody(0).adjustPerspectiveScale();
+//        getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FormImage.TYPE).calculateCenter());
     }
 
     public Set<String> getLayerNames() {
@@ -88,7 +87,7 @@ public class Visualization extends Image {
     }
 
     public Layer getLayer(int id) {
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             if (layer.getId() == id) {
                 return layer;
             }
@@ -96,69 +95,52 @@ public class Visualization extends Image {
         return null;
     }
 
-    public void setupImages() {
-
-        String machineLayerName = "machines";
-        addLayer(machineLayerName);
-        Layer defaultLayer = getLayer(machineLayerName);
-
-        Simulation simulation = (Simulation) getModel();
-
-        // Create machine sprites
-        for (Base base : simulation.getBases()) {
-            BaseImage baseImage = new BaseImage(base);
-            baseImage.setVisualization(this);
-
-            addImage(base, baseImage, machineLayerName);
-        }
+    private void findImagePosition(Image image) {
 
         // Calculate random positions separated by minimum distance
-        final float minimumDistance = 550;
-        ArrayList<PointHolder> imagePositions = new ArrayList<>();
-        while (imagePositions.size() < simulation.getBases().size()) {
-            boolean foundPoint = false;
-            if (imagePositions.size() == 0) {
-                imagePositions.add(new PointHolder(0, 0));
-            } else {
-                for (int i = 0; i < imagePositions.size(); i++) {
-                    for (int tryCount = 0; tryCount < 360; tryCount++) {
-                        boolean fail = false;
-                        PointHolder candidatePoint = Geometry.calculatePoint(imagePositions.get(i), Number.generateRandomInteger(0, 360), minimumDistance);
-                        for (int j = 0; j < imagePositions.size(); j++) {
-                            if (Geometry.calculateDistance(imagePositions.get(j), candidatePoint) < minimumDistance) {
-                                fail = true;
-                                break;
-                            }
-                        }
-                        if (fail == false) {
-                            imagePositions.add(candidatePoint);
-                            foundPoint = true;
-                            break;
-                        }
-                        if (foundPoint) {
-                            break;
-                        }
-                    }
-                    if (foundPoint) {
-                        break;
-                    }
-                }
-            }
+        final float imageSeparationDistance = 500;
+
+        ArrayList<Point> imagePositions = getImages().filterType(FormImage.TYPE).getPositions();
+
+        Point position = null;
+        boolean foundPoint = false;
+
+        Log.v("Position", "imagePositions.size = " + imagePositions.size());
+
+        if (imagePositions.size() == 0) {
+
+            position = new Point(0, 0);
+
+        } else if (imagePositions.size() == 1) {
+
+            position = Geometry.calculatePoint(
+                    imagePositions.get(0),
+                    Number.generateRandomInteger(0, 360),
+                    imageSeparationDistance
+            );
+
+        } else {
+
+            ArrayList<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
+
+            int sourceIndex = Number.generateRandomInteger(0, hullPoints.size() - 1);
+            int targetIndex = sourceIndex + 1;
+
+            Point midpoint = Geometry.calculateMidpoint(hullPoints.get(sourceIndex), hullPoints.get(targetIndex));
+            position = Geometry.calculatePoint(
+                    midpoint,
+                    Geometry.calculateRotationAngle(hullPoints.get(sourceIndex), hullPoints.get(targetIndex)) + 90,
+                    imageSeparationDistance
+            );
         }
 
-        for (int i = 0; i < simulation.getBases().size(); i++) {
-
-            BaseImage baseImage = (BaseImage) defaultLayer.getImage2(simulation.getBase(i));
-
-            baseImage.setRelativePosition(imagePositions.get(i));
-            baseImage.setRotation(Number.getRandomGenerator().nextInt(360));
-
-            baseImage.setupPortImages();
-        }
+        // Assign the found position to the image
+        image.setPosition(position);
+        image.setRotation(Number.getRandomGenerator().nextInt(360));
     }
 
     public Image getImage(Model model) {
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             Image image = layer.getImage2(model);
             if (image != null) {
                 return image;
@@ -168,7 +150,7 @@ public class Visualization extends Image {
     }
 
     public Model getModel(Image image) {
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             Model model = layer.getModel2(image);
             if (model != null) {
                 return model;
@@ -177,14 +159,14 @@ public class Visualization extends Image {
         return null;
     }
 
-    public ArrayList<BaseImage> getBaseImages() {
+    public ArrayList<FormImage> getFormImages() {
 
-        ArrayList<BaseImage> images = new ArrayList<>();
+        ArrayList<FormImage> images = new ArrayList<>();
 
-        for (Layer layer: getLayers()) {
-            for (Image image: layer.getImages()) {
-                if (image instanceof BaseImage) {
-                    images.add((BaseImage) image);
+        for (Layer layer : getLayers()) {
+            for (Image image : layer.getImages()) {
+                if (image instanceof FormImage) {
+                    images.add((FormImage) image);
                 }
             }
         }
@@ -196,7 +178,7 @@ public class Visualization extends Image {
 
         ArrayList<PortImage> sprites = new ArrayList<>();
 
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
                 if (image instanceof PortImage) {
                     sprites.add((PortImage) image);
@@ -209,7 +191,7 @@ public class Visualization extends Image {
 
     public <T> ArrayList<Image> getImages(ArrayList<T> models) {
         ArrayList<Image> images = new ArrayList<>();
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             for (T model : models) {
                 Image image = layer.getImage2((Model) model);
                 if (image != null) {
@@ -222,8 +204,8 @@ public class Visualization extends Image {
 
     public ImageGroup getImages() {
         ImageGroup imageGroup = new ImageGroup();
-        for (Layer layer: getLayers()) {
-            for (Image layerImage: layer.getImages()) {
+        for (Layer layer : getLayers()) {
+            for (Image layerImage : layer.getImages()) {
                 imageGroup.add(layerImage);
             }
         }
@@ -232,15 +214,16 @@ public class Visualization extends Image {
 
     /**
      * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     *
      * @param position
      * @return
      */
-    public Image getNearestImage (PointHolder position) {
+    public Image getNearestImage(Point position) {
 
         float shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
 
-        for (Image image: getImages().getList()) {
+        for (Image image : getImages().getList()) {
 
             float currentDistance = (float) Geometry.calculateDistance(
                     position,
@@ -256,36 +239,36 @@ public class Visualization extends Image {
         return nearestImage;
     }
 
-    public BaseImage getNearestBaseImage(PointHolder position) {
+    public FormImage getNearestBaseImage(Point position) {
 
         float shortestDistance = Float.MAX_VALUE;
-        BaseImage nearestBaseImage = null;
+        FormImage nearestFormImage = null;
 
-        for (BaseImage baseImage : getBaseImages()) {
+        for (FormImage formImage : getFormImages()) {
 
             // Update style of nearby machines
             float currentDistance = (float) Geometry.calculateDistance(
                     position,
-                    baseImage.getPosition()
+                    formImage.getPosition()
             );
 
             if (currentDistance < shortestDistance) {
 
                 shortestDistance = currentDistance;
-                nearestBaseImage = baseImage;
+                nearestFormImage = formImage;
 
             }
         }
 
-        return nearestBaseImage;
+        return nearestFormImage;
     }
 
-    public PortImage getNearestPortImage(PointHolder position) {
+    public PortImage getNearestPortImage(Point position) {
 
         float shortestDistance = Float.MAX_VALUE;
         PortImage nearestImage = null;
 
-        for (PortImage image: getPortImages()) {
+        for (PortImage image : getPortImages()) {
 
             // Update style of nearby machines
             float currentDistance = (float) Geometry.calculateDistance(
@@ -310,13 +293,12 @@ public class Visualization extends Image {
 
         getSimulation().getBody(0).getPerspective().update();
 
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
                 image.update();
             }
         }
     }
-
 
 
     @Override
@@ -335,23 +317,23 @@ public class Visualization extends Image {
         // drawGrid(visualizationSurface);
 
         // Draw images
-        for (Integer id: getLayerIds()) {
+        for (Integer id : getLayerIds()) {
             Layer layer = getLayer(id);
             if (layer == null) {
                 break;
             }
-            for (Image image: layer.getImages()) {
+            for (Image image : layer.getImages()) {
                 image.draw(visualizationSurface);
             }
         }
 
-        //Geometry.packCircles(getVisualization().getBaseImages(), 200, getVisualization().getList().filterType(BaseImage.TYPE).calculateCentroid());
+        //Geometry.computeCirclePacking(getFormImages(), 200, getImages().filterType(FormImage.TYPE).calculateCentroid());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
 
             // <FPS_ANNOTATION>
-            PointHolder fpsPosition = getImages().filterType(BaseImage.TYPE).calculateCenter();
+            Point fpsPosition = getImages().filterType(FormImage.TYPE).calculateCenter();
             fpsPosition.setY(fpsPosition.getY() - 200);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
@@ -363,11 +345,11 @@ public class Visualization extends Image {
             String fpsText = "FPS: " + (int) visualizationSurface.getRenderer().getFramesPerSecond();
             Rect fpsTextBounds = new Rect();
             visualizationSurface.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-            visualizationSurface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20,(float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+            visualizationSurface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20, (float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, visualizationSurface.getPaint());
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            PointHolder centroidPosition = getImages().filterType(BaseImage.TYPE).calculateCentroid();
+            Point centroidPosition = getImages().filterType(FormImage.TYPE).calculateCentroid();
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, visualizationSurface.getPaint());
@@ -382,11 +364,11 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            ArrayList<PointHolder> baseImagePositions = getImages().filterType(BaseImage.TYPE).getPositions();
-            PointHolder baseImagesCenterPosition = Geometry.calculateCenterPosition(baseImagePositions);
+            ArrayList<Point> formImagePositions = getImages().filterType(FormImage.TYPE).getPositions();
+            Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getCanvas().drawCircle((float) baseImagesCenterPosition.getX(), (float) baseImagesCenterPosition.getY(), 10, visualizationSurface.getPaint());
+            visualizationSurface.getCanvas().drawCircle((float) formImagesCenterPosition.getX(), (float) formImagesCenterPosition.getY(), 10, visualizationSurface.getPaint());
 
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getPaint().setTextSize(35);
@@ -394,12 +376,12 @@ public class Visualization extends Image {
             String centerLabeltext = "CENTER";
             Rect centerLabelTextBounds = new Rect();
             visualizationSurface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-            visualizationSurface.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterPosition.getX() + 20, (float) baseImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+            visualizationSurface.getCanvas().drawText(centerLabeltext, (float) formImagesCenterPosition.getX() + 20, (float) formImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
             // </CENTROID_ANNOTATION>
 
             // <CONVEX_HULL>
-            ArrayList<PointHolder> basePositions = Visualization.getPositions(getBaseImages());
-            ArrayList<PointHolder> convexHullVertices = Geometry.computeConvexHull(basePositions);
+            ArrayList<Point> formPositions = Visualization.getPositions(getFormImages());
+            ArrayList<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
 
             visualizationSurface.getPaint().setStrokeWidth(1.0f);
             visualizationSurface.getPaint().setColor(Color.RED);
@@ -415,7 +397,7 @@ public class Visualization extends Image {
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = getImages().filterType(BaseImage.TYPE).calculateBoundingBox();
+            Rectangle boundingBox = getImages().filterType(FormImage.TYPE).calculateBoundingBox();
             Shape.drawPolygon(boundingBox.getVertices(), visualizationSurface.getCanvas(), visualizationSurface.getPaint());
             // </BOUNDING_BOX>
         }
@@ -423,7 +405,7 @@ public class Visualization extends Image {
 
     public ArrayList<Integer> getLayerIds() {
         ArrayList<Integer> layers = new ArrayList<>();
-        for (Layer layer: getLayers()) {
+        for (Layer layer : getLayers()) {
             layers.add(layer.getId());
         }
         Collections.sort(layers);
@@ -460,12 +442,12 @@ public class Visualization extends Image {
     }
 
     @Override
-    public boolean isTouching(PointHolder point) {
+    public boolean isTouching(Point point) {
         return false;
     }
 
     @Override
-    public boolean isTouching(PointHolder point, double padding) {
+    public boolean isTouching(Point point, double padding) {
         return false;
     }
 
@@ -473,12 +455,12 @@ public class Visualization extends Image {
     public void onTouchInteraction(TouchInteraction touchInteraction) {
     }
 
-//    public PointHolder getCentroidPosition() {
+//    public Point getCentroidPosition() {
 //
 //        // Auto-adjust the perspective
-//        ArrayList<PointHolder> spritePositions = new ArrayList<PointHolder>();
+//        ArrayList<Point> spritePositions = new ArrayList<Point>();
 //
-//        for (Image image: getBaseImages()) {
+//        for (Image image: getFormImages()) {
 //            if (image.isVisible()) {
 //                spritePositions.add(image.getPosition());
 //            }

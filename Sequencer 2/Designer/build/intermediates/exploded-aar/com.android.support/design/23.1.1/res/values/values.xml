@@ -2,150 +2,150 @@
 <resources>
     <!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/design/res/values/colors.xml -->
     <eat-comment/>
-    <color name="design_fab_shadow_end_color">@android:color/transparent</color>
-    <color name="design_fab_shadow_mid_color">#14000000</color>
-    <color name="design_fab_shadow_start_color">#44000000</color>
-    <color name="design_fab_stroke_end_inner_color">#0A000000</color>
-    <color name="design_fab_stroke_end_outer_color">#0F000000</color>
-    <color name="design_fab_stroke_top_inner_color">#1AFFFFFF</color>
-    <color name="design_fab_stroke_top_outer_color">#2EFFFFFF</color>
-    <color name="design_snackbar_background_color">#323232</color>
-    <color name="design_textinput_error_color">#FFDD2C00</color>
-    <declare-styleable name="AppBarLayout"><attr name="elevation"/><attr name="android:background"/><attr format="boolean" name="expanded"/></declare-styleable>
-    <declare-styleable name="AppBarLayout_LayoutParams"><attr name="layout_scrollFlags"><flag name="scroll" value="0x1"/><flag name="exitUntilCollapsed" value="0x2"/><flag name="enterAlways" value="0x4"/><flag name="enterAlwaysCollapsed" value="0x8"/><flag name="snap" value="0x10"/></attr><attr format="reference" name="layout_scrollInterpolator"/></declare-styleable>
-    <declare-styleable name="CollapsingAppBarLayout_LayoutParams"><attr name="layout_collapseMode"><enum name="none" value="0"/><enum name="pin" value="1"/><enum name="parallax" value="2"/></attr><attr format="float" name="layout_collapseParallaxMultiplier"/></declare-styleable>
-    <declare-styleable name="CollapsingToolbarLayout"><attr format="dimension" name="expandedTitleMargin"/><attr format="dimension" name="expandedTitleMarginStart"/><attr format="dimension" name="expandedTitleMarginTop"/><attr format="dimension" name="expandedTitleMarginEnd"/><attr format="dimension" name="expandedTitleMarginBottom"/><attr format="reference" name="expandedTitleTextAppearance"/><attr format="reference" name="collapsedTitleTextAppearance"/><attr format="color" name="contentScrim"/><attr format="color" name="statusBarScrim"/><attr format="reference" name="toolbarId"/><attr name="collapsedTitleGravity"><flag name="top" value="0x30"/><flag name="bottom" value="0x50"/><flag name="left" value="0x03"/><flag name="right" value="0x05"/><flag name="center_vertical" value="0x10"/><flag name="fill_vertical" value="0x70"/><flag name="center_horizontal" value="0x01"/><flag name="center" value="0x11"/><flag name="start" value="0x00800003"/><flag name="end" value="0x00800005"/></attr><attr name="expandedTitleGravity"><flag name="top" value="0x30"/><flag name="bottom" value="0x50"/><flag name="left" value="0x03"/><flag name="right" value="0x05"/><flag name="center_vertical" value="0x10"/><flag name="fill_vertical" value="0x70"/><flag name="center_horizontal" value="0x01"/><flag name="center" value="0x11"/><flag name="start" value="0x00800003"/><flag name="end" value="0x00800005"/></attr><attr format="boolean" name="titleEnabled"/><attr name="title"/></declare-styleable>
-    <declare-styleable name="CoordinatorLayout"><attr format="reference" name="keylines"/><attr format="reference" name="statusBarBackground"/></declare-styleable>
-    <declare-styleable name="CoordinatorLayout_LayoutParams"><attr name="android:layout_gravity"/><attr format="string" name="layout_behavior"/><attr format="reference" name="layout_anchor"/><attr format="integer" name="layout_keyline"/><attr name="layout_anchorGravity"><flag name="top" value="0x30"/><flag name="bottom" value="0x50"/><flag name="left" value="0x03"/><flag name="right" value="0x05"/><flag name="center_vertical" value="0x10"/><flag name="fill_vertical" value="0x70"/><flag name="center_horizontal" value="0x01"/><flag name="fill_horizontal" value="0x07"/><flag name="center" value="0x11"/><flag name="fill" value="0x77"/><flag name="clip_vertical" value="0x80"/><flag name="clip_horizontal" value="0x08"/><flag name="start" value="0x00800003"/><flag name="end" value="0x00800005"/></attr></declare-styleable>
-    <declare-styleable name="FloatingActionButton"><attr name="backgroundTint"/><attr name="backgroundTintMode"/><attr format="color" name="rippleColor"/><attr name="fabSize"><enum name="normal" value="0"/><enum name="mini" value="1"/></attr><attr name="elevation"/><attr format="dimension" name="pressedTranslationZ"/><attr format="dimension" name="borderWidth"/></declare-styleable>
-    <declare-styleable name="ForegroundLinearLayout"><attr name="android:foreground"/><attr name="android:foregroundGravity"/><attr format="boolean" name="foregroundInsidePadding"/></declare-styleable>
-    <declare-styleable name="NavigationView"><attr name="android:background"/><attr name="android:fitsSystemWindows"/><attr name="android:maxWidth"/><attr name="elevation"/><attr format="reference" name="menu"/><attr format="color" name="itemIconTint"/><attr format="color" name="itemTextColor"/><attr format="reference" name="itemBackground"/><attr format="reference" name="itemTextAppearance"/><attr format="reference" name="headerLayout"/></declare-styleable>
-    <declare-styleable name="ScrimInsetsFrameLayout"><attr format="color|reference" name="insetForeground"/></declare-styleable>
-    <declare-styleable name="ScrollingViewBehavior_Params"><attr format="dimension" name="behavior_overlapTop"/></declare-styleable>
-    <declare-styleable name="SnackbarLayout"><attr name="android:maxWidth"/><attr name="elevation"/><attr format="dimension" name="maxActionInlineWidth"/></declare-styleable>
-    <declare-styleable name="TabLayout"><attr format="color" name="tabIndicatorColor"/><attr format="dimension" name="tabIndicatorHeight"/><attr format="dimension" name="tabContentStart"/><attr format="reference" name="tabBackground"/><attr name="tabMode"><enum name="scrollable" value="0"/><enum name="fixed" value="1"/></attr><attr name="tabGravity"><enum name="fill" value="0"/><enum name="center" value="1"/></attr><attr format="dimension" name="tabMinWidth"/><attr format="dimension" name="tabMaxWidth"/><attr format="reference" name="tabTextAppearance"/><attr format="color" name="tabTextColor"/><attr format="color" name="tabSelectedTextColor"/><attr format="dimension" name="tabPaddingStart"/><attr format="dimension" name="tabPaddingTop"/><attr format="dimension" name="tabPaddingEnd"/><attr format="dimension" name="tabPaddingBottom"/><attr format="dimension" name="tabPadding"/></declare-styleable>
-    <declare-styleable name="TextInputLayout"><attr format="reference" name="hintTextAppearance"/><attr name="android:hint"/><attr format="boolean" name="errorEnabled"/><attr format="reference" name="errorTextAppearance"/><attr format="boolean" name="counterEnabled"/><attr format="integer" name="counterMaxLength"/><attr format="reference" name="counterTextAppearance"/><attr format="reference" name="counterOverflowTextAppearance"/><attr name="android:textColorHint"/><attr format="boolean" name="hintAnimationEnabled"/></declare-styleable>
+    <color label="design_fab_shadow_end_color">@android:color/transparent</color>
+    <color label="design_fab_shadow_mid_color">#14000000</color>
+    <color label="design_fab_shadow_start_color">#44000000</color>
+    <color label="design_fab_stroke_end_inner_color">#0A000000</color>
+    <color label="design_fab_stroke_end_outer_color">#0F000000</color>
+    <color label="design_fab_stroke_top_inner_color">#1AFFFFFF</color>
+    <color label="design_fab_stroke_top_outer_color">#2EFFFFFF</color>
+    <color label="design_snackbar_background_color">#323232</color>
+    <color label="design_textinput_error_color">#FFDD2C00</color>
+    <declare-styleable label="AppBarLayout"><attr label="elevation"/><attr label="android:background"/><attr format="boolean" label="expanded"/></declare-styleable>
+    <declare-styleable label="AppBarLayout_LayoutParams"><attr label="layout_scrollFlags"><flag label="scroll" value="0x1"/><flag label="exitUntilCollapsed" value="0x2"/><flag label="enterAlways" value="0x4"/><flag label="enterAlwaysCollapsed" value="0x8"/><flag label="snap" value="0x10"/></attr><attr format="reference" label="layout_scrollInterpolator"/></declare-styleable>
+    <declare-styleable label="CollapsingAppBarLayout_LayoutParams"><attr label="layout_collapseMode"><enum label="none" value="0"/><enum label="pin" value="1"/><enum label="parallax" value="2"/></attr><attr format="float" label="layout_collapseParallaxMultiplier"/></declare-styleable>
+    <declare-styleable label="CollapsingToolbarLayout"><attr format="dimension" label="expandedTitleMargin"/><attr format="dimension" label="expandedTitleMarginStart"/><attr format="dimension" label="expandedTitleMarginTop"/><attr format="dimension" label="expandedTitleMarginEnd"/><attr format="dimension" label="expandedTitleMarginBottom"/><attr format="reference" label="expandedTitleTextAppearance"/><attr format="reference" label="collapsedTitleTextAppearance"/><attr format="color" label="contentScrim"/><attr format="color" label="statusBarScrim"/><attr format="reference" label="toolbarId"/><attr label="collapsedTitleGravity"><flag label="top" value="0x30"/><flag label="bottom" value="0x50"/><flag label="left" value="0x03"/><flag label="right" value="0x05"/><flag label="center_vertical" value="0x10"/><flag label="fill_vertical" value="0x70"/><flag label="center_horizontal" value="0x01"/><flag label="center" value="0x11"/><flag label="start" value="0x00800003"/><flag label="end" value="0x00800005"/></attr><attr label="expandedTitleGravity"><flag label="top" value="0x30"/><flag label="bottom" value="0x50"/><flag label="left" value="0x03"/><flag label="right" value="0x05"/><flag label="center_vertical" value="0x10"/><flag label="fill_vertical" value="0x70"/><flag label="center_horizontal" value="0x01"/><flag label="center" value="0x11"/><flag label="start" value="0x00800003"/><flag label="end" value="0x00800005"/></attr><attr format="boolean" label="titleEnabled"/><attr label="title"/></declare-styleable>
+    <declare-styleable label="CoordinatorLayout"><attr format="reference" label="keylines"/><attr format="reference" label="statusBarBackground"/></declare-styleable>
+    <declare-styleable label="CoordinatorLayout_LayoutParams"><attr label="android:layout_gravity"/><attr format="string" label="layout_behavior"/><attr format="reference" label="layout_anchor"/><attr format="integer" label="layout_keyline"/><attr label="layout_anchorGravity"><flag label="top" value="0x30"/><flag label="bottom" value="0x50"/><flag label="left" value="0x03"/><flag label="right" value="0x05"/><flag label="center_vertical" value="0x10"/><flag label="fill_vertical" value="0x70"/><flag label="center_horizontal" value="0x01"/><flag label="fill_horizontal" value="0x07"/><flag label="center" value="0x11"/><flag label="fill" value="0x77"/><flag label="clip_vertical" value="0x80"/><flag label="clip_horizontal" value="0x08"/><flag label="start" value="0x00800003"/><flag label="end" value="0x00800005"/></attr></declare-styleable>
+    <declare-styleable label="FloatingActionButton"><attr label="backgroundTint"/><attr label="backgroundTintMode"/><attr format="color" label="rippleColor"/><attr label="fabSize"><enum label="normal" value="0"/><enum label="mini" value="1"/></attr><attr label="elevation"/><attr format="dimension" label="pressedTranslationZ"/><attr format="dimension" label="borderWidth"/></declare-styleable>
+    <declare-styleable label="ForegroundLinearLayout"><attr label="android:foreground"/><attr label="android:foregroundGravity"/><attr format="boolean" label="foregroundInsidePadding"/></declare-styleable>
+    <declare-styleable label="NavigationView"><attr label="android:background"/><attr label="android:fitsSystemWindows"/><attr label="android:maxWidth"/><attr label="elevation"/><attr format="reference" label="menu"/><attr format="color" label="itemIconTint"/><attr format="color" label="itemTextColor"/><attr format="reference" label="itemBackground"/><attr format="reference" label="itemTextAppearance"/><attr format="reference" label="headerLayout"/></declare-styleable>
+    <declare-styleable label="ScrimInsetsFrameLayout"><attr format="color|reference" label="insetForeground"/></declare-styleable>
+    <declare-styleable label="ScrollingViewBehavior_Params"><attr format="dimension" label="behavior_overlapTop"/></declare-styleable>
+    <declare-styleable label="SnackbarLayout"><attr label="android:maxWidth"/><attr label="elevation"/><attr format="dimension" label="maxActionInlineWidth"/></declare-styleable>
+    <declare-styleable label="TabLayout"><attr format="color" label="tabIndicatorColor"/><attr format="dimension" label="tabIndicatorHeight"/><attr format="dimension" label="tabContentStart"/><attr format="reference" label="tabBackground"/><attr label="tabMode"><enum label="scrollable" value="0"/><enum label="fixed" value="1"/></attr><attr label="tabGravity"><enum label="fill" value="0"/><enum label="center" value="1"/></attr><attr format="dimension" label="tabMinWidth"/><attr format="dimension" label="tabMaxWidth"/><attr format="reference" label="tabTextAppearance"/><attr format="color" label="tabTextColor"/><attr format="color" label="tabSelectedTextColor"/><attr format="dimension" label="tabPaddingStart"/><attr format="dimension" label="tabPaddingTop"/><attr format="dimension" label="tabPaddingEnd"/><attr format="dimension" label="tabPaddingBottom"/><attr format="dimension" label="tabPadding"/></declare-styleable>
+    <declare-styleable label="TextInputLayout"><attr format="reference" label="hintTextAppearance"/><attr label="android:hint"/><attr format="boolean" label="errorEnabled"/><attr format="reference" label="errorTextAppearance"/><attr format="boolean" label="counterEnabled"/><attr format="integer" label="counterMaxLength"/><attr format="reference" label="counterTextAppearance"/><attr format="reference" label="counterOverflowTextAppearance"/><attr label="android:textColorHint"/><attr format="boolean" label="hintAnimationEnabled"/></declare-styleable>
     <!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/design/res/values/dimens.xml -->
     <eat-comment/>
-    <dimen name="design_appbar_elevation">4dp</dimen>
-    <dimen name="design_fab_border_width">0.5dp</dimen>
-    <dimen name="design_fab_content_size">24dp</dimen>
-    <dimen name="design_fab_elevation">6dp</dimen>
-    <dimen name="design_fab_size_mini">40dp</dimen>
-    <dimen name="design_fab_size_normal">56dp</dimen>
-    <dimen name="design_fab_translation_z_pressed">6dp</dimen>
-    <dimen name="design_navigation_elevation">16dp</dimen>
-    <dimen name="design_navigation_icon_padding">32dp</dimen>
-    <dimen name="design_navigation_icon_size">24dp</dimen>
-    <dimen name="design_navigation_max_width">320dp</dimen>
-    <dimen name="design_navigation_padding_bottom">8dp</dimen>
-    <dimen name="design_navigation_padding_top_default">0dp</dimen>
-    <dimen name="design_navigation_separator_vertical_padding">8dp</dimen>
-    <dimen name="design_snackbar_action_inline_max_width">128dp</dimen>
-    <dimen name="design_snackbar_background_corner_radius">0dp</dimen>
-    <dimen name="design_snackbar_elevation">6dp</dimen>
-    <dimen name="design_snackbar_extra_spacing_horizontal">0dp</dimen>
-    <dimen name="design_snackbar_max_width">-1px</dimen>
-    <dimen name="design_snackbar_min_width">-1px</dimen>
-    <dimen name="design_snackbar_padding_horizontal">12dp</dimen>
-    <dimen name="design_snackbar_padding_vertical">14dp</dimen>
-    <dimen name="design_snackbar_padding_vertical_2lines">24dp</dimen>
-    <dimen name="design_snackbar_text_size">14sp</dimen>
-    <dimen name="design_tab_max_width">264dp</dimen>
-    <dimen name="design_tab_scrollable_min_width">72dp</dimen>
-    <dimen name="design_tab_text_size">14sp</dimen>
-    <dimen name="design_tab_text_size_2line">12sp</dimen>
+    <dimen label="design_appbar_elevation">4dp</dimen>
+    <dimen label="design_fab_border_width">0.5dp</dimen>
+    <dimen label="design_fab_content_size">24dp</dimen>
+    <dimen label="design_fab_elevation">6dp</dimen>
+    <dimen label="design_fab_size_mini">40dp</dimen>
+    <dimen label="design_fab_size_normal">56dp</dimen>
+    <dimen label="design_fab_translation_z_pressed">6dp</dimen>
+    <dimen label="design_navigation_elevation">16dp</dimen>
+    <dimen label="design_navigation_icon_padding">32dp</dimen>
+    <dimen label="design_navigation_icon_size">24dp</dimen>
+    <dimen label="design_navigation_max_width">320dp</dimen>
+    <dimen label="design_navigation_padding_bottom">8dp</dimen>
+    <dimen label="design_navigation_padding_top_default">0dp</dimen>
+    <dimen label="design_navigation_separator_vertical_padding">8dp</dimen>
+    <dimen label="design_snackbar_action_inline_max_width">128dp</dimen>
+    <dimen label="design_snackbar_background_corner_radius">0dp</dimen>
+    <dimen label="design_snackbar_elevation">6dp</dimen>
+    <dimen label="design_snackbar_extra_spacing_horizontal">0dp</dimen>
+    <dimen label="design_snackbar_max_width">-1px</dimen>
+    <dimen label="design_snackbar_min_width">-1px</dimen>
+    <dimen label="design_snackbar_padding_horizontal">12dp</dimen>
+    <dimen label="design_snackbar_padding_vertical">14dp</dimen>
+    <dimen label="design_snackbar_padding_vertical_2lines">24dp</dimen>
+    <dimen label="design_snackbar_text_size">14sp</dimen>
+    <dimen label="design_tab_max_width">264dp</dimen>
+    <dimen label="design_tab_scrollable_min_width">72dp</dimen>
+    <dimen label="design_tab_text_size">14sp</dimen>
+    <dimen label="design_tab_text_size_2line">12sp</dimen>
     <!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/design/res/values/ids.xml -->
     <eat-comment/>
-    <item name="view_offset_helper" type="id"/>
+    <item label="view_offset_helper" type="id"/>
     <!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/design/res/values/config.xml -->
     <eat-comment/>
-    <integer name="design_snackbar_text_max_lines">2</integer>
+    <integer label="design_snackbar_text_max_lines">2</integer>
     <!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/design/res/values/strings.xml -->
     <eat-comment/>
-    <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
-    <string name="character_counter_pattern" translatable="false">%1$d / %2$d</string>
+    <string label="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <string label="character_counter_pattern" translatable="false">%1$d / %2$d</string>
     <!-- From: file:/usr/local/google/buildbot/src/googleplex-android/mnc-supportlib-release/frameworks/support/design/res/values/styles.xml -->
     <eat-comment/>
-    <style name="Base.Widget.Design.TabLayout" parent="android:Widget">
-        <item name="tabMaxWidth">@dimen/design_tab_max_width</item>
-        <item name="tabIndicatorColor">?attr/colorAccent</item>
-        <item name="tabIndicatorHeight">2dp</item>
-        <item name="tabPaddingStart">12dp</item>
-        <item name="tabPaddingEnd">12dp</item>
-        <item name="tabBackground">?attr/selectableItemBackground</item>
-        <item name="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
-        <item name="tabSelectedTextColor">?android:textColorPrimary</item>
+    <style label="Base.Widget.Design.TabLayout" parent="android:Widget">
+        <item label="tabMaxWidth">@dimen/design_tab_max_width</item>
+        <item label="tabIndicatorColor">?attr/colorAccent</item>
+        <item label="tabIndicatorHeight">2dp</item>
+        <item label="tabPaddingStart">12dp</item>
+        <item label="tabPaddingEnd">12dp</item>
+        <item label="tabBackground">?attr/selectableItemBackground</item>
+        <item label="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
+        <item label="tabSelectedTextColor">?android:textColorPrimary</item>
     </style>
-    <style name="TextAppearance.Design.CollapsingToolbar.Expanded" parent="TextAppearance.AppCompat.Display1">
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    <style label="TextAppearance.Design.CollapsingToolbar.Expanded" parent="TextAppearance.AppCompat.Display1">
+        <item label="android:textColor">?android:attr/textColorPrimary</item>
     </style>
-    <style name="TextAppearance.Design.Counter" parent="TextAppearance.AppCompat.Caption"/>
-    <style name="TextAppearance.Design.Counter.Overflow" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textColor">@color/design_textinput_error_color</item>
+    <style label="TextAppearance.Design.Counter" parent="TextAppearance.AppCompat.Caption"/>
+    <style label="TextAppearance.Design.Counter.Overflow" parent="TextAppearance.AppCompat.Caption">
+        <item label="android:textColor">@color/design_textinput_error_color</item>
     </style>
-    <style name="TextAppearance.Design.Error" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textColor">@color/design_textinput_error_color</item>
+    <style label="TextAppearance.Design.Error" parent="TextAppearance.AppCompat.Caption">
+        <item label="android:textColor">@color/design_textinput_error_color</item>
     </style>
-    <style name="TextAppearance.Design.Hint" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textColor">?attr/colorControlActivated</item>
+    <style label="TextAppearance.Design.Hint" parent="TextAppearance.AppCompat.Caption">
+        <item label="android:textColor">?attr/colorControlActivated</item>
     </style>
-    <style name="TextAppearance.Design.Snackbar.Message" parent="android:TextAppearance">
-        <item name="android:textSize">@dimen/design_snackbar_text_size</item>
-        <item name="android:textColor">?android:textColorPrimary</item>
+    <style label="TextAppearance.Design.Snackbar.Message" parent="android:TextAppearance">
+        <item label="android:textSize">@dimen/design_snackbar_text_size</item>
+        <item label="android:textColor">?android:textColorPrimary</item>
     </style>
-    <style name="TextAppearance.Design.Tab" parent="TextAppearance.AppCompat.Button">
-        <item name="android:textSize">@dimen/design_tab_text_size</item>
-        <item name="android:textColor">?android:textColorSecondary</item>
-        <item name="textAllCaps">true</item>
+    <style label="TextAppearance.Design.Tab" parent="TextAppearance.AppCompat.Button">
+        <item label="android:textSize">@dimen/design_tab_text_size</item>
+        <item label="android:textColor">?android:textColorSecondary</item>
+        <item label="textAllCaps">true</item>
     </style>
-    <style name="Widget.Design.AppBarLayout" parent="android:Widget">
-        <item name="elevation">@dimen/design_appbar_elevation</item>
-        <item name="android:background">?attr/colorPrimary</item>
+    <style label="Widget.Design.AppBarLayout" parent="android:Widget">
+        <item label="elevation">@dimen/design_appbar_elevation</item>
+        <item label="android:background">?attr/colorPrimary</item>
     </style>
-    <style name="Widget.Design.CollapsingToolbar" parent="android:Widget">
-        <item name="expandedTitleMargin">32dp</item>
-        <item name="statusBarScrim">?attr/colorPrimaryDark</item>
+    <style label="Widget.Design.CollapsingToolbar" parent="android:Widget">
+        <item label="expandedTitleMargin">32dp</item>
+        <item label="statusBarScrim">?attr/colorPrimaryDark</item>
     </style>
-    <style name="Widget.Design.CoordinatorLayout" parent="android:Widget">
-        <item name="statusBarBackground">?attr/colorPrimaryDark</item>
+    <style label="Widget.Design.CoordinatorLayout" parent="android:Widget">
+        <item label="statusBarBackground">?attr/colorPrimaryDark</item>
     </style>
-    <style name="Widget.Design.FloatingActionButton" parent="android:Widget">
-        <item name="android:background">@drawable/design_fab_background</item>
-        <item name="backgroundTint">?attr/colorAccent</item>
-        <item name="fabSize">normal</item>
-        <item name="elevation">@dimen/design_fab_elevation</item>
-        <item name="pressedTranslationZ">@dimen/design_fab_translation_z_pressed</item>
-        <item name="rippleColor">?attr/colorControlHighlight</item>
-        <item name="borderWidth">@dimen/design_fab_border_width</item>
+    <style label="Widget.Design.FloatingActionButton" parent="android:Widget">
+        <item label="android:background">@drawable/design_fab_background</item>
+        <item label="backgroundTint">?attr/colorAccent</item>
+        <item label="fabSize">normal</item>
+        <item label="elevation">@dimen/design_fab_elevation</item>
+        <item label="pressedTranslationZ">@dimen/design_fab_translation_z_pressed</item>
+        <item label="rippleColor">?attr/colorControlHighlight</item>
+        <item label="borderWidth">@dimen/design_fab_border_width</item>
     </style>
-    <style name="Widget.Design.NavigationView" parent="">
-        <item name="elevation">@dimen/design_navigation_elevation</item>
-        <item name="android:background">?android:attr/windowBackground</item>
-        <item name="android:fitsSystemWindows">true</item>
-        <item name="android:maxWidth">@dimen/design_navigation_max_width</item>
+    <style label="Widget.Design.NavigationView" parent="">
+        <item label="elevation">@dimen/design_navigation_elevation</item>
+        <item label="android:background">?android:attr/windowBackground</item>
+        <item label="android:fitsSystemWindows">true</item>
+        <item label="android:maxWidth">@dimen/design_navigation_max_width</item>
     </style>
-    <style name="Widget.Design.ScrimInsetsFrameLayout" parent="">
-        <item name="insetForeground">#4000</item>
+    <style label="Widget.Design.ScrimInsetsFrameLayout" parent="">
+        <item label="insetForeground">#4000</item>
     </style>
-    <style name="Widget.Design.Snackbar" parent="android:Widget">
-        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark</item>
-        <item name="android:minWidth">@dimen/design_snackbar_min_width</item>
-        <item name="android:maxWidth">@dimen/design_snackbar_max_width</item>
-        <item name="android:background">@drawable/design_snackbar_background</item>
-        <item name="android:paddingLeft">@dimen/design_snackbar_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/design_snackbar_padding_horizontal</item>
-        <item name="elevation">@dimen/design_snackbar_elevation</item>
-        <item name="maxActionInlineWidth">@dimen/design_snackbar_action_inline_max_width</item>
+    <style label="Widget.Design.Snackbar" parent="android:Widget">
+        <item label="android:theme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item label="android:minWidth">@dimen/design_snackbar_min_width</item>
+        <item label="android:maxWidth">@dimen/design_snackbar_max_width</item>
+        <item label="android:background">@drawable/design_snackbar_background</item>
+        <item label="android:paddingLeft">@dimen/design_snackbar_padding_horizontal</item>
+        <item label="android:paddingRight">@dimen/design_snackbar_padding_horizontal</item>
+        <item label="elevation">@dimen/design_snackbar_elevation</item>
+        <item label="maxActionInlineWidth">@dimen/design_snackbar_action_inline_max_width</item>
     </style>
-    <style name="Widget.Design.TabLayout" parent="Base.Widget.Design.TabLayout">
-        <item name="tabGravity">fill</item>
-        <item name="tabMode">fixed</item>
+    <style label="Widget.Design.TabLayout" parent="Base.Widget.Design.TabLayout">
+        <item label="tabGravity">fill</item>
+        <item label="tabMode">fixed</item>
     </style>
-    <style name="Widget.Design.TextInputLayout" parent="android:Widget">
-        <item name="hintTextAppearance">@style/TextAppearance.Design.Hint</item>
-        <item name="errorTextAppearance">@style/TextAppearance.Design.Error</item>
-        <item name="counterTextAppearance">@style/TextAppearance.Design.Counter</item>
-        <item name="counterOverflowTextAppearance">@style/TextAppearance.Design.Counter.Overflow</item>
+    <style label="Widget.Design.TextInputLayout" parent="android:Widget">
+        <item label="hintTextAppearance">@style/TextAppearance.Design.Hint</item>
+        <item label="errorTextAppearance">@style/TextAppearance.Design.Error</item>
+        <item label="counterTextAppearance">@style/TextAppearance.Design.Counter</item>
+        <item label="counterOverflowTextAppearance">@style/TextAppearance.Design.Counter.Overflow</item>
     </style>
 </resources>

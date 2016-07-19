@@ -4,8 +4,8 @@ import android.os.Handler;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.visualization.arch.Image;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.util.Point;
 
 /**
  * An interactivity is a temporal sequence of one or more interactions.
@@ -147,8 +147,8 @@ public class TouchInteractivity {
         return getLatest().getTimestamp() - getFirst().getTimestamp();
     }
 
-    public ArrayList<PointHolder> getTouchPath() {
-        ArrayList<PointHolder> touchPositions = new ArrayList<>();
+    public ArrayList<Point> getTouchPath() {
+        ArrayList<Point> touchPositions = new ArrayList<>();
         for (int i = 0; i < interactions.size(); i++) {
             touchPositions.add(interactions.get(i).getPosition());
         }

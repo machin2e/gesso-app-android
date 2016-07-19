@@ -1,7 +1,7 @@
 package camp.computer.clay.model.interaction;
 
-import camp.computer.clay.visualization.arch.Image;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.util.Point;
 
 public class TouchInteraction {
 
@@ -11,7 +11,7 @@ public class TouchInteraction {
         TOUCH(1),
         HOLD(2),
         MOVE(3),
-        PRE_DRAG(4),
+        TWITCH(4),
         DRAG(5),
         RELEASE(6),
         TAP(7);
@@ -34,7 +34,7 @@ public class TouchInteraction {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    public PointHolder[] touchPositions = new PointHolder[MAXIMUM_TOUCH_POINT_COUNT];
+    public Point[] touchPositions = new Point[MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 
     private Type type;
@@ -62,7 +62,7 @@ public class TouchInteraction {
 
     private void setup() {
         for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
-            touchPositions[i] = new PointHolder(0, 0);
+            touchPositions[i] = new Point(0, 0);
             isTouching[i] = false;
         }
     }
@@ -92,7 +92,7 @@ public class TouchInteraction {
         this.type = type;
     }
 
-    public PointHolder getPosition() {
+    public Point getPosition() {
         return this.touchPositions[0];
     }
 

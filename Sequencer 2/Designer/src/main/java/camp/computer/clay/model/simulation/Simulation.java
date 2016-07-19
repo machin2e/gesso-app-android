@@ -10,32 +10,32 @@ public class Simulation extends Model {
 
     private ArrayList<Body> bodies = new ArrayList<Body>();
 
-    private ArrayList<Base> bases = new ArrayList<Base>();
+    private ArrayList<Form> forms = new ArrayList<Form>();
 
-    public void addBase(Base path) {
-        this.bases.add(path);
+    public void addForm(Form path) {
+        this.forms.add(path);
     }
 
-    public Base getBase(int index) {
-        return this.bases.get(index);
+    public Form getForm(int index) {
+        return this.forms.get(index);
     }
 
-    public ArrayList<Base> getBases() {
-        return this.bases;
+    public ArrayList<Form> getForms() {
+        return this.forms;
     }
 
     public ArrayList<Port> getPorts() {
         ArrayList<Port> ports = new ArrayList<Port>();
-        for (Base base : this.bases) {
-            ports.addAll(base.getPorts());
+        for (Form form : this.forms) {
+            ports.addAll(form.getPorts());
         }
         return ports;
     }
 
     public ArrayList<Path> getPaths() {
         ArrayList<Path> paths = new ArrayList<Path>();
-        for (Base base : this.bases) {
-            for (Port port: base.getPorts()) {
+        for (Form form : this.forms) {
+            for (Port port: form.getPorts()) {
                 paths.addAll(port.getPaths());
             }
         }

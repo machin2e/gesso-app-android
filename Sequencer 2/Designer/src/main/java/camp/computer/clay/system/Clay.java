@@ -6,15 +6,12 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.model.interaction.Perspective;
 import camp.computer.clay.model.interaction.Body;
-import camp.computer.clay.model.simulation.Base;
+import camp.computer.clay.model.simulation.Form;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.system.host.CacheHost;
@@ -24,20 +21,29 @@ import camp.computer.clay.system.host.MessageHostInterface;
 import camp.computer.clay.system.host.NetworkHost;
 import camp.computer.clay.system.host.NetworkResourceInterface;
 import camp.computer.clay.system.host.SQLiteStoreHost;
-import camp.computer.clay.system.old_model.Content;
+import camp.computer.clay.system.old_model.Descriptor;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.old_model.Event;
-import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.visualization.architecture.Layer;
+import camp.computer.clay.visualization.architecture.Visualization;
+import camp.computer.clay.visualization.images.FormImage;
 import camp.computer.clay.visualization.util.Number;
 
 public class Clay {
 
-    private Content content;
+    private Descriptor descriptor;
 
-    // Resource management systems (e.g., networking, messaging, content)
-    private SQLiteStoreHost storeHost = null;
     private MessageHost messageHost = null;
+
     private NetworkHost networkHost = null;
+
+    private CacheHost cache = null;
+
+    private SQLiteStoreHost storeHost = null;
+
+    private Simulation simulation;
+
+    private Visualization visualization;
 
     // Group of discovered touchscreen devices
     private ArrayList<DisplayHostInterface> displays;
@@ -45,35 +51,28 @@ public class Clay {
     // Group of discovered devices
     private ArrayList<Device> devices = new ArrayList<Device>();
 
-    // Group of actions cached on this device
-    private CacheHost cache = null;
-
-    // The calendar used by Clay
-    // TODO: Create TimeHost for application-wide time operations
-    private Calendar calendar = Calendar.getInstance (TimeZone.getTimeZone("GMT"));
-
-    private Simulation simulation;
-
     public Clay() {
 
         this.displays = new ArrayList<DisplayHostInterface>(); // Create list to storeHost displays.
+
         this.messageHost = new MessageHost(this); // Start the communications systems
+
         this.networkHost = new NetworkHost(this); // Start the networking systems
 
         this.cache = new CacheHost(this); // Set up behavior repository
 
-        // Content
+        // Descriptor
         // TODO: Stream this in from the Internet and devices.
-        content = new Content("clay", "");
-        content.list("devices");
+        descriptor = new Descriptor("clay", "");
+        descriptor.list("devices");
 
         // Simulation
         this.simulation = new Simulation();
 
         // Visualization
-        Visualization visualization = new Visualization(simulation);
+        this.visualization = new Visualization (simulation);
 
-        initializeSimulation();
+//        initializeSimulation();
 
         // Create body and set perspective
         Body body = new Body();
@@ -83,49 +82,76 @@ public class Clay {
         // Add body to simulation
         simulation.addBody(body);
 
-        setupVisualization(visualization);
-
         Application.getDisplay().getVisualizationSurface().setVisualization(visualization);
-
     }
 
-    private void initializeSimulation() {
+    public Simulation getSimulation () {
+        return this.simulation;
+    }
 
-        final int VIRTUAL_MACHINE_COUNT = Number.generateRandomInteger(5, 20);
+    public Visualization getVisualization () {
+        return this.visualization;
+    }
 
-        // <MACHINE_CONFIGURATION>
-        // TODO: Read this from the device (or look up from machine UUID). It will be encoded on
+//    private void initializeSimulation() {
+//
+//        final int SIMULATED_FORM_COUNT = Number.generateRandomInteger(5, 10);
+//
+//        // <FORM_CONFIGURATION>
+//        // TODO: Read this from the device (or look up from form UUID). It will be encoded on
+//        // TODO: (cont'd) the device.
+//        final int PORT_COUNT = 12;
+//        // </FORM_CONFIGURATION>
+//
+//        // TODO: Move Simulation/Form this into Simulation or _Ecology (in Simulation) --- maybe combine Simulation+_Ecology
+//        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//        int letterIndex = 0;
+//        for (int i = 0; i < SIMULATED_FORM_COUNT; i++) {
+//            Form form = new Form();
+//            for (int j = 0; j < PORT_COUNT; j++) {
+//                Port port = new Port();
+//                form.addPort(port);
+//
+//                form.addTag(alphabet.substring(letterIndex, letterIndex + 1));
+//                letterIndex = letterIndex % alphabet.length();
+//            }
+//            simulation.addForm(form);
+//        }
+//    }
+
+    private void simulateForm() {
+
+        // <FORM_CONFIGURATION>
+        // TODO: Read this from the device (or look up from form UUID). It will be encoded on
         // TODO: (cont'd) the device.
         final int PORT_COUNT = 12;
-        // </MACHINE_CONFIGURATION>
+        // </FORM_CONFIGURATION>
 
-        // TODO: Move Simulation/Base this into Simulation or _Ecology (in Simulation) --- maybe combine Simulation+_Ecology
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int letterIndex = 0;
-        for (int i = 0; i < VIRTUAL_MACHINE_COUNT; i++) {
-            Base base = new Base();
-            for (int j = 0; j < PORT_COUNT; j++) {
-                Port port = new Port();
-                base.addPort(port);
+        Form form = new Form();
 
-                base.addTag(alphabet.substring(letterIndex, letterIndex + 1));
-                letterIndex = letterIndex % alphabet.length();
-            }
-            simulation.addBase(base);
+        for (int j = 0; j < PORT_COUNT; j++) {
+            Port port = new Port();
+            form.addPort(port);
         }
+
+        simulation.addForm(form);
+
+        // Update visualization
+
+        String layerName = "forms";
+        visualization.addLayer(layerName);
+        Layer defaultLayer = visualization.getLayer(layerName);
+
+        // Create form images
+        FormImage formImage = new FormImage(form);
+        formImage.setVisualization(visualization);
+        formImage.setupPortImages();
+        
+        visualization.addImage(form, formImage, layerName);
     }
 
-    private void setupVisualization(Visualization visualization) {
-
-        visualization.setupImages();
-
-//        visualization.setPosition(new PointF(0, 0));
-//        visualization.setRotation(0);
-//        visualizationSprites.add(visualization);
-    }
-
-    public Content getContent () {
-        return this.content;
+    public Descriptor getDescriptor() {
+        return this.descriptor;
     }
 
     /*
@@ -141,8 +167,8 @@ public class Clay {
     }
 
     /**
-     * Adds a content manager for use by Clay. Retrieves the basic actions provided by the
-     * content manager and makes them available in Clay.
+     * Adds a descriptor manager for use by Clay. Retrieves the basic actions provided by the
+     * descriptor manager and makes them available in Clay.
      */
     public void setStore(SQLiteStoreHost contentManager) {
         this.storeHost = contentManager;
@@ -235,6 +261,8 @@ public class Clay {
             device = new Device(getClay (), deviceUuid);
         }
 
+        simulateForm();
+
         // <HACK>
         /*
         String[] adverbs = new String[] { "abnormally", "absentmindedly", "accidentally", "acidly", "actually", "adventurously", "afterwards", "almost", "always", "angrily", "annually", "anxiously", "arrogantly", "awkwardly", "badly", "bashfully", "beautifully", "bitterly", "bleakly", "blindly", "blissfully", "boastfully", "boldly", "bravely", "briefly", "brightly", "briskly", "broadly", "busily", "calmly", "carefully", "carelessly", "cautiously", "certainly", "cheerfully", "clearly", "cleverly", "closely", "coaxingly", "colorfully", "commonly", "continually", "coolly", "correctly", "courageously", "crossly", "cruelly", "curiously", "daily", "daintily", "dearly", "deceivingly", "delightfully", "deeply", "defiantly", "deliberately", "delightfully", "diligently", "dimly", "doubtfully", "dreamily", "easily", "elegantly", "energetically", "enormously", "enthusiastically", "equally", "especially", "even", "evenly", "eventually", "exactly", "excitedly", "extremely", "fairly", "faithfully", "famously", "far", "fast", "fatally", "ferociously", "fervently", "fiercely", "fondly", "foolishly", "fortunately", "frankly", "frantically", "freely", "frenetically", "frightfully", "fully", "furiously", "generally", "generously", "gently", "gladly", "gleefully", "gracefully", "gratefully", "greatly", "greedily", "happily", "hastily", "healthily", "heavily", "helpfully", "helplessly", "highly", "honestly", "hopelessly", "hourly", "hungrily", "immediately", "innocently", "inquisitively", "instantly", "intensely", "intently", "interestingly", "inwardly", "irritably", "jaggedly", "jealously", "joshingly", "joyfully", "joyously", "jovially", "jubilantly", "judgementally", "justly", "keenly", "kiddingly", "kindheartedly", "kindly", "kissingly", "knavishly", "knottily", "knowingly", "knowledgeably", "kookily", "lazily", "less", "lightly", "likely", "limply", "lively", "loftily", "longingly", "loosely", "lovingly", "loudly", "loyally", "madly", "majestically", "meaningfully", "mechanically", "merrily", "miserably", "mockingly", "monthly", "more", "mortally", "mostly", "mysteriously", "naturally", "nearly", "neatly", "needily", "nervously", "never", "nicely", "noisily", "not", "obediently", "obnoxiously", "oddly", "offensively", "officially", "often", "only", "openly", "optimistically", "overconfidently", "owlishly", "painfully", "partially", "patiently", "perfectly", "physically", "playfully", "politely", "poorly", "positively", "potentially", "powerfully", "promptly", "properly", "punctually", "quaintly", "quarrelsomely", "queasily", "queerly", "questionably", "questioningly", "quicker", "quickly", "quietly", "quirkily", "quizzically", "rapidly", "rarely", "readily", "really", "reassuringly", "recklessly", "regularly", "reluctantly", "repeatedly", "reproachfully", "restfully", "righteously", "rightfully", "rigidly", "roughly", "rudely", "sadly", "safely", "scarcely", "scarily", "searchingly", "sedately", "seemingly", "seldom", "selfishly", "separately", "seriously", "shakily", "sharply", "sheepishly", "shrilly", "shyly", "silently", "sleepily", "slowly", "smoothly", "softly", "solemnly", "solidly", "sometimes", "soon", "speedily", "stealthily", "sternly", "strictly", "successfully", "suddenly", "surprisingly", "suspiciously", "sweetly", "swiftly", "sympathetically", "tenderly", "tensely", "terribly", "thankfully", "thoroughly", "thoughtfully", "tightly", "tomorrow", "too", "tremendously", "triumphantly", "truly", "truthfully", "ultimately", "unabashedly", "unaccountably", "unbearably", "unethically", "unexpectedly", "unfortunately", "unimpressively", "unnaturally", "unnecessarily", "utterly", "upbeat", "upliftingly", "upright", "upside-down", "upward", "upwardly", "urgently", "usefully", "uselessly", "usually", "utterly", "vacantly", "vaguely", "vainly", "valiantly", "vastly", "verbally", "very", "viciously", "victoriously", "violently", "vivaciously", "voluntarily", "warmly", "weakly", "wearily", "well", "wetly", "wholly", "wildly", "willfully", "wisely", "woefully", "wonderfully", "worriedly", "wrongly", "yawningly", "yearly", "yearningly", "yesterday", "yieldingly", "youthfully", "zealously", "zestfully", "zestily" };
@@ -268,34 +296,34 @@ public class Clay {
         if (device != null) {
 
             // Data.
-            Content deviceContent = getClay().getContent().get("devices").put(deviceUuid.toString());
+            Descriptor deviceDescriptor = getClay().getDescriptor().get("devices").put(deviceUuid.toString());
 
             // <HACK>
             // TODO: Update this from a list of the observables received from the boards.
-            Content channelsContent = deviceContent.list("channels");
+            Descriptor channelsDescriptor = deviceDescriptor.list("channels");
             for (int i = 0; i < 12; i++) {
 
                 // device/<uuid>/channels/<number>
-                Content channelContent = channelsContent.put(String.valueOf(i + 1));
+                Descriptor channelDescriptor = channelsDescriptor.put(String.valueOf(i + 1));
 
                 // device/<uuid>/channels/<number>/number
-                channelContent.put("number", String.valueOf(i + 1));
+                channelDescriptor.put("number", String.valueOf(i + 1));
 
                 // device/<uuid>/channels/<number>/direction
-                channelContent.put("direction").from("input", "output").set("input");
+                channelDescriptor.put("direction").from("input", "output").set("input");
 
                 // device/<uuid>/channels/<number>/type
-                channelContent.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
+                channelDescriptor.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
 
-                // device/<uuid>/channels/<number>/content
-                Content channelContentContent = channelContent.put("content");
+                // device/<uuid>/channels/<number>/descriptor
+                Descriptor channelContentDescriptor = channelDescriptor.put("descriptor");
 
-                // device/<uuid>/channels/<number>/content/<observable>
+                // device/<uuid>/channels/<number>/descriptor/<observable>
                 // TODO: Retreive the "from" values and the "default" value from the exposed observables on the actual hardware (or the hardware profile)
-                channelContentContent.put("toggle_value").from("on", "off").set("off");
-                channelContentContent.put("waveform_sample_value", "none");
-                channelContentContent.put("pulse_period_seconds", "0");
-                channelContentContent.put("pulse_duty_cycle", "0");
+                channelContentDescriptor.put("toggle_value").from("on", "off").set("off");
+                channelContentDescriptor.put("waveform_sample_value", "none");
+                channelContentDescriptor.put("pulse_period_seconds", "0");
+                channelContentDescriptor.put("pulse_duty_cycle", "0");
             }
             // </HACK>
 
@@ -317,7 +345,7 @@ public class Clay {
                 this.devices.add (device);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getDisplay().mapView.getSimulation().addBase(new Base());
+//                ApplicationView.getDisplay().mapView.getSimulation().simulateForm(new Form());
 
                 // Add timelines to attached displays
                 for (DisplayHostInterface view : this.displays) {
@@ -354,7 +382,7 @@ public class Clay {
                 // <HACK>
                 device.enqueueMessage("start event " + event.getUuid());
                 device.enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                device.enqueueMessage("set event " + event.getUuid() + " content \"" + event.getState().get(0).getState().toString() + "\"");
+                device.enqueueMessage("set event " + event.getUuid() + " descriptor \"" + event.getState().get(0).getState().toString() + "\"");
                 // </HACK>
             }
         }
@@ -381,11 +409,13 @@ public class Clay {
     }
 
     public boolean hasDeviceByAddress(String address) {
+        /*
         for (Device device : getDevices()) {
             if (device.getInternetAddress().equals(address)) {
                 return true;
             }
         }
+        */
         return false;
     }
 
@@ -451,8 +481,8 @@ public class Clay {
 //            event.getState().erase();
 //            event.getState().addAll(states);
 //            Log.v("New_Behavior_Parent", "Added " + states.size() + " states to new event.");
-//            for (State content : event.getState()) {
-//                Log.v("New_Behavior_Parent", "\t" + content.getState());
+//            for (State descriptor : event.getState()) {
+//                Log.v("New_Behavior_Parent", "\t" + descriptor.getState());
 //            }
 //            foundUnit.getTimeline().getEvents().add(0, event); // if storeHost event was successful
 //            getClay().getStore().storeEvent(event);
@@ -501,8 +531,8 @@ public class Clay {
 //    }
 
     /**
-     * Returns true if Clay has a content manager.
-     * @return True if Clay has a content manager. False otherwise.
+     * Returns true if Clay has a descriptor manager.
+     * @return True if Clay has a descriptor manager. False otherwise.
      */
     public boolean hasStore() {
         return this.storeHost != null;
@@ -517,17 +547,5 @@ public class Clay {
      */
     public void step () {
         messageHost.processMessage();
-    }
-
-    private Calendar getCalendar () {
-        return this.calendar;
-    }
-
-    public Date getDate () {
-        return this.calendar.getTime();
-    }
-
-    public long getTime () {
-        return this.calendar.getTimeInMillis();
     }
 }

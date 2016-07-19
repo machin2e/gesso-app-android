@@ -1,7 +1,7 @@
-package camp.computer.clay.visualization.arch;
+package camp.computer.clay.visualization.architecture;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import camp.computer.clay.model.simulation.Model;
 
@@ -15,7 +15,7 @@ public class Layer {
     // TODO: Add tags (can search by tags)
     private int id = -1;
 
-    private HashMap<Model, Image> images = new HashMap<Model, Image>();
+    private ConcurrentHashMap<Model, Image> images = new ConcurrentHashMap<Model, Image>();
 
     public Layer(Visualization visualization) {
         this.visualization = visualization;
@@ -33,7 +33,7 @@ public class Layer {
         return this.visualization;
     }
 
-    public void addImage(Model model, Image image) {
+    public void add(Model model, Image image) {
         this.images.put(model, image);
     }
 

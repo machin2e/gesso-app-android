@@ -1,0 +1,13 @@
+{
+  "form": {
+    "name": "Clay",
+    "ports": {
+      "count": 12,
+      "types": [
+        "switch",
+        "wave",
+        "pulse"
+      ]
+    }
+  }
+}

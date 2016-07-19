@@ -16,16 +16,14 @@
     <color name="red">#ff4444</color>
     <color name="timeline_segment_color">#1976D2</color>
     <color name="white_transparent">#99FFFFFF</color>
-    <dimen name="activity_horizontal_margin">0dp</dimen>
-    <dimen name="activity_vertical_margin">0dp</dimen>
     <item name="UUID_TAG_INDEX" type="id"/>
     <item name="channel_direction" type="id"/>
     <item name="click_remove" type="id"/>
-    <item name="content" type="id"/>
+    <item name="descriptor" type="id"/>
     <item name="drag_handle" type="id"/>
     <item name="event_bottom_layout" type="id"/>
-    <item name="event_label" type="id"/>
     <item name="event_middle_layout" type="id"/>
+    <item name="event_name" type="id"/>
     <item name="event_top_layout" type="id"/>
     <item name="list_item_type_io" type="id"/>
     <item name="list_item_type_light" type="id"/>

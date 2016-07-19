@@ -8,17 +8,14 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import camp.computer.clay.model.interaction.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.arch.Visualization;
-import camp.computer.clay.visualization.images.BaseImage;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.PointHolder;
+import camp.computer.clay.visualization.architecture.Visualization;
+import camp.computer.clay.visualization.util.Point;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -35,7 +32,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
     private VisualizationRenderer visualizationRenderer;
 
     // Coordinate System (Grid)
-    private PointHolder originPosition = new PointHolder ();
+    private Point originPosition = new Point();
 
     // Visualization
     private Visualization visualization;
@@ -76,21 +73,21 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // Kill the background Thread
-        boolean retry = true;
-        // visualizationRenderer.setRunning (false);
-        while (retry) {
-            try {
-                visualizationRenderer.join ();
-                retry = false;
-            } catch (InterruptedException e) {
-                e.printStackTrace ();
-            }
-        }
+//        // Kill the background Thread
+//        boolean retry = true;
+//        // visualizationRenderer.setRunning (false);
+//        while (retry) {
+//            try {
+//                visualizationRenderer.join ();
+//                retry = false;
+//            } catch (InterruptedException e) {
+//                e.printStackTrace ();
+//            }
+//        }
     }
 
     public void onResume() {
-        Log.v("MapView", "onResume");
+        // Log.v("MapView", "onResume");
 
         surfaceHolder = getHolder ();
         getHolder().addCallback (this);
@@ -103,12 +100,13 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
 
+        // Remove this?
         update();
 
     }
 
     public void onPause() {
-        Log.v("MapView", "onPause");
+        // Log.v("MapView", "onPause");
 
         // Pause the communications
 //        getClay ().getCommunication ().stopDatagramServer (); // HACK: This was commented out to prevent the server from "crashing" into an invalid state!
@@ -260,7 +258,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
             return false;
         }
 
-        Log.v("InteractionHistory", "Started touchPositions composition.");
+        // Log.v("InteractionHistory", "Started touchPositions composition.");
 
         // Get active body
         Body currentBody = visualization.getSimulation().getBody(0);
@@ -276,7 +274,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                 // Update touchPositions state based the points given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId (i);
-                    PointHolder perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
+                    Point perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
                     double perspectiveScale = visualization.getSimulation().getBody(0).getPerspective().getScale();
                     touchInteraction.touchPositions[id].setX((motionEvent.getX (i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
                     touchInteraction.touchPositions[id].setY((motionEvent.getY (i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);

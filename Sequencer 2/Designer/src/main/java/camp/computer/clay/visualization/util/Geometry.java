@@ -2,43 +2,45 @@ package camp.computer.clay.visualization.util;
 
 import java.util.ArrayList;
 
-import camp.computer.clay.visualization.images.BaseImage;
-import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.visualization.images.FormImage;
+import camp.computer.clay.visualization.architecture.Visualization;
 
 public abstract class Geometry {
 
-    public static double calculateDistance(PointHolder source, PointHolder target) {
-        return calculateDistance (source.getX(), source.getY(), target.getX(), target.getY());
+    public static double DEGREES_IN_CIRCLE = 360.0;
+
+    public static double calculateDistance(Point source, Point target) {
+        return calculateDistance(source.getX(), source.getY(), target.getX(), target.getY());
     }
 
     public static double calculateDistance(double x, double y, double x2, double y2) {
-        double distanceSquare = Math.pow (x - x2, 2) + Math.pow (y - y2, 2);
-        double distance = Math.sqrt (distanceSquare);
+        double distanceSquare = Math.pow(x - x2, 2) + Math.pow(y - y2, 2);
+        double distance = Math.sqrt(distanceSquare);
         return (double) distance;
     }
 
     /**
-     * Calculates the angle from centerPt to targetPt in degrees.
+     * Calculates the angle from source to target in degrees.
      * The return should range from [0,360), rotating CLOCKWISE,
      * 0 and 360 degrees represents NORTH,
      * 90 degrees represents EAST, etc...
-     *
+     * <p>
      * Assumes all points are in the same coordinate space.  If they are not,
      * you will need to call SwingUtilities.convertPointToScreen or equivalent
      * on all arguments before passing them  to this function.
      *
-     * @param centerPt   PointHolder we are rotating around.
-     * @param targetPt   PointHolder to which we want to calculate the angle, relative to the center point.
+     * @param source Point we are rotating around.
+     * @param target Point to which we want to calculate the angle, relative to the center point.
      * @return angle in degrees.  This is the angle from centerPt to targetPt.
      */
-    public static double calculateRotationAngle(PointHolder centerPt, PointHolder targetPt) {
+    public static double calculateRotationAngle(Point source, Point target) {
 
         // calculate the angle theta from the deltaY and deltaX values
         // (atan2 returns radians values from [-PI,PI])
         // 0 currently points EAST.
         // NOTE: By preserving Y and X param order to atan2,  we are expecting
         // a CLOCKWISE angle direction.
-        double theta = Math.atan2(targetPt.getY() - centerPt.getY(), targetPt.getX() - centerPt.getX());
+        double theta = Math.atan2(target.getY() - source.getY(), target.getX() - source.getX());
 
         // rotate the theta angle clockwise by 90 degrees
         // (this makes 0 point NORTH)
@@ -64,34 +66,34 @@ public abstract class Geometry {
     /**
      * Calculates coordinates of a point rotated about about another origin point by a given number
      * of degrees.
-     *
+     * <p>
      * References:
      * - http://www.gamefromscratch.com/post/2012/11/24/GameDev-math-recipes-Rotating-one-point-around-another-point.aspx
      *
      * @return
      */
-    public static PointHolder calculateRotatedPoint(PointHolder originPoint, double angle, PointHolder point) {
+    public static Point calculateRotatedPoint(Point originPoint, double angle, Point point) {
         return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), (double) Geometry.calculateDistance(originPoint, point));
     }
 
-    public static PointHolder calculatePoint(PointHolder originPoint, double rotation, double distance) {
-        PointHolder point = new PointHolder();
-        point.setX(originPoint.getX() + distance * (double) Math.cos(Math.toRadians(rotation)));
-        point.setY(originPoint.getY() + distance * (double) Math.sin(Math.toRadians(rotation)));
+    public static Point calculatePoint(Point originPoint, double rotation, double distance) {
+        Point point = new Point();
+        point.setX(originPoint.getX() + distance * Math.cos(Math.toRadians(rotation)));
+        point.setY(originPoint.getY() + distance * Math.sin(Math.toRadians(rotation)));
         return point;
     }
 
-    public static PointHolder calculateMidpoint(PointHolder source, PointHolder target) {
-        PointHolder midpoint = new PointHolder();
+    public static Point calculateMidpoint(Point source, Point target) {
+        Point midpoint = new Point();
         midpoint.setX((source.getX() + target.getX()) / 2.0f);
         midpoint.setY((source.getY() + target.getY()) / 2.0f);
         return midpoint;
     }
 
     //Compute the dot product AB . AC
-    public static double calculateDotProduct(PointHolder linePointA, PointHolder linePointB, PointHolder pointC) {
-        PointHolder AB = new PointHolder();
-        PointHolder BC = new PointHolder();
+    public static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC) {
+        Point AB = new Point();
+        Point BC = new Point();
         AB.setX(linePointB.getX() - linePointA.getX());
         AB.setY(linePointB.getY() - linePointA.getY());
         BC.setX(pointC.getX() - linePointB.getX());
@@ -101,9 +103,9 @@ public abstract class Geometry {
     }
 
     //Compute the cross product AB x AC
-    public static double calculateCrossProduct(PointHolder linePointA, PointHolder linePointB, PointHolder pointC) {
-        PointHolder AB = new PointHolder();
-        PointHolder AC = new PointHolder();
+    public static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
+        Point AB = new Point();
+        Point AC = new Point();
         AB.setX(linePointB.getX() - linePointA.getX());
         AB.setY(linePointB.getY() - linePointA.getY());
         AC.setX(pointC.getX() - linePointA.getX());
@@ -116,7 +118,7 @@ public abstract class Geometry {
     //if isSegment is true, AB is a segment, not a line.
     // References:
     // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
-    public static double calculateLineToPointDistance(PointHolder linePointA, PointHolder linePointB, PointHolder pointC, boolean isSegment) {
+    public static double calculateLineToPointDistance(Point linePointA, Point linePointB, Point pointC, boolean isSegment) {
         double distance = calculateCrossProduct(linePointA, linePointB, pointC) / Geometry.calculateDistance(linePointA, linePointB);
         if (isSegment) {
             double dot1 = calculateDotProduct(linePointA, linePointB, pointC);
@@ -132,10 +134,10 @@ public abstract class Geometry {
         return Math.abs(distance);
     }
 
-    public static PointHolder calculateCentroidPosition(ArrayList<PointHolder> points)  {
-        PointHolder centroidPosition = new PointHolder(0, 0);
+    public static Point calculateCentroidPosition(ArrayList<Point> points) {
+        Point centroidPosition = new Point(0, 0);
 
-        for(PointHolder point: points) {
+        for (Point point : points) {
             centroidPosition.setX(centroidPosition.getX() + point.getX());
             centroidPosition.setY(centroidPosition.getY() + point.getY());
         }
@@ -146,14 +148,14 @@ public abstract class Geometry {
         return centroidPosition;
     }
 
-    public static Rectangle calculateBoundingBox(ArrayList<PointHolder> points) {
+    public static Rectangle calculateBoundingBox(ArrayList<Point> points) {
 
         double minX = Float.MAX_VALUE;
         double maxX = -Float.MAX_VALUE;
         double minY = Float.MAX_VALUE;
         double maxY = -Float.MAX_VALUE;
 
-        for (PointHolder point: points) {
+        for (Point point : points) {
             if (point.getX() < minX) {
                 minX = point.getX();
             }
@@ -171,18 +173,18 @@ public abstract class Geometry {
         return new Rectangle(minX, minY, maxX, maxY);
     }
 
-    public static PointHolder calculateCenterPosition(ArrayList<PointHolder> points) {
+    public static Point calculateCenterPosition(ArrayList<Point> points) {
         return calculateBoundingBox(points).getPosition();
     }
 
-    public static PointHolder calculateNearestPoint(PointHolder sourcePoint, ArrayList<PointHolder> points) {
+    public static Point calculateNearestPoint(Point sourcePoint, ArrayList<Point> points) {
 
         // Initialize point
-        PointHolder nearestPoint = points.get(0);
+        Point nearestPoint = points.get(0);
         double nearestDistance = Geometry.calculateDistance(sourcePoint, nearestPoint);
 
         // Search for the nearest point
-        for (PointHolder point: points) {
+        for (Point point : points) {
             double distance = Geometry.calculateDistance(sourcePoint, point);
             if (distance < nearestDistance) {
                 nearestPoint.set(point);
@@ -194,16 +196,16 @@ public abstract class Geometry {
 
     /**
      * Computes the convex hull using the "quick hull" algorithm.
-     *
+     * <p>
      * <strong>References</strong>
      * - Another implementation is <em>GrahamScan</em> (http://algs4.cs.princeton.edu/99hull/GrahamScan.java.html).
      *
      * @param points
      * @return
      */
-    public static ArrayList<PointHolder> computeConvexHull (ArrayList<PointHolder> points) {
+    public static ArrayList<Point> computeConvexHull(ArrayList<Point> points) {
 
-        ArrayList<PointHolder> convexHull = new ArrayList<>();
+        ArrayList<Point> convexHull = new ArrayList<>();
 
         if (points.size() < 3) {
             return (ArrayList) points.clone();
@@ -228,8 +230,8 @@ public abstract class Geometry {
             }
         }
 
-        PointHolder A = points.get(minPoint);
-        PointHolder B = points.get(maxPoint);
+        Point A = points.get(minPoint);
+        Point B = points.get(maxPoint);
 
         convexHull.add(A);
         convexHull.add(B);
@@ -237,11 +239,11 @@ public abstract class Geometry {
         points.remove(A);
         points.remove(B);
 
-        ArrayList<PointHolder> leftSet = new ArrayList<>();
-        ArrayList<PointHolder> rightSet = new ArrayList<>();
+        ArrayList<Point> leftSet = new ArrayList<>();
+        ArrayList<Point> rightSet = new ArrayList<>();
 
         for (int i = 0; i < points.size(); i++) {
-            PointHolder p = points.get(i);
+            Point p = points.get(i);
             if (pointLocation(A, B, p) == -1) {
                 leftSet.add(p);
             } else if (pointLocation(A, B, p) == 1) {
@@ -255,7 +257,7 @@ public abstract class Geometry {
         return convexHull;
     }
 
-    public static void hullSet(PointHolder A, PointHolder B, ArrayList<PointHolder> set, ArrayList<PointHolder> hull) {
+    public static void hullSet(Point A, Point B, ArrayList<Point> set, ArrayList<Point> hull) {
         int insertPosition = hull.indexOf(B);
 
         if (set.size() == 0) {
@@ -263,7 +265,7 @@ public abstract class Geometry {
         }
 
         if (set.size() == 1) {
-            PointHolder p = set.get(0);
+            Point p = set.get(0);
             set.remove(p);
             hull.add(insertPosition, p);
             return;
@@ -273,7 +275,7 @@ public abstract class Geometry {
         int furthestPoint = -1;
 
         for (int i = 0; i < set.size(); i++) {
-            PointHolder p = set.get(i);
+            Point p = set.get(i);
             double distance = distance(A, B, p);
             if (distance > dist) {
                 dist = distance;
@@ -281,25 +283,23 @@ public abstract class Geometry {
             }
         }
 
-        PointHolder P = set.get(furthestPoint);
+        Point P = set.get(furthestPoint);
         set.remove(furthestPoint);
         hull.add(insertPosition, P);
 
         // Determine who's to the left of AP
-        ArrayList<PointHolder> leftSetAP = new ArrayList<>();
-        for (int i = 0; i < set.size(); i++)
-        {
-            PointHolder M = set.get(i);
-            if (pointLocation(A, P, M) == 1)
-            {
+        ArrayList<Point> leftSetAP = new ArrayList<>();
+        for (int i = 0; i < set.size(); i++) {
+            Point M = set.get(i);
+            if (pointLocation(A, P, M) == 1) {
                 leftSetAP.add(M);
             }
         }
 
         // Determine who's to the left of PB
-        ArrayList<PointHolder> leftSetPB = new ArrayList<>();
+        ArrayList<Point> leftSetPB = new ArrayList<>();
         for (int i = 0; i < set.size(); i++) {
-            PointHolder M = set.get(i);
+            Point M = set.get(i);
             if (pointLocation(P, B, M) == 1) {
                 leftSetPB.add(M);
             }
@@ -310,7 +310,7 @@ public abstract class Geometry {
 
     }
 
-    public static double distance (PointHolder A, PointHolder B, PointHolder C) {
+    public static double distance(Point A, Point B, Point C) {
         double ABx = B.getX() - A.getX();
         double ABy = B.getY() - A.getY();
         double num = ABx * (A.getY() - C.getY()) - ABy * (A.getX() - C.getX());
@@ -320,8 +320,7 @@ public abstract class Geometry {
         return num;
     }
 
-    public static int pointLocation(PointHolder A, PointHolder B, PointHolder P)
-    {
+    public static int pointLocation(Point A, Point B, Point P) {
         double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
         if (cp1 > 0) {
             return 1;
@@ -335,7 +334,7 @@ public abstract class Geometry {
     /**
      * Compute list of points that are separated by a minimal distance. Based on circle packing
      * algorithm.
-     *
+     * <p>
      * References:
      * - http://graphicdna.blogspot.com/2009/09/2d-circle-packing-algorithm-ported-to-c.html
      * - http://gamedevelopment.tutsplus.com/tutorials/when-worlds-collide-simulating-circle-circle-collisions--gamedev-769
@@ -346,11 +345,11 @@ public abstract class Geometry {
      * @param positions
      * @return
      */
-    public static ArrayList<BaseImage> packCircles(ArrayList<BaseImage> positions, double distance, PointHolder packingCenter) {
+    public static ArrayList<FormImage> computeCirclePacking(ArrayList<FormImage> positions, double distance, Point packingCenter) {
 
         // Sort points based on distance from center
-        ArrayList<BaseImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
-        ArrayList<PointHolder> sortedPositions = Visualization.getPositions(sortedImages);
+        ArrayList<FormImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
+        ArrayList<Point> sortedPositions = Visualization.getPositions(sortedImages);
 
         double minSeparationSq = distance * distance;
 
@@ -365,7 +364,7 @@ public abstract class Geometry {
 
                 // Vector/Segment connecting a pair of points
                 // TODO: Vector2 AB = mCircles[j].mCenter - mCircles[i].mCenter;
-                PointHolder vectorAB = new PointHolder(
+                Point vectorAB = new Point(
                         sortedPositions.get(j).getX() - sortedPositions.get(i).getX(),
                         sortedPositions.get(j).getY() - sortedPositions.get(i).getY()
                 );
@@ -394,8 +393,8 @@ public abstract class Geometry {
                     vectorAB.setY(vectorAB.getY() / magnitude);
 
                     // TODO: AB *= (double)((r - Math.Sqrt(d)) * 0.5f);
-                    vectorAB.setX(vectorAB.getX() * (double)((r - Math.sqrt(d)) * 0.5f));
-                    vectorAB.setY(vectorAB.getY() * (double)((r - Math.sqrt(d)) * 0.5f));
+                    vectorAB.setX(vectorAB.getX() * (double) ((r - Math.sqrt(d)) * 0.5f));
+                    vectorAB.setY(vectorAB.getY() * (double) ((r - Math.sqrt(d)) * 0.5f));
 
 //                    if (positions.get(j) != mDraggingCircle)
                     // TODO: positions.get(j).mCenter += AB;
@@ -411,12 +410,11 @@ public abstract class Geometry {
         }
 
         double damping = 0.1f / iterationCounter;
-        for (int i = 0; i < sortedPositions.size(); i++)
-        {
+        for (int i = 0; i < sortedPositions.size(); i++) {
 //            if (mCircles[i] != mDraggingCircle)
 //            {
             // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
-            PointHolder v = new PointHolder(
+            Point v = new Point(
                     sortedPositions.get(i).getX() - packingCenter.getX(),
                     sortedPositions.get(i).getY() - packingCenter.getY()
             );
@@ -429,7 +427,7 @@ public abstract class Geometry {
             sortedPositions.get(i).setX(sortedPositions.get(i).getX() - v.getX());
             sortedPositions.get(i).setY(sortedPositions.get(i).getY() - v.getY());
 
-            ((BaseImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
+            ((FormImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
 //            }
         }
 
@@ -437,16 +435,16 @@ public abstract class Geometry {
 
     }
 
-    public static ArrayList<BaseImage> sortByDistanceToPoint(ArrayList<BaseImage> positions, PointHolder point) {
+    public static ArrayList<FormImage> sortByDistanceToPoint(ArrayList<FormImage> positions, Point point) {
 
         // Initialize with unsorted list of points
-        ArrayList<BaseImage> sortedList = new ArrayList(positions);
+        ArrayList<FormImage> sortedList = new ArrayList(positions);
 
         for (int i = 0; i < sortedList.size(); i++) {
             for (int j = 1; j < (sortedList.size() - i); j++) {
 
-                BaseImage p1 = sortedList.get(j - 1);
-                BaseImage p2 = sortedList.get(j);
+                FormImage p1 = sortedList.get(j - 1);
+                FormImage p2 = sortedList.get(j);
 
                 if (Geometry.calculateDistance(p1.getPosition(), point) > Geometry.calculateDistance(p2.getPosition(), point)) {
                     sortedList.remove(j - 1);
@@ -472,10 +470,10 @@ public abstract class Geometry {
 //     * @param positions
 //     * @return
 //     */
-//    public static ArrayList<PointHolder> packCircles(ArrayList<PointHolder> positions, double distance, PointHolder packingCenter) {
+//    public static ArrayList<Point> computeCirclePacking(ArrayList<Point> positions, double distance, Point packingCenter) {
 //
 //        // Sort points based on distance from center
-//        ArrayList<PointHolder> sortedPoints = sortByDistanceToPoint(positions, packingCenter);
+//        ArrayList<Point> sortedPoints = sortByDistanceToPoint(positions, packingCenter);
 //
 //        double minSeparationSq = distance * distance;
 //
@@ -486,7 +484,7 @@ public abstract class Geometry {
 //                    continue;
 //                }
 //
-//                PointHolder vectorAB = new PointHolder();
+//                Point vectorAB = new Point();
 //                vectorAB.getX() = sortedPoints.get(j).getX() - sortedPoints.get(i).getX();
 //                vectorAB.getY() = sortedPoints.get(j).getY() - sortedPoints.get(i).getX();
 //
@@ -502,7 +500,7 @@ public abstract class Geometry {
 //                    // Normalize (transform into unit vector)
 //                    // TODO: AB.Normalize();
 //                    double magnitude = (double) Geometry.calculateDistance(packingCenter, vectorAB);
-//                    PointHolder unitVectorAB = new PointHolder(0, 0);
+//                    Point unitVectorAB = new Point(0, 0);
 //                    unitVectorAB.getX() = vectorAB.getX() / magnitude;
 //                    unitVectorAB.getY() = vectorAB.getY() / magnitude;
 //
@@ -530,7 +528,7 @@ public abstract class Geometry {
 ////            if (mCircles[i] != mDraggingCircle)
 ////            {
 //                // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
-//                PointHolder v = new PointHolder(0, 0);
+//                Point v = new Point(0, 0);
 //                v.getX() = sortedPoints.get(i).getX() - packingCenter.getX();
 //                v.getY() = sortedPoints.get(i).getY() - packingCenter.getY();
 //
@@ -548,16 +546,16 @@ public abstract class Geometry {
 //
 //    }
 //
-//    public static ArrayList<PointHolder> sortByDistanceToPoint(ArrayList<PointHolder> positions, PointHolder point) {
+//    public static ArrayList<Point> sortByDistanceToPoint(ArrayList<Point> positions, Point point) {
 //
 //        // Initialize with unsorted list of points
-//        ArrayList<PointHolder> sortedList = new ArrayList(positions);
+//        ArrayList<Point> sortedList = new ArrayList(positions);
 //
 //        for (int i = 0; i < sortedList.size(); i++) {
 //            for (int j = i + 1; j < sortedList.size(); j++) {
 //
-//                PointHolder p1 = positions.get(i);
-//                PointHolder p2 = positions.get(j);
+//                Point p1 = positions.get(i);
+//                Point p2 = positions.get(j);
 //
 //                if (Geometry.calculateDistance(p1, point) > Geometry.calculateDistance(p2, point)) {
 //                    positions.remove(i);
@@ -568,7 +566,7 @@ public abstract class Geometry {
 //        }
 //
 //        String sortedListResult = "";
-//        for (PointHolder p: sortedList) {
+//        for (Point p: sortedList) {
 //            sortedListResult += calculateDistance(p, point) + ", ";
 //        }
 //        Log.v("Sort", sortedListResult);

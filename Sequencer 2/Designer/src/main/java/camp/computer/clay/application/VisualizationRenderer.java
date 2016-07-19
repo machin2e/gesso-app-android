@@ -1,5 +1,7 @@
 package camp.computer.clay.application;
 
+import android.util.Log;
+
 import camp.computer.clay.visualization.util.Time;
 
 /**
@@ -69,16 +71,19 @@ public class VisualizationRenderer extends Thread {
 
             // Sleep the thread until the time remaining in the frame's allocated draw time expires.
             // This reduces energy consumption thereby increasing battery life.
-            if (ENABLE_THREAD_SLEEP) {
+//            if (ENABLE_THREAD_SLEEP) {
                 frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
+//                Log.v("SleepTime", "sleepTime: " + frameSleepTime);
                 try {
                     if (frameSleepTime > 0) {
                         Thread.sleep(frameSleepTime);
+                    } else {
+                        Thread.sleep(30);
                     }
                 } catch (Exception e) {
                     e.printStackTrace ();
                 }
-            }
+//            }
 
         }
     }

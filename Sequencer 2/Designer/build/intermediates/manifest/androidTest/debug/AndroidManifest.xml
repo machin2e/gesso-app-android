@@ -5,10 +5,10 @@
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="23" />
 
     <application>
-        <uses-library android:name="android.test.runner" />
+        <uses-library android:label="android.test.runner" />
     </application>
 
-    <instrumentation android:name="android.test.InstrumentationTestRunner"
+    <instrumentation android:label="android.test.InstrumentationTestRunner"
                      android:targetPackage="computer.camp.clay.designer"
                      android:handleProfiling="false"
                      android:functionalTest="false"
