@@ -73,7 +73,7 @@ public class MessageHost {
             // Insert the message into the incoming message queue.
             queueIncomingMessage (message);
             if (incomingMessages.size () > 0) {
-                Log.v("Clay Datagram Server", "myKey = " + incomingMessages.get(incomingMessages.size() - 1));
+//                Log.v("Clay Datagram Server", "myKey = " + incomingMessages.get(incomingMessages.size() - 1));
             }
         }
     };
@@ -85,7 +85,7 @@ public class MessageHost {
     /**
      * Send the received data to the main communication thread.
      */
-    public void expose(Message message) {
+    public void send(Message message) {
 
         // TODO: Make this handle both incoming and outgoing messages... right now it only does incoming!
 
@@ -99,7 +99,7 @@ public class MessageHost {
         bundle.putString ("serializedMessageObject", serializedMessage);
         msg.setData (bundle);
 
-        // ...and finally, expose the message to the main thread.
+        // ...and finally, send the message to the main thread.
         handler.sendMessage (msg);
     }
 
@@ -122,7 +122,7 @@ public class MessageHost {
 //        Log.v ("UDP_Processing", "<<< processIncomingQueue");
         // Dequeue and process the next message on the incoming message queue.
         if (hasIncomingMessages()) {
-            Log.v("Clay_Time", "Processing incoming message");
+//            Log.v("Clay_Time", "Processing incoming message");
             while (hasIncomingMessages ()) {
                 Message dequeuedMessage = dequeueIncomingMessage ();
                 processIncomingMessage (dequeuedMessage);
@@ -132,18 +132,18 @@ public class MessageHost {
 
     private void processIncomingMessage (Message message) {
 
-        Log.v("UDP", "Processing message \"" + message.getContent() + "\"");
+//        Log.v("UDP", "Processing message \"" + message.getContent() + "\"");
 
-        Log.v ("UDP_Time", "Processing incoming message: " + message.getContent());
+//        Log.v ("UDP_Time", "Processing incoming message: " + message.getContent());
 
         if (message.getContent().startsWith(Message.VERIFY_PREFIX)) {
 
-            Log.v("UDP", "\tReceived verification message \"" + message.getContent() + "\"");
+//            Log.v("UDP", "\tReceived verification message \"" + message.getContent() + "\"");
 
             if (hasOutgoingMessages ()) {
                 Message outgoingMessage = peekOutgoingMessage ();
 
-                Log.v("UDP", "\tHas outgoing message");
+//                Log.v("UDP", "\tHas outgoing message");
 
                 // Check if the outgoing message at the front of the queue should be verified.
                 //if (outgoingMessage.isDelivered() == true) {
@@ -157,10 +157,10 @@ public class MessageHost {
                     // TODO: Get the behaviorConstruct by UUID which sent this message originally.
                     // TODO: behaviorConstruct.setSynchronized (true);
 
-                    Log.v ("UDP", "\t----");
-                    Log.v ("UDP", "\tChecksum expected: " + outgoingMessage.getChecksum() + "\t" + Message.VERIFY_PREFIX + outgoingMessage.getContent());
-                    Log.v ("UDP", "\tChecksum received: " + message.getChecksum() + "\t" + message.getContent());
-                    Log.v ("UDP", "---");
+//                    Log.v ("UDP", "\t----");
+//                    Log.v ("UDP", "\tChecksum expected: " + outgoingMessage.getChecksum() + "\t" + Message.VERIFY_PREFIX + outgoingMessage.getContent());
+//                    Log.v ("UDP", "\tChecksum received: " + message.getChecksum() + "\t" + message.getContent());
+//                    Log.v ("UDP", "---");
 
                     try {
                         byte[] outgoingBytes = outgoingMessage.getContent().getBytes("UTF-8");
@@ -172,7 +172,7 @@ public class MessageHost {
                     // Check if the checksum matches the expected one for the outgoing message at the front of the queue.
                     if (message.getChecksum().compareTo(outgoingMessage.getChecksum()) == 0) {
 
-                        Log.v ("UDP_Time", "Got ack for front message.");
+//                        Log.v ("UDP_Time", "Got ack for front message.");
 
                         // Flag the outgoing message as verified
                         outgoingMessage.setDelivered(true);
@@ -190,7 +190,7 @@ public class MessageHost {
 
         } else if (message.getContent().startsWith("announce device ")) {
 
-            Log.v ("UDP", "Trying to add a device.");
+//            Log.v ("UDP", "Trying to add a device.");
 
             // e.g., "announce device <uuid>"
 
@@ -352,7 +352,7 @@ public class MessageHost {
      * @param address
      * @param content
      */
-    public void expose(String address, String content) {
+    public void send(String address, String content) {
 //        Log.v("Clay", "sendMessageAsync");
         //Message message = new Message (null, InetAddress.getByName(address), content);
         Message message = new Message("udp", null, address, content);

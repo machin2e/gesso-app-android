@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.images;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -13,8 +14,10 @@ import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
 
 public class PortImage extends Image {
@@ -31,7 +34,7 @@ public class PortImage extends Image {
     private boolean showDataLayer = true;
     private boolean showAnnotationLayer = true;
 
-    private double shapeRadius = 40.0f;
+    public double shapeRadius = 40.0f;
     private boolean showShapeOutline = false;
 
     private int uniqueColor = Color.BLACK;
@@ -476,7 +479,7 @@ public class PortImage extends Image {
     }
 
     public boolean hasVisibleAncestorPaths() {
-        ArrayList<Path> ancestorPaths = getVisualization().getSimulation().getAncestorPathsByPort(getPort());
+        ArrayList<Path> ancestorPaths = getPort().getAncestorPaths();
         for (Path ancestorPath: ancestorPaths) {
             PathImage pathImage = (PathImage) getVisualization().getImage(ancestorPath);
             if (pathImage.isVisible() && !pathImage.showDocks) {
@@ -521,7 +524,87 @@ public class PortImage extends Image {
         } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
             // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
+
+            Port port = getPort();
+
+            if (port.getType() == Port.Type.NONE) {
+
+                port.setDirection(Port.Direction.INPUT);
+                port.setType(Port.Type.getNextType(port.getType()));
+
+                // TODO: Speak ~ "setting as input. you can send the data to another board if you want. touchPositions another board."
+
+            } else if (!port.hasPath() && port.getAncestorPaths().size() == 0) {
+
+                // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
+
+                Port.Type nextType = port.getType();
+                while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+                    nextType = Port.Type.getNextType(nextType);
+                }
+                port.setType(nextType);
+
+            } else if (!hasVisiblePaths() && !hasVisibleAncestorPaths()) {
+
+                // TODO: Replace hasVisiblePaths() with check for focusedSprite/Path
+
+                // TODO: If second press, change the channel.
+
+                // Remove focus from other machines and their ports.
+                for (FormImage formImage : getVisualization().getFormImages()) {
+                    formImage.setTransparency(0.05f);
+                    formImage.hidePortImages();
+                    formImage.hidePathImages();
+                }
+
+                // Reduce focus on the machine
+                getFormImage().setTransparency(0.05f);
+
+                // Focus on the port
+                //portImage.getFormImage().showPathImage(portImage.getIndex(), true);
+                showPaths();
+                setVisibility(true);
+                setPathVisibility(true);
+
+                ArrayList<Path> paths = port.getPathsByPort();
+                for (Path connectedPath : paths) {
+                    // Show ports
+                    getVisualization().getImage(connectedPath.getSource()).setVisibility(true);
+                    ((PortImage) getVisualization().getImage(connectedPath.getSource())).showPaths();
+                    getVisualization().getImage(connectedPath.getTarget()).setVisibility(true);
+                    ((PortImage) getVisualization().getImage(connectedPath.getTarget())).showPaths();
+                    // Show path
+                    getVisualization().getImage(connectedPath).setVisibility(true);
+                }
+
+                // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+
+                // Perspective
+                ArrayList<Port> pathPorts = port.getPortsInPaths(paths);
+                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
+                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
+                Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
+                getVisualization().getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(boundingBox);
+
+                getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+
+            } else if (hasVisiblePaths() || hasVisibleAncestorPaths()) {
+
+                // Paths are being shown. Touching a port changes the port type. This will also
+                // updates the corresponding path requirement.
+
+                // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
+
+                Port.Type nextType = port.getType();
+                while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+                    nextType = Port.Type.getNextType(nextType);
+                }
+                port.setType(nextType);
+
+            }
+
+            setCandidatePathVisibility(false);
+
         } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
             // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
@@ -529,9 +612,26 @@ public class PortImage extends Image {
         } else if (touchInteraction.getType() == TouchInteraction.Type.TWITCH) {
             // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
-            // Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
+
+            Log.v("onHoldListener", "Port draggin!");
+
+            setCandidatePathDestinationPosition(touchInteraction.getPosition());
+            setCandidatePathVisibility(true);
+
+            // Setup port type and flow direction
+            Port port = getPort();
+            if (port.getDirection() == Port.Direction.NONE) {
+                Log.v("onHoldListener", "OH GOD!");
+                port.setDirection(Port.Direction.INPUT);
+            }
+            if (port.getType() == Port.Type.NONE) {
+                Log.v("onHoldListener", "OH SHIT!");
+                port.setType(Port.Type.getNextType(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+            }
+
         } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+//             Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+            Log.v("onHoldListener", "TouchInteraction.RELEASE to " + CLASS_NAME);
 
             setCandidatePathVisibility(false);
         }

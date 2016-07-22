@@ -1,4 +1,4 @@
 package camp.computer.clay.visualization.util;
 
-public class Polygon {
+public class Polygon extends Shape {
 }

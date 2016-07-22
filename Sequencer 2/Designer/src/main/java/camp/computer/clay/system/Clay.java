@@ -246,7 +246,7 @@ public class Clay {
      */
     public Device addDevice(final UUID deviceUuid, final String internetAddress) {
 
-        Log.v("UDP", "found device");
+//        Log.v("UDP", "found device");
 
         // Search for the device in the store
         if (hasDeviceByUuid(deviceUuid)) {

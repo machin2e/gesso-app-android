@@ -121,7 +121,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
                         // ...then pass the message to the message manager running in the main thread.
                         if (messageHost != null) {
-                            messageHost.expose(incomingMessage);
+                            messageHost.send(incomingMessage);
                         }
                     }
                 }
@@ -180,7 +180,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
     private void _kill() {
         Log.v("Clay_Messaging", "Killing datagram server.");
-        // isRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP expose message (on a different thread as well) is run! It's something related to that, apparently.
+        // isRunning = false; // HACK! This should not be commented. It was commented to previous mysterious crashing, which should be debugged! It seems to crash when an Android pop-up (on a different thread than the datagram serer) or UDP send message (on a different thread as well) is run! It's something related to that, apparently.
     }
 
     public boolean isActive () {
@@ -189,11 +189,11 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
     // Send the message.
     public void processMessage (Message outgoingMessage) {
-        exposeAsync(outgoingMessage);
+        sendAsync(outgoingMessage);
     }
 
-    // formerly "exposeAsync"
-    private void exposeAsync(Message message) {
+    // formerly "sendAsync"
+    private void sendAsync(Message message) {
         UdpDatagramTask udpDatagramTask = new UdpDatagramTask();
         udpDatagramTask.execute(message);
     }
@@ -208,31 +208,31 @@ public class DatagramHost extends Thread implements MessageHostInterface {
                 return null;
             }
 
-            // Get the message to expose.
+            // Get the message to send.
             Message message = params[0];
 
             // Send the datagram.
             // formerly "sendDatagram(...)"
-            //exposeDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getDescriptor());
-            exposeDatagram(message.getTargetAddress(), MESSAGE_PORT, message.getContent());
-            Log.v("UDP", "from: " + message.getSourceAddress());
-            Log.v("UDP", "to: " + message.getTargetAddress());
-            Log.v("UDP", "port: " + MESSAGE_PORT);
-            Log.v("UDP", "message: " + message.getContent());
-            Log.v("UDP", "---");
+            //sendDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getDescriptor());
+            sendDatagram(message.getTargetAddress(), MESSAGE_PORT, message.getContent());
+//            Log.v("UDP", "from: " + message.getSourceAddress());
+//            Log.v("UDP", "to: " + message.getTargetAddress());
+//            Log.v("UDP", "port: " + MESSAGE_PORT);
+//            Log.v("UDP", "message: " + message.getContent());
+//            Log.v("UDP", "---");
 
             // This only happens if there was an error getting or parsing the forecast.
             return null;
         }
 
-        private void exposeDatagram(String ipAddress, int port, String message) {
+        private void sendDatagram(String ipAddress, int port, String message) {
 
             try {
 
-                Log.v ("UDP", "ipAddress: " + ipAddress);
-                Log.v ("UDP", "port: " + port);
-                Log.v ("UDP", "message: " + message);
-                Log.v ("UDP", "---");
+//                Log.v ("UDP", "ipAddress: " + ipAddress);
+//                Log.v ("UDP", "port: " + port);
+//                Log.v ("UDP", "message: " + message);
+//                Log.v ("UDP", "---");
 
                 message += "\n";
 

@@ -17,4 +17,8 @@ public abstract class Number {
 
         return (minimum + Number.randomGenerator.nextInt(maximum - minimum));
     }
+
+    public static int chooseRandomInteger(int... integers) {
+        return integers[randomGenerator.nextInt(integers.length)];
+    }
 }

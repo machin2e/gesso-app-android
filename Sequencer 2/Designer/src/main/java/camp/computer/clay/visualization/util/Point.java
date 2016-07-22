@@ -1,5 +1,7 @@
 package camp.computer.clay.visualization.util;
 
+import android.util.Log;
+
 public class Point {
     // TODO: Add subscriber/publisher to automate geometry updates!
 
@@ -36,8 +38,10 @@ public class Point {
     }
 
     public void offset (double dx, double dy) {
-        this.x = this.x + dx;
-        this.y = this.y + dy;
+        Log.v("Drag", "dx: " + dx);
+        Log.v("Drag", "dy: " + dy);
+        this.x = this.x - dx;
+        this.y = this.y - dy;
     }
 
     public void set (Point point) {

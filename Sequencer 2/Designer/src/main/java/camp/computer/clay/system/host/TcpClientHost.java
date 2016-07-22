@@ -67,7 +67,7 @@ public class TcpClientHost {
         Log.i("TCP_Client", "stop");
 
         // send mesage that we are closing the connection
-        //expose(Constants.CLOSED_CONNECTION + "Kazy");
+        //send(Constants.CLOSED_CONNECTION + "Kazy");
 
         mRun = false;
 
@@ -105,7 +105,7 @@ public class TcpClientHost {
                 //receives the message which the server sends back
                 mBufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 // send login name
-                //expose(Constants.LOGIN_NAME + PreferencesManager.getInstance().getUserName());
+                //send(Constants.LOGIN_NAME + PreferencesManager.getInstance().getUserName());
                 // TODO: Call callback (if any) for "connection established"
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {

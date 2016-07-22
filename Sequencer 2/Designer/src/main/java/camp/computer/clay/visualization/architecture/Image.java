@@ -5,6 +5,7 @@ import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.visualization.util.Shape;
 
 public abstract class Image {
 
@@ -20,9 +21,11 @@ public abstract class Image {
     }
 
     public boolean isType (String... types) {
-        for (String type: types) {
-            if (this.type.equals(type)) {
-                return true;
+        if (types != null) {
+            for (String type : types) {
+                if (this.type.equals(type)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -41,7 +44,7 @@ public abstract class Image {
 //    }
 //    // <TAG_INTERFACE>
 
-    // TODO: Group of points to represent geometric objects, even circles. Helper functions for common shapes. Gives generality.
+    private Shape shape = null;
 
     private Point position = new Point(); // Image position
 

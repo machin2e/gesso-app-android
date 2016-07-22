@@ -14,7 +14,8 @@ public class TouchInteraction {
         TWITCH(4),
         DRAG(5),
         RELEASE(6),
-        TAP(7);
+        TAP(7),
+        PRESS(8);
 
         // TODO: Change the index to a UUID?
         int index;
@@ -63,6 +64,7 @@ public class TouchInteraction {
     private void setup() {
         for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
             touchPositions[i] = new Point(0, 0);
+            touchedImage[i] = null;
             isTouching[i] = false;
         }
     }
@@ -100,14 +102,32 @@ public class TouchInteraction {
         return this.timestamp;
     }
 
-    // TODO: Move these elsewhere, maybe into Visualization.
-    public Image getOverlappedImage() {
-        return this.overlappedImage;
+    private Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+
+    public boolean isTouching(int fingerIndex) {
+        return this.touchedImage[fingerIndex] != null;
     }
-    public void setOverlappedImage(Image image) {
-        this.overlappedImage = image;
+
+    public void setTarget(int fingerIndex, Image image) {
+        this.touchedImage[fingerIndex] = image;
     }
-    public boolean hasOverlappedImage() {
-        return (this.overlappedImage != null);
+
+    public Image getTarget(int fingerIndex) {
+        return this.touchedImage[fingerIndex];
+    }
+
+    public boolean isTouching() {
+        return isTouching(0);
+    }
+
+    public void setTarget(Image image) {
+        setTarget(0, image);
+        if (image != null) {
+            isTouching[0] = true;
+        }
+    }
+
+    public Image getTarget() {
+        return getTarget(0);
     }
 }

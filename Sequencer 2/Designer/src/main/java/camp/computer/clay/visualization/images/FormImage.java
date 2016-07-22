@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Form;
+import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.visualization.architecture.Image;
@@ -114,6 +115,8 @@ public class FormImage extends Image {
     }
 
     public void update() {
+        updateLightImages();
+        updatePortGroupImages();
     }
 
     public void draw(VisualizationSurface visualizationSurface) {
@@ -155,14 +158,9 @@ public class FormImage extends Image {
         }
     }
 
-    public void drawPortGroupImages(VisualizationSurface visualizationSurface) {
-
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
-
+    Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
+    public void updatePortGroupImages() {
         // <SHAPE>
-        Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
-
         // Positions before rotation
         portGroupCenterPositions[0] = new Point(
                 getPosition().getX() + 0,
@@ -186,6 +184,15 @@ public class FormImage extends Image {
 
             // Calculate rotated position
             portGroupCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation() + (((i - 1) * 90) - 90) + ((i - 1) * 90), portGroupCenterPositions[i]);
+        }
+    }
+
+    public void drawPortGroupImages(VisualizationSurface visualizationSurface) {
+
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
+
+        for (int i = 0; i < PORT_GROUP_COUNT; i++) {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
@@ -251,13 +258,11 @@ public class FormImage extends Image {
         }
     }
 
-    public void drawLightImages(VisualizationSurface visualizationSurface) {
+    Point[] lightCenterPositions = new Point[PORT_COUNT];
+    double[] lightRotationAngle = new double[12];
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
-
+    private void updateLightImages () {
         // <SHAPE>
-        Point[] lightCenterPositions = new Point[PORT_COUNT];
         lightCenterPositions[0] = new Point(
                 getPosition().getX() + (-20),
                 getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
@@ -309,7 +314,7 @@ public class FormImage extends Image {
                 getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (+20)
         );
-        double[] lightRotationAngle = new double[12];
+
         lightRotationAngle[0]  = 0;
         lightRotationAngle[1]  = 0;
         lightRotationAngle[2]  = 0;
@@ -324,10 +329,18 @@ public class FormImage extends Image {
         lightRotationAngle[11] = 270;
         // </SHAPE>
 
+        // Calculate rotated position
         for (int i = 0; i < PORT_COUNT; i++) {
-
-            // Calculate rotated position
             lightCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation(), lightCenterPositions[i]);
+        }
+    }
+
+    public void drawLightImages(VisualizationSurface visualizationSurface) {
+
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
+
+        for (int i = 0; i < PORT_COUNT; i++) {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
@@ -350,7 +363,7 @@ public class FormImage extends Image {
         }
     }
 
-    // TODO: Move this into Image (expose to all Images)
+    // TODO: Move this into Image (send to all Images)
     public void setTransparency (final double transparency) {
 
         targetTransparency = transparency;
@@ -435,8 +448,6 @@ public class FormImage extends Image {
         }
     }
 
-    public static final String CLASS_NAME = "BASE_SPRITE";
-
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
@@ -445,7 +456,26 @@ public class FormImage extends Image {
         } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
             // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TAP to " + CLASS_NAME);
+
+            // Focus on touched form
+            showPortImages();
+            showPathImages();
+            setTransparency(1.0f);
+
+            // TODO: Speak "choose a channel to get data."
+
+            // Show ports and paths of touched form
+            for (PortImage portImage : getPortImages()) {
+                ArrayList<Path> paths = portImage.getPort().getPathsByPort();
+                for (Path path : paths) {
+                    // Show ports
+                    getVisualization().getImage(path.getSource()).setVisibility(true);
+                    getVisualization().getImage(path.getTarget()).setVisibility(true);
+                    // Show path
+                    getVisualization().getImage(path).setVisibility(true);
+                }
+            }
+
         } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
             // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {

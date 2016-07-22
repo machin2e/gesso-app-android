@@ -132,6 +132,17 @@ public class ImageGroup {
 
     }
 
+    public ImageGroup filterVisibility(boolean isVisible) {
+
+        ImageGroup imageGroup = new ImageGroup();
+        for (int i = 0; i < images.size(); i++) {
+            if (images.get(i).isVisible()) {
+                imageGroup.add(images.get(i));
+            }
+        }
+        return imageGroup;
+    }
+
     public List<Image> getList() {
         return images;
     }
@@ -165,7 +176,7 @@ public class ImageGroup {
      * @param position
      * @return
      */
-    public Image getNearestImage (Point position) {
+    public Image getNearest(Point position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;

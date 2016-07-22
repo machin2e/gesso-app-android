@@ -8,12 +8,12 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.model.simulation.Form;
 import camp.computer.clay.model.simulation.Model;
 import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
@@ -32,10 +32,10 @@ public class Visualization extends Image {
 //        return arrayList;
 //    }
 
-    public static <T> ArrayList<Point> getPositions(ArrayList<T> images) {
+    public static <T extends Image> ArrayList<Point> getPositions(ArrayList<T> images) {
         ArrayList<Point> positions = new ArrayList<>();
         for (T image : images) {
-            positions.add(new Point(((Image) image).getPosition().getX(), ((Image) image).getPosition().getY()));
+            positions.add(image.getPosition());
         }
         return positions;
     }
@@ -74,7 +74,7 @@ public class Visualization extends Image {
         getLayer(layerName).add(model, image);
 
 //        // Update perspective
-//        getSimulation().getBody(0).adjustPerspectiveScale();
+        getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(0);
 //        getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FormImage.TYPE).calculateCenter());
     }
 
@@ -285,6 +285,15 @@ public class Visualization extends Image {
         return nearestImage;
     }
 
+    public Image getTarget(Point point) {
+        for (Image image: getImages().filterVisibility(true).getList()) {
+            if (image.isTouching(point)) {
+                return image;
+            }
+        }
+        return null;
+    }
+
     public Simulation getSimulation() {
         return (Simulation) getModel();
     }
@@ -454,18 +463,4 @@ public class Visualization extends Image {
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
     }
-
-//    public Point getCentroidPosition() {
-//
-//        // Auto-adjust the perspective
-//        ArrayList<Point> spritePositions = new ArrayList<Point>();
-//
-//        for (Image image: getFormImages()) {
-//            if (image.isVisible()) {
-//                spritePositions.add(image.getPosition());
-//            }
-//        }
-//
-//        return Geometry.calculateCentroidPosition(spritePositions);
-//    }
 }

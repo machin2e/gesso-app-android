@@ -22,34 +22,11 @@ public class TouchInteractivity {
     // TODO: (cont'd) Note can have multiple sequences per finger in an interactivity,
     // TODO: (cont'd) so consider remodeling as per-finger interactivity and treat each finger
     // TODO: (cont'd) as an individual actor.
-    private Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isHolding = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
     public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
-
-    public boolean isTouchingImage (int fingerIndex) {
-        return this.touchedImage[fingerIndex] != null;
-    }
-
-    public void setTouchedImage (int fingerIndex, Image image) {
-        this.touchedImage[fingerIndex] = image;
-    }
-
-    public Image getTouchedImage (int fingerIndex) {
-        return this.touchedImage[fingerIndex];
-    }
-
-    public boolean isTouchingImage () {
-        return isTouchingImage(0);
-    }
-
-    public void setTouchedImage (Image image) {
-        setTouchedImage(0, image);
-    }
-
-    public Image getTouchedImage () {
-        return getTouchedImage(0);
-    }
+    public double offsetX = 0;
+    public double offsetY = 0;
 
     public Handler timerHandler = new Handler();
     TouchInteractivity touchInteractivity = this;
@@ -78,7 +55,6 @@ public class TouchInteractivity {
             isHolding[i] = false;
             isDragging[i] = false;
             dragDistance[i] = 0;
-            touchedImage[i] = null;
         }
     }
 
@@ -89,8 +65,10 @@ public class TouchInteractivity {
     public void add(TouchInteraction touchInteraction) {
         this.interactions.add(touchInteraction);
 
-        if (interactions.size() == 1) {
+        offsetX += touchInteraction.getPosition().getX();
+        offsetY += touchInteraction.getPosition().getY();
 
+        if (interactions.size() == 1) {
             // Start timer to check for hold
             timerHandler.removeCallbacks(timerRunnable);
             timerHandler.postDelayed(timerRunnable, TouchInteraction.MINIMUM_HOLD_DURATION);
@@ -127,10 +105,11 @@ public class TouchInteractivity {
     }
 
     public TouchInteraction getPrevious() {
-        for (int i = 0; i < interactions.size() - 1; i++) {
-            if (interactions.get(i + 1) == getLatest()) {
-                return interactions.get(i);
-            }
+//        for (int i = 0; i < interactions.size() - 1; i++) {
+        if (interactions.size() > 1) {
+//            if (interactions.get(i + 1) == getLatest()) {
+                return interactions.get(interactions.size() - 1);
+//            }
         }
         return null;
     }

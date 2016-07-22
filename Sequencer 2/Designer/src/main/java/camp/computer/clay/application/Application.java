@@ -49,10 +49,13 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // </Settings>
 
     // <Style>
-    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
+    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = false;
 
-    // Configure the interface settings
-    private static final boolean ENABLE_FULLSCREEN = true;
+    /**
+     * Hides the operating system's status and navigation bars. Setting this to false is helpful
+     * during debugging.
+     */
+    private static final boolean ENABLE_FULLSCREEN = false;
     // </Style>
 
     public VisualizationSurface visualizationSurface;

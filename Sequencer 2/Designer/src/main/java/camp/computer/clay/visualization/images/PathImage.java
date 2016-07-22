@@ -2,6 +2,7 @@ package camp.computer.clay.visualization.images;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.simulation.Path;
@@ -141,6 +142,27 @@ public class PathImage extends Image {
 
     @Override
     public boolean isTouching(Point point) {
+
+//        if (isVisible()) {
+//            Log.v("Touch_", "FLOOOO");
+//            Path path = getPath();
+//
+//            PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
+//            PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
+//
+//            double distanceToLine = Geometry.calculateLineToPointDistance(
+//                    sourcePortImage.getPosition(),
+//                    targetPortImage.getPosition(),
+//                    point,
+//                    true
+//            );
+//
+//            if (distanceToLine < 60) {
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
         return false;
     }
 
