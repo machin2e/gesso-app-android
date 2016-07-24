@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="camp.computer.clay.application.Application">
+    tools:context="camp.computer.clay.app.Application">
 
-    <camp.computer.clay.application.VisualizationSurface
+    <camp.computer.clay.app.VizSurface
         android:id="@+id/app_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

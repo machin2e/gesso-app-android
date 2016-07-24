@@ -20,7 +20,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/application_name" >
         <activity
-            android:name="camp.computer.clay.application.Application"
+            android:name="camp.computer.clay.app.Application"
             android:icon="@drawable/ic_launcher"
             android:label="@string/application_name"
             android:theme="@style/SplashTheme" >

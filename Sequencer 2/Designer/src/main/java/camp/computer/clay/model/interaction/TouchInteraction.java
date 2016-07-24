@@ -1,29 +1,10 @@
 package camp.computer.clay.model.interaction;
 
-import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.model.sim.Body;
+import camp.computer.clay.viz.arch.Image;
+import camp.computer.clay.viz.util.Point;
 
 public class TouchInteraction {
-
-    public enum Type {
-
-        NONE(0),
-        TOUCH(1),
-        HOLD(2),
-        MOVE(3),
-        TWITCH(4),
-        DRAG(5),
-        RELEASE(6),
-        TAP(7),
-        PRESS(8);
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        Type(int index) {
-            this.index = index;
-        }
-    }
 
     public static int MAXIMUM_TOUCH_POINT_COUNT = 5;
 
@@ -35,10 +16,11 @@ public class TouchInteraction {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    public Point[] touchPositions = new Point[MAXIMUM_TOUCH_POINT_COUNT];
+    private Point[] touchPositions = new Point[MAXIMUM_TOUCH_POINT_COUNT];
+
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 
-    private Type type;
+    private OnTouchActionListener.Type type;
 
     private Body body;
     // TODO: targetImage? or is the state of body containing this info (e.g., hand occupied with model <M>)
@@ -50,11 +32,7 @@ public class TouchInteraction {
 
     public int pointerIndex = -1;
 
-    // touchedImage
-    // overlappedImage (not needed, probably, because can look in history, or look at first action in interaction)
-    private Image overlappedImage = null;
-
-    public TouchInteraction(Type type) {
+    public TouchInteraction(OnTouchActionListener.Type type) {
         this.type = type;
         this.timestamp = java.lang.System.currentTimeMillis ();
 
@@ -86,16 +64,20 @@ public class TouchInteraction {
         return this.body;
     }
 
-    public Type getType() {
+    public OnTouchActionListener.Type getType() {
         return this.type;
     }
 
-    public void setType(Type type) {
+    public void setType(OnTouchActionListener.Type type) {
         this.type = type;
     }
 
     public Point getPosition() {
         return this.touchPositions[0];
+    }
+
+    public Point getPosition(int pointerIndex) {
+        return this.touchPositions[pointerIndex];
     }
 
     public long getTimestamp() {

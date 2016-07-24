@@ -18,7 +18,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import camp.computer.clay.application.Application;
+import camp.computer.clay.app.Application;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.old_model.Action;
 import camp.computer.clay.system.old_model.Device;
@@ -477,7 +477,7 @@ public class SQLiteStoreHost {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get actions with parent with root UUID, addDevice to parent's list of
+        // - For each root, get actions with parent with root UUID, addFrame to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -1344,7 +1344,7 @@ public class SQLiteStoreHost {
                 Log.v ("New_Behavior", "\tThe action exists.");
                 if (parentAction == null) {
                     Log.v ("New_Behavior", "\tUpdating all object references to action to existing action.");
-                    // If the action exists, then update the action with the existing
+                    // If the action exists, then generate the action with the existing
                     // action's with the same structure's UUID.
 //                    String existingBehaviorUuidString = cursor.getString(cursor.getColumnIndexOrThrow(ActionEntry.COLUMN_NAME_UUID));
 //                    UUID existingBehaviorUuid = UUID.fromString (existingBehaviorUuidString);
@@ -1712,7 +1712,7 @@ public class SQLiteStoreHost {
         // TODO: ...before saving a action tree, not just the action node UUID.
         if (!db.queryActionExists(action, parentAction)) {
 
-            // TODO: Update the basic action that has a script, addDevice a parent! Yes, the action can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic action that has a script, addFrame a parent! Yes, the action can have both a parent and a script! (leaf node!)
 
             db.saveAction(action, parentAction);
         } else {

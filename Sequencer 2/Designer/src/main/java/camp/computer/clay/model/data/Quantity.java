@@ -6,5 +6,5 @@ package camp.computer.clay.model.data;
  *
  * Changes to a quantity are propagated to dependent quantities.
  */
-public class Quantity {
+public class Quantity<T> {
 }

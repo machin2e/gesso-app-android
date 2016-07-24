@@ -182,7 +182,7 @@ public class TcpMessageClientHost {
             mTcpClientHost = new TcpClientHost(remoteServerAddress, remoteServerPort);
 
             // <HACK>
-            // TODO: Put this in an intermediate "DeviceTcpConnection" class, that contains "TcpClientHost" and has methods for registering callbacks?
+            // TODO: Put this in an intermediate "DeviceTcpConnection" class, that containsPoint "TcpClientHost" and has methods for registering callbacks?
             mTcpClientHost.setOnMessageReceived(new TcpClientHost.OnMessageReceived() {
                 @Override
                 //here the messageReceived method is implemented
