@@ -82,8 +82,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == SpeechGenerator.CHECK_CODE) {
-            if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+        if (requestCode == SpeechGenerator.CHECK_CODE) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 speechGenerator = new SpeechGenerator(this);
             } else {
                 Intent install = new Intent();
@@ -93,7 +93,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
     }
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,7 +132,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         setContentView(R.layout.activity_main);
 
         // Viz Surface
-        vizSurface = (VizSurface) findViewById (R.id.app_surface_view);
+        vizSurface = (VizSurface) findViewById(R.id.app_surface_view);
         vizSurface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
@@ -146,7 +148,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             }
         });
 
-        final Button pathEditorAddActionButton = (Button) findViewById (R.id.path_editor_add_action);
+        final Button pathEditorAddActionButton = (Button) findViewById(R.id.path_editor_add_action);
         pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent motionEvent) {
@@ -180,67 +182,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             }
         });
 
-        // <Cache>
-        // </Cache>
-
-        // Read default form profiles
-        String jsonString = null;
-        try {
-            InputStream inputStream = getContext().getAssets().open("forms.json");
-            int fileSize = inputStream.available();
-            byte[] fileBuffer = new byte[fileSize];
-            inputStream.read(fileBuffer);
-            inputStream.close();
-            jsonString = new String(fileBuffer, "UTF-8");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Create JSON object
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(jsonString);
-
-            JSONObject formObject = jsonObject.getJSONObject("form");
-
-            String formName = formObject.getString("name");
-
-            Log.v("Configuration", "reading JSON name: " + formName);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-        // Clay
-        clay = new Clay();
-        clay.addDisplay(this); // Add the view provided by the host device.
-
-        // UDP Datagram Server
-        if (datagramServer == null) {
-            datagramServer = new DatagramHost("udp");
-            clay.addHost(this.datagramServer);
-            datagramServer.startServer ();
-        }
-
-        // Internet Network Interface
-        if (networkResource == null) {
-            networkResource = new NetworkResource();
-            clay.addResource(this.networkResource);
-        }
-
-        // Descriptor Database
-        SQLiteStoreHost sqliteStoreHost = new SQLiteStoreHost(getClay(), "sqlite");
-        getClay().setStore(sqliteStoreHost);
-
-        // Initialize content store
-        getClay().getStore().erase();
-        getClay().getCache().populate(); // alt. syntax: useClay().useCache().toPopulate();
-        getClay().getStore().generate();
-        getClay().getCache().populate();
-        // getClay().simulateSession(true, 10, false);
-
         // Prevent on-screen keyboard from pushing up content
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
@@ -252,7 +193,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
@@ -282,11 +223,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             @Override
             public boolean onTouch(View v, MotionEvent motionEvent) {
 
-                int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                int pointerId = motionEvent.getPointerId (pointerIndex);
+                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                int pointerId = motionEvent.getPointerId(pointerIndex);
                 //int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
-                int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
-                int pointCount = motionEvent.getPointerCount ();
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                int pointCount = motionEvent.getPointerCount();
 
                 // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
@@ -312,7 +253,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //            public boolean onAction(View v, MotionEvent event) {
 //                int inType = timelineButton.getInputType(); // backup the input type
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
-//                timelineButton.onTouchEvent(event); // call native handler
+//                timelineButton.onTouchEvent(event); // call native clayServiceHandler
 //                timelineButton.setInputType(inType); // restore input type
 //                return true; // consume touchPositions even
 //            }
@@ -382,8 +323,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         });
         // </CONTEXT_SCOPE>
 
-        // Start the initial worker thread (runnable task) by posting through the handler
-        handler.post(runnableCode);
+        // Start the initial worker thread (runnable task) by posting through the clayServiceHandler
+        clayServiceHandler.post(clayServiceRunnable);
 
         // Check availability of speech synthesis engine on Android host device.
         if (ENABLE_SPEECH_GENERATOR) {
@@ -395,6 +336,84 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         hideChat();
+
+        // <CLAY>
+        clay = new Clay();
+        clay.addDisplay(this); // Add the view provided by the host device.
+        // </CLAY>
+
+        // <CACHE>
+        // TODO:
+        // </CACHE>
+
+        // <STORE>
+        SQLiteStoreHost sqliteStoreHost = new SQLiteStoreHost(getClay(), "sqlite");
+        clay.setStore(sqliteStoreHost);
+        // </STORE>
+
+        // <DESCRIPTIONS>
+        cacheDescriptions();
+        // </DESCRIPTIONS>
+
+        // <DATAGRAM_SERVER>
+        if (datagramServer == null) {
+            datagramServer = new DatagramHost("udp");
+            clay.addHost(this.datagramServer);
+            datagramServer.startServer();
+        }
+        // </DATAGRAM_SERVER>
+
+        // <INTERNET>
+        if (networkResource == null) {
+            networkResource = new NetworkResource();
+            clay.addHost(this.networkResource);
+        }
+        // </INTERNET>
+
+        // <SIMULATION>
+        // Initialize content store
+        clay.getStore().erase();
+        clay.getCache().populate(); // alt. syntax: useClay().useCache().toPopulate();
+        clay.getStore().generate();
+        clay.getCache().populate();
+        // getClay().simulateSession(true, 10, false);
+        // </SIMULATION>
+    }
+
+    private void cacheDescriptions() {
+        loadDescriptions();
+    }
+
+    private void loadDescriptions() {
+
+        // Read default form profiles
+        String jsonString = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open("descriptions/frames/clay.json");
+            int fileSize = inputStream.available();
+            byte[] fileBuffer = new byte[fileSize];
+            inputStream.read(fileBuffer);
+            inputStream.close();
+            jsonString = new String(fileBuffer, "UTF-8");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create JSON object
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+
+            JSONObject formObject = jsonObject.getJSONObject("form");
+
+            String formName = formObject.getString("name");
+
+            Log.v("Configuration", "reading JSON name: " + formName);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void hideChat() {
@@ -406,7 +425,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         messageContentLayout.setVisibility(View.GONE);
@@ -419,7 +438,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
 
@@ -474,7 +493,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         // <CHAT>
 
@@ -512,7 +531,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         contextScope.setText("✓");
     }
@@ -524,7 +543,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
@@ -587,7 +606,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
         actionConstruct.setBackgroundColor(Color.parseColor("#44000000"));
 
-        final LinearLayout pathPatchActionList = (LinearLayout) findViewById (R.id.path_editor_action_list);
+        final LinearLayout pathPatchActionList = (LinearLayout) findViewById(R.id.path_editor_action_list);
 
         actionConstruct.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -626,12 +645,13 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private boolean enableFullscreenService = false;
 
     private Handler fullscreenServiceHandler = new Handler();
+
     private Runnable fullscreenServiceRunnable = new Runnable() {
         @Override
         public void run() {
             // Do what you need to do.
             // e.g., foobar();
-            hideSystemUI();
+            hideHostUi();
 
             // Uncomment this for periodic callback
             if (enableFullscreenService) {
@@ -653,7 +673,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
      * References:
      * - http://stackoverflow.com/questions/9926767/is-there-a-way-to-hide-the-system-navigation-bar-in-android-ics
      */
-    private void hideSystemUI() {
+    private void hideHostUi() {
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -692,17 +712,17 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     }
 
     // Create the Handler object. This will be run on the main thread by default.
-    Handler handler = new Handler();
+    Handler clayServiceHandler = new Handler();
 
     // Define the code block to be executed
-    private Runnable runnableCode = new Runnable() {
+    private Runnable clayServiceRunnable = new Runnable() {
         @Override
         public void run() {
             // Process the outgoing messages
             clay.step();
 
             // Repeat this the same runnable code block again another 2 seconds
-            handler.postDelayed(runnableCode, MESSAGE_SEND_FREQUENCY);
+            clayServiceHandler.postDelayed(clayServiceRunnable, MESSAGE_SEND_FREQUENCY);
         }
     };
 
@@ -742,13 +762,15 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     // TODO: Rename to something else and make a getDisplay() function specific to the
     // TODO: (cont'd) display interface.
-    public static Application getDisplay() { return Application.applicationView; }
+    public static Application getDisplay() {
+        return Application.applicationView;
+    }
 
     public VizSurface getVizSurface() {
         return this.vizSurface;
     }
 
-    public double getFramesPerSecond () {
+    public double getFramesPerSecond() {
         return getVizSurface().getRenderer().getFramesPerSecond();
     }
 

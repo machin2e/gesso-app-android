@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -69,19 +70,20 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
 
         canvasWidth = getWidth();
         canvasHeight = getHeight();
+
         canvasBitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
-        // canvas = new Canvas ();
+
         palette.getCanvas().setBitmap(canvasBitmap);
 
         identityMatrix = new Matrix();
 
-        // Center the viz coordinate system
+        // Center the canvas on the display
         originPosition.set(palette.getCanvas().getWidth() / 2.0f, palette.getCanvas().getHeight() / 2.0f);
+//        originPosition.set(0, 0);
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
     }
 
     @Override
@@ -114,7 +116,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
 //        getClay ().getCommunication ().startDatagramServer();
 
         // Remove this?
-        update();
+        generate();
 
     }
 
@@ -212,10 +214,12 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
                 if (image.isVisible()) {
                     getCanvas().save();
 
-                    getCanvas().translate(
-                            (float) -image.getPosition().getX(),
-                            (float) -image.getPosition().getY()
-                    );
+//                    getCanvas().translate(
+//                            (float) image.getPosition().getX(),
+//                            (float) image.getPosition().getY()
+////                            (float) image.getPosition().getAbsoluteX(),
+////                            (float) image.getPosition().getAbsoluteY()
+//                    );
 
                     //for (Shape shape : image.getShapes()) {
                     for (int i = 0; i < image.getShapes().size(); i++) {
@@ -341,7 +345,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
     /**
      * The function run in background thread, not UI thread.
      */
-    public void update() {
+    public void generate() {
 
         if (viz == null) {
             return;
@@ -374,7 +378,6 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void setCanvas(Canvas canvas) {
-//        this.canvas = canvas;
         palette.setCanvas(canvas);
     }
 
@@ -387,7 +390,9 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void setViz(Viz viz) {
+
         viz.setPalette(palette);
+
         this.viz = viz;
 
         // Get screen width and height of the device
@@ -427,8 +432,6 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
             return false;
         }
 
-        // Log.v("InteractionHistory", "Started touchPositions composition.");
-
         // Get active body
         Body currentBody = viz.getSimulation().getBody(0);
 
@@ -445,9 +448,17 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
                 double perspectiveScale = viz.getSimulation().getBody(0).getPerspective().getScale();
                 for (int i = 0; i < pointerCount; i++) {
                     int otherPointerId = motionEvent.getPointerId(i);
-                    touchInteraction.getPosition(otherPointerId).setX((motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
-                    touchInteraction.getPosition(otherPointerId).setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                    touchInteraction.getPosition(otherPointerId).set(
+//                            motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX()) / perspectiveScale,
+//                            motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY()) / perspectiveScale
+                            motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX()) / perspectiveScale,
+                            motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY()) / perspectiveScale
+                    );
                 }
+
+                Log.v("Touch", "-");
+
+                Log.v("Touch", "Surface.Touch: " + motionEvent.getX(pointerIndex) + ", " + motionEvent.getY(pointerIndex));
 
                 // ACTION_DOWN is called only for the first pointer that touches the screen. This
                 // starts the gesture. The pointer data for this pointer is always at index 0 in
@@ -469,21 +480,18 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
 
                 // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    touchInteraction.setType(OnTouchActionListener.Type.TOUCH);
                     touchInteraction.pointerIndex = pointerId;
                     currentBody.onStartInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO: Handle additional pointers after the first touchPositions!
+                    // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
-                    touchInteraction.setType(OnTouchActionListener.Type.MOVE);
                     touchInteraction.pointerIndex = pointerId;
                     currentBody.onContinueInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    touchInteraction.setType(OnTouchActionListener.Type.RELEASE);
                     touchInteraction.pointerIndex = pointerId;
                     currentBody.onCompleteInteractivity(touchInteraction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO: Handle additional pointers after the first touchPositions!
+                    // TODO:
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:
                 } else {

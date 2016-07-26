@@ -56,7 +56,7 @@ public class TouchInteractivity {
 
         if (touchInteractions.size() > 1) {
             dragDistance[touchInteraction.pointerIndex] += Geometry.calculateDistance(touchInteraction.getPosition(), getLast().getPosition());
-            Log.v("Touch", "dragDistance: " + dragDistance[touchInteraction.pointerIndex]);
+//            Log.v("Touch", "dragDistance: " + dragDistance[touchInteraction.pointerIndex]);
         }
 
         this.touchInteractions.add(touchInteraction);

@@ -33,6 +33,7 @@ public class Body {
 
     /**
      * Returns the latest touch interactivity.
+     *
      * @return
      */
     public TouchInteractivity getTouchInteractivity() {
@@ -43,21 +44,28 @@ public class Body {
         }
     }
 
-    public void onStartInteractivity(TouchInteraction touchInteraction) {
+    private void cacheInteractivity(TouchInteractivity touchInteractivity) {
+        // TODO: Cache and store the touch interactivites before deleting them completely! Do it in
+        // TODO: (cont'd) a background thread.
+        if (touchInteractivities.size() > 3) {
+            touchInteractivities.remove(0);
+        }
+    }
 
-        // Having an idea is just accumulating intention. It's a suggestion from your existential
-        // controller.
+    /**
+     * Having an idea is just accumulating intention. It's a suggestion from your existential
+     * controller.
+     *
+     * @param touchInteraction
+     */
+    public void onStartInteractivity(TouchInteraction touchInteraction) {
 
         TouchInteractivity touchInteractivity = new TouchInteractivity();
         touchInteractivity.add(touchInteraction);
 
         touchInteractivities.add(touchInteractivity);
 
-        // TODO: Cache and store the touch interactivites before deleting them completely! Do it in
-        // TODO: (cont'd) a background thread.
-        if (touchInteractivities.size() > 3) {
-            touchInteractivities.remove(0);
-        }
+        cacheInteractivity(touchInteractivity);
 
         onTouchListener(touchInteractivity, touchInteraction);
     }
@@ -99,11 +107,12 @@ public class Body {
 
     private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        touchInteraction.setType(OnTouchActionListener.Type.TOUCH);
-
         Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
-        Log.v("Touch", "touched: " + targetImage);
+//        Log.v("Touch", "touched: " + targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.TOUCH);
+
         if (targetImage != null) {
             targetImage.touch(touchInteraction);
         }
@@ -145,10 +154,11 @@ public class Body {
 
     public void onHoldListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        touchInteraction.setType(OnTouchActionListener.Type.HOLD);
-
         Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.HOLD);
+
         if (targetImage != null) {
             targetImage.touch(touchInteraction);
         }
@@ -171,12 +181,17 @@ public class Body {
 
     private void onDragListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        touchInteraction.setType(OnTouchActionListener.Type.DRAG);
+        // Stop listening for a hold interaction
+        touchInteractivity.timerHandler.removeCallbacks(touchInteractivity.timerRunnable);
 
         Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.DRAG);
+
         if (targetImage != null) {
-            targetImage.touch(touchInteraction);
+            //targetImage.touch(touchInteraction);
+            touchInteractivity.getFirst().getTarget().touch(touchInteraction);
         }
 
         Log.v("onDragListener", "" + touchInteraction.getType() + ": " + touchInteraction.getTarget());
@@ -263,10 +278,11 @@ public class Body {
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        touchInteraction.setType(OnTouchActionListener.Type.TAP);
-
         Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.TAP);
+
         if (targetImage != null) {
             targetImage.touch(touchInteraction);
         }
@@ -308,10 +324,12 @@ public class Body {
     }
 
     private void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-        touchInteraction.setType(OnTouchActionListener.Type.RELEASE);
 
         Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.RELEASE);
+
         if (targetImage != null) {
             targetImage.touch(touchInteraction);
         }

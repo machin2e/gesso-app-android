@@ -93,9 +93,9 @@ public class Viz extends Image {
     public void addImage(Image image, String layerName) {
 
         // Position
-        if (image.getModel().getClass() == Frame.class) {
-            generateImagePosition(image);
-        }
+//        if (image.getModel().getClass() == Frame.class) {
+//            generateImagePosition(image);
+//        }
 
         // Layer
         if (!hasLayer(layerName)) {
@@ -106,7 +106,7 @@ public class Viz extends Image {
         getLayer(layerName).add(image);
         Log.v("Viz", "Adding image " + image);
 
-        getSimulation().getBody(0).getPerspective().focusReset();
+//        getSimulation().getBody(0).getPerspective().focusReset();
     }
 
     public Model getModel(Image image) {

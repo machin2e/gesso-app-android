@@ -121,6 +121,15 @@ public class Clay {
 
         // Image
         Image frameImage = generateFrameImage(frame);
+
+        if (viz.getImages().filterType(Frame.class).getList().size() == 0) {
+            frameImage.setPosition(new Point(0, 0));
+        } else if (viz.getImages().filterType(Frame.class).getList().size() == 1) {
+            frameImage.setPosition(new Point(300, -300));
+        } else if (viz.getImages().filterType(Frame.class).getList().size() == 2) {
+            frameImage.setPosition(new Point(-300, 300));
+        }
+
         viz.addImage(frameImage, "frames");
 
         // Ports
@@ -202,7 +211,7 @@ public class Clay {
 
         // Board
         // Dimensions: (5.08 cm, 5.08 cm)
-        final Shape boardShape = new Rectangle(508 / CENTIMETERS_PER_PIXEL, 508 / CENTIMETERS_PER_PIXEL);
+        final Shape boardShape = new Rectangle(new Point(0, 0), 508 / CENTIMETERS_PER_PIXEL, 508 / CENTIMETERS_PER_PIXEL);
         boardShape.setRotation(0);
         boardShape.setStyle("color", "#fff7f7f7");
         boardShape.setStyle("outlineColor", "#ff414141");
@@ -225,6 +234,7 @@ public class Clay {
                     case DRAG:
                         Log.v("Touch", "boardShape.onDrag");
                         frameImage.setPosition(touchInteraction.getPosition());
+//                        boardShape.setPosition(touchInteraction.getPosition());
                         break;
 
                     case RELEASE:
@@ -354,14 +364,11 @@ public class Clay {
 
         // Offset the image relative to the parent frame
         final Image<Frame> frameImage = viz.getImage(port.getFrame());
-        position.offset(
-                frameImage.getPosition().getX(),
-                frameImage.getPosition().getY()
-        );
+        portImage.getPosition().setReferencePoint(frameImage.getPosition());
+        portImage.getPosition().setRelative(position);
 
         // Shapes
-        Shape portShape = null;
-        portShape = new Circle(position, 30);
+        final Shape portShape = new Circle(new Point(0, 0), 30);
         portShape.setRotation(0);
         portShape.setStyle("color", "#ffefefef");
         portShape.setStyle("outlineColor", "#ff000000");
@@ -387,6 +394,9 @@ public class Clay {
 
                     case DRAG:
                         Log.v("Touch", "portShape.onDrag");
+
+                        portShape.setPosition(touchInteraction.getPosition());
+
                         break;
 
                     case RELEASE:
@@ -433,7 +443,7 @@ public class Clay {
         this.messageHost.addHost(messageManager);
     }
 
-    public void addResource(NetworkResourceInterface networkResource) {
+    public void addHost(NetworkResourceInterface networkResource) {
         this.networkHost.addHost(networkResource);
     }
 

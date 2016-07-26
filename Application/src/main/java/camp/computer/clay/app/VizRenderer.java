@@ -54,7 +54,7 @@ public class VizRenderer extends Thread {
             frameStartTime = Time.getCurrentTime();
 
             // Advance the visualization state
-            vizSurface.update();
+            vizSurface.generate();
 
             frameStopTime = Time.getCurrentTime();
 

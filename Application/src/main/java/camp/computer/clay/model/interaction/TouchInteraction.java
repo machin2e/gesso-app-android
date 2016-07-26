@@ -1,5 +1,7 @@
 package camp.computer.clay.model.interaction;
 
+import android.util.Log;
+
 import camp.computer.clay.model.sim.Body;
 import camp.computer.clay.viz.arch.Image;
 import camp.computer.clay.viz.util.Point;
@@ -70,6 +72,8 @@ public class TouchInteraction {
 
     public void setType(OnTouchActionListener.Type type) {
         this.type = type;
+        Log.v("Touch", "TouchInteraction." + type + ": " + getPosition().getX() + ", " + getPosition().getY());
+        Log.v("Touch", "     on " + getTarget());
     }
 
     public Point getPosition() {

@@ -1,5 +1,7 @@
 package camp.computer.clay.viz.arch;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +96,7 @@ public class Image<T extends Model> {
     }
 
     public void addShape(Shape shape) {
+        shape.getPosition().setReferencePoint(getPosition());
         shapes.add(shape);
     }
 
@@ -126,6 +129,7 @@ public class Image<T extends Model> {
     }
 
     public void setPosition(Point position) {
+        Log.v("Touch", "\tImage.setPosition: " + position.getX() + ", " + position.getY());
         this.position.set(position.getX(), position.getY());
     }
 
@@ -171,6 +175,7 @@ public class Image<T extends Model> {
     public boolean isVisible() {
         return visibility == Visibility.VISIBLE;
     }
+
     public void generate() {
     }
 
@@ -188,14 +193,15 @@ public class Image<T extends Model> {
 
             //Log.v("Touching", "Image: " + point.getX() + ", " + point.getY() + " isTouching " + getPosition().getX() + ", " + getPosition().getY());
 
-            Point offsetPoint = new Point(
-                    point.getX() + getPosition().getX(),
-                    point.getY() + getPosition().getY()
-            );
+//            Point offsetPoint = new Point(
+//                    point.getX() - getPosition().getX(),
+//                    point.getY() - getPosition().getY()
+//            );
 
             for (int i = 0; i < shapes.size(); i++) {
-                //Log.v("Touching", "Image.isTouching");
-                if (shapes.get(i).isTouching(offsetPoint)) {
+//                if (shapes.get(i).isTouching(offsetPoint)) {
+                if (shapes.get(i).isTouching(point)) {
+                    Log.v("Touch", "Image.isTouching: " + shapes.get(i).getPosition().getX() + ", " + shapes.get(i).getPosition().getY());
                     return true;
                 }
             }
@@ -214,32 +220,30 @@ public class Image<T extends Model> {
 //    }
 
     public void touch(TouchInteraction touchInteraction) {
-        // TODO: Remove! onTouchInteraction(touchInteraction);
-//        if (onTouchActionListener != null) {
-//            onTouchActionListener.onAction(touchInteraction);
-//        }
 
-        Point offsetPoint = new Point(
-                touchInteraction.getPosition().getX() + getPosition().getX(),
-                touchInteraction.getPosition().getY() + getPosition().getY()
-        );
+//        Point offsetPoint = new Point(
+//                touchInteraction.getPosition().getX() + getPosition().getX(),
+//                touchInteraction.getPosition().getY() + getPosition().getY()
+//        );
 
 //        touchInteraction.getPosition().set(offsetPoint);
 
-        for (int i = 0; i < shapes.size(); i++) {
-            //Log.v("Touching", "Image.isTouching");
-            if (shapes.get(i).isTouching(offsetPoint)) {
-                shapes.get(i).touch(touchInteraction);
+        Log.v("Touch", "Image.touchInteraction: " + touchInteraction.getPosition().getX() + ", " + touchInteraction.getPosition().getY());
+        Log.v("Touch", "Image.touch: " + getPosition().getX() + ", " + getPosition().getY());
+
+//        Point offsetPoint = new Point(
+//                touchInteraction.getPosition().getX() - getPosition().getX(),
+//                touchInteraction.getPosition().getY() - getPosition().getY()
+//        );
+
+        for (Shape shape : shapes) {
+            if (shape.isTouching(touchInteraction.getPosition())) {
+//            if (shape.isTouching(offsetPoint)) {
+                shape.touch(touchInteraction);
             }
         }
 
-//        onTouchInteraction(touchInteraction);
-
-//        for (Shape shape: shapes) {
-//            if (shape.isTouching(touchInteraction.getPosition())) {
-//                shape.touch(touchInteraction);
-//            }
-//        }
+        onTouchInteraction(touchInteraction);
     }
 
     public void setOnDrawListener(OnDrawListener onDrawListener) {

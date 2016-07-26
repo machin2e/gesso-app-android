@@ -101,8 +101,8 @@ public class Perspective {
         // this.targetPosition.setY(-targetPosition.getY() * targetScale);
         */
 
-        this.targetPosition.setX(targetPosition.getX());
-        this.targetPosition.setY(targetPosition.getY());
+        this.targetPosition.setX(-targetPosition.getX());
+        this.targetPosition.setY(-targetPosition.getY());
 
         // <PLAN_ANIMATION>
         originalPosition.set(position);
