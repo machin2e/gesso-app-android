@@ -1,15 +1,33 @@
-# Sequencer
+# Clay
 
-Sequencer is a tool for programming Clay by creating and manipulating sequences of basic system behaviors such as controlling electronic components connected to a device and communications between devices.
+Designer is a mobile design environment for Clay.
 
-You might wonder why Sequencer exists along with [Looper](https://github.com/computercamp/Looper). After all, Looper is also a tool for programming Clay, too. The answer is simple! Both Sequencer and Looper are experimental programming environments for Clay. We are building both of them because we want to test multiple designs that are quite different by actually programming Clay.
+You use Designer to define
+interactivity, interconnectivity, and intelligence into your own projects
+made with Clay devices. You can, for example, define connectivity across
+Clay devices, controlling electronic peripherals connected to a device and
+communications between devices. In simple terms, Designer visualizes your
+system and gives you tools for manipulating the data structures that underly
+your project's system behavior by creating, copy, and curating from other
+projects.
 
-Generally speaking, Sequencer is programmatically simpler than Looper because it is built using the native list widgets. Looper implements a custom graphical design language.
+You might wonder why Designers exists along with
+[Looper](https://github.com/computercamp/Looper). After all, Looper is also
+a tool for programming Clay, too. The answer is simple! Both Sequencer and
+Looper are experimental programming environments for Clay. We are building
+both of them because we want to test multiple designs that are quite
+different by actually programming Clay.
 
-## Credits
+Generally speaking, Designer is programmatically simpler than Looper because
+it is built using the native list widgets. Looper implements a custom
+graphical design language.
 
-We proudly use open source software! Here's what we're using:
+## Dependencies
 
-* [FloatingActionButton](https://github.com/Clans/FloatingActionButton/)
+We used open source software to build Clay. Here's what we're using:
 
-We also used the [Android Asset Studio](http://romannurik.github.io/AndroidAssetStudio/index.html)'s Generic Icon Generator.
+*   [FloatingActionButton](https://github.com/Clans/FloatingActionButton/)
+
+We also used the
+[Android Asset Studio](http://romannurik.github.io/AndroidAssetStudio/index.html)'s
+Generic Icon Generator.
