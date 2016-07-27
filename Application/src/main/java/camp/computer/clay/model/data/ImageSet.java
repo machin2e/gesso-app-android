@@ -11,59 +11,70 @@ import camp.computer.clay.viz.util.Point;
 import camp.computer.clay.viz.util.Rectangle;
 
 /**
- * ImageGroup is an interface for managing and manaipulating sets of images.
+ * ImageSet is an interface for managing and manaipulating sets of images.
  */
-public class ImageGroup {
+public class ImageSet {
 
     private List<Image> images = new ArrayList<>();
 
-    public ImageGroup() {
+    public ImageSet() {
     }
 
-    public void add (Image image) {
+    public void add(Image image) {
         this.images.add(image);
     }
 
-    public void add (List<Image> images) {
+    public void add(List<Image> images) {
         this.images.addAll(images);
     }
 
-    public boolean contains (Image image) {
+    public boolean contains(Image image) {
         return images.contains(image);
     }
 
-    public ImageGroup remove (Image image) {
+    public ImageSet remove(Image image) {
         images.remove(image);
         return this;
     }
 
-    public Image get (int index) {
+    public Image get(int index) {
         return images.get(index);
     }
 
     /**
      * Removes all elements except those with the specified type.
+     *
      * @param type
      * @return
      */
-    public ImageGroup old_filterType(String type) {
-        ImageGroup imageGroup = new ImageGroup();
+    public ImageSet old_filterType(String type) {
+        ImageSet imageSet = new ImageSet();
         for (int i = 0; i < this.images.size(); i++) {
             if (this.images.get(i).isType(type)) {
-                imageGroup.add(this.images.get(i));
+                imageSet.add(this.images.get(i));
             }
         }
-        return imageGroup;
+        return imageSet;
     }
 
-    public <T extends Model> ImageGroup filterType(Class<T> type) {
-        ImageGroup imageGroup = new ImageGroup();
+    public <T extends Model> ImageSet filterType(Class<T> type) {
+        ImageSet imageSet = new ImageSet();
         for (int i = 0; i < this.images.size(); i++) {
             if (this.images.get(i).getModel().getClass() == type) {
-                imageGroup.add(this.images.get(i));
+                imageSet.add(this.images.get(i));
             }
         }
-        return imageGroup;
+        return imageSet;
+    }
+
+    public <T extends Model> List<T> getModels(Class<T> type) {
+        List models = new ArrayList<T>();
+        for (int i = 0; i < this.images.size(); i++) {
+            if (this.images.get(i).getModel().getClass() == type) {
+                models.add(this.images.get(i).getModel());
+            }
+        }
+        return models;
     }
 
 //    /**
@@ -92,43 +103,32 @@ public class ImageGroup {
      * @param distance
      * @return
      */
-    public ImageGroup filterDistance(Point position, double distance) {
-
-        ImageGroup imageGroup = new ImageGroup();
-
+    public ImageSet filterDistance(Point position, double distance) {
+        ImageSet imageSet = new ImageSet();
         for (int i = 0; i < images.size(); i++) {
-
-//            Image image = images.remove(0);
 
             double distanceToImage = Geometry.calculateDistance(
                     position,
-//                    image.getPosition()
                     images.get(i).getPosition()
             );
 
             if (distanceToImage < distance) {
-
-//                images.add(image);
-                imageGroup.add(images.get(i));
-
+                imageSet.add(images.get(i));
             }
+
         }
-
-//        this.images = imageGroup;
-
-        return imageGroup;
-
+        return imageSet;
     }
 
-    public ImageGroup filterVisibility(Visibility visibility) {
+    public ImageSet filterVisibility(Visibility visibility) {
 
-        ImageGroup imageGroup = new ImageGroup();
+        ImageSet imageSet = new ImageSet();
         for (int i = 0; i < images.size(); i++) {
             if (images.get(i).getVisibility() == visibility) {
-                imageGroup.add(images.get(i));
+                imageSet.add(images.get(i));
             }
         }
-        return imageGroup;
+        return imageSet;
     }
 
     public List<Image> getList() {
@@ -137,7 +137,7 @@ public class ImageGroup {
 
     public List<Point> getPositions() {
         List<Point> positions = new ArrayList<>();
-        for (Image image: images) {
+        for (Image image : images) {
             positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
         }
         return positions;
@@ -161,17 +161,18 @@ public class ImageGroup {
 
     /**
      * Finds and returns the nearest <em>visible</em> <code>Image</code>.
-     * @param position
+     *
+     * @param point
      * @return
      */
-    public Image getNearest(Point position) {
+    public Image getNearest(Point point) {
 
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
 
-        for (Image image: images) {
+        for (Image image : images) {
 
-            double currentDistance = Geometry.calculateDistance(position, image.getPosition());
+            double currentDistance = Geometry.calculateDistance(point, image.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;
@@ -180,6 +181,21 @@ public class ImageGroup {
         }
 
         return nearestImage;
+    }
+
+    public Image getAt(Point point) {
+        for (Image image : filterVisibility(Visibility.VISIBLE).getList()) {
+            if (image.isTouching(point)) {
+                return image;
+            }
+        }
+        return null;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        for (Image image : images) {
+            image.setVisibility(visibility);
+        }
     }
 
     // TODO: setVisibility()

@@ -7,8 +7,6 @@ public interface OnTouchActionListener {
         NONE(0),
         TOUCH(1),
         HOLD(2),
-        MOVE(3),
-        TWITCH(4),
         DRAG(5),
         RELEASE(6),
         TAP(7);

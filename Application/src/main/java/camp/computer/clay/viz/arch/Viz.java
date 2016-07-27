@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import camp.computer.clay.model.data.ImageGroup;
-import camp.computer.clay.model.sim.Frame;
+import camp.computer.clay.model.data.ImageSet;
 import camp.computer.clay.model.sim.Model;
 import camp.computer.clay.model.sim.Simulation;
 import camp.computer.clay.model.interaction.TouchInteraction;
@@ -129,12 +128,12 @@ public class Viz extends Image {
         return null;
     }
 
-    public <T extends Model> ImageGroup getImages(List<T> models) {
-        ImageGroup imageGroup = new ImageGroup();
+    public <T extends Model> ImageSet getImages(List<T> models) {
+        ImageSet imageSet = new ImageSet();
         for (T model : models) {
-            imageGroup.add(getImage(model));
+            imageSet.add(getImage(model));
         }
-        return imageGroup;
+        return imageSet;
     }
 
     /**
@@ -152,14 +151,14 @@ public class Viz extends Image {
         return this;
     }
 
-    public ImageGroup getImages() {
-        ImageGroup imageGroup = new ImageGroup();
+    public ImageSet getImages() {
+        ImageSet imageSet = new ImageSet();
         for (Layer layer : getLayers()) {
             for (Image layerImage : layer.getImages()) {
-                imageGroup.add(layerImage);
+                imageSet.add(layerImage);
             }
         }
-        return imageGroup;
+        return imageSet;
     }
 
     public void generate() {
@@ -204,7 +203,7 @@ public class Viz extends Image {
         // Calculate random positions separated by minimum distance
         final float imageSeparationDistance = 500;
 
-        //ArrayList<Point> imagePositions = getImages().old_filterType(FrameImage.TYPE).getPositions();
+        //ArrayList<Point> imagePositions = getImages().old_filterType(old_FrameImage.TYPE).getPositions();
         List<Point> imagePositions = getImages().getPositions();
 
         Point position = null;

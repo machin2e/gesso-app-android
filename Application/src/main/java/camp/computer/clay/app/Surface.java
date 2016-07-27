@@ -19,17 +19,19 @@ import java.util.List;
 import camp.computer.clay.model.interaction.OnTouchActionListener;
 import camp.computer.clay.model.sim.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.sim.Frame;
+import camp.computer.clay.model.sim.Path;
+import camp.computer.clay.model.sim.Port;
 import camp.computer.clay.viz.arch.Image;
-import camp.computer.clay.viz.arch.Layer;
 import camp.computer.clay.viz.arch.Viz;
-import camp.computer.clay.viz.img.FrameImage;
+import camp.computer.clay.viz.img.old_FrameImage;
 import camp.computer.clay.viz.util.Geometry;
 import camp.computer.clay.viz.util.Palette;
 import camp.computer.clay.viz.util.Point;
 import camp.computer.clay.viz.util.Rectangle;
 import camp.computer.clay.viz.arch.Shape;
 
-public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
+public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     // Viz Rendering Context
     private Bitmap canvasBitmap = null;
@@ -41,7 +43,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
 
     // Viz Renderer
     private SurfaceHolder surfaceHolder;
-    private VizRenderer vizRenderer;
+    private Renderer renderer;
 
     // Coordinate System (Grid)
     private Point originPosition = new Point();
@@ -49,17 +51,17 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
     // Viz
     private Viz viz;
 
-    public VizSurface(Context context) {
+    public Surface(Context context) {
         super(context);
 
         setFocusable(true);
     }
 
-    public VizSurface(Context context, AttributeSet attrs) {
+    public Surface(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public VizSurface(Context context, AttributeSet attrs, int defStyle) {
+    public Surface(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -90,10 +92,10 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
 //        // Kill the background Thread
 //        boolean retry = true;
-//        // vizRenderer.setRunning (false);
+//        // renderer.setRunning (false);
 //        while (retry) {
 //            try {
-//                vizRenderer.join ();
+//                renderer.join ();
 //                retry = false;
 //            } catch (InterruptedException e) {
 //                e.printStackTrace ();
@@ -108,9 +110,9 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
 
         // Create and start background Thread
-        vizRenderer = new VizRenderer(this);
-        vizRenderer.setRunning(true);
-        vizRenderer.start();
+        renderer = new Renderer(this);
+        renderer.setRunning(true);
+        renderer.start();
 
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
@@ -128,11 +130,11 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
 
         // Kill the background Thread
         boolean retry = true;
-        vizRenderer.setRunning(false);
+        renderer.setRunning(false);
 
         while (retry) {
             try {
-                vizRenderer.join();
+                renderer.join();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -170,15 +172,10 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawColor(Color.WHITE);
 
         // Scene
-//        getViz().draw(this);
         renderViz(getViz());
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap(canvasBitmap, identityMatrix, null);
-//        canvas.save();
-//        canvas.concat(identityMatrix);
-//        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
-//        canvas.restore();
 
         canvas.restore();
     }
@@ -194,84 +191,169 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
             // </AXES_ANNOTATION>
         }
 
-        // Draw images
-        for (Integer id : viz.getLayerIndices()) {
-            Layer layer = viz.getLayer(id);
-            if (layer == null) {
-                break;
-            }
-            for (Image image : layer.getImages()) {
-//                Log.v("Image", "drawing image class: " + image.getModel().getClass());
+        for (Image<Frame> image : viz.getImages().filterType(Frame.class).getList()) {
+            if (image.isVisible()) {
+                for (int i = 0; i < image.getShapes().size(); i++) {
+                    Shape shape = image.getShape(i);
 
-//                if (image.getModel().getClass() == Frame.class) {
-//                    Image<Frame> img = (Image<Frame>) image;
-//                    img.draw(visualizationSurface);
-//                } else if (image.getModel().getClass() == Frame.class) {
-//                    Image<Port> img = (Image<Port>) image;
-//                    img.draw(visualizationSurface);
-//                }
+                    if (shape.isVisible()) {
 
-                if (image.isVisible()) {
-                    getCanvas().save();
+                        getCanvas().save();
 
-//                    getCanvas().translate(
-//                            (float) image.getPosition().getX(),
-//                            (float) image.getPosition().getY()
-////                            (float) image.getPosition().getAbsoluteX(),
-////                            (float) image.getPosition().getAbsoluteY()
-//                    );
-
-                    //for (Shape shape : image.getShapes()) {
-                    for (int i = 0; i < image.getShapes().size(); i++) {
-
-                        Shape shape = image.getShape(i);
-
-                        if (shape.isVisible()) {
-
-                            getCanvas().save();
-
-//                            getCanvas().translate(
-//                                    (float) -shape.getPosition().getX(),
-//                                    (float) -shape.getPosition().getY()
-//                            );
-
-                            getPaint().setStyle(Paint.Style.FILL);
-                            if (shape.hasStyle("color")) {
-                                getPaint().setColor(Color.parseColor(shape.getStyle("color")));
-                            }
-                            shape.draw(viz);
-
-                            if (shape.hasStyle("outlineThickness")) {
-                                if (Double.parseDouble(shape.getStyle("outlineThickness")) > 0) {
-                                    getPaint().setStyle(Paint.Style.STROKE);
-                                    getPaint().setStrokeWidth((float) Double.parseDouble(shape.getStyle("outlineThickness")));
-
-                                    if (shape.hasStyle("outlineColor")) {
-                                        getPaint().setColor(Color.parseColor(shape.getStyle("outlineColor")));
-                                    }
-
-                                    shape.draw(viz);
-                                }
-                            }
-
-                            getCanvas().restore();
+                        getPaint().setStyle(Paint.Style.FILL);
+                        if (shape.hasStyle("color")) {
+                            getPaint().setColor(Color.parseColor(shape.getStyle("color")));
                         }
+                        shape.draw(viz);
+
+                        if (shape.hasStyle("outlineThickness")) {
+                            if (Double.parseDouble(shape.getStyle("outlineThickness")) > 0) {
+                                getPaint().setStyle(Paint.Style.STROKE);
+                                getPaint().setStrokeWidth((float) Double.parseDouble(shape.getStyle("outlineThickness")));
+
+                                if (shape.hasStyle("outlineColor")) {
+                                    getPaint().setColor(Color.parseColor(shape.getStyle("outlineColor")));
+                                }
+
+                                shape.draw(viz);
+                            }
+                        }
+
+                        getCanvas().restore();
+
                     }
-
-                    //image.draw(viz);
-
-                    getCanvas().restore();
                 }
             }
         }
 
-        //Geometry.computeCirclePacking(getFrameImages(), 200, getImages().old_filterType(FrameImage.TYPE).calculateCentroid());
+        for (Image<Port> image : viz.getImages().filterType(Port.class).getList()) {
+            if (image.isVisible()) {
+                for (int i = 0; i < image.getShapes().size(); i++) {
+                    Shape shape = image.getShape(i);
+
+                    if (shape.isVisible()) {
+
+                        getCanvas().save();
+
+                        getPaint().setStyle(Paint.Style.FILL);
+                        if (shape.hasStyle("color")) {
+                            getPaint().setColor(Color.parseColor(shape.getStyle("color")));
+                        }
+                        shape.draw(viz);
+
+                        if (shape.hasStyle("outlineThickness")) {
+                            if (Double.parseDouble(shape.getStyle("outlineThickness")) > 0) {
+                                getPaint().setStyle(Paint.Style.STROKE);
+                                getPaint().setStrokeWidth((float) Double.parseDouble(shape.getStyle("outlineThickness")));
+
+                                if (shape.hasStyle("outlineColor")) {
+                                    getPaint().setColor(Color.parseColor(shape.getStyle("outlineColor")));
+                                }
+
+                                shape.draw(viz);
+                            }
+                        }
+
+                        getCanvas().restore();
+
+                    }
+                }
+            }
+
+            // Draw paths
+            for (Path path : image.getModel().getPaths()) {
+
+                getPaint().setStyle(Paint.Style.FILL);
+                getPaint().setColor(Color.BLACK);
+
+                viz.drawTrianglePath(
+                        viz.getImage(path.getSource()).getPosition(),
+                        viz.getImage(path.getTarget()).getPosition(),
+                        10,
+                        10
+                );
+
+            }
+        }
+
+//        // Draw images
+//        for (Integer id : viz.getLayerIndices()) {
+//            Layer layer = viz.getLayer(id);
+//            if (layer == null) {
+//                break;
+//            }
+//            for (Image image : layer.getImages()) {
+////                Log.v("Image", "drawing image class: " + image.getModel().getClass());
+//
+////                if (image.getModel().getClass() == Frame.class) {
+////                    Image<Frame> img = (Image<Frame>) image;
+////                    img.draw(visualizationSurface);
+////                } else if (image.getModel().getClass() == Frame.class) {
+////                    Image<Port> img = (Image<Port>) image;
+////                    img.draw(visualizationSurface);
+////                }
+//
+//                if (image.isVisible()) {
+//                    getCanvas().save();
+//
+////                    getCanvas().translate(
+////                            (float) image.getPosition().getX(),
+////                            (float) image.getPosition().getY()
+//////                            (float) image.getPosition().getAbsoluteX(),
+//////                            (float) image.getPosition().getAbsoluteY()
+////                    );
+//
+//                    //for (Shape shape : image.getShapes()) {
+//                    for (int i = 0; i < image.getShapes().size(); i++) {
+//
+//                        Shape shape = image.getShape(i);
+//
+//                        if (shape.isVisible()) {
+//
+//                            getCanvas().save();
+//
+////                            getCanvas().translate(
+////                                    (float) -shape.getPosition().getX(),
+////                                    (float) -shape.getPosition().getY()
+////                            );
+//
+//                            getPaint().setStyle(Paint.Style.FILL);
+//                            if (shape.hasStyle("color")) {
+//                                getPaint().setColor(Color.parseColor(shape.getStyle("color")));
+//                            }
+//                            shape.draw(viz);
+//
+//                            if (shape.hasStyle("outlineThickness")) {
+//                                if (Double.parseDouble(shape.getStyle("outlineThickness")) > 0) {
+//                                    getPaint().setStyle(Paint.Style.STROKE);
+//                                    getPaint().setStrokeWidth((float) Double.parseDouble(shape.getStyle("outlineThickness")));
+//
+//                                    if (shape.hasStyle("outlineColor")) {
+//                                        getPaint().setColor(Color.parseColor(shape.getStyle("outlineColor")));
+//                                    }
+//
+//                                    shape.draw(viz);
+//                                }
+//                            }
+//
+//                            getCanvas().restore();
+//                        }
+//                    }
+//
+//                    //image.draw(viz);
+//
+//                    getCanvas().restore();
+//                }
+//            }
+//        }
+
+        //Geometry.computeCirclePacking(getFrameImages(), 200, getImages().old_filterType(old_FrameImage.TYPE).calculateCentroid());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
 
             // <FPS_ANNOTATION>
-            Point fpsPosition = viz.getImages().old_filterType(FrameImage.TYPE).calculateCenter();
+            Point fpsPosition = viz.getImages().old_filterType(old_FrameImage.TYPE).calculateCenter();
             fpsPosition.setY(fpsPosition.getY() - 200);
             getPaint().setColor(Color.RED);
             getPaint().setStyle(Paint.Style.FILL);
@@ -287,7 +369,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            Point centroidPosition = viz.getImages().old_filterType(FrameImage.TYPE).calculateCentroid();
+            Point centroidPosition = viz.getImages().old_filterType(old_FrameImage.TYPE).calculateCentroid();
             getPaint().setColor(Color.RED);
             getPaint().setStyle(Paint.Style.FILL);
             getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, getPaint());
@@ -302,7 +384,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            List<Point> frameImagePositions = viz.getImages().old_filterType(FrameImage.TYPE).getPositions();
+            List<Point> frameImagePositions = viz.getImages().old_filterType(old_FrameImage.TYPE).getPositions();
             Point frameImagesCenterPosition = Geometry.calculateCenter(frameImagePositions);
             getPaint().setColor(Color.RED);
             getPaint().setStyle(Paint.Style.FILL);
@@ -318,7 +400,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
             // </CENTROID_ANNOTATION>
 
             // <CONVEX_HULL>
-            List<Point> framePositions = viz.getImages().old_filterType(FrameImage.TYPE).getPositions();
+            List<Point> framePositions = viz.getImages().old_filterType(old_FrameImage.TYPE).getPositions();
             List<Point> convexHullVertices = Geometry.computeConvexHull(framePositions);
 
             getPaint().setStrokeWidth(1.0f);
@@ -335,7 +417,7 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
             getPaint().setColor(Color.RED);
             getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = viz.getImages().old_filterType(FrameImage.TYPE).calculateBoundingBox();
+            Rectangle boundingBox = viz.getImages().old_filterType(old_FrameImage.TYPE).calculateBoundingBox();
             viz.getPalette().drawShape(boundingBox.getVertices());
             // </BOUNDING_BOX>
         }
@@ -373,8 +455,8 @@ public class VizSurface extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public VizRenderer getRenderer() {
-        return this.vizRenderer;
+    public Renderer getRenderer() {
+        return this.renderer;
     }
 
     private void setCanvas(Canvas canvas) {

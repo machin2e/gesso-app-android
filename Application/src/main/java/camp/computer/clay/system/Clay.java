@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.app.Application;
+import camp.computer.clay.model.data.ImageSet;
 import camp.computer.clay.model.interaction.OnTouchActionListener;
 import camp.computer.clay.model.interaction.Perspective;
 import camp.computer.clay.model.sim.Body;
 import camp.computer.clay.model.interaction.TouchInteraction;
 import camp.computer.clay.model.sim.Frame;
+import camp.computer.clay.model.sim.Path;
 import camp.computer.clay.model.sim.Port;
 import camp.computer.clay.model.sim.Simulation;
 import camp.computer.clay.system.host.CacheHost;
@@ -32,6 +34,8 @@ import camp.computer.clay.viz.arch.OnDrawListener;
 import camp.computer.clay.viz.arch.Visibility;
 import camp.computer.clay.viz.arch.Viz;
 import camp.computer.clay.viz.util.Circle;
+import camp.computer.clay.viz.util.Color;
+import camp.computer.clay.viz.util.Line;
 import camp.computer.clay.viz.util.Point;
 import camp.computer.clay.viz.util.Rectangle;
 import camp.computer.clay.viz.arch.Shape;
@@ -89,7 +93,7 @@ public class Clay {
         // Add body to simulation
         simulation.addBody(body);
 
-        Application.getDisplay().getVizSurface().setViz(viz);
+        Application.getDisplay().getSurface().setViz(viz);
     }
 
     public Simulation getSimulation() {
@@ -134,40 +138,40 @@ public class Clay {
 
         // Ports
         Image portImage = null;
-        portImage = generatePortImage(frame.getPort(0), new Point(-75, 150));
+        portImage = generatePortImage(frame.getPort(0), new Point(-90, 160));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(1), new Point(0, 150));
+        portImage = generatePortImage(frame.getPort(1), new Point(0, 160));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(2), new Point(75, 150));
+        portImage = generatePortImage(frame.getPort(2), new Point(90, 160));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(3), new Point(150, 75));
+        portImage = generatePortImage(frame.getPort(3), new Point(160, 90));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(4), new Point(150, 0));
+        portImage = generatePortImage(frame.getPort(4), new Point(160, 0));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(5), new Point(150, -75));
+        portImage = generatePortImage(frame.getPort(5), new Point(160, -90));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(6), new Point(75, -150));
+        portImage = generatePortImage(frame.getPort(6), new Point(90, -160));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(7), new Point(0, -150));
+        portImage = generatePortImage(frame.getPort(7), new Point(0, -160));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(8), new Point(-75, -150));
+        portImage = generatePortImage(frame.getPort(8), new Point(-90, -160));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(9), new Point(-150, -75));
+        portImage = generatePortImage(frame.getPort(9), new Point(-160, -90));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(10), new Point(-150, 0));
+        portImage = generatePortImage(frame.getPort(10), new Point(-160, 0));
         viz.addImage(portImage, "ports");
 
-        portImage = generatePortImage(frame.getPort(11), new Point(-150, 75));
+        portImage = generatePortImage(frame.getPort(11), new Point(-160, 90));
         viz.addImage(portImage, "ports");
     }
 
@@ -358,7 +362,7 @@ public class Clay {
         return frameImage;
     }
 
-    private Image generatePortImage(Port port, Point position) {
+    private Image generatePortImage(final Port port, Point position) {
 
         final Image<Port> portImage = new Image<>(port);
 
@@ -367,19 +371,28 @@ public class Clay {
         portImage.getPosition().setReferencePoint(frameImage.getPosition());
         portImage.getPosition().setRelative(position);
 
-        // Shapes
-        final Shape portShape = new Circle(new Point(0, 0), 30);
+        // Port shape
+        final Shape portShape = new Circle(new Point(0, 0), 40);
         portShape.setRotation(0);
         portShape.setStyle("color", "#ffefefef");
         portShape.setStyle("outlineColor", "#ff000000");
         portShape.setStyle("outlineThickness", "0");
+        portImage.addShape(portShape);
+
+        // Shapes
+        final Shape candidateTargetPortShape = new Circle(new Point(0, 0), 40);
+        candidateTargetPortShape.setRotation(0);
+        candidateTargetPortShape.setStyle("color", "#ffefefef");
+        candidateTargetPortShape.setStyle("outlineColor", "#ff000000");
+        candidateTargetPortShape.setStyle("outlineThickness", "0");
+        portImage.addShape(candidateTargetPortShape);
+
+        final Line candidatePathLine = new Line(portImage.getPosition(), candidateTargetPortShape.getPosition());
 
         portImage.setVisibility(Visibility.INVISIBLE);
 
-        portImage.addShape(portShape);
-
         // Interaction
-        portShape.setOnTouchActionListener(new OnTouchActionListener() {
+        candidateTargetPortShape.setOnTouchActionListener(new OnTouchActionListener() {
             @Override
             public void onAction(TouchInteraction touchInteraction) {
 
@@ -395,16 +408,52 @@ public class Clay {
                     case DRAG:
                         Log.v("Touch", "portShape.onDrag");
 
-                        portShape.setPosition(touchInteraction.getPosition());
+                        candidateTargetPortShape.setPosition(touchInteraction.getPosition());
+
+                        // Hide all ports
+                        ImageSet frameImagesToHide = viz.getImages()
+                                .filterType(Frame.class)
+                                .remove(frameImage);
+
+                        for (Frame frame : frameImagesToHide.getModels(Frame.class)) {
+                            viz.getImages(frame.getPorts()).setVisibility(Visibility.INVISIBLE);
+                        }
+
+                        // Show ports of nearby frames
+                        ImageSet nearbyFrameImages = viz.getImages()
+                                .filterType(Frame.class)
+                                .filterDistance(candidateTargetPortShape.getPosition(), 200);
+
+                        for (Frame frame : nearbyFrameImages.getModels(Frame.class)) {
+                            viz.getImages(frame.getPorts()).setVisibility(Visibility.VISIBLE);
+                        }
 
                         break;
 
                     case RELEASE:
                         Log.v("Touch", "portShape.onRelease");
+
+                        candidateTargetPortShape.setPosition(portShape.getPosition());
+
+                        // Get target port (if any)
+                        Image<Port> nearestPortImage = viz.getImages()
+                                .filterType(Port.class)
+                                .getNearest(touchInteraction.getPosition());
+                                //.getAt(touchInteraction.getPosition());
+                        Log.v("Touching", "nearestPortImage: " + nearestPortImage);
+
+                        // Add path
+                        if (nearestPortImage != null) {
+                            Path path = new Path(port, nearestPortImage.getModel());
+                            port.addPath(path);
+                        }
+
                         break;
 
                     case TAP:
                         Log.v("Touch", "portShape.onTap");
+
+                        candidateTargetPortShape.setPosition(portShape.getPosition());
 
                         portImage.setVisibility(Visibility.INVISIBLE);
 
