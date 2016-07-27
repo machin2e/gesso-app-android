@@ -56,7 +56,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_FULLSCREEN = false;
     // </Style>
 
-    public VizSurface vizSurface;
+    public Surface surface;
 
     private SpeechGenerator speechGenerator;
 
@@ -132,8 +132,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         setContentView(R.layout.activity_main);
 
         // Viz Surface
-        vizSurface = (VizSurface) findViewById(R.id.app_surface_view);
-        vizSurface.onResume();
+        surface = (Surface) findViewById(R.id.app_surface_view);
+        surface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
@@ -691,7 +691,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onPause();
 
         // <VISUALIZATION>
-        vizSurface.onPause();
+        surface.onPause();
         // </VISUALIZATION>
     }
 
@@ -707,7 +707,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // <VISUALIZATION>
-        vizSurface.onResume();
+        surface.onResume();
         // </VISUALIZATION>
     }
 
@@ -766,12 +766,12 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return Application.applicationView;
     }
 
-    public VizSurface getVizSurface() {
-        return this.vizSurface;
+    public Surface getSurface() {
+        return this.surface;
     }
 
     public double getFramesPerSecond() {
-        return getVizSurface().getRenderer().getFramesPerSecond();
+        return getSurface().getRenderer().getFramesPerSecond();
     }
 
     public SpeechGenerator getSpeechGenerator() {

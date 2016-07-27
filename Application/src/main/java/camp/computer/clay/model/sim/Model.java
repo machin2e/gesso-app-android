@@ -3,7 +3,7 @@ package camp.computer.clay.model.sim;
 import java.util.UUID;
 
 public abstract class Model {
-
+    
     private UUID uuid = UUID.randomUUID();
 
     // TODO: UUID.

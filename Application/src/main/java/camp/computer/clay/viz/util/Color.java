@@ -3,7 +3,8 @@ package camp.computer.clay.viz.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.viz.img.PortImage;
+import camp.computer.clay.viz.arch.Image;
+import camp.computer.clay.viz.img.old_PortImage;
 
 public abstract class Color {
 
@@ -21,17 +22,17 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<PortImage, Integer> colorMap = new HashMap<PortImage, Integer>();
+    private static HashMap<Image, Integer> colorMap = new HashMap<>();
 
-    public static int getUniqueColor(PortImage portSprite) {
+    public static int getUniqueColor(Image image) {
 
-        if (colorMap.containsKey(portSprite)) {
-            return colorMap.get(portSprite);
+        if (colorMap.containsKey(image)) {
+            return colorMap.get(image);
         }
 
         for (int i = 0; i < PATH_COLOR_PALETTE.length; i++) {
             if (!colorMap.containsValue(PATH_COLOR_PALETTE[i])) {
-                colorMap.put(portSprite, PATH_COLOR_PALETTE[i]);
+                colorMap.put(image, PATH_COLOR_PALETTE[i]);
                 return PATH_COLOR_PALETTE[i];
             }
         }
@@ -43,7 +44,7 @@ public abstract class Color {
             int blue = 30 + random.nextInt(225);
             int randomColor = android.graphics.Color.rgb(red, green, blue);
             if (!colorMap.containsValue(randomColor)) {
-                colorMap.put(portSprite, randomColor);
+                colorMap.put(image, randomColor);
                 return randomColor;
             }
         }

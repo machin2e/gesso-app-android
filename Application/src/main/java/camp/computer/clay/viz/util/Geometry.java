@@ -15,7 +15,7 @@ public abstract class Geometry {
      * @return The distance between points {@code a} and {@code b}.
      */
     public static double calculateDistance(Point a, Point b) {
-        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getX() - b.getX(), 2));
+        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
     }
 
     /**
@@ -430,7 +430,7 @@ public abstract class Geometry {
 //            sortedPositions.get(i).setX(sortedPositions.get(i).getX() - v.getX());
 //            sortedPositions.get(i).setY(sortedPositions.get(i).getY() - v.getY());
 //
-//            ((FrameImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
+//            ((old_FrameImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
 ////            }
 //        }
 //

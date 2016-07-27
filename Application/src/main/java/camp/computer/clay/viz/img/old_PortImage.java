@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import camp.computer.clay.app.VizSurface;
+import camp.computer.clay.app.Surface;
 import camp.computer.clay.model.interaction.OnTouchActionListener;
 import camp.computer.clay.model.sim.Frame;
 import camp.computer.clay.model.sim.Path;
@@ -21,7 +21,7 @@ import camp.computer.clay.viz.util.Geometry;
 import camp.computer.clay.viz.util.Point;
 import camp.computer.clay.viz.util.Rectangle;
 
-public class PortImage extends Image {
+public class old_PortImage extends Image {
 
     public final static String TYPE = "port";
 
@@ -66,7 +66,7 @@ public class PortImage extends Image {
     private boolean isCandidatePathVisible = false;
     private Point candidatePathDestinationPosition = new Point(40, 80);
 
-    public PortImage(Port port) {
+    public old_PortImage(Port port) {
         super(port);
         setType(TYPE);
         setup();
@@ -84,18 +84,18 @@ public class PortImage extends Image {
         }
     }
 
-    public FrameImage getFrameImage() {
-        return (FrameImage) getParentImage();
+    public old_FrameImage getFrameImage() {
+        return (old_FrameImage) getParentImage();
     }
 
-    public List<PathImage> getPathImages() {
-        List<PathImage> pathImages = new ArrayList<>();
+    public List<old_PathImage> getPathImages() {
+        List<old_PathImage> oldPathImages = new ArrayList<>();
         for (Path path: getPort().getPaths()) {
-            PathImage pathImage = (PathImage) getViz().getImage(path);
-            pathImages.add(pathImage);
+            old_PathImage oldPathImage = (old_PathImage) getViz().getImage(path);
+            oldPathImages.add(oldPathImage);
         }
 
-        return pathImages;
+        return oldPathImages;
     }
 
     public int getUniqueColor() {
@@ -111,49 +111,49 @@ public class PortImage extends Image {
     }
 
     public void showPaths() {
-        for (PathImage pathImage: getPathImages()) {
-            pathImage.showDocks = false;
+        for (old_PathImage oldPathImage : getPathImages()) {
+            oldPathImage.showDocks = false;
 
             // Deep
-            PortImage targetPortImage = (PortImage) getViz().getImage(pathImage.getPath().getTarget());
-            targetPortImage.showPaths();
+            old_PortImage targetOldPortImage = (old_PortImage) getViz().getImage(oldPathImage.getPath().getTarget());
+            targetOldPortImage.showPaths();
         }
     }
 
     public void showDocks() {
-        for (PathImage pathImage: getPathImages()) {
-            pathImage.showDocks = true;
+        for (old_PathImage oldPathImage : getPathImages()) {
+            oldPathImage.showDocks = true;
 
             // Deep
-            PortImage targetPortImage = (PortImage) getViz().getImage(pathImage.getPath().getTarget());
-            targetPortImage.showDocks();
+            old_PortImage targetOldPortImage = (old_PortImage) getViz().getImage(oldPathImage.getPath().getTarget());
+            targetOldPortImage.showDocks();
         }
     }
 
-    public void draw(VizSurface vizSurface) {
+    public void draw(Surface surface) {
         if (isVisible()) {
             // Image
-            drawShape(vizSurface);
-            drawStyle(vizSurface);
-            drawData(vizSurface);
-            drawAnnotation(vizSurface);
+            drawShape(surface);
+            drawStyle(surface);
+            drawData(surface);
+            drawAnnotation(surface);
 
             // Draw children sprites
-            drawCandidatePathImages(vizSurface);
+            drawCandidatePathImages(surface);
         }
     }
 
     /**
      * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
      * placeholder for the sprite.
-     * @param vizSurface
+     * @param surface
      */
-    public void drawShape(VizSurface vizSurface) {
+    public void drawShape(Surface surface) {
 
         if (showShapeLayer) {
 
-            Canvas canvas = vizSurface.getCanvas();
-            Paint paint = vizSurface.getPaint();
+            Canvas canvas = surface.getCanvas();
+            Paint paint = surface.getPaint();
 
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
@@ -174,14 +174,14 @@ public class PortImage extends Image {
 
     /**
      * Draws the sprite's detail front layer.
-     * @param vizSurface
+     * @param surface
      */
-    public void drawStyle(VizSurface vizSurface) {
+    public void drawStyle(Surface surface) {
 
         if (showStyleLayer) {
 
-            Canvas canvas = vizSurface.getCanvas();
-            Paint paint = vizSurface.getPaint();
+            Canvas canvas = surface.getCanvas();
+            Paint paint = surface.getPaint();
 
             if (getPort().getType() != Port.Type.NONE) {
 
@@ -208,14 +208,14 @@ public class PortImage extends Image {
 
     /**
      * Draws the sprite's data layer.
-     * @param vizSurface
+     * @param surface
      */
-    private void drawData(VizSurface vizSurface) {
+    private void drawData(Surface surface) {
 
         if (showDataLayer) {
 
-            Canvas canvas = vizSurface.getCanvas();
-            Paint paint = vizSurface.getPaint();
+            Canvas canvas = surface.getCanvas();
+            Paint paint = surface.getPaint();
 
             Port port = (Port) getModel();
 
@@ -286,14 +286,14 @@ public class PortImage extends Image {
 
     /**
      * Draws the sprite's annotation layer. Contains labels and other text.
-     * @param vizSurface
+     * @param surface
      */
-    public void drawAnnotation(VizSurface vizSurface) {
+    public void drawAnnotation(Surface surface) {
 
         if (showAnnotationLayer) {
 
-            Canvas canvas = vizSurface.getCanvas();
-            Paint paint = vizSurface.getPaint();
+            Canvas canvas = surface.getCanvas();
+            Paint paint = surface.getPaint();
 
             // Geometry
             Point labelPosition = new Point();
@@ -373,60 +373,60 @@ public class PortImage extends Image {
 
         // <TODO>
         // TODO: Replace this with getParentSpriteBounds() -- get bounding box based on parent sprite's shape and orientation (to get width and height)
-        FrameImage frameImage = (FrameImage) getParentImage();
-        Frame frame = frameImage.getFrame();
+        old_FrameImage oldFrameImage = (old_FrameImage) getParentImage();
+        Frame frame = oldFrameImage.getFrame();
         // </TODO>
 
         // Ports
         double portRadius = 40.0f;
         Point[] relativePortPositions = new Point[frame.getPorts().size()];
         relativePortPositions[0] = new Point(
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                +1 * ((frameImage.boardWidth/ 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                -1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES),
+                +1 * ((oldFrameImage.boardWidth/ 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[1] = new Point(
                 0,
-                +1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                +1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[2] = new Point(
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                +1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                +1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES),
+                +1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[3] = new Point(
-                +1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+                +1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES)
         );
         relativePortPositions[4] = new Point(
-                +1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius),
                 0
         );
         relativePortPositions[5] = new Point(
-                +1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+                +1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES)
         );
         relativePortPositions[6] = new Point(
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                -1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                +1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES),
+                -1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[7] = new Point(
                 0,
-                -1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                -1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[8] = new Point(
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                -1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                -1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES),
+                -1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius)
         );
         relativePortPositions[9] = new Point(
-                -1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+                -1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES)
         );
         relativePortPositions[10] = new Point(
-                -1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                -1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius),
                 0
         );
         relativePortPositions[11] = new Point(
-                -1 * ((frameImage.boardWidth / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+                -1 * ((oldFrameImage.boardWidth / 2.0f) + old_PortImage.DISTANCE_FROM_BOARD + portRadius),
+                +1 * ((portRadius * 2) + old_PortImage.DISTANCE_BETWEEN_NODES)
         );
 
         relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
@@ -459,20 +459,20 @@ public class PortImage extends Image {
     }
 
     public void setPathVisibility (Visibility visibility) {
-        for (PathImage pathImage: getPathImages()) {
-            if (pathImage != null) {
-                pathImage.setVisibility(visibility);
+        for (old_PathImage oldPathImage : getPathImages()) {
+            if (oldPathImage != null) {
+                oldPathImage.setVisibility(visibility);
 
                 // Deep
-                PortImage targetPortImage = (PortImage) getViz().getImage(pathImage.getPath().getTarget());
-                targetPortImage.setVisibility(visibility);
+                old_PortImage targetOldPortImage = (old_PortImage) getViz().getImage(oldPathImage.getPath().getTarget());
+                targetOldPortImage.setVisibility(visibility);
             }
         }
     }
 
     public boolean hasVisiblePaths () {
-        for (PathImage pathImage: getPathImages()) {
-            if (pathImage.isVisible() && !pathImage.showDocks) {
+        for (old_PathImage oldPathImage : getPathImages()) {
+            if (oldPathImage.isVisible() && !oldPathImage.showDocks) {
                 return true;
             }
         }
@@ -482,28 +482,28 @@ public class PortImage extends Image {
     public boolean hasVisibleAncestorPaths() {
         List<Path> ancestorPaths = getPort().getAncestorPaths();
         for (Path ancestorPath: ancestorPaths) {
-            PathImage pathImage = (PathImage) getViz().getImage(ancestorPath);
-            if (pathImage.isVisible() && !pathImage.showDocks) {
+            old_PathImage oldPathImage = (old_PathImage) getViz().getImage(ancestorPath);
+            if (oldPathImage.isVisible() && !oldPathImage.showDocks) {
                 return true;
             }
         }
         return false;
     }
 
-    public List<PathImage> getVisiblePaths() {
-        List<PathImage> visiblePathImages = new ArrayList<>();
-        for (PathImage pathImage: getPathImages()) {
-            if (pathImage.isVisible()) {
-                visiblePathImages.add(pathImage);
+    public List<old_PathImage> getVisiblePaths() {
+        List<old_PathImage> visibleOldPathImages = new ArrayList<>();
+        for (old_PathImage oldPathImage : getPathImages()) {
+            if (oldPathImage.isVisible()) {
+                visibleOldPathImages.add(oldPathImage);
             }
         }
-        return visiblePathImages;
+        return visibleOldPathImages;
     }
 
     @Override
     public boolean isTouching(Point point) {
         if (isVisible()) {
-            return (Geometry.calculateDistance(point, getPosition()) < (shapeRadius + PortImage.DISTANCE_BETWEEN_NODES));
+            return (Geometry.calculateDistance(point, getPosition()) < (shapeRadius + old_PortImage.DISTANCE_BETWEEN_NODES));
         } else {
             return false;
         }
@@ -545,10 +545,10 @@ public class PortImage extends Image {
 
                 // Remove focus from other machines and their ports.
                 for (Image image : getViz().getImages().filterType(Frame.class).getList()) {
-                    FrameImage frameImage = (FrameImage) image;
-                    frameImage.setTransparency(0.05f);
-                    frameImage.hidePortImages();
-                    frameImage.hidePathImages();
+                    old_FrameImage oldFrameImage = (old_FrameImage) image;
+                    oldFrameImage.setTransparency(0.05f);
+                    oldFrameImage.hidePortImages();
+                    oldFrameImage.hidePathImages();
                 }
 
                 // Reduce focus on the machine
@@ -564,9 +564,9 @@ public class PortImage extends Image {
                 for (Path connectedPath : paths) {
                     // Show ports
                     getViz().getImage(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
-                    ((PortImage) getViz().getImage(connectedPath.getSource())).showPaths();
+                    ((old_PortImage) getViz().getImage(connectedPath.getSource())).showPaths();
                     getViz().getImage(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
-                    ((PortImage) getViz().getImage(connectedPath.getTarget())).showPaths();
+                    ((old_PortImage) getViz().getImage(connectedPath.getTarget())).showPaths();
                     // Show path
                     getViz().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
                 }
@@ -576,7 +576,7 @@ public class PortImage extends Image {
                 // Perspective
                 List<Port> pathPorts = port.getPortsByPath(paths);
                 List<Point> pathPortPositions = getViz().getImages(pathPorts).getPositions();
-                // List<Point> pathPortPositions = getViz().getImages().old_filterType(PortImage.TYPE).getPositions();
+                // List<Point> pathPortPositions = getViz().getImages().old_filterType(old_PortImage.TYPE).getPositions();
                 Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
                 getViz().getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(boundingBox);
 
@@ -601,10 +601,6 @@ public class PortImage extends Image {
 
         } else if (touchInteraction.getType() == OnTouchActionListener.Type.HOLD) {
             // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == OnTouchActionListener.Type.MOVE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == OnTouchActionListener.Type.TWITCH) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
         } else if (touchInteraction.getType() == OnTouchActionListener.Type.DRAG) {
 
             Log.v("onHoldListener", "Port draggin!");
@@ -644,13 +640,13 @@ public class PortImage extends Image {
     }
 
     // TODO: Make this into a shape and put this on a separate layer!
-    public void drawCandidatePathImages(VizSurface vizSurface) {
+    public void drawCandidatePathImages(Surface surface) {
         if (isCandidatePathVisible) {
 
             if (getPort().getType() != Port.Type.NONE) {
 
-                Canvas canvas = vizSurface.getCanvas();
-                Paint paint = vizSurface.getPaint();
+                Canvas canvas = surface.getCanvas();
+                Paint paint = surface.getPaint();
 
                 double triangleWidth = 20;
                 double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);

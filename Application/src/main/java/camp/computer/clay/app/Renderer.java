@@ -3,11 +3,11 @@ package camp.computer.clay.app;
 import camp.computer.clay.viz.util.Time;
 
 /**
- * VizRenderer is a background thread that periodically updates the visualization state
+ * Renderer is a background thread that periodically updates the visualization state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
  * visualization's state then re-rendering it.
  */
-public class VizRenderer extends Thread {
+public class Renderer extends Thread {
 
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
@@ -21,13 +21,13 @@ public class VizRenderer extends Thread {
     private int targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
     // </SETTINGS>
 
-    private VizSurface vizSurface;
+    private Surface surface;
 
     private boolean isRunning = false;
 
-    VizRenderer(VizSurface vizSurface) {
+    Renderer(Surface surface) {
         super();
-        this.vizSurface = vizSurface;
+        this.surface = surface;
     }
 
     public void setRunning (boolean isRunning) {
@@ -54,7 +54,7 @@ public class VizRenderer extends Thread {
             frameStartTime = Time.getCurrentTime();
 
             // Advance the visualization state
-            vizSurface.generate();
+            surface.generate();
 
             frameStopTime = Time.getCurrentTime();
 
