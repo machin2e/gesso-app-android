@@ -118,14 +118,14 @@ public class CacheHost {
         if (getClay().hasStore()) {
             Log.v("Content_Manager", "populateCache");
 
-            // Restore behavior scripts and addFrame them to the cache
+            // Restore behavior scripts and addDevice them to the cache
             getClay().getStore().restoreScripts();
             Log.v("Content_Manager", "Restored behavior scripts:");
             for (Script script : getClay().getCache().getScripts()) {
                 Log.v("Content_Manager", "\t" + script.getUuid());
             }
 
-            // Restore actions and addFrame them to the cache
+            // Restore actions and addDevice them to the cache
             getClay().getStore().restoreActions();
             Log.v("Content_Manager", "Restored actions:");
             for (Action action : getClay().getCache().getActions()) {

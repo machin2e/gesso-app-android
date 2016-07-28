@@ -2,6 +2,7 @@ package camp.computer.clay.system.host;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class MessageHost {
     Handler handler = new Handler() {
         @Override
         public void handleMessage (android.os.Message msg) {
-//            Log.v("Clay_Time", "addFrame called");
+//            Log.v("Clay_Time", "addDevice called");
 
             // Process the incoming message's data.
             Bundle bundle = msg.getData();
@@ -196,21 +197,20 @@ public class MessageHost {
             String[] messageTokens = message.getContent().split(" ");
 
             if (messageTokens.length == 3) {
+                String unitUuid = new String (messageTokens[2]);
+                String unitAddress = message.getSourceAddress(); // messageTokens[5];
 
-                String frameUuidString = new String (messageTokens[2]);
-                String frameInternetAddressString = message.getSourceAddress(); // messageTokens[5];
-
-                if (!getClay ().hasDeviceByAddress(frameInternetAddressString)) {
+                if (!getClay ().hasDeviceByAddress(unitAddress)) {
 
 //                    Log.v("UDP", "Adding Clay " + unitUuid + " with address " + unitAddress);
-                    UUID frameUuid = UUID.fromString(frameUuidString);
-                    getClay().addFrame(frameUuid, frameInternetAddressString);
+                    UUID deviceUuid = UUID.fromString(unitUuid);
+                    getClay().addDevice(deviceUuid, unitAddress);
 
                 } else {
 //                    Log.v("Clay", "Updating state of existing Device with address " + unitAddress);
 
-                    UUID frameUuid = UUID.fromString(frameUuidString);
-                    Device device = getClay().getDeviceByUuid(frameUuid);
+                    UUID deviceUuid = UUID.fromString(unitUuid);
+                    Device device = getClay().getDeviceByUuid(deviceUuid);
                 }
             }
 

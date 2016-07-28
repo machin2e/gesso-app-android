@@ -10,7 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import camp.computer.clay.app.Application;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.system.old_model.Message;
 import camp.computer.clay.system.host.util.CRC16;
 

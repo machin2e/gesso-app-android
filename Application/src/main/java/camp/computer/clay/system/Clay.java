@@ -6,17 +6,14 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.app.Application;
-import camp.computer.clay.model.interaction.OnTouchActionListener;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.model.interaction.Perspective;
-import camp.computer.clay.model.sim.Body;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.model.sim.Frame;
-import camp.computer.clay.model.sim.Port;
-import camp.computer.clay.model.sim.Simulation;
+import camp.computer.clay.model.interaction.Body;
+import camp.computer.clay.model.simulation.Frame;
+import camp.computer.clay.model.simulation.Port;
+import camp.computer.clay.model.simulation.Simulation;
 import camp.computer.clay.system.host.CacheHost;
 import camp.computer.clay.system.host.DisplayHostInterface;
 import camp.computer.clay.system.host.MessageHost;
@@ -27,14 +24,9 @@ import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.old_model.Descriptor;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.old_model.Event;
-import camp.computer.clay.viz.arch.Image;
-import camp.computer.clay.viz.arch.OnDrawListener;
-import camp.computer.clay.viz.arch.Visibility;
-import camp.computer.clay.viz.arch.Viz;
-import camp.computer.clay.viz.util.Circle;
-import camp.computer.clay.viz.util.Point;
-import camp.computer.clay.viz.util.Rectangle;
-import camp.computer.clay.viz.arch.Shape;
+import camp.computer.clay.visualization.architecture.Layer;
+import camp.computer.clay.visualization.architecture.Visualization;
+import camp.computer.clay.visualization.images.FrameImage;
 
 public class Clay {
 
@@ -50,19 +42,17 @@ public class Clay {
 
     private Simulation simulation;
 
-    private Viz viz;
+    private Visualization visualization;
 
-    /**
-     * List of the discovered touchscreen devices
-     */
-    private List<DisplayHostInterface> displays;
+    // Group of discovered touchscreen devices
+    private ArrayList<DisplayHostInterface> displays;
 
     // Group of discovered devices
-    private List<Device> devices = new ArrayList<>();
+    private ArrayList<Device> devices = new ArrayList<Device>();
 
     public Clay() {
 
-        this.displays = new ArrayList<>(); // Create list to storeHost displays
+        this.displays = new ArrayList<DisplayHostInterface>(); // Create list to storeHost displays.
 
         this.messageHost = new MessageHost(this); // Start the communications systems
 
@@ -78,357 +68,90 @@ public class Clay {
         // Simulation
         this.simulation = new Simulation();
 
-        // Viz
-        this.viz = new Viz(simulation);
+        // Visualization
+        this.visualization = new Visualization (simulation);
+
+//        initializeSimulation();
 
         // Create body and set perspective
         Body body = new Body();
-        Perspective perspective = new Perspective(viz);
+        Perspective perspective = new Perspective(visualization);
         body.setPerspective(perspective);
 
         // Add body to simulation
         simulation.addBody(body);
 
-        Application.getDisplay().getVizSurface().setViz(viz);
+        Application.getDisplay().getVisualizationSurface().setVisualization(visualization);
+
+        simulateForm();
+        simulateForm();
+        simulateForm();
+
     }
 
-    public Simulation getSimulation() {
+    public Simulation getSimulation () {
         return this.simulation;
     }
 
-    public Viz getViz() {
-        return this.viz;
+    public Visualization getVisualization () {
+        return this.visualization;
     }
 
-    public void generateFrame(UUID uuid) {
+//    private void initializeSimulation() {
+//
+//        final int SIMULATED_FORM_COUNT = Number.generateRandomInteger(5, 10);
+//
+//        // <FORM_CONFIGURATION>
+//        // TODO: Read this from the device (or look up from form UUID). It will be encoded on
+//        // TODO: (cont'd) the device.
+//        final int PORT_COUNT = 12;
+//        // </FORM_CONFIGURATION>
+//
+//        // TODO: Move Simulation/Frame this into Simulation or _Ecology (in Simulation) --- maybe combine Simulation+_Ecology
+//        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//        int letterIndex = 0;
+//        for (int i = 0; i < SIMULATED_FORM_COUNT; i++) {
+//            Frame form = new Frame();
+//            for (int j = 0; j < PORT_COUNT; j++) {
+//                Port port = new Port();
+//                form.addPort(port);
+//
+//                form.addTag(alphabet.substring(letterIndex, letterIndex + 1));
+//                letterIndex = letterIndex % alphabet.length();
+//            }
+//            simulation.addForm(form);
+//        }
+//    }
 
-        // Description
-        // TODO: Read this from the physical frame description and look up configuration in store.
+    private void simulateForm() {
+
+        // <FORM_CONFIGURATION>
+        // TODO: Read this from the device (or look up from frame UUID). It will be encoded on
+        // TODO: (cont'd) the device.
         final int PORT_COUNT = 12;
+        // </FORM_CONFIGURATION>
 
-        // Model
-        final Frame frame = new Frame();
-
-        frame.setUuid(uuid);
+        Frame frame = new Frame();
 
         for (int j = 0; j < PORT_COUNT; j++) {
             Port port = new Port();
             frame.addPort(port);
         }
 
-        // Simulation
-        simulation.addFrame(frame);
-
-        // Image
-        Image frameImage = generateFrameImage(frame);
-
-        if (viz.getImages().filterType(Frame.class).getList().size() == 0) {
-            frameImage.setPosition(new Point(0, 0));
-        } else if (viz.getImages().filterType(Frame.class).getList().size() == 1) {
-            frameImage.setPosition(new Point(300, -300));
-        } else if (viz.getImages().filterType(Frame.class).getList().size() == 2) {
-            frameImage.setPosition(new Point(-300, 300));
-        }
-
-        viz.addImage(frameImage, "frames");
-
-        // Ports
-        Image portImage = null;
-        portImage = generatePortImage(frame.getPort(0), new Point(-75, 150));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(1), new Point(0, 150));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(2), new Point(75, 150));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(3), new Point(150, 75));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(4), new Point(150, 0));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(5), new Point(150, -75));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(6), new Point(75, -150));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(7), new Point(0, -150));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(8), new Point(-75, -150));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(9), new Point(-150, -75));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(10), new Point(-150, 0));
-        viz.addImage(portImage, "ports");
-
-        portImage = generatePortImage(frame.getPort(11), new Point(-150, 75));
-        viz.addImage(portImage, "ports");
-    }
-
-    private static double CENTIMETERS_PER_PIXEL = 2.54;
-
-    private Image generateFrameImage(final Frame frame) {
-
-        final Image<Frame> frameImage = new Image<>(frame);
-
-        // Port Groups (i.e., Headers)
-        // Dimensions: (2.41 mm, 8.13 mm)
-        // Width equation: 2.54 mm * <Number> + 0.51 mm
-        Shape portGroupShape = null;
-        portGroupShape = new Rectangle(new Point(0, 103), 81.3 / CENTIMETERS_PER_PIXEL, 24.1 / CENTIMETERS_PER_PIXEL);
-        portGroupShape.setRotation(0);
-        portGroupShape.setStyle("color", "#ff3b3b3b");
-        portGroupShape.setStyle("outlineColor", "#ff414141");
-        portGroupShape.setStyle("outlineThickness", "0");
-        frameImage.addShape(portGroupShape);
-
-        portGroupShape = new Rectangle(new Point(103, 0), 24.1 / CENTIMETERS_PER_PIXEL, 81.3 / CENTIMETERS_PER_PIXEL);
-        portGroupShape.setRotation(0);
-        portGroupShape.setStyle("color", "#ff3b3b3b");
-        portGroupShape.setStyle("outlineColor", "#ff414141");
-        portGroupShape.setStyle("outlineThickness", "0");
-        frameImage.addShape(portGroupShape);
-
-        portGroupShape = new Rectangle(new Point(0, -103), 81.3 / CENTIMETERS_PER_PIXEL, 24.1 / CENTIMETERS_PER_PIXEL);
-        portGroupShape.setRotation(0);
-        portGroupShape.setStyle("color", "#ff3b3b3b");
-        portGroupShape.setStyle("outlineColor", "#ff414141");
-        portGroupShape.setStyle("outlineThickness", "0");
-        frameImage.addShape(portGroupShape);
-
-        portGroupShape = new Rectangle(new Point(-103, 0), 24.1 / CENTIMETERS_PER_PIXEL, 81.3 / CENTIMETERS_PER_PIXEL);
-        portGroupShape.setRotation(0);
-        portGroupShape.setStyle("color", "#ff3b3b3b");
-        portGroupShape.setStyle("outlineColor", "#ff414141");
-        portGroupShape.setStyle("outlineThickness", "0");
-        frameImage.addShape(portGroupShape);
-
-        // Board
-        // Dimensions: (5.08 cm, 5.08 cm)
-        final Shape boardShape = new Rectangle(new Point(0, 0), 508 / CENTIMETERS_PER_PIXEL, 508 / CENTIMETERS_PER_PIXEL);
-        boardShape.setRotation(0);
-        boardShape.setStyle("color", "#fff7f7f7");
-        boardShape.setStyle("outlineColor", "#ff414141");
-        boardShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(boardShape);
-
-        boardShape.setOnTouchActionListener(new OnTouchActionListener() {
-            @Override
-            public void onAction(TouchInteraction touchInteraction) {
-
-                switch (touchInteraction.getType()) {
-                    case TOUCH:
-                        Log.v("Touch", "boardShape.onAction");
-                        break;
-
-                    case HOLD:
-                        Log.v("Touch", "boardShape.onHold");
-                        break;
-
-                    case DRAG:
-                        Log.v("Touch", "boardShape.onDrag");
-                        frameImage.setPosition(touchInteraction.getPosition());
-//                        boardShape.setPosition(touchInteraction.getPosition());
-                        break;
-
-                    case RELEASE:
-                        Log.v("Touch", "boardShape.onRelease");
-                        break;
-
-                    case TAP:
-                        Log.v("Touch", "boardShape.onTap");
-
-                        // Show Ports
-                        for (Port port : frame.getPorts()) {
-                            viz.getImage(port).setVisibility(Visibility.VISIBLE);
-                        }
-
-                        break;
-                }
-            }
-        });
-
-        // Lights
-        // Dimensions: (1.60 mm, 2.10 mm)
-        Shape lightShape = null;
-        lightShape = new Rectangle(new Point(-11, 89), 16.0 / CENTIMETERS_PER_PIXEL, 25.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(0, 89), 16.0 / CENTIMETERS_PER_PIXEL, 25.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(11, 89), 16.0 / CENTIMETERS_PER_PIXEL, 25.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(89, 11), 25.0 / CENTIMETERS_PER_PIXEL, 16.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(89, 0), 25.0 / CENTIMETERS_PER_PIXEL, 16.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(89, -11), 25.0 / CENTIMETERS_PER_PIXEL, 16.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(11, -89), 16.0 / CENTIMETERS_PER_PIXEL, 25.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(0, -89), 16.0 / CENTIMETERS_PER_PIXEL, 25.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(-11, -89), 16.0 / CENTIMETERS_PER_PIXEL, 25.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(-89, -11), 25.0 / CENTIMETERS_PER_PIXEL, 16.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(-89, 0), 25.0 / CENTIMETERS_PER_PIXEL, 16.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        lightShape = new Rectangle(new Point(-89, 11), 25.0 / CENTIMETERS_PER_PIXEL, 16.0 / CENTIMETERS_PER_PIXEL);
-        lightShape.setRotation(0);
-        lightShape.setStyle("color", "#ffe7e7e7");
-        lightShape.setStyle("outlineColor", "#ff414141");
-        lightShape.setStyle("outlineThickness", "1");
-        frameImage.addShape(lightShape);
-
-        frameImage.setOnDrawListener(new OnDrawListener() {
-            @Override
-            public void onUpdate(Viz viz) {
-
-            }
-
-            @Override
-            public void onDraw(Viz viz) {
-                for (int i = 0; i < frameImage.getShapes().size(); i++) {
-                    frameImage.getShape(i).draw(viz);
-                }
-            }
-        });
-
-        return frameImage;
-    }
-
-    private Image generatePortImage(Port port, Point position) {
-
-        final Image<Port> portImage = new Image<>(port);
-
-        // Offset the image relative to the parent frame
-        final Image<Frame> frameImage = viz.getImage(port.getFrame());
-        portImage.getPosition().setReferencePoint(frameImage.getPosition());
-        portImage.getPosition().setRelative(position);
-
-        // Shapes
-        final Shape portShape = new Circle(new Point(0, 0), 30);
-        portShape.setRotation(0);
-        portShape.setStyle("color", "#ffefefef");
-        portShape.setStyle("outlineColor", "#ff000000");
-        portShape.setStyle("outlineThickness", "0");
-
-        portImage.setVisibility(Visibility.INVISIBLE);
-
-        portImage.addShape(portShape);
-
-        // Interaction
-        portShape.setOnTouchActionListener(new OnTouchActionListener() {
-            @Override
-            public void onAction(TouchInteraction touchInteraction) {
-
-                switch (touchInteraction.getType()) {
-                    case TOUCH:
-                        Log.v("Touch", "portShape.onAction");
-                        break;
-
-                    case HOLD:
-                        Log.v("Touch", "portShape.onHold");
-                        break;
-
-                    case DRAG:
-                        Log.v("Touch", "portShape.onDrag");
-
-                        portShape.setPosition(touchInteraction.getPosition());
-
-                        break;
-
-                    case RELEASE:
-                        Log.v("Touch", "portShape.onRelease");
-                        break;
-
-                    case TAP:
-                        Log.v("Touch", "portShape.onTap");
-
-                        portImage.setVisibility(Visibility.INVISIBLE);
-
-                        break;
-                }
-            }
-        });
-
-        // Draw
-        portImage.setOnDrawListener(new OnDrawListener() {
-            @Override
-            public void onUpdate(Viz viz) {
-
-            }
-
-            @Override
-            public void onDraw(Viz viz) {
-                for (Shape shape : portImage.getShapes()) {
-                    shape.draw(viz);
-                }
-            }
-        });
-
-        return portImage;
+        simulation.addForm(frame);
+
+        // Update visualization
+
+        String layerName = "forms";
+        visualization.addLayer(layerName);
+        Layer defaultLayer = visualization.getLayer(layerName);
+
+        // Create frame images
+        FrameImage frameImage = new FrameImage(frame);
+        frameImage.setVisualization(visualization);
+        frameImage.setupPortImages();
+        
+        visualization.addImage(frame, frameImage, layerName);
     }
 
     public Descriptor getDescriptor() {
@@ -443,7 +166,7 @@ public class Clay {
         this.messageHost.addHost(messageManager);
     }
 
-    public void addHost(NetworkResourceInterface networkResource) {
+    public void addResource (NetworkResourceInterface networkResource) {
         this.networkHost.addHost(networkResource);
     }
 
@@ -461,21 +184,19 @@ public class Clay {
 
     /**
      * Adds a view to Clay. This makes the view available for use in systems built with Clay.
-     *
      * @param view The view to make available to Clay.
      */
     public void addDisplay(DisplayHostInterface view) {
-        this.displays.add(view);
+        this.displays.add (view);
     }
 
     /**
      * Returns the view manager the specified index.
-     *
      * @param i The index of the view to return.
      * @return The view at the specified index.
      */
-    public DisplayHostInterface getView(int i) {
-        return this.displays.get(i);
+    public DisplayHostInterface getView (int i) {
+        return this.displays.get (i);
     }
 
     public CacheHost getCache() {
@@ -486,26 +207,26 @@ public class Clay {
         return this.storeHost;
     }
 
-    public List<Device> getDevices() {
+    public ArrayList<Device> getDevices() {
         return this.devices;
     }
 
-    public boolean hasNetworkManager() {
+    public boolean hasNetworkManager () {
         return this.networkHost != null;
     }
 
     // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
-    public String getInternetAddress() {
+    public String getInternetAddress () {
         Context context = Application.getContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        Log.v("Clay", "Internet address: " + ip);
+        Log.v ("Clay", "Internet address: " + ip);
         return ip;
     }
 
-    public String getInternetBroadcastAddress() {
+    public String getInternetBroadcastAddress () {
         String broadcastAddressString = getInternetAddress();
-        Log.v("Clay", "Broadcast: " + broadcastAddressString);
+        Log.v ("Clay", "Broadcast: " + broadcastAddressString);
         broadcastAddressString = broadcastAddressString.substring(0, broadcastAddressString.lastIndexOf("."));
         broadcastAddressString += ".255";
         return broadcastAddressString;
@@ -513,45 +234,73 @@ public class Clay {
 
     public Device getDeviceByAddress(String address) {
         for (Device device : getDevices()) {
-            if (device.getInternetAddress().compareTo(address) == 0) {
+            if (device.getInternetAddress ().compareTo (address) == 0) {
                 return device;
             }
         }
         return null;
     }
 
-    private Clay getClay() {
+    private Clay getClay () {
         return this;
     }
 
     /**
      * Adds the specified unit to Clay's operating environment.
      */
-    public Device addFrame(final UUID uuid, final String internetAddress) {
+    public Device addDevice(final UUID deviceUuid, final String internetAddress) {
 
 //        Log.v("UDP", "found device");
 
         // Search for the device in the store
-        if (hasFrame(uuid)) {
+        if (hasDeviceByUuid(deviceUuid)) {
             return null;
         }
 
-        generateFrame(uuid);
-
         // Try to restore the device profile from the storeHost.
-        // TODO: Replace this with regenerateFrame(UUID)
-        Device device = getStore().restoreDevice(uuid);
+        Device device = getStore().restoreDevice(deviceUuid);
 
         // If unable to restore the device's profile, then create a profile for the device.
         if (device == null) {
-            device = new Device(getClay(), uuid);
+            device = new Device(getClay (), deviceUuid);
         }
+
+        simulateForm();
+
+        // <HACK>
+        /*
+        String[] adverbs = new String[] { "abnormally", "absentmindedly", "accidentally", "acidly", "actually", "adventurously", "afterwards", "almost", "always", "angrily", "annually", "anxiously", "arrogantly", "awkwardly", "badly", "bashfully", "beautifully", "bitterly", "bleakly", "blindly", "blissfully", "boastfully", "boldly", "bravely", "briefly", "brightly", "briskly", "broadly", "busily", "calmly", "carefully", "carelessly", "cautiously", "certainly", "cheerfully", "clearly", "cleverly", "closely", "coaxingly", "colorfully", "commonly", "continually", "coolly", "correctly", "courageously", "crossly", "cruelly", "curiously", "daily", "daintily", "dearly", "deceivingly", "delightfully", "deeply", "defiantly", "deliberately", "delightfully", "diligently", "dimly", "doubtfully", "dreamily", "easily", "elegantly", "energetically", "enormously", "enthusiastically", "equally", "especially", "even", "evenly", "eventually", "exactly", "excitedly", "extremely", "fairly", "faithfully", "famously", "far", "fast", "fatally", "ferociously", "fervently", "fiercely", "fondly", "foolishly", "fortunately", "frankly", "frantically", "freely", "frenetically", "frightfully", "fully", "furiously", "generally", "generously", "gently", "gladly", "gleefully", "gracefully", "gratefully", "greatly", "greedily", "happily", "hastily", "healthily", "heavily", "helpfully", "helplessly", "highly", "honestly", "hopelessly", "hourly", "hungrily", "immediately", "innocently", "inquisitively", "instantly", "intensely", "intently", "interestingly", "inwardly", "irritably", "jaggedly", "jealously", "joshingly", "joyfully", "joyously", "jovially", "jubilantly", "judgementally", "justly", "keenly", "kiddingly", "kindheartedly", "kindly", "kissingly", "knavishly", "knottily", "knowingly", "knowledgeably", "kookily", "lazily", "less", "lightly", "likely", "limply", "lively", "loftily", "longingly", "loosely", "lovingly", "loudly", "loyally", "madly", "majestically", "meaningfully", "mechanically", "merrily", "miserably", "mockingly", "monthly", "more", "mortally", "mostly", "mysteriously", "naturally", "nearly", "neatly", "needily", "nervously", "never", "nicely", "noisily", "not", "obediently", "obnoxiously", "oddly", "offensively", "officially", "often", "only", "openly", "optimistically", "overconfidently", "owlishly", "painfully", "partially", "patiently", "perfectly", "physically", "playfully", "politely", "poorly", "positively", "potentially", "powerfully", "promptly", "properly", "punctually", "quaintly", "quarrelsomely", "queasily", "queerly", "questionably", "questioningly", "quicker", "quickly", "quietly", "quirkily", "quizzically", "rapidly", "rarely", "readily", "really", "reassuringly", "recklessly", "regularly", "reluctantly", "repeatedly", "reproachfully", "restfully", "righteously", "rightfully", "rigidly", "roughly", "rudely", "sadly", "safely", "scarcely", "scarily", "searchingly", "sedately", "seemingly", "seldom", "selfishly", "separately", "seriously", "shakily", "sharply", "sheepishly", "shrilly", "shyly", "silently", "sleepily", "slowly", "smoothly", "softly", "solemnly", "solidly", "sometimes", "soon", "speedily", "stealthily", "sternly", "strictly", "successfully", "suddenly", "surprisingly", "suspiciously", "sweetly", "swiftly", "sympathetically", "tenderly", "tensely", "terribly", "thankfully", "thoroughly", "thoughtfully", "tightly", "tomorrow", "too", "tremendously", "triumphantly", "truly", "truthfully", "ultimately", "unabashedly", "unaccountably", "unbearably", "unethically", "unexpectedly", "unfortunately", "unimpressively", "unnaturally", "unnecessarily", "utterly", "upbeat", "upliftingly", "upright", "upside-down", "upward", "upwardly", "urgently", "usefully", "uselessly", "usually", "utterly", "vacantly", "vaguely", "vainly", "valiantly", "vastly", "verbally", "very", "viciously", "victoriously", "violently", "vivaciously", "voluntarily", "warmly", "weakly", "wearily", "well", "wetly", "wholly", "wildly", "willfully", "wisely", "woefully", "wonderfully", "worriedly", "wrongly", "yawningly", "yearly", "yearningly", "yesterday", "yieldingly", "youthfully", "zealously", "zestfully", "zestily" };
+        String[] nouns = new String[] { "account", "achiever", "acoustics", "act", "action", "activity", "actor", "addition", "adjustment", "advertisement", "advice", "aftermath", "afternoon", "afterthought", "agreement", "air", "airplane", "airport", "alarm", "amount", "amusement", "anger", "angle", "animal", "answer", "ant", "ants", "apparatus", "apparel", "apple", "apples", "appliance", "approval", "arch", "argument", "arithmetic", "arm", "army", "art", "attack", "attempt", "attention", "attraction", "aunt", "authority", "babies", "baby", "back", "badge", "bag", "bait", "balance", "ball", "balloon", "balls", "banana", "band", "base", "baseball", "basin", "basket", "basketball", "bat", "bath", "battle", "bead", "beam", "bean", "bear", "bears", "beast", "bed", "bedroom", "beds", "bee", "beef", "beetle", "beggar", "beginner", "behavior", "belief", "believe", "bell", "bells", "berry", "bike", "bikes", "bird", "birds", "birth", "birthday", "bit", "bite", "blade", "blood", "blow", "board", "boat", "boats", "body", "bomb", "bone", "book", "books", "boot", "border", "bottle", "boundary", "box", "boy", "boys", "brain", "brake", "branch", "brass", "bread", "breakfast", "breath", "brick", "bridge", "brother", "brothers", "brush", "bubble", "bucket", "building", "bulb", "bun", "burn", "burst", "bushes", "business", "butter", "button", "cabbage", "cable", "cactus", "cake", "cakes", "calculator", "calendar", "camera", "camp", "can", "cannon", "canvas", "cap", "caption", "car", "card", "care", "carpenter", "carriage", "cars", "cart", "cast", "cat", "cats", "cattle", "cause", "cave", "celery", "cellar", "cemetery", "cent", "chain", "chair", "chairs", "chalk", "chance", "change", "channel", "cheese", "cherries", "cherry", "chess", "chicken", "chickens", "children", "chin", "church", "circle", "clam", "class", "clock", "clocks", "cloth", "cloud", "clouds", "clover", "club", "coach", "coal", "coast", "coat", "cobweb", "coil", "collar", "color", "comb", "comfort", "committee", "company", "comparison", "competition", "condition", "connection", "control", "cook", "copper", "copy", "cord", "cork", "corn", "cough", "country", "cover", "cow", "cows", "crack", "cracker", "crate", "crayon", "cream", "creator", "creature", "credit", "crib", "crime", "crook", "crow", "crowd", "crown", "crush", "cry", "cub", "cup", "current", "curtain", "curve", "cushion", "dad", "daughter", "day", "death", "debt", "decision", "deer", "degree", "design", "desire", "desk", "destruction", "detail", "development", "digestion", "dime", "dinner", "dinosaurs", "direction", "dirt", "discovery", "discussion", "disease", "disgust", "distance", "distribution", "division", "dock", "doctor", "dog", "dogs", "doll", "dolls", "donkey", "door", "downtown", "drain", "drawer", "dress", "drink", "driving", "drop", "drug", "drum", "duck", "ducks", "dust", "ear", "earth", "earthquake", "edge", "education", "effect", "egg", "eggnog", "eggs", "elbow", "end", "engine", "error", "event", "example", "exchange", "existence", "expansion", "experience", "expert", "eye", "eyes", "face", "fact", "fairies", "fall", "family", "fan", "fang", "farm", "farmer", "father", "father", "faucet", "fear", "feast", "feather", "feeling", "feet", "fiction", "field", "fifth", "fight", "finger", "finger", "fire", "fireman", "fish", "flag", "flame", "flavor", "flesh", "flight", "flock", "floor", "flower", "flowers", "fly", "fog", "fold", "food", "foot", "force", "fork", "form", "fowl", "frame", "friction", "friend", "friends", "frog", "frogs", "front", "fruit", "fuel", "furniture", "alley", "game", "garden", "gate", "geese", "ghost", "giants", "giraffe", "girl", "girls", "glass", "glove", "glue", "goat", "gold", "goldfish", "good-bye", "goose", "government", "governor", "grade", "grain", "grandfather", "grandmother", "grape", "grass", "grip", "ground", "group", "growth", "guide", "guitar", "gun ", "hair", "haircut", "hall", "hammer", "hand", "hands", "harbor", "harmony", "hat", "hate", "head", "health", "hearing", "heart", "heat", "help", "hen", "hill", "history", "hobbies", "hole", "holiday", "home", "honey", "hook", "hope", "horn", "horse", "horses", "hose", "hospital", "hot", "hour", "house", "houses", "humor", "hydrant", "ice", "icicle", "idea", "impulse", "income", "increase", "industry", "ink", "insect", "instrument", "insurance", "interest", "invention", "iron", "island", "jail", "jam", "jar", "jeans", "jelly", "jellyfish", "jewel", "join", "joke", "journey", "judge", "juice", "jump", "kettle", "key", "kick", "kiss", "kite", "kitten", "kittens", "kitty", "knee", "knife", "knot", "knowledge", "laborer", "lace", "ladybug", "lake", "lamp", "land", "language", "laugh", "lawyer", "lead", "leaf", "learning", "leather", "leg", "legs", "letter", "letters", "lettuce", "level", "library", "lift", "light", "limit", "line", "linen", "lip", "liquid", "list", "lizards", "loaf", "lock", "locket", "look", "loss", "love", "low", "lumber", "lunch", "lunchroom", "machine", "magic", "maid", "mailbox", "man", "manager", "map", "marble", "mark", "market", "mask", "mass", "match", "meal", "measure", "meat", "meeting", "memory", "men", "metal", "mice", "middle", "milk", "mind", "mine", "minister", "mint", "minute", "mist", "mitten", "mom", "money", "monkey", "month", "moon", "morning", "mother", "motion", "mountain", "mouth", "move", "muscle", "music", "nail", "name", "nation", "neck", "need", "needle", "nerve", "nest", "net", "news", "night", "noise", "north", "nose", "note", "notebook", "number", "nut", "oatmeal", "observation", "ocean", "offer", "office", "oil", "operation", "opinion", "orange", "oranges", "order", "organization", "ornament", "oven", "owl", "owner", "page", "pail", "pain", "paint", "pan", "pancake", "paper", "parcel", "parent", "park", "part", "partner", "party", "passenger", "paste", "patch", "payment", "peace", "pear", "pen", "pencil", "person", "pest", "pet", "pets", "pickle", "picture", "pie", "pies", "pig", "pigs", "pin", "pipe", "pizzas", "place", "plane", "planes", "plant", "plantation", "plants", "plastic", "plate", "play", "playground", "pleasure", "plot", "plough", "pocket", "point", "poison", "police", "polish", "pollution", "popcorn", "porter", "position", "pot", "potato", "powder", "power", "price", "print", "prison", "process", "produce", "profit", "property", "prose", "protest", "pull", "pump", "punishment", "purpose", "push", "quarter", "quartz", "queen", "question", "quicksand", "quiet", "quill", "quilt", "quince", "quiver ", "rabbit", "rabbits", "rail", "railway", "rain", "rainstorm", "rake", "range", "rat", "rate", "ray", "reaction", "reading", "reason", "receipt", "recess", "record", "regret", "relation", "religion", "representative", "request", "respect", "rest", "reward", "rhythm", "rice", "riddle", "rifle", "ring", "rings", "river", "road", "robin", "rock", "rod", "roll", "roof", "room", "root", "rose", "route", "rub", "rule", "run", "sack", "sail", "salt", "sand", "scale", "scarecrow", "scarf", "scene", "scent", "school", "science", "scissors", "screw", "sea", "seashore", "seat", "secretary", "seed", "selection", "self", "sense", "servant", "shade", "shake", "shame", "shape", "sheep", "sheet", "shelf", "ship", "shirt", "shock", "shoe", "shoes", "shop", "show", "side", "sidewalk", "sign", "silk", "silver", "sink", "sister", "sisters", "size", "skate", "skin", "skirt", "sky", "slave", "sleep", "sleet", "slip", "slope", "smash", "smell", "smile", "smoke", "snail", "snails", "snake", "snakes", "sneeze", "snow", "soap", "society", "sock", "soda", "sofa", "son", "song", "songs", "sort", "sound", "soup", "space", "spade", "spark", "spiders", "sponge", "spoon", "spot", "spring", "spy", "square", "squirrel", "stage", "stamp", "star", "start", "statement", "station", "steam", "steel", "stem", "step", "stew", "stick", "sticks", "stitch", "stocking", "stomach", "stone", "stop", "storeHost", "story", "stove", "stranger", "straw", "stream", "street", "stretch", "string", "structure", "substance", "sugar", "suggestion", "suit", "summer", "sun", "support", "surprise", "sweater", "swim", "swing", "system", "table", "tail", "talk", "tank", "taste", "tax", "teaching", "team", "teeth", "temper", "tendency", "tent", "territory", "test", "texture", "theory", "thing", "things", "thought", "thread", "thrill", "throat", "throne", "thumb", "thunder", "ticket", "tiger", "time", "tin", "title", "toad", "toe", "toes", "tomatoes", "tongue", "tooth", "toothbrush", "toothpaste", "top", "touchPositions", "town", "toy", "toys", "trade", "trail", "train", "trains", "tramp", "transport", "tray", "treatment", "tree", "trees", "trick", "trip", "trouble", "trousers", "truck", "trucks", "tub", "turkey", "turn", "twig", "twist", "umbrella", "uncle", "underwear", "unit", "use", "vacation", "value", "van", "vase", "vegetable", "veil", "vein", "verse", "vessel", "vest", "view", "visitor", "voice", "volcano", "volleyball", "voyage", "walk", "wall", "war", "wash", "waste", "watch", "water", "wave", "waves", "wax", "way", "wealth", "weather", "week", "weight", "wheel", "whip", "whistle", "wilderness", "wind", "window", "wine", "wing", "winter", "wire", "wish", "woman", "women", "wood", "wool", "word", "work", "worm", "wound", "wren", "wrench", "wrist", "writer", "writing", "yak", "yam", "yard", "yarn", "year", "yoke" };
+
+        Random random = new Random();
+        String deviceTag = adverbs[random.nextInt(adverbs.length)] + "-" + nouns[random.nextInt(nouns.length)];
+        */
+
+        /*
+        String deviceTag = "";
+        if (device.getUuid().toString().equals("001affff-ffff-ffff-4e45-3158200a0027")) {
+            deviceTag = "bender";
+            Application.getDisplay().getSpeechGenerator().speakPhrase("bender");
+        } else if (device.getUuid().toString().equals("002effff-ffff-ffff-4e45-3158200a0015")) {
+            deviceTag = "kitt";
+            Application.getDisplay().getSpeechGenerator().speakPhrase("kitt");
+        } else if (device.getUuid().toString().equals("002fffff-ffff-ffff-4e45-3158200a0015")) {
+            deviceTag = "gerty";
+            Application.getDisplay().getSpeechGenerator().speakPhrase("gerty");
+        } else if (device.getUuid().toString().equals("0027ffff-ffff-ffff-4e45-36932003000a")) {
+            deviceTag = "hal";
+            Application.getDisplay().getSpeechGenerator().speakPhrase("hal");
+        }
+
+        device.setTag(deviceTag);
+        */
+        // </HACK>
 
         // Update the device's profile based on information received from device itself.
         if (device != null) {
 
             // Data.
-            Descriptor deviceDescriptor = getClay().getDescriptor().get("devices").put(uuid.toString());
+            Descriptor deviceDescriptor = getClay().getDescriptor().get("devices").put(deviceUuid.toString());
 
             // <HACK>
             // TODO: Update this from a list of the observables received from the boards.
@@ -585,22 +334,22 @@ public class Clay {
             // Update restored device with information from device
             device.setInternetAddress(internetAddress);
 
-            Log.v("TCP", "device.internetAddress: " + internetAddress);
+            Log.v ("TCP", "device.internetAddress: " + internetAddress);
 
             // Store the updated device profile.
-            getStore().storeDevice(device);
+            getStore ().storeDevice (device);
             getStore().storeTimeline(device.getTimeline());
 
             Log.v("TCP", "device.internetAddress (2): " + internetAddress);
 
             // Add device to ClayaddMessage
-            if (!this.devices.contains(device)) {
+            if (!this.devices.contains (device)) {
 
                 // Add device to present (i.e., local cache).
-                this.devices.add(device);
+                this.devices.add (device);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getDisplay().mapView.getSimulation().simulateFrame(new Frame());
+//                ApplicationView.getDisplay().mapView.getSimulation().simulateForm(new Frame());
 
                 // Add timelines to attached displays
                 for (DisplayHostInterface view : this.displays) {
@@ -645,7 +394,7 @@ public class Clay {
         return device;
     }
 
-    public boolean hasFrame(UUID uuid) {
+    public boolean hasDeviceByUuid(UUID uuid) {
         for (Device device : getDevices()) {
             if (device.getUuid().compareTo(uuid) == 0) {
                 return true;
@@ -679,12 +428,12 @@ public class Clay {
 //
 //        // Discover first device
 //        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
-//        getClay().addFrame(unitUuidA, "10.1.10.29");
+//        getClay().addDevice(unitUuidA, "10.1.10.29");
 //        Device foundUnit = getDeviceByUuid(unitUuidA);
 //
 //        // Discover second device
 //        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
-//        getClay().addFrame(unitUuidB, "192.168.1.123");
+//        getClay().addDevice(unitUuidB, "192.168.1.123");
 //
 //        if (addBehaviorToTimeline) {
 //            for (int i = 0; i < behaviorCount; i++) {
@@ -787,7 +536,6 @@ public class Clay {
 
     /**
      * Returns true if Clay has a descriptor manager.
-     *
      * @return True if Clay has a descriptor manager. False otherwise.
      */
     public boolean hasStore() {
@@ -801,7 +549,7 @@ public class Clay {
     /**
      * Cycle through routine operations.
      */
-    public void step() {
+    public void step () {
         messageHost.processMessage();
     }
 }
