@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/Application/Application.iml" filepath="$PROJECT_DIR$/Application/Application.iml" />
+=======
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8
       <module fileurl="file://$PROJECT_DIR$/Designer.iml" filepath="$PROJECT_DIR$/Designer.iml" />
     </modules>
   </component>

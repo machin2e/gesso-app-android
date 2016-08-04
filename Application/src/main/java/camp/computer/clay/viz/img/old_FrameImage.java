@@ -1,25 +1,26 @@
-package camp.computer.clay.visualization.images;
+package camp.computer.clay.viz.img;
 
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/visualization/images/FrameImage.java
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import camp.computer.clay.application.Application;
-import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Frame;
-import camp.computer.clay.model.simulation.Path;
-import camp.computer.clay.model.simulation.Port;
+import camp.computer.clay.app.Application;
+import camp.computer.clay.app.Surface;
+import camp.computer.clay.model.interaction.OnTouchActionListener;
+import camp.computer.clay.model.sim.Frame;
+import camp.computer.clay.model.sim.Path;
+import camp.computer.clay.model.sim.Port;
 import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Rectangle;
-import camp.computer.clay.visualization.util.Shape;
+import camp.computer.clay.viz.arch.Image;
+import camp.computer.clay.viz.arch.Visibility;
+import camp.computer.clay.viz.util.Geometry;
+import camp.computer.clay.viz.util.Point;
+import camp.computer.clay.viz.util.Rectangle;
 
-public class FrameImage extends Image {
+public class old_FrameImage extends Image {
 
     public final static String TYPE = "base";
 
@@ -60,7 +61,7 @@ public class FrameImage extends Image {
     private int lightOutlineColor = Color.parseColor("#e7e7e7");
     // </STYLE>
 
-    public FrameImage(Frame frame) {
+    public old_FrameImage(Frame frame) {
         super(frame);
         setType(TYPE);
         setup();
@@ -77,61 +78,62 @@ public class FrameImage extends Image {
     public void setupPortImages() {
 
         // Add a port sprite for each of the associated base's ports
-        for (Port port: getForm().getPorts()) {
-            PortImage portImage = new PortImage(port);
-            portImage.setVisualization(getVisualization());
-            getVisualization().addImage(port, portImage, "ports");
+        for (Port port : getFrame().getPorts()) {
+            old_PortImage oldPortImage = new old_PortImage(port);
+            oldPortImage.setViz(getViz());
+            getViz().addImage(oldPortImage, "ports");
         }
     }
 
-    public Frame getForm() {
+    public Frame getFrame() {
         return (Frame) getModel();
     }
 
-    public ArrayList<PortImage> getPortImages() {
-        ArrayList<PortImage> portImages = new ArrayList<PortImage>();
-        Frame frame = getForm();
+    public ArrayList<old_PortImage> getPortImages() {
+        ArrayList<old_PortImage> oldPortImages = new ArrayList<old_PortImage>();
+        Frame frame = getFrame();
 
-        for (Port port: frame.getPorts()) {
-            PortImage portImage = (PortImage) getVisualization().getImage(port);
-            portImages.add(portImage);
+        for (Port port : frame.getPorts()) {
+            old_PortImage oldPortImage = (old_PortImage) getViz().getImage(port);
+            oldPortImages.add(oldPortImage);
         }
 
-        return portImages;
+        return oldPortImages;
     }
 
-    public PortImage getPortImage(int index) {
-        Frame frame = getForm();
-        PortImage portImage = (PortImage) getVisualization().getImage(frame.getPort(index));
-        return portImage;
+    public old_PortImage getPortImage(int index) {
+        Frame frame = getFrame();
+        old_PortImage oldPortImage = (old_PortImage) getViz().getImage(frame.getPort(index));
+        return oldPortImage;
     }
 
     // TODO: Remove this! Store Port index/id
-    public int getPortImageIndex(PortImage portImage) {
-        Port port = (Port) getVisualization().getModel(portImage);
-        if (getForm().getPorts().contains(port)) {
-            return this.getForm().getPorts().indexOf(port);
+    public int getPortImageIndex(old_PortImage oldPortImage) {
+        Port port = (Port) getViz().getModel(oldPortImage);
+        if (getFrame().getPorts().contains(port)) {
+            return this.getFrame().getPorts().indexOf(port);
         }
         return -1;
     }
 
-    public void update() {
+    public void generate() {
         updateLightImages();
         updatePortGroupImages();
     }
 
-    public void draw(VisualizationSurface visualizationSurface) {
+    public void draw(Surface surface) {
+
         if (isVisible()) {
             // drawPortPeripheralImages(visualizationSurface);
-            drawPortGroupImages(visualizationSurface);
-            drawBoardImage(visualizationSurface);
-            drawLightImages(visualizationSurface);
+            drawPortGroupImages(surface);
+            drawBoardImage(surface);
+            drawLightImages(surface);
 
             if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
-                visualizationSurface.getPaint().setColor(Color.GREEN);
-                visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                Shape.drawCircle(getPosition(), shape.getWidth(), 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
-                Shape.drawCircle(getPosition(), shape.getWidth() / 2.0f, 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                surface.getPaint().setColor(Color.GREEN);
+                surface.getPaint().setStyle(Paint.Style.STROKE);
+                getViz().getPalette().drawCircle(getPosition(), shape.getWidth(), 0);
+                getViz().getPalette().drawCircle(getPosition(), shape.getWidth() / 2.0f, 0);
             }
         }
     }
@@ -140,26 +142,27 @@ public class FrameImage extends Image {
         return this.shape;
     }
 
-    public void drawBoardImage(VisualizationSurface visualizationSurface) {
+    public void drawBoardImage(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.boardColor);
-        Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
+        getViz().getPalette().drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight());
 
         // Outline
         if (this.showBoardOutline) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.boardOutlineColor);
             paint.setStrokeWidth((float) boardOutlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
+            getViz().getPalette().drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight());
         }
     }
 
     Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
+
     public void updatePortGroupImages() {
         // <SHAPE>
         // Positions before rotation
@@ -188,33 +191,33 @@ public class FrameImage extends Image {
         }
     }
 
-    public void drawPortGroupImages(VisualizationSurface visualizationSurface) {
+    public void drawPortGroupImages(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         for (int i = 0; i < PORT_GROUP_COUNT; i++) {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            Shape.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, canvas, paint);
+            getViz().getPalette().drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight);
 
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth((float) portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
-                Shape.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, canvas, paint);
+                getViz().getPalette().drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight);
             }
 
         }
     }
 
-    public void drawPortPeripheralImages(VisualizationSurface visualizationSurface) {
+    public void drawPortPeripheralImages(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         // <SHAPE>
         Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
@@ -246,14 +249,14 @@ public class FrameImage extends Image {
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            Shape.drawCircle(portGroupCenterPositions[i], 20, 0, canvas, paint);
+            getViz().getPalette().drawCircle(portGroupCenterPositions[i], 20, 0);
 
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth((float) portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
-                Shape.drawCircle(portGroupCenterPositions[i], 20, 0, canvas, paint);
+                getViz().getPalette().drawCircle(portGroupCenterPositions[i], 20, 0);
             }
 
         }
@@ -262,7 +265,7 @@ public class FrameImage extends Image {
     Point[] lightCenterPositions = new Point[PORT_COUNT];
     double[] lightRotationAngle = new double[12];
 
-    private void updateLightImages () {
+    private void updateLightImages() {
         // <SHAPE>
         lightCenterPositions[0] = new Point(
                 getPosition().getX() + (-20),
@@ -316,16 +319,16 @@ public class FrameImage extends Image {
                 getPosition().getY() + (+20)
         );
 
-        lightRotationAngle[0]  = 0;
-        lightRotationAngle[1]  = 0;
-        lightRotationAngle[2]  = 0;
-        lightRotationAngle[3]  = 90;
-        lightRotationAngle[4]  = 90;
-        lightRotationAngle[5]  = 90;
-        lightRotationAngle[6]  = 180;
-        lightRotationAngle[7]  = 180;
-        lightRotationAngle[8]  = 180;
-        lightRotationAngle[9]  = 270;
+        lightRotationAngle[0] = 0;
+        lightRotationAngle[1] = 0;
+        lightRotationAngle[2] = 0;
+        lightRotationAngle[3] = 90;
+        lightRotationAngle[4] = 90;
+        lightRotationAngle[5] = 90;
+        lightRotationAngle[6] = 180;
+        lightRotationAngle[7] = 180;
+        lightRotationAngle[8] = 180;
+        lightRotationAngle[9] = 270;
         lightRotationAngle[10] = 270;
         lightRotationAngle[11] = 270;
         // </SHAPE>
@@ -336,36 +339,36 @@ public class FrameImage extends Image {
         }
     }
 
-    public void drawLightImages(VisualizationSurface visualizationSurface) {
+    public void drawLightImages(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         for (int i = 0; i < PORT_COUNT; i++) {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setStrokeWidth(3);
-            Port port = (Port) getForm().getPort(i);
+            Port port = (Port) getFrame().getPort(i);
             if (port.getType() != Port.Type.NONE) {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), (float) currentTransparency));
+                paint.setColor(camp.computer.clay.viz.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), (float) currentTransparency));
             } else {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, (float) currentTransparency));
+                paint.setColor(camp.computer.clay.viz.util.Color.setTransparency(old_PortImage.FLOW_PATH_COLOR_NONE, (float) currentTransparency));
             }
-            Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
+            getViz().getPalette().drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight);
 
             // Outline
             if (this.showLightOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth((float) lightOutlineThickness);
                 paint.setColor(this.lightOutlineColor);
-                Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
+                getViz().getPalette().drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight);
             }
         }
     }
 
     // TODO: Move this into Image (send to all Images)
-    public void setTransparency (final double transparency) {
+    public void setTransparency(final double transparency) {
 
         targetTransparency = transparency;
 
@@ -404,28 +407,28 @@ public class FrameImage extends Image {
     }
 
     public void showPortImages() {
-        for (PortImage portImage: getPortImages()) {
-            portImage.setVisibility(true);
-            portImage.showDocks();
+        for (old_PortImage oldPortImage : getPortImages()) {
+            oldPortImage.setVisibility(Visibility.VISIBLE);
+            oldPortImage.showDocks();
         }
     }
 
     public void hidePortImages() {
-        for (PortImage portImage: getPortImages()) {
-            portImage.setVisibility(false);
+        for (old_PortImage oldPortImage : getPortImages()) {
+            oldPortImage.setVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void showPathImages() {
-        for (PortImage portImage: getPortImages()) {
-            portImage.setPathVisibility(true);
+        for (old_PortImage oldPortImage : getPortImages()) {
+            oldPortImage.setPathVisibility(Visibility.VISIBLE);
         }
     }
 
     public void hidePathImages() {
-        for (PortImage portImage: getPortImages()) {
-            portImage.setPathVisibility(false);
-            portImage.showDocks();
+        for (old_PortImage oldPortImage : getPortImages()) {
+            oldPortImage.setPathVisibility(Visibility.INVISIBLE);
+            oldPortImage.showDocks();
         }
     }
 
@@ -433,17 +436,17 @@ public class FrameImage extends Image {
     // Interaction
     //-------------------------
 
-    public boolean isTouching (Point point) {
+    public boolean isTouching(Point point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f);
+            return Geometry.calculateDistance(getPosition(), point) < (this.shape.getHeight() / 2.0f);
         } else {
             return false;
         }
     }
 
-    public boolean isTouching (Point point, double padding) {
+    public boolean isTouching(Point point, double padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f + padding);
+            return Geometry.calculateDistance(getPosition(), point) < (this.shape.getHeight() / 2.0f + padding);
         } else {
             return false;
         }
@@ -452,11 +455,11 @@ public class FrameImage extends Image {
     @Override
     public void onTouchInteraction(TouchInteraction touchInteraction) {
 
-        if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
+        if (touchInteraction.getType() == OnTouchActionListener.Type.NONE) {
             // Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
+        } else if (touchInteraction.getType() == OnTouchActionListener.Type.TOUCH) {
             // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
+        } else if (touchInteraction.getType() == OnTouchActionListener.Type.TAP) {
 
             // Focus on touched form
             showPortImages();
@@ -466,36 +469,24 @@ public class FrameImage extends Image {
             // TODO: Speak "choose a channel to get data."
 
             // Show ports and paths of touched form
-            for (PortImage portImage : getPortImages()) {
-                ArrayList<Path> paths = portImage.getPort().getPathsByPort();
+            for (old_PortImage oldPortImage : getPortImages()) {
+                List<Path> paths = oldPortImage.getPort().getConnectedPaths();
                 for (Path path : paths) {
                     // Show ports
-                    getVisualization().getImage(path.getSource()).setVisibility(true);
-                    getVisualization().getImage(path.getTarget()).setVisibility(true);
+                    getViz().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
+                    getViz().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
                     // Show path
-                    getVisualization().getImage(path).setVisibility(true);
+                    getViz().getImage(path).setVisibility(Visibility.VISIBLE);
                 }
             }
 
-        } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
+        } else if (touchInteraction.getType() == OnTouchActionListener.Type.HOLD) {
             // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TWITCH) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
+        } else if (touchInteraction.getType() == OnTouchActionListener.Type.DRAG) {
             // Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
+        } else if (touchInteraction.getType() == OnTouchActionListener.Type.RELEASE) {
             // Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
-=======
-import camp.computer.clay.model.sim.Frame;
-import camp.computer.clay.viz.arch.Image;
-
-public class FrameImage extends Image<Frame> {
-
-    public FrameImage(Frame model) {
-        super(model);
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/viz/img/FrameImage.java
     }
 }
+

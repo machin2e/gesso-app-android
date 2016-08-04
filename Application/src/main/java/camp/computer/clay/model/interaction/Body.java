@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 import camp.computer.clay.model.simulation._Actor;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;
@@ -12,6 +13,17 @@ import camp.computer.clay.visualization.images.FrameImage;
 import camp.computer.clay.visualization.images.PathImage;
 import camp.computer.clay.visualization.images.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
+=======
+import camp.computer.clay.model.interaction.OnTouchActionListener;
+import camp.computer.clay.model.interaction.Perspective;
+import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.interaction.TouchInteractivity;
+import camp.computer.clay.viz.arch.Image;
+import camp.computer.clay.viz.img.old_FrameImage;
+import camp.computer.clay.viz.img.old_PathImage;
+import camp.computer.clay.viz.img.old_PortImage;
+import camp.computer.clay.viz.util.Geometry;
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
 public class Body extends _Actor {
 
@@ -69,9 +81,15 @@ public class Body extends _Actor {
         touchInteractivity.dragDistance[touchInteraction.pointerIndex] = Geometry.calculateDistance(touchInteraction.getPosition(), touchInteractivity.getFirst().touchPositions[touchInteraction.pointerIndex]);
 
         // Classify/Callback
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
         if (touchInteractivity.dragDistance[touchInteraction.pointerIndex] > TouchInteraction.MINIMUM_DRAG_DISTANCE) {
             onDragListener(touchInteractivity, touchInteraction);
         }
+=======
+//        if (touchInteractivity.isDragging()) {
+        onDragListener(touchInteractivity, touchInteraction);
+//        }
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
     }
 
     public void onCompleteInteractivity(TouchInteraction touchInteraction) {
@@ -94,39 +112,63 @@ public class Body extends _Actor {
 
     private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
         touchInteraction.setType(TouchInteraction.Type.TOUCH);
+=======
+        Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
+        touchInteraction.setTargetImage(targetImage);
+//        Log.v("Touch", "touched: " + targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.TOUCH);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
         Image touchedImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
         touchInteraction.setTarget(touchedImage);
 
 //        if (perspective.hasFocus()) {
 //
-//            if (perspective.getFocus().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
+//            if (perspective.getFocus().isType(old_FrameImage.TYPE, old_PortImage.TYPE, old_PathImage.TYPE)) {
 //
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 //                if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(PortImage.TYPE)) {
 ////                    Log.v("Interaction", "BUH");
 ////                    perspective.InteractionfocusOnPort((PortImage) touchInteraction.getImageByPosition());
+=======
+//                if (touchInteraction.containsPoint() && touchInteraction.getImage().isType(old_PortImage.TYPE)) {
+////                    Log.v("Interaction", "BUH");
+////                    perspective.InteractionfocusOnPort((old_PortImage) touchInteraction.getImage());
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //                }
 //            }
 //
-//            if (perspective.getFocus().isType(PortImage.TYPE, PathImage.TYPE)) {
+//            if (perspective.getFocus().isType(old_PortImage.TYPE, old_PathImage.TYPE)) {
 //
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 //                if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(PathImage.TYPE)) {
 ////                    perspective.InteractionfocusOnPath((PathImage) touchInteraction.getImageByPosition());
+=======
+//                if (touchInteraction.containsPoint() && touchInteraction.getImage().isType(old_PathImage.TYPE)) {
+////                    perspective.InteractionfocusOnPath((old_PathImage) touchInteraction.getImage());
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //                }
 //            }
 //        }
 //
 //        // Reset object interaction state
-//        if (!perspective.hasFocus() || perspective.getFocus().isType(FrameImage.TYPE, PortImage.TYPE)) {
+//        if (!perspective.hasFocus() || perspective.getFocus().isType(old_FrameImage.TYPE, old_PortImage.TYPE)) {
 //
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 //            if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(FrameImage.TYPE)) {
 ////                perspective.InteractionfocusOnForm((FrameImage) touchInteraction.getImageByPosition());
+=======
+//            if (touchInteraction.containsPoint() && touchInteraction.getImage().isType(old_FrameImage.TYPE)) {
+////                perspective.InteractionfocusOnFrame((old_FrameImage) touchInteraction.getImage());
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //            }
 //
 //        }
 //
-//        if (!perspective.hasFocus() || perspective.getFocus().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
+//        if (!perspective.hasFocus() || perspective.getFocus().isType(old_FrameImage.TYPE, old_PortImage.TYPE, old_PathImage.TYPE)) {
 //
 //            if (!touchInteraction.isTouching()) {
 ////                perspective.InteractionfocusReset();
@@ -136,7 +178,12 @@ public class Body extends _Actor {
 
     public void onHoldListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
         touchInteraction.setType(TouchInteraction.Type.HOLD);
+=======
+        Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
+        touchInteraction.setTargetImage(targetImage);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
         Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
@@ -145,11 +192,11 @@ public class Body extends _Actor {
 
         if (touchInteraction.isTouching()) {
 
-            if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+            if (touchInteraction.getTarget().isType(old_FrameImage.TYPE)) {
 
                 // TODO:
 
-            } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+            } else if (touchInteraction.getTarget().isType(old_PortImage.TYPE)) {
 
                 // TODO:
 
@@ -161,9 +208,24 @@ public class Body extends _Actor {
 
         touchInteraction.setType(TouchInteraction.Type.DRAG);
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
         Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
 
+=======
+        Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
+        touchInteraction.setTargetImage(targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.DRAG);
+
+//        if (touchInteractivity.getFirst().getTarget() != null) {
+        if (targetImage != null) {
+            //targetImage.touch(touchInteraction);
+//            touchInteractivity.getFirst().getTarget().touch(touchInteraction);
+            targetImage.touch(touchInteraction);
+        }
+
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
         Log.v("onDragListener", "" + touchInteraction.getType() + ": " + touchInteraction.getTarget());
 
         Log.v("Interaction", "onDrag");
@@ -172,7 +234,7 @@ public class Body extends _Actor {
         Log.v("Interaction", "-");
 
         if (touchInteractivity.getSize() > 1) {
-            touchInteraction.setTarget(touchInteractivity.getFirst().getTarget());
+            touchInteraction.setTargetImage(touchInteractivity.getFirst().getTarget());
         }
 
         touchInteractivity.isDragging[touchInteraction.pointerIndex] = true;
@@ -185,23 +247,29 @@ public class Body extends _Actor {
             // TODO: Put into callback
             if (touchInteraction.isTouching()) {
 
-                if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+                if (touchInteraction.getTarget().isType(old_FrameImage.TYPE)) {
 
-                    FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                    frameImage.touch(touchInteraction);
-                    frameImage.setPosition(touchInteraction.getPosition());
+                    old_FrameImage oldFrameImage = (old_FrameImage) touchInteraction.getTarget();
+                    oldFrameImage.touch(touchInteraction);
+                    oldFrameImage.setPosition(touchInteraction.getPosition());
 
                     // Zoom out to show overview
 //                    perspective.setScale(0.8f);
 
-                } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+                } else if (touchInteraction.getTarget().isType(old_PortImage.TYPE)) {
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                     PortImage portImage = (PortImage) touchInteraction.getTarget();
                     portImage.isTouched = true;
 //                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.getPosition(), TouchInteraction.Type.DRAG);
+=======
+                    old_PortImage oldPortImage = (old_PortImage) touchInteraction.getTarget();
+                    oldPortImage.isTouched = true;
+//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.getPosition(), OnTouchActionListener.Type.DRAG);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //                    portSprite.touchPositions(touchInteraction);
 
-                    portImage.setPosition(touchInteraction.getPosition());
+                    oldPortImage.setPosition(touchInteraction.getPosition());
                 }
 
             } else if (perspective.isAdjustable()) {
@@ -221,18 +289,18 @@ public class Body extends _Actor {
             // TODO: Put into callback
             if (touchInteraction.isTouching()) {
 
-                if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+                if (touchInteraction.getTarget().isType(old_FrameImage.TYPE)) {
 
-                    FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                    frameImage.touch(touchInteraction);
-                    frameImage.setPosition(touchInteraction.getPosition());
+                    old_FrameImage oldFrameImage = (old_FrameImage) touchInteraction.getTarget();
+                    oldFrameImage.touch(touchInteraction);
+                    oldFrameImage.setPosition(touchInteraction.getPosition());
 
                     perspective.drag_focusOnForm();
 
-                } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+                } else if (touchInteraction.getTarget().isType(old_PortImage.TYPE)) {
 
-                    PortImage portImage = (PortImage) touchInteraction.getTarget();
-                    portImage.touch(touchInteraction);
+                    old_PortImage oldPortImage = (old_PortImage) touchInteraction.getTarget();
+                    oldPortImage.touch(touchInteraction);
 
                     perspective.drag_focusOnPortNewPath(touchInteractivity, touchInteraction);
                 }
@@ -248,7 +316,14 @@ public class Body extends _Actor {
 
     private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
         touchInteraction.setType(TouchInteraction.Type.TAP);
+=======
+        Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
+        touchInteraction.setTargetImage(targetImage);
+
+        touchInteraction.setType(OnTouchActionListener.Type.TAP);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
         Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
@@ -260,24 +335,30 @@ public class Body extends _Actor {
 
         if (touchInteraction.isTouching()) {
 
-            if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+            if (touchInteraction.getTarget().isType(old_FrameImage.TYPE)) {
 
                 // Frame
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                 FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
                 perspective.tap_focusOnForm(this, touchInteractivity, touchInteraction);
                 frameImage.touch(touchInteraction);
+=======
+                old_FrameImage oldFrameImage = (old_FrameImage) touchInteraction.getTarget();
+                perspective.tap_focusOnFrame(this, touchInteractivity, touchInteraction);
+                oldFrameImage.touch(touchInteraction);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
-            } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+            } else if (touchInteraction.getTarget().isType(old_PortImage.TYPE)) {
 
                 // Port
-                PortImage portImage = (PortImage) touchInteraction.getTarget();
-                portImage.touch(touchInteraction);
+                old_PortImage oldPortImage = (old_PortImage) touchInteraction.getTarget();
+                oldPortImage.touch(touchInteraction);
 
-            } else if (touchInteraction.getTarget().isType(PathImage.TYPE)) {
+            } else if (touchInteraction.getTarget().isType(old_PathImage.TYPE)) {
 
                 // Path
-                PathImage pathImage = (PathImage) touchInteraction.getTarget();
-                pathImage.touch(touchInteraction);
+                old_PathImage oldPathImage = (old_PathImage) touchInteraction.getTarget();
+                oldPathImage.touch(touchInteraction);
 
 //                perspective.tap_focusOnPath();
             }
@@ -292,8 +373,13 @@ public class Body extends _Actor {
     private void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
         touchInteraction.setType(TouchInteraction.Type.RELEASE);
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
         Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
         touchInteraction.setTarget(targetImage);
+=======
+        Image targetImage = perspective.getViz().getImage(touchInteraction.getPosition());
+        touchInteraction.setTargetImage(targetImage);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
         Log.v("Interaction", "onRelease");
         Log.v("Interaction", "focus: " + perspective.getFocus());
@@ -302,47 +388,67 @@ public class Body extends _Actor {
 
         if (touchInteraction.isTouching()) {
 
-            if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+            if (touchInteraction.getTarget().isType(old_FrameImage.TYPE)) {
 
                 // If first touch was on the same form, then respond
-                if (touchInteractivity.getFirst().isTouching() && touchInteractivity.getFirst().getTarget().isType(FrameImage.TYPE)) {
+                if (touchInteractivity.getFirst().isTouching() && touchInteractivity.getFirst().getTarget().isType(old_FrameImage.TYPE)) {
                     // Frame
-                    FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                    frameImage.touch(touchInteraction);
+                    old_FrameImage oldFrameImage = (old_FrameImage) touchInteraction.getTarget();
+                    oldFrameImage.touch(touchInteraction);
                 }
 
-            } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+            } else if (touchInteraction.getTarget().isType(old_PortImage.TYPE)) {
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                 // PortImage portImage = (PortImage) touchInteraction.getImageByPosition();
                 PortImage sourcePortImage = (PortImage) touchInteractivity.getFirst().getTarget();
 
                 // Show ports of nearby forms
                 boolean useNearbyPortImage = false;
                 for (FrameImage nearbyFrameImage : perspective.getVisualization().getFormImages()) {
+=======
+                // old_PortImage portImage = (old_PortImage) touchInteraction.getImage();
+                old_PortImage sourceOldPortImage = (old_PortImage) touchInteractivity.getFirst().getTarget();
+
+                // Show ports of nearby forms
+                boolean useNearbyPortImage = false;
+                for (Image nearbyImage : perspective.getViz().getImages().old_filterType(old_FrameImage.TYPE).getList()) {
+
+                    old_FrameImage nearbyOldFrameImage = (old_FrameImage) nearbyImage;
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
                     Log.v("Interaction", "A");
 
                     // Update style of nearby machines
                     double distanceToFormImage = Geometry.calculateDistance(
                             touchInteraction.getPosition(),
-                            nearbyFrameImage.getPosition()
+                            nearbyOldFrameImage.getPosition()
                     );
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                     if (distanceToFormImage < nearbyFrameImage.boardHeight + 50) {
+=======
+                    if (distanceToFrameImage < nearbyOldFrameImage.boardHeight + 50) {
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
                         Log.v("Interaction", "B");
 
-                        // TODO: Use overlappedImage instanceof PortImage
+                        // TODO: Use overlappedImage instanceof old_PortImage
 
-                        for (PortImage nearbyPortImage : nearbyFrameImage.getPortImages()) {
+                        for (old_PortImage nearbyOldPortImage : nearbyOldFrameImage.getPortImages()) {
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                             if (nearbyPortImage != sourcePortImage) {
                                 if (nearbyPortImage.isTouching(touchInteraction.getPosition(), 50)) {
+=======
+                            if (nearbyOldPortImage != sourceOldPortImage) {
+                                if (nearbyOldPortImage.isTouching(touchInteraction.getPosition())) {
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
                                     Log.v("Interaction", "C");
 
-                                    Port port = sourcePortImage.getPort();
-                                    Port nearbyPort = nearbyPortImage.getPort();
+                                    Port port = sourceOldPortImage.getPort();
+                                    Port nearbyPort = nearbyOldPortImage.getPort();
 
                                     useNearbyPortImage = true;
 
@@ -357,8 +463,13 @@ public class Body extends _Actor {
                                     nearbyPort.setType(Port.Type.getNextType(nearbyPort.getType()));
 
                                     // Create and add path to port
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                                     Port sourcePort = (Port) perspective.getVisualization().getModel(sourcePortImage);
                                     Port targetPort = (Port) perspective.getVisualization().getModel(nearbyPortImage);
+=======
+                                    Port sourcePort = (Port) perspective.getViz().getModel(sourceOldPortImage);
+                                    Port targetPort = (Port) perspective.getViz().getModel(nearbyOldPortImage);
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
                                     if (!sourcePort.hasAncestor(targetPort)) {
 
@@ -367,12 +478,21 @@ public class Body extends _Actor {
                                         Path path = new Path(sourcePort, targetPort);
                                         sourcePort.addPath(path);
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
                                         PathImage pathImage = new PathImage(path);
                                         pathImage.setVisualization(perspective.getVisualization());
                                         perspective.getVisualization().addImage(path, pathImage, "paths");
 
                                         PortImage targetPortImage = (PortImage) perspective.getVisualization().getImage(path.getTarget());
                                         targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+=======
+                                        old_PathImage oldPathImage = new old_PathImage(path);
+                                        oldPathImage.setViz(perspective.getViz());
+                                        perspective.getViz().addImage(oldPathImage, "paths");
+
+                                        old_PortImage targetOldPortImage = (old_PortImage) perspective.getViz().getImage(path.getTarget());
+                                        targetOldPortImage.setUniqueColor(sourceOldPortImage.getUniqueColor());
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 
                                         // Perspective
                                         perspective.release_focusOnPath(sourcePort);
@@ -389,7 +509,7 @@ public class Body extends _Actor {
 
                 if (!useNearbyPortImage) {
 
-                    Port port = (Port) sourcePortImage.getModel();
+                    Port port = (Port) sourceOldPortImage.getModel();
 
                     port.setDirection(Port.Direction.INPUT);
 
@@ -398,7 +518,7 @@ public class Body extends _Actor {
                     }
                 }
 
-                sourcePortImage.setCandidatePathVisibility(false);
+                sourceOldPortImage.setCandidatePathVisibility(false);
 
                 // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
@@ -411,20 +531,30 @@ public class Body extends _Actor {
 //
 //                getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 //                touchInteraction.setTarget(touchInteractivity.getFirst().getImageByPosition());
 //                touchInteraction.setType(TouchInteraction.Type.RELEASE);
 //                Log.v("onHoldListener", "Source port: " + touchInteraction.getImageByPosition());
+=======
+//                touchInteraction.setTargetImage(touchInteractivity.getFirst().getImage());
+//                touchInteraction.setType(OnTouchActionListener.Type.RELEASE);
+//                Log.v("onHoldListener", "Source port: " + touchInteraction.getImage());
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //                targetImage.touch(touchInteraction);
 
-            } else if (touchInteraction.getTarget().isType(PathImage.TYPE)) {
+            } else if (touchInteraction.getTarget().isType(old_PathImage.TYPE)) {
 
-                PathImage pathImage = (PathImage) touchInteraction.getTarget();
+                old_PathImage oldPathImage = (old_PathImage) touchInteraction.getTarget();
             }
 
         } else if (!touchInteraction.isTouching()) {
 
 //            // No touchPositions on board or port. Touch is on map. So hide ports.
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 //            for (FrameImage formImage : perspective.getVisualization().getFormImages()) {
+=======
+//            for (old_FrameImage formImage : perspective.getViz().getFrameImages()) {
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //                formImage.hidePortImages();
 //                formImage.hidePathImages();
 //                formImage.setTransparency(1.0f);
@@ -432,15 +562,19 @@ public class Body extends _Actor {
 //
 //            // Adjust panning
 //            // Auto-adjust the perspective
+<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/interaction/Body.java
 //            Point centroidPosition = perspective.getVisualization().getImages().filterType(FrameImage.TYPE).calculateCentroid();
+=======
+//            Point centroidPosition = perspective.getViz().getImages().old_filterType(old_FrameImage.TYPE).calculateCentroid();
+>>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Body.java
 //            perspective.setPosition(new Point(centroidPosition.x, centroidPosition.y));
 //
 //            adjustPerspectiveScale();
 
             // Check if first touch was on an image
             if (touchInteractivity.getFirst().isTouching()) {
-                if (touchInteractivity.getFirst().getTarget().isType(PortImage.TYPE)) {
-                    ((PortImage) touchInteractivity.getFirst().getTarget()).setCandidatePathVisibility(false);
+                if (touchInteractivity.getFirst().getTarget().isType(old_PortImage.TYPE)) {
+                    ((old_PortImage) touchInteractivity.getFirst().getTarget()).setCandidatePathVisibility(false);
                 }
             }
 
