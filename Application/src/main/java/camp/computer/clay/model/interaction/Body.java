@@ -206,11 +206,13 @@ public class Body extends _Actor {
 
             } else if (perspective.isAdjustable()) {
 
-                perspective.setScale(0.9f);
-                perspective.setOffset(
-                        touchInteraction.getPosition().getX() - touchInteractivity.getFirst().getPosition().getX(),
-                        touchInteraction.getPosition().getY() - touchInteractivity.getFirst().getPosition().getY()
-                );
+//                perspective.setScale(0.9f);
+//                perspective.setOffset(
+//                        touchInteraction.getPosition().getX() - touchInteractivity.getFirst().getPosition().getX(),
+//                        touchInteraction.getPosition().getY() - touchInteractivity.getFirst().getPosition().getY()
+//                );
+
+                perspective.focusOnPerspectiveAdjustment(touchInteractivity);
 
             }
 
@@ -227,7 +229,7 @@ public class Body extends _Actor {
                     frameImage.touch(touchInteraction);
                     frameImage.setPosition(touchInteraction.getPosition());
 
-                    perspective.drag_focusOnFrame();
+                    perspective.focusOnFrame(this, touchInteractivity, touchInteraction);
 
                 } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
 

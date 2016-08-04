@@ -216,25 +216,8 @@ public class Perspective {
         this.focusImage = image;
     }
 
-//    public void touch_focusReset() {
-//        Log.v("TouchedImage", "touch_focusReset");
-//
-//        // <PERSPECTIVE>
-//        setFocusImage(null);
-//        // this.isAdjustable = false;
-//        // </PERSPECTIVE>
-//
-//    }
-
-//    public void touch_focusOnForm(FrameImage formImage) {
-//        Log.v("TouchedImage", "touch_focusOnForm");
-//
-//        setFocusImage(formImage);
-//        setAdjustability(false);
-//    }
-
-    public void touch_focusOnPort(PortImage portImage) {
-        Log.v("TouchedImage", "touch_focusOnPort");
+    public void focusOnPort(PortImage portImage) {
+        Log.v("TouchedImage", "focusOnPort");
 
 //        // Perspective
 //        if (getPerspective().getFocusImage().isType(PathImage.TYPE)) {
@@ -251,23 +234,6 @@ public class Perspective {
         setFocusImage(portImage);
         setAdjustability(false);
         // </PERSPECTIVE>
-
-    }
-
-//    public void touch_focusOnPath(PathImage pathImage) {
-//        Log.v("TouchedImage", "touch_focusOnPath");
-//
-//        setFocusImage(pathImage);
-//        setAdjustability(false);
-//
-//    }
-
-    public void drag_focusOnFrame() {
-        Log.v("Focus", "drag_focusOnFrame");
-
-        // Perspective (zoom out to show overview)
-        // adjustPosition();
-        adjustScale();
 
     }
 
@@ -359,103 +325,100 @@ public class Perspective {
 
     public void focusOnFrame(Body body, TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
+        if (touchInteractivity.isDragging[touchInteraction.pointerIndex]) {
 
-        // <UPDATE_PERSPECTIVE>
-        // Remove focus from other form
-        ImageGroup otherFormImages = getVisualization().getImages().filterType(FrameImage.TYPE).remove(frameImage);
-        for (Image image : otherFormImages.getList()) {
-            FrameImage otherFrameImage = (FrameImage) image;
-            otherFrameImage.hidePortImages();
-            otherFrameImage.hidePathImages();
-            otherFrameImage.setTransparency(0.1f);
-        }
+            adjustScale();
 
-        TouchInteractivity previousInteractivity = null;
-        if (body.touchInteractivities.size() > 1) {
-            previousInteractivity = body.touchInteractivities.get(body.touchInteractivities.size() - 2);
-            Log.v("PreviousTouch", "Previous: " + previousInteractivity.getFirst().getTarget());
-            Log.v("PreviousTouch", "Current: " + touchInteraction.getTarget());
-        }
+        } else {
+            FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
 
-        // Perspective
-        if (frameImage.getForm().getPaths().size() > 0
-                && (previousInteractivity != null && previousInteractivity.getFirst().getTarget() != touchInteraction.getTarget())) {
-
-            Log.v("Touch_", "A");
-
-            for (PortImage portImage : frameImage.getPortImages()) {
-                ArrayList<PathImage> pathImages = portImage.getPathImages();
-                for (PathImage pathImage : pathImages) {
-                    pathImage.setVisibility(false);
-                }
+            // <UPDATE_PERSPECTIVE>
+            // Remove focus from other form
+            ImageGroup otherFormImages = getVisualization().getImages().filterType(FrameImage.TYPE).remove(frameImage);
+            for (Image image : otherFormImages.getList()) {
+                FrameImage otherFrameImage = (FrameImage) image;
+                otherFrameImage.hidePortImages();
+                otherFrameImage.hidePathImages();
+                otherFrameImage.setTransparency(0.1f);
             }
 
-            // Get ports along every path connected to the ports on the touched form
-            ArrayList<Port> formPathPorts = new ArrayList<>();
-            for (Port port : frameImage.getForm().getPorts()) {
-
-                // TODO: ((PortImage) getPerspective().getVisualization().getImage(port)).getVisiblePaths()
-
-                if (!formPathPorts.contains(port)) {
-                    formPathPorts.add(port);
-                }
-
-                ArrayList<Path> portPaths = port.getPathsByPort();
-                for (Path path : portPaths) {
-                    if (!formPathPorts.contains(path.getSource())) {
-                        formPathPorts.add(path.getSource());
-                    }
-                    if (!formPathPorts.contains(path.getTarget())) {
-                        formPathPorts.add(path.getTarget());
-                    }
-                }
+            TouchInteractivity previousInteractivity = null;
+            if (body.touchInteractivities.size() > 1) {
+                previousInteractivity = body.touchInteractivities.get(body.touchInteractivities.size() - 2);
+                Log.v("PreviousTouch", "Previous: " + previousInteractivity.getFirst().getTarget());
+                Log.v("PreviousTouch", "Current: " + touchInteraction.getTarget());
             }
 
             // Perspective
-            ArrayList<Image> formPathPortImages = getVisualization().getImages(formPathPorts);
+            if (frameImage.getForm().getPaths().size() > 0
+                    && (previousInteractivity != null && previousInteractivity.getFirst().getTarget() != touchInteraction.getTarget())) {
 
-            ArrayList<Point> formPortPositions = Visualization.getPositions(formPathPortImages);
-            Rectangle boundingBox = Geometry.calculateBoundingBox(formPortPositions);
+                Log.v("Touch_", "A");
 
-            setAdjustability(false);
-            adjustScale(boundingBox);
-            setPosition(boundingBox.getPosition());
-
-        } else {
-
-            Log.v("Touch_", "B");
-
-            // Do this on second press, or when none of the machine's ports have paths.
-            // This provides lookahead, so you can be triggered to touch again to recover
-            // the perspective.
-
-            for (PortImage portImage : frameImage.getPortImages()) {
-                ArrayList<PathImage> pathImages = portImage.getPathImages();
-                for (PathImage pathImage : pathImages) {
-                    pathImage.setVisibility(false);
+                for (PortImage portImage : frameImage.getPortImages()) {
+                    ArrayList<PathImage> pathImages = portImage.getPathImages();
+                    for (PathImage pathImage : pathImages) {
+                        pathImage.setVisibility(false);
+                    }
                 }
+
+                // Get ports along every path connected to the ports on the touched form
+                ArrayList<Port> formPathPorts = new ArrayList<>();
+                for (Port port : frameImage.getForm().getPorts()) {
+
+                    // TODO: ((PortImage) getPerspective().getVisualization().getImage(port)).getVisiblePaths()
+
+                    if (!formPathPorts.contains(port)) {
+                        formPathPorts.add(port);
+                    }
+
+                    ArrayList<Path> portPaths = port.getPathsByPort();
+                    for (Path path : portPaths) {
+                        if (!formPathPorts.contains(path.getSource())) {
+                            formPathPorts.add(path.getSource());
+                        }
+                        if (!formPathPorts.contains(path.getTarget())) {
+                            formPathPorts.add(path.getTarget());
+                        }
+                    }
+                }
+
+                // Perspective
+                ArrayList<Image> formPathPortImages = getVisualization().getImages(formPathPorts);
+
+                ArrayList<Point> formPortPositions = Visualization.getPositions(formPathPortImages);
+                Rectangle boundingBox = Geometry.calculateBoundingBox(formPortPositions);
+
+                setAdjustability(false);
+                adjustScale(boundingBox);
+                setPosition(boundingBox.getPosition());
+
+            } else {
+
+                Log.v("Touch_", "B");
+
+                // Do this on second press, or when none of the machine's ports have paths.
+                // This provides lookahead, so you can be triggered to touch again to recover
+                // the perspective.
+
+                for (PortImage portImage : frameImage.getPortImages()) {
+                    ArrayList<PathImage> pathImages = portImage.getPathImages();
+                    for (PathImage pathImage : pathImages) {
+                        pathImage.setVisibility(false);
+                    }
+                }
+
+                // TODO: (on second press, also hide external ports, send peripherals) getPerspective().setScale(1.2f);
+                // TODO: (cont'd) getPerspective().setPosition(frameImage.getPosition());
+
+                setAdjustability(false);
+                setScale(1.2f);
+                setPosition(frameImage.getPosition());
             }
-
-            // TODO: (on second press, also hide external ports, send peripherals) getPerspective().setScale(1.2f);
-            // TODO: (cont'd) getPerspective().setPosition(frameImage.getPosition());
-
-            setAdjustability(false);
-            setScale(1.2f);
-            setPosition(frameImage.getPosition());
+            // </UPDATE_PERSPECTIVE>
         }
-        // </UPDATE_PERSPECTIVE>
 
     }
-
-//    public void tap_focusOnPath() {
-//
-//        // TODO: Show path programmer (Create and curate actions built in JS by inserting
-//        // TODO: (cont'd) exposed ports into action ports. This defines a path)
-//        final RelativeLayout timelineView = (RelativeLayout) Application.getDisplay().findViewById(R.id.path_editor_view);
-//        timelineView.setVisibility(View.VISIBLE);
-//
-//    }
 
     public void focusOnPath(Port sourcePort) {
 
