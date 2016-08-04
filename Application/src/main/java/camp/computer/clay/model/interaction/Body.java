@@ -99,9 +99,9 @@ public class Body extends _Actor {
         Image touchedImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
         touchInteraction.setTarget(touchedImage);
 
-//        if (perspective.hasFocus()) {
+//        if (perspective.hasFocusImage()) {
 //
-//            if (perspective.getFocus().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
+//            if (perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
 //
 //                if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(PortImage.TYPE)) {
 ////                    Log.v("Interaction", "BUH");
@@ -109,7 +109,7 @@ public class Body extends _Actor {
 //                }
 //            }
 //
-//            if (perspective.getFocus().isType(PortImage.TYPE, PathImage.TYPE)) {
+//            if (perspective.getFocusImage().isType(PortImage.TYPE, PathImage.TYPE)) {
 //
 //                if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(PathImage.TYPE)) {
 ////                    perspective.InteractionfocusOnPath((PathImage) touchInteraction.getImageByPosition());
@@ -118,7 +118,7 @@ public class Body extends _Actor {
 //        }
 //
 //        // Reset object interaction state
-//        if (!perspective.hasFocus() || perspective.getFocus().isType(FrameImage.TYPE, PortImage.TYPE)) {
+//        if (!perspective.hasFocusImage() || perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE)) {
 //
 //            if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(FrameImage.TYPE)) {
 ////                perspective.InteractionfocusOnForm((FrameImage) touchInteraction.getImageByPosition());
@@ -126,7 +126,7 @@ public class Body extends _Actor {
 //
 //        }
 //
-//        if (!perspective.hasFocus() || perspective.getFocus().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
+//        if (!perspective.hasFocusImage() || perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
 //
 //            if (!touchInteraction.isTouching()) {
 ////                perspective.InteractionfocusReset();
@@ -167,7 +167,7 @@ public class Body extends _Actor {
         Log.v("onDragListener", "" + touchInteraction.getType() + ": " + touchInteraction.getTarget());
 
         Log.v("Interaction", "onDrag");
-        Log.v("Interaction", "focus: " + perspective.getFocus());
+        Log.v("Interaction", "focus: " + perspective.getFocusImage());
         Log.v("Interaction", "touch: " + touchInteraction.getTarget());
         Log.v("Interaction", "-");
 
@@ -227,21 +227,33 @@ public class Body extends _Actor {
                     frameImage.touch(touchInteraction);
                     frameImage.setPosition(touchInteraction.getPosition());
 
-                    perspective.drag_focusOnForm();
+                    perspective.drag_focusOnFrame();
 
                 } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
 
                     PortImage portImage = (PortImage) touchInteraction.getTarget();
                     portImage.touch(touchInteraction);
 
-                    perspective.drag_focusOnPortNewPath(touchInteractivity, touchInteraction);
+                    perspective.focusOnNewPath(touchInteractivity, touchInteraction);
                 }
 
-            } else {
+            } else if (perspective.isAdjustable()) {
 
-                perspective.drag_focusReset(touchInteractivity);
+                perspective.setScale(0.9f);
+                if (touchInteractivity.getSize() > 1) {
+                    perspective.setOffset(
+                            touchInteraction.getPosition().getX() - touchInteractivity.getPrevious(touchInteraction).getPosition().getX(),
+                            touchInteraction.getPosition().getY() - touchInteractivity.getPrevious(touchInteraction).getPosition().getY()
+                    );
+                }
 
             }
+
+//            else {
+//
+//                perspective.focusOnPerspectiveAdjustment(touchInteractivity);
+//
+//            }
 
         }
     }
@@ -254,7 +266,7 @@ public class Body extends _Actor {
         touchInteraction.setTarget(targetImage);
 
         Log.v("Interaction", "onTap");
-        Log.v("Interaction", "focus: " + perspective.getFocus());
+        Log.v("Interaction", "focus: " + perspective.getFocusImage());
         Log.v("Interaction", "touch: " + touchInteraction.getTarget());
         Log.v("Interaction", "-");
 
@@ -264,7 +276,7 @@ public class Body extends _Actor {
 
                 // Frame
                 FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                perspective.tap_focusOnForm(this, touchInteractivity, touchInteraction);
+                perspective.focusOnFrame(this, touchInteractivity, touchInteraction);
                 frameImage.touch(touchInteraction);
 
             } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
@@ -296,7 +308,7 @@ public class Body extends _Actor {
         touchInteraction.setTarget(targetImage);
 
         Log.v("Interaction", "onRelease");
-        Log.v("Interaction", "focus: " + perspective.getFocus());
+        Log.v("Interaction", "focus: " + perspective.getFocusImage());
         Log.v("Interaction", "touch: " + touchInteraction.getTarget());
         Log.v("Interaction", "-");
 
@@ -306,9 +318,13 @@ public class Body extends _Actor {
 
                 // If first touch was on the same form, then respond
                 if (touchInteractivity.getFirst().isTouching() && touchInteractivity.getFirst().getTarget().isType(FrameImage.TYPE)) {
+
                     // Frame
                     FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
                     frameImage.touch(touchInteraction);
+
+                    // Perspective
+                    perspective.focusReset();
                 }
 
             } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
@@ -318,7 +334,7 @@ public class Body extends _Actor {
 
                 // Show ports of nearby forms
                 boolean useNearbyPortImage = false;
-                for (FrameImage nearbyFrameImage : perspective.getVisualization().getFormImages()) {
+                for (FrameImage nearbyFrameImage : perspective.getVisualization().getFrameImages()) {
 
                     Log.v("Interaction", "A");
 
@@ -375,7 +391,7 @@ public class Body extends _Actor {
                                         targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
 
                                         // Perspective
-                                        perspective.release_focusOnPath(sourcePort);
+                                        perspective.focusOnPath(sourcePort);
                                     }
 
                                     break;
@@ -407,7 +423,7 @@ public class Body extends _Actor {
 //                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
 //                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
 //                Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
-//                getVisualization().getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(boundingBox);
+//                getVisualization().getSimulation().getBody(0).getPerspective().adjustScale(boundingBox);
 //
 //                getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
@@ -424,7 +440,7 @@ public class Body extends _Actor {
         } else if (!touchInteraction.isTouching()) {
 
 //            // No touchPositions on board or port. Touch is on map. So hide ports.
-//            for (FrameImage formImage : perspective.getVisualization().getFormImages()) {
+//            for (FrameImage formImage : perspective.getVisualization().getFrameImages()) {
 //                formImage.hidePortImages();
 //                formImage.hidePathImages();
 //                formImage.setTransparency(1.0f);
@@ -435,7 +451,7 @@ public class Body extends _Actor {
 //            Point centroidPosition = perspective.getVisualization().getImages().filterType(FrameImage.TYPE).calculateCentroid();
 //            perspective.setPosition(new Point(centroidPosition.x, centroidPosition.y));
 //
-//            adjustPerspectiveScale();
+//            adjustScale();
 
             // Check if first touch was on an image
             if (touchInteractivity.getFirst().isTouching()) {

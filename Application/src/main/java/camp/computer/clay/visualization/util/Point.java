@@ -40,8 +40,8 @@ public class Point {
     public void offset (double dx, double dy) {
         Log.v("Drag", "dx: " + dx);
         Log.v("Drag", "dy: " + dy);
-        this.x = this.x - dx;
-        this.y = this.y - dy;
+        this.x = this.x + dx;
+        this.y = this.y + dy;
     }
 
     public void set (Point point) {

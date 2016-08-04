@@ -65,20 +65,21 @@ public class Visualization extends Image {
     }
 
     // TODO: Remove Image parameter. Create that and return it.
-    public void addImage(Model model, Image image, String layerName) {
+    public void addImage(Model model, Image image, String layerTag) {
 
         // Position image
-        findImagePosition(image);
+        locateImagePosition(image);
 
         // Add image
-        if (!hasLayer(layerName)) {
-            addLayer(layerName);
+        if (!hasLayer(layerTag)) {
+            addLayer(layerTag);
         }
-        getLayer(layerName).add(model, image);
+        getLayer(layerTag).add(model, image);
 
-//        // Update perspective
-        getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(0);
-//        getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).calculateCenter());
+        // Update perspective
+//        getSimulation().getBody(0).getPerspective().adjustScale(0);
+        // getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).calculateCenter());
+        getSimulation().getBody(0).getPerspective().adjustPosition();
     }
 
     public Layer getLayer(String tag) {
@@ -99,10 +100,10 @@ public class Visualization extends Image {
         return null;
     }
 
-    private void findImagePosition(Image image) {
+    private void locateImagePosition(Image image) {
 
         // Calculate random positions separated by minimum distance
-        final float imageSeparationDistance = 500;
+        final float imageSeparationDistance = 525; // 500;
 
         ArrayList<Point> imagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
 
@@ -163,7 +164,7 @@ public class Visualization extends Image {
         return null;
     }
 
-    public ArrayList<FrameImage> getFormImages() {
+    public ArrayList<FrameImage> getFrameImages() {
 
         ArrayList<FrameImage> images = new ArrayList<>();
 
@@ -248,7 +249,7 @@ public class Visualization extends Image {
         float shortestDistance = Float.MAX_VALUE;
         FrameImage nearestFrameImage = null;
 
-        for (FrameImage frameImage : getFormImages()) {
+        for (FrameImage frameImage : getFrameImages()) {
 
             // Update style of nearby machines
             float currentDistance = (float) Geometry.calculateDistance(
@@ -335,7 +336,7 @@ public class Visualization extends Image {
             }
         }
 
-        Geometry.computeCirclePacking(getFormImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
+        Geometry.computeCirclePacking(getFrameImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
@@ -388,7 +389,7 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CONVEX_HULL>
-            ArrayList<Point> formPositions = Visualization.getPositions(getFormImages());
+            ArrayList<Point> formPositions = Visualization.getPositions(getFrameImages());
             ArrayList<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
 
             visualizationSurface.getPaint().setStrokeWidth(1.0f);

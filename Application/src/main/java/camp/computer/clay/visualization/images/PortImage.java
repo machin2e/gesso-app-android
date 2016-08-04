@@ -557,7 +557,7 @@ public class PortImage extends Image {
                 // TODO: If second press, change the channel.
 
                 // Remove focus from other machines and their ports.
-                for (FrameImage frameImage : getVisualization().getFormImages()) {
+                for (FrameImage frameImage : getVisualization().getFrameImages()) {
                     frameImage.setTransparency(0.05f);
                     frameImage.hidePortImages();
                     frameImage.hidePathImages();
@@ -590,7 +590,7 @@ public class PortImage extends Image {
                 ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
                 ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
                 Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
-                getVisualization().getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(boundingBox);
+                getVisualization().getSimulation().getBody(0).getPerspective().adjustScale(boundingBox);
 
                 getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 

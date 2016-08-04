@@ -142,7 +142,7 @@ public class Clay {
 
         // Update visualization
 
-        String layerName = "forms";
+        String layerName = "frames";
         visualization.addLayer(layerName);
         Layer defaultLayer = visualization.getLayer(layerName);
 

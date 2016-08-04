@@ -20,7 +20,7 @@ import camp.computer.clay.visualization.util.Shape;
 
 public class FrameImage extends Image {
 
-    public final static String TYPE = "base";
+    public final static String TYPE = "frame";
 
     // TODO: Replace these with dynamic counts.
     final static int PORT_GROUP_COUNT = 4;
