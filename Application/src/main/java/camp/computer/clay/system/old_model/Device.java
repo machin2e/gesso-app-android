@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,19 +21,19 @@ public class Device {
 
     private UUID uuid = null; // The unit's static, unchanging, UUID
 
-    // TODO: Put this into a MessageHost<Internet> class
     private String internetAddress = null; // The unit's IP address
-    private TcpMessageClientHost tcpMessageClientHost;
 
-    // TODO: Put this into a MessageHost<Thread> class
     private String meshAddress = null; // The unit's IP address
 
     private Timeline timeline = null;
 
-    // TODO: Add this to MessageHost<?> classes
     private Date timeOfLastContact = null;
 
     // TODO: Cache/model the unit's state and behavior
+
+    private TcpMessageClientHost tcpMessageClientHost;
+
+    private ArrayList<String> tags;
 
     public Device() {
     }
@@ -43,13 +44,53 @@ public class Device {
         this.uuid = uuid;
 
         this.timeline = new Timeline(this);
+
+        tags = new ArrayList<String>();
     }
 
     public Clay getClay () {
         return this.clay;
     }
 
-    // TODO: Put this into MessageHost<?> classes
+//    public long getTimeSinceLastMessage () {
+////        Log.v ("Clay_Time", "Time since last message: " + this.timeOfLastContact);
+//        Date currentTime = Calendar.getInstance().getTime ();
+//
+//        if (timeOfLastContact != null) {
+//            long timeDifferenceInMilliseconds = currentTime.getTime () - timeOfLastContact.getTime ();
+//            // long seconds = timeDifferenceInMilliseconds / 1000;
+//            // long minutes = seconds / 60;
+//            // long hours = minutes / 60;
+//            // long days = hours / 24;
+//            return timeDifferenceInMilliseconds;
+//        } else {
+//            return Long.MAX_VALUE;
+//        }
+//    }
+
+    public void setTag (String tag) {
+        if (this.tags != null && this.tags.size() > 0) {
+            this.tags.add(0, tag);
+        } else {
+            this.tags.add(tag);
+        }
+    }
+
+    public void addTag (String tag) {
+        this.tags.add(tag);
+    }
+
+    public String getTag () {
+        if (this.tags != null && this.tags.size() > 0) {
+            return this.tags.get(0);
+        }
+        return null;
+    }
+
+    public ArrayList<String> getTags () {
+        return this.tags;
+    }
+
     public void setTimeOfLastContact (Date time) {
         this.timeOfLastContact = time;
         Log.v("Clay_Time", "Changing time from " + this.timeOfLastContact.getTime() + " to " + time.getTime());
@@ -103,8 +144,7 @@ public class Device {
         }
     }
 
-    // TODO: Add addMessageHost to set general-purpose message interface.
-    // TODO: (cont'd) Replace with messageInterface.send(Message message)
+    // TODO: public void queueMessageTcp (String content, callbackToCallWhenReceiveResponse) // Adding a callback indicates that the message should be acknowledged and bookkeeping should track when it is received and invoke this callback when response is received.
     public void enqueueMessage(String content) {
         Log.v("TCP_Server", "enqueueMessage");
 

@@ -3,7 +3,6 @@ package camp.computer.clay.system.old_model;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -17,22 +16,21 @@ public class Descriptor {
     private String label;
     private String description;
 
-    private List<String> descriptionRange = null;
+    private ArrayList<String> descriptionRange = null;
 
-    private Descriptor parent = null;
+    private Descriptor parent;
 
-    private List<Descriptor> children = new ArrayList<>();
+    private ArrayList<Descriptor> children;
 
-    private List<OnDescriptorUpdateListener> onDescriptorUpdateListeners;
+    private ArrayList<OnDescriptorUpdateListener> onDescriptorUpdateListeners;
 
     /**
      * The depth of the descriptor in the containing descriptor tree. Root descriptors have depth 0.
      */
-    private int depth = 0;
+    private int depth;
 
-    private boolean isList = false;
-
-    private Descriptor listChoice = null;
+    private boolean isList;
+    private Descriptor listChoice;
 
     public Descriptor(String label, String description) {
 
@@ -40,7 +38,15 @@ public class Descriptor {
 
         this.label = label;
 
-        this.onDescriptorUpdateListeners = new ArrayList<>();
+        this.isList = false;
+        this.listChoice = null;
+
+        this.depth = 0;
+
+        this.parent = null;
+        this.children = new ArrayList<Descriptor>();
+
+        this.onDescriptorUpdateListeners = new ArrayList<OnDescriptorUpdateListener>();
 
         this.setDescription(description);
     }
@@ -65,12 +71,12 @@ public class Descriptor {
         this.label = label;
     }
 
-    public List<String> getLabels() {
-        List<String> labels = new ArrayList<>();
+    public ArrayList<String> getKeys () {
+        ArrayList<String> keys = new ArrayList<String>();
         for (Descriptor child : children) {
-            labels.add(child.getLabel());
+            keys.add (child.getLabel());
         }
-        return labels;
+        return keys;
     }
 
     public String getLabel() {
@@ -78,30 +84,30 @@ public class Descriptor {
     }
 
     public void setDescription(String description) {
-        setDescription(description, true);
+        setContent (description, true);
     }
 
-    public void setDescription(String description, boolean notifySubscribers) {
-        this.description = description;
+    public void setContent (String content, boolean notifyContentTree) {
+        this.description = content;
 
         // Notify observers, "peer datas'" observers, and children's observers (in data hierarchy)
-        if (notifySubscribers) {
-            notifyDescriptorTree();
+        if (notifyContentTree) {
+            this.notifyContentTree();
         }
     }
 
     // The callback interface
     public interface OnDescriptorUpdateListener {
-        void notifyDescriptorChanged();
+        void notifyContentChanged ();
     }
 
-    public void removeOnContentChangeListener(OnDescriptorUpdateListener onDescriptorUpdateListener) {
+    public void removeOnContentChangeListener (OnDescriptorUpdateListener onDescriptorUpdateListener) {
         if (this.onDescriptorUpdateListeners.contains(onDescriptorUpdateListener)) {
             this.onDescriptorUpdateListeners.remove(onDescriptorUpdateListener);
         }
     }
 
-    public void addOnContentChangeListener(OnDescriptorUpdateListener onDescriptorUpdateListener) {
+    public void addOnContentChangeListener (OnDescriptorUpdateListener onDescriptorUpdateListener) {
         if (!this.onDescriptorUpdateListeners.contains(onDescriptorUpdateListener)) {
             this.onDescriptorUpdateListeners.add(onDescriptorUpdateListener);
         }
@@ -109,19 +115,16 @@ public class Descriptor {
 
     // TODO: store
 
-    /**
-     * Notifies the parent of descriptor {@code descriptor}.
-     */
-    private void notifyParent(Descriptor descriptor) {
+    private void notifyParent(Descriptor notifySource) {
         if (this.parent != null) {
-            Log.v("Content_Tree", "notifyParent");
+            Log.v ("Content_Tree", "notifyParent");
             for (OnDescriptorUpdateListener onDescriptorUpdateListener : this.parent.onDescriptorUpdateListeners) {
-                onDescriptorUpdateListener.notifyDescriptorChanged();
+                onDescriptorUpdateListener.notifyContentChanged();
             }
 
             // Notify parents recursively until encountering a list or tree root (null).
             if (!this.parent.isList) {
-                this.parent.notifyParent(descriptor);
+                this.parent.notifyParent(notifySource);
             }
         }
     }
@@ -130,31 +133,31 @@ public class Descriptor {
      * Recursively notify the parents (until root or list), siblings, and siblings' children of
      * an event.
      */
-    private void notifyDescriptorTree() {
+    private void notifyContentTree() {
 
         Log.v("Content_Update", "notify: " + this.getLabel() + ", " + this.getDescription());
 
         Log.v("Content_Tree", "Descriptor Tree:");
         this.notifyParent(this);
-        this.updateChildrenDescriptions();
-        for (Descriptor sibling : this.siblings()) {
-            Log.v("Content_Tree", "\t" + sibling.getLabel() + " -> " + sibling.getDescription());
-            sibling.updateChildrenDescriptions();
+        this.updateChildrenContent();
+        for (Descriptor sibling : this.siblings ()) {
+            Log.v ("Content_Tree", "\t" + sibling.getLabel() + " -> " + sibling.getDescription());
+            sibling.updateChildrenContent();
         }
     }
 
-    private void updateChildrenDescriptions() {
+    private void updateChildrenContent () {
 
         // Notify listeners (via list of callbacks)
         for (OnDescriptorUpdateListener onDescriptorUpdateListener : this.onDescriptorUpdateListeners) {
-            onDescriptorUpdateListener.notifyDescriptorChanged();
+            onDescriptorUpdateListener.notifyContentChanged();
         }
 
         // Notify children
         for (Descriptor child : this.getChildren()) {
-            Log.v("Content_Tree", "\t\t" + child.getLabel() + " -> " + child.getDescription());
+            Log.v ("Content_Tree", "\t\t" + child.getLabel() + " -> " + child.getDescription());
             Log.v("Content_Tree", "\t\t\t|children|:" + child.children.size());
-            child.updateChildrenDescriptions();
+            child.updateChildrenContent();
         }
     }
 
@@ -162,12 +165,12 @@ public class Descriptor {
     // Navigation //
     //            //
 
-    public Descriptor parent() {
+    public Descriptor parent () {
         return this.parent;
     }
 
-    public List<Descriptor> siblings() {
-        List<Descriptor> siblings = new ArrayList<>();
+    public ArrayList<Descriptor> siblings () {
+        ArrayList<Descriptor> siblings = new ArrayList<Descriptor>();
         if (parent != null) {
             for (Descriptor descriptor : this.parent.getChildren()) {
                 if (descriptor != this) {
@@ -182,20 +185,20 @@ public class Descriptor {
     // Operations //
     //            //
 
-    public Descriptor set(String description) {
-        return this.set(description, true);
+    public Descriptor set (String content) {
+        return this.set (content, true);
     }
 
-    public Descriptor set(String description, boolean notifyDescriptorTree) {
-        if ((this.descriptionRange == null) || (this.descriptionRange != null && this.descriptionRange.contains(description))) {
-            Log.v("Descriptor", "set '" + this.label + "' to '" + description + "'");
+    public Descriptor set (String content, boolean notifyContentTree) {
+        if ((this.descriptionRange == null) || (this.descriptionRange != null && this.descriptionRange.contains(content))) {
+            Log.v("Descriptor", "set '" + this.label + "' to '" + content + "'");
             if (this.isList) {
                 Log.v("Content_Decision_List", "LIST");
 
                 // Update listChoice
                 for (Descriptor childEntry : this.getChildren()) {
                     if (childEntry.contains("number")) {
-                        if (childEntry.get("number").getDescription().equals(description)) {
+                        if (childEntry.get("number").getDescription().equals(content)) {
                             this.listChoice = childEntry;
                             break;
                         }
@@ -203,11 +206,11 @@ public class Descriptor {
                 }
 
                 if (listChoice != null) {
-                    //this.listChoice.setDescription(description, notifyDescriptorTree);
-                    this.setDescription(description, notifyDescriptorTree);
+                    //this.listChoice.setDescription(description, notifyContentTree);
+                    this.setContent(content, notifyContentTree);
                 }
             } else {
-                this.setDescription(description, notifyDescriptorTree);
+                this.setContent(content, notifyContentTree);
             }
         }
         return this;
@@ -225,47 +228,47 @@ public class Descriptor {
     // Structure Description //
     //                       //
 
-    public List<String> getDescriptionRange() {
+    public ArrayList<String> getDescriptionRange() {
         return this.descriptionRange;
     }
 
-    public void setDescriptionRange(List<String> descriptionRange) {
+    public void setDescriptionRange(ArrayList<String> descriptionRange) {
         this.descriptionRange = descriptionRange;
     }
 
-    public Descriptor from(List<String> descriptors) {
-        this.setDescriptionRange(descriptors);
+    public Descriptor from(ArrayList<String> contentRange) {
+        this.setDescriptionRange(contentRange);
         return this;
     }
 
     // e.g., data.put("type").from("switch", "wave", "pulse").case(directionEntry, "input", "pulse").case(directionEntry, "output", "wave")
     // pop-up chat with swipe left and right
     // small arrow centered above and below description value selectors
-    public Descriptor from(String... descriptions) {
-        List<String> descriptors = new ArrayList<>();
-        for (int i = 0; i < descriptions.length; i++) {
-            descriptors.add(descriptions[i]);
+    public Descriptor from(String... contentRangeValues) {
+        ArrayList<String> contentRange = new ArrayList<String>();
+        for (int i = 0; i < contentRangeValues.length; i++) {
+            contentRange.add(contentRangeValues[i]);
         }
-        this.from(descriptors);
+        this.from(contentRange);
         return this;
     }
 
-    public List<Descriptor> getChildren() {
+    public ArrayList<Descriptor> getChildren () {
         return this.children;
     }
 
-    public Descriptor get(String label) {
+    public Descriptor get (String key) {
         for (Descriptor descriptor : this.children) {
-            if (descriptor.getLabel().equals(label)) {
-                Log.v("Descriptor", "get '" + label + "'");
+            if (descriptor.getLabel().equals(key)) {
+                Log.v ("Descriptor", "get '" + key + "'");
                 return descriptor;
             }
         }
-        Log.v("Descriptor", "failed to get '" + label + "'");
+        Log.v ("Descriptor", "failed to get '" + key + "'");
         return null;
     }
 
-    public Descriptor choice() {
+    public Descriptor choice () {
         if (this.isList) {
             return this.listChoice;
         } else {
@@ -273,35 +276,35 @@ public class Descriptor {
         }
     }
 
-    public boolean contains(String label) {
+    public boolean contains (String key) {
         for (Descriptor descriptor : this.children) {
-            if (descriptor.getLabel().equals(label)) {
+            if (descriptor.getLabel().equals(key)) {
                 return true;
             }
         }
         return false;
     }
 
-    public Descriptor put(String label) {
-        return put(label, null);
+    public Descriptor put (String key) {
+        return put (key, null);
     }
 
-    public Descriptor list(String label) {
-        Descriptor descriptor = put(label);
+    public Descriptor list (String key) {
+        Descriptor descriptor = put (key);
         descriptor.isList = true;
         return descriptor;
     }
 
-    public Descriptor put(String label, String description) {
-        if (description == null) {
-            Log.v("Descriptor", "set '" + label);
+    public Descriptor put (String key, String content) {
+        if (content == null) {
+            Log.v("Descriptor", "set '" + key);
         } else {
-            Log.v("Descriptor", "set '" + label + "' to '" + description + "'");
+            Log.v("Descriptor", "set '" + key + "' to '" + content + "'");
         }
 
-        Descriptor descriptorEntry = this.get(label);
+        Descriptor descriptorEntry = this.get(key);
         if (descriptorEntry == null) {
-            descriptorEntry = new Descriptor(label, description);
+            descriptorEntry = new Descriptor(key, content);
             this.addChild(descriptorEntry);
 
             if (this.isList) {
@@ -310,20 +313,20 @@ public class Descriptor {
                 }
             }
         } else {
-            if ((descriptorEntry.descriptionRange == null) || (descriptorEntry.descriptionRange != null && descriptorEntry.descriptionRange.contains(description))) {
-                descriptorEntry.setDescription(description);
+            if ((descriptorEntry.descriptionRange == null) || (descriptorEntry.descriptionRange != null && descriptorEntry.descriptionRange.contains(content))) {
+                descriptorEntry.setDescription(content);
             }
         }
         return descriptorEntry;
     }
 
-    public void addChild(Descriptor descriptor) {
+    public void addChild (Descriptor descriptor) {
         this.children.add(descriptor);
         descriptor.parent = this;
         descriptor.depth = this.depth + 1;
     }
 
-    public int getDepth() {
+    public int getDepth () {
         return this.depth;
     }
 }

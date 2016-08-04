@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="camp.computer.clay.app"
+    package="camp.computer.clay.application"
     android:versionCode="6"
     android:versionName="6">
     <uses-sdk android:minSdkVersion="14"
@@ -15,7 +15,7 @@
     <application
         android:label="@string/application_name"
         android:icon="@drawable/ic_launcher">
-        <activity android:name="camp.computer.clay.app.Application"
+        <activity android:name="camp.computer.clay.application.Application"
             android:theme="@style/SplashTheme"
             android:icon="@drawable/ic_launcher"
             android:label="@string/application_name">

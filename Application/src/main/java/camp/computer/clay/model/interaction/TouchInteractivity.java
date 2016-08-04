@@ -1,40 +1,48 @@
 package camp.computer.clay.model.interaction;
 
 import android.os.Handler;
-import android.util.Log;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
-import camp.computer.clay.viz.util.Geometry;
-import camp.computer.clay.viz.util.Point;
+import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.util.Point;
 
 /**
- * An interactivity is a temporal sequence of one or more touchInteractions.
+ * An interactivity is a temporal sequence of one or more interactions.
  */
 public class TouchInteractivity {
 
     // TODO: Model this with a "touchPositions interaction envelope" or "interaction envelope".
     // TODO: Model voice interaction in the same way. Generify to Interactivity<T> or subclass.
-    // TODO: (?) Model data transmissions as touchInteractions in the same way?
+    // TODO: (?) Model data transmissions as interactions in the same way?
 
-    private List<TouchInteraction> touchInteractions = new LinkedList<>();
+    private ArrayList<TouchInteraction> interactions = new ArrayList<>();
 
-    private double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    // TODO: Classify these! Every time an Interaction is added!
+    // TODO: (cont'd) Note can have multiple sequences per finger in an interactivity,
+    // TODO: (cont'd) so consider remodeling as per-finger interactivity and treat each finger
+    // TODO: (cont'd) as an individual actor.
+    public boolean[] isHolding = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public boolean[] isDragging = new boolean[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public double[] dragDistance = new double[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    public double offsetX = 0;
+    public double offsetY = 0;
 
     public Handler timerHandler = new Handler();
-
     TouchInteractivity touchInteractivity = this;
-
     public Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
+            // Do what you need to do.
+            // e.g., foobar();
             int pointerId = 0;
-            if (getFirst().isTouching[pointerId]) {
+            if (getFirst().isTouching[pointerId])
                 if (dragDistance[pointerId] < TouchInteraction.MINIMUM_DRAG_DISTANCE) {
                     getFirst().getBody().onHoldListener(touchInteractivity, getFirst());
                 }
-            }
+
+            // Uncomment this for periodic callback
+            // timerHandler.postDelayed(this, 100);
         }
     };
 
@@ -44,27 +52,23 @@ public class TouchInteractivity {
 
     private void setup() {
         for (int i = 0; i < TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT; i++) {
+            isHolding[i] = false;
+            isDragging[i] = false;
             dragDistance[i] = 0;
         }
     }
 
     public int getSize() {
-        return this.touchInteractions.size();
+        return this.interactions.size();
     }
 
     public void add(TouchInteraction touchInteraction) {
+        this.interactions.add(touchInteraction);
 
-        if (touchInteractions.size() > 1) {
-            dragDistance[touchInteraction.pointerIndex] += Geometry.calculateDistance(touchInteraction.getPosition(), getLast().getPosition());
-//            Log.v("Touch", "dragDistance: " + dragDistance[touchInteraction.pointerIndex]);
-        }
+        offsetX += touchInteraction.getPosition().getX();
+        offsetY += touchInteraction.getPosition().getY();
 
-        this.touchInteractions.add(touchInteraction);
-
-//        offsetX += touchInteraction.getPosition().getX();
-//        offsetY += touchInteraction.getPosition().getY();
-
-        if (touchInteractions.size() == 1) {
+        if (interactions.size() == 1) {
             // Start timer to check for hold
             timerHandler.removeCallbacks(timerRunnable);
             timerHandler.postDelayed(timerRunnable, TouchInteraction.MINIMUM_HOLD_DURATION);
@@ -72,37 +76,40 @@ public class TouchInteractivity {
     }
 
     public TouchInteraction get(int index) {
-        return this.touchInteractions.get(index);
+        return this.interactions.get(index);
     }
 
     public TouchInteraction getFirst() {
-        if (touchInteractions.size() > 0) {
-            return touchInteractions.get(0);
+        if (interactions.size() > 0) {
+            return interactions.get(0);
         } else {
             return null;
         }
     }
 
-    public TouchInteraction getLast() {
-        if (touchInteractions.size() > 0) {
-            return touchInteractions.get(touchInteractions.size() - 1);
+    public TouchInteraction getLatest() {
+        if (interactions.size() > 0) {
+            return interactions.get(interactions.size() - 1);
         } else {
             return null;
         }
     }
 
     public TouchInteraction getPrevious(TouchInteraction touchInteraction) {
-        for (int i = 0; i < touchInteractions.size() - 1; i++) {
-            if (touchInteractions.get(i + 1) == touchInteraction) {
-                return touchInteractions.get(i);
+        for (int i = 0; i < interactions.size() - 1; i++) {
+            if (interactions.get(i + 1) == touchInteraction) {
+                return interactions.get(i);
             }
         }
         return null;
     }
 
     public TouchInteraction getPrevious() {
-        if (touchInteractions.size() > 1) {
-            return touchInteractions.get(touchInteractions.size() - 1);
+//        for (int i = 0; i < interactions.size() - 1; i++) {
+        if (interactions.size() > 1) {
+//            if (interactions.get(i + 1) == getLatest()) {
+                return interactions.get(interactions.size() - 1);
+//            }
         }
         return null;
     }
@@ -112,44 +119,19 @@ public class TouchInteractivity {
     }
 
     public long getStopTime() {
-        return getLast().getTimestamp();
+        return getLatest().getTimestamp();
     }
 
     public long getDuration() {
-        return getLast().getTimestamp() - getFirst().getTimestamp();
+        return getLatest().getTimestamp() - getFirst().getTimestamp();
     }
 
-    public List<Point> getTouchPath() {
-        List<Point> touchPositions = new LinkedList<>();
-        for (int i = 0; i < touchInteractions.size(); i++) {
-            touchPositions.add(touchInteractions.get(i).getPosition());
+    public ArrayList<Point> getTouchPath() {
+        ArrayList<Point> touchPositions = new ArrayList<>();
+        for (int i = 0; i < interactions.size(); i++) {
+            touchPositions.add(interactions.get(i).getPosition());
         }
         return touchPositions;
-    }
-
-    public boolean isHolding(int pointerIndex) {
-        for (TouchInteraction touchInteraction : touchInteractions) {
-            //if (touchInteractions.get(pointerIndex).getType() == OnTouchActionListener.Type.HOLD) {
-            if (touchInteraction.getType() == OnTouchActionListener.Type.HOLD) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isHolding() {
-        return isHolding(0);
-    }
-
-    public boolean isDragging(int pointerIndex) {
-        if (dragDistance[pointerIndex] > TouchInteraction.MINIMUM_DRAG_DISTANCE) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isDragging() {
-        return isDragging(0);
     }
 
     // <CLASSIFIER>
