@@ -119,7 +119,7 @@ public class Clay {
 //                form.addTag(alphabet.substring(letterIndex, letterIndex + 1));
 //                letterIndex = letterIndex % alphabet.length();
 //            }
-//            simulation.addForm(form);
+//            simulation.addFrame(form);
 //        }
 //    }
 
@@ -138,7 +138,7 @@ public class Clay {
             frame.addPort(port);
         }
 
-        simulation.addForm(frame);
+        simulation.addFrame(frame);
 
         // Update visualization
 

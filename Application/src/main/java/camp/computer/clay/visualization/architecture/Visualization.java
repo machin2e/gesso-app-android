@@ -68,7 +68,9 @@ public class Visualization extends Image {
     public void addImage(Model model, Image image, String layerTag) {
 
         // Position image
-        locateImagePosition(image);
+        if (image.isType("frame")) {
+            locateImagePosition(image);
+        }
 
         // Add image
         if (!hasLayer(layerTag)) {
@@ -336,7 +338,7 @@ public class Visualization extends Image {
             }
         }
 
-        Geometry.computeCirclePacking(getFrameImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
+        // Geometry.computeCirclePacking(getFrameImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {

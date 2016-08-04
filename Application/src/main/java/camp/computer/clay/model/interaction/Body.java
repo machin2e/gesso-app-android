@@ -4,12 +4,15 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import camp.computer.clay.model.simulation.Peripheral;
 import camp.computer.clay.model.simulation._Actor;
 import camp.computer.clay.model.simulation.Path;
 import camp.computer.clay.model.simulation.Port;
 import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Layer;
 import camp.computer.clay.visualization.images.FrameImage;
 import camp.computer.clay.visualization.images.PathImage;
+import camp.computer.clay.visualization.images.PeripheralImage;
 import camp.computer.clay.visualization.images.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 
@@ -334,6 +337,27 @@ public class Body extends _Actor {
                 // PortImage portImage = (PortImage) touchInteraction.getImageByPosition();
                 PortImage sourcePortImage = (PortImage) touchInteractivity.getFirst().getTarget();
 
+//                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
+//
+//                    // Model
+//                    Peripheral peripheral = new Peripheral();
+//                    getPerspective().getVisualization().getSimulation().addPeripheral(peripheral);
+//
+//                    // Visualization (Layer)
+//                    String layerTag = "peripherals";
+//                    getPerspective().getVisualization().addLayer(layerTag);
+//                    Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
+//
+//                    // Image
+//                    PeripheralImage peripheralImage = new PeripheralImage(peripheral);
+//                    peripheralImage.setPosition(touchInteraction.getPosition());
+//                    peripheralImage.setVisualization(getPerspective().getVisualization());
+//
+//                    // Visualization
+//                    getPerspective().getVisualization().addImage(peripheral, peripheralImage, layerTag);
+//
+//                }
+
                 // Show ports of nearby forms
                 boolean useNearbyPortImage = false;
                 for (FrameImage nearbyFrameImage : perspective.getVisualization().getFrameImages()) {
@@ -341,12 +365,12 @@ public class Body extends _Actor {
                     Log.v("Interaction", "A");
 
                     // Update style of nearby machines
-                    double distanceToFormImage = Geometry.calculateDistance(
+                    double distanceToFrameImage = Geometry.calculateDistance(
                             touchInteraction.getPosition(),
                             nearbyFrameImage.getPosition()
                     );
 
-                    if (distanceToFormImage < nearbyFrameImage.boardHeight + 50) {
+                    if (distanceToFrameImage < nearbyFrameImage.boardHeight + 50) {
 
                         Log.v("Interaction", "B");
 
@@ -440,6 +464,41 @@ public class Body extends _Actor {
             }
 
         } else if (!touchInteraction.isTouching()) {
+
+            if (touchInteractivity.getFirst().getTarget().isType(PortImage.TYPE)) {
+
+                // PortImage portImage = (PortImage) touchInteraction.getImageByPosition();
+                PortImage sourcePortImage = (PortImage) touchInteractivity.getFirst().getTarget();
+
+                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
+
+                    // Model
+                    Peripheral peripheral = new Peripheral();
+                    getPerspective().getVisualization().getSimulation().addPeripheral(peripheral);
+
+                    // Visualization (Layer)
+                    String layerTag = "peripherals";
+                    getPerspective().getVisualization().addLayer(layerTag);
+                    Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
+
+                    // Image
+                    PeripheralImage peripheralImage = new PeripheralImage(peripheral);
+                    peripheralImage.setPosition(touchInteraction.getPosition());
+//                    peripheralImage.setRotation();
+                    peripheralImage.setVisualization(getPerspective().getVisualization());
+
+                    double pathRotationAngle = Geometry.calculateRotationAngle(
+                            sourcePortImage.getPosition(),
+                            peripheralImage.getPosition()
+                    );
+                    peripheralImage.setRotation(pathRotationAngle);
+
+                    // Visualization
+                    getPerspective().getVisualization().addImage(peripheral, peripheralImage, layerTag);
+
+                }
+
+            }
 
 //            // No touchPositions on board or port. Touch is on map. So hide ports.
 //            for (FrameImage formImage : perspective.getVisualization().getFrameImages()) {

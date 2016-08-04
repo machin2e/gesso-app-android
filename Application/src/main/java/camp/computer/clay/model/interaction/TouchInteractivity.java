@@ -3,6 +3,8 @@ package camp.computer.clay.model.interaction;
 import android.os.Handler;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Point;
@@ -16,7 +18,7 @@ public class TouchInteractivity {
     // TODO: Model voice interaction in the same way. Generify to Interactivity<T> or subclass.
     // TODO: (?) Model data transmissions as interactions in the same way?
 
-    private ArrayList<TouchInteraction> interactions = new ArrayList<>();
+    private List<TouchInteraction> interactions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Interaction is added!
     // TODO: (cont'd) Note can have multiple sequences per finger in an interactivity,
@@ -132,6 +134,10 @@ public class TouchInteractivity {
             touchPositions.add(interactions.get(i).getPosition());
         }
         return touchPositions;
+    }
+
+    public boolean isDragging() {
+        return isDragging[getLatest().pointerIndex];
     }
 
     // <CLASSIFIER>

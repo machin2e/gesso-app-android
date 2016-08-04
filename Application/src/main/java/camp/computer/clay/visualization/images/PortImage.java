@@ -40,7 +40,7 @@ public class PortImage extends Image {
     private int uniqueColor = Color.BLACK;
 
     public int getIndex() {
-        return getFormImage().getPortImageIndex(this);
+        return getFrameImage().getPortImageIndex(this);
     }
     // </STYLE>
 
@@ -65,6 +65,8 @@ public class PortImage extends Image {
     private boolean isCandidatePathVisible = false;
     private Point candidatePathDestinationPosition = new Point(40, 80);
 
+    private boolean isCandidatePeripheralVisible = false;
+
     public PortImage(Port port) {
         super(port);
         setType(TYPE);
@@ -83,7 +85,7 @@ public class PortImage extends Image {
         }
     }
 
-    public FrameImage getFormImage() {
+    public FrameImage getFrameImage() {
         return (FrameImage) getParentImage();
     }
 
@@ -131,14 +133,18 @@ public class PortImage extends Image {
 
     public void draw(VisualizationSurface visualizationSurface) {
         if (isVisible()) {
-            // Image
+
+            // Port
             drawShape(visualizationSurface);
             drawStyle(visualizationSurface);
             drawData(visualizationSurface);
             drawAnnotation(visualizationSurface);
 
-            // Draw children sprites
+            // Candidate Path
             drawCandidatePathImages(visualizationSurface);
+
+            // Candidate Peripheral
+            drawCandidatePeripheralImage(visualizationSurface);
         }
     }
 
@@ -268,7 +274,7 @@ public class PortImage extends Image {
                     FrameImage frameImage = (FrameImage) getParentImage();
                     rotatedPortDataSamplePoints[i] = Geometry.calculateRotatedPoint(
                             getPosition(),
-                            getFormImage().getRotation() + portGroupRotation[getIndex()],
+                            getFrameImage().getRotation() + portGroupRotation[getIndex()],
                             samplePoint
                     );
 //                    rotatedPortDataSamplePoints[i] = samplePoint;
@@ -564,10 +570,10 @@ public class PortImage extends Image {
                 }
 
                 // Reduce focus on the machine
-                getFormImage().setTransparency(0.05f);
+                getFrameImage().setTransparency(0.05f);
 
                 // Focus on the port
-                //portImage.getFormImage().showPathImage(portImage.getIndex(), true);
+                //portImage.getFrameImage().showPathImage(portImage.getIndex(), true);
                 showPaths();
                 setVisibility(true);
                 setPathVisibility(true);
@@ -611,7 +617,7 @@ public class PortImage extends Image {
 
             setCandidatePathVisibility(false);
 
-        } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
+        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
             // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
         } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
             // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
@@ -621,8 +627,32 @@ public class PortImage extends Image {
 
             Log.v("onHoldListener", "Port draggin!");
 
+            // Candidate Path Visibility
             setCandidatePathDestinationPosition(touchInteraction.getPosition());
             setCandidatePathVisibility(true);
+
+            // Candidate Peripheral Visibility
+
+            boolean isPeripheral = true;
+            for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {
+
+                // Update style of nearby machines
+                double distanceToFrameImage = Geometry.calculateDistance(
+                        candidatePathDestinationPosition,
+                        nearbyFrameImage.getPosition()
+                );
+
+                if (distanceToFrameImage < 500) {
+                    isPeripheral = false;
+                    break;
+                }
+            }
+
+            if (isPeripheral) {
+                setCandidatePeripheralVisibility(true);
+            } else {
+                setCandidatePeripheralVisibility(false);
+            }
 
             // Setup port type and flow direction
             Port port = getPort();
@@ -649,6 +679,14 @@ public class PortImage extends Image {
 
     public boolean getCandidatePathVisibility() {
         return this.isCandidatePathVisible;
+    }
+
+    public void setCandidatePeripheralVisibility(boolean isVisible) {
+        this.isCandidatePeripheralVisible = isVisible;
+    }
+
+    public boolean getCandidatePeripheralVisibility() {
+        return this.isCandidatePeripheralVisible;
     }
 
     public void setCandidatePathDestinationPosition(Point position) {
@@ -705,5 +743,26 @@ public class PortImage extends Image {
                 Shape.drawCircle(candidatePathDestinationPosition, shapeRadius, 0.0f, canvas, paint);
             }
         }
+    }
+
+
+    private void drawCandidatePeripheralImage(VisualizationSurface visualizationSurface) {
+
+        if (isCandidatePeripheralVisible) {
+
+            Canvas canvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
+
+            double pathRotationAngle = Geometry.calculateRotationAngle(
+                    getPosition(),
+                    candidatePathDestinationPosition
+            );
+
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(getUniqueColor());
+            Shape.drawRectangle(candidatePathDestinationPosition, pathRotationAngle + 180, 250, 250, canvas, paint);
+
+        }
+
     }
 }

@@ -232,6 +232,10 @@ public class Perspective {
 //        } else {
         // <PERSPECTIVE>
         setFocusImage(portImage);
+
+        setPosition(portImage.getPosition());
+        setScale(1.5);
+
         setAdjustability(false);
         // </PERSPECTIVE>
 
@@ -245,7 +249,7 @@ public class Perspective {
         ImageGroup nearbyImages = getVisualization().getImages().filterType(FrameImage.TYPE).filterDistance(touchInteraction.getPosition(), 200 + 60);
         for (Image image : getVisualization().getImages().filterType(FrameImage.TYPE).getList()) {
 
-            if (image == portImage.getFormImage() || nearbyImages.contains(image)) {
+            if (image == portImage.getFrameImage() || nearbyImages.contains(image)) {
 
                 FrameImage nearbyFrameImage = (FrameImage) image;
                 nearbyFrameImage.setTransparency(1.0f);
@@ -325,11 +329,12 @@ public class Perspective {
 
     public void focusOnFrame(Body body, TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
 
-        if (touchInteractivity.isDragging[touchInteraction.pointerIndex]) {
+        if (touchInteractivity.isDragging()) {
 
             adjustScale();
 
         } else {
+
             FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
 
             // <UPDATE_PERSPECTIVE>

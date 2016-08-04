@@ -66,7 +66,7 @@ public class Layer {
     }
 
     public ArrayList<Image> getImages() {
-        return new ArrayList<Image>(this.images);
+        return new ArrayList<>(this.images);
     }
 
     public int getCardinality() {
