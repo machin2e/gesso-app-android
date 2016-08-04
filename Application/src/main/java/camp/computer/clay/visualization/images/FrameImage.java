@@ -1,6 +1,5 @@
 package camp.computer.clay.visualization.images;
 
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/visualization/images/FrameImage.java
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -488,14 +487,6 @@ public class FrameImage extends Image {
         } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
             // Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
         }
-=======
-import camp.computer.clay.model.sim.Frame;
-import camp.computer.clay.viz.arch.Image;
-
-public class FrameImage extends Image<Frame> {
-
-    public FrameImage(Frame model) {
-        super(model);
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/viz/img/FrameImage.java
     }
 }
+

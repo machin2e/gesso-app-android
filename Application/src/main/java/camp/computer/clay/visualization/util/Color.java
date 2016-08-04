@@ -3,12 +3,7 @@ package camp.computer.clay.visualization.util;
 import java.util.HashMap;
 import java.util.Random;
 
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/visualization/util/Color.java
 import camp.computer.clay.visualization.images.PortImage;
-=======
-import camp.computer.clay.viz.arch.Image;
-import camp.computer.clay.viz.img.old_PortImage;
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/viz/util/Color.java
 
 public abstract class Color {
 
@@ -26,17 +21,17 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<Image, Integer> colorMap = new HashMap<>();
+    private static HashMap<PortImage, Integer> colorMap = new HashMap<PortImage, Integer>();
 
-    public static int getUniqueColor(Image image) {
+    public static int getUniqueColor(PortImage portSprite) {
 
-        if (colorMap.containsKey(image)) {
-            return colorMap.get(image);
+        if (colorMap.containsKey(portSprite)) {
+            return colorMap.get(portSprite);
         }
 
         for (int i = 0; i < PATH_COLOR_PALETTE.length; i++) {
             if (!colorMap.containsValue(PATH_COLOR_PALETTE[i])) {
-                colorMap.put(image, PATH_COLOR_PALETTE[i]);
+                colorMap.put(portSprite, PATH_COLOR_PALETTE[i]);
                 return PATH_COLOR_PALETTE[i];
             }
         }
@@ -48,7 +43,7 @@ public abstract class Color {
             int blue = 30 + random.nextInt(225);
             int randomColor = android.graphics.Color.rgb(red, green, blue);
             if (!colorMap.containsValue(randomColor)) {
-                colorMap.put(image, randomColor);
+                colorMap.put(portSprite, randomColor);
                 return randomColor;
             }
         }

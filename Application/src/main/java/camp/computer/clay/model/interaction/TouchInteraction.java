@@ -103,7 +103,7 @@ public class TouchInteraction {
         return this.touchedImage[fingerIndex] != null;
     }
 
-    public void setTargetImage(int fingerIndex, Image image) {
+    public void setTarget(int fingerIndex, Image image) {
         this.touchedImage[fingerIndex] = image;
     }
 
@@ -115,8 +115,8 @@ public class TouchInteraction {
         return isTouching(0);
     }
 
-    public void setTargetImage(Image image) {
-        setTargetImage(0, image);
+    public void setTarget(Image image) {
+        setTarget(0, image);
         if (image != null) {
             isTouching[0] = true;
         }

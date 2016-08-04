@@ -1,12 +1,6 @@
 package camp.computer.clay.model.simulation;
 
 public abstract class Model {
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/model/simulation/Model.java
-=======
-    
-    private UUID uuid = UUID.randomUUID();
-
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/model/sim/Model.java
     // TODO: UUID.
     // TODO: Tag.
     // TODO: Physical dimensions (of actual physical object). Add it as a tag-like property.

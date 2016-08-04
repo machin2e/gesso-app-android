@@ -58,11 +58,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_FULLSCREEN = false;
     // </Style>
 
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/application/Application.java
     public VisualizationSurface visualizationSurface;
-=======
-    public Surface surface;
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/app/Application.java
 
     private SpeechGenerator speechGenerator;
 
@@ -135,15 +131,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         setContentView(R.layout.activity_main);
 
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/application/Application.java
         // Visualization Surface
         visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
         visualizationSurface.onResume();
-=======
-        // Viz Surface
-        surface = (Surface) findViewById(R.id.app_surface_view);
-        surface.onResume();
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/app/Application.java
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
@@ -683,11 +673,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onPause();
 
         // <VISUALIZATION>
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/application/Application.java
         visualizationSurface.onPause();
-=======
-        surface.onPause();
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/app/Application.java
         // </VISUALIZATION>
     }
 
@@ -703,11 +689,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // <VISUALIZATION>
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/application/Application.java
         visualizationSurface.onResume();
-=======
-        surface.onResume();
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/app/Application.java
         // </VISUALIZATION>
     }
 
@@ -764,21 +746,12 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // TODO: (cont'd) display interface.
     public static Application getDisplay() { return Application.applicationView; }
 
-<<<<<<< HEAD:Application/src/main/java/camp/computer/clay/application/Application.java
     public VisualizationSurface getVisualizationSurface() {
         return this.visualizationSurface;
     }
 
     public double getFramesPerSecond () {
         return getVisualizationSurface().getRenderer().getFramesPerSecond();
-=======
-    public Surface getSurface() {
-        return this.surface;
-    }
-
-    public double getFramesPerSecond() {
-        return getSurface().getRenderer().getFramesPerSecond();
->>>>>>> 4ce8be0ece817c35e9964b62d77b33121747f3e8:Application/src/main/java/camp/computer/clay/app/Application.java
     }
 
     public SpeechGenerator getSpeechGenerator() {
