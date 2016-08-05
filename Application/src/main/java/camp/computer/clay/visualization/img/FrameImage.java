@@ -12,7 +12,7 @@ import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.arch.Frame;
 import camp.computer.clay.model.arch.Path;
 import camp.computer.clay.model.arch.Port;
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
@@ -450,13 +450,13 @@ public class FrameImage extends Image {
     }
 
     @Override
-    public void onTouchInteraction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(Interaction interaction) {
 
-        if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
+        if (interaction.getType() == Interaction.Type.NONE) {
+            // Log.v("onTouchInteraction", "Interaction.NONE to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.TOUCH) {
+            // Log.v("onTouchInteraction", "Interaction.TOUCH to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.TAP) {
 
             // Focus on touched form
             showPortImages();
@@ -477,16 +477,16 @@ public class FrameImage extends Image {
                 }
             }
 
-        } else if (touchInteraction.getType() == TouchInteraction.Type.HOLD) {
-            // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TWITCH) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
-            // Log.v("onTouchInteraction", "TouchInteraction.DRAG to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.HOLD) {
+            // Log.v("onTouchInteraction", "Interaction.HOLD to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.MOVE) {
+            // Log.v("onTouchInteraction", "Interaction.MOVE to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.TWITCH) {
+            // Log.v("onTouchInteraction", "Interaction.TWITCH to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.DRAG) {
+            // Log.v("onTouchInteraction", "Interaction.DRAG to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.RELEASE) {
+            // Log.v("onTouchInteraction", "Interaction.RELEASE to " + CLASS_NAME);
         }
     }
 }

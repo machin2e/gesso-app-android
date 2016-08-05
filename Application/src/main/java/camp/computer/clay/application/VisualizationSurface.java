@@ -13,7 +13,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import camp.computer.clay.model.interactivity.Body;
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.visualization.arch.Visualization;
 import camp.computer.clay.visualization.util.Point;
 
@@ -264,11 +264,11 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         Body currentBody = visualization.getSimulation().getBody(0);
 
         // Create touchPositions interaction
-        TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.Type.NONE);
-        touchInteraction.setBody(currentBody);
+        Interaction interaction = new Interaction(Interaction.Type.NONE);
+        interaction.setBody(currentBody);
 
-        if (pointerCount <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT) {
-            if (pointerIndex <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT - 1) {
+        if (pointerCount <= Interaction.MAXIMUM_TOUCH_POINT_COUNT) {
+            if (pointerIndex <= Interaction.MAXIMUM_TOUCH_POINT_COUNT - 1) {
 
                 // Current
                 // Update touchPositions state based the points given by the host OS (e.g., Android).
@@ -276,8 +276,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                     int id = motionEvent.getPointerId (i);
                     Point perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
                     double perspectiveScale = visualization.getSimulation().getBody(0).getPerspective().getScale();
-                    touchInteraction.touchPositions[id].setX((motionEvent.getX (i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
-                    touchInteraction.touchPositions[id].setY((motionEvent.getY (i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                    interaction.touchPositions[id].setX((motionEvent.getX (i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
+                    interaction.touchPositions[id].setY((motionEvent.getY (i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }
 
                 // ACTION_DOWN is called only for the first pointer that touches the screen. This
@@ -300,19 +300,19 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
 
                 // Update the state of the touched object based on the current touchPositions interaction state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    touchInteraction.setType(TouchInteraction.Type.TOUCH);
-                    touchInteraction.pointerIndex = pointerId;
-                    currentBody.onStartInteractivity(touchInteraction);
+                    interaction.setType(Interaction.Type.TOUCH);
+                    interaction.pointerIndex = pointerId;
+                    currentBody.onStartInteractivity(interaction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
-                    touchInteraction.setType(TouchInteraction.Type.MOVE);
-                    touchInteraction.pointerIndex = pointerId;
-                    currentBody.onContinueInteractivity(touchInteraction);
+                    interaction.setType(Interaction.Type.MOVE);
+                    interaction.pointerIndex = pointerId;
+                    currentBody.onContinueInteractivity(interaction);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    touchInteraction.setType(TouchInteraction.Type.RELEASE);
-                    touchInteraction.pointerIndex = pointerId;
-                    currentBody.onCompleteInteractivity(touchInteraction);
+                    interaction.setType(Interaction.Type.RELEASE);
+                    interaction.pointerIndex = pointerId;
+                    currentBody.onCompleteInteractivity(interaction);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {

@@ -13,7 +13,7 @@ import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.arch.Frame;
 import camp.computer.clay.model.arch.Path;
 import camp.computer.clay.model.arch.Port;
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.arch.Visualization;
 import camp.computer.clay.visualization.util.Geometry;
@@ -562,13 +562,13 @@ public class PortImage extends Image {
     }
 
     @Override
-    public void onTouchInteraction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(Interaction interaction) {
 
-        if (touchInteraction.getType() == TouchInteraction.Type.NONE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.NONE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TOUCH) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TOUCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
+        if (interaction.getType() == Interaction.Type.NONE) {
+            // Log.v("onTouchInteraction", "Interaction.NONE to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.TOUCH) {
+            // Log.v("onTouchInteraction", "Interaction.TOUCH to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.TAP) {
 
             Port port = getPort();
 
@@ -650,18 +650,18 @@ public class PortImage extends Image {
 
             setCandidatePathVisibility(false);
 
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TAP) {
-            // Log.v("onTouchInteraction", "TouchInteraction.HOLD to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.MOVE) {
-            // Log.v("onTouchInteraction", "TouchInteraction.MOVE to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.TWITCH) {
-            // Log.v("onTouchInteraction", "TouchInteraction.TWITCH to " + CLASS_NAME);
-        } else if (touchInteraction.getType() == TouchInteraction.Type.DRAG) {
+        } else if (interaction.getType() == Interaction.Type.TAP) {
+            // Log.v("onTouchInteraction", "Interaction.HOLD to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.MOVE) {
+            // Log.v("onTouchInteraction", "Interaction.MOVE to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.TWITCH) {
+            // Log.v("onTouchInteraction", "Interaction.TWITCH to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.DRAG) {
 
             Log.v("onHoldListener", "Port draggin!");
 
             // Candidate Path Visibility
-            setCandidatePathDestinationPosition(touchInteraction.getPosition());
+            setCandidatePathDestinationPosition(interaction.getPosition());
             setCandidatePathVisibility(true);
 
             // Candidate Peripheral Visibility
@@ -698,9 +698,9 @@ public class PortImage extends Image {
                 port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
             }
 
-        } else if (touchInteraction.getType() == TouchInteraction.Type.RELEASE) {
-//             Log.v("onTouchInteraction", "TouchInteraction.RELEASE to " + CLASS_NAME);
-            Log.v("onHoldListener", "TouchInteraction.RELEASE to " + CLASS_NAME);
+        } else if (interaction.getType() == Interaction.Type.RELEASE) {
+//             Log.v("onTouchInteraction", "Interaction.RELEASE to " + CLASS_NAME);
+            Log.v("onHoldListener", "Interaction.RELEASE to " + CLASS_NAME);
 
             setCandidatePathVisibility(false);
         }

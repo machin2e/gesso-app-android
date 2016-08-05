@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
@@ -642,7 +642,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private void startFullscreenService() {
         enableFullscreenService = true;
-        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, TouchInteraction.MINIMUM_HOLD_DURATION);
+        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Interaction.MINIMUM_HOLD_DURATION);
     }
 
     public void stopFullscreenService() {

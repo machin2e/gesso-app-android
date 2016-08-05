@@ -13,7 +13,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.arch.Model;
 import camp.computer.clay.model.arch.Simulation;
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.visualization.img.FrameImage;
 import camp.computer.clay.visualization.img.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
@@ -438,6 +438,6 @@ public class Visualization extends Image {
     }
 
     @Override
-    public void onTouchInteraction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(Interaction interaction) {
     }
 }

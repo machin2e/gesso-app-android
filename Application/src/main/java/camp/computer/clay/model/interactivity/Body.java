@@ -20,7 +20,7 @@ public class Body {
 
     private Perspective perspective;
 
-    public List<TouchInteractivity> touchInteractivities = new ArrayList<>();
+    public List<Interplay> touchInteractivities = new ArrayList<>();
 
     public Body() {
     }
@@ -33,7 +33,7 @@ public class Body {
         return this.perspective;
     }
 
-    public TouchInteractivity getLatestTouchInteractivity() {
+    public Interplay getLatestTouchInteractivity() {
         if (touchInteractivities.size() > 0) {
             return this.touchInteractivities.get(touchInteractivities.size() - 1);
         } else {
@@ -41,15 +41,15 @@ public class Body {
         }
     }
 
-    public void onStartInteractivity(TouchInteraction touchInteraction) {
+    public void onStartInteractivity(Interaction interaction) {
 
         // Having an idea is just accumulating intention. It's a suggestion from your existential
         // controller.
 
-        TouchInteractivity touchInteractivity = new TouchInteractivity();
-        touchInteractivity.add(touchInteraction);
+        Interplay interplay = new Interplay();
+        interplay.add(interaction);
 
-        touchInteractivities.add(touchInteractivity);
+        touchInteractivities.add(interplay);
 
         // TODO: Cache and store the touch interactivites before deleting them completely! Do it in
         // TODO: (cont'd) a background thread.
@@ -57,65 +57,65 @@ public class Body {
             touchInteractivities.remove(0);
         }
 
-        onTouchListener(touchInteractivity, touchInteraction);
+        onTouchListener(interplay, interaction);
     }
 
-    public void onContinueInteractivity(TouchInteraction touchInteraction) {
+    public void onContinueInteractivity(Interaction interaction) {
 
         // Current
-        touchInteraction.isTouching[touchInteraction.pointerIndex] = true;
+        interaction.isTouching[interaction.pointerIndex] = true;
 
-        TouchInteractivity touchInteractivity = getLatestTouchInteractivity();
-        touchInteractivity.add(touchInteraction);
+        Interplay interplay = getLatestTouchInteractivity();
+        interplay.add(interaction);
 
         // Calculate drag distance
-        touchInteractivity.dragDistance[touchInteraction.pointerIndex] = Geometry.calculateDistance(touchInteraction.getPosition(), touchInteractivity.getFirst().touchPositions[touchInteraction.pointerIndex]);
+        interplay.dragDistance[interaction.pointerIndex] = Geometry.calculateDistance(interaction.getPosition(), interplay.getFirst().touchPositions[interaction.pointerIndex]);
 
         // Classify/Callback
-        if (touchInteractivity.dragDistance[touchInteraction.pointerIndex] > TouchInteraction.MINIMUM_DRAG_DISTANCE) {
-            onDragListener(touchInteractivity, touchInteraction);
+        if (interplay.dragDistance[interaction.pointerIndex] > Interaction.MINIMUM_DRAG_DISTANCE) {
+            onDragListener(interplay, interaction);
         }
     }
 
-    public void onCompleteInteractivity(TouchInteraction touchInteraction) {
+    public void onCompleteInteractivity(Interaction interaction) {
 
-        TouchInteractivity touchInteractivity = getLatestTouchInteractivity();
-        touchInteractivity.add(touchInteraction);
+        Interplay interplay = getLatestTouchInteractivity();
+        interplay.add(interaction);
 
         // Stop listening for a hold interaction
-        touchInteractivity.timerHandler.removeCallbacks(touchInteractivity.timerRunnable);
+        interplay.timerHandler.removeCallbacks(interplay.timerRunnable);
 
         // Current
-        touchInteraction.isTouching[touchInteraction.pointerIndex] = false;
+        interaction.isTouching[interaction.pointerIndex] = false;
 
-        if (touchInteractivity.getDuration() < TouchInteraction.MAXIMUM_TAP_DURATION) {
-            onTapListener(touchInteractivity, touchInteraction);
+        if (interplay.getDuration() < Interaction.MAXIMUM_TAP_DURATION) {
+            onTapListener(interplay, interaction);
         } else {
-            onReleaseListener(touchInteractivity, touchInteraction);
+            onReleaseListener(interplay, interaction);
         }
     }
 
-    private void onTouchListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    private void onTouchListener(Interplay interplay, Interaction interaction) {
 
-        touchInteraction.setType(TouchInteraction.Type.TOUCH);
+        interaction.setType(Interaction.Type.TOUCH);
 
-        Image touchedImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
-        touchInteraction.setTarget(touchedImage);
+        Image touchedImage = perspective.getVisualization().getImageByPosition(interaction.getPosition());
+        interaction.setTargetImage(touchedImage);
 
 //        if (perspective.hasFocusImage()) {
 //
 //            if (perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
 //
-//                if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(PortImage.TYPE)) {
+//                if (interaction.isTouching() && interaction.getImageByPosition().isType(PortImage.TYPE)) {
 ////                    Log.v("Interaction", "BUH");
-////                    perspective.InteractionfocusOnPort((PortImage) touchInteraction.getImageByPosition());
+////                    perspective.InteractionfocusOnPort((PortImage) interaction.getImageByPosition());
 //                }
 //            }
 //
 //            if (perspective.getFocusImage().isType(PortImage.TYPE, PathImage.TYPE)) {
 //
-//                if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(PathImage.TYPE)) {
-////                    perspective.InteractionfocusOnPath((PathImage) touchInteraction.getImageByPosition());
+//                if (interaction.isTouching() && interaction.getImageByPosition().isType(PathImage.TYPE)) {
+////                    perspective.InteractionfocusOnPath((PathImage) interaction.getImageByPosition());
 //                }
 //            }
 //        }
@@ -123,36 +123,36 @@ public class Body {
 //        // Reset object interaction state
 //        if (!perspective.hasFocusImage() || perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE)) {
 //
-//            if (touchInteraction.isTouching() && touchInteraction.getImageByPosition().isType(FrameImage.TYPE)) {
-////                perspective.InteractionfocusOnForm((FrameImage) touchInteraction.getImageByPosition());
+//            if (interaction.isTouching() && interaction.getImageByPosition().isType(FrameImage.TYPE)) {
+////                perspective.InteractionfocusOnForm((FrameImage) interaction.getImageByPosition());
 //            }
 //
 //        }
 //
 //        if (!perspective.hasFocusImage() || perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
 //
-//            if (!touchInteraction.isTouching()) {
+//            if (!interaction.isTouching()) {
 ////                perspective.InteractionfocusReset();
 //            }
 //        }
     }
 
-    public void onHoldListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    public void onHoldListener(Interplay interplay, Interaction interaction) {
 
-        touchInteraction.setType(TouchInteraction.Type.HOLD);
+        interaction.setType(Interaction.Type.HOLD);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
-        touchInteraction.setTarget(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(interaction.getPosition());
+        interaction.setTargetImage(targetImage);
 
-        touchInteractivity.isHolding[touchInteraction.pointerIndex] = true;
+        interplay.isHolding[interaction.pointerIndex] = true;
 
-        if (touchInteraction.isTouching()) {
+        if (interaction.isTouching()) {
 
-            if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+            if (interaction.getTargetImage().isType(FrameImage.TYPE)) {
 
                 // TODO:
 
-            } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+            } else if (interaction.getTargetImage().isType(PortImage.TYPE)) {
 
                 // TODO:
 
@@ -160,62 +160,62 @@ public class Body {
         }
     }
 
-    private void onDragListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    private void onDragListener(Interplay interplay, Interaction interaction) {
 
-        touchInteraction.setType(TouchInteraction.Type.DRAG);
+        interaction.setType(Interaction.Type.DRAG);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
-        touchInteraction.setTarget(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(interaction.getPosition());
+        interaction.setTargetImage(targetImage);
 
-        Log.v("onDragListener", "" + touchInteraction.getType() + ": " + touchInteraction.getTarget());
+        Log.v("onDragListener", "" + interaction.getType() + ": " + interaction.getTargetImage());
 
         Log.v("Interaction", "onDrag");
         Log.v("Interaction", "focus: " + perspective.getFocusImage());
-        Log.v("Interaction", "touch: " + touchInteraction.getTarget());
+        Log.v("Interaction", "touch: " + interaction.getTargetImage());
         Log.v("Interaction", "-");
 
-        if (touchInteractivity.getSize() > 1) {
-            touchInteraction.setTarget(touchInteractivity.getFirst().getTarget());
+        if (interplay.getSize() > 1) {
+            interaction.setTargetImage(interplay.getFirst().getTargetImage());
         }
 
-        touchInteractivity.isDragging[touchInteraction.pointerIndex] = true;
+        interplay.isDragging[interaction.pointerIndex] = true;
 
         // Dragging and holding
-        if (touchInteractivity.isHolding[touchInteraction.pointerIndex]) {
+        if (interplay.isHolding[interaction.pointerIndex]) {
 
             // Holding and dragging
 
             // TODO: Put into callback
-            if (touchInteraction.isTouching()) {
+            if (interaction.isTouching()) {
 
-                if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+                if (interaction.getTargetImage().isType(FrameImage.TYPE)) {
 
-                    FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                    frameImage.touch(touchInteraction);
-                    frameImage.setPosition(touchInteraction.getPosition());
+                    FrameImage frameImage = (FrameImage) interaction.getTargetImage();
+                    frameImage.touch(interaction);
+                    frameImage.setPosition(interaction.getPosition());
 
                     // Zoom out to show overview
 //                    perspective.setScale(0.8f);
 
-                } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+                } else if (interaction.getTargetImage().isType(PortImage.TYPE)) {
 
-                    PortImage portImage = (PortImage) touchInteraction.getTarget();
+                    PortImage portImage = (PortImage) interaction.getTargetImage();
                     portImage.isTouched = true;
-//                    TouchInteraction touchInteraction = new TouchInteraction(touchInteraction.getPosition(), TouchInteraction.Type.DRAG);
-//                    portSprite.touchPositions(touchInteraction);
+//                    Interaction interaction = new Interaction(interaction.getPosition(), Interaction.Type.DRAG);
+//                    portSprite.touchPositions(interaction);
 
-                    portImage.setPosition(touchInteraction.getPosition());
+                    portImage.setPosition(interaction.getPosition());
                 }
 
             } else if (perspective.isAdjustable()) {
 
 //                perspective.setScale(0.9f);
 //                perspective.setOffset(
-//                        touchInteraction.getPosition().getX() - touchInteractivity.getFirst().getPosition().getX(),
-//                        touchInteraction.getPosition().getY() - touchInteractivity.getFirst().getPosition().getY()
+//                        interaction.getPosition().getX() - interplay.getFirst().getPosition().getX(),
+//                        interaction.getPosition().getY() - interplay.getFirst().getPosition().getY()
 //                );
 
-                perspective.focusOnPerspectiveAdjustment(touchInteractivity);
+                perspective.focusOnPerspectiveAdjustment(interplay);
 
             }
 
@@ -224,31 +224,31 @@ public class Body {
             // Dragging only (not holding)
 
             // TODO: Put into callback
-            if (touchInteraction.isTouching()) {
+            if (interaction.isTouching()) {
 
-                if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+                if (interaction.getTargetImage().isType(FrameImage.TYPE)) {
 
-                    FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                    frameImage.touch(touchInteraction);
-                    frameImage.setPosition(touchInteraction.getPosition());
+                    FrameImage frameImage = (FrameImage) interaction.getTargetImage();
+                    frameImage.touch(interaction);
+                    frameImage.setPosition(interaction.getPosition());
 
-                    perspective.focusOnFrame(this, touchInteractivity, touchInteraction);
+                    perspective.focusOnFrame(this, interplay, interaction);
 
-                } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+                } else if (interaction.getTargetImage().isType(PortImage.TYPE)) {
 
-                    PortImage portImage = (PortImage) touchInteraction.getTarget();
-                    portImage.touch(touchInteraction);
+                    PortImage portImage = (PortImage) interaction.getTargetImage();
+                    portImage.touch(interaction);
 
-                    perspective.focusOnNewPath(touchInteractivity, touchInteraction);
+                    perspective.focusOnNewPath(interplay, interaction);
                 }
 
             } else if (perspective.isAdjustable()) {
 
                 perspective.setScale(0.9f);
-                if (touchInteractivity.getSize() > 1) {
+                if (interplay.getSize() > 1) {
                     perspective.setOffset(
-                            touchInteraction.getPosition().getX() - touchInteractivity.getPrevious(touchInteraction).getPosition().getX(),
-                            touchInteraction.getPosition().getY() - touchInteractivity.getPrevious(touchInteraction).getPosition().getY()
+                            interaction.getPosition().getX() - interplay.getPrevious(interaction).getPosition().getX(),
+                            interaction.getPosition().getY() - interplay.getPrevious(interaction).getPosition().getY()
                     );
                 }
 
@@ -256,86 +256,104 @@ public class Body {
 
 //            else {
 //
-//                perspective.focusOnPerspectiveAdjustment(touchInteractivity);
+//                perspective.focusOnPerspectiveAdjustment(interplay);
 //
 //            }
 
         }
     }
 
-    private void onTapListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    private void onTapListener(Interplay interplay, Interaction interaction) {
 
-        touchInteraction.setType(TouchInteraction.Type.TAP);
+        interaction.setType(Interaction.Type.TAP);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
-        touchInteraction.setTarget(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(interaction.getPosition());
+        interaction.setTargetImage(targetImage);
 
         Log.v("Interaction", "onTap");
         Log.v("Interaction", "focus: " + perspective.getFocusImage());
-        Log.v("Interaction", "touch: " + touchInteraction.getTarget());
+        Log.v("Interaction", "touch: " + interaction.getTargetImage());
         Log.v("Interaction", "-");
 
-        if (touchInteraction.isTouching()) {
+        if (interaction.isTouching()) {
 
-            if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+            if (interaction.getTargetImage().isType(FrameImage.TYPE)) {
 
                 // Frame
-                FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                perspective.focusOnFrame(this, touchInteractivity, touchInteraction);
-                frameImage.touch(touchInteraction);
+                FrameImage frameImage = (FrameImage) interaction.getTargetImage();
+                perspective.focusOnFrame(this, interplay, interaction);
+                frameImage.touch(interaction);
 
-            } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+            } else if (interaction.getTargetImage().isType(PortImage.TYPE)) {
 
                 // Port
-                PortImage portImage = (PortImage) touchInteraction.getTarget();
-                portImage.touch(touchInteraction);
+                PortImage portImage = (PortImage) interaction.getTargetImage();
+                portImage.touch(interaction);
 
-            } else if (touchInteraction.getTarget().isType(PathImage.TYPE)) {
+            } else if (interaction.getTargetImage().isType(PathImage.TYPE)) {
 
                 // Path
-                PathImage pathImage = (PathImage) touchInteraction.getTarget();
-                pathImage.touch(touchInteraction);
+                PathImage pathImage = (PathImage) interaction.getTargetImage();
+                pathImage.touch(interaction);
 
 //                perspective.tap_focusOnPath();
             }
 
-        } else if (!touchInteraction.isTouching()) {
+        } else if (!interaction.isTouching()) {
 
             perspective.focusReset();
         }
 
     }
 
-    private void onReleaseListener(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
-        touchInteraction.setType(TouchInteraction.Type.RELEASE);
+    private void onReleaseListener(Interplay interplay, Interaction interaction) {
+        interaction.setType(Interaction.Type.RELEASE);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(touchInteraction.getPosition());
-        touchInteraction.setTarget(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(interaction.getPosition());
+        interaction.setTargetImage(targetImage);
 
         Log.v("Interaction", "onRelease");
         Log.v("Interaction", "focus: " + perspective.getFocusImage());
-        Log.v("Interaction", "touch: " + touchInteraction.getTarget());
+        Log.v("Interaction", "touch: " + interaction.getTargetImage());
         Log.v("Interaction", "-");
 
-        if (touchInteraction.isTouching()) {
+        if (interaction.isTouching()) {
 
-            if (touchInteraction.getTarget().isType(FrameImage.TYPE)) {
+            // First touch was on a frame image...
+            if (interplay.getFirst().getTargetImage().isType(FrameImage.TYPE)) {
 
-                // If first touch was on the same form, then respond
-                if (touchInteractivity.getFirst().isTouching() && touchInteractivity.getFirst().getTarget().isType(FrameImage.TYPE)) {
+                if (interaction.getTargetImage().isType(FrameImage.TYPE)) {
 
-                    // Frame
-                    FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
-                    frameImage.touch(touchInteraction);
+                    // If first touch was on the same form, then respond
+                    if (interplay.getFirst().isTouching() && interplay.getFirst().getTargetImage().isType(FrameImage.TYPE)) {
 
-                    // Perspective
-                    perspective.focusReset();
+                        // Frame
+                        FrameImage frameImage = (FrameImage) interaction.getTargetImage();
+                        frameImage.touch(interaction);
+
+                        // Perspective
+                        perspective.focusReset();
+                    }
+
                 }
 
-            } else if (touchInteraction.getTarget().isType(PortImage.TYPE)) {
+            } else if (interplay.getFirst().getTargetImage().isType(PortImage.TYPE)) {
 
-                // PortImage portImage = (PortImage) touchInteraction.getImageByPosition();
-                PortImage sourcePortImage = (PortImage) touchInteractivity.getFirst().getTarget();
+                // First touch was on a port image...
+
+                if (interaction.getTargetImage().isType(FrameImage.TYPE)) {
+
+                    // ...last touch was on a frame image.
+
+                    PortImage sourcePortImage = (PortImage) interplay.getFirst().getTargetImage();
+                    sourcePortImage.setCandidatePathVisibility(false);
+
+                } else if (interaction.getTargetImage().isType(PortImage.TYPE)) {
+
+                    // ...last touch was on a port image.
+
+                    // PortImage portImage = (PortImage) interaction.getImageByPosition();
+                    PortImage sourcePortImage = (PortImage) interplay.getFirst().getTargetImage();
 
 //                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
 //
@@ -350,7 +368,7 @@ public class Body {
 //
 //                    // Image
 //                    PeripheralImage peripheralImage = new PeripheralImage(peripheral);
-//                    peripheralImage.setPosition(touchInteraction.getPosition());
+//                    peripheralImage.setPosition(interaction.getPosition());
 //                    peripheralImage.setVisualization(getPerspective().getVisualization());
 //
 //                    // Visualization
@@ -358,91 +376,91 @@ public class Body {
 //
 //                }
 
-                // Show ports of nearby forms
-                boolean useNearbyPortImage = false;
-                for (FrameImage nearbyFrameImage : perspective.getVisualization().getFrameImages()) {
+                    // Show ports of nearby forms
+                    boolean useNearbyPortImage = false;
+                    for (FrameImage nearbyFrameImage : perspective.getVisualization().getFrameImages()) {
 
-                    Log.v("Interaction", "A");
+                        Log.v("Interaction", "A");
 
-                    // Update style of nearby machines
-                    double distanceToFrameImage = Geometry.calculateDistance(
-                            touchInteraction.getPosition(),
-                            nearbyFrameImage.getPosition()
-                    );
+                        // Update style of nearby machines
+                        double distanceToFrameImage = Geometry.calculateDistance(
+                                interaction.getPosition(),
+                                nearbyFrameImage.getPosition()
+                        );
 
-                    if (distanceToFrameImage < nearbyFrameImage.getShape().getHeight() + 50) {
+                        if (distanceToFrameImage < nearbyFrameImage.getShape().getHeight() + 50) {
 
-                        Log.v("Interaction", "B");
+                            Log.v("Interaction", "B");
 
-                        // TODO: Use overlappedImage instanceof PortImage
+                            // TODO: Use overlappedImage instanceof PortImage
 
-                        for (PortImage nearbyPortImage : nearbyFrameImage.getPortImages()) {
+                            for (PortImage nearbyPortImage : nearbyFrameImage.getPortImages()) {
 
-                            if (nearbyPortImage != sourcePortImage) {
-                                if (nearbyPortImage.isTouching(touchInteraction.getPosition(), 50)) {
+                                if (nearbyPortImage != sourcePortImage) {
+                                    if (nearbyPortImage.isTouching(interaction.getPosition(), 50)) {
 
-                                    Log.v("Interaction", "C");
+                                        Log.v("Interaction", "C");
 
-                                    Port port = sourcePortImage.getPort();
-                                    Port nearbyPort = nearbyPortImage.getPort();
+                                        Port port = sourcePortImage.getPort();
+                                        Port nearbyPort = nearbyPortImage.getPort();
 
-                                    useNearbyPortImage = true;
+                                        useNearbyPortImage = true;
 
-                                    if (port.getDirection() == Port.Direction.NONE) {
-                                        port.setDirection(Port.Direction.INPUT);
+                                        if (port.getDirection() == Port.Direction.NONE) {
+                                            port.setDirection(Port.Direction.INPUT);
+                                        }
+                                        if (port.getType() == Port.Type.NONE) {
+                                            port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                        }
+
+                                        nearbyPort.setDirection(Port.Direction.OUTPUT);
+                                        nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
+
+                                        // Create and add path to port
+                                        Port sourcePort = (Port) perspective.getVisualization().getModel(sourcePortImage);
+                                        Port targetPort = (Port) perspective.getVisualization().getModel(nearbyPortImage);
+
+                                        if (!sourcePort.hasAncestor(targetPort)) {
+
+                                            Log.v("Interaction", "D.1");
+
+                                            Path path = new Path(sourcePort, targetPort);
+                                            sourcePort.addPath(path);
+
+                                            PathImage pathImage = new PathImage(path);
+                                            pathImage.setVisualization(perspective.getVisualization());
+                                            perspective.getVisualization().addImage(path, pathImage, "paths");
+
+                                            PortImage targetPortImage = (PortImage) perspective.getVisualization().getImage(path.getTarget());
+                                            targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                                            // Perspective
+                                            perspective.focusOnPath(sourcePort);
+                                        }
+
+                                        break;
                                     }
-                                    if (port.getType() == Port.Type.NONE) {
-                                        port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                                    }
-
-                                    nearbyPort.setDirection(Port.Direction.OUTPUT);
-                                    nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
-
-                                    // Create and add path to port
-                                    Port sourcePort = (Port) perspective.getVisualization().getModel(sourcePortImage);
-                                    Port targetPort = (Port) perspective.getVisualization().getModel(nearbyPortImage);
-
-                                    if (!sourcePort.hasAncestor(targetPort)) {
-
-                                        Log.v("Interaction", "D.1");
-
-                                        Path path = new Path(sourcePort, targetPort);
-                                        sourcePort.addPath(path);
-
-                                        PathImage pathImage = new PathImage(path);
-                                        pathImage.setVisualization(perspective.getVisualization());
-                                        perspective.getVisualization().addImage(path, pathImage, "paths");
-
-                                        PortImage targetPortImage = (PortImage) perspective.getVisualization().getImage(path.getTarget());
-                                        targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
-
-                                        // Perspective
-                                        perspective.focusOnPath(sourcePort);
-                                    }
-
-                                    break;
                                 }
                             }
                         }
                     }
-                }
 
-//                portImage.touch(touchInteraction);
+//                portImage.touch(interaction);
 
-                if (!useNearbyPortImage) {
+                    if (!useNearbyPortImage) {
 
-                    Port port = (Port) sourcePortImage.getModel();
+                        Port port = (Port) sourcePortImage.getModel();
 
-                    port.setDirection(Port.Direction.INPUT);
+                        port.setDirection(Port.Direction.INPUT);
 
-                    if (port.getType() == Port.Type.NONE) {
-                        port.setType(Port.Type.next(port.getType()));
+                        if (port.getType() == Port.Type.NONE) {
+                            port.setType(Port.Type.next(port.getType()));
+                        }
                     }
-                }
 
-                sourcePortImage.setCandidatePathVisibility(false);
+                    sourcePortImage.setCandidatePathVisibility(false);
 
-                // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                    // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
 //                // Perspective
 //                ArrayList<Port> pathPorts = port.getPorts(paths);
@@ -453,23 +471,29 @@ public class Body {
 //
 //                getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
-//                touchInteraction.setTarget(touchInteractivity.getFirst().getImageByPosition());
-//                touchInteraction.setType(TouchInteraction.Type.RELEASE);
-//                Log.v("onHoldListener", "Source port: " + touchInteraction.getImageByPosition());
-//                targetImage.touch(touchInteraction);
+//                interaction.setTargetImage(interplay.getFirst().getImageByPosition());
+//                interaction.setType(Interaction.Type.RELEASE);
+//                Log.v("onHoldListener", "Source port: " + interaction.getImageByPosition());
+//                targetImage.touch(interaction);
 
-            } else if (touchInteraction.getTarget().isType(PathImage.TYPE)) {
+                }
 
-                PathImage pathImage = (PathImage) touchInteraction.getTarget();
+            } else if (interplay.getFirst().getTargetImage().isType(PathImage.TYPE)) {
+
+                // First touch was on a path image...
+
+                if (interaction.getTargetImage().isType(PathImage.TYPE)) {
+                    PathImage pathImage = (PathImage) interaction.getTargetImage();
+                }
             }
 
-        } else if (!touchInteraction.isTouching()) {
+        } else if (!interaction.isTouching()) {
 
-            if (touchInteractivity.getFirst().getTarget() != null
-                    && touchInteractivity.getFirst().getTarget().isType(PortImage.TYPE)) {
+            if (interplay.getFirst().getTargetImage() != null
+                    && interplay.getFirst().getTargetImage().isType(PortImage.TYPE)) {
 
-                // PortImage portImage = (PortImage) touchInteraction.getImageByPosition();
-                PortImage sourcePortImage = (PortImage) touchInteractivity.getFirst().getTarget();
+                // PortImage portImage = (PortImage) interaction.getImageByPosition();
+                PortImage sourcePortImage = (PortImage) interplay.getFirst().getTargetImage();
 
                 if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
 
@@ -484,7 +508,7 @@ public class Body {
 
                     // Image
                     PeripheralImage peripheralImage = new PeripheralImage(peripheral);
-                    peripheralImage.setPosition(touchInteraction.getPosition());
+                    peripheralImage.setPosition(interaction.getPosition());
 //                    peripheralImage.setRotation();
                     peripheralImage.setVisualization(getPerspective().getVisualization());
 
@@ -516,9 +540,9 @@ public class Body {
 //            adjustScale();
 
             // Check if first touch was on an image
-            if (touchInteractivity.getFirst().isTouching()) {
-                if (touchInteractivity.getFirst().getTarget().isType(PortImage.TYPE)) {
-                    ((PortImage) touchInteractivity.getFirst().getTarget()).setCandidatePathVisibility(false);
+            if (interplay.getFirst().isTouching()) {
+                if (interplay.getFirst().getTargetImage().isType(PortImage.TYPE)) {
+                    ((PortImage) interplay.getFirst().getTargetImage()).setCandidatePathVisibility(false);
                 }
             }
 
@@ -526,7 +550,7 @@ public class Body {
 
         }
 
-        // Interactivity
+        // Interplay
         perspective.setAdjustability(true);
     }
 }

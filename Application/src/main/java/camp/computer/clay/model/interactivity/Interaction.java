@@ -3,7 +3,7 @@ package camp.computer.clay.model.interactivity;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Point;
 
-public class TouchInteraction {
+public class Interaction {
 
     public enum Type {
 
@@ -49,9 +49,9 @@ public class TouchInteraction {
 
     public int pointerIndex = -1;
 
-    public TouchInteraction(Type type) {
+    public Interaction(Type type) {
         this.type = type;
-        this.timestamp = java.lang.System.currentTimeMillis ();
+        this.timestamp = java.lang.System.currentTimeMillis();
 
         setup();
     }
@@ -64,7 +64,7 @@ public class TouchInteraction {
         }
     }
 
-    public boolean hasTouches () {
+    public boolean hasTouches() {
         for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
             if (isTouching[i]) {
                 return true;
@@ -97,17 +97,17 @@ public class TouchInteraction {
         return this.timestamp;
     }
 
-    private Image[] touchedImage = new Image[TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT];
+    private Image[] touchedImage = new Image[Interaction.MAXIMUM_TOUCH_POINT_COUNT];
 
     public boolean isTouching(int fingerIndex) {
         return this.touchedImage[fingerIndex] != null;
     }
 
-    public void setTarget(int fingerIndex, Image image) {
+    public void setTargetImage(int fingerIndex, Image image) {
         this.touchedImage[fingerIndex] = image;
     }
 
-    public Image getTarget(int fingerIndex) {
+    public Image getTargetImage(int fingerIndex) {
         return this.touchedImage[fingerIndex];
     }
 
@@ -115,14 +115,14 @@ public class TouchInteraction {
         return isTouching(0);
     }
 
-    public void setTarget(Image image) {
-        setTarget(0, image);
+    public void setTargetImage(Image image) {
+        setTargetImage(0, image);
         if (image != null) {
             isTouching[0] = true;
         }
     }
 
-    public Image getTarget() {
-        return getTarget(0);
+    public Image getTargetImage() {
+        return getTargetImage(0);
     }
 }

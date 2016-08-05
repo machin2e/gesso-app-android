@@ -2,7 +2,7 @@ package camp.computer.clay.visualization.arch;
 
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.arch.Model;
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;
@@ -154,15 +154,15 @@ public abstract class Image {
     public interface TouchActionListener {
     }
 
-    public abstract void onTouchInteraction(TouchInteraction touchInteraction);
+    public abstract void onTouchInteraction(Interaction interaction);
 
     // TODO: change this to addOnTouchListener (since have abstract onTouchInteraction)... and call at end of that
     public void setOnTouchActionListener(TouchActionListener touchActionListener) {
         this.touchActionListener = touchActionListener;
     }
 
-    public void touch(TouchInteraction touchInteraction) {
-        onTouchInteraction(touchInteraction);
+    public void touch(Interaction interaction) {
+        onTouchInteraction(interaction);
     }
 
 }

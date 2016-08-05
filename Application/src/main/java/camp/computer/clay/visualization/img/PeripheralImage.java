@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.interactivity.Interaction;
 import camp.computer.clay.model.arch.Model;
 import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Geometry;
@@ -84,7 +84,7 @@ public class PeripheralImage extends Image {
     }
 
     @Override
-    public void onTouchInteraction(TouchInteraction touchInteraction) {
+    public void onTouchInteraction(Interaction interaction) {
 
     }
 }

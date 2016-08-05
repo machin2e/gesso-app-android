@@ -242,12 +242,12 @@ public class Perspective {
 
     }
 
-    public void focusOnNewPath(TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    public void focusOnNewPath(Interplay interplay, Interaction interaction) {
 
-        PortImage portImage = (PortImage) touchInteraction.getTarget();
+        PortImage portImage = (PortImage) interaction.getTargetImage();
 
         // Show ports of nearby forms
-        ImageGroup nearbyImages = getVisualization().getImages().filterType(FrameImage.TYPE).filterDistance(touchInteraction.getPosition(), 200 + 60);
+        ImageGroup nearbyImages = getVisualization().getImages().filterType(FrameImage.TYPE).filterDistance(interaction.getPosition(), 200 + 60);
         for (Image image : getVisualization().getImages().filterType(FrameImage.TYPE).getList()) {
 
             if (image == portImage.getFrameImage() || nearbyImages.contains(image)) {
@@ -268,7 +268,7 @@ public class Perspective {
         }
 
         // Check if a machine sprite was nearby
-        Image nearestFormImage = getVisualization().getImages().filterType(FrameImage.TYPE).getNearest(touchInteraction.getPosition());
+        Image nearestFormImage = getVisualization().getImages().filterType(FrameImage.TYPE).getNearest(interaction.getPosition());
         if (nearestFormImage != null) {
 
             // TODO: Vibrate
@@ -302,7 +302,7 @@ public class Perspective {
 
     }
 
-    public void focusOnPerspectiveAdjustment(TouchInteractivity touchInteractivity) {
+    public void focusOnPerspectiveAdjustment(Interplay interplay) {
 
         // Dragging perspective
 
@@ -311,32 +311,32 @@ public class Perspective {
 //                if (getPerspective().isAdjustable()) {
 //                    getPerspective().setScale(0.9f);
 //                    getPerspective().setOffset(
-//                            touchInteraction.getPosition().getX() - touchInteractivity.getFirst().getPosition().getX(),
-//                            touchInteraction.getPosition().getY() - touchInteractivity.getFirst().getPosition().getY()
+//                            touchInteraction.getPosition().getX() - interplay.getFirst().getPosition().getX(),
+//                            touchInteraction.getPosition().getY() - interplay.getFirst().getPosition().getY()
 //                    );
-        setOffset(touchInteractivity.offsetX, touchInteractivity.offsetY);
+        setOffset(interplay.offsetX, interplay.offsetY);
 //                    getPerspective().setPosition(
 //                            new Point(
-//                                    -(touchInteraction.getPosition().getX() - touchInteractivity.getFirst().getPosition().getX()),
-//                                    -(touchInteraction.getPosition().getY() - touchInteractivity.getFirst().getPosition().getY())
+//                                    -(touchInteraction.getPosition().getX() - interplay.getFirst().getPosition().getX()),
+//                                    -(touchInteraction.getPosition().getY() - interplay.getFirst().getPosition().getY())
 //                            )
 //                    );
 //                    getPerspective().setPosition(touchInteraction.getPosition(), 0);
-//                        (int) (touchInteraction.getPosition().getX() - touchInteractivity.getFirst().getPosition().getX()),
-//                        (int) (touchInteraction.getPosition().getY() - touchInteractivity.getFirst().getPosition().getY()));
+//                        (int) (touchInteraction.getPosition().getX() - interplay.getFirst().getPosition().getX()),
+//                        (int) (touchInteraction.getPosition().getY() - interplay.getFirst().getPosition().getY()));
 //                }
 
     }
 
-    public void focusOnFrame(Body body, TouchInteractivity touchInteractivity, TouchInteraction touchInteraction) {
+    public void focusOnFrame(Body body, Interplay interplay, Interaction interaction) {
 
-        if (touchInteractivity.isDragging()) {
+        if (interplay.isDragging()) {
 
             adjustScale();
 
         } else {
 
-            FrameImage frameImage = (FrameImage) touchInteraction.getTarget();
+            FrameImage frameImage = (FrameImage) interaction.getTargetImage();
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
@@ -348,16 +348,16 @@ public class Perspective {
                 otherFrameImage.setTransparency(0.1f);
             }
 
-            TouchInteractivity previousInteractivity = null;
+            Interplay previousInterplay = null;
             if (body.touchInteractivities.size() > 1) {
-                previousInteractivity = body.touchInteractivities.get(body.touchInteractivities.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousInteractivity.getFirst().getTarget());
-                Log.v("PreviousTouch", "Current: " + touchInteraction.getTarget());
+                previousInterplay = body.touchInteractivities.get(body.touchInteractivities.size() - 2);
+                Log.v("PreviousTouch", "Previous: " + previousInterplay.getFirst().getTargetImage());
+                Log.v("PreviousTouch", "Current: " + interaction.getTargetImage());
             }
 
             // Perspective
             if (frameImage.getForm().getPaths().size() > 0
-                    && (previousInteractivity != null && previousInteractivity.getFirst().getTarget() != touchInteraction.getTarget())) {
+                    && (previousInterplay != null && previousInterplay.getFirst().getTargetImage() != interaction.getTargetImage())) {
 
                 Log.v("Touch_", "A");
 
@@ -484,7 +484,7 @@ public class Perspective {
         //getPerspective().setPosition(getPerspective().getVisualization().getList().filterType(FrameImage.TYPE).calculateCentroid());
         setPosition(formImagesCenterPosition);
 
-        // Reset map interactivity
+        // Reset map interplay
         setAdjustability(true);
 
     }
