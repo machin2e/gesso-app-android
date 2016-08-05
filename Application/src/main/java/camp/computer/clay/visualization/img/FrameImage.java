@@ -1,18 +1,19 @@
-package camp.computer.clay.visualization.images;
+package camp.computer.clay.visualization.img;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Frame;
-import camp.computer.clay.model.simulation.Path;
-import camp.computer.clay.model.simulation.Port;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.model.arch.Frame;
+import camp.computer.clay.model.arch.Path;
+import camp.computer.clay.model.arch.Port;
+import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
@@ -28,18 +29,18 @@ public class FrameImage extends Image {
 
     // <STYLE>
     // TODO: Make these private once the map is working well and the sprite is working well.
-    public double boardHeight = 250.0f;
-    public double boardWidth = 250.0f;
-    public Rectangle shape = new Rectangle(boardWidth, boardHeight);
 
-    private String boardColorString = "f7f7f7"; // "404040"; // "414141";
-    private int boardColor = Color.parseColor("#ff" + boardColorString); // Color.parseColor("#212121");
-    private boolean showBoardOutline = true;
-    private String boardOutlineColorString = "414141";
-    private int boardOutlineColor = Color.parseColor("#ff" + boardOutlineColorString); // Color.parseColor("#737272");
-    private double boardOutlineThickness = 3.0f;
+    // Shapes
+    private Rectangle shape = new Rectangle(250, 250);
 
-    private double targetTransparency = 1.0f;
+    // Color, Transparency
+    private String colorString = "f7f7f7"; // "404040"; // "414141";
+    private int color = Color.parseColor("#ff" + colorString); // Color.parseColor("#212121");
+    private boolean outlineVisibility = true;
+    private String outlineColorString = "414141";
+    private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
+    private double outlineThickness = 3.0;
+    private double targetTransparency = 1.0;
     private double currentTransparency = targetTransparency;
 
     private double portGroupWidth = 50;
@@ -49,7 +50,7 @@ public class FrameImage extends Image {
     private boolean showPortGroupOutline = false;
     private String portGroupOutlineColorString = "000000";
     private int portGroupOutlineColor = Color.parseColor("#ff" + portGroupOutlineColorString);
-    private double portGroupOutlineThickness = boardOutlineThickness;
+    private double portGroupOutlineThickness = outlineThickness;
 
     private double distanceLightsToEdge = 12.0f;
     private double lightWidth = 12;
@@ -87,8 +88,8 @@ public class FrameImage extends Image {
         return (Frame) getModel();
     }
 
-    public ArrayList<PortImage> getPortImages() {
-        ArrayList<PortImage> portImages = new ArrayList<PortImage>();
+    public List<PortImage> getPortImages() {
+        List<PortImage> portImages = new ArrayList<>();
         Frame frame = getForm();
 
         for (Port port: frame.getPorts()) {
@@ -146,14 +147,14 @@ public class FrameImage extends Image {
 
         // Color
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(this.boardColor);
+        paint.setColor(this.color);
         Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
 
         // Outline
-        if (this.showBoardOutline) {
+        if (this.outlineVisibility) {
             paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(this.boardOutlineColor);
-            paint.setStrokeWidth((float) boardOutlineThickness);
+            paint.setColor(this.outlineColor);
+            paint.setStrokeWidth((float) outlineThickness);
             Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
         }
     }
@@ -372,8 +373,8 @@ public class FrameImage extends Image {
         String transparencyString = String.format("%02x", (int) currentTransparency * 255);
 
         // Frame color
-        boardColor = Color.parseColor("#" + transparencyString + boardColorString);
-        boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+        color = Color.parseColor("#" + transparencyString + colorString);
+        outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
 
         // Header color
         portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
@@ -389,8 +390,8 @@ public class FrameImage extends Image {
 //                    String transparencyString = String.format("%02x", (int) currentScale);
 //
 //                    // Frame color
-//                    boardColor = Color.parseColor("#" + transparencyString + boardColorString);
-//                    boardOutlineColor = Color.parseColor("#" + transparencyString + boardOutlineColorString);
+//                    color = Color.parseColor("#" + transparencyString + colorString);
+//                    outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
 //
 //                    // Header color
 //                    portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
@@ -466,7 +467,7 @@ public class FrameImage extends Image {
 
             // Show ports and paths of touched form
             for (PortImage portImage : getPortImages()) {
-                ArrayList<Path> paths = portImage.getPort().getPathsByPort();
+                List<Path> paths = portImage.getPort().getGraph();
                 for (Path path : paths) {
                     // Show ports
                     getVisualization().getImage(path.getSource()).setVisibility(true);

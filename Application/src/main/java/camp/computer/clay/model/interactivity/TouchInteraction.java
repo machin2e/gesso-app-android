@@ -1,6 +1,6 @@
-package camp.computer.clay.model.interaction;
+package camp.computer.clay.model.interactivity;
 
-import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Point;
 
 public class TouchInteraction {

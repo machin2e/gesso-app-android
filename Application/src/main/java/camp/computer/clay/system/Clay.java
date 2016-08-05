@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.model.interaction.Perspective;
-import camp.computer.clay.model.interaction.Body;
-import camp.computer.clay.model.simulation.Frame;
-import camp.computer.clay.model.simulation.Port;
-import camp.computer.clay.model.simulation.Simulation;
+import camp.computer.clay.model.interactivity.Perspective;
+import camp.computer.clay.model.interactivity.Body;
+import camp.computer.clay.model.arch.Frame;
+import camp.computer.clay.model.arch.Port;
+import camp.computer.clay.model.arch.Simulation;
 import camp.computer.clay.system.host.CacheHost;
 import camp.computer.clay.system.host.DisplayHostInterface;
 import camp.computer.clay.system.host.MessageHost;
@@ -24,9 +24,9 @@ import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.old_model.Descriptor;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.old_model.Event;
-import camp.computer.clay.visualization.architecture.Layer;
-import camp.computer.clay.visualization.architecture.Visualization;
-import camp.computer.clay.visualization.images.FrameImage;
+import camp.computer.clay.visualization.arch.Layer;
+import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.visualization.img.FrameImage;
 
 public class Clay {
 

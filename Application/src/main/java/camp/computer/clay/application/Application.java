@@ -27,14 +27,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
-import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.interactivity.TouchInteraction;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.host.util.CRC16;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.host.DisplayHostInterface;
 

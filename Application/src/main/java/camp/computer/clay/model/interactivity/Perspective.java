@@ -1,18 +1,19 @@
-package camp.computer.clay.model.interaction;
+package camp.computer.clay.model.interactivity;
 
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.model.simulation.Path;
-import camp.computer.clay.model.simulation.Port;
-import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.architecture.ImageGroup;
-import camp.computer.clay.visualization.architecture.Visualization;
-import camp.computer.clay.visualization.images.FrameImage;
-import camp.computer.clay.visualization.images.PathImage;
-import camp.computer.clay.visualization.images.PortImage;
+import camp.computer.clay.model.arch.Path;
+import camp.computer.clay.model.arch.Port;
+import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.visualization.arch.ImageGroup;
+import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.visualization.img.FrameImage;
+import camp.computer.clay.visualization.img.PathImage;
+import camp.computer.clay.visualization.img.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
@@ -290,8 +291,8 @@ public class Perspective {
 
                     /*
                     // Show the ports in the path
-                    ArrayList<Path> portPaths = getPerspective().getVisualization().getSimulation().getPathsByPort(port);
-                    ArrayList<Port> portConnections = getPerspective().getVisualization().getSimulation().getPortsInPaths(portPaths);
+                    List<Path> portPaths = getPerspective().getVisualization().getSimulation().getGraph(port);
+                    List<Port> portConnections = getPerspective().getVisualization().getSimulation().getPorts(portPaths);
                     for (Port portConnection: portConnections) {
                         PortImage portImageConnection = (PortImage) getPerspective().getVisualization().getImage(portConnection);
                         portImageConnection.setVisibility(true);
@@ -361,14 +362,14 @@ public class Perspective {
                 Log.v("Touch_", "A");
 
                 for (PortImage portImage : frameImage.getPortImages()) {
-                    ArrayList<PathImage> pathImages = portImage.getPathImages();
+                    List<PathImage> pathImages = portImage.getPathImages();
                     for (PathImage pathImage : pathImages) {
                         pathImage.setVisibility(false);
                     }
                 }
 
                 // Get ports along every path connected to the ports on the touched form
-                ArrayList<Port> formPathPorts = new ArrayList<>();
+                List<Port> formPathPorts = new ArrayList<>();
                 for (Port port : frameImage.getForm().getPorts()) {
 
                     // TODO: ((PortImage) getPerspective().getVisualization().getImage(port)).getVisiblePaths()
@@ -377,7 +378,7 @@ public class Perspective {
                         formPathPorts.add(port);
                     }
 
-                    ArrayList<Path> portPaths = port.getPathsByPort();
+                    List<Path> portPaths = port.getGraph();
                     for (Path path : portPaths) {
                         if (!formPathPorts.contains(path.getSource())) {
                             formPathPorts.add(path.getSource());
@@ -389,9 +390,9 @@ public class Perspective {
                 }
 
                 // Perspective
-                ArrayList<Image> formPathPortImages = getVisualization().getImages(formPathPorts);
+                List<Image> formPathPortImages = getVisualization().getImages(formPathPorts);
 
-                ArrayList<Point> formPortPositions = Visualization.getPositions(formPathPortImages);
+                List<Point> formPortPositions = Visualization.getPositions(formPathPortImages);
                 Rectangle boundingBox = Geometry.calculateBoundingBox(formPortPositions);
 
                 setAdjustability(false);
@@ -407,7 +408,7 @@ public class Perspective {
                 // the perspective.
 
                 for (PortImage portImage : frameImage.getPortImages()) {
-                    ArrayList<PathImage> pathImages = portImage.getPathImages();
+                    List<PathImage> pathImages = portImage.getPathImages();
                     for (PathImage pathImage : pathImages) {
                         pathImage.setVisibility(false);
                     }
@@ -442,21 +443,23 @@ public class Perspective {
 //        targetPortImage.showPaths();
 //        pathImage.setVisibility(true);
 
-        ArrayList<Path> paths = sourcePort.getPathsByPort();
+        List<Path> paths = sourcePort.getGraph();
         for (Path connectedPath : paths) {
+
             // Show ports
             ((PortImage) getVisualization().getImage(connectedPath.getSource())).setVisibility(true);
             ((PortImage) getVisualization().getImage(connectedPath.getSource())).showPaths();
             ((PortImage) getVisualization().getImage(connectedPath.getTarget())).setVisibility(true);
             ((PortImage) getVisualization().getImage(connectedPath.getTarget())).showPaths();
+
             // Show path
             getVisualization().getImage(connectedPath).setVisibility(true);
         }
 
         // Perspective
-        ArrayList<Port> pathPorts = sourcePort.getPortsInPaths(paths);
-        ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
-        ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
+        List<Port> pathPorts = sourcePort.getPorts(paths);
+        List<Image> pathPortImages = getVisualization().getImages(pathPorts);
+        List<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
         setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
         Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
@@ -473,7 +476,7 @@ public class Perspective {
             frameImage.setTransparency(1.0f);
         }
 
-        ArrayList<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE).getPositions();
+        List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE).getPositions();
         Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
 
         adjustScale();
@@ -487,7 +490,7 @@ public class Perspective {
     }
 
     public void adjustPosition() {
-        ArrayList<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE).getPositions();
+        List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE).getPositions();
         Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
         setPosition(formImagesCenterPosition);
 
@@ -498,7 +501,7 @@ public class Perspective {
     }
 
     public void adjustScale(double duration) {
-        ArrayList<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE).getPositions();
+        List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE).getPositions();
         if (formImagePositions.size() > 0) {
             Rectangle boundingBox = Geometry.calculateBoundingBox(formImagePositions);
             adjustScale(boundingBox, duration);

@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.visualization.arch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +167,7 @@ public class ImageGroup {
         return Geometry.calculateBoundingBox(getPositions());
     }
 
-    public ArrayList<Point> computeConvexHull() {
+    public List<Point> computeConvexHull() {
         return Geometry.computeConvexHull(getPositions());
     }
 

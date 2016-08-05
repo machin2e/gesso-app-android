@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.visualization.arch;
 
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,11 +11,11 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Model;
-import camp.computer.clay.model.simulation.Simulation;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.images.FrameImage;
-import camp.computer.clay.visualization.images.PortImage;
+import camp.computer.clay.model.arch.Model;
+import camp.computer.clay.model.arch.Simulation;
+import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.visualization.img.FrameImage;
+import camp.computer.clay.visualization.img.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
 import camp.computer.clay.visualization.util.Point;
@@ -24,13 +24,13 @@ import camp.computer.clay.visualization.util.Shape;
 
 public class Visualization extends Image {
 
-//    private <T> ArrayList<T> getModel(Class<T> type) {
-//        ArrayList<T> arrayList = new ArrayList<T>();
+//    private <T> List<T> getModel(Class<T> type) {
+//        List<T> arrayList = new ArrayList<T>();
 //        return arrayList;
 //    }
 
-    public static <T extends Image> ArrayList<Point> getPositions(ArrayList<T> images) {
-        ArrayList<Point> positions = new ArrayList<>();
+    public static <T extends Image> List<Point> getPositions(List<T> images) {
+        List<Point> positions = new ArrayList<>();
         for (T image : images) {
             positions.add(image.getPosition());
         }
@@ -107,7 +107,7 @@ public class Visualization extends Image {
         // Calculate random positions separated by minimum distance
         final float imageSeparationDistance = 525; // 500;
 
-        ArrayList<Point> imagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
+        List<Point> imagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
 
         Point position = null;
         boolean foundPoint = false;
@@ -128,7 +128,7 @@ public class Visualization extends Image {
 
         } else {
 
-            ArrayList<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
+            List<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
 
             int sourceIndex = Number.generateRandomInteger(0, hullPoints.size() - 1);
             int targetIndex = sourceIndex + 1;
@@ -166,9 +166,9 @@ public class Visualization extends Image {
         return null;
     }
 
-    public ArrayList<FrameImage> getFrameImages() {
+    public List<FrameImage> getFrameImages() {
 
-        ArrayList<FrameImage> images = new ArrayList<>();
+        List<FrameImage> images = new ArrayList<>();
 
         for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
@@ -181,9 +181,9 @@ public class Visualization extends Image {
         return images;
     }
 
-    public ArrayList<PortImage> getPortImages() {
+    public List<PortImage> getPortImages() {
 
-        ArrayList<PortImage> sprites = new ArrayList<>();
+        List<PortImage> sprites = new ArrayList<>();
 
         for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
@@ -196,8 +196,8 @@ public class Visualization extends Image {
         return sprites;
     }
 
-    public <T> ArrayList<Image> getImages(ArrayList<T> models) {
-        ArrayList<Image> images = new ArrayList<>();
+    public <T> List<Image> getImages(List<T> models) {
+        List<Image> images = new ArrayList<>();
         for (Layer layer : getLayers()) {
             for (T model : models) {
                 Image image = layer.getImage((Model) model);
@@ -375,7 +375,7 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            ArrayList<Point> formImagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
+            List<Point> formImagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
             Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
@@ -391,8 +391,8 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CONVEX_HULL>
-            ArrayList<Point> formPositions = Visualization.getPositions(getFrameImages());
-            ArrayList<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
+            List<Point> formPositions = Visualization.getPositions(getFrameImages());
+            List<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
 
             visualizationSurface.getPaint().setStrokeWidth(1.0f);
             visualizationSurface.getPaint().setColor(Color.RED);
@@ -414,8 +414,8 @@ public class Visualization extends Image {
         }
     }
 
-    public ArrayList<Integer> getLayerIndices() {
-        ArrayList<Integer> layers = new ArrayList<>();
+    public List<Integer> getLayerIndices() {
+        List<Integer> layers = new ArrayList<>();
         for (Layer layer : getLayers()) {
             layers.add(layer.getIndex());
         }
@@ -423,7 +423,7 @@ public class Visualization extends Image {
         return layers;
     }
 
-    public ArrayList<Layer> getLayers() {
+    public List<Layer> getLayers() {
         return new ArrayList<>(this.layers);
     }
 

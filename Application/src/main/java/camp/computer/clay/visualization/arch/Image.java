@@ -1,8 +1,8 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.visualization.arch;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Model;
-import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.arch.Model;
+import camp.computer.clay.model.interactivity.TouchInteraction;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;

@@ -1,4 +1,4 @@
-package camp.computer.clay.model.interaction;
+package camp.computer.clay.model.interactivity;
 
 import android.os.Handler;
 
@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Point;
 
 /**

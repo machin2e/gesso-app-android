@@ -19,6 +19,11 @@ public class Point {
         this(0, 0);
     }
 
+    public Point(Point otherPoint) {
+        this.x = otherPoint.x;
+        this.y = otherPoint.y;
+    }
+
     public Point(double x, double y) {
         this.x = x;
         this.y = y;

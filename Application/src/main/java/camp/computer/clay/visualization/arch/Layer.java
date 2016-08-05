@@ -1,9 +1,9 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.visualization.arch;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.model.simulation.Model;
+import camp.computer.clay.model.arch.Model;
 
 public class Layer {
 

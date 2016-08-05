@@ -13,12 +13,12 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
-        android:label="@string/application_name"
+        android:tag="@string/application_name"
         android:icon="@drawable/ic_launcher">
         <activity android:name="camp.computer.clay.application.Application"
             android:theme="@style/SplashTheme"
             android:icon="@drawable/ic_launcher"
-            android:label="@string/application_name">
+            android:tag="@string/application_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

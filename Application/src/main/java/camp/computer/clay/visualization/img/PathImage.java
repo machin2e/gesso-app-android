@@ -1,13 +1,12 @@
-package camp.computer.clay.visualization.images;
+package camp.computer.clay.visualization.img;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Path;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.model.arch.Path;
+import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;

@@ -1,13 +1,13 @@
-package camp.computer.clay.visualization.images;
+package camp.computer.clay.visualization.img;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.model.simulation.Model;
-import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.model.interactivity.TouchInteraction;
+import camp.computer.clay.model.arch.Model;
+import camp.computer.clay.visualization.arch.Image;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;
@@ -18,6 +18,13 @@ public class PeripheralImage extends Image {
 
     private double width = 175;
     private double height = 175;
+
+    private String colorString = "f7f7f7"; // "f7f7f7"; // "404040"; // "414141";
+    private int color = Color.parseColor("#ff" + colorString); // Color.parseColor("#212121");
+    private boolean showOutline = true;
+    private String outlineColorString = "414141";
+    private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
+    private double outlineThickness = 3.0f;
 
     private int uniqueColor = Color.BLACK;
 
@@ -38,13 +45,6 @@ public class PeripheralImage extends Image {
             drawPeripheralImage(visualizationSurface);
         }
     }
-
-    private String colorString = "f7f7f7"; // "f7f7f7"; // "404040"; // "414141";
-    private int color = Color.parseColor("#ff" + colorString); // Color.parseColor("#212121");
-    private boolean showOutline = true;
-    private String outlineColorString = "414141";
-    private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
-    private double outlineThickness = 3.0f;
 
     public void drawPeripheralImage(VisualizationSurface visualizationSurface) {
 

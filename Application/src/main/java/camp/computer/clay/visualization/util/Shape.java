@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Shape {
 
@@ -169,7 +170,7 @@ public abstract class Shape {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawPolygon(ArrayList<Point> vertices, Canvas canvas, Paint paint) {
+    public static void drawPolygon(List<Point> vertices, Canvas canvas, Paint paint) {
         android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < vertices.size(); i++) {
 

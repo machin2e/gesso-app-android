@@ -1,26 +1,26 @@
-package camp.computer.clay.model.interaction;
+package camp.computer.clay.model.interactivity;
 
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import camp.computer.clay.model.simulation.Peripheral;
-import camp.computer.clay.model.simulation._Actor;
-import camp.computer.clay.model.simulation.Path;
-import camp.computer.clay.model.simulation.Port;
-import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.architecture.Layer;
-import camp.computer.clay.visualization.images.FrameImage;
-import camp.computer.clay.visualization.images.PathImage;
-import camp.computer.clay.visualization.images.PeripheralImage;
-import camp.computer.clay.visualization.images.PortImage;
+import camp.computer.clay.model.arch.Peripheral;
+import camp.computer.clay.model.arch.Path;
+import camp.computer.clay.model.arch.Port;
+import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.visualization.arch.Layer;
+import camp.computer.clay.visualization.img.FrameImage;
+import camp.computer.clay.visualization.img.PathImage;
+import camp.computer.clay.visualization.img.PeripheralImage;
+import camp.computer.clay.visualization.img.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 
-public class Body extends _Actor {
+public class Body {
 
     private Perspective perspective;
 
-    public ArrayList<TouchInteractivity> touchInteractivities = new ArrayList<>();
+    public List<TouchInteractivity> touchInteractivities = new ArrayList<>();
 
     public Body() {
     }
@@ -370,7 +370,7 @@ public class Body extends _Actor {
                             nearbyFrameImage.getPosition()
                     );
 
-                    if (distanceToFrameImage < nearbyFrameImage.boardHeight + 50) {
+                    if (distanceToFrameImage < nearbyFrameImage.getShape().getHeight() + 50) {
 
                         Log.v("Interaction", "B");
 
@@ -392,11 +392,11 @@ public class Body extends _Actor {
                                         port.setDirection(Port.Direction.INPUT);
                                     }
                                     if (port.getType() == Port.Type.NONE) {
-                                        port.setType(Port.Type.getNextType(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                        port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
                                     }
 
                                     nearbyPort.setDirection(Port.Direction.OUTPUT);
-                                    nearbyPort.setType(Port.Type.getNextType(nearbyPort.getType()));
+                                    nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
 
                                     // Create and add path to port
                                     Port sourcePort = (Port) perspective.getVisualization().getModel(sourcePortImage);
@@ -436,7 +436,7 @@ public class Body extends _Actor {
                     port.setDirection(Port.Direction.INPUT);
 
                     if (port.getType() == Port.Type.NONE) {
-                        port.setType(Port.Type.getNextType(port.getType()));
+                        port.setType(Port.Type.next(port.getType()));
                     }
                 }
 
@@ -445,7 +445,7 @@ public class Body extends _Actor {
                 // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
 
 //                // Perspective
-//                ArrayList<Port> pathPorts = port.getPortsInPaths(paths);
+//                ArrayList<Port> pathPorts = port.getPorts(paths);
 //                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
 //                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
 //                Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
@@ -465,7 +465,8 @@ public class Body extends _Actor {
 
         } else if (!touchInteraction.isTouching()) {
 
-            if (touchInteractivity.getFirst().getTarget().isType(PortImage.TYPE)) {
+            if (touchInteractivity.getFirst().getTarget() != null
+                    && touchInteractivity.getFirst().getTarget().isType(PortImage.TYPE)) {
 
                 // PortImage portImage = (PortImage) touchInteraction.getImageByPosition();
                 PortImage sourcePortImage = (PortImage) touchInteractivity.getFirst().getTarget();

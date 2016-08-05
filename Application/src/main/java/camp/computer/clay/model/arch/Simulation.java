@@ -1,16 +1,17 @@
-package camp.computer.clay.model.simulation;
+package camp.computer.clay.model.arch;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import camp.computer.clay.model.interaction.Body;
+import camp.computer.clay.model.interactivity.Body;
 
 public class Simulation extends Model {
 
-    private ArrayList<Body> bodies = new ArrayList<>();
+    private List<Body> bodies = new ArrayList<>();
 
-    private ArrayList<Frame> frames = new ArrayList<>();
+    private List<Frame> frames = new ArrayList<>();
 
-    private ArrayList<Peripheral> peripherals = new ArrayList<>();
+    private List<Peripheral> peripherals = new ArrayList<>();
 
     public void addFrame(Frame path) {
         this.frames.add(path);
@@ -20,22 +21,22 @@ public class Simulation extends Model {
         return this.frames.get(index);
     }
 
-    public ArrayList<Frame> getFrames() {
+    public List<Frame> getFrames() {
         return this.frames;
     }
 
-    public ArrayList<Port> getPorts() {
-        ArrayList<Port> ports = new ArrayList<Port>();
+    public List<Port> getPorts() {
+        List<Port> ports = new ArrayList<>();
         for (Frame frame : this.frames) {
             ports.addAll(frame.getPorts());
         }
         return ports;
     }
 
-    public ArrayList<Path> getPaths() {
-        ArrayList<Path> paths = new ArrayList<Path>();
+    public List<Path> getPaths() {
+        List<Path> paths = new ArrayList<>();
         for (Frame frame : this.frames) {
-            for (Port port: frame.getPorts()) {
+            for (Port port : frame.getPorts()) {
                 paths.addAll(port.getPaths());
             }
         }
@@ -50,7 +51,7 @@ public class Simulation extends Model {
         return this.peripherals.get(index);
     }
 
-    public ArrayList<Peripheral> getPeripherals() {
+    public List<Peripheral> getPeripherals() {
         return this.peripherals;
     }
 
@@ -62,7 +63,7 @@ public class Simulation extends Model {
         return this.bodies.get(index);
     }
 
-    public ArrayList<Body> getBodies() {
+    public List<Body> getBodies() {
         return this.bodies;
     }
 }

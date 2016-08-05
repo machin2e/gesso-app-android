@@ -1,9 +1,10 @@
 package camp.computer.clay.visualization.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import camp.computer.clay.visualization.images.FrameImage;
-import camp.computer.clay.visualization.architecture.Visualization;
+import camp.computer.clay.visualization.img.FrameImage;
+import camp.computer.clay.visualization.arch.Visualization;
 
 public abstract class Geometry {
 
@@ -134,7 +135,7 @@ public abstract class Geometry {
         return Math.abs(distance);
     }
 
-    public static Point calculateCentroidPosition(ArrayList<Point> points) {
+    public static Point calculateCentroidPosition(List<Point> points) {
         Point centroidPosition = new Point(0, 0);
 
         for (Point point : points) {
@@ -148,7 +149,7 @@ public abstract class Geometry {
         return centroidPosition;
     }
 
-    public static Rectangle calculateBoundingBox(ArrayList<Point> points) {
+    public static Rectangle calculateBoundingBox(List<Point> points) {
 
         double minX = Float.MAX_VALUE;
         double maxX = -Float.MAX_VALUE;
@@ -173,11 +174,11 @@ public abstract class Geometry {
         return new Rectangle(minX, minY, maxX, maxY);
     }
 
-    public static Point calculateCenterPosition(ArrayList<Point> points) {
+    public static Point calculateCenterPosition(List<Point> points) {
         return calculateBoundingBox(points).getPosition();
     }
 
-    public static Point calculateNearestPoint(Point sourcePoint, ArrayList<Point> points) {
+    public static Point calculateNearestPoint(Point sourcePoint, List<Point> points) {
 
         // Initialize point
         Point nearestPoint = points.get(0);
@@ -203,12 +204,16 @@ public abstract class Geometry {
      * @param points
      * @return
      */
-    public static ArrayList<Point> computeConvexHull(ArrayList<Point> points) {
+    public static List<Point> computeConvexHull(List<Point> points) {
 
-        ArrayList<Point> convexHull = new ArrayList<>();
+        List<Point> convexHull = new ArrayList<>();
 
         if (points.size() < 3) {
-            return (ArrayList) points.clone();
+            //return (ArrayList) points.clone();
+            for (int i = 0; i < points.size(); i++) {
+                Point pointCopy = new Point(points.get(i));
+                convexHull.add(pointCopy);
+            }
         }
 
         int minPoint = -1;
@@ -239,8 +244,8 @@ public abstract class Geometry {
         points.remove(A);
         points.remove(B);
 
-        ArrayList<Point> leftSet = new ArrayList<>();
-        ArrayList<Point> rightSet = new ArrayList<>();
+        List<Point> leftSet = new ArrayList<>();
+        List<Point> rightSet = new ArrayList<>();
 
         for (int i = 0; i < points.size(); i++) {
             Point p = points.get(i);
@@ -257,7 +262,7 @@ public abstract class Geometry {
         return convexHull;
     }
 
-    public static void hullSet(Point A, Point B, ArrayList<Point> set, ArrayList<Point> hull) {
+    public static void hullSet(Point A, Point B, List<Point> set, List<Point> hull) {
         int insertPosition = hull.indexOf(B);
 
         if (set.size() == 0) {
@@ -288,7 +293,7 @@ public abstract class Geometry {
         hull.add(insertPosition, P);
 
         // Determine who's to the left of AP
-        ArrayList<Point> leftSetAP = new ArrayList<>();
+        List<Point> leftSetAP = new ArrayList<>();
         for (int i = 0; i < set.size(); i++) {
             Point M = set.get(i);
             if (pointLocation(A, P, M) == 1) {
@@ -297,7 +302,7 @@ public abstract class Geometry {
         }
 
         // Determine who's to the left of PB
-        ArrayList<Point> leftSetPB = new ArrayList<>();
+        List<Point> leftSetPB = new ArrayList<>();
         for (int i = 0; i < set.size(); i++) {
             Point M = set.get(i);
             if (pointLocation(P, B, M) == 1) {
@@ -345,11 +350,11 @@ public abstract class Geometry {
      * @param positions
      * @return
      */
-    public static ArrayList<FrameImage> computeCirclePacking(ArrayList<FrameImage> positions, double distance, Point packingCenter) {
+    public static List<FrameImage> computeCirclePacking(List<FrameImage> positions, double distance, Point packingCenter) {
 
         // Sort points based on distance from center
-        ArrayList<FrameImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
-        ArrayList<Point> sortedPositions = Visualization.getPositions(sortedImages);
+        List<FrameImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
+        List<Point> sortedPositions = Visualization.getPositions(sortedImages);
 
         double minSeparationSq = distance * distance;
 
@@ -369,7 +374,7 @@ public abstract class Geometry {
                         sortedPositions.get(j).getY() - sortedPositions.get(i).getY()
                 );
 
-                double r = (sortedImages.get(i).boardWidth / 2.0f) + (sortedImages.get(i).boardWidth / 2.0f);
+                double r = (sortedImages.get(i).getShape().getWidth() / 2.0f) + (sortedImages.get(i).getShape().getWidth() / 2.0f);
 
                 // Length squared = (dx * dx) + (dy * dy);
                 double vectorABLength = Geometry.calculateDistance(sortedPositions.get(i), sortedPositions.get(j));
@@ -435,10 +440,10 @@ public abstract class Geometry {
 
     }
 
-    public static ArrayList<FrameImage> sortByDistanceToPoint(ArrayList<FrameImage> positions, Point point) {
+    public static List<FrameImage> sortByDistanceToPoint(List<FrameImage> positions, Point point) {
 
         // Initialize with unsorted list of points
-        ArrayList<FrameImage> sortedList = new ArrayList(positions);
+        List<FrameImage> sortedList = new ArrayList(positions);
 
         for (int i = 0; i < sortedList.size(); i++) {
             for (int j = 1; j < (sortedList.size() - i); j++) {

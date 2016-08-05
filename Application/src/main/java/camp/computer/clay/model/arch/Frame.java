@@ -1,12 +1,13 @@
-package camp.computer.clay.model.simulation;
+package camp.computer.clay.model.arch;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Frame extends Model {
 
     // has Script (i.e., Frame runs a Script)
 
-    private ArrayList<Port> ports = new ArrayList<Port>();
+    private List<Port> ports = new ArrayList<>();
     private String nameTag;
 
     public void addPort(Port port) {
@@ -20,12 +21,12 @@ public class Frame extends Model {
         return this.ports.get(index);
     }
 
-    public ArrayList<Port> getPorts() {
+    public List<Port> getPorts() {
         return this.ports;
     }
 
-    public ArrayList<Path> getPaths() {
-        ArrayList<Path> paths = new ArrayList<>();
+    public List<Path> getPaths() {
+        List<Path> paths = new ArrayList<>();
         for (Port port: getPorts()) {
             paths.addAll (port.getPaths());
         }
@@ -33,9 +34,9 @@ public class Frame extends Model {
     }
 
     // <TAG_INTERFACE>
-    private ArrayList<String> tags = new ArrayList<String>();
+    private List<String> tags = new ArrayList<>();
 
-    public ArrayList<String> getTags() {
+    public List<String> getTags() {
         return this.tags;
     }
 
