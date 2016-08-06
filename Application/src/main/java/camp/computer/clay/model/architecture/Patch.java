@@ -3,7 +3,7 @@ package camp.computer.clay.model.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Device extends Model {
+public class Patch extends Model {
 
     private List<Port> ports = new ArrayList<>();
 

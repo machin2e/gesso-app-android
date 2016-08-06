@@ -42,7 +42,7 @@ public class MessageHost {
     Handler handler = new Handler() {
         @Override
         public void handleMessage (android.os.Message msg) {
-//            Log.v("Clay_Time", "addDevice called");
+//            Log.v("Clay_Time", "addPatch called");
 
             // Process the incoming message's data.
             Bundle bundle = msg.getData();
@@ -207,7 +207,7 @@ public class MessageHost {
                     getClay().addDevice(deviceUuid, unitAddress);
 
                 } else {
-//                    Log.v("Clay", "Updating state of existing Device with address " + unitAddress);
+//                    Log.v("Clay", "Updating state of existing Patch with address " + unitAddress);
 
                     UUID deviceUuid = UUID.fromString(unitUuid);
                     Device device = getClay().getDeviceByUuid(deviceUuid);

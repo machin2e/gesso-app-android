@@ -17,6 +17,6 @@ public interface DisplayHostInterface {
 
     public void refreshListViewFromData(Device device);
 
-    // TODO: removeTimelineView (Device unit);
-    // TODO: hideTimelineView (Device unit);
+    // TODO: removeTimelineView (Patch unit);
+    // TODO: hideTimelineView (Patch unit);
 }

@@ -60,7 +60,7 @@ public class SQLiteStoreHost {
             uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
             if (!getClay().getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-                generateBehaviorScript(uuid, "message", "regex", "Device Other \"hello\"");
+                generateBehaviorScript(uuid, "message", "regex", "Patch Other \"hello\"");
             }
 
             // tone
@@ -128,7 +128,7 @@ public class SQLiteStoreHost {
 
     /* Tables */
 
-    private static final String DEVICE_TABLE_NAME          = "Device";
+    private static final String DEVICE_TABLE_NAME          = "Patch";
     private static final String TIMELINE_TABLE_NAME        = "Timeline";
     private static final String EVENT_TABLE_NAME           = "Event";
     private static final String ACTION_TABLE_NAME          = "Impression";
@@ -477,7 +477,7 @@ public class SQLiteStoreHost {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get actions with parent with root UUID, addDevice to parent's list of
+        // - For each root, get actions with parent with root UUID, addPatch to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -1712,7 +1712,7 @@ public class SQLiteStoreHost {
         // TODO: ...before saving a action tree, not just the action node UUID.
         if (!db.queryActionExists(action, parentAction)) {
 
-            // TODO: Update the basic action that has a script, addDevice a parent! Yes, the action can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic action that has a script, addPatch a parent! Yes, the action can have both a parent and a script! (leaf node!)
 
             db.saveAction(action, parentAction);
         } else {

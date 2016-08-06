@@ -71,7 +71,7 @@ public class Timeline {
         }
 
 //        if (event != null) {
-//            getDevice().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
+//            getPatch().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
 //                @Override
 //                public void onSuccess(Object object) {
 //                    Log.v("Content_Manager", "Deleted event from database.");

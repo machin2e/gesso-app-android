@@ -6,9 +6,10 @@ public class Path extends Model {
 
     public enum Direction {
 
-        NONE(0),
-        OUTPUT(1),
-        INPUT(2);
+        NONE(0),   // source  |  destination
+        OUTPUT(1), // source --> destination
+        INPUT(2),  // source <-- destination
+        BOTH(3);   // source <-> destination
 
         // TODO: Change the index to a UUID?
         int index;
@@ -22,9 +23,9 @@ public class Path extends Model {
 
         NONE(0),
         ELECTRONIC(1),
-        MESH(2),
-        INTERNET(3),
-        BLUETOOTH(4);
+        BLUETOOTH(2),
+        MESH(3),
+        INTERNET(4);
 
         // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
         // TODO: TCP, UDP, HTTP, HTTPS
@@ -41,10 +42,14 @@ public class Path extends Model {
         }
     }
 
+    // TODO: public enum Protocol (i.e., BLUETOOTH, TCP, UDP, HTTP, HTTPS)
+
     private Type type = Type.NONE;
+
     private Direction direction = Direction.NONE;
 
     private Port source;
+
     private Port target;
 
     public Path(Port sourcePort, Port targetPort) {

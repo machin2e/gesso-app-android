@@ -15,6 +15,7 @@ import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Simulation;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.image.FrameImage;
+import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
@@ -221,79 +222,6 @@ public class Visualization extends Image {
         return imageGroup;
     }
 
-    /**
-     * Finds and returns the nearest <em>visible</em> <code>Image</code>.
-     *
-     * @param position
-     * @return
-     */
-    public Image getNearestImage(Point position) {
-
-        float shortestDistance = Float.MAX_VALUE;
-        Image nearestImage = null;
-
-        for (Image image : getImages().getList()) {
-
-            float currentDistance = (float) Geometry.calculateDistance(
-                    position,
-                    image.getPosition()
-            );
-
-            if (currentDistance < shortestDistance) {
-                shortestDistance = currentDistance;
-                nearestImage = image;
-            }
-        }
-
-        return nearestImage;
-    }
-
-    public FrameImage getNearestBaseImage(Point position) {
-
-        float shortestDistance = Float.MAX_VALUE;
-        FrameImage nearestFrameImage = null;
-
-        for (FrameImage frameImage : getFrameImages()) {
-
-            // Update style of nearby machines
-            float currentDistance = (float) Geometry.calculateDistance(
-                    position,
-                    frameImage.getPosition()
-            );
-
-            if (currentDistance < shortestDistance) {
-
-                shortestDistance = currentDistance;
-                nearestFrameImage = frameImage;
-
-            }
-        }
-
-        return nearestFrameImage;
-    }
-
-    public PortImage getNearestPortImage(Point position) {
-
-        float shortestDistance = Float.MAX_VALUE;
-        PortImage nearestImage = null;
-
-        for (PortImage image : getPortImages()) {
-
-            // Update style of nearby machines
-            float currentDistance = (float) Geometry.calculateDistance(
-                    position,
-                    image.getPosition()
-            );
-
-            if (currentDistance < shortestDistance) {
-                shortestDistance = currentDistance;
-                nearestImage = image;
-            }
-        }
-
-        return nearestImage;
-    }
-
     public Image getImageByPosition(Point point) {
         for (Image image : getImages().filterVisibility(true).getList()) {
             if (image.containsPoint(point)) {
@@ -340,7 +268,7 @@ public class Visualization extends Image {
             }
         }
 
-        // Geometry.computeCirclePacking(getFrameImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
+        Geometry.computeCirclePacking(getImages().filterType(FrameImage.class, PatchImage.class).getList(), 200, getImages().filterType(FrameImage.class, PatchImage.class).calculateCentroid());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {

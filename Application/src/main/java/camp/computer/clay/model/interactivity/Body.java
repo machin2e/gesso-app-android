@@ -5,13 +5,13 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Device;
+import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.architecture.Layer;
 import camp.computer.clay.visualization.architecture.Visualization;
-import camp.computer.clay.visualization.image.DeviceImage;
+import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PathImage;
 import camp.computer.clay.visualization.image.PortImage;
@@ -226,14 +226,18 @@ public class Body {
 
                 if (impression.getTargetImage() instanceof FrameImage) {
 
+                    // Frame
+
                     FrameImage frameImage = (FrameImage) impression.getTargetImage();
                     frameImage.apply(impression);
                     frameImage.setPosition(impression.getPosition());
 
-                    // Zoom out to show overview
-//                    perspective.setScale(0.8f);
+                    // Perspective
+                    perspective.focusOnFrame(this, interaction, impression);
 
                 } else if (impression.getTargetImage() instanceof PortImage) {
+
+                    // Port
 
                     PortImage portImage = (PortImage) impression.getTargetImage();
                     portImage.isTouched = true;
@@ -245,6 +249,8 @@ public class Body {
 
                 } else if (impression.getTargetImage() instanceof Visualization) {
 
+                    // Visualization
+
                     if (perspective.isAdjustable()) {
 
 //                        perspective.setScale(0.9f);
@@ -253,7 +259,7 @@ public class Body {
 //                                impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
 //                        );
 
-                        perspective.focusOnPerspectiveAdjustment(interaction);
+                        perspective.focusOnVisualization(interaction);
 
                     }
 
@@ -286,35 +292,26 @@ public class Body {
 
                     perspective.focusOnNewPath(interaction, impression);
 
-                } else if (impression.getTargetImage() instanceof DeviceImage) {
+                } else if (impression.getTargetImage() instanceof PatchImage) {
 
-                    // Device
+                    // Patch
 
-                    DeviceImage deviceImage = (DeviceImage) impression.getTargetImage();
-                    deviceImage.setPosition(impression.getPosition());
-                    deviceImage.apply(impression);
+                    PatchImage patchImage = (PatchImage) impression.getTargetImage();
+                    patchImage.setPosition(impression.getPosition());
+                    patchImage.apply(impression);
 
                 } else if (impression.getTargetImage() instanceof Visualization) {
 
-//                    if (perspective.isAdjustable()) {
+                    // Visualization
 
-//                        perspective.setScale(0.9f);
+                    if (interaction.getSize() > 1) {
 
-                        if (interaction.getSize() > 1) {
+                        perspective.setOffset(
+                                impression.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+                                impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
+                        );
 
-//                            perspective.setOffset(
-//                                    impression.getPosition().getX() - interaction.getPrevious(impression).getPosition().getX(),
-//                                    impression.getPosition().getY() - interaction.getPrevious(impression).getPosition().getY()
-//                            );
-
-                            perspective.setOffset(
-                                    impression.getPosition().getX() - interaction.getFirst().getPosition().getX(),
-                                    impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
-                            );
-
-                        }
-
-//                    }
+                    }
 
                 }
             }
@@ -356,11 +353,11 @@ public class Body {
                 PathImage pathImage = (PathImage) impression.getTargetImage();
                 pathImage.apply(impression);
 
-            } else if (impression.getTargetImage() instanceof DeviceImage) {
+            } else if (impression.getTargetImage() instanceof PatchImage) {
 
-                // Device
-                DeviceImage deviceImage = (DeviceImage) impression.getTargetImage();
-                deviceImage.apply(impression);
+                // Patch
+                PatchImage patchImage = (PatchImage) impression.getTargetImage();
+                patchImage.apply(impression);
 
             } else if (impression.getTargetImage() instanceof Visualization) {
 
@@ -499,8 +496,8 @@ public class Body {
 //                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
 //
 //                    // Model
-//                    Device peripheral = new Device();
-//                    getPerspective().getVisualization().getSimulation().addDevice(peripheral);
+//                    Patch peripheral = new Patch();
+//                    getPerspective().getVisualization().getSimulation().addPatch(peripheral);
 //
 //                    // Visualization (Layer)
 //                    String layerTag = "peripherals";
@@ -508,7 +505,7 @@ public class Body {
 //                    Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
 //
 //                    // Image
-//                    DeviceImage peripheralImage = new DeviceImage(peripheral);
+//                    PatchImage peripheralImage = new PatchImage(peripheral);
 //                    peripheralImage.setPosition(impression.getPosition());
 //                    peripheralImage.setVisualization(getPerspective().getVisualization());
 //
@@ -566,6 +563,7 @@ public class Body {
                                                 Log.v("Impression", "D.1");
 
                                                 Path path = new Path(sourcePort, targetPort);
+                                                path.setType(Path.Type.MESH);
                                                 sourcePort.addPath(path);
 
                                                 PathImage pathImage = new PathImage(path);
@@ -619,6 +617,14 @@ public class Body {
 
                     }
 
+                } else if (impression.getTargetImage() instanceof PatchImage) {
+
+                    PortImage sourcePortImage = (PortImage) interaction.getFirst().getTargetImage();
+
+                    // Update Image
+                    sourcePortImage.setCandidatePathVisibility(false);
+                    sourcePortImage.setCandidatePeripheralVisibility(false);
+
                 } else if (impression.getTargetImage() instanceof Visualization) {
 
                     PortImage sourcePortImage = (PortImage) interaction.getFirst().getTargetImage();
@@ -626,50 +632,80 @@ public class Body {
                     if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
 
                         // Model
-                        Device device = new Device();
+                        Patch patch = new Patch();
+                        patch.setParent(getPerspective().getVisualization().getSimulation());
+
                         // Add port to model
                         for (int j = 0; j < 3; j++) {
                             Port port = new Port();
-                            device.addPort(port);
+                            patch.addPort(port);
                         }
 
-                        getPerspective().getVisualization().getSimulation().addDevice(device);
+                        getPerspective().getVisualization().getSimulation().addPatch(patch);
 
                         // Visualization (Layer)
                         String layerTag = "peripherals";
                         getPerspective().getVisualization().addLayer(layerTag);
                         Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
 
-                        // Image
-                        DeviceImage deviceImage = new DeviceImage(device);
-                        deviceImage.setPosition(impression.getPosition());
-//                    deviceImage.setRotation();
-                        deviceImage.setVisualization(getPerspective().getVisualization());
+                        // Create Patch Image
+                        PatchImage patchImage = new PatchImage(patch);
+                        patchImage.setPosition(impression.getPosition());
+                        // patchImage.setRotation();
+                        patchImage.setVisualization(getPerspective().getVisualization());
 
-                        // Port Images
-                        for (Port port : device.getPorts()) {
+                        double pathRotationAngle = Geometry.calculateRotationAngle(
+                                sourcePortImage.getPosition(),
+                                patchImage.getPosition()
+                        );
+                        patchImage.setRotation(pathRotationAngle + 90);
+
+                        // Create Port Images for each of Patch's Ports
+                        for (Port port : patch.getPorts()) {
                             PortImage portImage = new PortImage(port);
                             portImage.setVisualization(getPerspective().getVisualization());
                             getPerspective().getVisualization().addImage(port, portImage, "ports");
                         }
 
-                        double pathRotationAngle = Geometry.calculateRotationAngle(
-                                sourcePortImage.getPosition(),
-                                deviceImage.getPosition()
-                        );
-                        deviceImage.setRotation(pathRotationAngle + 90);
+                        // Add Patch Image to Visualization
+                        getPerspective().getVisualization().addImage(patch, patchImage, layerTag);
 
-                        // Visualization
-                        getPerspective().getVisualization().addImage(device, deviceImage, layerTag);
+                        // Configure Ports
+                        Port sourcePort = sourcePortImage.getPort();
+                        Port destinationPort = patch.getPorts().get(0);
 
-//                    // Add a port sprite for each of the associated base's ports
-//                    for (Port port : device.getPorts()) {
-//                        PortImage portImage = new PortImage(port);
-//                        portImage.setVisualization(getPerspective().getVisualization());
-//                        getPerspective().getVisualization().addImage(port, portImage, "ports");
-//                    }
+                        if (sourcePort.getDirection() == Port.Direction.NONE) {
+                            sourcePort.setDirection(Port.Direction.OUTPUT);
+                        }
+//                        if (sourcePort.getType() == Port.Type.NONE) {
+                        //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                        sourcePort.setType(Port.Type.POWER_REFERENCE);
+//                        }
+
+                        destinationPort.setDirection(Port.Direction.INPUT);
+                        //destinationPort.setType(Port.Type.next(destinationPort.getType()));
+                        destinationPort.setType(sourcePort.getType());
+
+                        // Create Path
+                        Path path = new Path(sourcePortImage.getPort(), patch.getPorts().get(0));
+                        path.setType(Path.Type.ELECTRONIC);
+                        sourcePort.addPath(path);
+
+                        PathImage pathImage = new PathImage(path);
+                        pathImage.setVisualization(perspective.getVisualization());
+                        perspective.getVisualization().addImage(path, pathImage, "paths");
+
+                        PortImage targetPortImage = (PortImage) perspective.getVisualization().getImage(path.getTarget());
+                        targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                        // Update Perspective
+                        perspective.focusOnPath(sourcePortImage.getPort());
 
                     }
+
+                    // Update Image
+                    sourcePortImage.setCandidatePathVisibility(false);
+                    sourcePortImage.setCandidatePeripheralVisibility(false);
 
                 }
 
