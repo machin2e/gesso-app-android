@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.architecture.Visualization;
 
@@ -350,10 +351,10 @@ public abstract class Geometry {
      * @param positions
      * @return
      */
-    public static List<FrameImage> computeCirclePacking(List<FrameImage> positions, double distance, Point packingCenter) {
+    public static <T extends Image> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
 
         // Sort points based on distance from center
-        List<FrameImage> sortedImages = sortByDistanceToPoint(positions, packingCenter);
+        List<T> sortedImages = sortByDistanceToPoint(positions, packingCenter);
         List<Point> sortedPositions = Visualization.getPositions(sortedImages);
 
         double minSeparationSq = distance * distance;
@@ -432,7 +433,7 @@ public abstract class Geometry {
             sortedPositions.get(i).setX(sortedPositions.get(i).getX() - v.getX());
             sortedPositions.get(i).setY(sortedPositions.get(i).getY() - v.getY());
 
-            ((FrameImage) sortedImages.get(i)).setPosition(sortedPositions.get(i));
+            sortedImages.get(i).setPosition(sortedPositions.get(i));
 //            }
         }
 
@@ -440,16 +441,16 @@ public abstract class Geometry {
 
     }
 
-    public static List<FrameImage> sortByDistanceToPoint(List<FrameImage> positions, Point point) {
+    public static <T extends Image> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
 
         // Initialize with unsorted list of points
-        List<FrameImage> sortedList = new ArrayList(positions);
+        List<T> sortedList = new ArrayList(positions);
 
         for (int i = 0; i < sortedList.size(); i++) {
             for (int j = 1; j < (sortedList.size() - i); j++) {
 
-                FrameImage p1 = sortedList.get(j - 1);
-                FrameImage p2 = sortedList.get(j);
+                T p1 = sortedList.get(j - 1);
+                T p2 = sortedList.get(j);
 
                 if (Geometry.calculateDistance(p1.getPosition(), point) > Geometry.calculateDistance(p2.getPosition(), point)) {
                     sortedList.remove(j - 1);

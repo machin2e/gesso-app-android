@@ -5,7 +5,9 @@ import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
+import camp.computer.clay.visualization.image.Visibility;
 
 public abstract class Image {
 
@@ -34,14 +36,22 @@ public abstract class Image {
 
     private Shape shape = null;
 
-    private Point position = new Point(); // Image position
+    // TODO: Replace this!
+    public Rectangle getShape() {
+        return null;
+    }
+
+    protected Point position = new Point(); // Image position
 
     // TODO: Move scale into list of points defining shape. Draw on "unit canvas (scale 1.0)", and set scale. Recomputing happens automatically!
-    private double scale = 1.0f; // Image scale factor
+    protected double scale = 1.0f; // Image scale factor
 
-    private double angle = 0.0f; // Image heading rotation
+    protected double angle = 0.0f; // Image heading rotation
 
-    private boolean isVisible = true;
+    protected double targetTransparency = 1.0;
+    protected double currentTransparency = targetTransparency;
+
+    protected Visibility visibility = Visibility.VISIBLE;
 
     // TODO: Replace with Body (touching it) or Body's Finger (or whatever Pointer, whatever).
     public boolean isTouched = false;
@@ -135,12 +145,12 @@ public abstract class Image {
         this.scale = scale;
     }
 
-    public void setVisibility(boolean isVisible) {
-        this.isVisible = isVisible;
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
     public boolean isVisible() {
-        return this.isVisible;
+        return visibility == Visibility.VISIBLE;
     }
 
     public abstract void update();
@@ -163,6 +173,11 @@ public abstract class Image {
 
     public void apply(Impression impression) {
         onImpression(impression);
+    }
+
+    public void setTransparency(final double transparency) {
+        targetTransparency = transparency;
+        currentTransparency = targetTransparency;
     }
 
 }

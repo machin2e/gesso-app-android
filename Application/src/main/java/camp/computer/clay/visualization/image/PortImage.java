@@ -12,7 +12,7 @@ import java.util.Random;
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.architecture.Frame;
 import camp.computer.clay.model.architecture.Path;
-import camp.computer.clay.model.architecture.Device;
+import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.architecture.Image;
@@ -31,11 +31,6 @@ public class PortImage extends Image {
     public static double DISTANCE_BETWEEN_NODES = 15.0f;
     public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
 
-    private boolean showShapeLayer = true;
-    private boolean showStyleLayer = true;
-    private boolean showDataLayer = true;
-    private boolean showAnnotationLayer = true;
-
     public double shapeRadius = 40.0f;
     private boolean showShapeOutline = false;
 
@@ -44,8 +39,8 @@ public class PortImage extends Image {
     public int getIndex() {
         if (getParentImage() instanceof FrameImage) {
             return getFrameImage().getPortImageIndex(this);
-        } else if (getParentImage() instanceof DeviceImage) {
-            return ((DeviceImage) getParentImage()).getPortImageIndex(this);
+        } else if (getParentImage() instanceof PatchImage) {
+            return ((PatchImage) getParentImage()).getPortImageIndex(this);
         }
         return -1;
     }
@@ -100,7 +95,7 @@ public class PortImage extends Image {
     private void setup() {
         uniqueColor = updateUniqueColor();
         setupData();
-        setVisibility(false);
+        setVisibility(Visibility.INVISIBLE);
     }
 
     private void setupData() {
@@ -167,7 +162,7 @@ public class PortImage extends Image {
             // Candidate Path
             drawCandidatePathImages(visualizationSurface);
 
-            // Candidate Device
+            // Candidate Patch
             drawCandidatePeripheralImage(visualizationSurface);
         }
     }
@@ -180,25 +175,22 @@ public class PortImage extends Image {
      */
     public void drawShape(VisualizationSurface visualizationSurface) {
 
-        if (showShapeLayer) {
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
 
-            Canvas canvas = visualizationSurface.getCanvas();
-            Paint paint = visualizationSurface.getPaint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(3);
+        paint.setColor(FLOW_PATH_COLOR_NONE);
 
-            paint.setStyle(Paint.Style.FILL);
+        Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
+
+        // Outline
+        if (showShapeOutline) {
+            paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(3);
-            paint.setColor(FLOW_PATH_COLOR_NONE);
+            paint.setColor(Color.BLACK);
 
             Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
-
-            // Outline
-            if (showShapeOutline) {
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(3);
-                paint.setColor(Color.BLACK);
-
-                Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
-            }
         }
     }
 
@@ -209,25 +201,22 @@ public class PortImage extends Image {
      */
     public void drawStyle(VisualizationSurface visualizationSurface) {
 
-        if (showStyleLayer) {
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
 
-            Canvas canvas = visualizationSurface.getCanvas();
-            Paint paint = visualizationSurface.getPaint();
+        if (getPort().getType() != Port.Type.NONE) {
 
-            if (getPort().getType() != Port.Type.NONE) {
+            // Color
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(this.uniqueColor);
+            Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
 
-                // Color
-                paint.setStyle(Paint.Style.FILL);
-                paint.setColor(this.uniqueColor);
+            // Outline
+            if (showShapeOutline) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(3);
+                paint.setColor(Color.BLACK);
                 Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
-
-                // Outline
-                if (showShapeOutline) {
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setStrokeWidth(3);
-                    paint.setColor(Color.BLACK);
-                    Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
-                }
             }
         }
     }
@@ -244,86 +233,83 @@ public class PortImage extends Image {
      */
     private void drawData(VisualizationSurface visualizationSurface) {
 
-        if (showDataLayer) {
+        Canvas canvas = visualizationSurface.getCanvas();
+        Paint paint = visualizationSurface.getPaint();
 
-            Canvas canvas = visualizationSurface.getCanvas();
-            Paint paint = visualizationSurface.getPaint();
+        Port port = getPort();
 
-            Port port = getPort();
+        if (port.getType() != Port.Type.NONE) {
 
-            if (port.getType() != Port.Type.NONE) {
+            // Outline
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(2.0f);
+            paint.setColor(Color.WHITE);
 
-                // Outline
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth(2.0f);
-                paint.setColor(Color.WHITE);
+            double plotStep = ((2.0f * (float) shapeRadius) / (float) portDataSamples.length);
 
-                double plotStep = ((2.0f * (float) shapeRadius) / (float) portDataSamples.length);
+            Point[] rotatedPortDataSamplePoints = new Point[portDataSamples.length];
 
-                Point[] rotatedPortDataSamplePoints = new Point[portDataSamples.length];
+            double[] portGroupRotation = new double[]{
+                    0,
+                    0,
+                    0,
+                    -90,
+                    -90,
+                    -90,
+                    -180,
+                    -180,
+                    -180,
+                    -270,
+                    -270,
+                    -270
+            };
 
-                double[] portGroupRotation = new double[]{
-                        0,
-                        0,
-                        0,
-                        -90,
-                        -90,
-                        -90,
-                        -180,
-                        -180,
-                        -180,
-                        -270,
-                        -270,
-                        -270
-                };
+            for (int i = 0; i < portDataSamples.length; i++) {
 
-                for (int i = 0; i < portDataSamples.length; i++) {
-
-                    Point samplePoint = null;
-
-                    if (port.getDirection() == Port.Direction.INPUT) {
-
-                        // Set position before rotation adjustment
-                        samplePoint = new Point(
-                                this.getPosition().getX() + portDataSamples[i],
-                                this.getPosition().getY() + -shapeRadius + i * plotStep
-                        );
-
-                    } else if (port.getDirection() == Port.Direction.OUTPUT) {
-
-                        // Set position before rotation adjustment
-                        samplePoint = new Point(
-                                this.getPosition().getX() + portDataSamples[i],
-                                this.getPosition().getY() + shapeRadius - i * plotStep
-                        );
-
-                    } else if (port.getDirection() == Port.Direction.BOTH) {
-
-                        // TODO: Visualize bidirectional data.
-
-                    }
-
-                    // Rotate point
-                    rotatedPortDataSamplePoints[i] = Geometry.calculateRotatedPoint(
-                            getPosition(),
-                            getParentImage().getRotation() + portGroupRotation[getIndex()],
-                            samplePoint
-                    );
-                }
+                Point samplePoint = null;
 
                 if (port.getDirection() == Port.Direction.INPUT) {
 
-                    for (int i = 0; i < portDataSamples.length - 1; i++) {
-                        Shape.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], canvas, paint);
-                    }
+                    // Set position before rotation adjustment
+                    samplePoint = new Point(
+                            this.getPosition().getX() + portDataSamples[i],
+                            this.getPosition().getY() + -shapeRadius + i * plotStep
+                    );
 
                 } else if (port.getDirection() == Port.Direction.OUTPUT) {
 
-                    for (int i = 0; i < portDataSamples.length - 1; i++) {
-                        Shape.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], canvas, paint);
-                    }
+                    // Set position before rotation adjustment
+                    samplePoint = new Point(
+                            this.getPosition().getX() + portDataSamples[i],
+                            this.getPosition().getY() + shapeRadius - i * plotStep
+                    );
+
+                } else if (port.getDirection() == Port.Direction.BOTH) {
+
+                    // TODO: Visualize bidirectional data.
 
                 }
+
+                // Rotate point
+                rotatedPortDataSamplePoints[i] = Geometry.calculateRotatedPoint(
+                        getPosition(),
+                        getParentImage().getRotation() + portGroupRotation[getIndex()],
+                        samplePoint
+                );
+            }
+
+            if (port.getDirection() == Port.Direction.INPUT) {
+
+                for (int i = 0; i < portDataSamples.length - 1; i++) {
+                    Shape.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], canvas, paint);
+                }
+
+            } else if (port.getDirection() == Port.Direction.OUTPUT) {
+
+                for (int i = 0; i < portDataSamples.length - 1; i++) {
+                    Shape.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], canvas, paint);
+                }
+
             }
         }
     }
@@ -335,28 +321,25 @@ public class PortImage extends Image {
      */
     public void drawAnnotation(VisualizationSurface visualizationSurface) {
 
-        if (showAnnotationLayer) {
+        if (getPort().getType() != Port.Type.NONE) {
 
-            if (getPort().getType() != Port.Type.NONE) {
+            Canvas canvas = visualizationSurface.getCanvas();
+            Paint paint = visualizationSurface.getPaint();
 
-                Canvas canvas = visualizationSurface.getCanvas();
-                Paint paint = visualizationSurface.getPaint();
+            // Geometry
+            Point labelPosition = new Point();
+            labelPosition.set(
+                    getPosition().getX() + shapeRadius + 25,
+                    getPosition().getY()
+            );
 
-                // Geometry
-                Point labelPosition = new Point();
-                labelPosition.set(
-                        getPosition().getX() + shapeRadius + 25,
-                        getPosition().getY()
-                );
+            // Style
+            paint.setColor(this.uniqueColor);
+            double typeLabelTextSize = 27;
 
-                // Style
-                paint.setColor(this.uniqueColor);
-                double typeLabelTextSize = 27;
+            // Draw
+            Shape.drawText(labelPosition, getPort().getType().getTag(), typeLabelTextSize, canvas, paint);
 
-                // Draw
-                Shape.drawText(labelPosition, getPort().getType().getTag(), typeLabelTextSize, canvas, paint);
-
-            }
         }
     }
 
@@ -501,61 +484,61 @@ public class PortImage extends Image {
 
             setRelativePosition(relativePortPositions[getIndex()]);
 
-        } else if (getParentImage() instanceof DeviceImage) {
+        } else if (getParentImage() instanceof PatchImage) {
 
-            DeviceImage deviceImage = (DeviceImage) getParentImage();
-            Device device = deviceImage.getPeripheral();
+            PatchImage patchImage = (PatchImage) getParentImage();
+            Patch patch = patchImage.getPeripheral();
             // </TODO>
 
             // Ports
             double portRadius = 40.0f;
-            Point[] relativePortPositions = new Point[device.getPorts().size()];
+            Point[] relativePortPositions = new Point[patch.getPorts().size()];
             relativePortPositions[0] = new Point(
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[1] = new Point(
                     0,
-                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[2] = new Point(
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
 //            relativePortPositions[3] = new Point(
-//                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
 //            );
 //            relativePortPositions[4] = new Point(
-//                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    0
 //            );
 //            relativePortPositions[5] = new Point(
-//                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
 //            );
 //            relativePortPositions[6] = new Point(
 //                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//                    -1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
 //            );
 //            relativePortPositions[7] = new Point(
 //                    0,
-//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//                    -1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
 //            );
 //            relativePortPositions[8] = new Point(
 //                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//                    -1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
 //            );
 //            relativePortPositions[9] = new Point(
-//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    -1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
 //            );
 //            relativePortPositions[10] = new Point(
-//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    -1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    0
 //            );
 //            relativePortPositions[11] = new Point(
-//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    -1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
 //            );
 
@@ -585,22 +568,14 @@ public class PortImage extends Image {
         return ((float) Math.sin(xWaveStart + x * 0.2)) * shapeRadius * 0.5f;
     }
 
-    public void setVisibility(boolean isVisible) {
-        super.setVisibility(isVisible);
-        showShapeLayer = isVisible;
-        showStyleLayer = isVisible;
-        showDataLayer = isVisible;
-        showAnnotationLayer = isVisible;
-    }
-
-    public void setPathVisibility(boolean isVisible) {
+    public void setPathVisibility(Visibility visibility) {
         for (PathImage pathImage : getPathImages()) {
             if (pathImage != null) {
-                pathImage.setVisibility(isVisible);
+                pathImage.setVisibility(visibility);
 
                 // Deep
                 PortImage targetPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getTarget());
-                targetPortImage.setVisibility(isVisible);
+                targetPortImage.setVisibility(visibility);
             }
         }
     }
@@ -694,23 +669,23 @@ public class PortImage extends Image {
                 }
 
                 // Reduce focus on the machine
-                getFrameImage().setTransparency(0.1);
+                getParentImage().setTransparency(0.1);
 
                 // Focus on the port
                 //portImage.getFrameImage().showPathImage(portImage.getIndex(), true);
                 showPaths();
-                setVisibility(true);
-                setPathVisibility(true);
+                setVisibility(Visibility.VISIBLE);
+                setPathVisibility(Visibility.VISIBLE);
 
                 List<Path> paths = port.getGraph();
                 for (Path connectedPath : paths) {
                     // Show ports
-                    getVisualization().getImage(connectedPath.getSource()).setVisibility(true);
+                    getVisualization().getImage(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
                     ((PortImage) getVisualization().getImage(connectedPath.getSource())).showPaths();
-                    getVisualization().getImage(connectedPath.getTarget()).setVisibility(true);
+                    getVisualization().getImage(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
                     ((PortImage) getVisualization().getImage(connectedPath.getTarget())).showPaths();
                     // Show path
-                    getVisualization().getImage(connectedPath).setVisibility(true);
+                    getVisualization().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
                 }
 
                 // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
@@ -751,7 +726,7 @@ public class PortImage extends Image {
             setCandidatePathDestinationPosition(impression.getPosition());
             setCandidatePathVisibility(true);
 
-            // Candidate Device Visibility
+            // Candidate Patch Visibility
 
             boolean isPeripheral = true;
             for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {

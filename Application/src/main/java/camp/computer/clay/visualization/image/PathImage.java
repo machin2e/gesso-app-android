@@ -69,8 +69,8 @@ public class PathImage extends Image {
         PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
 
         // Show target port
-        targetPortImage.setVisibility(true);
-        targetPortImage.setPathVisibility(true);
+        targetPortImage.setVisibility(Visibility.VISIBLE);
+        targetPortImage.setPathVisibility(Visibility.VISIBLE);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
@@ -139,8 +139,8 @@ public class PathImage extends Image {
         PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
 
         // Show target port
-        targetPortImage.setVisibility(true);
-        targetPortImage.setPathVisibility(true);
+        targetPortImage.setVisibility(Visibility.VISIBLE);
+        targetPortImage.setPathVisibility(Visibility.VISIBLE);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
@@ -198,19 +198,6 @@ public class PathImage extends Image {
             );
         }
 
-    }
-
-    public void setVisibility(boolean isVisible) {
-
-        this.isVisible = isVisible;
-        showFormLayer = isVisible;
-        showStyleLayer = isVisible;
-        showDataLayer = isVisible;
-        showAnnotationLayer = isVisible;
-    }
-
-    public boolean isVisible() {
-        return this.isVisible;
     }
 
     @Override

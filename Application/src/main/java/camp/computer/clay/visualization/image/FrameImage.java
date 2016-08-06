@@ -106,6 +106,17 @@ public class FrameImage extends Image {
     }
 
     public void update() {
+
+        String transparencyString = String.format("%02x", (int) currentTransparency * 255);
+
+        // Frame color
+        color = Color.parseColor("#" + transparencyString + colorString);
+        outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
+
+        // Header color
+        portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
+        portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
+
         updateLightImages();
         updatePortGroupImages();
     }
@@ -306,46 +317,28 @@ public class FrameImage extends Image {
         }
     }
 
-    // TODO: Move this into Image (send to all Images)
-    public void setTransparency(final double transparency) {
-
-        targetTransparency = transparency;
-
-        currentTransparency = targetTransparency;
-        String transparencyString = String.format("%02x", (int) currentTransparency * 255);
-
-        // Frame color
-        color = Color.parseColor("#" + transparencyString + colorString);
-        outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
-
-        // Header color
-        portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
-        portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
-
-    }
-
     public void showPortImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setVisibility(true);
+            portImage.setVisibility(Visibility.VISIBLE);
             portImage.showDocks();
         }
     }
 
     public void hidePortImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setVisibility(false);
+            portImage.setVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void showPathImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setPathVisibility(true);
+            portImage.setPathVisibility(Visibility.VISIBLE);
         }
     }
 
     public void hidePathImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setPathVisibility(false);
+            portImage.setPathVisibility(Visibility.INVISIBLE);
             portImage.showDocks();
         }
     }
@@ -391,10 +384,10 @@ public class FrameImage extends Image {
                 List<Path> paths = portImage.getPort().getGraph();
                 for (Path path : paths) {
                     // Show ports
-                    getVisualization().getImage(path.getSource()).setVisibility(true);
-                    getVisualization().getImage(path.getTarget()).setVisibility(true);
+                    getVisualization().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
+                    getVisualization().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
                     // Show path
-                    getVisualization().getImage(path).setVisibility(true);
+                    getVisualization().getImage(path).setVisibility(Visibility.VISIBLE);
                 }
             }
 

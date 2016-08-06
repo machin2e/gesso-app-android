@@ -416,7 +416,7 @@ public class Clay {
 
     public boolean hasDeviceByAddress(String address) {
         /*
-        for (Device device : getDevices()) {
+        for (Patch device : getPatches()) {
             if (device.getInternetAddress().equals(address)) {
                 return true;
             }
@@ -430,12 +430,12 @@ public class Clay {
 //
 //        // Discover first device
 //        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
-//        getClay().addDevice(unitUuidA, "10.1.10.29");
-//        Device foundUnit = getDeviceByUuid(unitUuidA);
+//        getClay().addPatch(unitUuidA, "10.1.10.29");
+//        Patch foundUnit = getDeviceByUuid(unitUuidA);
 //
 //        // Discover second device
 //        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
-//        getClay().addDevice(unitUuidB, "192.168.1.123");
+//        getClay().addPatch(unitUuidB, "192.168.1.123");
 //
 //        if (addBehaviorToTimeline) {
 //            for (int i = 0; i < behaviorCount; i++) {
@@ -449,7 +449,7 @@ public class Clay {
 //                getClay().getStore().storeAction(action);
 //
 //                // Create event for the action and add it to the unit's timeline
-//                Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
+//                Log.v("Content_Manager", "> Patch (UUID: " + foundUnit.getUuid() + ")");
 //                Event event = new Event(foundUnit.getTimeline(), action);
 //                getClay().getDeviceByUuid(unitUuidA).getTimeline().addEvent(event);
 //                getClay().getStore().storeEvent(event);
@@ -480,7 +480,7 @@ public class Clay {
 //            foundUnit.getTimeline().getEvents().remove(1); // if storeHost action successful
 //
 //            // Create event for the action and add it to the unit's timeline
-//            Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
+//            Log.v("Content_Manager", "> Patch (UUID: " + foundUnit.getUuid() + ")");
 //            Event event = new Event(foundUnit.getTimeline(), action);
 //            // insert new event for abstract action
 //            //            foundUnit.getTimeline().addEvent(event);
@@ -510,7 +510,7 @@ public class Clay {
 ////            foundUnit.getTimeline().getEvents().remove(1); // if storeHost behavior successful
 ////
 ////            // Create event for the behavior and add it to the unit's timeline
-////            Log.v("Content_Manager", "> Device (UUID: " + foundUnit.getUuid() + ")");
+////            Log.v("Content_Manager", "> Patch (UUID: " + foundUnit.getUuid() + ")");
 ////            Event event = new Event(foundUnit.getTimeline(), behavior);
 ////            // insert new event for abstract behavior
 ////            //            foundUnit.getTimeline().addEvent(event);
@@ -523,8 +523,8 @@ public class Clay {
 //
 //        getClay().getStore().writeDatabase();
 //
-//        for (Device unit : getClay().getDevices()) {
-//            Log.v ("Content_Manager", "Device (UUID: " + unit.getUuid() + ")");
+//        for (Patch unit : getClay().getPatches()) {
+//            Log.v ("Content_Manager", "Patch (UUID: " + unit.getUuid() + ")");
 //            Log.v ("Content_Manager", "\tTimeline (UUID: " + unit.getTimeline().getUuid() + ")");
 //
 //            int tabCount = 3;

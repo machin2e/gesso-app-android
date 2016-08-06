@@ -8,7 +8,6 @@ public class Frame extends Model {
     // has Script (i.e., Frame runs a Script)
 
     private List<Port> ports = new ArrayList<>();
-    private String nameTag;
 
     public void addPort(Port port) {
         if (!this.ports.contains(port)) {

@@ -7,13 +7,13 @@ import camp.computer.clay.model.interactivity.Body;
 
 public class Simulation extends Model {
 
+    private System system = new System();
+
     private List<Body> bodies = new ArrayList<>();
 
     private List<Frame> frames = new ArrayList<>();
 
-    private List<Device> devices = new ArrayList<>();
-
-    private System system = new System();
+    private List<Patch> patches = new ArrayList<>();
 
     public void setSystem(System system) {
         this.system = system;
@@ -53,16 +53,16 @@ public class Simulation extends Model {
         return paths;
     }
 
-    public void addDevice(Device device) {
-        this.devices.add(device);
+    public void addPatch(Patch patch) {
+        this.patches.add(patch);
     }
 
-    public Device getDevice(int index) {
-        return this.devices.get(index);
+    public Patch getPatch(int index) {
+        return this.patches.get(index);
     }
 
-    public List<Device> getDevices() {
-        return this.devices;
+    public List<Patch> getPatches() {
+        return this.patches;
     }
 
     public void addBody(Body body) {

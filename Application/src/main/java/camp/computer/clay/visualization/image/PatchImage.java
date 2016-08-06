@@ -10,7 +10,7 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.architecture.Device;
+import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Impression;
@@ -20,7 +20,7 @@ import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
 import camp.computer.clay.visualization.util.Shape;
 
-public class DeviceImage extends Image {
+public class PatchImage extends Image {
 
     public final static String TYPE = "peripheral";
 
@@ -41,8 +41,6 @@ public class DeviceImage extends Image {
     private String outlineColorString = "414141";
     private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
     private double outlineThickness = 3.0;
-    private double targetTransparency = 1.0;
-    private double currentTransparency = targetTransparency;
 
     private double portGroupWidth = 50;
     private double portGroupHeight = 13;
@@ -61,19 +59,19 @@ public class DeviceImage extends Image {
     private int lightOutlineColor = Color.parseColor("#e7e7e7");
     // </STYLE>
 
-    public DeviceImage(Device device) {
-        super(device);
+    public PatchImage(Patch patch) {
+        super(patch);
     }
 
-    public Device getPeripheral() {
-        return (Device) getModel();
+    public Patch getPeripheral() {
+        return (Patch) getModel();
     }
 
     public List<PortImage> getPortImages() {
         List<PortImage> portImages = new ArrayList<>();
-        Device device = getPeripheral();
+        Patch patch = getPeripheral();
 
-        for (Port port : device.getPorts()) {
+        for (Port port : patch.getPorts()) {
             PortImage portImage = (PortImage) getVisualization().getImage(port);
             portImages.add(portImage);
         }
@@ -82,8 +80,8 @@ public class DeviceImage extends Image {
     }
 
     public PortImage getPortImage(int index) {
-        Device device = getPeripheral();
-        PortImage portImage = (PortImage) getVisualization().getImage(device.getPort(index));
+        Patch patch = getPeripheral();
+        PortImage portImage = (PortImage) getVisualization().getImage(patch.getPort(index));
         return portImage;
     }
 
@@ -99,6 +97,16 @@ public class DeviceImage extends Image {
     public void update() {
 //        updateLightImages();
 //        updatePortGroupImages();
+
+        String transparencyString = String.format("%02x", (int) currentTransparency * 255);
+
+        // Frame color
+        color = Color.parseColor("#" + transparencyString + colorString);
+        outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
+
+        // Header color
+        portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
+        portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
     }
 
     public void draw(VisualizationSurface visualizationSurface) {
@@ -139,46 +147,28 @@ public class DeviceImage extends Image {
         }
     }
 
-    // TODO: Move this into Image (send to all Images)
-    public void setTransparency(final double transparency) {
-
-        targetTransparency = transparency;
-
-        currentTransparency = targetTransparency;
-        String transparencyString = String.format("%02x", (int) currentTransparency * 255);
-
-        // Frame color
-        color = Color.parseColor("#" + transparencyString + colorString);
-        outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
-
-        // Header color
-        portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
-        portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
-
-    }
-
     public void showPortImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setVisibility(true);
+            portImage.setVisibility(Visibility.VISIBLE);
             portImage.showDocks();
         }
     }
 
     public void hidePortImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setVisibility(false);
+            portImage.setVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void showPathImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setPathVisibility(true);
+            portImage.setPathVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void hidePathImages() {
         for (PortImage portImage : getPortImages()) {
-            portImage.setPathVisibility(false);
+            portImage.setPathVisibility(Visibility.INVISIBLE);
             portImage.showDocks();
         }
     }
@@ -222,10 +212,10 @@ public class DeviceImage extends Image {
                 List<Path> paths = portImage.getPort().getGraph();
                 for (Path path : paths) {
                     // Show ports
-                    getVisualization().getImage(path.getSource()).setVisibility(true);
-                    getVisualization().getImage(path.getTarget()).setVisibility(true);
+                    getVisualization().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
+                    getVisualization().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
                     // Show path
-                    getVisualization().getImage(path).setVisibility(true);
+                    getVisualization().getImage(path).setVisibility(Visibility.VISIBLE);
                 }
             }
 
