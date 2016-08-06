@@ -9,28 +9,28 @@ import camp.computer.clay.visualization.util.Shape;
 
 public abstract class Image {
 
-    // <TYPE_INTERFACE>
-    private String type = "Image";
-
-    public String getType() {
-        return this.type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isType(String... types) {
-        if (types != null) {
-            for (String type : types) {
-                if (this.type.equals(type)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    // <TYPE_INTERFACE>
+//    // <TYPE_INTERFACE>
+//    private String type = "Image";
+//
+//    public String getType() {
+//        return this.type;
+//    }
+//
+//    public void setType(String type) {
+//        this.type = type;
+//    }
+//
+//    public boolean isType(String... types) {
+//        if (types != null) {
+//            for (String type : types) {
+//                if (this.type.equals(type)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+//    // <TYPE_INTERFACE>
 
     private Shape shape = null;
 
@@ -147,22 +147,22 @@ public abstract class Image {
 
     public abstract void draw(VisualizationSurface visualizationSurface);
 
-    public abstract boolean contains(Point point);
+    public abstract boolean containsPoint(Point point);
 
-    public abstract boolean contains(Point point, double padding);
+    public abstract boolean containsPoint(Point point, double padding);
 
     public interface ActionListener {
     }
 
-    public abstract void onInteraction(Impression impression);
+    public abstract void onImpression(Impression impression);
 
-    // TODO: change this to addOnTouchListener (since have abstract onInteraction)... and call at end of that
+    // TODO: change this to addOnTouchListener (since have abstract onImpression)... and call at end of that
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 
     public void apply(Impression impression) {
-        onInteraction(impression);
+        onImpression(impression);
     }
 
 }

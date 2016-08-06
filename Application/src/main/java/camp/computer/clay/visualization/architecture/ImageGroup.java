@@ -41,10 +41,10 @@ public class ImageGroup {
     /**
      * Removes all elements except those with the specified type.
      *
-     * @param type
+     * @param types
      * @return
      */
-    public ImageGroup filterType(String... types) {
+    public <T extends Image> ImageGroup filterType(Class<?>... types) {
 
 //        for (int i = 0; i < this.images.size(); i++) {
 //            Image image = this.images.get(0);
@@ -69,10 +69,12 @@ public class ImageGroup {
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < this.images.size(); i++) {
+            for (Class<?> type : types) {
 //                Log.v("Centering", "Looking for " + type);
-            if (this.images.get(i).isType(types)) {
+                if (this.images.get(i).getClass() == type) {
 //                    Log.v("Centering", "\tFound " + type);
-                imageGroup.add(this.images.get(i));
+                    imageGroup.add(this.images.get(i));
+                }
             }
         }
 

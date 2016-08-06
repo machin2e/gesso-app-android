@@ -69,7 +69,7 @@ public class Visualization extends Image {
     public void addImage(Model model, Image image, String layerTag) {
 
         // Position image
-        if (image.isType("frame")) {
+        if (image instanceof FrameImage) {
             locateImagePosition(image);
         }
 
@@ -108,7 +108,7 @@ public class Visualization extends Image {
         // Calculate random positions separated by minimum distance
         final float imageSeparationDistance = 525; // 500;
 
-        List<Point> imagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
+        List<Point> imagePositions = getImages().filterType(FrameImage.class).getPositions();
 
         Point position = null;
         boolean foundPoint = false;
@@ -296,7 +296,7 @@ public class Visualization extends Image {
 
     public Image getImageByPosition(Point point) {
         for (Image image : getImages().filterVisibility(true).getList()) {
-            if (image.contains(point)) {
+            if (image.containsPoint(point)) {
                 return image;
             }
         }
@@ -346,7 +346,7 @@ public class Visualization extends Image {
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
 
             // <FPS_ANNOTATION>
-            Point fpsPosition = getImages().filterType(FrameImage.TYPE).calculateCenter();
+            Point fpsPosition = getImages().filterType(FrameImage.class).calculateCenter();
             fpsPosition.setY(fpsPosition.getY() - 200);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
@@ -362,7 +362,7 @@ public class Visualization extends Image {
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            Point centroidPosition = getImages().filterType(FrameImage.TYPE).calculateCentroid();
+            Point centroidPosition = getImages().filterType(FrameImage.class).calculateCentroid();
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, visualizationSurface.getPaint());
@@ -377,7 +377,7 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            List<Point> formImagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
+            List<Point> formImagePositions = getImages().filterType(FrameImage.class).getPositions();
             Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
@@ -410,7 +410,7 @@ public class Visualization extends Image {
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = getImages().filterType(FrameImage.TYPE).calculateBoundingBox();
+            Rectangle boundingBox = getImages().filterType(FrameImage.class).calculateBoundingBox();
             Shape.drawPolygon(boundingBox.getVertices(), visualizationSurface.getCanvas(), visualizationSurface.getPaint());
             // </BOUNDING_BOX>
         }
@@ -430,16 +430,16 @@ public class Visualization extends Image {
     }
 
     @Override
-    public boolean contains(Point point) {
+    public boolean containsPoint(Point point) {
         return false;
     }
 
     @Override
-    public boolean contains(Point point, double padding) {
+    public boolean containsPoint(Point point, double padding) {
         return false;
     }
 
     @Override
-    public void onInteraction(Impression impression) {
+    public void onImpression(Impression impression) {
     }
 }

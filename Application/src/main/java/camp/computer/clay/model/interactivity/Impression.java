@@ -5,15 +5,16 @@ import camp.computer.clay.visualization.util.Point;
 
 public class Impression {
 
+    // TODO: Rename to stage. Type should be "Touch", "Sound", "Motion", etc.
     public enum Type {
 
         NONE(0),
         TOUCH(1),
         HOLD(2),
         MOVE(3),
-        DRAG(4),
+        DRAG(4), // TODO: Remove this. Instead, use MOVE and Interaction.getDistance()/getCardinality()/getSum(":dragDelta").
         RELEASE(5),
-        TAP(6);
+        TAP(6); // TODO: Remove this. Instead, put logic in RELEASE and use Interaction.getDuration().
 
         // TODO: Change the index to a UUID?
         int index;
@@ -37,9 +38,11 @@ public class Impression {
 
     public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
 
-    private Type type;
+    private Interaction interaction = null;
 
-    private Body body;
+    private Type type = null;
+
+    private Body body = null;
 
     // <CONTEXT>
     private long timestamp = DEFAULT_TIMESTAMP;
@@ -48,10 +51,8 @@ public class Impression {
 
     public int pointerIndex = -1;
 
-    public Impression(Type type) {
-        this.type = type;
+    public Impression() {
         this.timestamp = java.lang.System.currentTimeMillis();
-
         setup();
     }
 
@@ -70,6 +71,18 @@ public class Impression {
             }
         }
         return false;
+    }
+
+    public boolean hasInteraction() {
+        return interaction != null;
+    }
+
+    public void setInteraction(Interaction interaction) {
+        this.interaction = interaction;
+    }
+
+    public Interaction getInteraction() {
+        return this.interaction;
     }
 
     public void setBody(Body body) {

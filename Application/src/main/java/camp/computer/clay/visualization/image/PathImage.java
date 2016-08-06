@@ -32,7 +32,6 @@ public class PathImage extends Image {
 
     public PathImage(Path path) {
         super(path);
-        setType(TYPE);
         setup();
     }
 
@@ -140,7 +139,7 @@ public class PathImage extends Image {
     }
 
     @Override
-    public boolean contains(Point point) {
+    public boolean containsPoint(Point point) {
 
 //        if (isVisible()) {
 //            Log.v("Touch_", "FLOOOO");
@@ -165,27 +164,27 @@ public class PathImage extends Image {
         return false;
     }
 
-    public boolean contains(Point point, double padding) {
+    public boolean containsPoint(Point point, double padding) {
         return false;
     }
 
     @Override
-    public void onInteraction(Impression impression) {
+    public void onImpression(Impression impression) {
 
         if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("onInteraction", "Impression.NONE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.NONE to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("onInteraction", "Impression.TOUCH to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.TOUCH to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.TAP) {
-            // Log.v("onInteraction", "Impression.TAP to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.TAP to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.HOLD) {
-            // Log.v("onInteraction", "Impression.HOLD to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.HOLD to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("onInteraction", "Impression.MOVE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.MOVE to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.DRAG) {
-            // Log.v("onInteraction", "Impression.DRAG to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.DRAG to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.RELEASE) {
-            // Log.v("onInteraction", "Impression.RELEASE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.RELEASE to " + CLASS_NAME);
         }
     }
 }

@@ -62,7 +62,6 @@ public class FrameImage extends Image {
 
     public FrameImage(Frame frame) {
         super(frame);
-        setType(TYPE);
     }
 
     public void setupPortImages() {
@@ -355,7 +354,7 @@ public class FrameImage extends Image {
     // Impression
     //-------------------------
 
-    public boolean contains(Point point) {
+    public boolean containsPoint(Point point) {
         if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f);
         } else {
@@ -363,7 +362,7 @@ public class FrameImage extends Image {
         }
     }
 
-    public boolean contains(Point point, double padding) {
+    public boolean containsPoint(Point point, double padding) {
         if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f + padding);
         } else {
@@ -372,12 +371,12 @@ public class FrameImage extends Image {
     }
 
     @Override
-    public void onInteraction(Impression impression) {
+    public void onImpression(Impression impression) {
 
         if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("onInteraction", "Impression.NONE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.NONE to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("onInteraction", "Impression.TOUCH to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.TOUCH to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.TAP) {
 
             // Focus on touched form
@@ -400,13 +399,13 @@ public class FrameImage extends Image {
             }
 
         } else if (impression.getType() == Impression.Type.HOLD) {
-            // Log.v("onInteraction", "Impression.HOLD to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.HOLD to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("onInteraction", "Impression.MOVE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.MOVE to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.DRAG) {
-            // Log.v("onInteraction", "Impression.DRAG to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.DRAG to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.RELEASE) {
-            // Log.v("onInteraction", "Impression.RELEASE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.RELEASE to " + CLASS_NAME);
         }
     }
 }
