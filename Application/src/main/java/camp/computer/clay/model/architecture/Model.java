@@ -1,4 +1,4 @@
-package camp.computer.clay.model.simulation;
+package camp.computer.clay.model.architecture;
 
 public abstract class Model {
     // TODO: UUID.

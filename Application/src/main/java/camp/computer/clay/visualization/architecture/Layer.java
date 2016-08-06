@@ -3,7 +3,7 @@ package camp.computer.clay.visualization.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.model.simulation.Model;
+import camp.computer.clay.model.architecture.Model;
 
 public class Layer {
 
@@ -66,7 +66,7 @@ public class Layer {
     }
 
     public ArrayList<Image> getImages() {
-        return new ArrayList<Image>(this.images);
+        return new ArrayList<>(this.images);
     }
 
     public int getCardinality() {

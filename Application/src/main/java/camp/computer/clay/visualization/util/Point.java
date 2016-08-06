@@ -19,6 +19,11 @@ public class Point {
         this(0, 0);
     }
 
+    public Point(Point otherPoint) {
+        this.x = otherPoint.x;
+        this.y = otherPoint.y;
+    }
+
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
@@ -40,8 +45,8 @@ public class Point {
     public void offset (double dx, double dy) {
         Log.v("Drag", "dx: " + dx);
         Log.v("Drag", "dy: " + dy);
-        this.x = this.x - dx;
-        this.y = this.y - dy;
+        this.x = this.x + dx;
+        this.y = this.y + dy;
     }
 
     public void set (Point point) {

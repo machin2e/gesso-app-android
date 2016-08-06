@@ -11,11 +11,11 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Model;
-import camp.computer.clay.model.simulation.Simulation;
-import camp.computer.clay.model.interaction.TouchInteraction;
-import camp.computer.clay.visualization.images.FrameImage;
-import camp.computer.clay.visualization.images.PortImage;
+import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Simulation;
+import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.visualization.image.FrameImage;
+import camp.computer.clay.visualization.image.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
 import camp.computer.clay.visualization.util.Point;
@@ -24,13 +24,13 @@ import camp.computer.clay.visualization.util.Shape;
 
 public class Visualization extends Image {
 
-//    private <T> ArrayList<T> getModel(Class<T> type) {
-//        ArrayList<T> arrayList = new ArrayList<T>();
+//    private <T> List<T> getModel(Class<T> type) {
+//        List<T> arrayList = new ArrayList<T>();
 //        return arrayList;
 //    }
 
-    public static <T extends Image> ArrayList<Point> getPositions(ArrayList<T> images) {
-        ArrayList<Point> positions = new ArrayList<>();
+    public static <T extends Image> List<Point> getPositions(List<T> images) {
+        List<Point> positions = new ArrayList<>();
         for (T image : images) {
             positions.add(image.getPosition());
         }
@@ -58,6 +58,7 @@ public class Visualization extends Image {
 
     public void addLayer(String tag) {
         if (!hasLayer(tag)) {
+            Log.v("Centering", "Adding LAYER: " + tag);
             Layer layer = new Layer(this);
             layer.setTag(tag);
             layers.add(layer);
@@ -65,20 +66,23 @@ public class Visualization extends Image {
     }
 
     // TODO: Remove Image parameter. Create that and return it.
-    public void addImage(Model model, Image image, String layerName) {
+    public void addImage(Model model, Image image, String layerTag) {
 
         // Position image
-        findImagePosition(image);
+        if (image.isType("frame")) {
+            locateImagePosition(image);
+        }
 
         // Add image
-        if (!hasLayer(layerName)) {
-            addLayer(layerName);
+        if (!hasLayer(layerTag)) {
+            addLayer(layerTag);
         }
-        getLayer(layerName).add(model, image);
+        getLayer(layerTag).add(model, image);
 
-//        // Update perspective
-        getSimulation().getBody(0).getPerspective().adjustPerspectiveScale(0);
-//        getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).calculateCenter());
+        // Update perspective
+//        getSimulation().getBody(0).getPerspective().adjustScale(0);
+        // getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).calculateCenter());
+        getSimulation().getBody(0).getPerspective().adjustPosition();
     }
 
     public Layer getLayer(String tag) {
@@ -99,12 +103,12 @@ public class Visualization extends Image {
         return null;
     }
 
-    private void findImagePosition(Image image) {
+    private void locateImagePosition(Image image) {
 
         // Calculate random positions separated by minimum distance
-        final float imageSeparationDistance = 500;
+        final float imageSeparationDistance = 525; // 500;
 
-        ArrayList<Point> imagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
+        List<Point> imagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
 
         Point position = null;
         boolean foundPoint = false;
@@ -125,7 +129,7 @@ public class Visualization extends Image {
 
         } else {
 
-            ArrayList<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
+            List<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
 
             int sourceIndex = Number.generateRandomInteger(0, hullPoints.size() - 1);
             int targetIndex = sourceIndex + 1;
@@ -163,9 +167,9 @@ public class Visualization extends Image {
         return null;
     }
 
-    public ArrayList<FrameImage> getFormImages() {
+    public List<FrameImage> getFrameImages() {
 
-        ArrayList<FrameImage> images = new ArrayList<>();
+        List<FrameImage> images = new ArrayList<>();
 
         for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
@@ -178,9 +182,9 @@ public class Visualization extends Image {
         return images;
     }
 
-    public ArrayList<PortImage> getPortImages() {
+    public List<PortImage> getPortImages() {
 
-        ArrayList<PortImage> sprites = new ArrayList<>();
+        List<PortImage> sprites = new ArrayList<>();
 
         for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
@@ -193,8 +197,8 @@ public class Visualization extends Image {
         return sprites;
     }
 
-    public <T> ArrayList<Image> getImages(ArrayList<T> models) {
-        ArrayList<Image> images = new ArrayList<>();
+    public <T> List<Image> getImages(List<T> models) {
+        List<Image> images = new ArrayList<>();
         for (Layer layer : getLayers()) {
             for (T model : models) {
                 Image image = layer.getImage((Model) model);
@@ -208,9 +212,10 @@ public class Visualization extends Image {
 
     public ImageGroup getImages() {
         ImageGroup imageGroup = new ImageGroup();
-        for (Layer layer : getLayers()) {
-            for (Image layerImage : layer.getImages()) {
-                imageGroup.add(layerImage);
+        for (Integer index : getLayerIndices()) {
+            Layer layer = getLayer(index);
+            if (layer != null) {
+                imageGroup.add(layer.getImages());
             }
         }
         return imageGroup;
@@ -248,7 +253,7 @@ public class Visualization extends Image {
         float shortestDistance = Float.MAX_VALUE;
         FrameImage nearestFrameImage = null;
 
-        for (FrameImage frameImage : getFormImages()) {
+        for (FrameImage frameImage : getFrameImages()) {
 
             // Update style of nearby machines
             float currentDistance = (float) Geometry.calculateDistance(
@@ -291,11 +296,11 @@ public class Visualization extends Image {
 
     public Image getImageByPosition(Point point) {
         for (Image image : getImages().filterVisibility(true).getList()) {
-            if (image.isTouching(point)) {
+            if (image.contains(point)) {
                 return image;
             }
         }
-        return null;
+        return this;
     }
 
     public Simulation getSimulation() {
@@ -335,7 +340,7 @@ public class Visualization extends Image {
             }
         }
 
-        Geometry.computeCirclePacking(getFormImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
+        // Geometry.computeCirclePacking(getFrameImages(), 200, getImages().filterType(FrameImage.TYPE).calculateCentroid());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
@@ -372,7 +377,7 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            ArrayList<Point> formImagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
+            List<Point> formImagePositions = getImages().filterType(FrameImage.TYPE).getPositions();
             Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
@@ -388,8 +393,8 @@ public class Visualization extends Image {
             // </CENTROID_ANNOTATION>
 
             // <CONVEX_HULL>
-            ArrayList<Point> formPositions = Visualization.getPositions(getFormImages());
-            ArrayList<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
+            List<Point> formPositions = Visualization.getPositions(getFrameImages());
+            List<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
 
             visualizationSurface.getPaint().setStrokeWidth(1.0f);
             visualizationSurface.getPaint().setColor(Color.RED);
@@ -411,8 +416,8 @@ public class Visualization extends Image {
         }
     }
 
-    public ArrayList<Integer> getLayerIndices() {
-        ArrayList<Integer> layers = new ArrayList<>();
+    public List<Integer> getLayerIndices() {
+        List<Integer> layers = new ArrayList<>();
         for (Layer layer : getLayers()) {
             layers.add(layer.getIndex());
         }
@@ -420,21 +425,21 @@ public class Visualization extends Image {
         return layers;
     }
 
-    public ArrayList<Layer> getLayers() {
+    public List<Layer> getLayers() {
         return new ArrayList<>(this.layers);
     }
 
     @Override
-    public boolean isTouching(Point point) {
+    public boolean contains(Point point) {
         return false;
     }
 
     @Override
-    public boolean isTouching(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         return false;
     }
 
     @Override
-    public void onTouchInteraction(TouchInteraction touchInteraction) {
+    public void onInteraction(Impression impression) {
     }
 }

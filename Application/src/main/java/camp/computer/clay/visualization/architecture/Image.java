@@ -1,8 +1,8 @@
 package camp.computer.clay.visualization.architecture;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.simulation.Model;
-import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;
@@ -12,15 +12,15 @@ public abstract class Image {
     // <TYPE_INTERFACE>
     private String type = "Image";
 
-    public String getType () {
+    public String getType() {
         return this.type;
     }
 
-    public void setType (String type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public boolean isType (String... types) {
+    public boolean isType(String... types) {
         if (types != null) {
             for (String type : types) {
                 if (this.type.equals(type)) {
@@ -51,7 +51,7 @@ public abstract class Image {
     private Visualization visualization;
 
     // TODO: Make this an interface? Move interface out of class.
-    private TouchActionListener touchActionListener;
+    private ActionListener actionListener;
 
     public Image(Model model) {
         this.model = model;
@@ -147,22 +147,22 @@ public abstract class Image {
 
     public abstract void draw(VisualizationSurface visualizationSurface);
 
-    public abstract boolean isTouching(Point point);
+    public abstract boolean contains(Point point);
 
-    public abstract boolean isTouching(Point point, double padding);
+    public abstract boolean contains(Point point, double padding);
 
-    public interface TouchActionListener {
+    public interface ActionListener {
     }
 
-    public abstract void onTouchInteraction(TouchInteraction touchInteraction);
+    public abstract void onInteraction(Impression impression);
 
-    // TODO: change this to addOnTouchListener (since have abstract onTouchInteraction)... and call at end of that
-    public void setOnTouchActionListener(TouchActionListener touchActionListener) {
-        this.touchActionListener = touchActionListener;
+    // TODO: change this to addOnTouchListener (since have abstract onInteraction)... and call at end of that
+    public void setOnActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 
-    public void touch(TouchInteraction touchInteraction) {
-        onTouchInteraction(touchInteraction);
+    public void apply(Impression impression) {
+        onInteraction(impression);
     }
 
 }

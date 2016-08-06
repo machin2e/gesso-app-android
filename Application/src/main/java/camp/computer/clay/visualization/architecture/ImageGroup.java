@@ -8,42 +8,43 @@ import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
 
 /**
- * ImageGroup is an interface for managing and manaipulating sets of images.
+ * ImageGroup is an interface for managing and manipulating sets of images.
  */
 public class ImageGroup {
 
-    private ArrayList<Image> images = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 
     public ImageGroup() {
     }
 
-    public void add (Image image) {
+    public void add(Image image) {
         this.images.add(image);
     }
 
-    public void add (List<Image> images) {
+    public void add(List<Image> images) {
         this.images.addAll(images);
     }
 
-    public boolean contains (Image image) {
+    public boolean contains(Image image) {
         return images.contains(image);
     }
 
-    public ImageGroup remove (Image image) {
+    public ImageGroup remove(Image image) {
         images.remove(image);
         return this;
     }
 
-    public Image get (int index) {
+    public Image get(int index) {
         return images.get(index);
     }
 
     /**
      * Removes all elements except those with the specified type.
+     *
      * @param type
      * @return
      */
-    public ImageGroup filterType (String type) {
+    public ImageGroup filterType(String... types) {
 
 //        for (int i = 0; i < this.images.size(); i++) {
 //            Image image = this.images.get(0);
@@ -68,11 +69,11 @@ public class ImageGroup {
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < this.images.size(); i++) {
-
-            if (this.images.get(i).isType(type)) {
+//                Log.v("Centering", "Looking for " + type);
+            if (this.images.get(i).isType(types)) {
+//                    Log.v("Centering", "\tFound " + type);
                 imageGroup.add(this.images.get(i));
             }
-
         }
 
         return imageGroup;
@@ -148,8 +149,8 @@ public class ImageGroup {
     }
 
     public ArrayList<Point> getPositions() {
-        ArrayList<Point> positions = new ArrayList<Point>();
-        for (Image image: images) {
+        ArrayList<Point> positions = new ArrayList<>();
+        for (Image image : images) {
             positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
         }
         return positions;
@@ -167,12 +168,13 @@ public class ImageGroup {
         return Geometry.calculateBoundingBox(getPositions());
     }
 
-    public ArrayList<Point> computeConvexHull() {
+    public List<Point> computeConvexHull() {
         return Geometry.computeConvexHull(getPositions());
     }
 
     /**
      * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     *
      * @param position
      * @return
      */
@@ -181,7 +183,7 @@ public class ImageGroup {
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
 
-        for (Image image: images) {
+        for (Image image : images) {
 
             double currentDistance = Geometry.calculateDistance(position, image.getPosition());
 

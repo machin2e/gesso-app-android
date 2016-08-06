@@ -141,7 +141,7 @@ public class Event {
         this.initializeContent();
     }
 
-//    public Event (Timeline timeline, Action action, State state) {
+//    public Event (Timeline timeline, Impression action, State state) {
 //
 //        this.uuid = UUID.randomUUID();
 //

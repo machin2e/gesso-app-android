@@ -12,8 +12,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import camp.computer.clay.model.interaction.Body;
-import camp.computer.clay.model.interaction.TouchInteraction;
+import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Body;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Point;
 
@@ -232,7 +232,7 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
     }
 
     //----------------------------------------------------------------------------------------------
-    // Interaction Model
+    // Impression Model
     //----------------------------------------------------------------------------------------------
 
     @Override
@@ -261,14 +261,13 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
         // Log.v("InteractionHistory", "Started touchPositions composition.");
 
         // Get active body
-        Body currentBody = visualization.getSimulation().getBody(0);
+        Body body = visualization.getSimulation().getBody(0);
 
-        // Create touchPositions interaction
-        TouchInteraction touchInteraction = new TouchInteraction(TouchInteraction.Type.NONE);
-        touchInteraction.setBody(currentBody);
+        // Create touchPositions impression
+        Impression impression = new Impression(Impression.Type.NONE);
 
-        if (pointerCount <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT) {
-            if (pointerIndex <= TouchInteraction.MAXIMUM_TOUCH_POINT_COUNT - 1) {
+        if (pointerCount <= Impression.MAXIMUM_TOUCH_POINT_COUNT) {
+            if (pointerIndex <= Impression.MAXIMUM_TOUCH_POINT_COUNT - 1) {
 
                 // Current
                 // Update touchPositions state based the points given by the host OS (e.g., Android).
@@ -276,8 +275,8 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                     int id = motionEvent.getPointerId (i);
                     Point perspectivePosition = visualization.getSimulation().getBody(0).getPerspective().getPosition();
                     double perspectiveScale = visualization.getSimulation().getBody(0).getPerspective().getScale();
-                    touchInteraction.touchPositions[id].setX((motionEvent.getX (i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
-                    touchInteraction.touchPositions[id].setY((motionEvent.getY (i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                    impression.touchPositions[id].setX((motionEvent.getX (i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
+                    impression.touchPositions[id].setY((motionEvent.getY (i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }
 
                 // ACTION_DOWN is called only for the first pointer that touches the screen. This
@@ -298,21 +297,21 @@ public class VisualizationSurface extends SurfaceView implements SurfaceHolder.C
                 // REFERENCES:
                 // - https://developer.android.com/training/gestures/multi.html
 
-                // Update the state of the touched object based on the current touchPositions interaction state.
+                // Update the state of the touched object based on the current touchPositions impression state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    touchInteraction.setType(TouchInteraction.Type.TOUCH);
-                    touchInteraction.pointerIndex = pointerId;
-                    currentBody.onStartInteractivity(touchInteraction);
+                    impression.setType(Impression.Type.TOUCH);
+                    impression.pointerIndex = pointerId;
+                    body.onStartInteraction(impression);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
-                    touchInteraction.setType(TouchInteraction.Type.MOVE);
-                    touchInteraction.pointerIndex = pointerId;
-                    currentBody.onContinueInteractivity(touchInteraction);
+                    impression.setType(Impression.Type.MOVE);
+                    impression.pointerIndex = pointerId;
+                    body.onContinueInteraction(impression);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    touchInteraction.setType(TouchInteraction.Type.RELEASE);
-                    touchInteraction.pointerIndex = pointerId;
-                    currentBody.onCompleteInteractivity(touchInteraction);
+                    impression.setType(Impression.Type.RELEASE);
+                    impression.pointerIndex = pointerId;
+                    body.onStopInteraction(impression);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the first touchPositions!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
