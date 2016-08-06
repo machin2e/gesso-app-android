@@ -94,7 +94,6 @@ public class PortImage extends Image {
 
     public PortImage(Port port) {
         super(port);
-        setType(TYPE);
         setup();
     }
 
@@ -637,7 +636,7 @@ public class PortImage extends Image {
     }
 
     @Override
-    public boolean contains(Point point) {
+    public boolean containsPoint(Point point) {
         if (isVisible()) {
             return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + PortImage.DISTANCE_BETWEEN_NODES));
         } else {
@@ -645,7 +644,7 @@ public class PortImage extends Image {
         }
     }
 
-    public boolean contains(Point point, double padding) {
+    public boolean containsPoint(Point point, double padding) {
         if (isVisible()) {
             return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + padding));
         } else {
@@ -654,12 +653,12 @@ public class PortImage extends Image {
     }
 
     @Override
-    public void onInteraction(Impression impression) {
+    public void onImpression(Impression impression) {
 
         if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("onInteraction", "Impression.NONE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.NONE to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("onInteraction", "Impression.TOUCH to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.TOUCH to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.TAP) {
 
             Port port = getPort();
@@ -743,7 +742,7 @@ public class PortImage extends Image {
             setCandidatePathVisibility(false);
 
         } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("onInteraction", "Impression.MOVE to " + CLASS_NAME);
+            // Log.v("onImpression", "Impression.MOVE to " + CLASS_NAME);
         } else if (impression.getType() == Impression.Type.DRAG) {
 
             Log.v("onHoldListener", "Port draggin!");
@@ -787,7 +786,7 @@ public class PortImage extends Image {
             }
 
         } else if (impression.getType() == Impression.Type.RELEASE) {
-//             Log.v("onInteraction", "Impression.RELEASE to " + CLASS_NAME);
+//             Log.v("onImpression", "Impression.RELEASE to " + CLASS_NAME);
             Log.v("onHoldListener", "Impression.RELEASE to " + CLASS_NAME);
 
             setCandidatePathVisibility(false);

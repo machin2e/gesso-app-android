@@ -90,28 +90,40 @@ public class Perspective {
             return;
         }
 
-        /*
-        // Solution 1: This works without per-frame adjustment. It's a starting point for that.
-        // this.targetPosition.setX(-targetPosition.getX() * targetScale);
-        // this.targetPosition.setY(-targetPosition.getY() * targetScale);
-        */
+        if (duration == 0) {
 
-        this.targetPosition.setX(-targetPosition.getX());
-        this.targetPosition.setY(-targetPosition.getY());
+            this.targetPosition.setX(-targetPosition.getX());
+            this.targetPosition.setY(-targetPosition.getY());
 
-        // <PLAN_ANIMATION>
-        originalPosition.set(position);
+            this.originalPosition.set(targetPosition);
 
-        positionFrameLimit = (int) (Application.getDisplay().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
-        // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
-        positionFrameIndex = 0;
-        // </PLAN_ANIMATION>
+            this.position.set(targetPosition);
+
+        } else {
+
+            /*
+            // Solution 1: This works without per-frame adjustment. It's a starting point for that.
+            // this.targetPosition.setX(-targetPosition.getX() * targetScale);
+            // this.targetPosition.setY(-targetPosition.getY() * targetScale);
+            */
+
+            this.targetPosition.setX(-targetPosition.getX());
+            this.targetPosition.setY(-targetPosition.getY());
+
+            // <PLAN_ANIMATION>
+            originalPosition.set(position);
+
+            positionFrameLimit = (int) (Application.getDisplay().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
+            // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
+            positionFrameIndex = 0;
+            // </PLAN_ANIMATION>
+        }
     }
 
     public void setOffset(double xOffset, double yOffset) {
-        this.position.offset(xOffset, yOffset);
-        this.originalPosition.offset(xOffset, yOffset);
         this.targetPosition.offset(xOffset, yOffset);
+        this.originalPosition.offset(xOffset, yOffset);
+        this.position.offset(xOffset, yOffset);
     }
 
     public void setScale(double targetScale) {
@@ -248,8 +260,8 @@ public class Perspective {
         PortImage portImage = (PortImage) impression.getTargetImage();
 
         // Show ports of nearby forms
-        ImageGroup nearbyImages = getVisualization().getImages().filterType(FrameImage.TYPE).filterDistance(impression.getPosition(), 200 + 60);
-        for (Image image : getVisualization().getImages().filterType(FrameImage.TYPE).getList()) {
+        ImageGroup nearbyImages = getVisualization().getImages().filterType(FrameImage.class).filterDistance(impression.getPosition(), 200 + 60);
+        for (Image image : getVisualization().getImages().filterType(FrameImage.class).getList()) {
 
             if (image == portImage.getParentImage() || nearbyImages.contains(image)) {
 
@@ -269,7 +281,7 @@ public class Perspective {
         }
 
         // Check if a machine sprite was nearby
-        Image nearestFormImage = getVisualization().getImages().filterType(FrameImage.TYPE).getNearest(impression.getPosition());
+        Image nearestFormImage = getVisualization().getImages().filterType(FrameImage.class).getNearest(impression.getPosition());
         if (nearestFormImage != null) {
 
             // TODO: Vibrate
@@ -285,7 +297,7 @@ public class Perspective {
             portImage.showPaths();
 
             // Adjust perspective
-            setPosition(getVisualization().getImages().filterType(FrameImage.TYPE).calculateCenter());
+            setPosition(getVisualization().getImages().filterType(FrameImage.class).calculateCenter());
             setScale(0.6f); // Zoom out to show overview
 
         }
@@ -341,7 +353,7 @@ public class Perspective {
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
-            ImageGroup otherFormImages = getVisualization().getImages().filterType(FrameImage.TYPE).remove(frameImage);
+            ImageGroup otherFormImages = getVisualization().getImages().filterType(FrameImage.class).remove(frameImage);
             for (Image image : otherFormImages.getList()) {
                 FrameImage otherFrameImage = (FrameImage) image;
                 otherFrameImage.hidePortImages();
@@ -477,14 +489,14 @@ public class Perspective {
             frameImage.setTransparency(1.0f);
         }
 
-        for (Image deviceImageRaw : getVisualization().getImages().filterType(DeviceImage.TYPE).getList()) {
+        for (Image deviceImageRaw : getVisualization().getImages().filterType(DeviceImage.class).getList()) {
             DeviceImage deviceImage = (DeviceImage) deviceImageRaw;
             deviceImage.hidePortImages();
             deviceImage.hidePathImages();
             deviceImage.setTransparency(1.0f);
         }
 
-        List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.TYPE, DeviceImage.TYPE).getPositions();
+        List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.class, DeviceImage.class).getPositions();
         Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
 
         adjustScale();
@@ -498,7 +510,7 @@ public class Perspective {
     }
 
     public void adjustPosition() {
-        List<Point> imagePositions = getVisualization().getImages().filterType(FrameImage.TYPE, DeviceImage.TYPE).getPositions();
+        List<Point> imagePositions = getVisualization().getImages().filterType(FrameImage.class, DeviceImage.class).getPositions();
         Point centerPosition = Geometry.calculateCenterPosition(imagePositions);
         setPosition(centerPosition);
 
@@ -509,7 +521,7 @@ public class Perspective {
     }
 
     public void adjustScale(double duration) {
-        List<Point> imagePositions = getVisualization().getImages().filterType(FrameImage.TYPE, DeviceImage.TYPE).getPositions();
+        List<Point> imagePositions = getVisualization().getImages().filterType(FrameImage.class, DeviceImage.class).getPositions();
         if (imagePositions.size() > 0) {
             Rectangle boundingBox = Geometry.calculateBoundingBox(imagePositions);
             adjustScale(boundingBox, duration);

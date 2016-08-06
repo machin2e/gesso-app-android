@@ -39,7 +39,7 @@ public class Interaction {
             int pointerId = 0;
             if (getFirst().isTouching[pointerId])
                 if (dragDistance[pointerId] < Impression.MINIMUM_DRAG_DISTANCE) {
-                    getFirst().getBody().onHoldListener(interaction, getFirst());
+                    getFirst().getBody().onHoldListener(interaction);
                 }
 
             // Uncomment this for periodic callback
@@ -88,7 +88,7 @@ public class Interaction {
         }
     }
 
-    public Impression getLatest() {
+    public Impression getLast() {
         if (impressions.size() > 0) {
             return impressions.get(impressions.size() - 1);
         } else {
@@ -108,7 +108,7 @@ public class Interaction {
     public Impression getPrevious() {
 //        for (int i = 0; i < impressions.size() - 1; i++) {
         if (impressions.size() > 1) {
-//            if (impressions.get(i + 1) == getLatest()) {
+//            if (impressions.get(i + 1) == getLast()) {
             return impressions.get(impressions.size() - 1);
 //            }
         }
@@ -120,11 +120,11 @@ public class Interaction {
     }
 
     public long getStopTime() {
-        return getLatest().getTimestamp();
+        return getLast().getTimestamp();
     }
 
     public long getDuration() {
-        return getLatest().getTimestamp() - getFirst().getTimestamp();
+        return getLast().getTimestamp() - getFirst().getTimestamp();
     }
 
     public ArrayList<Point> getTouchPath() {
@@ -136,7 +136,7 @@ public class Interaction {
     }
 
     public boolean isDragging() {
-        return isDragging[getLatest().pointerIndex];
+        return isDragging[getLast().pointerIndex];
     }
 
     // <CLASSIFIER>
