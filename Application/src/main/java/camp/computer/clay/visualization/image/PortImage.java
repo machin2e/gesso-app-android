@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.img;
+package camp.computer.clay.visualization.image;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Random;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.arch.Frame;
-import camp.computer.clay.model.arch.Path;
-import camp.computer.clay.model.arch.Port;
-import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.visualization.arch.Image;
-import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.model.architecture.Frame;
+import camp.computer.clay.model.architecture.Path;
+import camp.computer.clay.model.architecture.Device;
+import camp.computer.clay.model.architecture.Port;
+import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Rectangle;
@@ -41,7 +42,12 @@ public class PortImage extends Image {
     private int uniqueColor = Color.BLACK;
 
     public int getIndex() {
-        return getFrameImage().getPortImageIndex(this);
+        if (getParentImage() instanceof FrameImage) {
+            return getFrameImage().getPortImageIndex(this);
+        } else if (getParentImage() instanceof DeviceImage) {
+            return ((DeviceImage) getParentImage()).getPortImageIndex(this);
+        }
+        return -1;
     }
     // </STYLE>
 
@@ -62,6 +68,24 @@ public class PortImage extends Image {
     // </SIMULATED_DATA>
 
     public static final String CLASS_NAME = "PORT_SPRITE";
+
+    private boolean isDragging = false;
+    private Point previousPosition = new Point(getPosition());
+
+    public boolean isDragging() {
+        return this.isDragging;
+    }
+
+    public void setDragging(boolean isDragging) {
+
+        if (this.isDragging == false && isDragging == true) {
+            this.previousPosition.set(getPosition());
+            this.isDragging = true;
+        } else if (this.isDragging == true && isDragging == false) {
+            this.setPosition(previousPosition);
+            this.isDragging = false;
+        }
+    }
 
     private boolean isCandidatePathVisible = false;
     private Point candidatePathDestinationPosition = new Point(40, 80);
@@ -144,7 +168,7 @@ public class PortImage extends Image {
             // Candidate Path
             drawCandidatePathImages(visualizationSurface);
 
-            // Candidate Peripheral
+            // Candidate Device
             drawCandidatePeripheralImage(visualizationSurface);
         }
     }
@@ -283,7 +307,7 @@ public class PortImage extends Image {
                     // Rotate point
                     rotatedPortDataSamplePoints[i] = Geometry.calculateRotatedPoint(
                             getPosition(),
-                            getFrameImage().getRotation() + portGroupRotation[getIndex()],
+                            getParentImage().getRotation() + portGroupRotation[getIndex()],
                             samplePoint
                     );
                 }
@@ -413,69 +437,137 @@ public class PortImage extends Image {
 
         // <TODO>
         // TODO: Replace this with getParentSpriteBounds() -- get bounding box based on parent sprite's shape and orientation (to get width and height)
-        FrameImage frameImage = (FrameImage) getParentImage();
-        Frame frame = frameImage.getForm();
-        // </TODO>
+        if (getParentImage() instanceof FrameImage) {
+            FrameImage frameImage = (FrameImage) getParentImage();
+            Frame frame = frameImage.getFrame();
+            // </TODO>
 
-        // Ports
-        double portRadius = 40.0f;
-        Point[] relativePortPositions = new Point[frame.getPorts().size()];
-        relativePortPositions[0] = new Point(
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-        );
-        relativePortPositions[1] = new Point(
-                0,
-                +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-        );
-        relativePortPositions[2] = new Point(
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-        );
-        relativePortPositions[3] = new Point(
-                +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
-        );
-        relativePortPositions[4] = new Point(
-                +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                0
-        );
-        relativePortPositions[5] = new Point(
-                +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
-        );
-        relativePortPositions[6] = new Point(
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-        );
-        relativePortPositions[7] = new Point(
-                0,
-                -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-        );
-        relativePortPositions[8] = new Point(
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-        );
-        relativePortPositions[9] = new Point(
-                -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
-        );
-        relativePortPositions[10] = new Point(
-                -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                0
-        );
-        relativePortPositions[11] = new Point(
-                -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
-                +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
-        );
+            // Ports
+            double portRadius = 40.0f;
+            Point[] relativePortPositions = new Point[frame.getPorts().size()];
+            relativePortPositions[0] = new Point(
+                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[1] = new Point(
+                    0,
+                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[2] = new Point(
+                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[3] = new Point(
+                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+            );
+            relativePortPositions[4] = new Point(
+                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    0
+            );
+            relativePortPositions[5] = new Point(
+                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+            );
+            relativePortPositions[6] = new Point(
+                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[7] = new Point(
+                    0,
+                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[8] = new Point(
+                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[9] = new Point(
+                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+            );
+            relativePortPositions[10] = new Point(
+                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    0
+            );
+            relativePortPositions[11] = new Point(
+                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+            );
 
-        relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
-                new Point(0, 0), //getParentImage().getPosition(),
-                getParentImage().getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
-                relativePortPositions[getIndex()]
-        );
+            relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
+                    new Point(0, 0), //getParentImage().getPosition(),
+                    getParentImage().getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
+                    relativePortPositions[getIndex()]
+            );
 
-        setRelativePosition(relativePortPositions[getIndex()]);
+            setRelativePosition(relativePortPositions[getIndex()]);
+
+        } else if (getParentImage() instanceof DeviceImage) {
+
+            DeviceImage deviceImage = (DeviceImage) getParentImage();
+            Device device = deviceImage.getPeripheral();
+            // </TODO>
+
+            // Ports
+            double portRadius = 40.0f;
+            Point[] relativePortPositions = new Point[device.getPorts().size()];
+            relativePortPositions[0] = new Point(
+                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[1] = new Point(
+                    0,
+                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+            relativePortPositions[2] = new Point(
+                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+            );
+//            relativePortPositions[3] = new Point(
+//                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+//            );
+//            relativePortPositions[4] = new Point(
+//                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    0
+//            );
+//            relativePortPositions[5] = new Point(
+//                    +1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+//            );
+//            relativePortPositions[6] = new Point(
+//                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//            );
+//            relativePortPositions[7] = new Point(
+//                    0,
+//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//            );
+//            relativePortPositions[8] = new Point(
+//                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//            );
+//            relativePortPositions[9] = new Point(
+//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+//            );
+//            relativePortPositions[10] = new Point(
+//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    0
+//            );
+//            relativePortPositions[11] = new Point(
+//                    -1 * ((deviceImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+//                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
+//            );
+
+            relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
+                    new Point(0, 0), //getParentImage().getPosition(),
+                    getParentImage().getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
+                    relativePortPositions[getIndex()]
+            );
+
+            setRelativePosition(relativePortPositions[getIndex()]);
+        }
     }
 
     private double getSyntheticSample(double value) {
@@ -545,7 +637,7 @@ public class PortImage extends Image {
     }
 
     @Override
-    public boolean isTouching(Point point) {
+    public boolean contains(Point point) {
         if (isVisible()) {
             return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + PortImage.DISTANCE_BETWEEN_NODES));
         } else {
@@ -553,7 +645,7 @@ public class PortImage extends Image {
         }
     }
 
-    public boolean isTouching(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         if (isVisible()) {
             return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + padding));
         } else {
@@ -562,13 +654,13 @@ public class PortImage extends Image {
     }
 
     @Override
-    public void onTouchInteraction(Interaction interaction) {
+    public void onInteraction(Impression impression) {
 
-        if (interaction.getType() == Interaction.Type.NONE) {
-            // Log.v("onTouchInteraction", "Interaction.NONE to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.TOUCH) {
-            // Log.v("onTouchInteraction", "Interaction.TOUCH to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.TAP) {
+        if (impression.getType() == Impression.Type.NONE) {
+            // Log.v("onInteraction", "Impression.NONE to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.TOUCH) {
+            // Log.v("onInteraction", "Impression.TOUCH to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.TAP) {
 
             Port port = getPort();
 
@@ -597,13 +689,13 @@ public class PortImage extends Image {
 
                 // Remove focus from other machines and their ports.
                 for (FrameImage frameImage : getVisualization().getFrameImages()) {
-                    frameImage.setTransparency(0.05f);
+                    frameImage.setTransparency(0.1);
                     frameImage.hidePortImages();
                     frameImage.hidePathImages();
                 }
 
                 // Reduce focus on the machine
-                getFrameImage().setTransparency(0.05f);
+                getFrameImage().setTransparency(0.1);
 
                 // Focus on the port
                 //portImage.getFrameImage().showPathImage(portImage.getIndex(), true);
@@ -650,21 +742,17 @@ public class PortImage extends Image {
 
             setCandidatePathVisibility(false);
 
-        } else if (interaction.getType() == Interaction.Type.TAP) {
-            // Log.v("onTouchInteraction", "Interaction.HOLD to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.MOVE) {
-            // Log.v("onTouchInteraction", "Interaction.MOVE to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.TWITCH) {
-            // Log.v("onTouchInteraction", "Interaction.TWITCH to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.DRAG) {
+        } else if (impression.getType() == Impression.Type.MOVE) {
+            // Log.v("onInteraction", "Impression.MOVE to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.DRAG) {
 
             Log.v("onHoldListener", "Port draggin!");
 
             // Candidate Path Visibility
-            setCandidatePathDestinationPosition(interaction.getPosition());
+            setCandidatePathDestinationPosition(impression.getPosition());
             setCandidatePathVisibility(true);
 
-            // Candidate Peripheral Visibility
+            // Candidate Device Visibility
 
             boolean isPeripheral = true;
             for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {
@@ -695,14 +783,15 @@ public class PortImage extends Image {
             }
             if (port.getType() == Port.Type.NONE) {
                 Log.v("onHoldListener", "OH SHIT!");
-                port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                port.setType(Port.Type.next(port.getType()));
             }
 
-        } else if (interaction.getType() == Interaction.Type.RELEASE) {
-//             Log.v("onTouchInteraction", "Interaction.RELEASE to " + CLASS_NAME);
-            Log.v("onHoldListener", "Interaction.RELEASE to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.RELEASE) {
+//             Log.v("onInteraction", "Impression.RELEASE to " + CLASS_NAME);
+            Log.v("onHoldListener", "Impression.RELEASE to " + CLASS_NAME);
 
             setCandidatePathVisibility(false);
+            setCandidatePeripheralVisibility(false);
         }
     }
 

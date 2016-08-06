@@ -3,8 +3,8 @@ package camp.computer.clay.visualization.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.visualization.img.FrameImage;
-import camp.computer.clay.visualization.arch.Visualization;
+import camp.computer.clay.visualization.image.FrameImage;
+import camp.computer.clay.visualization.architecture.Visualization;
 
 public abstract class Geometry {
 

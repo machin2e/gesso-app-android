@@ -1,4 +1,4 @@
-package camp.computer.clay.model.arch;
+package camp.computer.clay.model.architecture;
 
 public class Path extends Model {
 

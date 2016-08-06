@@ -1,4 +1,4 @@
-package camp.computer.clay.model.arch;
+package camp.computer.clay.model.architecture;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,128 +1,145 @@
 package camp.computer.clay.model.interactivity;
 
-import camp.computer.clay.visualization.arch.Image;
+import android.os.Handler;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import camp.computer.clay.visualization.util.Point;
 
+/**
+ * An interaction is a temporal sequence of one or more impressions.
+ */
 public class Interaction {
 
-    public enum Type {
+    // TODO: Model this with a "touchPositions interaction envelope" or "interaction envelope".
+    // TODO: Model voice interaction in the same way. Generify to Interaction<T> or subclass.
+    // TODO: (?) Model data transmissions as impressions in the same way?
 
-        NONE(0),
-        TOUCH(1),
-        HOLD(2),
-        MOVE(3),
-        TWITCH(4),
-        DRAG(5),
-        RELEASE(6),
-        TAP(7),
-        PRESS(8);
+    private List<Impression> impressions = new LinkedList<>();
 
-        // TODO: Change the index to a UUID?
-        int index;
+    // TODO: Classify these! Every time an Impression is added!
+    // TODO: (cont'd) Note can have multiple sequences per finger in an interaction,
+    // TODO: (cont'd) so consider remodeling as per-finger interaction and treat each finger
+    // TODO: (cont'd) as an individual actor.
+    public boolean[] isHolding = new boolean[Impression.MAXIMUM_TOUCH_POINT_COUNT];
+    public boolean[] isDragging = new boolean[Impression.MAXIMUM_TOUCH_POINT_COUNT];
+    public double[] dragDistance = new double[Impression.MAXIMUM_TOUCH_POINT_COUNT];
+    public double offsetX = 0;
+    public double offsetY = 0;
 
-        Type(int index) {
-            this.index = index;
+    public Handler timerHandler = new Handler();
+    Interaction interaction = this;
+    public Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // Do what you need to do.
+            // e.g., foobar();
+            int pointerId = 0;
+            if (getFirst().isTouching[pointerId])
+                if (dragDistance[pointerId] < Impression.MINIMUM_DRAG_DISTANCE) {
+                    getFirst().getBody().onHoldListener(interaction, getFirst());
+                }
+
+            // Uncomment this for periodic callback
+            // timerHandler.postDelayed(this, 100);
         }
-    }
+    };
 
-    public static int MAXIMUM_TOUCH_POINT_COUNT = 5;
-
-    public static int MAXIMUM_TAP_DURATION = 200;
-
-    public static int MINIMUM_HOLD_DURATION = 600;
-
-    public static int MINIMUM_DRAG_DISTANCE = 35;
-
-    final public static long DEFAULT_TIMESTAMP = 0L;
-
-    public Point[] touchPositions = new Point[MAXIMUM_TOUCH_POINT_COUNT];
-    public boolean[] isTouching = new boolean[MAXIMUM_TOUCH_POINT_COUNT];
-
-    private Type type;
-
-    private Body body;
-
-    // <CONTEXT>
-    private long timestamp = DEFAULT_TIMESTAMP;
-    // TODO: Link to context, e.g., Sensor data (inc. 3D orienetation, brightness).
-    // </CONTEXT>
-
-    public int pointerIndex = -1;
-
-    public Interaction(Type type) {
-        this.type = type;
-        this.timestamp = java.lang.System.currentTimeMillis();
-
+    public Interaction() {
         setup();
     }
 
     private void setup() {
-        for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
-            touchPositions[i] = new Point(0, 0);
-            touchedImage[i] = null;
-            isTouching[i] = false;
+        for (int i = 0; i < Impression.MAXIMUM_TOUCH_POINT_COUNT; i++) {
+            isHolding[i] = false;
+            isDragging[i] = false;
+            dragDistance[i] = 0;
         }
     }
 
-    public boolean hasTouches() {
-        for (int i = 0; i < MAXIMUM_TOUCH_POINT_COUNT; i++) {
-            if (isTouching[i]) {
-                return true;
+    public int getSize() {
+        return this.impressions.size();
+    }
+
+    public void add(Impression impression) {
+        this.impressions.add(impression);
+
+        offsetX += impression.getPosition().getX();
+        offsetY += impression.getPosition().getY();
+
+        if (impressions.size() == 1) {
+            // Start timer to check for hold
+            timerHandler.removeCallbacks(timerRunnable);
+            timerHandler.postDelayed(timerRunnable, Impression.MINIMUM_HOLD_DURATION);
+        }
+    }
+
+    public Impression get(int index) {
+        return this.impressions.get(index);
+    }
+
+    public Impression getFirst() {
+        if (impressions.size() > 0) {
+            return impressions.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public Impression getLatest() {
+        if (impressions.size() > 0) {
+            return impressions.get(impressions.size() - 1);
+        } else {
+            return null;
+        }
+    }
+
+    public Impression getPrevious(Impression impression) {
+        for (int i = 0; i < impressions.size() - 1; i++) {
+            if (impressions.get(i + 1) == impression) {
+                return impressions.get(i);
             }
         }
-        return false;
+        return null;
     }
 
-    public void setBody(Body body) {
-        this.body = body;
-    }
-
-    public Body getBody() {
-        return this.body;
-    }
-
-    public Type getType() {
-        return this.type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Point getPosition() {
-        return this.touchPositions[0];
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
-    }
-
-    private Image[] touchedImage = new Image[Interaction.MAXIMUM_TOUCH_POINT_COUNT];
-
-    public boolean isTouching(int fingerIndex) {
-        return this.touchedImage[fingerIndex] != null;
-    }
-
-    public void setTargetImage(int fingerIndex, Image image) {
-        this.touchedImage[fingerIndex] = image;
-    }
-
-    public Image getTargetImage(int fingerIndex) {
-        return this.touchedImage[fingerIndex];
-    }
-
-    public boolean isTouching() {
-        return isTouching(0);
-    }
-
-    public void setTargetImage(Image image) {
-        setTargetImage(0, image);
-        if (image != null) {
-            isTouching[0] = true;
+    public Impression getPrevious() {
+//        for (int i = 0; i < impressions.size() - 1; i++) {
+        if (impressions.size() > 1) {
+//            if (impressions.get(i + 1) == getLatest()) {
+            return impressions.get(impressions.size() - 1);
+//            }
         }
+        return null;
     }
 
-    public Image getTargetImage() {
-        return getTargetImage(0);
+    public long getStartTime() {
+        return getFirst().getTimestamp();
     }
+
+    public long getStopTime() {
+        return getLatest().getTimestamp();
+    }
+
+    public long getDuration() {
+        return getLatest().getTimestamp() - getFirst().getTimestamp();
+    }
+
+    public ArrayList<Point> getTouchPath() {
+        ArrayList<Point> touchPositions = new ArrayList<>();
+        for (int i = 0; i < impressions.size(); i++) {
+            touchPositions.add(impressions.get(i).getPosition());
+        }
+        return touchPositions;
+    }
+
+    public boolean isDragging() {
+        return isDragging[getLatest().pointerIndex];
+    }
+
+    // <CLASSIFIER>
+    // TODO: Implement classifiers (inc. $1).
+    // </CLASSIFIER>
 }

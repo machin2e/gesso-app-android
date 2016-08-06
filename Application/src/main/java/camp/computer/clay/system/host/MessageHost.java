@@ -117,10 +117,10 @@ public class MessageHost {
         return incomingMessages.remove(0);
     }
 
-    // TODO: Unify queues and rename to "process()" or "step()"
+    // TODO: Unify queues and rename to "apply()" or "step()"
     public void processIncomingMessages () {
 //        Log.v ("UDP_Processing", "<<< processIncomingQueue");
-        // Dequeue and process the next message on the incoming message queue.
+        // Dequeue and apply the next message on the incoming message queue.
         if (hasIncomingMessages()) {
 //            Log.v("Clay_Time", "Processing incoming message");
             while (hasIncomingMessages ()) {

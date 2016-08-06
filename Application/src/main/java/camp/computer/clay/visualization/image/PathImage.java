@@ -1,12 +1,12 @@
-package camp.computer.clay.visualization.img;
+package camp.computer.clay.visualization.image;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.arch.Path;
-import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.visualization.arch.Image;
+import camp.computer.clay.model.architecture.Path;
+import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Point;
 import camp.computer.clay.visualization.util.Shape;
@@ -140,7 +140,7 @@ public class PathImage extends Image {
     }
 
     @Override
-    public boolean isTouching(Point point) {
+    public boolean contains(Point point) {
 
 //        if (isVisible()) {
 //            Log.v("Touch_", "FLOOOO");
@@ -165,31 +165,27 @@ public class PathImage extends Image {
         return false;
     }
 
-    public boolean isTouching (Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         return false;
     }
 
-    public static final String CLASS_NAME = "PATH_SPRITE";
-
     @Override
-    public void onTouchInteraction(Interaction interaction) {
+    public void onInteraction(Impression impression) {
 
-        if (interaction.getType() == Interaction.Type.NONE) {
-            // Log.v("onTouchInteraction", "Interaction.NONE to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.TOUCH) {
-            // Log.v("onTouchInteraction", "Interaction.TOUCH to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.TAP) {
-            // Log.v("onTouchInteraction", "Interaction.TAP to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.HOLD) {
-            // Log.v("onTouchInteraction", "Interaction.HOLD to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.MOVE) {
-            // Log.v("onTouchInteraction", "Interaction.MOVE to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.TWITCH) {
-            // Log.v("onTouchInteraction", "Interaction.TWITCH to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.DRAG) {
-            // Log.v("onTouchInteraction", "Interaction.DRAG to " + CLASS_NAME);
-        } else if (interaction.getType() == Interaction.Type.RELEASE) {
-            // Log.v("onTouchInteraction", "Interaction.RELEASE to " + CLASS_NAME);
+        if (impression.getType() == Impression.Type.NONE) {
+            // Log.v("onInteraction", "Impression.NONE to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.TOUCH) {
+            // Log.v("onInteraction", "Impression.TOUCH to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.TAP) {
+            // Log.v("onInteraction", "Impression.TAP to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.HOLD) {
+            // Log.v("onInteraction", "Impression.HOLD to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.MOVE) {
+            // Log.v("onInteraction", "Impression.MOVE to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.DRAG) {
+            // Log.v("onInteraction", "Impression.DRAG to " + CLASS_NAME);
+        } else if (impression.getType() == Impression.Type.RELEASE) {
+            // Log.v("onInteraction", "Impression.RELEASE to " + CLASS_NAME);
         }
     }
 }

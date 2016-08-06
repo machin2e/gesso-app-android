@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.arch;
+package camp.computer.clay.visualization.architecture;
 
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -11,11 +11,11 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.VisualizationSurface;
-import camp.computer.clay.model.arch.Model;
-import camp.computer.clay.model.arch.Simulation;
-import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.visualization.img.FrameImage;
-import camp.computer.clay.visualization.img.PortImage;
+import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Simulation;
+import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.visualization.image.FrameImage;
+import camp.computer.clay.visualization.image.PortImage;
 import camp.computer.clay.visualization.util.Geometry;
 import camp.computer.clay.visualization.util.Number;
 import camp.computer.clay.visualization.util.Point;
@@ -58,6 +58,7 @@ public class Visualization extends Image {
 
     public void addLayer(String tag) {
         if (!hasLayer(tag)) {
+            Log.v("Centering", "Adding LAYER: " + tag);
             Layer layer = new Layer(this);
             layer.setTag(tag);
             layers.add(layer);
@@ -211,9 +212,10 @@ public class Visualization extends Image {
 
     public ImageGroup getImages() {
         ImageGroup imageGroup = new ImageGroup();
-        for (Layer layer : getLayers()) {
-            for (Image layerImage : layer.getImages()) {
-                imageGroup.add(layerImage);
+        for (Integer index : getLayerIndices()) {
+            Layer layer = getLayer(index);
+            if (layer != null) {
+                imageGroup.add(layer.getImages());
             }
         }
         return imageGroup;
@@ -294,11 +296,11 @@ public class Visualization extends Image {
 
     public Image getImageByPosition(Point point) {
         for (Image image : getImages().filterVisibility(true).getList()) {
-            if (image.isTouching(point)) {
+            if (image.contains(point)) {
                 return image;
             }
         }
-        return null;
+        return this;
     }
 
     public Simulation getSimulation() {
@@ -428,16 +430,16 @@ public class Visualization extends Image {
     }
 
     @Override
-    public boolean isTouching(Point point) {
+    public boolean contains(Point point) {
         return false;
     }
 
     @Override
-    public boolean isTouching(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         return false;
     }
 
     @Override
-    public void onTouchInteraction(Interaction interaction) {
+    public void onInteraction(Impression impression) {
     }
 }

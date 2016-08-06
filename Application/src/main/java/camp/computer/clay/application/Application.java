@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import camp.computer.clay.model.interactivity.Interaction;
+import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
@@ -581,7 +581,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private void addPathPatchAction() {
 
         final TextView actionConstruct = new TextView(getContext());
-        actionConstruct.setText("Action (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
+        actionConstruct.setText("Impression (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
         int horizontalPadding = (int) convertDipToPx(20);
         int verticalPadding = (int) convertDipToPx(10);
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
@@ -642,7 +642,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private void startFullscreenService() {
         enableFullscreenService = true;
-        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Interaction.MINIMUM_HOLD_DURATION);
+        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Impression.MINIMUM_HOLD_DURATION);
     }
 
     public void stopFullscreenService() {

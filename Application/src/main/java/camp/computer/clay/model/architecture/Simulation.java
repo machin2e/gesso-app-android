@@ -1,4 +1,4 @@
-package camp.computer.clay.model.arch;
+package camp.computer.clay.model.architecture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,17 @@ public class Simulation extends Model {
 
     private List<Frame> frames = new ArrayList<>();
 
-    private List<Peripheral> peripherals = new ArrayList<>();
+    private List<Device> devices = new ArrayList<>();
+
+    private System system = new System();
+
+    public void setSystem(System system) {
+        this.system = system;
+    }
+
+    public System getSystem() {
+        return this.system;
+    }
 
     public void addFrame(Frame path) {
         this.frames.add(path);
@@ -43,16 +53,16 @@ public class Simulation extends Model {
         return paths;
     }
 
-    public void addPeripheral(Peripheral peripheral) {
-        this.peripherals.add(peripheral);
+    public void addDevice(Device device) {
+        this.devices.add(device);
     }
 
-    public Peripheral getPeripheral(int index) {
-        return this.peripherals.get(index);
+    public Device getDevice(int index) {
+        return this.devices.get(index);
     }
 
-    public List<Peripheral> getPeripherals() {
-        return this.peripherals;
+    public List<Device> getDevices() {
+        return this.devices;
     }
 
     public void addBody(Body body) {
