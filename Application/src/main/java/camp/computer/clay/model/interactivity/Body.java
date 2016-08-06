@@ -300,19 +300,19 @@ public class Body {
 
 //                        perspective.setScale(0.9f);
 
-                        if (interaction.getSize() > 1) {
+                    if (interaction.getSize() > 1) {
 
 //                            perspective.setOffset(
 //                                    impression.getPosition().getX() - interaction.getPrevious(impression).getPosition().getX(),
 //                                    impression.getPosition().getY() - interaction.getPrevious(impression).getPosition().getY()
 //                            );
 
-                            perspective.setOffset(
-                                    impression.getPosition().getX() - interaction.getFirst().getPosition().getX(),
-                                    impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
-                            );
+                        perspective.setOffset(
+                                impression.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+                                impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
+                        );
 
-                        }
+                    }
 
 //                    }
 
@@ -566,6 +566,7 @@ public class Body {
                                                 Log.v("Impression", "D.1");
 
                                                 Path path = new Path(sourcePort, targetPort);
+                                                path.setType(Path.Type.MESH);
                                                 sourcePort.addPath(path);
 
                                                 PathImage pathImage = new PathImage(path);
@@ -640,18 +641,11 @@ public class Body {
                         getPerspective().getVisualization().addLayer(layerTag);
                         Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
 
-                        // Image
+                        // Create Device Image
                         DeviceImage deviceImage = new DeviceImage(device);
                         deviceImage.setPosition(impression.getPosition());
-//                    deviceImage.setRotation();
+                        // deviceImage.setRotation();
                         deviceImage.setVisualization(getPerspective().getVisualization());
-
-                        // Port Images
-                        for (Port port : device.getPorts()) {
-                            PortImage portImage = new PortImage(port);
-                            portImage.setVisualization(getPerspective().getVisualization());
-                            getPerspective().getVisualization().addImage(port, portImage, "ports");
-                        }
 
                         double pathRotationAngle = Geometry.calculateRotationAngle(
                                 sourcePortImage.getPosition(),
@@ -659,15 +653,50 @@ public class Body {
                         );
                         deviceImage.setRotation(pathRotationAngle + 90);
 
-                        // Visualization
+                        // Create Port Images for each of Device's Ports
+                        for (Port port : device.getPorts()) {
+                            PortImage portImage = new PortImage(port);
+                            portImage.setVisualization(getPerspective().getVisualization());
+                            getPerspective().getVisualization().addImage(port, portImage, "ports");
+                        }
+
+                        // Add Device Image to Visualization
                         getPerspective().getVisualization().addImage(device, deviceImage, layerTag);
 
-//                    // Add a port sprite for each of the associated base's ports
-//                    for (Port port : device.getPorts()) {
-//                        PortImage portImage = new PortImage(port);
-//                        portImage.setVisualization(getPerspective().getVisualization());
-//                        getPerspective().getVisualization().addImage(port, portImage, "ports");
-//                    }
+                        // Configure Ports
+                        Port sourcePort = sourcePortImage.getPort();
+                        Port destinationPort = device.getPorts().get(0);
+
+                        if (sourcePort.getDirection() == Port.Direction.NONE) {
+                            sourcePort.setDirection(Port.Direction.OUTPUT);
+                        }
+//                        if (sourcePort.getType() == Port.Type.NONE) {
+                        //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                        sourcePort.setType(Port.Type.POWER_REFERENCE);
+//                        }
+
+                        destinationPort.setDirection(Port.Direction.INPUT);
+                        //destinationPort.setType(Port.Type.next(destinationPort.getType()));
+                        destinationPort.setType(sourcePort.getType());
+
+                        // Create Path
+                        Path path = new Path(sourcePortImage.getPort(), device.getPorts().get(0));
+                        path.setType(Path.Type.ELECTRONIC);
+                        sourcePort.addPath(path);
+
+                        PathImage pathImage = new PathImage(path);
+                        pathImage.setVisualization(perspective.getVisualization());
+                        perspective.getVisualization().addImage(path, pathImage, "paths");
+
+                        PortImage targetPortImage = (PortImage) perspective.getVisualization().getImage(path.getTarget());
+                        targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                        // Update Image
+                        sourcePortImage.setCandidatePathVisibility(false);
+                        sourcePortImage.setCandidatePeripheralVisibility(false);
+
+                        // Update Perspective
+                        perspective.focusOnPath(sourcePortImage.getPort());
 
                     }
 

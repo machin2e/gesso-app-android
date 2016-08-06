@@ -33,7 +33,7 @@ public class Port extends Model {
         SWITCH("switch"),
         PULSE("pulse"),
         WAVE("wave"),
-        POWER_COMMON("common"),
+        POWER_REFERENCE("reference"),
         POWER_CMOS("+3.3v"),
         POWER_TTL("+5v"); // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
 

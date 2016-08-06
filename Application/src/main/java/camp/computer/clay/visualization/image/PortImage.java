@@ -421,7 +421,7 @@ public class PortImage extends Image {
             // Add new samples for the type
             double sample = getSyntheticSample(0.0);
             portDataSamples[portDataSamples.length - 1] = sample;
-        } else if (port.getType() == Port.Type.POWER_COMMON) {
+        } else if (port.getType() == Port.Type.POWER_REFERENCE) {
             // Shift data to make room for new samples
             for (int k = 0; k < portDataSamples.length - 1; k++) {
                 portDataSamples[k] = portDataSamples[k + 1];

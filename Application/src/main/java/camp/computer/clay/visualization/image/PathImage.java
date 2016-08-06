@@ -47,7 +47,13 @@ public class PathImage extends Image {
             Canvas canvas = visualizationSurface.getCanvas();
             Paint paint = visualizationSurface.getPaint();
 
-            drawTrianglePath(canvas, paint);
+            // Draw path between ports with style dependant on path type
+            Path path = getPath();
+            if (path.getType() == Path.Type.MESH) {
+                drawTrianglePath(canvas, paint);
+            } else if (path.getType() == Path.Type.ELECTRONIC) {
+                drawLinePath(canvas, paint);
+            }
         }
     }
 
@@ -55,7 +61,7 @@ public class PathImage extends Image {
         return (Path) getModel();
     }
 
-    public void drawTrianglePath(Canvas mapCanvas, Paint paint) {
+    public void drawTrianglePath(Canvas canvas, Paint paint) {
 
         Path path = getPath();
 
@@ -98,7 +104,7 @@ public class PathImage extends Image {
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    mapCanvas,
+                    canvas,
                     paint
             );
 
@@ -108,7 +114,7 @@ public class PathImage extends Image {
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    mapCanvas,
+                    canvas,
                     paint
             );
 
@@ -119,10 +125,79 @@ public class PathImage extends Image {
                     pathStopPosition,
                     triangleWidth,
                     triangleHeight,
-                    mapCanvas,
+                    canvas,
                     paint
             );
         }
+    }
+
+    private void drawLinePath(Canvas canvas, Paint paint) {
+
+        Path path = getPath();
+
+        PortImage sourcePortImage = (PortImage) getVisualization().getImage(path.getSource());
+        PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
+
+        // Show target port
+        targetPortImage.setVisibility(true);
+        targetPortImage.setPathVisibility(true);
+
+        // Color
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(15.0f);
+        paint.setColor(sourcePortImage.getUniqueColor());
+
+        double pathRotationAngle = Geometry.calculateRotationAngle(
+                sourcePortImage.getPosition(),
+                targetPortImage.getPosition()
+        );
+
+        double triangleRotationAngle = pathRotationAngle + 90.0f;
+
+        Point pathStartPosition = Geometry.calculatePoint(
+                sourcePortImage.getPosition(),
+                pathRotationAngle,
+                2 * triangleSpacing
+        );
+
+        Point pathStopPosition = Geometry.calculatePoint(
+                targetPortImage.getPosition(),
+                pathRotationAngle + 180,
+                2 * triangleSpacing
+        );
+
+        if (showDocks) {
+
+            paint.setStyle(Paint.Style.FILL);
+            Shape.drawTriangle(
+                    pathStartPosition,
+                    triangleRotationAngle,
+                    triangleWidth,
+                    triangleHeight,
+                    canvas,
+                    paint
+            );
+
+            paint.setStyle(Paint.Style.FILL);
+            Shape.drawTriangle(
+                    pathStopPosition,
+                    triangleRotationAngle,
+                    triangleWidth,
+                    triangleHeight,
+                    canvas,
+                    paint
+            );
+
+        } else {
+
+            Shape.drawLine(
+                    pathStartPosition,
+                    pathStopPosition,
+                    canvas,
+                    paint
+            );
+        }
+
     }
 
     public void setVisibility(boolean isVisible) {
