@@ -1,7 +1,7 @@
 package camp.computer.clay.model.interactivity;
 
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.visualization.util.geometry.Point;
 
 public class Impression {
 

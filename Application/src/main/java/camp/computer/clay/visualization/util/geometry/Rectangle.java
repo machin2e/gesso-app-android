@@ -1,62 +1,34 @@
-package camp.computer.clay.visualization.util;
+package camp.computer.clay.visualization.util.geometry;
 
 import android.graphics.PointF;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Rectangle extends Shape {
 
-    // TODO: Replace with Point
-    private Point position = new Point(0, 0);
-
-    private double width = 0;
-    private double height = 0;
+    private double width = 1.0;
+    private double height = 1.0;
 
     public Rectangle(double width, double height) {
+        super();
         this.width = width;
         this.height = height;
     }
 
     public Rectangle(Point position, double width, double height) {
-        this.position.set(position);
+        super(position);
         this.width = width;
         this.height = height;
     }
 
     public Rectangle(double left, double top, double right, double bottom) {
+        super(new Point((right + left) / 2.0, (top + bottom) / 2.0));
         this.width = (right - left);
         this.height = (bottom - top);
-        this.position = new Point(
-                (right + left) / 2.0,
-                (top + bottom) / 2.0
-        );
     }
 
-    public Point getPosition() {
-        return position;
-    }
-
-    public void setPosition(PointF position) {
-        this.position.set(position.x, position.y);
-    }
-
-    public Point getTopLeft() {
-        return new Point(getLeft(), getTop());
-    }
-
-    public Point getTopRight() {
-        return new Point(getRight(), getTop());
-    }
-
-    public Point getBottomRight() {
-        return new Point(getRight(), getBottom());
-    }
-
-    public Point getBottomLeft() {
-        return new Point(getLeft(), getBottom());
-    }
-
-    public ArrayList<Point> getVertices() {
+    public List<Point> getVertices() {
         ArrayList<Point> vertices = new ArrayList<>();
         vertices.add(getTopLeft());
         vertices.add(getTopRight());
@@ -65,7 +37,7 @@ public class Rectangle extends Shape {
         return vertices;
     }
 
-    public ArrayList<Line> getSegments() {
+    public List<Line> getSegments() {
         ArrayList<Line> segments = new ArrayList<>();
         segments.add(new Line(getTopLeft(), getTopRight()));
         segments.add(new Line(getTopRight(), getBottomRight()));
@@ -104,6 +76,22 @@ public class Rectangle extends Shape {
 
     public double getBottom() {
         return this.position.getY() + (height / 2.0f);
+    }
+
+    public Point getTopLeft() {
+        return new Point(getLeft(), getTop());
+    }
+
+    public Point getTopRight() {
+        return new Point(getRight(), getTop());
+    }
+
+    public Point getBottomRight() {
+        return new Point(getRight(), getBottom());
+    }
+
+    public Point getBottomLeft() {
+        return new Point(getLeft(), getBottom());
     }
 
     public double getArea() {

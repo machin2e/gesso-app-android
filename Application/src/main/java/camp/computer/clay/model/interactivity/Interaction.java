@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.visualization.util.geometry.Point;
 
 /**
  * An interaction is a temporal sequence of one or more impressions.

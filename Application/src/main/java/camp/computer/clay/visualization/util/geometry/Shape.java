@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.util;
+package camp.computer.clay.visualization.util.geometry;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -7,7 +7,89 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.visualization.util.Visibility;
+
 public abstract class Shape {
+
+    protected Visibility visibility = Visibility.VISIBLE;
+
+    protected Point position = new Point(0, 0);
+
+    protected double rotation = 0;
+
+    public Shape() {
+    }
+
+    public Shape(Point position) {
+        this.position.set(position);
+    }
+
+    public Point getPosition() {
+        return position;
+    }
+
+    public void setPosition(Point position) {
+        this.position.set(position);
+    }
+
+    public void setRotation(double angle) {
+        this.rotation = angle;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
+    abstract public List<Point> getVertices();
+
+    abstract public List<Line> getSegments();
+
+    public boolean containsPoint(Point point) {
+        return Geometry.containsPoint(getVertices(), point);
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public boolean isVisible() {
+        return visibility == Visibility.VISIBLE;
+    }
+
+    public static List<Point> getRegularPolygon(Point position, double radius, int segmentCount) {
+
+        List<Point> vertices = new ArrayList<>();
+
+        android.graphics.Path path = new android.graphics.Path();
+        for (int i = 0; i < segmentCount; i++) {
+
+            Point vertexPosition = new Point(
+                    (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)),
+                    (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount))
+            );
+
+            vertices.add(vertexPosition);
+
+            // Draw points in shape
+            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+            if (i == 0) {
+                path.moveTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
+            }
+
+            path.lineTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
+        }
+
+        path.close();
+
+        return vertices;
+    }
+
+
+    //----- OLD -----
 
     public static void drawTriangle(Point position, double angle, double width, double height, Canvas canvas, Paint paint) {
 
@@ -137,9 +219,10 @@ public abstract class Shape {
 
     /**
      * Draw regular shape.
-     *
+     * <p>
      * Reference:
      * - https://en.wikipedia.org/wiki/Regular_polygon
+     *
      * @param position
      * @param radius
      * @param sideCount

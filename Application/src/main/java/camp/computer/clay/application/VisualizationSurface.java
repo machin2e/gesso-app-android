@@ -15,7 +15,7 @@ import android.view.SurfaceView;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.model.interactivity.Body;
 import camp.computer.clay.visualization.architecture.Visualization;
-import camp.computer.clay.visualization.util.Point;
+import camp.computer.clay.visualization.util.geometry.Point;
 
 public class VisualizationSurface extends SurfaceView implements SurfaceHolder.Callback {
 

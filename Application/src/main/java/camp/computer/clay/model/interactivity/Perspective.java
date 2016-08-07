@@ -9,17 +9,17 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.architecture.ImageGroup;
+import camp.computer.clay.visualization.architecture.ImageSet;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PathImage;
 import camp.computer.clay.visualization.image.PortImage;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Rectangle;
+import camp.computer.clay.visualization.util.geometry.Geometry;
+import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Rectangle;
 import camp.computer.clay.visualization.util.Time;
-import camp.computer.clay.visualization.image.Visibility;
+import camp.computer.clay.visualization.util.Visibility;
 
 public class Perspective {
 
@@ -234,7 +234,7 @@ public class Perspective {
         PortImage portImage = (PortImage) impression.getTargetImage();
 
         // Show ports of nearby forms
-        ImageGroup nearbyImages = getVisualization().getImages().filterType(FrameImage.class).filterDistance(impression.getPosition(), 200 + 60);
+        ImageSet nearbyImages = getVisualization().getImages().filterType(FrameImage.class).filterProximity(impression.getPosition(), 200 + 60);
         for (Image image : getVisualization().getImages().filterType(FrameImage.class).getList()) {
 
             if (image == portImage.getParentImage() || nearbyImages.contains(image)) {
@@ -271,7 +271,7 @@ public class Perspective {
             portImage.showPaths();
 
             // Adjust perspective
-            setPosition(getVisualization().getImages().filterType(FrameImage.class).calculateCenter());
+            setPosition(getVisualization().getImages().filterType(FrameImage.class).getCenterPoint());
             setScale(0.6f); // Zoom out to show overview
 
         }
@@ -329,7 +329,7 @@ public class Perspective {
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
-            ImageGroup otherFormImages = getVisualization().getImages().filterType(FrameImage.class).remove(frameImage);
+            ImageSet otherFormImages = getVisualization().getImages().filterType(FrameImage.class).remove(frameImage);
             for (Image image : otherFormImages.getList()) {
                 FrameImage otherFrameImage = (FrameImage) image;
                 otherFrameImage.hidePortImages();
@@ -477,7 +477,7 @@ public class Perspective {
 
         adjustScale();
 
-        //getPerspective().setPosition(getPerspective().getVisualization().getList().filterType(FrameImage.TYPE).calculateCentroid());
+        //getPerspective().setPosition(getPerspective().getVisualization().getList().filterType(FrameImage.TYPE).getCentroidPoint());
         setPosition(formImagesCenterPosition);
 
         // Reset map interaction

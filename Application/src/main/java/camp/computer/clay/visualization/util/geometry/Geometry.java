@@ -1,10 +1,9 @@
-package camp.computer.clay.visualization.util;
+package camp.computer.clay.visualization.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.architecture.Visualization;
 
 public abstract class Geometry {
@@ -375,7 +374,7 @@ public abstract class Geometry {
                         sortedPositions.get(j).getY() - sortedPositions.get(i).getY()
                 );
 
-                double r = (sortedImages.get(i).getShape().getWidth() / 2.0f) + (sortedImages.get(i).getShape().getWidth() / 2.0f);
+                double r = (sortedImages.get(i).getBoundingRectangle().getWidth() / 2.0f) + (sortedImages.get(i).getBoundingRectangle().getWidth() / 2.0f);
 
                 // Length squared = (dx * dx) + (dy * dy);
                 double vectorABLength = Geometry.calculateDistance(sortedPositions.get(i), sortedPositions.get(j));
@@ -580,6 +579,47 @@ public abstract class Geometry {
 //        return sortedList;
 //
 //    }
+
+    /**
+     * General-purpose function that returns true if the given point is contained inside the shape
+     * defined by the boundary points.
+     *
+     * @param vertices The vertices defining the boundary polygon
+     * @param point    The point to check
+     * @return true If the point is inside the boundary, false otherwise
+     * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Point Inclusion in Polygon Test (W. Randolph Franklin)</a>
+     */
+    public static boolean containsPoint(List<Point> vertices, Point point) {
+
+        // Setup
+        double minX = vertices.get(0).getX();
+        double maxX = vertices.get(0).getX();
+        double minY = vertices.get(0).getY();
+        double maxY = vertices.get(0).getY();
+
+        for (int i = 1; i < vertices.size(); i++) {
+            Point q = vertices.get(i);
+            minX = Math.min(q.getX(), minX);
+            maxX = Math.max(q.getX(), maxX);
+            minY = Math.min(q.getY(), minY);
+            maxY = Math.max(q.getY(), maxY);
+        }
+
+        if (point.getX() < minX || point.getX() > maxX || point.getY() < minY || point.getY() > maxY) {
+            return false;
+        }
+
+        // Procedure
+        boolean isContained = false;
+        for (int i = 0, j = vertices.size() - 1; i < vertices.size(); j = i++) {
+            if ((vertices.get(i).getY() > point.getY()) != (vertices.get(j).getY() > point.getY()) &&
+                    point.getX() < (vertices.get(j).getX() - vertices.get(i).getX()) * (point.getY() - vertices.get(i).getY()) / (vertices.get(j).getY() - vertices.get(i).getY()) + vertices.get(i).getX()) {
+                isContained = !isContained;
+            }
+        }
+
+        return isContained;
+    }
 
     // TODO: Detect if a point falls within a shape defined by list of points.
     // TODO: (cont'd) - http://alienryderflex.com/polygon/

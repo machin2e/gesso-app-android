@@ -99,7 +99,7 @@ public class Clay {
 
 //    private void initializeSimulation() {
 //
-//        final int SIMULATED_FORM_COUNT = Number.generateRandomInteger(5, 10);
+//        final int SIMULATED_FORM_COUNT = Probability.generateRandomInteger(5, 10);
 //
 //        // <FORM_CONFIGURATION>
 //        // TODO: Read this from the device (or look up from form UUID). It will be encoded on

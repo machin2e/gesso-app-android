@@ -14,10 +14,11 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Rectangle;
-import camp.computer.clay.visualization.util.Shape;
+import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.visualization.util.geometry.Geometry;
+import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class FrameImage extends Image {
 
@@ -31,7 +32,7 @@ public class FrameImage extends Image {
     // TODO: Make these private once the map is working well and the sprite is working well.
 
     // Shapes
-    private Rectangle shape = new Rectangle(250, 250);
+    private Rectangle boardShape = new Rectangle(250, 250);
 
     // Color, Transparency
     private String colorString = "f7f7f7"; // "404040"; // "414141";
@@ -62,6 +63,12 @@ public class FrameImage extends Image {
 
     public FrameImage(Frame frame) {
         super(frame);
+
+        // Create shapes for image
+        boardShape = new Rectangle(250, 250);
+
+        addShape(boardShape);
+
     }
 
     public void setupPortImages() {
@@ -130,14 +137,10 @@ public class FrameImage extends Image {
             if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
                 visualizationSurface.getPaint().setColor(Color.GREEN);
                 visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                Shape.drawCircle(getPosition(), shape.getWidth(), 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
-                Shape.drawCircle(getPosition(), shape.getWidth() / 2.0f, 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                Shape.drawCircle(getPosition(), boardShape.getWidth(), 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                Shape.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
             }
         }
-    }
-
-    public Rectangle getShape() {
-        return this.shape;
     }
 
     private void drawBoardImage(VisualizationSurface visualizationSurface) {
@@ -148,14 +151,14 @@ public class FrameImage extends Image {
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.color);
-        Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
+        Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
 
         // Outline
         if (this.outlineVisibility) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.outlineColor);
             paint.setStrokeWidth((float) outlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
+            Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
         }
     }
 
@@ -166,18 +169,18 @@ public class FrameImage extends Image {
         // Positions before rotation
         portGroupCenterPositions[0] = new Point(
                 getPosition().getX() + 0,
-                getPosition().getY() + ((shape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
+                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
         portGroupCenterPositions[1] = new Point(
-                getPosition().getX() + ((shape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
+                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().getY() + 0
         );
         portGroupCenterPositions[2] = new Point(
                 getPosition().getX() + 0,
-                getPosition().getY() - ((shape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
+                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (portGroupHeight / 2.0f))
         );
         portGroupCenterPositions[3] = new Point(
-                getPosition().getX() - ((shape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
+                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (portGroupHeight / 2.0f)),
                 getPosition().getY() + 0
         );
         // </SHAPE>
@@ -219,53 +222,53 @@ public class FrameImage extends Image {
         // <SHAPE>
         lightCenterPositions[0] = new Point(
                 getPosition().getX() + (-20),
-                getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[1] = new Point(
                 getPosition().getX() + (0),
-                getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[2] = new Point(
                 getPosition().getX() + (+20),
-                getPosition().getY() + ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
         lightCenterPositions[3] = new Point(
-                getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (+20)
         );
         lightCenterPositions[4] = new Point(
-                getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (0)
         );
         lightCenterPositions[5] = new Point(
-                getPosition().getX() + ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (-20)
         );
 
         lightCenterPositions[6] = new Point(
                 getPosition().getX() + (+20),
-                getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[7] = new Point(
                 getPosition().getX() + (0),
-                getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
         lightCenterPositions[8] = new Point(
                 getPosition().getX() + (-20),
-                getPosition().getY() - ((shape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
         );
 
         lightCenterPositions[9] = new Point(
-                getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (-20)
         );
         lightCenterPositions[10] = new Point(
-                getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (0)
         );
         lightCenterPositions[11] = new Point(
-                getPosition().getX() - ((shape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
                 getPosition().getY() + (+20)
         );
 
@@ -349,7 +352,7 @@ public class FrameImage extends Image {
 
     public boolean containsPoint(Point point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f);
+            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
         } else {
             return false;
         }
@@ -357,7 +360,7 @@ public class FrameImage extends Image {
 
     public boolean containsPoint(Point point, double padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.shape.getHeight() / 2.0f + padding);
+            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
         } else {
             return false;
         }

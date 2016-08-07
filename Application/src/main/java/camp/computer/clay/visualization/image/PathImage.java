@@ -7,9 +7,10 @@ import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Shape;
+import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.visualization.util.geometry.Geometry;
+import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PathImage extends Image {
 

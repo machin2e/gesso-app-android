@@ -15,7 +15,7 @@ import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PathImage;
 import camp.computer.clay.visualization.image.PortImage;
-import camp.computer.clay.visualization.util.Geometry;
+import camp.computer.clay.visualization.util.geometry.Geometry;
 
 public class Body {
 
@@ -338,8 +338,10 @@ public class Body {
 
                 // Frame
                 FrameImage frameImage = (FrameImage) impression.getTargetImage();
-                perspective.focusOnFrame(this, interaction, impression);
                 frameImage.apply(impression);
+
+                // Perspective
+                perspective.focusOnFrame(this, interaction, impression);
 
             } else if (impression.getTargetImage() instanceof PortImage) {
 
@@ -526,7 +528,7 @@ public class Body {
                                     nearbyFrameImage.getPosition()
                             );
 
-                            if (distanceToFrameImage < nearbyFrameImage.getShape().getHeight() + 50) {
+                            if (distanceToFrameImage < nearbyFrameImage.getBoundingRectangle().getHeight() + 50) {
 
                                 Log.v("Impression", "B");
 
@@ -605,7 +607,7 @@ public class Body {
 //                ArrayList<Port> pathPorts = port.getPorts(paths);
 //                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
 //                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
-//                Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
+//                Rectangle boundingBox = Geometry.getBoundingBox(pathPortPositions);
 //                getVisualization().getSimulation().getBody(0).getPerspective().adjustScale(boundingBox);
 //
 //                getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));

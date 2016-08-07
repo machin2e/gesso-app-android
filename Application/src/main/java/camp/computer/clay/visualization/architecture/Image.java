@@ -1,45 +1,23 @@
 package camp.computer.clay.visualization.architecture;
 
+import android.graphics.Rect;
+import android.util.Log;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import camp.computer.clay.application.VisualizationSurface;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.interactivity.Impression;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Rectangle;
-import camp.computer.clay.visualization.util.Shape;
-import camp.computer.clay.visualization.image.Visibility;
+import camp.computer.clay.visualization.util.geometry.Geometry;
+import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.visualization.util.geometry.Shape;
+import camp.computer.clay.visualization.util.Visibility;
 
 public abstract class Image {
 
-//    // <TYPE_INTERFACE>
-//    private String type = "Image";
-//
-//    public String getType() {
-//        return this.type;
-//    }
-//
-//    public void setType(String type) {
-//        this.type = type;
-//    }
-//
-//    public boolean isType(String... types) {
-//        if (types != null) {
-//            for (String type : types) {
-//                if (this.type.equals(type)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//    // <TYPE_INTERFACE>
-
-    private Shape shape = null;
-
-    // TODO: Replace this!
-    public Rectangle getShape() {
-        return null;
-    }
+    protected List<Shape> shapes = new LinkedList<>();
 
     protected Point position = new Point(); // Image position
 
@@ -56,12 +34,12 @@ public abstract class Image {
     // TODO: Replace with Body (touching it) or Body's Finger (or whatever Pointer, whatever).
     public boolean isTouched = false;
 
-    private Model model;
+    protected Model model;
 
-    private Visualization visualization;
+    protected Visualization visualization;
 
     // TODO: Make this an interface? Move interface out of class.
-    private ActionListener actionListener;
+    protected ActionListener actionListener;
 
     public Image(Model model) {
         this.model = model;
@@ -145,12 +123,33 @@ public abstract class Image {
         this.scale = scale;
     }
 
+    public boolean isVisible() {
+        return visibility == Visibility.VISIBLE;
+    }
+
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
     }
 
-    public boolean isVisible() {
-        return visibility == Visibility.VISIBLE;
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void addShape(Shape shape) {
+        shape.getPosition().setReferencePoint(getPosition());
+        shapes.add(shape);
+    }
+
+    public Shape getShape(int index) {
+        return shapes.get(index);
+    }
+
+    public List<Shape> getShapes() {
+        return shapes;
+    }
+
+    public Shape removeShape(int index) {
+        return shapes.remove(index);
     }
 
     public abstract void update();
@@ -178,6 +177,22 @@ public abstract class Image {
     public void setTransparency(final double transparency) {
         targetTransparency = transparency;
         currentTransparency = targetTransparency;
+    }
+
+    public Rectangle getBoundingRectangle() {
+
+        List<Point> pointList = new LinkedList<>();
+
+        for (Shape shape : shapes) {
+            pointList.addAll(shape.getVertices());
+        }
+
+        Log.v("Bounds", "vertex #: " + pointList.size());
+
+//        return Geometry.calculateBoundingBox(pointList);
+
+        return new Rectangle(250, 250);
+
     }
 
 }
