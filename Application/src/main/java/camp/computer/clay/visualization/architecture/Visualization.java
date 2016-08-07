@@ -17,18 +17,14 @@ import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.PortImage;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Number;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Rectangle;
-import camp.computer.clay.visualization.util.Shape;
+import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.visualization.util.Probability;
+import camp.computer.clay.visualization.util.geometry.Geometry;
+import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class Visualization extends Image {
-
-//    private <T> List<T> getModel(Class<T> type) {
-//        List<T> arrayList = new ArrayList<T>();
-//        return arrayList;
-//    }
 
     public static <T extends Image> List<Point> getPositions(List<T> images) {
         List<Point> positions = new ArrayList<>();
@@ -59,7 +55,6 @@ public class Visualization extends Image {
 
     public void addLayer(String tag) {
         if (!hasLayer(tag)) {
-            Log.v("Centering", "Adding LAYER: " + tag);
             Layer layer = new Layer(this);
             layer.setTag(tag);
             layers.add(layer);
@@ -82,7 +77,7 @@ public class Visualization extends Image {
 
         // Update perspective
 //        getSimulation().getBody(0).getPerspective().adjustScale(0);
-        // getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).calculateCenter());
+        // getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).getCenterPoint());
         getSimulation().getBody(0).getPerspective().adjustPosition();
     }
 
@@ -124,7 +119,7 @@ public class Visualization extends Image {
 
             position = Geometry.calculatePoint(
                     imagePositions.get(0),
-                    Number.generateRandomInteger(0, 360),
+                    Probability.generateRandomInteger(0, 360),
                     imageSeparationDistance
             );
 
@@ -132,7 +127,7 @@ public class Visualization extends Image {
 
             List<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
 
-            int sourceIndex = Number.generateRandomInteger(0, hullPoints.size() - 1);
+            int sourceIndex = Probability.generateRandomInteger(0, hullPoints.size() - 1);
             int targetIndex = sourceIndex + 1;
 
             Point midpoint = Geometry.calculateMidpoint(hullPoints.get(sourceIndex), hullPoints.get(targetIndex));
@@ -145,7 +140,7 @@ public class Visualization extends Image {
 
         // Assign the found position to the image
         image.setPosition(position);
-        image.setRotation(Number.getRandomGenerator().nextInt(360));
+        image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
     public Image getImage(Model model) {
@@ -211,19 +206,19 @@ public class Visualization extends Image {
         return images;
     }
 
-    public ImageGroup getImages() {
-        ImageGroup imageGroup = new ImageGroup();
+    public ImageSet getImages() {
+        ImageSet imageSet = new ImageSet();
         for (Integer index : getLayerIndices()) {
             Layer layer = getLayer(index);
             if (layer != null) {
-                imageGroup.add(layer.getImages());
+                imageSet.add(layer.getImages());
             }
         }
-        return imageGroup;
+        return imageSet;
     }
 
     public Image getImageByPosition(Point point) {
-        for (Image image : getImages().filterVisibility(true).getList()) {
+        for (Image image : getImages().filterVisibility(Visibility.VISIBLE).getList()) {
             if (image.containsPoint(point)) {
                 return image;
             }
@@ -268,13 +263,13 @@ public class Visualization extends Image {
             }
         }
 
-        Geometry.computeCirclePacking(getImages().filterType(FrameImage.class, PatchImage.class).getList(), 200, getImages().filterType(FrameImage.class, PatchImage.class).calculateCentroid());
+        Geometry.computeCirclePacking(getImages().filterType(FrameImage.class, PatchImage.class).getList(), 200, getImages().filterType(FrameImage.class, PatchImage.class).getCentroidPoint());
 
         // Draw annotations
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
 
             // <FPS_ANNOTATION>
-            Point fpsPosition = getImages().filterType(FrameImage.class).calculateCenter();
+            Point fpsPosition = getImages().filterType(FrameImage.class).getCenterPoint();
             fpsPosition.setY(fpsPosition.getY() - 200);
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
@@ -290,7 +285,7 @@ public class Visualization extends Image {
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            Point centroidPosition = getImages().filterType(FrameImage.class).calculateCentroid();
+            Point centroidPosition = getImages().filterType(FrameImage.class).getCentroidPoint();
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
             visualizationSurface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, visualizationSurface.getPaint());
@@ -338,7 +333,7 @@ public class Visualization extends Image {
             visualizationSurface.getPaint().setColor(Color.RED);
             visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = getImages().filterType(FrameImage.class).calculateBoundingBox();
+            Rectangle boundingBox = getImages().filterType(FrameImage.class).getBoundingBox();
             Shape.drawPolygon(boundingBox.getVertices(), visualizationSurface.getCanvas(), visualizationSurface.getPaint());
             // </BOUNDING_BOX>
         }

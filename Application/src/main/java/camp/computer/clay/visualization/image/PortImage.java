@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.image;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -17,10 +18,11 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Impression;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.architecture.Visualization;
-import camp.computer.clay.visualization.util.Geometry;
-import camp.computer.clay.visualization.util.Point;
-import camp.computer.clay.visualization.util.Rectangle;
-import camp.computer.clay.visualization.util.Shape;
+import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.visualization.util.geometry.Geometry;
+import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PortImage extends Image {
 
@@ -424,55 +426,59 @@ public class PortImage extends Image {
             Frame frame = frameImage.getFrame();
             // </TODO>
 
+            Rectangle boundingRectangle = getBoundingRectangle();
+
+            Log.v("BoundingRectangle", "boundary width: " + boundingRectangle.getWidth() + ", height: " + boundingRectangle.getHeight());
+
             // Ports
             double portRadius = 40.0f;
             Point[] relativePortPositions = new Point[frame.getPorts().size()];
             relativePortPositions[0] = new Point(
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[1] = new Point(
                     0,
-                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[2] = new Point(
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[3] = new Point(
-                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
             relativePortPositions[4] = new Point(
-                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     0
             );
             relativePortPositions[5] = new Point(
-                    +1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
             relativePortPositions[6] = new Point(
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[7] = new Point(
                     0,
-                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[8] = new Point(
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[9] = new Point(
-                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
             relativePortPositions[10] = new Point(
-                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     0
             );
             relativePortPositions[11] = new Point(
-                    -1 * ((frameImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
 

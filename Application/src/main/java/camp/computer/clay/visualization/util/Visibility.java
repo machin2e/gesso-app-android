@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.image;
+package camp.computer.clay.visualization.util;
 
 public enum Visibility {
 
