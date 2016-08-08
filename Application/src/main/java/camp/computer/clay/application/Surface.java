@@ -140,20 +140,20 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save ();
         canvas.translate (
-//                originPosition.x + visualization.getSimulation().getBody(0).getPerspective().getPosition().x + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-//                originPosition.y + visualization.getSimulation().getBody(0).getPerspective().getPosition().y - (float) Application.getDisplay().getSensorAdapter().getRotationX()
-                (float) originPosition.getX() + (float) visualization.getSimulation().getBody(0).getPerspective().getPosition().getX(),
-                (float) originPosition.getY() + (float) visualization.getSimulation().getBody(0).getPerspective().getPosition().getY()
+//                originPosition.x + visualization.getEnvironment().getBody(0).getPerspective().getPosition().x + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+//                originPosition.y + visualization.getEnvironment().getBody(0).getPerspective().getPosition().y - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+                (float) originPosition.getX() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getX(),
+                (float) originPosition.getY() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getY()
         );
         // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
         canvas.scale (
-                (float) visualization.getSimulation().getBody(0).getPerspective().getScale(),
-                (float) visualization.getSimulation().getBody(0).getPerspective().getScale()
+                (float) visualization.getEnvironment().getBody(0).getPerspective().getScale(),
+                (float) visualization.getEnvironment().getBody(0).getPerspective().getScale()
         );
         // </PERSPECTIVE>
 
-        // TODO: Get Simulation
-        // TODO: Get Simulation's selected Visualization
+        // TODO: Get Environment
+        // TODO: Get Environment's selected Visualization
 
         // Draw the background
         canvas.drawColor(Color.WHITE);
@@ -227,8 +227,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-        visualization.getSimulation().getBody(0).getPerspective().setWidth(screenWidth);
-        visualization.getSimulation().getBody(0).getPerspective().setHeight(screenHeight);
+        visualization.getEnvironment().getBody(0).getPerspective().setWidth(screenWidth);
+        visualization.getEnvironment().getBody(0).getPerspective().setHeight(screenHeight);
     }
 
     public Visualization getVisualization() {
@@ -265,7 +265,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Log.v("InteractionHistory", "Started touchPoints composition.");
 
         // Get active body
-        Body body = visualization.getSimulation().getBody(0);
+        Body body = visualization.getEnvironment().getBody(0);
 
         // Create touchPoints action
         Action action = new Action();
@@ -305,17 +305,17 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
                     action.setType(Action.Type.TOUCH);
                     action.pointerIndex = pointerId;
-                    body.onImpression(action);
+                    body.onAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the first touchPoints!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     action.setType(Action.Type.MOVE);
                     action.pointerIndex = pointerId;
-                    body.onImpression(action);
+                    body.onAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     action.setType(Action.Type.RELEASE);
                     action.pointerIndex = pointerId;
-                    body.onImpression(action);
+                    body.onAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the first touchPoints!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
@@ -380,6 +380,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     public static void drawRectangle(Point position, double angle, double width, double height, Surface surface) {
 
+        // TODO: Absolute rotate at 0,0; Translate with position. (or, make algorithm to translate WRT another reference point)
+
         Canvas canvas = surface.getCanvas();
         Paint paint = surface.getPaint();
 
@@ -390,10 +392,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         Point bottomLeft = new Point(position.getX() - (width / 2.0f), position.getY() + (height / 2.0f));
 
         // Calculate points after rotation
-        Point rotatedTopLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topLeft), (double) Geometry.calculateDistance(position, topLeft));
-        Point rotatedTopRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topRight), (double) Geometry.calculateDistance(position, topRight));
-        Point rotatedBottomRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomRight), (double) Geometry.calculateDistance(position, bottomRight));
-        Point rotatedBottomLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomLeft), (double) Geometry.calculateDistance(position, bottomLeft));
+        Point rotatedTopLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topLeft), Geometry.calculateDistance(position, topLeft));
+        Point rotatedTopRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topRight), Geometry.calculateDistance(position, topRight));
+        Point rotatedBottomRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomRight), Geometry.calculateDistance(position, bottomRight));
+        Point rotatedBottomLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomLeft), Geometry.calculateDistance(position, bottomLeft));
 
         // Draw points in shape
         android.graphics.Path path = new android.graphics.Path();

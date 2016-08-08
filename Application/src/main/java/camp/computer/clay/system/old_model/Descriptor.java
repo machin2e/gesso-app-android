@@ -56,7 +56,7 @@ public class Descriptor {
     }
 
     // TODO: diff detection to generate events.
-    // TODO: apply a copy of this tree, accepted as input (e.g., for an event), and compute changes to apply to make changes to this tree based on others
+    // TODO: processAction a copy of this tree, accepted as input (e.g., for an event), and compute changes to processAction to make changes to this tree based on others
 
     // TODO: Linked data. Support it. Consider using @ prefix. Research JSON-LD and RDFa.
     // TODO: Semantic relationships between entries. Add them.

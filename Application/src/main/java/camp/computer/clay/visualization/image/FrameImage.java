@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.image;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,6 @@ public class FrameImage extends Image {
     private String outlineColorString = "414141";
     private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
     private double outlineThickness = 3.0;
-    private double targetTransparency = 1.0;
-    private double currentTransparency = targetTransparency;
 
     private double portGroupWidth = 50;
     private double portGroupHeight = 13;
@@ -65,8 +64,11 @@ public class FrameImage extends Image {
 
         // Create shapes for image
         boardShape = new Rectangle(250, 250);
-
         addShape(boardShape);
+
+        Rectangle headerShape = new Rectangle(50, 50);
+        headerShape.setPosition(new Point(0, 125));
+        addShape(headerShape);
 
     }
 
@@ -86,9 +88,8 @@ public class FrameImage extends Image {
 
     public List<PortImage> getPortImages() {
         List<PortImage> portImages = new ArrayList<>();
-        Frame frame = getFrame();
 
-        for (Port port : frame.getPorts()) {
+        for (Port port : getFrame().getPorts()) {
             PortImage portImage = (PortImage) getVisualization().getImage(port);
             portImages.add(portImage);
         }
@@ -151,6 +152,9 @@ public class FrameImage extends Image {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.color);
         Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
+
+        paint.setColor(Color.BLUE);
+        Surface.drawRectangle(((Rectangle) shapes.get(1)).getPosition(), getRotation(), ((Rectangle) shapes.get(1)).getWidth(), ((Rectangle) shapes.get(1)).getHeight(), surface);
 
         // Outline
         if (this.outlineVisibility) {
@@ -366,7 +370,7 @@ public class FrameImage extends Image {
     }
 
     @Override
-    public void onImpression(Action action) {
+    public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
 
@@ -377,6 +381,7 @@ public class FrameImage extends Image {
             // Focus on touched form
             showPortImages();
             showPathImages();
+
             setTransparency(1.0);
 
             // TODO: Speak "choose a channel to get data."
@@ -384,7 +389,10 @@ public class FrameImage extends Image {
             // Show ports and paths of touched form
             for (PortImage portImage : getPortImages()) {
                 List<Path> paths = portImage.getPort().getGraph();
+                Log.v("TouchFrame", "\tpaths.size = " + paths.size());
                 for (Path path : paths) {
+                    Log.v("TouchFrame", "\t\tsource = " + path.getSource());
+                    Log.v("TouchFrame", "\t\ttarget = " + path.getTarget());
                     // Show ports
                     getVisualization().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
                     getVisualization().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);

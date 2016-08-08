@@ -70,15 +70,12 @@ public class Port extends Model {
         }
     }
 
-    public Path getPath(int index) {
-        return this.paths.get(index);
-    }
-
     public List<Path> getPaths() {
         return this.paths;
     }
 
     private Type type = Type.NONE;
+
     private Direction direction = Direction.NONE;
 
     public Type getType() {
@@ -116,44 +113,6 @@ public class Port extends Model {
      * @return List of paths in the graph containing the port.
      */
     public List<Path> getGraph() {
-
-//        Simulation simulation = (Simulation) getParent().getParent();
-//        //List<Path> paths = getPaths();
-//        List<Path> paths = simulation.getPaths();
-//        List<Path> ancestorPaths = new ArrayList<>();
-//        List<Path> descendantPaths = new ArrayList<>();
-//        List<Port> searchablePorts = new ArrayList<>();
-//
-//        // Seed port queue with the specified port
-//        searchablePorts.clear();
-//        searchablePorts.add(this);
-//
-//        // Search descendant paths from port
-//        while (searchablePorts.size() > 0) {
-//            Port dequeuedPort = searchablePorts.remove(0);
-//            for (Path path : dequeuedPort.getPaths()) {
-//                descendantPaths.add(path); // Store the path
-//                searchablePorts.add(path.getTarget()); // Queue the target port in the search
-//            }
-//        }
-//
-//        // Seed port queue with the specified port
-//        searchablePorts.clear();
-//        searchablePorts.add(this);
-//
-//        // Search ancestor paths from port
-//        while (searchablePorts.size() > 0) {
-//            Port dequeuedPort = searchablePorts.remove(0);
-//
-//            // Search for direct ancestor paths from port
-//            for (Path path : paths) {
-//                if (path.getTarget() == dequeuedPort) {
-//                    ancestorPaths.add(path); // Store the path
-//                    searchablePorts.add(path.getSource()); // Queue the source port in the search
-//                }
-//            }
-//        }
-
         List<Path> connectedPaths = new ArrayList<>();
         connectedPaths.addAll(getAncestorPaths());
         connectedPaths.addAll(getDescendantPaths());
@@ -162,9 +121,9 @@ public class Port extends Model {
 
     public List<Path> getAncestorPaths() {
 
-        Simulation simulation = (Simulation) getParent().getParent();
+        Environment environment = (Environment) getParent().getParent();
         //List<Path> paths = getPaths();
-        List<Path> paths = simulation.getPaths();
+        List<Path> paths = environment.getPaths();
 
         List<Path> ancestorPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -195,7 +154,7 @@ public class Port extends Model {
 
     public List<Path> getDescendantPaths() {
 
-//        Simulation simulation = (Simulation) getParent().getParent();
+//        Environment simulation = (Environment) getParent().getParent();
 //        //List<Path> paths = getPaths();
 //        List<Path> paths = simulation.getPaths();
         List<Path> descendantPaths = new ArrayList<>();

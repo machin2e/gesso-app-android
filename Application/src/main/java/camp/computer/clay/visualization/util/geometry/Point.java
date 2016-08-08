@@ -17,7 +17,7 @@ public class Point {
     private double y = 0;
 
     /**
-     * Rotation angle in degrees
+     * Rotation rotation in degrees
      */
     // TODO: Refactor so 0 degrees faces upward, not right.
     public Point() {

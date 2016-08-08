@@ -18,18 +18,15 @@ public abstract class Image {
 
     protected Point position = new Point(); // Image position
 
-    // TODO: Move scale into list of points defining shape. Draw on "unit canvas (scale 1.0)", and set scale. Recomputing happens automatically!
     protected double scale = 1.0f; // Image scale factor
 
-    protected double angle = 0.0f; // Image heading rotation
-
-    protected double targetTransparency = 1.0;
-    protected double currentTransparency = targetTransparency;
+    protected double rotation = 0.0f; // Image heading rotation
 
     protected Visibility visibility = Visibility.VISIBLE;
 
-    // TODO: Replace with Body (touching it) or Body's Finger (or whatever Pointer, whatever).
-    public boolean isTouched = false;
+    protected double targetTransparency = 1.0;
+
+    protected double currentTransparency = targetTransparency;
 
     protected Model model;
 
@@ -67,7 +64,7 @@ public abstract class Image {
     }
 
     public double getRotation() {
-        return angle;
+        return rotation;
     }
 
     public double getAbsoluteRotation() {
@@ -113,7 +110,7 @@ public abstract class Image {
     }
 
     public void setRotation(double angle) {
-        this.angle = angle;
+        this.rotation = angle;
     }
 
     public void setScale(double scale) {
@@ -160,20 +157,20 @@ public abstract class Image {
     public interface ActionListener {
     }
 
-    public abstract void onImpression(Action action);
+    public abstract void onAction(Action action);
 
-    // TODO: change this to addOnTouchListener (since have abstract onImpression)... and call at end of that
+    // TODO: change this to addOnTouchListener (since have abstract onAction)... and call at end of that
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 
-    public void apply(Action action) {
-        onImpression(action);
+    public void processAction(Action action) {
+        onAction(action);
     }
 
     public void setTransparency(final double transparency) {
-        targetTransparency = transparency;
-        currentTransparency = targetTransparency;
+        this.targetTransparency = transparency;
+        this.currentTransparency = transparency;
     }
 
     public Rectangle getBoundingRectangle() {

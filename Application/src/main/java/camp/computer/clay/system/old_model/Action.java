@@ -18,7 +18,7 @@ public class Action {
     private Script script;
 
     /**
-     * The state to apply to the behavior script (if any).
+     * The state to processAction to the behavior script (if any).
      */
 //    private State behaviorState;
 

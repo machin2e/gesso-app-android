@@ -1,6 +1,5 @@
 package camp.computer.clay.visualization.image;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
@@ -15,12 +14,10 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Rectangle;
-import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PatchImage extends Image {
 
@@ -166,12 +163,12 @@ public class PatchImage extends Image {
     }
 
     @Override
-    public void onImpression(Action action) {
+    public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
-            // Log.v("Action", "Action.NONE to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.TOUCH) {
-            // Log.v("Action", "Action.TOUCH to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.TAP) {
 
             Log.v("Action", "Tapped peripheral. Port image count: " + getPortImages().size());
@@ -187,22 +184,29 @@ public class PatchImage extends Image {
             for (PortImage portImage : getPortImages()) {
                 List<Path> paths = portImage.getPort().getGraph();
                 for (Path path : paths) {
+
                     // Show ports
                     getVisualization().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
                     getVisualization().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
+
                     // Show path
                     getVisualization().getImage(path).setVisibility(Visibility.VISIBLE);
                 }
             }
 
         } else if (action.getType() == Action.Type.HOLD) {
-            // Log.v("Action", "Action.HOLD to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.MOVE) {
-            // Log.v("Action", "Action.MOVE to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.DRAG) {
-            // Log.v("Action", "Action.DRAG to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.RELEASE) {
-            // Log.v("Action", "Action.RELEASE to " + CLASS_NAME);
+
+            // Update Image
+            PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
+            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+            sourcePortImage.setCandidatePeripheralVisibility(Visibility.INVISIBLE);
+
         }
     }
 }
