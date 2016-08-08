@@ -366,7 +366,7 @@ public class FrameImage extends Image {
     }
 
     @Override
-    public void onImpression(Action action) {
+    public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
 

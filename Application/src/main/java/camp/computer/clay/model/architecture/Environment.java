@@ -3,7 +3,10 @@ package camp.computer.clay.model.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Simulation extends Model {
+/**
+ * {@code Environment} is a simulation of the environmental context.
+ */
+public class Environment extends Model {
 
     private System system = new System();
 
@@ -12,6 +15,18 @@ public class Simulation extends Model {
     private List<Frame> frames = new ArrayList<>();
 
     private List<Patch> patches = new ArrayList<>();
+
+    public void addBody(Body body) {
+        this.bodies.add(body);
+    }
+
+    public Body getBody(int index) {
+        return this.bodies.get(index);
+    }
+
+    public List<Body> getBodies() {
+        return this.bodies;
+    }
 
     public void setSystem(System system) {
         this.system = system;
@@ -61,17 +76,5 @@ public class Simulation extends Model {
 
     public List<Patch> getPatches() {
         return this.patches;
-    }
-
-    public void addBody(Body body) {
-        this.bodies.add(body);
-    }
-
-    public Body getBody(int index) {
-        return this.bodies.get(index);
-    }
-
-    public List<Body> getBodies() {
-        return this.bodies;
     }
 }

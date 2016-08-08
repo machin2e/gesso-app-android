@@ -228,22 +228,22 @@ public class PathImage extends Image {
     }
 
     @Override
-    public void onImpression(Action action) {
+    public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
-            // Log.v("onImpression", "Action.NONE to " + CLASS_NAME);
+            // Log.v("onAction", "Action.NONE to " + CLASS_NAME);
         } else if (action.getType() == Action.Type.TOUCH) {
-            // Log.v("onImpression", "Action.TOUCH to " + CLASS_NAME);
+            // Log.v("onAction", "Action.TOUCH to " + CLASS_NAME);
         } else if (action.getType() == Action.Type.TAP) {
-            // Log.v("onImpression", "Action.TAP to " + CLASS_NAME);
+            // Log.v("onAction", "Action.TAP to " + CLASS_NAME);
         } else if (action.getType() == Action.Type.HOLD) {
-            // Log.v("onImpression", "Action.HOLD to " + CLASS_NAME);
+            // Log.v("onAction", "Action.HOLD to " + CLASS_NAME);
         } else if (action.getType() == Action.Type.MOVE) {
-            // Log.v("onImpression", "Action.MOVE to " + CLASS_NAME);
+            // Log.v("onAction", "Action.MOVE to " + CLASS_NAME);
         } else if (action.getType() == Action.Type.DRAG) {
-            // Log.v("onImpression", "Action.DRAG to " + CLASS_NAME);
+            // Log.v("onAction", "Action.DRAG to " + CLASS_NAME);
         } else if (action.getType() == Action.Type.RELEASE) {
-            // Log.v("onImpression", "Action.RELEASE to " + CLASS_NAME);
+            // Log.v("onAction", "Action.RELEASE to " + CLASS_NAME);
         }
     }
 }

@@ -1,6 +1,5 @@
 package camp.computer.clay.visualization.architecture;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -12,18 +11,23 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.Surface;
+import camp.computer.clay.model.architecture.Environment;
 import camp.computer.clay.model.architecture.Model;
-import camp.computer.clay.model.architecture.Simulation;
+import camp.computer.clay.model.architecture.Patch;
+import camp.computer.clay.model.architecture.Path;
+import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interactivity.Interaction;
+import camp.computer.clay.model.interactivity.Perspective;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PatchImage;
+import camp.computer.clay.visualization.image.PathImage;
 import camp.computer.clay.visualization.image.PortImage;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.Probability;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Rectangle;
-import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class Visualization extends Image {
 
@@ -37,8 +41,8 @@ public class Visualization extends Image {
 
     private List<Layer> layers = new ArrayList<>();
 
-    public Visualization(Simulation simulation) {
-        super(simulation);
+    public Visualization(Environment environment) {
+        super(environment);
         setup();
     }
 
@@ -77,9 +81,9 @@ public class Visualization extends Image {
         getLayer(layerTag).add(model, image);
 
         // Update perspective
-//        getSimulation().getBody(0).getPerspective().adjustScale(0);
-        // getSimulation().getBody(0).getPerspective().setPosition(getSimulation().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).getCenterPoint());
-        getSimulation().getBody(0).getPerspective().adjustPosition();
+//        getEnvironment().getBody(0).getPerspective().adjustScale(0);
+        // getEnvironment().getBody(0).getPerspective().setPosition(getEnvironment().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).getCenterPoint());
+        getEnvironment().getBody(0).getPerspective().adjustPosition();
     }
 
     public Layer getLayer(String tag) {
@@ -227,13 +231,13 @@ public class Visualization extends Image {
         return this;
     }
 
-    public Simulation getSimulation() {
-        return (Simulation) getModel();
+    public Environment getEnvironment() {
+        return (Environment) getModel();
     }
 
     public void update() {
 
-        getSimulation().getBody(0).getPerspective().update();
+        getEnvironment().getBody(0).getPerspective().update();
 
         for (Layer layer : getLayers()) {
             for (Image image : layer.getImages()) {
@@ -364,6 +368,368 @@ public class Visualization extends Image {
     }
 
     @Override
-    public void onImpression(Action action) {
+    public void onAction(Action action) {
+
+        if (action.getType() == Action.Type.NONE) {
+
+        } else if (action.getType() == Action.Type.TOUCH) {
+
+        } else if (action.getType() == Action.Type.TAP) {
+
+        } else if (action.getType() == Action.Type.HOLD) {
+
+        } else if (action.getType() == Action.Type.MOVE) {
+
+        } else if (action.getType() == Action.Type.DRAG) {
+
+        } else if (action.getType() == Action.Type.RELEASE) {
+
+            Perspective perspective = action.getBody().getPerspective();
+
+            PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
+
+            if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
+
+                // Model
+                Patch patch = new Patch();
+                patch.setParent(getEnvironment());
+
+                // Add port to model
+                for (int j = 0; j < 3; j++) {
+                    Port port = new Port();
+                    patch.addPort(port);
+                }
+
+                getEnvironment().addPatch(patch);
+
+                // Visualization (Layer)
+                String layerTag = "peripherals";
+                addLayer(layerTag);
+                Layer defaultLayer = getLayer(layerTag);
+
+                // Create Patch Image
+                PatchImage patchImage = new PatchImage(patch);
+                patchImage.setPosition(action.getPosition());
+                // patchImage.setRotation();
+                patchImage.setVisualization(this);
+
+                double pathRotationAngle = Geometry.calculateRotationAngle(
+                        sourcePortImage.getPosition(),
+                        patchImage.getPosition()
+                );
+                patchImage.setRotation(pathRotationAngle + 90);
+
+                // Create Port Images for each of Patch's Ports
+                for (Port port : patch.getPorts()) {
+                    PortImage portImage = new PortImage(port);
+                    portImage.setVisualization(this);
+                    addImage(port, portImage, "ports");
+                }
+
+                // Add Patch Image to Visualization
+                addImage(patch, patchImage, layerTag);
+
+                // Configure Ports
+                Port sourcePort = sourcePortImage.getPort();
+                Port destinationPort = patch.getPorts().get(0);
+
+                if (sourcePort.getDirection() == Port.Direction.NONE) {
+                    sourcePort.setDirection(Port.Direction.OUTPUT);
+                }
+//                        if (sourcePort.getType() == Port.Type.NONE) {
+                //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                sourcePort.setType(Port.Type.POWER_REFERENCE);
+//                        }
+
+                destinationPort.setDirection(Port.Direction.INPUT);
+                //destinationPort.setType(Port.Type.next(destinationPort.getType()));
+                destinationPort.setType(sourcePort.getType());
+
+                // Create Path
+                Path path = new Path(sourcePortImage.getPort(), patch.getPorts().get(0));
+                path.setType(Path.Type.ELECTRONIC);
+                sourcePort.addPath(path);
+
+                PathImage pathImage = new PathImage(path);
+                pathImage.setVisualization(this);
+                addImage(path, pathImage, "paths");
+
+                PortImage targetPortImage = (PortImage) getImage(path.getTarget());
+                targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                // Update Perspective
+                perspective.focusOnPath(sourcePortImage.getPort());
+
+            }
+
+            // Update Image
+            sourcePortImage.setCandidatePathVisibility(false);
+            sourcePortImage.setCandidatePeripheralVisibility(false);
+
+        }
+    }
+
+    public void onTouchListener(Action action) {
+
+        Image targetImage = getImageByPosition(action.getPosition());
+        action.setTarget(targetImage);
+
+    }
+
+    public void onHoldListener(Action action) {
+
+        Interaction interaction = action.getInteraction();
+
+        action.setType(Action.Type.HOLD);
+
+        Image targetImage = getImageByPosition(action.getPosition());
+        action.setTarget(targetImage);
+
+        interaction.isHolding[action.pointerIndex] = true;
+    }
+
+    public void onDragListener(Action action) {
+
+        Interaction interaction = action.getInteraction();
+
+        action.setType(Action.Type.DRAG);
+
+        Image targetImage = getImageByPosition(action.getPosition());
+        action.setTarget(targetImage);
+
+        Perspective perspective = action.getBody().getPerspective();
+
+        Log.v("onDragListener", "" + action.getType() + ": " + action.getTarget());
+
+        Log.v("Action", "onDrag");
+        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "processAction: " + action.getTarget());
+        Log.v("Action", "-");
+
+        if (interaction.getSize() > 1) {
+            action.setTarget(interaction.getFirst().getTarget());
+        }
+
+        interaction.isDragging[action.pointerIndex] = true;
+
+        // Holding
+        if (interaction.isHolding[action.pointerIndex]) {
+
+            // Holding and dragging
+
+            if (action.getTarget() instanceof FrameImage) {
+
+                // Frame
+                action.getTarget().processAction(action);
+                action.getTarget().setPosition(action.getPosition());
+
+                // Perspective
+                perspective.focusOnFrame(action);
+
+            } else if (action.getTarget() instanceof PortImage) {
+
+                // Port
+
+                PortImage portImage = (PortImage) action.getTarget();
+
+                portImage.setDragging(true);
+                portImage.setPosition(action.getPosition());
+
+            } else if (action.getTarget() instanceof Visualization) {
+
+                // Visualization
+
+                if (perspective.isAdjustable()) {
+
+//                        perspective.setScale(0.9f);
+//                        perspective.setOffset(
+//                                action.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+//                                action.getPosition().getY() - interaction.getFirst().getPosition().getY()
+//                        );
+
+                    perspective.focusOnVisualization(interaction);
+
+                }
+
+            }
+
+        } else {
+
+            // Not holding. Drag was detected prior to the hold duration threshold.
+
+            if (action.getTarget() instanceof FrameImage) {
+
+                // Frame
+                action.getTarget().processAction(action);
+                action.getTarget().setPosition(action.getPosition());
+
+                // Perspective
+                perspective.focusOnFrame(action);
+
+            } else if (action.getTarget() instanceof PortImage) {
+
+                // Port
+                PortImage portImage = (PortImage) action.getTarget();
+                portImage.processAction(action);
+
+                // Perspective
+                perspective.focusOnNewPath(interaction, action);
+
+            } else if (action.getTarget() instanceof PatchImage) {
+
+                // Patch
+                action.getTarget().setPosition(action.getPosition());
+                action.getTarget().processAction(action);
+
+            } else if (action.getTarget() instanceof Visualization) {
+
+                // Perspective
+                if (interaction.getSize() > 1) {
+                    perspective.setOffset(
+                            action.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+                            action.getPosition().getY() - interaction.getFirst().getPosition().getY()
+                    );
+
+                }
+
+            }
+        }
+    }
+
+    public void onTapListener(Action action) {
+
+        Interaction interaction = action.getInteraction();
+
+        action.setType(Action.Type.TAP);
+
+        Image targetImage = getImageByPosition(action.getPosition());
+        action.setTarget(targetImage);
+
+        Perspective perspective = action.getBody().getPerspective();
+
+        Log.v("Action", "onTap");
+        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "processAction: " + action.getTarget());
+        Log.v("Action", "-");
+
+        if (action.getTarget() instanceof FrameImage) {
+
+            // Frame
+            action.getTarget().processAction(action);
+
+            // Perspective
+            perspective.focusOnFrame(action);
+
+        } else if (action.getTarget() instanceof PortImage) {
+
+            // Port
+            action.getTarget().processAction(action);
+
+        } else if (action.getTarget() instanceof PathImage) {
+
+            // Path
+            action.getTarget().processAction(action);
+
+        } else if (action.getTarget() instanceof PatchImage) {
+
+            // Patch
+            action.getTarget().processAction(action);
+
+        } else if (action.getTarget() instanceof Visualization) {
+
+            // Visualization
+            action.getTarget().processAction(action);
+
+            // Perspective
+            perspective.focusReset();
+
+        }
+
+    }
+
+    public void onReleaseListener(Action action) {
+
+        Interaction interaction = action.getInteraction();
+
+        action.setType(Action.Type.RELEASE);
+
+        Image targetImage = getImageByPosition(action.getPosition());
+        action.setTarget(targetImage);
+
+        Perspective perspective = action.getBody().getPerspective();
+
+        Log.v("Action", "onRelease");
+        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "processAction: " + action.getTarget());
+        Log.v("Action", "-");
+
+        // First processAction was on a frame image...
+        if (interaction.getFirst().getTarget() instanceof FrameImage) {
+
+            if (action.getTarget() instanceof FrameImage) {
+
+                // If first processAction was on the same form, then respond
+                if (interaction.getFirst().isTouching() && interaction.getFirst().getTarget() instanceof FrameImage) {
+
+                    // Frame
+                    action.getTarget().processAction(action);
+
+                    // Perspective
+                    perspective.focusReset();
+                }
+
+            }
+
+        } else if (interaction.getFirst().getTarget() instanceof PortImage) {
+
+            // First processAction was on a port image...
+
+            if (action.getTarget() instanceof FrameImage) {
+
+                // ...last processAction was on a frame image.
+
+                PortImage sourcePortImage = (PortImage) interaction.getFirst().getTarget();
+                sourcePortImage.setCandidatePathVisibility(false);
+
+            } else if (action.getTarget() instanceof PortImage) {
+
+                // Port
+                action.getTarget().processAction(action);
+
+            } else if (action.getTarget() instanceof PatchImage) {
+
+                // Patch
+                action.getTarget().processAction(action);
+
+            } else if (action.getTarget() instanceof Visualization) {
+
+                action.getTarget().processAction(action);
+
+            }
+
+        } else if (interaction.getFirst().getTarget() instanceof PathImage) {
+
+            // Path --> ?
+
+            if (action.getTarget() instanceof PathImage) {
+                // Path --> Path
+                PathImage pathImage = (PathImage) action.getTarget();
+            }
+
+        } else if (interaction.getFirst().getTarget() instanceof Visualization) {
+
+            // Visualization --> ?
+
+            // Check if first processAction was on an image
+            if (interaction.getFirst().getTarget() instanceof PortImage) {
+                ((PortImage) interaction.getFirst().getTarget()).setCandidatePathVisibility(false);
+            }
+
+            perspective.focusReset();
+
+        }
+
+        // Interaction
+        perspective.setAdjustability(true);
     }
 }

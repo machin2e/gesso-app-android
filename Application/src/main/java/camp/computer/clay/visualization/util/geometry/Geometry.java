@@ -21,7 +21,7 @@ public abstract class Geometry {
     }
 
     /**
-     * Calculates the angle from source to target in degrees.
+     * Calculates the rotation from source to target in degrees.
      * The return should range from [0,360), rotating CLOCKWISE,
      * 0 and 360 degrees represents NORTH,
      * 90 degrees represents EAST, etc...
@@ -31,34 +31,34 @@ public abstract class Geometry {
      * on all arguments before passing them  to this function.
      *
      * @param source Point we are rotating around.
-     * @param target Point to which we want to calculate the angle, relative to the center point.
-     * @return angle in degrees.  This is the angle from centerPt to targetPt.
+     * @param target Point to which we want to calculate the rotation, relative to the center point.
+     * @return rotation in degrees.  This is the rotation from centerPt to targetPt.
      */
     public static double calculateRotationAngle(Point source, Point target) {
 
-        // calculate the angle theta from the deltaY and deltaX values
+        // calculate the rotation theta from the deltaY and deltaX values
         // (atan2 returns radians values from [-PI,PI])
         // 0 currently points EAST.
         // NOTE: By preserving Y and X param order to atan2,  we are expecting
-        // a CLOCKWISE angle direction.
+        // a CLOCKWISE rotation direction.
         double theta = Math.atan2(target.getY() - source.getY(), target.getX() - source.getX());
 
-        // rotate the theta angle clockwise by 90 degrees
+        // rotate the theta rotation clockwise by 90 degrees
         // (this makes 0 point NORTH)
-        // NOTE: adding to an angle rotates it clockwise.
+        // NOTE: adding to an rotation rotates it clockwise.
         // subtracting would rotate it counter-clockwise
 //        theta += Math.PI / 2.0;
 
         // convert from radians to degrees
-        // this will give you an angle from [0->270],[-180,0]
+        // this will give you an rotation from [0->270],[-180,0]
         double angle = Math.toDegrees(theta);
 
         // convert to positive range [0-360)
         // since we want to prevent negative angles, adjust them now.
         // we can assume that atan2 will not return a negative value
         // greater than one partial rotation
-//        if (angle < 0) {
-//            angle += 360;
+//        if (rotation < 0) {
+//            rotation += 360;
 //        }
 
         return (double) angle;

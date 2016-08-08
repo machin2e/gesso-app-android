@@ -48,7 +48,7 @@ public class Perspective {
     private Visualization visualization;
 
     // Focus in Perspective
-    // TODO: Infer this from interaction history/perspective
+    // TODO: Infer this from thisInteraction history/perspective
     private Image focusImage = null;
 
     private boolean isAdjustable = true;
@@ -232,7 +232,7 @@ public class Perspective {
 
     public void focusOnNewPath(Interaction interaction, Action action) {
 
-        PortImage portImage = (PortImage) action.getTargetImage();
+        PortImage portImage = (PortImage) action.getTarget();
 
         // Show ports of nearby forms
         ImageSet nearbyImages = getVisualization().getImages().filterType(FrameImage.class).filterProximity(action.getPosition(), 200 + 60);
@@ -279,8 +279,8 @@ public class Perspective {
 
                     /*
                     // Show the ports in the path
-                    List<Path> portPaths = getPerspective().getVisualization().getSimulation().getGraph(port);
-                    List<Port> portConnections = getPerspective().getVisualization().getSimulation().getPorts(portPaths);
+                    List<Path> portPaths = getPerspective().getVisualization().getEnvironment().getGraph(port);
+                    List<Port> portConnections = getPerspective().getVisualization().getEnvironment().getPorts(portPaths);
                     for (Port portConnection: portConnections) {
                         PortImage portImageConnection = (PortImage) getPerspective().getVisualization().getImage(portConnection);
                         portImageConnection.setVisibility(true);
@@ -299,7 +299,10 @@ public class Perspective {
         setOffset(interaction.offsetX, interaction.offsetY);
     }
 
-    public void focusOnFrame(Body body, Interaction interaction, Action action) {
+    public void focusOnFrame(Action action) {
+
+        Body body = action.getBody();
+        Interaction interaction = action.getInteraction();
 
         if (interaction.isDragging()) {
 
@@ -309,7 +312,7 @@ public class Perspective {
 
         } else {
 
-            FrameImage frameImage = (FrameImage) action.getTargetImage();
+            FrameImage frameImage = (FrameImage) action.getTarget();
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
@@ -324,13 +327,13 @@ public class Perspective {
             Interaction previousInteraction = null;
             if (body.interactions.size() > 1) {
                 previousInteraction = body.interactions.get(body.interactions.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousInteraction.getFirst().getTargetImage());
-                Log.v("PreviousTouch", "Current: " + action.getTargetImage());
+                Log.v("PreviousTouch", "Previous: " + previousInteraction.getFirst().getTarget());
+                Log.v("PreviousTouch", "Current: " + action.getTarget());
             }
 
             // Perspective
             if (frameImage.getFrame().getPaths().size() > 0
-                    && (previousInteraction != null && previousInteraction.getFirst().getTargetImage() != action.getTargetImage())) {
+                    && (previousInteraction != null && previousInteraction.getFirst().getTarget() != action.getTarget())) {
 
                 Log.v("Touch_", "A");
 
@@ -377,7 +380,7 @@ public class Perspective {
                 Log.v("Touch_", "B");
 
                 // Do this on second press, or when none of the machine's ports have paths.
-                // This provides lookahead, so you can be triggered to apply again to recover
+                // This provides lookahead, so you can be triggered to processAction again to recover
                 // the perspective.
 
                 for (PortImage portImage : frameImage.getPortImages()) {
@@ -464,7 +467,7 @@ public class Perspective {
         //getPerspective().setPosition(getPerspective().getVisualization().getList().filterType(FrameImage.TYPE).getCentroidPoint());
         setPosition(formImagesCenterPosition);
 
-        // Reset map interaction
+        // Reset map thisInteraction
         setAdjustability(true);
 
     }

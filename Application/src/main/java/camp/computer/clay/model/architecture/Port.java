@@ -117,7 +117,7 @@ public class Port extends Model {
      */
     public List<Path> getGraph() {
 
-//        Simulation simulation = (Simulation) getParent().getParent();
+//        Environment simulation = (Environment) getParent().getParent();
 //        //List<Path> paths = getPaths();
 //        List<Path> paths = simulation.getPaths();
 //        List<Path> ancestorPaths = new ArrayList<>();
@@ -162,9 +162,9 @@ public class Port extends Model {
 
     public List<Path> getAncestorPaths() {
 
-        Simulation simulation = (Simulation) getParent().getParent();
+        Environment environment = (Environment) getParent().getParent();
         //List<Path> paths = getPaths();
-        List<Path> paths = simulation.getPaths();
+        List<Path> paths = environment.getPaths();
 
         List<Path> ancestorPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -195,7 +195,7 @@ public class Port extends Model {
 
     public List<Path> getDescendantPaths() {
 
-//        Simulation simulation = (Simulation) getParent().getParent();
+//        Environment simulation = (Environment) getParent().getParent();
 //        //List<Path> paths = getPaths();
 //        List<Path> paths = simulation.getPaths();
         List<Path> descendantPaths = new ArrayList<>();

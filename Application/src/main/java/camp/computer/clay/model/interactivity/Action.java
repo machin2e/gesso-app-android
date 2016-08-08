@@ -2,6 +2,7 @@ package camp.computer.clay.model.interactivity;
 
 import camp.computer.clay.model.architecture.Body;
 import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.util.Time;
 import camp.computer.clay.visualization.util.geometry.Point;
 
 public class Action {
@@ -50,7 +51,7 @@ public class Action {
     public int pointerIndex = -1;
 
     public Action() {
-        this.timestamp = java.lang.System.currentTimeMillis();
+        this.timestamp = Time.getCurrentTime();
         setup();
     }
 
@@ -113,11 +114,11 @@ public class Action {
         return this.touchedImage[fingerIndex] != null;
     }
 
-    public void setTargetImage(int fingerIndex, Image image) {
+    public void setTarget(int fingerIndex, Image image) {
         this.touchedImage[fingerIndex] = image;
     }
 
-    public Image getTargetImage(int fingerIndex) {
+    public Image getTarget(int fingerIndex) {
         return this.touchedImage[fingerIndex];
     }
 
@@ -125,14 +126,14 @@ public class Action {
         return isTouching(0);
     }
 
-    public void setTargetImage(Image image) {
-        setTargetImage(0, image);
+    public void setTarget(Image image) {
+        setTarget(0, image);
         if (image != null) {
             isTouching[0] = true;
         }
     }
 
-    public Image getTargetImage() {
-        return getTargetImage(0);
+    public Image getTarget() {
+        return getTarget(0);
     }
 }

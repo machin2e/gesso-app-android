@@ -9,41 +9,44 @@ import java.util.List;
 import camp.computer.clay.visualization.util.geometry.Point;
 
 /**
- * An interaction is a temporal sequence of one or more actions.
+ * An thisInteraction is a temporal sequence of one or more actions.
  */
 public class Interaction {
 
-    // TODO: Model this with a "touchPoints interaction envelope" or "interaction envelope".
-    // TODO: Model voice interaction in the same way. Generify to Interaction<T> or subclass.
+    // TODO: Model this with a "touchPoints thisInteraction envelope" or "thisInteraction envelope".
+    // TODO: Model voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
     // TODO: (?) Model data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an interaction,
-    // TODO: (cont'd) so consider remodeling as per-finger interaction and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisInteraction,
+    // TODO: (cont'd) so consider remodeling as per-finger thisInteraction and treat each finger
     // TODO: (cont'd) as an individual actor.
     public boolean[] isHolding = new boolean[Action.MAX_TOUCH_POINT_COUNT];
     public boolean[] isDragging = new boolean[Action.MAX_TOUCH_POINT_COUNT];
     public double[] dragDistance = new double[Action.MAX_TOUCH_POINT_COUNT];
+
     public double offsetX = 0;
     public double offsetY = 0;
 
     public Handler timerHandler = new Handler();
-    Interaction interaction = this;
+
+    Interaction thisInteraction = this;
+
     public Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
-            // Do what you need to do.
-            // e.g., foobar();
-            int pointerId = 0;
-            if (getFirst().isTouching[pointerId])
-                if (dragDistance[pointerId] < Action.MIN_DRAG_DISTANCE) {
-                    getFirst().getBody().onHoldListener(interaction);
-                }
 
-            // Uncomment this for periodic callback
-            // timerHandler.postDelayed(this, 100);
+            int pointerIndex = 0;
+            if (getFirst().isTouching[pointerIndex]) {
+                if (dragDistance[pointerIndex] < Action.MIN_DRAG_DISTANCE) {
+
+                    // TODO: Make this less ugly! It's so ugly.
+                    getFirst().getBody().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+
+                }
+            }
         }
     };
 
@@ -64,6 +67,9 @@ public class Interaction {
     }
 
     public void add(Action action) {
+
+        action.setInteraction(this);
+
         this.actions.add(action);
 
         offsetX += action.getPosition().getX();
