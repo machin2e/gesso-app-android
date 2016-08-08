@@ -3,18 +3,17 @@ package camp.computer.clay.visualization.image;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PathImage extends Image {
-
-    public final static String TYPE = "path";
 
     // </SETTINGS>
     private boolean showFormLayer = false;
@@ -42,18 +41,15 @@ public class PathImage extends Image {
     public void update() {
     }
 
-    public void draw(VisualizationSurface visualizationSurface) {
+    public void draw(Surface surface) {
 
         if (isVisible()) {
-            Canvas canvas = visualizationSurface.getCanvas();
-            Paint paint = visualizationSurface.getPaint();
-
             // Draw path between ports with style dependant on path type
             Path path = getPath();
             if (path.getType() == Path.Type.MESH) {
-                drawTrianglePath(canvas, paint);
+                drawTrianglePath(surface);
             } else if (path.getType() == Path.Type.ELECTRONIC) {
-                drawLinePath(canvas, paint);
+                drawLinePath(surface);
             }
         }
     }
@@ -62,7 +58,10 @@ public class PathImage extends Image {
         return (Path) getModel();
     }
 
-    public void drawTrianglePath(Canvas canvas, Paint paint) {
+    public void drawTrianglePath(Surface surface) {
+
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         Path path = getPath();
 
@@ -100,39 +99,39 @@ public class PathImage extends Image {
         if (showDocks) {
 
             paint.setStyle(Paint.Style.FILL);
-            Shape.drawTriangle(
+            Surface.drawTriangle(
                     pathStartPosition,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    canvas,
-                    paint
+                    surface
             );
 
             paint.setStyle(Paint.Style.FILL);
-            Shape.drawTriangle(
+            Surface.drawTriangle(
                     pathStopPosition,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    canvas,
-                    paint
+                    surface
             );
 
         } else {
 
-            Shape.drawTrianglePath(
+            Surface.drawTrianglePath(
                     pathStartPosition,
                     pathStopPosition,
                     triangleWidth,
                     triangleHeight,
-                    canvas,
-                    paint
+                    surface
             );
         }
     }
 
-    private void drawLinePath(Canvas canvas, Paint paint) {
+    private void drawLinePath(Surface surface) {
+
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         Path path = getPath();
 
@@ -170,32 +169,29 @@ public class PathImage extends Image {
         if (showDocks) {
 
             paint.setStyle(Paint.Style.FILL);
-            Shape.drawTriangle(
+            Surface.drawTriangle(
                     pathStartPosition,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    canvas,
-                    paint
+                    surface
             );
 
             paint.setStyle(Paint.Style.FILL);
-            Shape.drawTriangle(
+            Surface.drawTriangle(
                     pathStopPosition,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    canvas,
-                    paint
+                    surface
             );
 
         } else {
 
-            Shape.drawLine(
+            Surface.drawLine(
                     pathStartPosition,
                     pathStopPosition,
-                    canvas,
-                    paint
+                    surface
             );
         }
 
@@ -232,22 +228,22 @@ public class PathImage extends Image {
     }
 
     @Override
-    public void onImpression(Impression impression) {
+    public void onImpression(Action action) {
 
-        if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("onImpression", "Impression.NONE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("onImpression", "Impression.TOUCH to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TAP) {
-            // Log.v("onImpression", "Impression.TAP to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.HOLD) {
-            // Log.v("onImpression", "Impression.HOLD to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("onImpression", "Impression.MOVE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.DRAG) {
-            // Log.v("onImpression", "Impression.DRAG to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.RELEASE) {
-            // Log.v("onImpression", "Impression.RELEASE to " + CLASS_NAME);
+        if (action.getType() == Action.Type.NONE) {
+            // Log.v("onImpression", "Action.NONE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.TOUCH) {
+            // Log.v("onImpression", "Action.TOUCH to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.TAP) {
+            // Log.v("onImpression", "Action.TAP to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.HOLD) {
+            // Log.v("onImpression", "Action.HOLD to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.MOVE) {
+            // Log.v("onImpression", "Action.MOVE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.DRAG) {
+            // Log.v("onImpression", "Action.DRAG to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.RELEASE) {
+            // Log.v("onImpression", "Action.RELEASE to " + CLASS_NAME);
         }
     }
 }

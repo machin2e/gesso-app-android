@@ -1,5 +1,6 @@
 package camp.computer.clay.visualization.architecture;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -10,10 +11,10 @@ import java.util.Collections;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Simulation;
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.PortImage;
@@ -242,14 +243,14 @@ public class Visualization extends Image {
     }
 
     @Override
-    public void draw(VisualizationSurface visualizationSurface) {
+    public void draw(Surface surface) {
 
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
             // <AXES_ANNOTATION>
-            visualizationSurface.getPaint().setColor(Color.CYAN);
-            visualizationSurface.getPaint().setStrokeWidth(1.0f);
-            visualizationSurface.getCanvas().drawLine(-1000, 0, 1000, 0, visualizationSurface.getPaint());
-            visualizationSurface.getCanvas().drawLine(0, -1000, 0, 1000, visualizationSurface.getPaint());
+            surface.getPaint().setColor(Color.CYAN);
+            surface.getPaint().setStrokeWidth(1.0f);
+            surface.getCanvas().drawLine(-1000, 0, 1000, 0, surface.getPaint());
+            surface.getCanvas().drawLine(0, -1000, 0, 1000, surface.getPaint());
             // </AXES_ANNOTATION>
         }
 
@@ -258,7 +259,7 @@ public class Visualization extends Image {
             Layer layer = getLayer(index);
             if (layer != null) {
                 for (Image image : layer.getImages()) {
-                    image.draw(visualizationSurface);
+                    image.draw(surface);
                 }
             }
         }
@@ -271,70 +272,70 @@ public class Visualization extends Image {
             // <FPS_ANNOTATION>
             Point fpsPosition = getImages().filterType(FrameImage.class).getCenterPoint();
             fpsPosition.setY(fpsPosition.getY() - 200);
-            visualizationSurface.getPaint().setColor(Color.RED);
-            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getCanvas().drawCircle((float) fpsPosition.getX(), (float) fpsPosition.getY(), 10, visualizationSurface.getPaint());
+            surface.getPaint().setColor(Color.RED);
+            surface.getPaint().setStyle(Paint.Style.FILL);
+            surface.getCanvas().drawCircle((float) fpsPosition.getX(), (float) fpsPosition.getY(), 10, surface.getPaint());
 
-            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getPaint().setTextSize(35);
+            surface.getPaint().setStyle(Paint.Style.FILL);
+            surface.getPaint().setTextSize(35);
 
-            String fpsText = "FPS: " + (int) visualizationSurface.getRenderer().getFramesPerSecond();
+            String fpsText = "FPS: " + (int) surface.getRenderer().getFramesPerSecond();
             Rect fpsTextBounds = new Rect();
-            visualizationSurface.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-            visualizationSurface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20, (float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+            surface.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
+            surface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20, (float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, surface.getPaint());
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
             Point centroidPosition = getImages().filterType(FrameImage.class).getCentroidPoint();
-            visualizationSurface.getPaint().setColor(Color.RED);
-            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, visualizationSurface.getPaint());
+            surface.getPaint().setColor(Color.RED);
+            surface.getPaint().setStyle(Paint.Style.FILL);
+            surface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, surface.getPaint());
 
-            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getPaint().setTextSize(35);
+            surface.getPaint().setStyle(Paint.Style.FILL);
+            surface.getPaint().setTextSize(35);
 
             String text = "CENTROID";
             Rect bounds = new Rect();
-            visualizationSurface.getPaint().getTextBounds(text, 0, text.length(), bounds);
-            visualizationSurface.getCanvas().drawText(text, (float) centroidPosition.getX() + 20, (float) centroidPosition.getY() + bounds.height() / 2.0f, visualizationSurface.getPaint());
+            surface.getPaint().getTextBounds(text, 0, text.length(), bounds);
+            surface.getCanvas().drawText(text, (float) centroidPosition.getX() + 20, (float) centroidPosition.getY() + bounds.height() / 2.0f, surface.getPaint());
             // </CENTROID_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
             List<Point> formImagePositions = getImages().filterType(FrameImage.class).getPositions();
             Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
-            visualizationSurface.getPaint().setColor(Color.RED);
-            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getCanvas().drawCircle((float) formImagesCenterPosition.getX(), (float) formImagesCenterPosition.getY(), 10, visualizationSurface.getPaint());
+            surface.getPaint().setColor(Color.RED);
+            surface.getPaint().setStyle(Paint.Style.FILL);
+            surface.getCanvas().drawCircle((float) formImagesCenterPosition.getX(), (float) formImagesCenterPosition.getY(), 10, surface.getPaint());
 
-            visualizationSurface.getPaint().setStyle(Paint.Style.FILL);
-            visualizationSurface.getPaint().setTextSize(35);
+            surface.getPaint().setStyle(Paint.Style.FILL);
+            surface.getPaint().setTextSize(35);
 
             String centerLabeltext = "CENTER";
             Rect centerLabelTextBounds = new Rect();
-            visualizationSurface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-            visualizationSurface.getCanvas().drawText(centerLabeltext, (float) formImagesCenterPosition.getX() + 20, (float) formImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, visualizationSurface.getPaint());
+            surface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
+            surface.getCanvas().drawText(centerLabeltext, (float) formImagesCenterPosition.getX() + 20, (float) formImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, surface.getPaint());
             // </CENTROID_ANNOTATION>
 
             // <CONVEX_HULL>
             List<Point> formPositions = Visualization.getPositions(getFrameImages());
             List<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
 
-            visualizationSurface.getPaint().setStrokeWidth(1.0f);
-            visualizationSurface.getPaint().setColor(Color.RED);
-            visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
+            surface.getPaint().setStrokeWidth(1.0f);
+            surface.getPaint().setColor(Color.RED);
+            surface.getPaint().setStyle(Paint.Style.STROKE);
 
             for (int i = 0; i < convexHullVertices.size() - 1; i++) {
-                Shape.drawPolygon(convexHullVertices, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                Surface.drawPolygon(convexHullVertices, surface);
             }
             // </CONVEX_HULL>
 
             // <BOUNDING_BOX>
-            visualizationSurface.getPaint().setStrokeWidth(1.0f);
-            visualizationSurface.getPaint().setColor(Color.RED);
-            visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
+            surface.getPaint().setStrokeWidth(1.0f);
+            surface.getPaint().setColor(Color.RED);
+            surface.getPaint().setStyle(Paint.Style.STROKE);
 
             Rectangle boundingBox = getImages().filterType(FrameImage.class).getBoundingBox();
-            Shape.drawPolygon(boundingBox.getVertices(), visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+            Surface.drawPolygon(boundingBox.getVertices(), surface);
             // </BOUNDING_BOX>
         }
     }
@@ -363,6 +364,6 @@ public class Visualization extends Image {
     }
 
     @Override
-    public void onImpression(Impression impression) {
+    public void onImpression(Action action) {
     }
 }

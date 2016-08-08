@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
+import camp.computer.clay.model.architecture.Body;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.visualization.architecture.Image;
@@ -229,12 +230,12 @@ public class Perspective {
         this.focusImage = image;
     }
 
-    public void focusOnNewPath(Interaction interaction, Impression impression) {
+    public void focusOnNewPath(Interaction interaction, Action action) {
 
-        PortImage portImage = (PortImage) impression.getTargetImage();
+        PortImage portImage = (PortImage) action.getTargetImage();
 
         // Show ports of nearby forms
-        ImageSet nearbyImages = getVisualization().getImages().filterType(FrameImage.class).filterProximity(impression.getPosition(), 200 + 60);
+        ImageSet nearbyImages = getVisualization().getImages().filterType(FrameImage.class).filterProximity(action.getPosition(), 200 + 60);
         for (Image image : getVisualization().getImages().filterType(FrameImage.class).getList()) {
 
             if (image == portImage.getParentImage() || nearbyImages.contains(image)) {
@@ -255,7 +256,7 @@ public class Perspective {
         }
 
         // Check if a machine sprite was nearby
-        Image nearestFormImage = getVisualization().getImages().filterType(FrameImage.class).getNearest(impression.getPosition());
+        Image nearestFormImage = getVisualization().getImages().filterType(FrameImage.class).getNearest(action.getPosition());
         if (nearestFormImage != null) {
 
             // TODO: Vibrate
@@ -295,27 +296,10 @@ public class Perspective {
 
         Log.v("Drag", "moving perspective");
 
-//                if (getPerspective().isAdjustable()) {
-//                    getPerspective().setScale(0.9f);
-//                    getPerspective().setOffset(
-//                            touchInteraction.getPosition().getX() - interaction.getFirst().getPosition().getX(),
-//                            touchInteraction.getPosition().getY() - interaction.getFirst().getPosition().getY()
-//                    );
         setOffset(interaction.offsetX, interaction.offsetY);
-//                    getPerspective().setPosition(
-//                            new Point(
-//                                    -(touchInteraction.getPosition().getX() - interaction.getFirst().getPosition().getX()),
-//                                    -(touchInteraction.getPosition().getY() - interaction.getFirst().getPosition().getY())
-//                            )
-//                    );
-//                    getPerspective().setPosition(touchInteraction.getPosition(), 0);
-//                        (int) (touchInteraction.getPosition().getX() - interaction.getFirst().getPosition().getX()),
-//                        (int) (touchInteraction.getPosition().getY() - interaction.getFirst().getPosition().getY()));
-//                }
-
     }
 
-    public void focusOnFrame(Body body, Interaction interaction, Impression impression) {
+    public void focusOnFrame(Body body, Interaction interaction, Action action) {
 
         if (interaction.isDragging()) {
 
@@ -325,7 +309,7 @@ public class Perspective {
 
         } else {
 
-            FrameImage frameImage = (FrameImage) impression.getTargetImage();
+            FrameImage frameImage = (FrameImage) action.getTargetImage();
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
@@ -341,12 +325,12 @@ public class Perspective {
             if (body.interactions.size() > 1) {
                 previousInteraction = body.interactions.get(body.interactions.size() - 2);
                 Log.v("PreviousTouch", "Previous: " + previousInteraction.getFirst().getTargetImage());
-                Log.v("PreviousTouch", "Current: " + impression.getTargetImage());
+                Log.v("PreviousTouch", "Current: " + action.getTargetImage());
             }
 
             // Perspective
             if (frameImage.getFrame().getPaths().size() > 0
-                    && (previousInteraction != null && previousInteraction.getFirst().getTargetImage() != impression.getTargetImage())) {
+                    && (previousInteraction != null && previousInteraction.getFirst().getTargetImage() != action.getTargetImage())) {
 
                 Log.v("Touch_", "A");
 
@@ -458,7 +442,7 @@ public class Perspective {
 
     public void focusReset() {
 
-        // No touchPositions on board or port. Touch is on map. So hide ports.
+        // No touchPoints on board or port. Touch is on map. So hide ports.
         for (FrameImage frameImage : getVisualization().getFrameImages()) {
             frameImage.hidePortImages();
             frameImage.hidePathImages();

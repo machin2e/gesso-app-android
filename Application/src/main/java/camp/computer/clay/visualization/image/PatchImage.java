@@ -9,12 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
@@ -22,12 +23,6 @@ import camp.computer.clay.visualization.util.geometry.Rectangle;
 import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PatchImage extends Image {
-
-    public final static String TYPE = "peripheral";
-
-    // TODO: Replace these with dynamic counts.
-    final static int PORT_GROUP_COUNT = 4;
-    final static int PORT_COUNT = 3;
 
     // <STYLE>
     // TODO: Make these private once the map is working well and the sprite is working well.
@@ -43,21 +38,8 @@ public class PatchImage extends Image {
     private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
     private double outlineThickness = 3.0;
 
-    private double portGroupWidth = 50;
-    private double portGroupHeight = 13;
     private String portGroupColorString = "3b3b3b";
-    private int portGroupColor = Color.parseColor("#ff" + portGroupColorString);
-    private boolean showPortGroupOutline = false;
     private String portGroupOutlineColorString = "000000";
-    private int portGroupOutlineColor = Color.parseColor("#ff" + portGroupOutlineColorString);
-    private double portGroupOutlineThickness = outlineThickness;
-
-    private double distanceLightsToEdge = 12.0f;
-    private double lightWidth = 12;
-    private double lightHeight = 20;
-    private boolean showLightOutline = true;
-    private double lightOutlineThickness = 1.0f;
-    private int lightOutlineColor = Color.parseColor("#e7e7e7");
     // </STYLE>
 
     public PatchImage(Patch patch) {
@@ -96,31 +78,25 @@ public class PatchImage extends Image {
     }
 
     public void update() {
-//        updateLightImages();
-//        updatePortGroupImages();
 
+        // Transparency
         String transparencyString = String.format("%02x", (int) currentTransparency * 255);
-
-        // Frame color
         color = Color.parseColor("#" + transparencyString + colorString);
         outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
 
-        // Header color
-        portGroupColor = Color.parseColor("#" + transparencyString + portGroupColorString);
-        portGroupOutlineColor = Color.parseColor("#" + transparencyString + portGroupOutlineColorString);
     }
 
-    public void draw(VisualizationSurface visualizationSurface) {
+    public void draw(Surface surface) {
         if (isVisible()) {
 //            drawPortGroupImages(visualizationSurface);
-            drawBoardImage(visualizationSurface);
+            drawBoardImage(surface);
 //            drawLightImages(visualizationSurface);
 
             if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
-                visualizationSurface.getPaint().setColor(Color.GREEN);
-                visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                Shape.drawCircle(getPosition(), shape.getWidth(), 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
-                Shape.drawCircle(getPosition(), shape.getWidth() / 2.0f, 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                surface.getPaint().setColor(Color.GREEN);
+                surface.getPaint().setStyle(Paint.Style.STROKE);
+                Surface.drawCircle(getPosition(), shape.getWidth(), 0, surface);
+                Surface.drawCircle(getPosition(), shape.getWidth() / 2.0f, 0, surface);
             }
         }
     }
@@ -129,22 +105,21 @@ public class PatchImage extends Image {
         return this.shape;
     }
 
-    private void drawBoardImage(VisualizationSurface visualizationSurface) {
+    private void drawBoardImage(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Paint paint = surface.getPaint();
 
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.color);
-        Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
+        Surface.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), surface);
 
         // Outline
         if (this.outlineVisibility) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.outlineColor);
             paint.setStrokeWidth((float) outlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), canvas, paint);
+            Surface.drawRectangle(getPosition(), getRotation(), shape.getWidth(), shape.getHeight(), surface);
         }
     }
 
@@ -191,15 +166,15 @@ public class PatchImage extends Image {
     }
 
     @Override
-    public void onImpression(Impression impression) {
+    public void onImpression(Action action) {
 
-        if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("Impression", "Impression.NONE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("Impression", "Impression.TOUCH to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TAP) {
+        if (action.getType() == Action.Type.NONE) {
+            // Log.v("Action", "Action.NONE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.TOUCH) {
+            // Log.v("Action", "Action.TOUCH to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.TAP) {
 
-            Log.v("Impression", "Tapped peripheral. Port image count: " + getPortImages().size());
+            Log.v("Action", "Tapped peripheral. Port image count: " + getPortImages().size());
 
             // Focus on touched form
             showPortImages();
@@ -220,14 +195,14 @@ public class PatchImage extends Image {
                 }
             }
 
-        } else if (impression.getType() == Impression.Type.HOLD) {
-            // Log.v("Impression", "Impression.HOLD to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("Impression", "Impression.MOVE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.DRAG) {
-            // Log.v("Impression", "Impression.DRAG to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.RELEASE) {
-            // Log.v("Impression", "Impression.RELEASE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.HOLD) {
+            // Log.v("Action", "Action.HOLD to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.MOVE) {
+            // Log.v("Action", "Action.MOVE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.DRAG) {
+            // Log.v("Action", "Action.DRAG to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.RELEASE) {
+            // Log.v("Action", "Action.RELEASE to " + CLASS_NAME);
         }
     }
 }

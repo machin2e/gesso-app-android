@@ -131,7 +131,7 @@ public class SQLiteStoreHost {
     private static final String DEVICE_TABLE_NAME          = "Patch";
     private static final String TIMELINE_TABLE_NAME        = "Timeline";
     private static final String EVENT_TABLE_NAME           = "Event";
-    private static final String ACTION_TABLE_NAME          = "Impression";
+    private static final String ACTION_TABLE_NAME          = "Action";
     private static final String SCRIPT_TABLE_NAME          = "Script";
     private static final String STATE_TABLE_NAME           = "State";
 
@@ -197,7 +197,7 @@ public class SQLiteStoreHost {
         public static final String COLUMN_NAME_UUID          = "uuid";
         public static final String COLUMN_NAME_TAG           = "tag"; // Used by interpretter on devices
         public static final String COLUMN_NAME_STATE_PATTERN = "statePattern"; // Regular expression to validate state encoding
-        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize State for a (Event, Impression) pair
+        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize State for a (Event, Action) pair
 
         public static final String COLUMN_NAME_TIME_CREATED  = "timeCreated";
         public static final String COLUMN_NAME_HIDDEN        = "hidden";
@@ -590,7 +590,7 @@ public class SQLiteStoreHost {
 
         // TODO: queryScripts () // Get all actions, for use to create the first actions in the database.
 
-        /** Impression Script */
+        /** Action Script */
 
         public void saveScript(Script script) {
 
@@ -733,7 +733,7 @@ public class SQLiteStoreHost {
 //            return null;
 //        }
 
-        /** Impression States */
+        /** Action States */
 
         public void saveState(Event event, State state) {
 
@@ -809,7 +809,7 @@ public class SQLiteStoreHost {
             // be available in the cache, since it is assumed they are loaded and cached when
             // Clay is first opened.
             Script behaviorScript = getClay ().getCache ().getScript(UUID.fromString(behaviorScriptUuidString));
-            Impression behavior = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
+            Action behavior = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
             behavior.setScript(behaviorScript);
 
             // Reconstruct behavior state object
@@ -830,7 +830,7 @@ public class SQLiteStoreHost {
 
         public void queryState(Event event) {
 
-//            Impression behavior = event.getAction();
+//            Action behavior = event.getAction();
 
             Log.v("Content_Manager", "queryState");
             SQLiteDatabase db = SQLiteStoreHost.this.db.getReadableDatabase();
@@ -1490,10 +1490,10 @@ public class SQLiteStoreHost {
                 // Reconstruct the event object
                 Event event = new Event (UUID.fromString (uuidString), timeline);
 
-                // Get the Impression and Script objects. These are assumed to be
+                // Get the Action and Script objects. These are assumed to be
                 // available in the cache at this point, since they should be loaded when Clay
                 // is first oepned.
-                //Impression action = getClay ().getAction (UUID.fromString (behaviorUuidString));
+                //Action action = getClay ().getAction (UUID.fromString (behaviorUuidString));
 
                 // Reconstruct the associated action
                 Action action = getClay().getCache().getAction(UUID.fromString(actionUuidString));
@@ -1510,7 +1510,7 @@ public class SQLiteStoreHost {
                     // associated with these. Note that at this point, the action is assumed to
                     // be present in the cache. This should be the case since all actions are
                     // cached when the app starts.
-                    Impression action = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
+                    Action action = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
                     event.setAction (action);
                 } else {
                     // Reconstruct leaf node.
@@ -1739,7 +1739,7 @@ public class SQLiteStoreHost {
 
     public void restoreAction(UUID uuid) {
         Log.v("Content_Manager", "restoreAction");
-//        Impression behavior = db.queryBehavior(uuid);
+//        Action behavior = db.queryBehavior(uuid);
 //        if (behavior == null) {
 //            callback.onFailure();
 //        } else {

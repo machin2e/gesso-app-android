@@ -3,19 +3,18 @@ package camp.computer.clay.visualization.image;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Frame;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
@@ -25,8 +24,6 @@ import camp.computer.clay.visualization.util.geometry.Rectangle;
 import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PortImage extends Image {
-
-    public final static String TYPE = "port";
 
     // <STYLE>
     public static double DISTANCE_FROM_BOARD = 45.0f;
@@ -63,8 +60,6 @@ public class PortImage extends Image {
     private int previousPulseState = 0;
     private double xWaveStart = 0;
     // </SIMULATED_DATA>
-
-    public static final String CLASS_NAME = "PORT_SPRITE";
 
     private boolean isDragging = false;
     private Point previousPosition = new Point(getPosition());
@@ -152,20 +147,20 @@ public class PortImage extends Image {
         }
     }
 
-    public void draw(VisualizationSurface visualizationSurface) {
+    public void draw(Surface surface) {
         if (isVisible()) {
 
             // Port
-            drawShape(visualizationSurface);
-            drawStyle(visualizationSurface);
-            drawData(visualizationSurface);
-            drawAnnotation(visualizationSurface);
+            drawShape(surface);
+            drawStyle(surface);
+            drawData(surface);
+            drawAnnotation(surface);
 
             // Candidate Path
-            drawCandidatePathImages(visualizationSurface);
+            drawCandidatePathImages(surface);
 
             // Candidate Patch
-            drawCandidatePeripheralImage(visualizationSurface);
+            drawCandidatePeripheralImage(surface);
         }
     }
 
@@ -173,18 +168,18 @@ public class PortImage extends Image {
      * Draws the shape of the sprite filled with a solid color. Graphically, this represents a
      * placeholder for the sprite.
      *
-     * @param visualizationSurface
+     * @param surface
      */
-    public void drawShape(VisualizationSurface visualizationSurface) {
+    public void drawShape(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeWidth(3);
         paint.setColor(FLOW_PATH_COLOR_NONE);
 
-        Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
+        Surface.drawCircle(getPosition(), shapeRadius, 0, surface);
 
         // Outline
         if (showShapeOutline) {
@@ -192,33 +187,33 @@ public class PortImage extends Image {
             paint.setStrokeWidth(3);
             paint.setColor(Color.BLACK);
 
-            Shape.drawCircle(getPosition(), shapeRadius, 0, canvas, paint);
+            Surface.drawCircle(getPosition(), shapeRadius, 0, surface);
         }
     }
 
     /**
      * Draws the sprite's detail front layer.
      *
-     * @param visualizationSurface
+     * @param surface
      */
-    public void drawStyle(VisualizationSurface visualizationSurface) {
+    public void drawStyle(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         if (getPort().getType() != Port.Type.NONE) {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.uniqueColor);
-            Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
+            Surface.drawCircle(getPosition(), shapeRadius, getRotation(), surface);
 
             // Outline
             if (showShapeOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(3);
                 paint.setColor(Color.BLACK);
-                Shape.drawCircle(getPosition(), shapeRadius, getRotation(), canvas, paint);
+                Surface.drawCircle(getPosition(), shapeRadius, getRotation(), surface);
             }
         }
     }
@@ -231,12 +226,12 @@ public class PortImage extends Image {
     /**
      * Draws the sprite's data layer.
      *
-     * @param visualizationSurface
+     * @param surface
      */
-    private void drawData(VisualizationSurface visualizationSurface) {
+    private void drawData(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         Port port = getPort();
 
@@ -303,13 +298,13 @@ public class PortImage extends Image {
             if (port.getDirection() == Port.Direction.INPUT) {
 
                 for (int i = 0; i < portDataSamples.length - 1; i++) {
-                    Shape.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], canvas, paint);
+                    Surface.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], surface);
                 }
 
             } else if (port.getDirection() == Port.Direction.OUTPUT) {
 
                 for (int i = 0; i < portDataSamples.length - 1; i++) {
-                    Shape.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], canvas, paint);
+                    Surface.drawLine(rotatedPortDataSamplePoints[i], rotatedPortDataSamplePoints[i + 1], surface);
                 }
 
             }
@@ -319,14 +314,14 @@ public class PortImage extends Image {
     /**
      * Draws the sprite's annotation layer. Contains labels and other text.
      *
-     * @param visualizationSurface
+     * @param surface
      */
-    public void drawAnnotation(VisualizationSurface visualizationSurface) {
+    public void drawAnnotation(Surface surface) {
 
         if (getPort().getType() != Port.Type.NONE) {
 
-            Canvas canvas = visualizationSurface.getCanvas();
-            Paint paint = visualizationSurface.getPaint();
+            Canvas canvas = surface.getCanvas();
+            Paint paint = surface.getPaint();
 
             // Geometry
             Point labelPosition = new Point();
@@ -340,7 +335,7 @@ public class PortImage extends Image {
             double typeLabelTextSize = 27;
 
             // Draw
-            Shape.drawText(labelPosition, getPort().getType().getTag(), typeLabelTextSize, canvas, paint);
+            Surface.drawText(labelPosition, getPort().getType().getTag(), typeLabelTextSize, surface);
 
         }
     }
@@ -634,13 +629,13 @@ public class PortImage extends Image {
     }
 
     @Override
-    public void onImpression(Impression impression) {
+    public void onImpression(Action action) {
 
-        if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("onImpression", "Impression.NONE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("onImpression", "Impression.TOUCH to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TAP) {
+        if (action.getType() == Action.Type.NONE) {
+            // Log.v("onImpression", "Action.NONE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.TOUCH) {
+            // Log.v("onImpression", "Action.TOUCH to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.TAP) {
 
             Port port = getPort();
 
@@ -649,7 +644,7 @@ public class PortImage extends Image {
                 port.setDirection(Port.Direction.INPUT);
                 port.setType(Port.Type.next(port.getType()));
 
-                // TODO: Speak ~ "setting as input. you can send the data to another board if you want. touchPositions another board."
+                // TODO: Speak ~ "setting as input. you can send the data to another board if you want. touchPoints another board."
 
             } else if (!port.hasPath() && port.getAncestorPaths().size() == 0) {
 
@@ -694,7 +689,7 @@ public class PortImage extends Image {
                     getVisualization().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
                 }
 
-                // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
 
                 // Perspective
                 List<Port> pathPorts = port.getPorts(paths);
@@ -722,14 +717,14 @@ public class PortImage extends Image {
 
             setCandidatePathVisibility(false);
 
-        } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("onImpression", "Impression.MOVE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.DRAG) {
+        } else if (action.getType() == Action.Type.MOVE) {
+            // Log.v("onImpression", "Action.MOVE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.DRAG) {
 
             Log.v("onHoldListener", "Port draggin!");
 
             // Candidate Path Visibility
-            setCandidatePathDestinationPosition(impression.getPosition());
+            setCandidatePathDestinationPosition(action.getPosition());
             setCandidatePathVisibility(true);
 
             // Candidate Patch Visibility
@@ -766,10 +761,7 @@ public class PortImage extends Image {
                 port.setType(Port.Type.next(port.getType()));
             }
 
-        } else if (impression.getType() == Impression.Type.RELEASE) {
-//             Log.v("onImpression", "Impression.RELEASE to " + CLASS_NAME);
-            Log.v("onHoldListener", "Impression.RELEASE to " + CLASS_NAME);
-
+        } else if (action.getType() == Action.Type.RELEASE) {
             setCandidatePathVisibility(false);
             setCandidatePeripheralVisibility(false);
         }
@@ -796,13 +788,13 @@ public class PortImage extends Image {
     }
 
     // TODO: Make this into a shape and put this on a separate layer!
-    public void drawCandidatePathImages(VisualizationSurface visualizationSurface) {
+    public void drawCandidatePathImages(Surface surface) {
         if (isCandidatePathVisible) {
 
             if (getPort().getType() != Port.Type.NONE) {
 
-                Canvas canvas = visualizationSurface.getCanvas();
-                Paint paint = visualizationSurface.getPaint();
+                Canvas canvas = surface.getCanvas();
+                Paint paint = surface.getPaint();
 
                 double triangleWidth = 20;
                 double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
@@ -830,30 +822,29 @@ public class PortImage extends Image {
                         2 * triangleSpacing
                 );
 
-                Shape.drawTrianglePath(
+                Surface.drawTrianglePath(
                         pathStartPosition,
                         pathStopPosition,
                         triangleWidth,
                         triangleHeight,
-                        canvas,
-                        paint
+                        surface
                 );
 
                 // Color
                 paint.setStyle(Paint.Style.FILL);
                 paint.setColor(getUniqueColor());
-                Shape.drawCircle(candidatePathDestinationPosition, shapeRadius, 0.0f, canvas, paint);
+                Surface.drawCircle(candidatePathDestinationPosition, shapeRadius, 0.0f, surface);
             }
         }
     }
 
 
-    private void drawCandidatePeripheralImage(VisualizationSurface visualizationSurface) {
+    private void drawCandidatePeripheralImage(Surface surface) {
 
         if (isCandidatePeripheralVisible) {
 
-            Canvas canvas = visualizationSurface.getCanvas();
-            Paint paint = visualizationSurface.getPaint();
+            Canvas canvas = surface.getCanvas();
+            Paint paint = surface.getPaint();
 
             double pathRotationAngle = Geometry.calculateRotationAngle(
                     getPosition(),
@@ -862,7 +853,7 @@ public class PortImage extends Image {
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(getUniqueColor());
-            Shape.drawRectangle(candidatePathDestinationPosition, pathRotationAngle + 180, 250, 250, canvas, paint);
+            Surface.drawRectangle(candidatePathDestinationPosition, pathRotationAngle + 180, 250, 250, surface);
 
         }
 

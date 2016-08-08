@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Frame;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
@@ -21,8 +22,6 @@ import camp.computer.clay.visualization.util.geometry.Rectangle;
 import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class FrameImage extends Image {
-
-    public final static String TYPE = "frame";
 
     // TODO: Replace these with dynamic counts.
     final static int PORT_GROUP_COUNT = 4;
@@ -128,37 +127,37 @@ public class FrameImage extends Image {
         updatePortGroupImages();
     }
 
-    public void draw(VisualizationSurface visualizationSurface) {
+    public void draw(Surface surface) {
         if (isVisible()) {
-            drawPortGroupImages(visualizationSurface);
-            drawBoardImage(visualizationSurface);
-            drawLightImages(visualizationSurface);
+            drawPortGroupImages(surface);
+            drawBoardImage(surface);
+            drawLightImages(surface);
 
             if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
-                visualizationSurface.getPaint().setColor(Color.GREEN);
-                visualizationSurface.getPaint().setStyle(Paint.Style.STROKE);
-                Shape.drawCircle(getPosition(), boardShape.getWidth(), 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
-                Shape.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, visualizationSurface.getCanvas(), visualizationSurface.getPaint());
+                surface.getPaint().setColor(Color.GREEN);
+                surface.getPaint().setStyle(Paint.Style.STROKE);
+                Surface.drawCircle(getPosition(), boardShape.getWidth(), 0, surface);
+                Surface.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, surface);
             }
         }
     }
 
-    private void drawBoardImage(VisualizationSurface visualizationSurface) {
+    private void drawBoardImage(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.color);
-        Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
+        Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
 
         // Outline
         if (this.outlineVisibility) {
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(this.outlineColor);
             paint.setStrokeWidth((float) outlineThickness);
-            Shape.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), canvas, paint);
+            Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
         }
     }
 
@@ -192,24 +191,24 @@ public class FrameImage extends Image {
         }
     }
 
-    private void drawPortGroupImages(VisualizationSurface visualizationSurface) {
+    private void drawPortGroupImages(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         for (int i = 0; i < PORT_GROUP_COUNT; i++) {
 
             // Color
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(this.portGroupColor);
-            Shape.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, canvas, paint);
+            Surface.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, surface);
 
             // Outline
             if (this.showPortGroupOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth((float) portGroupOutlineThickness);
                 paint.setColor(this.portGroupOutlineColor);
-                Shape.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, canvas, paint);
+                Surface.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, surface);
             }
 
         }
@@ -292,10 +291,10 @@ public class FrameImage extends Image {
         }
     }
 
-    private void drawLightImages(VisualizationSurface visualizationSurface) {
+    private void drawLightImages(Surface surface) {
 
-        Canvas canvas = visualizationSurface.getCanvas();
-        Paint paint = visualizationSurface.getPaint();
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
 
         for (int i = 0; i < PORT_COUNT; i++) {
 
@@ -308,14 +307,14 @@ public class FrameImage extends Image {
             } else {
                 paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, (float) currentTransparency));
             }
-            Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
+            Surface.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, surface);
 
             // Outline
             if (this.showLightOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth((float) lightOutlineThickness);
                 paint.setColor(this.lightOutlineColor);
-                Shape.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, canvas, paint);
+                Surface.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, surface);
             }
         }
     }
@@ -347,7 +346,7 @@ public class FrameImage extends Image {
     }
 
     //-------------------------
-    // Impression
+    // Action
     //-------------------------
 
     public boolean containsPoint(Point point) {
@@ -367,13 +366,13 @@ public class FrameImage extends Image {
     }
 
     @Override
-    public void onImpression(Impression impression) {
+    public void onImpression(Action action) {
 
-        if (impression.getType() == Impression.Type.NONE) {
-            // Log.v("onImpression", "Impression.NONE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TOUCH) {
-            // Log.v("onImpression", "Impression.TOUCH to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.TAP) {
+        if (action.getType() == Action.Type.NONE) {
+
+        } else if (action.getType() == Action.Type.TOUCH) {
+
+        } else if (action.getType() == Action.Type.TAP) {
 
             // Focus on touched form
             showPortImages();
@@ -394,14 +393,14 @@ public class FrameImage extends Image {
                 }
             }
 
-        } else if (impression.getType() == Impression.Type.HOLD) {
-            // Log.v("onImpression", "Impression.HOLD to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.MOVE) {
-            // Log.v("onImpression", "Impression.MOVE to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.DRAG) {
-            // Log.v("onImpression", "Impression.DRAG to " + CLASS_NAME);
-        } else if (impression.getType() == Impression.Type.RELEASE) {
-            // Log.v("onImpression", "Impression.RELEASE to " + CLASS_NAME);
+        } else if (action.getType() == Action.Type.HOLD) {
+
+        } else if (action.getType() == Action.Type.MOVE) {
+
+        } else if (action.getType() == Action.Type.DRAG) {
+
+        } else if (action.getType() == Action.Type.RELEASE) {
+
         }
     }
 }

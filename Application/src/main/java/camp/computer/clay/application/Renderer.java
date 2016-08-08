@@ -1,15 +1,13 @@
 package camp.computer.clay.application;
 
-import android.util.Log;
-
 import camp.computer.clay.visualization.util.Time;
 
 /**
- * VisualizationRenderer is a background thread that periodically updates the visualization state
+ * Renderer is a background thread that periodically updates the visualization state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
  * visualization's state then re-rendering it.
  */
-public class VisualizationRenderer extends Thread {
+public class Renderer extends Thread {
 
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
@@ -23,13 +21,13 @@ public class VisualizationRenderer extends Thread {
     private int targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
     // </SETTINGS>
 
-    private VisualizationSurface visualizationSurface;
+    private Surface surface;
 
     private boolean isRunning = false;
 
-    VisualizationRenderer(VisualizationSurface visualizationSurface) {
+    Renderer(Surface surface) {
         super();
-        this.visualizationSurface = visualizationSurface;
+        this.surface = surface;
     }
 
     public void setRunning (boolean isRunning) {
@@ -56,7 +54,7 @@ public class VisualizationRenderer extends Thread {
             frameStartTime = Time.getCurrentTime();
 
             // Advance the visualization state
-            visualizationSurface.update();
+            surface.update();
 
             frameStopTime = Time.getCurrentTime();
 

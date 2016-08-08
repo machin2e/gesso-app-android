@@ -585,7 +585,7 @@ public abstract class Geometry {
      * defined by the boundary points.
      *
      * @param vertices The vertices defining the boundary polygon
-     * @param point    The point to check
+     * @param point The point to check
      * @return true If the point is inside the boundary, false otherwise
      * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Point Inclusion in Polygon Test (W. Randolph Franklin)</a>
      */
@@ -619,6 +619,34 @@ public abstract class Geometry {
         }
 
         return isContained;
+    }
+
+    public static List<Point> getRegularPolygon(Point position, double radius, int segmentCount) {
+
+        List<Point> vertices = new ArrayList<>();
+
+        android.graphics.Path path = new android.graphics.Path();
+        for (int i = 0; i < segmentCount; i++) {
+
+            Point vertexPosition = new Point(
+                    (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)),
+                    (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount))
+            );
+
+            vertices.add(vertexPosition);
+
+            // Draw points in shape
+            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+            if (i == 0) {
+                path.moveTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
+            }
+
+            path.lineTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
+        }
+
+        path.close();
+
+        return vertices;
     }
 
     // TODO: Detect if a point falls within a shape defined by list of points.

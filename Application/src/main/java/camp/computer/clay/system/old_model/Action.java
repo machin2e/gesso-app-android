@@ -45,7 +45,7 @@ public class Action {
         this.actions = null;
     }
 
-//    public Impression(Script script, State behaviorState) {
+//    public Action(Script script, State behaviorState) {
 //
 //        this.uuid = UUID.randomUUID();
 //
