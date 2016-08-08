@@ -204,8 +204,8 @@ public class PatchImage extends Image {
 
             // Update Image
             PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
-            sourcePortImage.setCandidatePathVisibility(false);
-            sourcePortImage.setCandidatePeripheralVisibility(false);
+            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+            sourcePortImage.setCandidatePeripheralVisibility(Visibility.INVISIBLE);
 
         }
     }

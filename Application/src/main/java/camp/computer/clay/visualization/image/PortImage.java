@@ -78,10 +78,10 @@ public class PortImage extends Image {
         }
     }
 
-    private boolean isCandidatePathVisible = false;
+    private Visibility candidatePathVisibility = Visibility.INVISIBLE;
     private Point candidatePathDestinationPosition = new Point(40, 80);
 
-    private boolean isCandidatePeripheralVisible = false;
+    private Visibility candidatePeripheralVisibility = Visibility.INVISIBLE;
 
     public PortImage(Port port) {
         super(port);
@@ -568,13 +568,11 @@ public class PortImage extends Image {
 
     public void setPathVisibility(Visibility visibility) {
         for (PathImage pathImage : getPathImages()) {
-            if (pathImage != null) {
-                pathImage.setVisibility(visibility);
+            pathImage.setVisibility(visibility);
 
-                // Deep
-                PortImage targetPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getTarget());
-                targetPortImage.setVisibility(visibility);
-            }
+            // Deep
+            PortImage targetPortImage = (PortImage) getVisualization().getImage(pathImage.getPath().getTarget());
+            targetPortImage.setVisibility(visibility);
         }
     }
 
@@ -629,9 +627,9 @@ public class PortImage extends Image {
     public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
-            // Log.v("onAction", "Action.NONE to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.TOUCH) {
-            // Log.v("onAction", "Action.TOUCH to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.TAP) {
 
             Port port = getPort();
@@ -712,17 +710,15 @@ public class PortImage extends Image {
 
             }
 
-            setCandidatePathVisibility(false);
+            setCandidatePathVisibility(Visibility.INVISIBLE);
 
         } else if (action.getType() == Action.Type.MOVE) {
-            // Log.v("onAction", "Action.MOVE to " + CLASS_NAME);
-        } else if (action.getType() == Action.Type.DRAG) {
 
-            Log.v("onHoldListener", "Port draggin!");
+        } else if (action.getType() == Action.Type.DRAG) {
 
             // Candidate Path Visibility
             setCandidatePathDestinationPosition(action.getPosition());
-            setCandidatePathVisibility(true);
+            setCandidatePathVisibility(Visibility.VISIBLE);
 
             // Candidate Patch Visibility
 
@@ -742,19 +738,17 @@ public class PortImage extends Image {
             }
 
             if (isPeripheral) {
-                setCandidatePeripheralVisibility(true);
+                setCandidatePeripheralVisibility(Visibility.VISIBLE);
             } else {
-                setCandidatePeripheralVisibility(false);
+                setCandidatePeripheralVisibility(Visibility.INVISIBLE);
             }
 
             // Setup port type and flow direction
             Port port = getPort();
             if (port.getDirection() == Port.Direction.NONE) {
-                Log.v("onHoldListener", "OH GOD!");
                 port.setDirection(Port.Direction.INPUT);
             }
             if (port.getType() == Port.Type.NONE) {
-                Log.v("onHoldListener", "OH SHIT!");
                 port.setType(Port.Type.next(port.getType()));
             }
 
@@ -941,7 +935,7 @@ public class PortImage extends Image {
                     }
                 }
 
-                sourcePortImage.setCandidatePathVisibility(false);
+                sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
 
                 // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
 
@@ -962,25 +956,25 @@ public class PortImage extends Image {
             }
 
 
-            setCandidatePathVisibility(false);
-            setCandidatePeripheralVisibility(false);
+            setCandidatePathVisibility(Visibility.INVISIBLE);
+            setCandidatePeripheralVisibility(Visibility.INVISIBLE);
         }
     }
 
-    public void setCandidatePathVisibility(boolean isVisible) {
-        this.isCandidatePathVisible = isVisible;
+    public void setCandidatePathVisibility(Visibility visibility) {
+        candidatePathVisibility = visibility;
     }
 
-    public boolean getCandidatePathVisibility() {
-        return this.isCandidatePathVisible;
+    public Visibility getCandidatePathVisibility() {
+        return candidatePathVisibility;
     }
 
-    public void setCandidatePeripheralVisibility(boolean isVisible) {
-        this.isCandidatePeripheralVisible = isVisible;
+    public void setCandidatePeripheralVisibility(Visibility visibility) {
+        candidatePeripheralVisibility = visibility;
     }
 
-    public boolean getCandidatePeripheralVisibility() {
-        return this.isCandidatePeripheralVisible;
+    public Visibility getCandidatePeripheralVisibility() {
+        return candidatePeripheralVisibility;
     }
 
     public void setCandidatePathDestinationPosition(Point position) {
@@ -989,7 +983,7 @@ public class PortImage extends Image {
 
     // TODO: Make this into a shape and put this on a separate layer!
     public void drawCandidatePathImages(Surface surface) {
-        if (isCandidatePathVisible) {
+        if (candidatePathVisibility == Visibility.VISIBLE) {
 
             if (getPort().getType() != Port.Type.NONE) {
 
@@ -1041,7 +1035,7 @@ public class PortImage extends Image {
 
     private void drawCandidatePeripheralImage(Surface surface) {
 
-        if (isCandidatePeripheralVisible) {
+        if (candidatePeripheralVisibility == Visibility.VISIBLE) {
 
             Canvas canvas = surface.getCanvas();
             Paint paint = surface.getPaint();

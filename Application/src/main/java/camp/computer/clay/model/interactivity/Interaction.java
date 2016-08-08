@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 
 /**
@@ -24,8 +25,8 @@ public class Interaction {
     // TODO: (cont'd) so consider remodeling as per-finger thisInteraction and treat each finger
     // TODO: (cont'd) as an individual actor.
     public boolean[] isHolding = new boolean[Action.MAX_TOUCH_POINT_COUNT];
-    public boolean[] isDragging = new boolean[Action.MAX_TOUCH_POINT_COUNT];
-    public double[] dragDistance = new double[Action.MAX_TOUCH_POINT_COUNT];
+    private boolean[] isDragging = new boolean[Action.MAX_TOUCH_POINT_COUNT];
+    private double[] dragDistance = new double[Action.MAX_TOUCH_POINT_COUNT];
 
     public double offsetX = 0;
     public double offsetY = 0;
@@ -40,7 +41,7 @@ public class Interaction {
 
             int pointerIndex = 0;
             if (getFirst().isTouching[pointerIndex]) {
-                if (dragDistance[pointerIndex] < Action.MIN_DRAG_DISTANCE) {
+                if (getDragDistance() < Action.MIN_DRAG_DISTANCE) {
 
                     // TODO: Make this less ugly! It's so ugly.
                     getFirst().getBody().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
@@ -70,15 +71,26 @@ public class Interaction {
 
         action.setInteraction(this);
 
-        this.actions.add(action);
+        actions.add(action);
 
         offsetX += action.getPosition().getX();
         offsetY += action.getPosition().getY();
 
         if (actions.size() == 1) {
+
             // Start timer to check for hold
             timerHandler.removeCallbacks(timerRunnable);
             timerHandler.postDelayed(timerRunnable, Action.MIN_HOLD_DURATION);
+
+        } else if (actions.size() > 1) {
+
+            // Calculate drag distance
+            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), getFirst().touchPoints[action.pointerIndex]);
+
+            if (getDragDistance() > Action.MIN_DRAG_DISTANCE) {
+                isDragging[action.pointerIndex] = true;
+            }
+
         }
     }
 
@@ -143,6 +155,10 @@ public class Interaction {
 
     public boolean isDragging() {
         return isDragging[getLast().pointerIndex];
+    }
+
+    public double getDragDistance() {
+        return dragDistance[getLast().pointerIndex];
     }
 
     // <CLASSIFIER>

@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.image;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,6 @@ public class FrameImage extends Image {
     private String outlineColorString = "414141";
     private int outlineColor = Color.parseColor("#ff" + outlineColorString); // Color.parseColor("#737272");
     private double outlineThickness = 3.0;
-    private double targetTransparency = 1.0;
-    private double currentTransparency = targetTransparency;
 
     private double portGroupWidth = 50;
     private double portGroupHeight = 13;
@@ -86,9 +85,8 @@ public class FrameImage extends Image {
 
     public List<PortImage> getPortImages() {
         List<PortImage> portImages = new ArrayList<>();
-        Frame frame = getFrame();
 
-        for (Port port : frame.getPorts()) {
+        for (Port port : getFrame().getPorts()) {
             PortImage portImage = (PortImage) getVisualization().getImage(port);
             portImages.add(portImage);
         }
@@ -377,6 +375,7 @@ public class FrameImage extends Image {
             // Focus on touched form
             showPortImages();
             showPathImages();
+
             setTransparency(1.0);
 
             // TODO: Speak "choose a channel to get data."
@@ -384,7 +383,10 @@ public class FrameImage extends Image {
             // Show ports and paths of touched form
             for (PortImage portImage : getPortImages()) {
                 List<Path> paths = portImage.getPort().getGraph();
+                Log.v("TouchFrame", "\tpaths.size = " + paths.size());
                 for (Path path : paths) {
+                    Log.v("TouchFrame", "\t\tsource = " + path.getSource());
+                    Log.v("TouchFrame", "\t\ttarget = " + path.getTarget());
                     // Show ports
                     getVisualization().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
                     getVisualization().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);

@@ -1,8 +1,5 @@
 package camp.computer.clay.model.architecture;
 
-import android.util.Log;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,11 +80,8 @@ public class Body {
                 // Current
                 action.isTouching[action.pointerIndex] = true;
 
-                // Calculate drag distance
-                interaction.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), interaction.getFirst().touchPoints[action.pointerIndex]);
-
                 // Classify/Callback
-                if (interaction.dragDistance[action.pointerIndex] > Action.MIN_DRAG_DISTANCE) {
+                if (interaction.getDragDistance() > Action.MIN_DRAG_DISTANCE) {
                     getPerspective().getVisualization().onDragListener(action);
                 }
 

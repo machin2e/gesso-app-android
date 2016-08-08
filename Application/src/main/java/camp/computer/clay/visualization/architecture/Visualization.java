@@ -368,6 +368,11 @@ public class Visualization extends Image {
     }
 
     @Override
+    public void processAction(Action action) {
+        onAction(action);
+    }
+
+    @Override
     public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
@@ -388,7 +393,7 @@ public class Visualization extends Image {
 
             PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
 
-            if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
+            if (sourcePortImage.getCandidatePeripheralVisibility() == Visibility.VISIBLE) {
 
                 // Model
                 Patch patch = new Patch();
@@ -463,8 +468,8 @@ public class Visualization extends Image {
             }
 
             // Update Image
-            sourcePortImage.setCandidatePathVisibility(false);
-            sourcePortImage.setCandidatePeripheralVisibility(false);
+            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+            sourcePortImage.setCandidatePeripheralVisibility(Visibility.INVISIBLE);
 
         }
     }
@@ -502,15 +507,13 @@ public class Visualization extends Image {
         Log.v("onDragListener", "" + action.getType() + ": " + action.getTarget());
 
         Log.v("Action", "onDrag");
-        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "focus: " + perspective.getFocus());
         Log.v("Action", "processAction: " + action.getTarget());
         Log.v("Action", "-");
 
         if (interaction.getSize() > 1) {
             action.setTarget(interaction.getFirst().getTarget());
         }
-
-        interaction.isDragging[action.pointerIndex] = true;
 
         // Holding
         if (interaction.isHolding[action.pointerIndex]) {
@@ -598,8 +601,6 @@ public class Visualization extends Image {
 
     public void onTapListener(Action action) {
 
-        Interaction interaction = action.getInteraction();
-
         action.setType(Action.Type.TAP);
 
         Image targetImage = getImageByPosition(action.getPosition());
@@ -608,7 +609,7 @@ public class Visualization extends Image {
         Perspective perspective = action.getBody().getPerspective();
 
         Log.v("Action", "onTap");
-        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "focus: " + perspective.getFocus());
         Log.v("Action", "processAction: " + action.getTarget());
         Log.v("Action", "-");
 
@@ -659,7 +660,7 @@ public class Visualization extends Image {
         Perspective perspective = action.getBody().getPerspective();
 
         Log.v("Action", "onRelease");
-        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "focus: " + perspective.getFocus());
         Log.v("Action", "processAction: " + action.getTarget());
         Log.v("Action", "-");
 
@@ -689,7 +690,7 @@ public class Visualization extends Image {
                 // ...last processAction was on a frame image.
 
                 PortImage sourcePortImage = (PortImage) interaction.getFirst().getTarget();
-                sourcePortImage.setCandidatePathVisibility(false);
+                sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
 
             } else if (action.getTarget() instanceof PortImage) {
 
@@ -722,7 +723,7 @@ public class Visualization extends Image {
 
             // Check if first processAction was on an image
             if (interaction.getFirst().getTarget() instanceof PortImage) {
-                ((PortImage) interaction.getFirst().getTarget()).setCandidatePathVisibility(false);
+                ((PortImage) interaction.getFirst().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
             }
 
             perspective.focusReset();

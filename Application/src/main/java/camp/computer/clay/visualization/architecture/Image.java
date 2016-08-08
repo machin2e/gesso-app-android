@@ -169,8 +169,8 @@ public abstract class Image {
     }
 
     public void setTransparency(final double transparency) {
-        targetTransparency = transparency;
-        currentTransparency = targetTransparency;
+        this.targetTransparency = transparency;
+        this.currentTransparency = transparency;
     }
 
     public Rectangle getBoundingRectangle() {

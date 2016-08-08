@@ -2,31 +2,22 @@ package camp.computer.clay.visualization.image;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
-import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
-import camp.computer.clay.visualization.util.geometry.Shape;
 
 public class PathImage extends Image {
 
-    // </SETTINGS>
-    private boolean showFormLayer = false;
-    private boolean showStyleLayer = true;
-    private boolean showDataLayer = true;
-    private boolean showAnnotationLayer = false;
-    // </SETTINGS>
-
     // </STYLE>
-    private boolean isVisible = false;
     public boolean showDocks = true;
     private double triangleWidth = 20;
-    private double triangleHeight = triangleWidth * ((double) Math.sqrt(3.0) / 2);
+    private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
     // </STYLE>
 
@@ -39,6 +30,11 @@ public class PathImage extends Image {
     }
 
     public void update() {
+    }
+
+    public void setVisibility(Visibility visibility) {
+        Log.v("TouchFrame", "pathImage.setVisibility = " + visibility);
+        this.visibility = visibility;
     }
 
     public void draw(Surface surface) {
@@ -231,19 +227,19 @@ public class PathImage extends Image {
     public void onAction(Action action) {
 
         if (action.getType() == Action.Type.NONE) {
-            // Log.v("onAction", "Action.NONE to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.TOUCH) {
-            // Log.v("onAction", "Action.TOUCH to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.TAP) {
-            // Log.v("onAction", "Action.TAP to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.HOLD) {
-            // Log.v("onAction", "Action.HOLD to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.MOVE) {
-            // Log.v("onAction", "Action.MOVE to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.DRAG) {
-            // Log.v("onAction", "Action.DRAG to " + CLASS_NAME);
+
         } else if (action.getType() == Action.Type.RELEASE) {
-            // Log.v("onAction", "Action.RELEASE to " + CLASS_NAME);
+
         }
     }
 }

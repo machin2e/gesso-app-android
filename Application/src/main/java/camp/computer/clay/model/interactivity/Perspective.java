@@ -218,15 +218,15 @@ public class Perspective {
         return this.visualization;
     }
 
-    public Image getFocusImage() {
+    public Image getFocus() {
         return this.focusImage;
     }
 
-    public boolean hasFocusImage() {
+    public boolean hasFocus() {
         return this.focusImage != null;
     }
 
-    public void setFocusImage(Image image) {
+    public void setFocus(Image image) {
         this.focusImage = image;
     }
 
@@ -319,8 +319,8 @@ public class Perspective {
             ImageSet otherFormImages = getVisualization().getImages().filterType(FrameImage.class).remove(frameImage);
             for (Image image : otherFormImages.getList()) {
                 FrameImage otherFrameImage = (FrameImage) image;
-                otherFrameImage.hidePortImages();
-                otherFrameImage.hidePathImages();
+//                otherFrameImage.hidePortImages();
+//                otherFrameImage.hidePathImages();
                 otherFrameImage.setTransparency(0.1f);
             }
 
@@ -337,12 +337,12 @@ public class Perspective {
 
                 Log.v("Touch_", "A");
 
-                for (PortImage portImage : frameImage.getPortImages()) {
-                    List<PathImage> pathImages = portImage.getPathImages();
-                    for (PathImage pathImage : pathImages) {
-                        pathImage.setVisibility(Visibility.INVISIBLE);
-                    }
-                }
+//                for (PortImage portImage : frameImage.getPortImages()) {
+//                    List<PathImage> pathImages = portImage.getPathImages();
+//                    for (PathImage pathImage : pathImages) {
+//                        pathImage.setVisibility(Visibility.INVISIBLE);
+//                    }
+//                }
 
                 // Get ports along every path connected to the ports on the touched form
                 List<Port> formPathPorts = new ArrayList<>();
@@ -383,12 +383,12 @@ public class Perspective {
                 // This provides lookahead, so you can be triggered to processAction again to recover
                 // the perspective.
 
-                for (PortImage portImage : frameImage.getPortImages()) {
-                    List<PathImage> pathImages = portImage.getPathImages();
-                    for (PathImage pathImage : pathImages) {
-                        pathImage.setVisibility(Visibility.INVISIBLE);
-                    }
-                }
+//                for (PortImage portImage : frameImage.getPortImages()) {
+//                    List<PathImage> pathImages = portImage.getPathImages();
+//                    for (PathImage pathImage : pathImages) {
+//                        pathImage.setVisibility(Visibility.INVISIBLE);
+//                    }
+//                }
 
                 // TODO: (on second press, also hide external ports, send peripherals) getPerspective().setScale(1.2f);
                 // TODO: (cont'd) getPerspective().setPosition(frameImage.getPosition());
@@ -449,14 +449,14 @@ public class Perspective {
         for (FrameImage frameImage : getVisualization().getFrameImages()) {
             frameImage.hidePortImages();
             frameImage.hidePathImages();
-            frameImage.setTransparency(1.0f);
+            frameImage.setTransparency(1.0);
         }
 
         for (Image deviceImageRaw : getVisualization().getImages().filterType(PatchImage.class).getList()) {
             PatchImage patchImage = (PatchImage) deviceImageRaw;
             patchImage.hidePortImages();
             patchImage.hidePathImages();
-            patchImage.setTransparency(1.0f);
+            patchImage.setTransparency(1.0);
         }
 
         List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
