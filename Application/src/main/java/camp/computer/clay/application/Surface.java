@@ -380,6 +380,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     public static void drawRectangle(Point position, double angle, double width, double height, Surface surface) {
 
+        // TODO: Absolute rotate at 0,0; Translate with position. (or, make algorithm to translate WRT another reference point)
+
         Canvas canvas = surface.getCanvas();
         Paint paint = surface.getPaint();
 
@@ -390,10 +392,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         Point bottomLeft = new Point(position.getX() - (width / 2.0f), position.getY() + (height / 2.0f));
 
         // Calculate points after rotation
-        Point rotatedTopLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topLeft), (double) Geometry.calculateDistance(position, topLeft));
-        Point rotatedTopRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topRight), (double) Geometry.calculateDistance(position, topRight));
-        Point rotatedBottomRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomRight), (double) Geometry.calculateDistance(position, bottomRight));
-        Point rotatedBottomLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomLeft), (double) Geometry.calculateDistance(position, bottomLeft));
+        Point rotatedTopLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topLeft), Geometry.calculateDistance(position, topLeft));
+        Point rotatedTopRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topRight), Geometry.calculateDistance(position, topRight));
+        Point rotatedBottomRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomRight), Geometry.calculateDistance(position, bottomRight));
+        Point rotatedBottomLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomLeft), Geometry.calculateDistance(position, bottomLeft));
 
         // Draw points in shape
         android.graphics.Path path = new android.graphics.Path();

@@ -64,8 +64,11 @@ public class FrameImage extends Image {
 
         // Create shapes for image
         boardShape = new Rectangle(250, 250);
-
         addShape(boardShape);
+
+        Rectangle headerShape = new Rectangle(50, 50);
+        headerShape.setPosition(new Point(0, 125));
+        addShape(headerShape);
 
     }
 
@@ -149,6 +152,9 @@ public class FrameImage extends Image {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.color);
         Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
+
+        paint.setColor(Color.BLUE);
+        Surface.drawRectangle(((Rectangle) shapes.get(1)).getPosition(), getRotation(), ((Rectangle) shapes.get(1)).getWidth(), ((Rectangle) shapes.get(1)).getHeight(), surface);
 
         // Outline
         if (this.outlineVisibility) {
