@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
@@ -56,7 +56,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_FULLSCREEN = false;
     // </Style>
 
-    public VisualizationSurface visualizationSurface;
+    public Surface surface;
 
     private SpeechGenerator speechGenerator;
 
@@ -130,8 +130,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         setContentView(R.layout.activity_main);
 
         // Visualization Surface
-        visualizationSurface = (VisualizationSurface) findViewById (R.id.app_surface_view);
-        visualizationSurface.onResume();
+        surface = (Surface) findViewById (R.id.app_surface_view);
+        surface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
@@ -157,7 +157,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount();
 
-                // Update the state of the touched object based on the current touchPositions interaction state.
+                // Update the state of the touched object based on the current touchPoints interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -288,7 +288,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount ();
 
-                // Update the state of the touched object based on the current touchPositions interaction state.
+                // Update the state of the touched object based on the current touchPoints interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -314,7 +314,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler
 //                timelineButton.setInputType(inType); // restore input type
-//                return true; // consume touchPositions even
+//                return true; // consume touchPoints even
 //            }
         });
 
@@ -581,7 +581,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private void addPathPatchAction() {
 
         final TextView actionConstruct = new TextView(getContext());
-        actionConstruct.setText("Impression (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
+        actionConstruct.setText("Action (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
         int horizontalPadding = (int) convertDipToPx(20);
         int verticalPadding = (int) convertDipToPx(10);
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
@@ -642,7 +642,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private void startFullscreenService() {
         enableFullscreenService = true;
-        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Impression.MINIMUM_HOLD_DURATION);
+        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Action.MIN_HOLD_DURATION);
     }
 
     public void stopFullscreenService() {
@@ -671,7 +671,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onPause();
 
         // <VISUALIZATION>
-        visualizationSurface.onPause();
+        surface.onPause();
         // </VISUALIZATION>
     }
 
@@ -687,7 +687,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // <VISUALIZATION>
-        visualizationSurface.onResume();
+        surface.onResume();
         // </VISUALIZATION>
     }
 
@@ -744,12 +744,12 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // TODO: (cont'd) display interface.
     public static Application getDisplay() { return Application.applicationView; }
 
-    public VisualizationSurface getVisualizationSurface() {
-        return this.visualizationSurface;
+    public Surface getSurface() {
+        return this.surface;
     }
 
     public double getFramesPerSecond () {
-        return getVisualizationSurface().getRenderer().getFramesPerSecond();
+        return getSurface().getRenderer().getFramesPerSecond();
     }
 
     public SpeechGenerator getSpeechGenerator() {

@@ -1,14 +1,11 @@
 package camp.computer.clay.visualization.architecture;
 
-import android.graphics.Rect;
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.VisualizationSurface;
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Model;
-import camp.computer.clay.model.interactivity.Impression;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Rectangle;
@@ -154,7 +151,7 @@ public abstract class Image {
 
     public abstract void update();
 
-    public abstract void draw(VisualizationSurface visualizationSurface);
+    public abstract void draw(Surface surface);
 
     public abstract boolean containsPoint(Point point);
 
@@ -163,15 +160,15 @@ public abstract class Image {
     public interface ActionListener {
     }
 
-    public abstract void onImpression(Impression impression);
+    public abstract void onImpression(Action action);
 
     // TODO: change this to addOnTouchListener (since have abstract onImpression)... and call at end of that
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 
-    public void apply(Impression impression) {
-        onImpression(impression);
+    public void apply(Action action) {
+        onImpression(action);
     }
 
     public void setTransparency(final double transparency) {
@@ -187,7 +184,7 @@ public abstract class Image {
             pointList.addAll(shape.getVertices());
         }
 
-        Log.v("Bounds", "vertex #: " + pointList.size());
+//        Log.v("Bounds", "vertex #: " + pointList.size());
 
 //        return Geometry.calculateBoundingBox(pointList);
 

@@ -1,13 +1,12 @@
-package camp.computer.clay.model.interactivity;
+package camp.computer.clay.model.architecture;
 
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Patch;
-import camp.computer.clay.model.architecture.Path;
-import camp.computer.clay.model.architecture.Port;
+import camp.computer.clay.model.interactivity.*;
+import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.architecture.Layer;
 import camp.computer.clay.visualization.architecture.Visualization;
@@ -51,13 +50,13 @@ public class Body {
         }
     }
 
-    public void onImpression(Impression impression) {
+    public void onImpression(Action action) {
 
-        switch (impression.getType()) {
+        action.setBody(this);
+
+        switch (action.getType()) {
 
             case TOUCH: {
-
-                impression.setBody(this);
 
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
@@ -66,8 +65,8 @@ public class Body {
                 Interaction interaction = new Interaction();
                 interactions.add(interaction);
 
-                // Add impression to interaction
-                interaction.add(impression);
+                // Add action to interaction
+                interaction.add(action);
 
                 // Record interactions on timeline
                 // TODO: Cache and store the apply interactions before deleting them completely! Do it in
@@ -76,7 +75,7 @@ public class Body {
                     interactions.remove(0);
                 }
 
-                // Process the impression
+                // Process the action
                 onTouchListener(interaction);
 
                 break;
@@ -84,19 +83,17 @@ public class Body {
 
             case MOVE: {
 
-                impression.setBody(this);
+                Interaction interaction = getInteraction();
+                interaction.add(action);
 
                 // Current
-                impression.isTouching[impression.pointerIndex] = true;
-
-                Interaction interaction = getInteraction();
-                interaction.add(impression);
+                action.isTouching[action.pointerIndex] = true;
 
                 // Calculate drag distance
-                interaction.dragDistance[impression.pointerIndex] = Geometry.calculateDistance(impression.getPosition(), interaction.getFirst().touchPositions[impression.pointerIndex]);
+                interaction.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), interaction.getFirst().touchPoints[action.pointerIndex]);
 
                 // Classify/Callback
-                if (interaction.dragDistance[impression.pointerIndex] > Impression.MINIMUM_DRAG_DISTANCE) {
+                if (interaction.dragDistance[action.pointerIndex] > Action.MIN_DRAG_DISTANCE) {
                     onDragListener(interaction);
                 }
 
@@ -105,18 +102,16 @@ public class Body {
 
             case RELEASE: {
 
-                impression.setBody(this);
-
                 Interaction interaction = getInteraction();
-                interaction.add(impression);
-
-                // Stop listening for a hold impression
-                interaction.timerHandler.removeCallbacks(interaction.timerRunnable);
+                interaction.add(action);
 
                 // Current
-                impression.isTouching[impression.pointerIndex] = false;
+                action.isTouching[action.pointerIndex] = false;
 
-                if (interaction.getDuration() < Impression.MAXIMUM_TAP_DURATION) {
+                // Stop listening for a hold action
+                interaction.timerHandler.removeCallbacks(interaction.timerRunnable);
+
+                if (interaction.getDuration() < Action.MAX_TAP_DURATION) {
                     onTapListener(interaction);
                 } else {
                     onReleaseListener(interaction);
@@ -129,64 +124,31 @@ public class Body {
 
     private void onTouchListener(Interaction interaction) {
 
-        Impression impression = interaction.getLast();
+        Action action = interaction.getLast();
 
-        Image touchedImage = perspective.getVisualization().getImageByPosition(impression.getPosition());
-        impression.setTargetImage(touchedImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(action.getPosition());
+        action.setTargetImage(targetImage);
 
-//        if (perspective.hasFocusImage()) {
-//
-//            if (perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
-//
-//                if (impression.containsPoint() && impression.getImageByPosition().isType(PortImage.TYPE)) {
-////                    Log.v("Impression", "BUH");
-////                    perspective.InteractionfocusOnPort((PortImage) impression.getImageByPosition());
-//                }
-//            }
-//
-//            if (perspective.getFocusImage().isType(PortImage.TYPE, PathImage.TYPE)) {
-//
-//                if (impression.containsPoint() && impression.getImageByPosition().isType(PathImage.TYPE)) {
-////                    perspective.InteractionfocusOnPath((PathImage) impression.getImageByPosition());
-//                }
-//            }
-//        }
-//
-//        // Reset object impression state
-//        if (!perspective.hasFocusImage() || perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE)) {
-//
-//            if (impression.containsPoint() && impression.getImageByPosition().isType(FrameImage.TYPE)) {
-////                perspective.InteractionfocusOnForm((FrameImage) impression.getImageByPosition());
-//            }
-//
-//        }
-//
-//        if (!perspective.hasFocusImage() || perspective.getFocusImage().isType(FrameImage.TYPE, PortImage.TYPE, PathImage.TYPE)) {
-//
-//            if (!impression.containsPoint()) {
-////                perspective.InteractionfocusReset();
-//            }
-//        }
     }
 
     public void onHoldListener(Interaction interaction) {
 
-        Impression impression = interaction.getLast();
+        Action action = interaction.getLast();
 
-        impression.setType(Impression.Type.HOLD);
+        action.setType(Action.Type.HOLD);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(impression.getPosition());
-        impression.setTargetImage(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(action.getPosition());
+        action.setTargetImage(targetImage);
 
-        interaction.isHolding[impression.pointerIndex] = true;
+        interaction.isHolding[action.pointerIndex] = true;
 
-        if (impression.isTouching()) {
+        if (action.isTouching()) {
 
-            if (impression.getTargetImage() instanceof FrameImage) {
+            if (action.getTargetImage() instanceof FrameImage) {
 
                 // TODO:
 
-            } else if (impression.getTargetImage() instanceof PortImage) {
+            } else if (action.getTargetImage() instanceof PortImage) {
 
                 // TODO:
 
@@ -196,58 +158,58 @@ public class Body {
 
     private void onDragListener(Interaction interaction) {
 
-        Impression impression = interaction.getLast();
+        camp.computer.clay.model.interactivity.Action action = interaction.getLast();
 
-        impression.setType(Impression.Type.DRAG);
+        action.setType(Action.Type.DRAG);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(impression.getPosition());
-        impression.setTargetImage(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(action.getPosition());
+        action.setTargetImage(targetImage);
 
-        Log.v("onDragListener", "" + impression.getType() + ": " + impression.getTargetImage());
+        Log.v("onDragListener", "" + action.getType() + ": " + action.getTargetImage());
 
-        Log.v("Impression", "onDrag");
-        Log.v("Impression", "focus: " + perspective.getFocusImage());
-        Log.v("Impression", "apply: " + impression.getTargetImage());
-        Log.v("Impression", "-");
+        Log.v("Action", "onDrag");
+        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "apply: " + action.getTargetImage());
+        Log.v("Action", "-");
 
         if (interaction.getSize() > 1) {
-            impression.setTargetImage(interaction.getFirst().getTargetImage());
+            action.setTargetImage(interaction.getFirst().getTargetImage());
         }
 
-        interaction.isDragging[impression.pointerIndex] = true;
+        interaction.isDragging[action.pointerIndex] = true;
 
         // Holding
-        if (interaction.isHolding[impression.pointerIndex]) {
+        if (interaction.isHolding[action.pointerIndex]) {
 
             // Holding and dragging
 
             // TODO: Put into callback
-            if (impression.isTouching()) {
+            if (action.isTouching()) {
 
-                if (impression.getTargetImage() instanceof FrameImage) {
+                if (action.getTargetImage() instanceof FrameImage) {
 
                     // Frame
 
-                    FrameImage frameImage = (FrameImage) impression.getTargetImage();
-                    frameImage.apply(impression);
-                    frameImage.setPosition(impression.getPosition());
+                    FrameImage frameImage = (FrameImage) action.getTargetImage();
+                    frameImage.apply(action);
+                    frameImage.setPosition(action.getPosition());
 
                     // Perspective
-                    perspective.focusOnFrame(this, interaction, impression);
+                    perspective.focusOnFrame(this, interaction, action);
 
-                } else if (impression.getTargetImage() instanceof PortImage) {
+                } else if (action.getTargetImage() instanceof PortImage) {
 
                     // Port
 
-                    PortImage portImage = (PortImage) impression.getTargetImage();
+                    PortImage portImage = (PortImage) action.getTargetImage();
                     portImage.isTouched = true;
-//                    Impression impression = new Impression(impression.getPosition(), Impression.Type.DRAG);
-//                    portSprite.touchPositions(impression);
+//                    Action action = new Action(action.getPosition(), Action.Type.DRAG);
+//                    portSprite.touchPoints(action);
 
                     portImage.setDragging(true);
-                    portImage.setPosition(impression.getPosition());
+                    portImage.setPosition(action.getPosition());
 
-                } else if (impression.getTargetImage() instanceof Visualization) {
+                } else if (action.getTargetImage() instanceof Visualization) {
 
                     // Visualization
 
@@ -255,8 +217,8 @@ public class Body {
 
 //                        perspective.setScale(0.9f);
 //                        perspective.setOffset(
-//                                impression.getPosition().getX() - interaction.getFirst().getPosition().getX(),
-//                                impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
+//                                action.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+//                                action.getPosition().getY() - interaction.getFirst().getPosition().getY()
 //                        );
 
                         perspective.focusOnVisualization(interaction);
@@ -271,44 +233,44 @@ public class Body {
 
             // Not holding. Drag was detected prior to the hold duration threshold.
 
-            if (impression.isTouching()) {
+            if (action.isTouching()) {
 
-                if (impression.getTargetImage() instanceof FrameImage) {
+                if (action.getTargetImage() instanceof FrameImage) {
 
                     // Frame
 
-                    FrameImage frameImage = (FrameImage) impression.getTargetImage();
-                    frameImage.apply(impression);
-                    frameImage.setPosition(impression.getPosition());
+                    FrameImage frameImage = (FrameImage) action.getTargetImage();
+                    frameImage.apply(action);
+                    frameImage.setPosition(action.getPosition());
 
-                    perspective.focusOnFrame(this, interaction, impression);
+                    perspective.focusOnFrame(this, interaction, action);
 
-                } else if (impression.getTargetImage() instanceof PortImage) {
+                } else if (action.getTargetImage() instanceof PortImage) {
 
                     // Port
 
-                    PortImage portImage = (PortImage) impression.getTargetImage();
-                    portImage.apply(impression);
+                    PortImage portImage = (PortImage) action.getTargetImage();
+                    portImage.apply(action);
 
-                    perspective.focusOnNewPath(interaction, impression);
+                    perspective.focusOnNewPath(interaction, action);
 
-                } else if (impression.getTargetImage() instanceof PatchImage) {
+                } else if (action.getTargetImage() instanceof PatchImage) {
 
                     // Patch
 
-                    PatchImage patchImage = (PatchImage) impression.getTargetImage();
-                    patchImage.setPosition(impression.getPosition());
-                    patchImage.apply(impression);
+                    PatchImage patchImage = (PatchImage) action.getTargetImage();
+                    patchImage.setPosition(action.getPosition());
+                    patchImage.apply(action);
 
-                } else if (impression.getTargetImage() instanceof Visualization) {
+                } else if (action.getTargetImage() instanceof Visualization) {
 
                     // Visualization
 
                     if (interaction.getSize() > 1) {
 
                         perspective.setOffset(
-                                impression.getPosition().getX() - interaction.getFirst().getPosition().getX(),
-                                impression.getPosition().getY() - interaction.getFirst().getPosition().getY()
+                                action.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+                                action.getPosition().getY() - interaction.getFirst().getPosition().getY()
                         );
 
                     }
@@ -320,48 +282,48 @@ public class Body {
 
     private void onTapListener(Interaction interaction) {
 
-        Impression impression = interaction.getLast();
+        Action action = interaction.getLast();
 
-        impression.setType(Impression.Type.TAP);
+        action.setType(Action.Type.TAP);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(impression.getPosition());
-        impression.setTargetImage(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(action.getPosition());
+        action.setTargetImage(targetImage);
 
-        Log.v("Impression", "onTap");
-        Log.v("Impression", "focus: " + perspective.getFocusImage());
-        Log.v("Impression", "apply: " + impression.getTargetImage());
-        Log.v("Impression", "-");
+        Log.v("Action", "onTap");
+        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "apply: " + action.getTargetImage());
+        Log.v("Action", "-");
 
-        if (impression.isTouching()) {
+        if (action.isTouching()) {
 
-            if (impression.getTargetImage() instanceof FrameImage) {
+            if (action.getTargetImage() instanceof FrameImage) {
 
                 // Frame
-                FrameImage frameImage = (FrameImage) impression.getTargetImage();
-                frameImage.apply(impression);
+                FrameImage frameImage = (FrameImage) action.getTargetImage();
+                frameImage.apply(action);
 
                 // Perspective
-                perspective.focusOnFrame(this, interaction, impression);
+                perspective.focusOnFrame(this, interaction, action);
 
-            } else if (impression.getTargetImage() instanceof PortImage) {
+            } else if (action.getTargetImage() instanceof PortImage) {
 
                 // Port
-                PortImage portImage = (PortImage) impression.getTargetImage();
-                portImage.apply(impression);
+                PortImage portImage = (PortImage) action.getTargetImage();
+                portImage.apply(action);
 
-            } else if (impression.getTargetImage() instanceof PathImage) {
+            } else if (action.getTargetImage() instanceof PathImage) {
 
                 // Path
-                PathImage pathImage = (PathImage) impression.getTargetImage();
-                pathImage.apply(impression);
+                PathImage pathImage = (PathImage) action.getTargetImage();
+                pathImage.apply(action);
 
-            } else if (impression.getTargetImage() instanceof PatchImage) {
+            } else if (action.getTargetImage() instanceof PatchImage) {
 
                 // Patch
-                PatchImage patchImage = (PatchImage) impression.getTargetImage();
-                patchImage.apply(impression);
+                PatchImage patchImage = (PatchImage) action.getTargetImage();
+                patchImage.apply(action);
 
-            } else if (impression.getTargetImage() instanceof Visualization) {
+            } else if (action.getTargetImage() instanceof Visualization) {
 
                 // Visualization
                 perspective.focusReset();
@@ -374,31 +336,31 @@ public class Body {
 
     private void onReleaseListener(Interaction interaction) {
 
-        Impression impression = interaction.getLast();
+        Action action = interaction.getLast();
 
-        impression.setType(Impression.Type.RELEASE);
+        action.setType(Action.Type.RELEASE);
 
-        Image targetImage = perspective.getVisualization().getImageByPosition(impression.getPosition());
-        impression.setTargetImage(targetImage);
+        Image targetImage = perspective.getVisualization().getImageByPosition(action.getPosition());
+        action.setTargetImage(targetImage);
 
-        Log.v("Impression", "onRelease");
-        Log.v("Impression", "focus: " + perspective.getFocusImage());
-        Log.v("Impression", "apply: " + impression.getTargetImage());
-        Log.v("Impression", "-");
+        Log.v("Action", "onRelease");
+        Log.v("Action", "focus: " + perspective.getFocusImage());
+        Log.v("Action", "apply: " + action.getTargetImage());
+        Log.v("Action", "-");
 
-        if (impression.isTouching()) {
+        if (action.isTouching()) {
 
             // First apply was on a frame image...
             if (interaction.getFirst().getTargetImage() instanceof FrameImage) {
 
-                if (impression.getTargetImage() instanceof FrameImage) {
+                if (action.getTargetImage() instanceof FrameImage) {
 
                     // If first apply was on the same form, then respond
                     if (interaction.getFirst().isTouching() && interaction.getFirst().getTargetImage() instanceof FrameImage) {
 
                         // Frame
-                        FrameImage frameImage = (FrameImage) impression.getTargetImage();
-                        frameImage.apply(impression);
+                        FrameImage frameImage = (FrameImage) action.getTargetImage();
+                        frameImage.apply(action);
 
                         // Perspective
                         perspective.focusReset();
@@ -410,24 +372,24 @@ public class Body {
 
                 // First apply was on a port image...
 
-                if (impression.getTargetImage() instanceof FrameImage) {
+                if (action.getTargetImage() instanceof FrameImage) {
 
                     // ...last apply was on a frame image.
 
                     PortImage sourcePortImage = (PortImage) interaction.getFirst().getTargetImage();
                     sourcePortImage.setCandidatePathVisibility(false);
 
-                } else if (impression.getTargetImage() instanceof PortImage) {
+                } else if (action.getTargetImage() instanceof PortImage) {
 
                     // ...last apply was on a port image.
 
-                    // PortImage portImage = (PortImage) impression.getImageByPosition();
+                    // PortImage portImage = (PortImage) action.getImageByPosition();
                     PortImage sourcePortImage = (PortImage) interaction.getFirst().getTargetImage();
 
                     if (sourcePortImage.isDragging()) {
 
                         // Get nearest port image
-                        PortImage nearestPortImage = (PortImage) getPerspective().getVisualization().getImages().filterType(PortImage.class).getNearest(impression.getPosition());
+                        PortImage nearestPortImage = (PortImage) getPerspective().getVisualization().getImages().filterType(PortImage.class).getNearest(action.getPosition());
                         Port nearestPort = nearestPortImage.getPort();
                         Log.v("DND", "nearestPort: " + nearestPort);
 
@@ -508,7 +470,7 @@ public class Body {
 //
 //                    // Image
 //                    PatchImage peripheralImage = new PatchImage(peripheral);
-//                    peripheralImage.setPosition(impression.getPosition());
+//                    peripheralImage.setPosition(action.getPosition());
 //                    peripheralImage.setVisualization(getPerspective().getVisualization());
 //
 //                    // Visualization
@@ -520,26 +482,26 @@ public class Body {
                         boolean useNearbyPortImage = false;
                         for (FrameImage nearbyFrameImage : perspective.getVisualization().getFrameImages()) {
 
-                            Log.v("Impression", "A");
+                            Log.v("Action", "A");
 
                             // Update style of nearby machines
                             double distanceToFrameImage = Geometry.calculateDistance(
-                                    impression.getPosition(),
+                                    action.getPosition(),
                                     nearbyFrameImage.getPosition()
                             );
 
                             if (distanceToFrameImage < nearbyFrameImage.getBoundingRectangle().getHeight() + 50) {
 
-                                Log.v("Impression", "B");
+                                Log.v("Action", "B");
 
                                 // TODO: Use overlappedImage instanceof PortImage
 
                                 for (PortImage nearbyPortImage : nearbyFrameImage.getPortImages()) {
 
                                     if (nearbyPortImage != sourcePortImage) {
-                                        if (nearbyPortImage.containsPoint(impression.getPosition(), 50)) {
+                                        if (nearbyPortImage.containsPoint(action.getPosition(), 50)) {
 
-                                            Log.v("Impression", "C");
+                                            Log.v("Action", "C");
 
                                             Port port = sourcePortImage.getPort();
                                             Port nearbyPort = nearbyPortImage.getPort();
@@ -562,7 +524,7 @@ public class Body {
 
                                             if (!sourcePort.hasAncestor(targetPort)) {
 
-                                                Log.v("Impression", "D.1");
+                                                Log.v("Action", "D.1");
 
                                                 Path path = new Path(sourcePort, targetPort);
                                                 path.setType(Path.Type.MESH);
@@ -586,7 +548,7 @@ public class Body {
                             }
                         }
 
-//                portImage.apply(impression);
+//                portImage.apply(action);
 
                         if (!useNearbyPortImage) {
 
@@ -601,7 +563,7 @@ public class Body {
 
                         sourcePortImage.setCandidatePathVisibility(false);
 
-                        // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPositions another board.");
+                        // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
 
 //                // Perspective
 //                ArrayList<Port> pathPorts = port.getPorts(paths);
@@ -612,14 +574,14 @@ public class Body {
 //
 //                getVisualization().getSimulation().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
-//                impression.setTargetImage(interaction.getFirst().getImageByPosition());
-//                impression.setType(Impression.Type.RELEASE);
-//                Log.v("onHoldListener", "Source port: " + impression.getImageByPosition());
-//                targetImage.apply(impression);
+//                action.setTargetImage(interaction.getFirst().getImageByPosition());
+//                action.setType(Action.Type.RELEASE);
+//                Log.v("onHoldListener", "Source port: " + action.getImageByPosition());
+//                targetImage.apply(action);
 
                     }
 
-                } else if (impression.getTargetImage() instanceof PatchImage) {
+                } else if (action.getTargetImage() instanceof PatchImage) {
 
                     PortImage sourcePortImage = (PortImage) interaction.getFirst().getTargetImage();
 
@@ -627,7 +589,7 @@ public class Body {
                     sourcePortImage.setCandidatePathVisibility(false);
                     sourcePortImage.setCandidatePeripheralVisibility(false);
 
-                } else if (impression.getTargetImage() instanceof Visualization) {
+                } else if (action.getTargetImage() instanceof Visualization) {
 
                     PortImage sourcePortImage = (PortImage) interaction.getFirst().getTargetImage();
 
@@ -652,7 +614,7 @@ public class Body {
 
                         // Create Patch Image
                         PatchImage patchImage = new PatchImage(patch);
-                        patchImage.setPosition(impression.getPosition());
+                        patchImage.setPosition(action.getPosition());
                         // patchImage.setRotation();
                         patchImage.setVisualization(getPerspective().getVisualization());
 
@@ -715,9 +677,9 @@ public class Body {
 
                 // Path --> ?
 
-                if (impression.getTargetImage() instanceof PathImage) {
+                if (action.getTargetImage() instanceof PathImage) {
                     // Path --> Path
-                    PathImage pathImage = (PathImage) impression.getTargetImage();
+                    PathImage pathImage = (PathImage) action.getTargetImage();
                 }
 
             } else if (interaction.getFirst().getTargetImage() instanceof Visualization) {

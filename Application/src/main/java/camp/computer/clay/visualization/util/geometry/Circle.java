@@ -42,7 +42,7 @@ public class Circle extends Shape {
      */
     @Override
     public List<Point> getVertices() {
-        return Shape.getRegularPolygon(position, this.radius, vertexCount + 1);
+        return Geometry.getRegularPolygon(position, this.radius, vertexCount + 1);
     }
 
     @Override
