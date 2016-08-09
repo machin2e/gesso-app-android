@@ -3,6 +3,7 @@ package camp.computer.clay.visualization.image;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ public class FrameImage extends Image {
 
     // Shapes
     private Rectangle boardShape = new Rectangle(250, 250);
+
+    Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
 
     // Color, Transparency
     private String colorString = "f7f7f7"; // "404040"; // "414141";
@@ -66,9 +69,87 @@ public class FrameImage extends Image {
         boardShape = new Rectangle(250, 250);
         addShape(boardShape);
 
-        Rectangle headerShape = new Rectangle(50, 50);
-        headerShape.setPosition(new Point(0, 125));
-        addShape(headerShape);
+        // Headers
+        Rectangle headerShape1 = new Rectangle(50, 14);
+//        headerShape1.setRotation(0);
+        addShape(headerShape1);
+        headerShape1.setPosition(new Point(0, 132));
+
+        Rectangle headerShape2 = new Rectangle(50, 14);
+        addShape(headerShape2);
+        headerShape2.setPosition(new Point(132, 0));
+        headerShape2.setRotation(90);
+
+        Rectangle headerShape3 = new Rectangle(50, 14);
+        addShape(headerShape3);
+        headerShape3.setPosition(new Point(0, -132));
+//        headerShape2.setRotation(180);
+
+        Rectangle headerShape4 = new Rectangle(50, 14);
+        addShape(headerShape4);
+        headerShape4.setPosition(new Point(-132, 0));
+        headerShape4.setRotation(90);
+
+        // Lights
+        Rectangle light1 = new Rectangle(12, 20);
+        addShape(light1);
+        light1.setPosition(new Point(-20, 105));
+//        light1.setRotation(90);
+
+        Rectangle light2 = new Rectangle(12, 20);
+        addShape(light2);
+        light2.setPosition(new Point(0, 105));
+//        light2.setRotation(90);
+
+        Rectangle light3 = new Rectangle(12, 20);
+        addShape(light3);
+        light3.setPosition(new Point(20, 105));
+//        light3.setRotation(90);
+
+        Rectangle light4 = new Rectangle(12, 20);
+        addShape(light4);
+        light4.setPosition(new Point(105, 20));
+        light4.setRotation(90);
+
+        Rectangle light5 = new Rectangle(12, 20);
+        addShape(light5);
+        light5.setPosition(new Point(105, 0));
+        light5.setRotation(90);
+
+        Rectangle light6 = new Rectangle(12, 20);
+        addShape(light6);
+        light6.setPosition(new Point(105, -20));
+        light6.setRotation(90);
+
+        Rectangle light7 = new Rectangle(12, 20);
+        addShape(light7);
+        light7.setPosition(new Point(20, -105));
+//        light7.setRotation(90);
+
+        Rectangle light8 = new Rectangle(12, 20);
+        addShape(light8);
+        light8.setPosition(new Point(0, -105));
+//        light8.setRotation(90);
+
+        Rectangle light9 = new Rectangle(12, 20);
+        addShape(light9);
+        light9.setPosition(new Point(-20, -105));
+//        light9.setRotation(90);
+
+        Rectangle light10 = new Rectangle(12, 20);
+        addShape(light10);
+        light10.setPosition(new Point(-105, -20));
+        light10.setRotation(90);
+
+        Rectangle light11 = new Rectangle(12, 20);
+        addShape(light11);
+        light11.setPosition(new Point(-105, 0));
+        light11.setRotation(90);
+
+        Rectangle light12 = new Rectangle(12, 20);
+        addShape(light12);
+        light12.setPosition(new Point(-105, 20));
+        light12.setRotation(90);
 
     }
 
@@ -130,9 +211,9 @@ public class FrameImage extends Image {
 
     public void draw(Surface surface) {
         if (isVisible()) {
-            drawPortGroupImages(surface);
+//            drawPortGroupImages(surface);
             drawBoardImage(surface);
-            drawLightImages(surface);
+//            drawLightImages(surface);
 
             if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
                 surface.getPaint().setColor(Color.GREEN);
@@ -151,10 +232,21 @@ public class FrameImage extends Image {
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(this.color);
-        Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
+//        Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
+        Surface.drawRectangle((Rectangle) shapes.get(0), surface);
 
         paint.setColor(Color.BLUE);
-        Surface.drawRectangle(((Rectangle) shapes.get(1)).getPosition(), getRotation(), ((Rectangle) shapes.get(1)).getWidth(), ((Rectangle) shapes.get(1)).getHeight(), surface);
+//        Surface.drawRectangle(((Rectangle) shapes.get(1)).getPosition(), getRotation(), ((Rectangle) shapes.get(1)).getWidth(), ((Rectangle) shapes.get(1)).getHeight(), surface);
+//        Surface.drawRectangle(((Rectangle) shapes.get(2)).getPosition(), getRotation(), ((Rectangle) shapes.get(2)).getWidth(), ((Rectangle) shapes.get(2)).getHeight(), surface);
+//        Surface.drawRectangle(((Rectangle) shapes.get(3)).getPosition(), getRotation(), ((Rectangle) shapes.get(3)).getWidth(), ((Rectangle) shapes.get(3)).getHeight(), surface);
+//        Surface.drawRectangle(((Rectangle) shapes.get(4)).getPosition(), getRotation(), ((Rectangle) shapes.get(4)).getWidth(), ((Rectangle) shapes.get(4)).getHeight(), surface);
+        for (int i = 1; i < shapes.size(); i++) {
+            Surface.drawRectangle((Rectangle) shapes.get(i), surface);
+        }
+//        Surface.drawRectangle((Rectangle) shapes.get(1), surface);
+//        Surface.drawRectangle((Rectangle) shapes.get(2), surface);
+//        Surface.drawRectangle((Rectangle) shapes.get(3), surface);
+//        Surface.drawRectangle((Rectangle) shapes.get(4), surface);
 
         // Outline
         if (this.outlineVisibility) {
@@ -164,8 +256,6 @@ public class FrameImage extends Image {
             Surface.drawRectangle(getPosition(), getRotation(), boardShape.getWidth(), boardShape.getHeight(), surface);
         }
     }
-
-    Point[] portGroupCenterPositions = new Point[PORT_GROUP_COUNT];
 
     private void updatePortGroupImages() {
         // <SHAPE>
@@ -195,133 +285,133 @@ public class FrameImage extends Image {
         }
     }
 
-    private void drawPortGroupImages(Surface surface) {
+//    private void drawPortGroupImages(Surface surface) {
+//
+//        Canvas canvas = surface.getCanvas();
+//        Paint paint = surface.getPaint();
+//
+//        for (int i = 0; i < PORT_GROUP_COUNT; i++) {
+//
+//            // Color
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setColor(this.portGroupColor);
+//            Surface.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, surface);
+//
+//            // Outline
+//            if (this.showPortGroupOutline) {
+//                paint.setStyle(Paint.Style.STROKE);
+//                paint.setStrokeWidth((float) portGroupOutlineThickness);
+//                paint.setColor(this.portGroupOutlineColor);
+//                Surface.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, surface);
+//            }
+//
+//        }
+//    }
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
-
-        for (int i = 0; i < PORT_GROUP_COUNT; i++) {
-
-            // Color
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(this.portGroupColor);
-            Surface.drawRectangle(portGroupCenterPositions[i], getRotation() + ((i * 90) + 90), portGroupWidth, portGroupHeight, surface);
-
-            // Outline
-            if (this.showPortGroupOutline) {
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth((float) portGroupOutlineThickness);
-                paint.setColor(this.portGroupOutlineColor);
-                Surface.drawRectangle(portGroupCenterPositions[i], getRotation(), portGroupWidth, portGroupHeight, surface);
-            }
-
-        }
-    }
-
-    Point[] lightCenterPositions = new Point[PORT_COUNT];
-    double[] lightRotationAngle = new double[12];
+//    Point[] lightCenterPositions = new Point[PORT_COUNT];
+//    double[] lightRotationAngle = new double[12];
 
     private void updateLightImages() {
-        // <SHAPE>
-        lightCenterPositions[0] = new Point(
-                getPosition().getX() + (-20),
-                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-        lightCenterPositions[1] = new Point(
-                getPosition().getX() + (0),
-                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-        lightCenterPositions[2] = new Point(
-                getPosition().getX() + (+20),
-                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-
-        lightCenterPositions[3] = new Point(
-                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().getY() + (+20)
-        );
-        lightCenterPositions[4] = new Point(
-                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().getY() + (0)
-        );
-        lightCenterPositions[5] = new Point(
-                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().getY() + (-20)
-        );
-
-        lightCenterPositions[6] = new Point(
-                getPosition().getX() + (+20),
-                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-        lightCenterPositions[7] = new Point(
-                getPosition().getX() + (0),
-                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-        lightCenterPositions[8] = new Point(
-                getPosition().getX() + (-20),
-                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
-        );
-
-        lightCenterPositions[9] = new Point(
-                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().getY() + (-20)
-        );
-        lightCenterPositions[10] = new Point(
-                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().getY() + (0)
-        );
-        lightCenterPositions[11] = new Point(
-                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
-                getPosition().getY() + (+20)
-        );
-
-        lightRotationAngle[0] = 0;
-        lightRotationAngle[1] = 0;
-        lightRotationAngle[2] = 0;
-        lightRotationAngle[3] = 90;
-        lightRotationAngle[4] = 90;
-        lightRotationAngle[5] = 90;
-        lightRotationAngle[6] = 180;
-        lightRotationAngle[7] = 180;
-        lightRotationAngle[8] = 180;
-        lightRotationAngle[9] = 270;
-        lightRotationAngle[10] = 270;
-        lightRotationAngle[11] = 270;
-        // </SHAPE>
-
-        // Calculate rotated position
-        for (int i = 0; i < PORT_COUNT; i++) {
-            lightCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation(), lightCenterPositions[i]);
-        }
+//        // <SHAPE>
+//        lightCenterPositions[0] = new Point(
+//                getPosition().getX() + (-20),
+//                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+//        );
+//        lightCenterPositions[1] = new Point(
+//                getPosition().getX() + (0),
+//                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+//        );
+//        lightCenterPositions[2] = new Point(
+//                getPosition().getX() + (+20),
+//                getPosition().getY() + ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+//        );
+//
+//        lightCenterPositions[3] = new Point(
+//                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+//                getPosition().getY() + (+20)
+//        );
+//        lightCenterPositions[4] = new Point(
+//                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+//                getPosition().getY() + (0)
+//        );
+//        lightCenterPositions[5] = new Point(
+//                getPosition().getX() + ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+//                getPosition().getY() + (-20)
+//        );
+//
+//        lightCenterPositions[6] = new Point(
+//                getPosition().getX() + (+20),
+//                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+//        );
+//        lightCenterPositions[7] = new Point(
+//                getPosition().getX() + (0),
+//                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+//        );
+//        lightCenterPositions[8] = new Point(
+//                getPosition().getX() + (-20),
+//                getPosition().getY() - ((boardShape.getHeight() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f))
+//        );
+//
+//        lightCenterPositions[9] = new Point(
+//                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+//                getPosition().getY() + (-20)
+//        );
+//        lightCenterPositions[10] = new Point(
+//                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+//                getPosition().getY() + (0)
+//        );
+//        lightCenterPositions[11] = new Point(
+//                getPosition().getX() - ((boardShape.getWidth() / 2.0f) + (-distanceLightsToEdge) + -(lightHeight / 2.0f)),
+//                getPosition().getY() + (+20)
+//        );
+//
+//        lightRotationAngle[0] = 0;
+//        lightRotationAngle[1] = 0;
+//        lightRotationAngle[2] = 0;
+//        lightRotationAngle[3] = 90;
+//        lightRotationAngle[4] = 90;
+//        lightRotationAngle[5] = 90;
+//        lightRotationAngle[6] = 180;
+//        lightRotationAngle[7] = 180;
+//        lightRotationAngle[8] = 180;
+//        lightRotationAngle[9] = 270;
+//        lightRotationAngle[10] = 270;
+//        lightRotationAngle[11] = 270;
+//        // </SHAPE>
+//
+//        // Calculate rotated position
+//        for (int i = 0; i < PORT_COUNT; i++) {
+//            lightCenterPositions[i] = Geometry.calculateRotatedPoint(getPosition(), getRotation(), lightCenterPositions[i]);
+//        }
     }
 
-    private void drawLightImages(Surface surface) {
-
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
-
-        for (int i = 0; i < PORT_COUNT; i++) {
-
-            // Color
-            paint.setStyle(Paint.Style.FILL);
-            paint.setStrokeWidth(3);
-            Port port = (Port) getFrame().getPort(i);
-            if (port.getType() != Port.Type.NONE) {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), (float) currentTransparency));
-            } else {
-                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, (float) currentTransparency));
-            }
-            Surface.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, surface);
-
-            // Outline
-            if (this.showLightOutline) {
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setStrokeWidth((float) lightOutlineThickness);
-                paint.setColor(this.lightOutlineColor);
-                Surface.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, surface);
-            }
-        }
-    }
+//    private void drawLightImages(Surface surface) {
+//
+//        Canvas canvas = surface.getCanvas();
+//        Paint paint = surface.getPaint();
+//
+//        for (int i = 0; i < PORT_COUNT; i++) {
+//
+//            // Color
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setStrokeWidth(3);
+//            Port port = (Port) getFrame().getPort(i);
+//            if (port.getType() != Port.Type.NONE) {
+//                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(this.getPortImage(i).getUniqueColor(), (float) currentTransparency));
+//            } else {
+//                paint.setColor(camp.computer.clay.visualization.util.Color.setTransparency(PortImage.FLOW_PATH_COLOR_NONE, (float) currentTransparency));
+//            }
+//            Surface.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, surface);
+//
+//            // Outline
+//            if (this.showLightOutline) {
+//                paint.setStyle(Paint.Style.STROKE);
+//                paint.setStrokeWidth((float) lightOutlineThickness);
+//                paint.setColor(this.lightOutlineColor);
+//                Surface.drawRectangle(lightCenterPositions[i], getRotation() + lightRotationAngle[i], lightWidth, lightHeight, surface);
+//            }
+//        }
+//    }
 
     public void showPortImages() {
         for (PortImage portImage : getPortImages()) {

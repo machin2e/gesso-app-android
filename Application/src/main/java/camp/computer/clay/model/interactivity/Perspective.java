@@ -45,13 +45,16 @@ public class Perspective {
     }
 
     // The visualization displayed from this perspective
-    private Visualization visualization;
+    private Visualization visualization = null;
 
     // Focus in Perspective
     // TODO: Infer this from thisInteraction history/perspective
     private Image focusImage = null;
 
     private boolean isAdjustable = true;
+
+    public Perspective() {
+    }
 
     public Perspective(Visualization visualization) {
         this.visualization = visualization;
@@ -212,6 +215,10 @@ public class Perspective {
 
     public boolean isAdjustable() {
         return isAdjustable;
+    }
+
+    public void setVisualization(Visualization visualization) {
+        this.visualization = visualization;
     }
 
     public Visualization getVisualization() {

@@ -67,11 +67,11 @@ public abstract class Image {
         return rotation;
     }
 
-    public double getAbsoluteRotation() {
+    public double old_getAbsoluteRotation() {
         double absoluteRotation = 0;
         Image parentImage = getParentImage();
         if (parentImage != null) {
-            absoluteRotation = parentImage.getAbsoluteRotation() + getRotation();
+            absoluteRotation = parentImage.old_getAbsoluteRotation() + getRotation();
         } else {
             return getRotation();
         }
@@ -89,7 +89,7 @@ public abstract class Image {
     /**
      * Absolute position calculated from relative position.
      */
-    public void setRelativePosition(Point position) {
+    public void old_setRelativePosition(Point position) {
         Point absolutePosition = new Point();
         Image parentImage = getParentImage();
         if (parentImage != null) {
@@ -111,6 +111,7 @@ public abstract class Image {
 
     public void setRotation(double angle) {
         this.rotation = angle;
+        this.position.setAngle(angle);
     }
 
     public void setScale(double scale) {

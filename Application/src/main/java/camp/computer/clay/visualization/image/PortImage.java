@@ -476,11 +476,11 @@ public class PortImage extends Image {
 
             relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
                     new Point(0, 0), //getParentImage().getPosition(),
-                    getParentImage().getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
+                    getParentImage().old_getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
                     relativePortPositions[getIndex()]
             );
 
-            setRelativePosition(relativePortPositions[getIndex()]);
+            old_setRelativePosition(relativePortPositions[getIndex()]);
 
         } else if (getParentImage() instanceof PatchImage) {
 
@@ -542,11 +542,11 @@ public class PortImage extends Image {
 
             relativePortPositions[getIndex()] = Geometry.calculateRotatedPoint(
                     new Point(0, 0), //getParentImage().getPosition(),
-                    getParentImage().getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
+                    getParentImage().old_getAbsoluteRotation(), //  + (((rot - 1) * 90) - 90) + ((rot - 1) * 90),
                     relativePortPositions[getIndex()]
             );
 
-            setRelativePosition(relativePortPositions[getIndex()]);
+            old_setRelativePosition(relativePortPositions[getIndex()]);
         }
     }
 

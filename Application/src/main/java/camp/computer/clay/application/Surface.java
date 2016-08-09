@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -20,6 +21,7 @@ import camp.computer.clay.model.architecture.Body;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.visualization.util.geometry.Rectangle;
 
 public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -385,17 +387,63 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         Canvas canvas = surface.getCanvas();
         Paint paint = surface.getPaint();
 
+        Point rotatedPosition = null;
+        if (position.getReferencePoint() != null) {
+//            Log.v("RectDraw", "!= null");
+            rotatedPosition = Geometry.calculatePoint(position.getReferencePoint(), angle + Geometry.calculateRotationAngle(position.getReferencePoint(), position), Geometry.calculateDistance(position.getReferencePoint(), position));
+        } else {
+//            Log.v("RectDraw", "NULL");
+            rotatedPosition = new Point(position);
+        }
+
         // Calculate points before rotation
-        Point topLeft = new Point(position.getX() - (width / 2.0f), position.getY() - (height / 2.0f));
-        Point topRight = new Point(position.getX() + (width / 2.0f), position.getY() - (height / 2.0f));
-        Point bottomRight = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
-        Point bottomLeft = new Point(position.getX() - (width / 2.0f), position.getY() + (height / 2.0f));
+        Point topLeft = new Point(rotatedPosition.getX() - (width / 2.0f), rotatedPosition.getY() - (height / 2.0f));
+        Point topRight = new Point(rotatedPosition.getX() + (width / 2.0f), rotatedPosition.getY() - (height / 2.0f));
+        Point bottomRight = new Point(rotatedPosition.getX() + (width / 2.0f), rotatedPosition.getY() + (height / 2.0f));
+        Point bottomLeft = new Point(rotatedPosition.getX() - (width / 2.0f), rotatedPosition.getY() + (height / 2.0f));
 
         // Calculate points after rotation
-        Point rotatedTopLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topLeft), Geometry.calculateDistance(position, topLeft));
-        Point rotatedTopRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, topRight), Geometry.calculateDistance(position, topRight));
-        Point rotatedBottomRight = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomRight), Geometry.calculateDistance(position, bottomRight));
-        Point rotatedBottomLeft = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, bottomLeft), Geometry.calculateDistance(position, bottomLeft));
+        Point rotatedTopLeft = Geometry.calculatePoint(rotatedPosition, angle + Geometry.calculateRotationAngle(rotatedPosition, topLeft), Geometry.calculateDistance(rotatedPosition, topLeft));
+        Point rotatedTopRight = Geometry.calculatePoint(rotatedPosition, angle + Geometry.calculateRotationAngle(rotatedPosition, topRight), Geometry.calculateDistance(rotatedPosition, topRight));
+        Point rotatedBottomRight = Geometry.calculatePoint(rotatedPosition, angle + Geometry.calculateRotationAngle(rotatedPosition, bottomRight), Geometry.calculateDistance(rotatedPosition, bottomRight));
+        Point rotatedBottomLeft = Geometry.calculatePoint(rotatedPosition, angle + Geometry.calculateRotationAngle(rotatedPosition, bottomLeft), Geometry.calculateDistance(rotatedPosition, bottomLeft));
+
+        // Draw points in shape
+        android.graphics.Path path = new android.graphics.Path();
+        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+        path.moveTo((float) rotatedTopLeft.getX(), (float) rotatedTopLeft.getY());
+        path.lineTo((float) rotatedTopRight.getX(), (float) rotatedTopRight.getY());
+        path.lineTo((float) rotatedBottomRight.getX(), (float) rotatedBottomRight.getY());
+        path.lineTo((float) rotatedBottomLeft.getX(), (float) rotatedBottomLeft.getY());
+        path.close();
+
+        canvas.drawPath(path, paint);
+    }
+
+    public static void drawRectangle(Rectangle rectangle, Surface surface) {
+
+        Canvas canvas = surface.getCanvas();
+        Paint paint = surface.getPaint();
+
+        Point rotatedPosition = null;
+        if (rectangle.getPosition().getReferencePoint() != null) {
+//            rotatedPosition = Geometry.calculatePoint(rectangle.getPosition().getReferencePoint(), rectangle.getRotation() + Geometry.calculateRotationAngle(rectangle.getPosition().getReferencePoint(), rectangle.getPosition()), Geometry.calculateDistance(rectangle.getPosition().getReferencePoint(), rectangle.getPosition()));
+            rotatedPosition = Geometry.calculatePoint(rectangle.getPosition().getReferencePoint(), rectangle.getPosition().getReferencePoint().getAngle() + Geometry.calculateRotationAngle(rectangle.getPosition().getReferencePoint(), rectangle.getPosition()), Geometry.calculateDistance(rectangle.getPosition().getReferencePoint(), rectangle.getPosition()));
+        } else {
+            rotatedPosition = new Point(rectangle.getPosition());
+        }
+
+        // Calculate points before rotation
+        Point topLeft = new Point(rotatedPosition.getX() - (rectangle.getWidth() / 2.0f), rotatedPosition.getY() - (rectangle.getHeight() / 2.0f));
+        Point topRight = new Point(rotatedPosition.getX() + (rectangle.getWidth() / 2.0f), rotatedPosition.getY() - (rectangle.getHeight() / 2.0f));
+        Point bottomRight = new Point(rotatedPosition.getX() + (rectangle.getWidth() / 2.0f), rotatedPosition.getY() + (rectangle.getHeight() / 2.0f));
+        Point bottomLeft = new Point(rotatedPosition.getX() - (rectangle.getWidth() / 2.0f), rotatedPosition.getY() + (rectangle.getHeight() / 2.0f));
+
+        // Calculate points after rotation
+        Point rotatedTopLeft = Geometry.calculatePoint(rotatedPosition, rectangle.getRotation() + Geometry.calculateRotationAngle(rotatedPosition, topLeft), Geometry.calculateDistance(rotatedPosition, topLeft));
+        Point rotatedTopRight = Geometry.calculatePoint(rotatedPosition, rectangle.getRotation() + Geometry.calculateRotationAngle(rotatedPosition, topRight), Geometry.calculateDistance(rotatedPosition, topRight));
+        Point rotatedBottomRight = Geometry.calculatePoint(rotatedPosition, rectangle.getRotation() + Geometry.calculateRotationAngle(rotatedPosition, bottomRight), Geometry.calculateDistance(rotatedPosition, bottomRight));
+        Point rotatedBottomLeft = Geometry.calculatePoint(rotatedPosition, rectangle.getRotation() + Geometry.calculateRotationAngle(rotatedPosition, bottomLeft), Geometry.calculateDistance(rotatedPosition, bottomLeft));
 
         // Draw points in shape
         android.graphics.Path path = new android.graphics.Path();

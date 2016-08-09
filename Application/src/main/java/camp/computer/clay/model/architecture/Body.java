@@ -14,6 +14,9 @@ public class Body {
     public List<Interaction> interactions = new LinkedList<>();
 
     public Body() {
+        // Perspective
+        Perspective perspective = new Perspective();
+        setPerspective(perspective);
     }
 
     public void setPerspective(Perspective perspective) {

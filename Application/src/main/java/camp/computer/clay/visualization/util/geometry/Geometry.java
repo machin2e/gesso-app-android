@@ -17,7 +17,7 @@ public abstract class Geometry {
     public static double calculateDistance(double x, double y, double x2, double y2) {
         double distanceSquare = Math.pow(x - x2, 2) + Math.pow(y - y2, 2);
         double distance = Math.sqrt(distanceSquare);
-        return (double) distance;
+        return distance;
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class Geometry {
 //            rotation += 360;
 //        }
 
-        return (double) angle;
+        return angle;
     }
 
     /**

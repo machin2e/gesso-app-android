@@ -75,8 +75,7 @@ public class Clay {
 
         // Create body and set perspective
         Body body = new Body();
-        Perspective perspective = new Perspective(visualization);
-        body.setPerspective(perspective);
+        body.getPerspective().setVisualization(visualization);
 
         // Add body to environment
         environment.addBody(body);

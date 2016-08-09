@@ -15,7 +15,7 @@ public abstract class Shape {
 
     protected Point position = new Point(0, 0);
 
-    protected double rotation = 0;
+//    protected double rotation = 0;
 
     public Shape() {
     }
@@ -33,11 +33,11 @@ public abstract class Shape {
     }
 
     public void setRotation(double angle) {
-        this.rotation = angle;
+        this.position.setAngle(angle);
     }
 
     public double getRotation() {
-        return rotation;
+        return this.position.getAngle();
     }
 
     abstract public List<Point> getVertices();
