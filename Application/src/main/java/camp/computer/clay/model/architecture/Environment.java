@@ -36,8 +36,9 @@ public class Environment extends Model {
         return this.system;
     }
 
-    public void addFrame(Frame path) {
-        this.frames.add(path);
+    public void addFrame(Frame frame) {
+        this.frames.add(frame);
+        frame.setParent(this);
     }
 
     public Frame getFrame(int index) {
@@ -68,6 +69,7 @@ public class Environment extends Model {
 
     public void addPatch(Patch patch) {
         this.patches.add(patch);
+        patch.setParent(this);
     }
 
     public Patch getPatch(int index) {

@@ -6,6 +6,7 @@ import java.util.List;
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interactivity.ActionListener;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Rectangle;
@@ -16,21 +17,21 @@ public abstract class Image {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-    protected Point position = new Point(); // Image position
+    protected Point position = new Point(0, 0); // Image position
 
-    protected double scale = 1.0f; // Image scale factor
+    protected double scale = 1.0; // Image scale factor
 
-    protected double rotation = 0.0f; // Image heading rotation
+    protected double rotation = 0.0; // Image heading rotation
 
     protected Visibility visibility = Visibility.VISIBLE;
 
     protected double targetTransparency = 1.0;
 
-    protected double currentTransparency = targetTransparency;
+    protected double transparency = targetTransparency;
 
-    protected Model model;
+    protected Model model = null;
 
-    protected Visualization visualization;
+    protected Visualization visualization = null;
 
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
@@ -111,7 +112,7 @@ public abstract class Image {
 
     public void setRotation(double angle) {
         this.rotation = angle;
-        this.position.setAngle(angle);
+        this.position.setRotation(angle);
     }
 
     public void setScale(double scale) {
@@ -139,6 +140,15 @@ public abstract class Image {
         return shapes.get(index);
     }
 
+    public Shape getShape(String label) {
+        for (Shape shape : shapes) {
+            if (shape.getLabel().equals(label)) {
+                return shape;
+            }
+        }
+        return null;
+    }
+
     public List<Shape> getShapes() {
         return shapes;
     }
@@ -155,23 +165,20 @@ public abstract class Image {
 
     public abstract boolean containsPoint(Point point, double padding);
 
-    public interface ActionListener {
-    }
-
-    public abstract void onAction(Action action);
-
     // TODO: change this to addOnTouchListener (since have abstract onAction)... and call at end of that
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 
     public void processAction(Action action) {
-        onAction(action);
+        if (actionListener != null) {
+            actionListener.onAction(action);
+        }
     }
 
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
-        this.currentTransparency = transparency;
+        this.transparency = transparency;
     }
 
     public Rectangle getBoundingRectangle() {
@@ -184,9 +191,9 @@ public abstract class Image {
 
 //        Log.v("Bounds", "vertex #: " + pointList.size());
 
-//        return Geometry.calculateBoundingBox(pointList);
+        return Geometry.calculateBoundingBox(pointList);
 
-        return new Rectangle(250, 250);
+//        return new Rectangle(250, 250);
 
     }
 

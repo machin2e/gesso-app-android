@@ -11,8 +11,8 @@ public class Frame extends Model {
 
     public void addPort(Port port) {
         if (!this.ports.contains(port)) {
-            port.setParent(this);
             this.ports.add(port);
+            port.setParent(this);
         }
     }
 

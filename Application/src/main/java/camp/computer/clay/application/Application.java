@@ -53,7 +53,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
      * Hides the operating system's status and navigation bars. Setting this to false is helpful
      * during debugging.
      */
-    private static final boolean ENABLE_FULLSCREEN = false;
+    private static final boolean ENABLE_FULLSCREEN = true;
     // </Style>
 
     public Surface surface;
@@ -70,7 +70,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private Clay clay;
 
-    private DatagramHost datagramServer;
+    private DatagramHost datagramHost;
 
     private NetworkResource networkResource;
 
@@ -218,10 +218,10 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         clay.addDisplay(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
-        if (datagramServer == null) {
-            datagramServer = new DatagramHost("udp");
-            clay.addHost(this.datagramServer);
-            datagramServer.startServer ();
+        if (datagramHost == null) {
+            datagramHost = new DatagramHost("udp");
+            clay.addHost(this.datagramHost);
+            datagramHost.startServer ();
         }
 
         // Internet Network Interface
@@ -679,11 +679,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     protected void onResume() {
         super.onResume();
 
-        if (datagramServer == null) {
-            datagramServer = new DatagramHost("udp");
+        if (datagramHost == null) {
+            datagramHost = new DatagramHost("udp");
         }
-        if (!datagramServer.isActive()) {
-            datagramServer.startServer();
+        if (!datagramHost.isActive()) {
+            datagramHost.startServer();
         }
 
         // <VISUALIZATION>

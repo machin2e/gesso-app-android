@@ -16,10 +16,9 @@ public class Action {
         NONE,
         TOUCH,
         HOLD,
-        MOVE,
-        DRAG, // TODO: Remove this. Instead, use MOVE and Interaction.getDistance()/getCardinality()/getSum(":dragDelta").
-        RELEASE,
-        TAP; // TODO: Remove this. Instead, put logic in RELEASE and use Interaction.getDuration().
+        MOVE, // TODO: Remove this. Instead, use MOVE and Interaction.getDistance()/getCardinality()/getSum(":dragDelta").
+        RELEASE;
+        //TAP; // TODO: Remove this. Instead, put logic in RELEASE and use Interaction.getDuration().
 
         Type() {
         }

@@ -59,8 +59,8 @@ public class Port extends Model {
 
     public void addPath(Path path) {
         if (!hasPath(path)) {
-            path.setParent(this);
             this.paths.add(path);
+            path.setParent(this);
         }
     }
 

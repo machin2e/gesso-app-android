@@ -16,7 +16,7 @@ public class Point {
     private double x = 0;
     private double y = 0;
 
-    private double angle = 0;
+    private double rotation = 0;
 
     /**
      * Rotation rotation in degrees
@@ -72,7 +72,7 @@ public class Point {
     }
 
     public double getRelativeAngle() {
-        return angle;
+        return rotation;
     }
 
     public void setRelative(Point point) {
@@ -89,7 +89,7 @@ public class Point {
     }
 
     public void setRelativeAngle(double angle) {
-        this.angle = angle;
+        this.rotation = angle;
     }
 
     /**
@@ -107,7 +107,7 @@ public class Point {
     public double getX() {
         if (referencePoint != null) {
             return referencePoint.getX() + this.x;
-//            return Geometry.calculateRotatedPoint(referencePoint, getAngle(), this).getX();
+//            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getX();
         } else {
             return this.x;
         }
@@ -119,17 +119,17 @@ public class Point {
     public double getY() {
         if (referencePoint != null) {
             return referencePoint.getY() + this.y;
-//            return Geometry.calculateRotatedPoint(referencePoint, getAngle(), this).getY();
+//            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getY();
         } else {
             return this.y;
         }
     }
 
-    public double getAngle() {
+    public double getRotation() {
         if (referencePoint != null) {
-            return referencePoint.getAngle() + this.angle;
+            return referencePoint.getRotation() + this.rotation;
         } else {
-            return this.angle;
+            return this.rotation;
         }
     }
 
@@ -172,11 +172,11 @@ public class Point {
         }
     }
 
-    public void setAngle(double angle) {
+    public void setRotation(double rotation) {
         if (referencePoint != null) {
-            this.angle = angle - referencePoint.getAngle();
+            this.rotation = rotation - referencePoint.getRotation();
         } else {
-            this.angle = angle;
+            this.rotation = rotation;
         }
     }
 

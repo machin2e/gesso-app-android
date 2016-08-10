@@ -56,4 +56,8 @@ public abstract class Color {
         int blue = android.graphics.Color.blue(color);
         return android.graphics.Color.argb(alpha, red, green, blue);
     }
+
+    public static String getHexColorString(int color) {
+        return String.format("#%06X", (0xFFFFFFFF & color));
+    }
 }

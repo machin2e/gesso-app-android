@@ -1,21 +1,21 @@
 package camp.computer.clay.visualization.util.geometry;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.visualization.util.Visibility;
 
 public abstract class Shape {
 
+    protected String label = null;
+
     protected Visibility visibility = Visibility.VISIBLE;
 
     protected Point position = new Point(0, 0);
 
-//    protected double rotation = 0;
+    protected String color = "#f7f7f7";
+    protected String outlineColor = "#000000";
+    protected double outlineThickness = 1.0;
+    protected double transparency = 1.0;
 
     public Shape() {
     }
@@ -28,16 +28,16 @@ public abstract class Shape {
         return position;
     }
 
-    public void setPosition(Point position) {
-        this.position.set(position);
+    public void setPosition(double x, double y) {
+        this.position.set(x, y);
     }
 
     public void setRotation(double angle) {
-        this.position.setAngle(angle);
+        this.position.setRotation(angle);
     }
 
     public double getRotation() {
-        return this.position.getAngle();
+        return this.position.getRotation();
     }
 
     abstract public List<Point> getVertices();
@@ -58,5 +58,41 @@ public abstract class Shape {
 
     public boolean isVisible() {
         return visibility == Visibility.VISIBLE;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setOutlineColor(String color) {
+        this.outlineColor = color;
+    }
+
+    public String getOutlineColor() {
+        return outlineColor;
+    }
+
+    public void setOutlineThickness(double thickness) {
+        this.outlineThickness = thickness;
+    }
+
+    public double getOutlineThickness() {
+        return outlineThickness;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public boolean hasLabel() {
+        return this.label != null && this.label.length() > 0;
+    }
+
+    public String getLabel() {
+        return this.label;
     }
 }

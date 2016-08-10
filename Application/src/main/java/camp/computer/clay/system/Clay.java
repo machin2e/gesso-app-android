@@ -6,6 +6,7 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
@@ -27,10 +28,11 @@ import camp.computer.clay.system.old_model.Event;
 import camp.computer.clay.visualization.architecture.Layer;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.image.FrameImage;
+import camp.computer.clay.visualization.image.PortImage;
 
 public class Clay {
 
-    private Descriptor descriptor;
+    private Descriptor descriptor = null;
 
     private MessageHost messageHost = null;
 
@@ -45,20 +47,18 @@ public class Clay {
     private Visualization visualization;
 
     // Group of discovered touchscreen devices
-    private ArrayList<DisplayHostInterface> displays;
+    private List<DisplayHostInterface> displays = new ArrayList<>();
 
     // Group of discovered devices
-    private ArrayList<Device> devices = new ArrayList<Device>();
+    private List<Device> devices = new ArrayList<>();
 
     public Clay() {
 
-        this.displays = new ArrayList<DisplayHostInterface>(); // Create list to storeHost displays.
+        this.cache = new CacheHost(this); // Set up cache
 
-        this.messageHost = new MessageHost(this); // Start the communications systems
+        this.messageHost = new MessageHost(this); // Start the messaging systems
 
         this.networkHost = new NetworkHost(this); // Start the networking systems
-
-        this.cache = new CacheHost(this); // Set up behavior repository
 
         // Descriptor
         // TODO: Stream this in from the Internet and devices.
@@ -71,7 +71,7 @@ public class Clay {
         // Visualization
         this.visualization = new Visualization (environment);
 
-//        initializeSimulation();
+//        setupSimulation();
 
         // Create body and set perspective
         Body body = new Body();
@@ -96,7 +96,7 @@ public class Clay {
         return this.visualization;
     }
 
-//    private void initializeSimulation() {
+//    private void setupSimulation() {
 //
 //        final int SIMULATED_FORM_COUNT = Probability.generateRandomInteger(5, 10);
 //
@@ -137,22 +137,19 @@ public class Clay {
             frame.addPort(port);
         }
 
-        frame.setParent(environment);
-
         environment.addFrame(frame);
-
-        // Update visualization
-
-        String layerName = "frames";
-        visualization.addLayer(layerName);
-        Layer defaultLayer = visualization.getLayer(layerName);
 
         // Create frame images
         FrameImage frameImage = new FrameImage(frame);
-        frameImage.setVisualization(visualization);
-        frameImage.setupPortImages();
-        
-        visualization.addImage(frame, frameImage, layerName);
+
+        // Setup frame's port images
+        // Add a port sprite for each of the associated base's ports
+        for (Port port : frame.getPorts()) {
+            PortImage portImage = new PortImage(port);
+            visualization.addImage(portImage, "ports");
+        }
+
+        visualization.addImage(frameImage, "frames");
     }
 
     public Descriptor getDescriptor() {
@@ -208,11 +205,11 @@ public class Clay {
         return this.storeHost;
     }
 
-    public ArrayList<Device> getDevices() {
+    public List<Device> getDevices() {
         return this.devices;
     }
 
-    public boolean hasNetworkManager () {
+    public boolean hasNetworkHost() {
         return this.networkHost != null;
     }
 
@@ -464,8 +461,8 @@ public class Clay {
 ////            action.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
 ////            action.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
 ////            getClay().getStore().storeAction(action);
-//            ArrayList<Action> children = new ArrayList<Action>();
-//            ArrayList<State> states = new ArrayList<State>();
+//            List<Action> children = new ArrayList<Action>();
+//            List<State> states = new ArrayList<State>();
 //            children.add(foundUnit.getTimeline().getEvents().get(0).getAction());
 //            states.addAll(foundUnit.getTimeline().getEvents().get(0).getState());
 //            children.add(foundUnit.getTimeline().getEvents().get(1).getAction());

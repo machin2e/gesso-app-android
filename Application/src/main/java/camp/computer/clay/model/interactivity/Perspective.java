@@ -466,8 +466,8 @@ public class Perspective {
             patchImage.setTransparency(1.0);
         }
 
-        List<Point> formImagePositions = getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
-        Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
+        List<Point> frameImagePositions = getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
+        Point formImagesCenterPosition = Geometry.calculateCenterPosition(frameImagePositions);
 
         adjustScale();
 

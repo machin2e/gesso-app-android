@@ -15,16 +15,19 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interactivity.ActionListener;
+import camp.computer.clay.model.interactivity.Interaction;
+import camp.computer.clay.model.interactivity.Perspective;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.visualization.util.geometry.Circle;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Rectangle;
 
 public class PortImage extends Image {
 
-    // <STYLE>
     public static double DISTANCE_FROM_BOARD = 45.0f;
     public static double DISTANCE_BETWEEN_NODES = 15.0f;
     public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
@@ -42,14 +45,10 @@ public class PortImage extends Image {
         }
         return -1;
     }
-    // </STYLE>
 
-    // <DATA>
     private int dataSampleCount = 40;
     private double[] portDataSamples = new double[dataSampleCount];
-    // </DATA>
 
-    // <SIMULATED_DATA>
     private int previousSwitchState = 0;
     private double switchPeriod = 20.0f;
     private int switchHalfPeriodSampleCount = 0;
@@ -58,7 +57,6 @@ public class PortImage extends Image {
     private int pulsePeriodSampleCount = 0;
     private int previousPulseState = 0;
     private double xWaveStart = 0;
-    // </SIMULATED_DATA>
 
     private boolean isDragging = false;
     private Point previousPosition = new Point(getPosition());
@@ -89,8 +87,24 @@ public class PortImage extends Image {
     }
 
     private void setup() {
-        uniqueColor = updateUniqueColor();
+        setupShapes();
+        setupStyle();
         setupData();
+        setupInteractivity();
+    }
+
+    private void setupShapes() {
+
+        // Create shapes for image
+        Circle portCircle = new Circle(shapeRadius);
+        portCircle.setColor("#f7f7f7");
+        portCircle.setOutlineThickness(0);
+        addShape(portCircle);
+
+    }
+
+    private void setupStyle() {
+        uniqueColor = updateUniqueColor();
         setVisibility(Visibility.INVISIBLE);
     }
 
@@ -100,8 +114,363 @@ public class PortImage extends Image {
         }
     }
 
+    private void setupInteractivity() {
+
+        setOnActionListener(new ActionListener() {
+            @Override
+            public void onAction(Action action) {
+
+                if (action.getType() == Action.Type.NONE) {
+
+                } else if (action.getType() == Action.Type.TOUCH) {
+
+                } else if (action.getType() == Action.Type.MOVE) {
+
+                    // Candidate Path Visibility
+                    setCandidatePathDestinationPosition(action.getPosition());
+                    setCandidatePathVisibility(Visibility.VISIBLE);
+
+                    // Candidate Patch Visibility
+
+                    boolean isPeripheral = true;
+                    for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {
+
+                        // Update style of nearby machines
+                        double distanceToFrameImage = Geometry.calculateDistance(
+                                candidatePathDestinationPosition,
+                                nearbyFrameImage.getPosition()
+                        );
+
+                        if (distanceToFrameImage < 500) {
+                            isPeripheral = false;
+                            break;
+                        }
+                    }
+
+                    if (isPeripheral) {
+                        setCandidatePeripheralVisibility(Visibility.VISIBLE);
+                    } else {
+                        setCandidatePeripheralVisibility(Visibility.INVISIBLE);
+                    }
+
+                    // f port type and flow direction
+                    Port port = getPort();
+                    if (port.getDirection() == Port.Direction.NONE) {
+                        port.setDirection(Port.Direction.INPUT);
+                    }
+                    if (port.getType() == Port.Type.NONE) {
+                        port.setType(Port.Type.next(port.getType()));
+                    }
+
+                } else if (action.getType() == Action.Type.RELEASE) {
+
+                    Interaction interaction = action.getInteraction();
+
+                    Image targetImage = visualization.getImageByPosition(action.getPosition());
+                    action.setTarget(targetImage);
+
+                    Perspective perspective = action.getBody().getPerspective();
+
+                    if (interaction.getDuration() < Action.MAX_TAP_DURATION) {
+
+                        Port port = getPort();
+
+                        if (port.getType() == Port.Type.NONE) {
+
+                            port.setDirection(Port.Direction.INPUT);
+                            port.setType(Port.Type.next(port.getType()));
+
+                            // TODO: Speak ~ "setting as input. you can send the data to another board if you want. touchPoints another board."
+
+                        } else if (!port.hasPath() && port.getAncestorPaths().size() == 0) {
+
+                            // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
+
+                            Port.Type nextType = port.getType();
+                            while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+                                nextType = Port.Type.next(nextType);
+                            }
+                            port.setType(nextType);
+
+                        } else if (!hasVisiblePaths() && !hasVisibleAncestorPaths()) {
+
+                            // TODO: Replace hasVisiblePaths() with check for focusedSprite/Path
+
+                            // TODO: If second press, change the channel.
+
+                            // Remove focus from other machines and their ports.
+                            for (FrameImage frameImage : getVisualization().getFrameImages()) {
+                                frameImage.setTransparency(0.1);
+                                frameImage.hidePortImages();
+                                frameImage.hidePathImages();
+                            }
+
+                            // Reduce focus on the machine
+                            getParentImage().setTransparency(0.1);
+
+                            // Focus on the port
+                            //portImage.getFrameImage().showPathImage(portImage.getIndex(), true);
+                            showPaths();
+                            setVisibility(Visibility.VISIBLE);
+                            setPathVisibility(Visibility.VISIBLE);
+
+                            List<Path> paths = port.getGraph();
+                            for (Path connectedPath : paths) {
+                                // Show ports
+                                getVisualization().getImage(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
+                                ((PortImage) getVisualization().getImage(connectedPath.getSource())).showPaths();
+                                getVisualization().getImage(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
+                                ((PortImage) getVisualization().getImage(connectedPath.getTarget())).showPaths();
+                                // Show path
+                                getVisualization().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
+                            }
+
+                            // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
+
+                            // Perspective
+                            List<Port> pathPorts = port.getPorts(paths);
+                            List<Image> pathPortImages = getVisualization().getImages(pathPorts);
+                            List<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
+                            Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
+                            getVisualization().getEnvironment().getBody(0).getPerspective().adjustScale(boundingBox);
+
+                            getVisualization().getEnvironment().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+
+                        } else if (hasVisiblePaths() || hasVisibleAncestorPaths()) {
+
+                            // Paths are being shown. Touching a port changes the port type. This will also
+                            // updates the corresponding path requirement.
+
+                            // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
+
+                            Port.Type nextType = port.getType();
+                            while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+                                nextType = Port.Type.next(nextType);
+                            }
+                            port.setType(nextType);
+
+                        }
+
+                        setCandidatePathVisibility(Visibility.INVISIBLE);
+
+                    } else {
+
+                        // ...last processAction was on a port image.
+
+                        // PortImage portImage = (PortImage) action.getImageByPosition();
+                        PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
+
+                        if (sourcePortImage.isDragging()) {
+
+                            // Get nearest port image
+                            PortImage nearestPortImage = (PortImage) getVisualization().getImages().filterType(PortImage.class).getNearest(action.getPosition());
+                            Port nearestPort = nearestPortImage.getPort();
+                            Log.v("DND", "nearestPort: " + nearestPort);
+
+                            // TODO: When dragging, enable pushing ports?
+
+                            // Remove the paths from the port and move them to the selected port
+//                        Port nearestPort = nearestPortImage.getPort();
+//                        while (sourcePortImage.getPort().getPaths().size() > 0) {
+//                            Path path = sourcePortImage.getPort().getPaths().remove(0);
+//                            path.setSource(nearestPort);
+//                            nearestPort.addPath(path);
+//                        }
+
+                            Port sourcePort = sourcePortImage.getPort();
+
+                            List<Path> paths = getVisualization().getEnvironment().getPaths();
+
+                            // Copy configuration
+                            nearestPort.setDirection(sourcePort.getDirection());
+                            nearestPort.setType(sourcePort.getType());
+                            nearestPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                            // Reset port configuration
+                            sourcePort.setDirection(Port.Direction.NONE);
+                            sourcePort.setType(Port.Type.NONE);
+                            sourcePortImage.updateUniqueColor();
+
+                            // Clear the port's list of paths
+                            sourcePort.getPaths().clear();
+
+                            // Copy paths
+                            for (Path path : paths) {
+
+                                // Update source
+                                if (path.getSource() == sourcePort) {
+                                    path.setSource(nearestPort);
+                                    Log.v("DND", "Updating source");
+                                }
+
+                                // Update target
+                                if (path.getTarget() == sourcePort) {
+                                    path.setTarget(nearestPort);
+                                    Log.v("DND", "Updating target");
+                                }
+
+//                            Path replacementPath = new Path(nearestPortImage.getPort(), path.getTarget());
+//                            nearestPortImage.getPort().addPath(replacementPath);
+//
+//                            PathImage replacementPathImage = new PathImage(path);
+//                            replacementPathImage.setVisualization(perspective.getVisualization());
+//                            addImage(path, replacementPathImage, "paths");
+//
+//                            PortImage targetPortImage = (PortImage) getImage(path.getTarget());
+//                            targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                                nearestPort.addPath(path);
+
+                            }
+
+                            // Restore port image's position
+                            sourcePortImage.setDragging(false);
+
+                            // Perspective
+                            action.getBody().getPerspective().focusOnPath(sourcePort);
+
+                        } else {
+
+//                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
+//
+//                    // Model
+//                    Patch peripheral = new Patch();
+//                    getPerspective().getVisualization().getEnvironment().addPatch(peripheral);
+//
+//                    // Visualization (Layer)
+//                    String layerTag = "peripherals";
+//                    getPerspective().getVisualization().addLayer(layerTag);
+//                    Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
+//
+//                    // Image
+//                    PatchImage peripheralImage = new PatchImage(peripheral);
+//                    peripheralImage.setPosition(action.getPosition());
+//                    peripheralImage.setVisualization(getPerspective().getVisualization());
+//
+//                    // Visualization
+//                    getPerspective().getVisualization().addImage(peripheral, peripheralImage, layerTag);
+//
+//                }
+
+                            // Show ports of nearby forms
+                            boolean useNearbyPortImage = false;
+                            for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {
+
+                                Log.v("Action", "A");
+
+                                // Update style of nearby machines
+                                double distanceToFrameImage = Geometry.calculateDistance(
+                                        action.getPosition(),
+                                        nearbyFrameImage.getPosition()
+                                );
+
+                                if (distanceToFrameImage < nearbyFrameImage.getBoundingRectangle().getHeight() + 50) {
+
+                                    Log.v("Action", "B");
+
+                                    // TODO: Use overlappedImage instanceof PortImage
+
+                                    for (PortImage nearbyPortImage : nearbyFrameImage.getPortImages()) {
+
+                                        if (nearbyPortImage != sourcePortImage) {
+                                            if (nearbyPortImage.containsPoint(action.getPosition(), 50)) {
+
+                                                Log.v("Action", "C");
+
+                                                Port port = sourcePortImage.getPort();
+                                                Port nearbyPort = nearbyPortImage.getPort();
+
+                                                useNearbyPortImage = true;
+
+                                                if (port.getDirection() == Port.Direction.NONE) {
+                                                    port.setDirection(Port.Direction.INPUT);
+                                                }
+                                                if (port.getType() == Port.Type.NONE) {
+                                                    port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                                }
+
+                                                nearbyPort.setDirection(Port.Direction.OUTPUT);
+                                                nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
+
+                                                // Create and add path to port
+                                                Port sourcePort = (Port) getVisualization().getModel(sourcePortImage);
+                                                Port targetPort = (Port) getVisualization().getModel(nearbyPortImage);
+
+                                                if (!sourcePort.hasAncestor(targetPort)) {
+
+                                                    Log.v("Action", "D.1");
+
+                                                    Path path = new Path(sourcePort, targetPort);
+                                                    path.setType(Path.Type.MESH);
+                                                    sourcePort.addPath(path);
+
+                                                    PathImage pathImage = new PathImage(path);
+//                                        pathImage.setVisualization(getVisualization());
+                                                    getVisualization().addImage(pathImage, "paths");
+
+                                                    PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
+                                                    targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+
+                                                    // Perspective
+                                                    action.getBody().getPerspective().focusOnPath(sourcePort);
+                                                }
+
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+//                portImage.processAction(action);
+
+                            if (!useNearbyPortImage) {
+
+                                Port port = (Port) sourcePortImage.getModel();
+
+                                port.setDirection(Port.Direction.INPUT);
+
+                                if (port.getType() == Port.Type.NONE) {
+                                    port.setType(Port.Type.next(port.getType()));
+                                }
+                            }
+
+                            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+
+                            // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
+
+//                // Perspective
+//                ArrayList<Port> pathPorts = port.getPorts(paths);
+//                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
+//                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
+//                Rectangle boundingBox = Geometry.getBoundingBox(pathPortPositions);
+//                getVisualization().getEnvironment().getBody(0).getPerspective().adjustScale(boundingBox);
+//
+//                getVisualization().getEnvironment().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+
+//                action.setTarget(interaction.getFirst().getImageByPosition());
+//                action.setType(Action.Type.RELEASE);
+//                Log.v("onHoldListener", "Source port: " + action.getImageByPosition());
+//                targetImage.processAction(action);
+
+                        }
+
+
+                        setCandidatePathVisibility(Visibility.INVISIBLE);
+                        setCandidatePeripheralVisibility(Visibility.INVISIBLE);
+                    }
+                }
+            }
+        });
+    }
+
     public FrameImage getFrameImage() {
         return (FrameImage) getParentImage();
+    }
+
+    public Port getPort() {
+        Port port = (Port) getModel();
+        return port;
     }
 
     public List<PathImage> getPathImages() {
@@ -159,7 +528,7 @@ public class PortImage extends Image {
             drawCandidatePathImages(surface);
 
             // Candidate Patch
-            drawCandidatePeripheralImage(surface);
+            drawCandidatePatchImage(surface);
         }
     }
 
@@ -178,7 +547,7 @@ public class PortImage extends Image {
         paint.setStrokeWidth(3);
         paint.setColor(FLOW_PATH_COLOR_NONE);
 
-        Surface.drawCircle(getPosition(), shapeRadius, 0, surface);
+        Surface.drawCircle((Circle) shapes.get(0), surface);
 
         // Outline
         if (showShapeOutline) {
@@ -215,11 +584,6 @@ public class PortImage extends Image {
                 Surface.drawCircle(getPosition(), shapeRadius, getRotation(), surface);
             }
         }
-    }
-
-    public Port getPort() {
-        Port port = (Port) getModel();
-        return port;
     }
 
     /**
@@ -418,59 +782,57 @@ public class PortImage extends Image {
             Frame frame = frameImage.getFrame();
             // </TODO>
 
-            Rectangle boundingRectangle = getBoundingRectangle();
-
-            Log.v("BoundingRectangle", "boundary width: " + boundingRectangle.getWidth() + ", height: " + boundingRectangle.getHeight());
+            Rectangle boardRectangle = (Rectangle) frameImage.getShape(0);
 
             // Ports
             double portRadius = 40.0f;
             Point[] relativePortPositions = new Point[frame.getPorts().size()];
             relativePortPositions[0] = new Point(
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[1] = new Point(
                     0,
-                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[2] = new Point(
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    +1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[3] = new Point(
-                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
             relativePortPositions[4] = new Point(
-                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     0
             );
             relativePortPositions[5] = new Point(
-                    +1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    +1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
             relativePortPositions[6] = new Point(
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    -1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[7] = new Point(
                     0,
-                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    -1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[8] = new Point(
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+                    -1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
             relativePortPositions[9] = new Point(
-                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
             relativePortPositions[10] = new Point(
-                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     0
             );
             relativePortPositions[11] = new Point(
-                    -1 * ((boundingRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
+                    -1 * ((boardRectangle.getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
                     +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
             );
 
@@ -485,24 +847,25 @@ public class PortImage extends Image {
         } else if (getParentImage() instanceof PatchImage) {
 
             PatchImage patchImage = (PatchImage) getParentImage();
-            Patch patch = patchImage.getPeripheral();
+            Patch patch = patchImage.getPatch();
             // </TODO>
 
             // Ports
             double portRadius = 40.0f;
             Point[] relativePortPositions = new Point[patch.getPorts().size()];
             relativePortPositions[0] = new Point(
-                    -1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-            );
-            relativePortPositions[1] = new Point(
+                    //-1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
                     0,
                     +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
             );
-            relativePortPositions[2] = new Point(
-                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
-                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
-            );
+//            relativePortPositions[1] = new Point(
+//                    0,
+//                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//            );
+//            relativePortPositions[2] = new Point(
+//                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES),
+//                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius)
+//            );
 //            relativePortPositions[3] = new Point(
 //                    +1 * ((patchImage.getShape().getWidth() / 2.0f) + PortImage.DISTANCE_FROM_BOARD + portRadius),
 //                    +1 * ((portRadius * 2) + PortImage.DISTANCE_BETWEEN_NODES)
@@ -623,344 +986,6 @@ public class PortImage extends Image {
         }
     }
 
-    @Override
-    public void onAction(Action action) {
-
-        if (action.getType() == Action.Type.NONE) {
-
-        } else if (action.getType() == Action.Type.TOUCH) {
-
-        } else if (action.getType() == Action.Type.TAP) {
-
-            Port port = getPort();
-
-            if (port.getType() == Port.Type.NONE) {
-
-                port.setDirection(Port.Direction.INPUT);
-                port.setType(Port.Type.next(port.getType()));
-
-                // TODO: Speak ~ "setting as input. you can send the data to another board if you want. touchPoints another board."
-
-            } else if (!port.hasPath() && port.getAncestorPaths().size() == 0) {
-
-                // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
-
-                Port.Type nextType = port.getType();
-                while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
-                    nextType = Port.Type.next(nextType);
-                }
-                port.setType(nextType);
-
-            } else if (!hasVisiblePaths() && !hasVisibleAncestorPaths()) {
-
-                // TODO: Replace hasVisiblePaths() with check for focusedSprite/Path
-
-                // TODO: If second press, change the channel.
-
-                // Remove focus from other machines and their ports.
-                for (FrameImage frameImage : getVisualization().getFrameImages()) {
-                    frameImage.setTransparency(0.1);
-                    frameImage.hidePortImages();
-                    frameImage.hidePathImages();
-                }
-
-                // Reduce focus on the machine
-                getParentImage().setTransparency(0.1);
-
-                // Focus on the port
-                //portImage.getFrameImage().showPathImage(portImage.getIndex(), true);
-                showPaths();
-                setVisibility(Visibility.VISIBLE);
-                setPathVisibility(Visibility.VISIBLE);
-
-                List<Path> paths = port.getGraph();
-                for (Path connectedPath : paths) {
-                    // Show ports
-                    getVisualization().getImage(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
-                    ((PortImage) getVisualization().getImage(connectedPath.getSource())).showPaths();
-                    getVisualization().getImage(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
-                    ((PortImage) getVisualization().getImage(connectedPath.getTarget())).showPaths();
-                    // Show path
-                    getVisualization().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
-                }
-
-                // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
-
-                // Perspective
-                List<Port> pathPorts = port.getPorts(paths);
-                List<Image> pathPortImages = getVisualization().getImages(pathPorts);
-                List<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
-                Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
-                getVisualization().getEnvironment().getBody(0).getPerspective().adjustScale(boundingBox);
-
-                getVisualization().getEnvironment().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
-
-            } else if (hasVisiblePaths() || hasVisibleAncestorPaths()) {
-
-                // Paths are being shown. Touching a port changes the port type. This will also
-                // updates the corresponding path requirement.
-
-                // TODO: Replace with state of perspective. i.e., Check if seeing a single path.
-
-                Port.Type nextType = port.getType();
-                while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
-                    nextType = Port.Type.next(nextType);
-                }
-                port.setType(nextType);
-
-            }
-
-            setCandidatePathVisibility(Visibility.INVISIBLE);
-
-        } else if (action.getType() == Action.Type.MOVE) {
-
-        } else if (action.getType() == Action.Type.DRAG) {
-
-            // Candidate Path Visibility
-            setCandidatePathDestinationPosition(action.getPosition());
-            setCandidatePathVisibility(Visibility.VISIBLE);
-
-            // Candidate Patch Visibility
-
-            boolean isPeripheral = true;
-            for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {
-
-                // Update style of nearby machines
-                double distanceToFrameImage = Geometry.calculateDistance(
-                        candidatePathDestinationPosition,
-                        nearbyFrameImage.getPosition()
-                );
-
-                if (distanceToFrameImage < 500) {
-                    isPeripheral = false;
-                    break;
-                }
-            }
-
-            if (isPeripheral) {
-                setCandidatePeripheralVisibility(Visibility.VISIBLE);
-            } else {
-                setCandidatePeripheralVisibility(Visibility.INVISIBLE);
-            }
-
-            // Setup port type and flow direction
-            Port port = getPort();
-            if (port.getDirection() == Port.Direction.NONE) {
-                port.setDirection(Port.Direction.INPUT);
-            }
-            if (port.getType() == Port.Type.NONE) {
-                port.setType(Port.Type.next(port.getType()));
-            }
-
-        } else if (action.getType() == Action.Type.RELEASE) {
-
-
-            // ...last processAction was on a port image.
-
-            // PortImage portImage = (PortImage) action.getImageByPosition();
-            PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
-
-            if (sourcePortImage.isDragging()) {
-
-                // Get nearest port image
-                PortImage nearestPortImage = (PortImage) getVisualization().getImages().filterType(PortImage.class).getNearest(action.getPosition());
-                Port nearestPort = nearestPortImage.getPort();
-                Log.v("DND", "nearestPort: " + nearestPort);
-
-                // TODO: When dragging, enable pushing ports?
-
-                // Remove the paths from the port and move them to the selected port
-//                        Port nearestPort = nearestPortImage.getPort();
-//                        while (sourcePortImage.getPort().getPaths().size() > 0) {
-//                            Path path = sourcePortImage.getPort().getPaths().remove(0);
-//                            path.setSource(nearestPort);
-//                            nearestPort.addPath(path);
-//                        }
-
-                Port sourcePort = sourcePortImage.getPort();
-
-                List<Path> paths = getVisualization().getEnvironment().getPaths();
-
-                // Copy configuration
-                nearestPort.setDirection(sourcePort.getDirection());
-                nearestPort.setType(sourcePort.getType());
-                nearestPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
-
-                // Reset port configuration
-                sourcePort.setDirection(Port.Direction.NONE);
-                sourcePort.setType(Port.Type.NONE);
-                sourcePortImage.updateUniqueColor();
-
-                // Clear the port's list of paths
-                sourcePort.getPaths().clear();
-
-                // Copy paths
-                for (Path path : paths) {
-
-                    // Update source
-                    if (path.getSource() == sourcePort) {
-                        path.setSource(nearestPort);
-                        Log.v("DND", "Updating source");
-                    }
-
-                    // Update target
-                    if (path.getTarget() == sourcePort) {
-                        path.setTarget(nearestPort);
-                        Log.v("DND", "Updating target");
-                    }
-
-//                            Path replacementPath = new Path(nearestPortImage.getPort(), path.getTarget());
-//                            nearestPortImage.getPort().addPath(replacementPath);
-//
-//                            PathImage replacementPathImage = new PathImage(path);
-//                            replacementPathImage.setVisualization(perspective.getVisualization());
-//                            addImage(path, replacementPathImage, "paths");
-//
-//                            PortImage targetPortImage = (PortImage) getImage(path.getTarget());
-//                            targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
-
-                    nearestPort.addPath(path);
-
-                }
-
-                // Restore port image's position
-                sourcePortImage.setDragging(false);
-
-                // Perspective
-                action.getBody().getPerspective().focusOnPath(sourcePort);
-
-            } else {
-
-//                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
-//
-//                    // Model
-//                    Patch peripheral = new Patch();
-//                    getPerspective().getVisualization().getEnvironment().addPatch(peripheral);
-//
-//                    // Visualization (Layer)
-//                    String layerTag = "peripherals";
-//                    getPerspective().getVisualization().addLayer(layerTag);
-//                    Layer defaultLayer = getPerspective().getVisualization().getLayer(layerTag);
-//
-//                    // Image
-//                    PatchImage peripheralImage = new PatchImage(peripheral);
-//                    peripheralImage.setPosition(action.getPosition());
-//                    peripheralImage.setVisualization(getPerspective().getVisualization());
-//
-//                    // Visualization
-//                    getPerspective().getVisualization().addImage(peripheral, peripheralImage, layerTag);
-//
-//                }
-
-                // Show ports of nearby forms
-                boolean useNearbyPortImage = false;
-                for (FrameImage nearbyFrameImage : getVisualization().getFrameImages()) {
-
-                    Log.v("Action", "A");
-
-                    // Update style of nearby machines
-                    double distanceToFrameImage = Geometry.calculateDistance(
-                            action.getPosition(),
-                            nearbyFrameImage.getPosition()
-                    );
-
-                    if (distanceToFrameImage < nearbyFrameImage.getBoundingRectangle().getHeight() + 50) {
-
-                        Log.v("Action", "B");
-
-                        // TODO: Use overlappedImage instanceof PortImage
-
-                        for (PortImage nearbyPortImage : nearbyFrameImage.getPortImages()) {
-
-                            if (nearbyPortImage != sourcePortImage) {
-                                if (nearbyPortImage.containsPoint(action.getPosition(), 50)) {
-
-                                    Log.v("Action", "C");
-
-                                    Port port = sourcePortImage.getPort();
-                                    Port nearbyPort = nearbyPortImage.getPort();
-
-                                    useNearbyPortImage = true;
-
-                                    if (port.getDirection() == Port.Direction.NONE) {
-                                        port.setDirection(Port.Direction.INPUT);
-                                    }
-                                    if (port.getType() == Port.Type.NONE) {
-                                        port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                                    }
-
-                                    nearbyPort.setDirection(Port.Direction.OUTPUT);
-                                    nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
-
-                                    // Create and add path to port
-                                    Port sourcePort = (Port) getVisualization().getModel(sourcePortImage);
-                                    Port targetPort = (Port) getVisualization().getModel(nearbyPortImage);
-
-                                    if (!sourcePort.hasAncestor(targetPort)) {
-
-                                        Log.v("Action", "D.1");
-
-                                        Path path = new Path(sourcePort, targetPort);
-                                        path.setType(Path.Type.MESH);
-                                        sourcePort.addPath(path);
-
-                                        PathImage pathImage = new PathImage(path);
-                                        pathImage.setVisualization(getVisualization());
-                                        getVisualization().addImage(path, pathImage, "paths");
-
-                                        PortImage targetPortImage = (PortImage) getVisualization().getImage(path.getTarget());
-                                        targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
-
-                                        // Perspective
-                                        action.getBody().getPerspective().focusOnPath(sourcePort);
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-//                portImage.processAction(action);
-
-                if (!useNearbyPortImage) {
-
-                    Port port = (Port) sourcePortImage.getModel();
-
-                    port.setDirection(Port.Direction.INPUT);
-
-                    if (port.getType() == Port.Type.NONE) {
-                        port.setType(Port.Type.next(port.getType()));
-                    }
-                }
-
-                sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
-
-                // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. touchPoints another board.");
-
-//                // Perspective
-//                ArrayList<Port> pathPorts = port.getPorts(paths);
-//                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
-//                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
-//                Rectangle boundingBox = Geometry.getBoundingBox(pathPortPositions);
-//                getVisualization().getEnvironment().getBody(0).getPerspective().adjustScale(boundingBox);
-//
-//                getVisualization().getEnvironment().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
-
-//                action.setTarget(interaction.getFirst().getImageByPosition());
-//                action.setType(Action.Type.RELEASE);
-//                Log.v("onHoldListener", "Source port: " + action.getImageByPosition());
-//                targetImage.processAction(action);
-
-            }
-
-
-            setCandidatePathVisibility(Visibility.INVISIBLE);
-            setCandidatePeripheralVisibility(Visibility.INVISIBLE);
-        }
-    }
-
     public void setCandidatePathVisibility(Visibility visibility) {
         candidatePathVisibility = visibility;
     }
@@ -1033,7 +1058,7 @@ public class PortImage extends Image {
     }
 
 
-    private void drawCandidatePeripheralImage(Surface surface) {
+    private void drawCandidatePatchImage(Surface surface) {
 
         if (candidatePeripheralVisibility == Visibility.VISIBLE) {
 

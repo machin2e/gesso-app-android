@@ -1,6 +1,7 @@
 package camp.computer.clay.visualization.architecture;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.architecture.Model;
@@ -17,7 +18,7 @@ public class Layer {
 
     private String tag = "default";
 
-    private List<Image> images = new ArrayList<>();
+    private List<Image> images = new LinkedList<>();
 
     public Layer(Visualization visualization) {
         this.visualization = visualization;
@@ -43,8 +44,9 @@ public class Layer {
         return this.visualization;
     }
 
-    public void add(Model model, Image image) {
+    public void add(Image image) {
         images.add(image);
+        image.setVisualization(visualization);
     }
 
     public Image getImage(Model model) {
@@ -65,8 +67,8 @@ public class Layer {
         return null;
     }
 
-    public ArrayList<Image> getImages() {
-        return new ArrayList<>(this.images);
+    public List<Image> getImages() {
+        return images;
     }
 
     public int getCardinality() {

@@ -2,11 +2,11 @@ package camp.computer.clay.visualization.image;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.util.Log;
 
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interactivity.ActionListener;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
@@ -27,13 +27,33 @@ public class PathImage extends Image {
     }
 
     private void setup() {
+        setupInteractivity();
+    }
+
+    private void setupInteractivity() {
+        setOnActionListener(new ActionListener() {
+            @Override
+            public void onAction(Action action) {
+
+                if (action.getType() == Action.Type.NONE) {
+
+                } else if (action.getType() == Action.Type.TOUCH) {
+
+                } else if (action.getType() == Action.Type.HOLD) {
+
+                } else if (action.getType() == Action.Type.MOVE) {
+
+                } else if (action.getType() == Action.Type.RELEASE) {
+
+                }
+            }
+        });
     }
 
     public void update() {
     }
 
     public void setVisibility(Visibility visibility) {
-        Log.v("TouchFrame", "pathImage.setVisibility = " + visibility);
         this.visibility = visibility;
     }
 
@@ -221,25 +241,5 @@ public class PathImage extends Image {
 
     public boolean containsPoint(Point point, double padding) {
         return false;
-    }
-
-    @Override
-    public void onAction(Action action) {
-
-        if (action.getType() == Action.Type.NONE) {
-
-        } else if (action.getType() == Action.Type.TOUCH) {
-
-        } else if (action.getType() == Action.Type.TAP) {
-
-        } else if (action.getType() == Action.Type.HOLD) {
-
-        } else if (action.getType() == Action.Type.MOVE) {
-
-        } else if (action.getType() == Action.Type.DRAG) {
-
-        } else if (action.getType() == Action.Type.RELEASE) {
-
-        }
     }
 }

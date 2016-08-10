@@ -5,7 +5,6 @@ import java.util.List;
 
 import camp.computer.clay.model.interactivity.*;
 import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.visualization.util.geometry.Geometry;
 
 public class Body {
 
@@ -85,7 +84,8 @@ public class Body {
 
                 // Classify/Callback
                 if (interaction.getDragDistance() > Action.MIN_DRAG_DISTANCE) {
-                    getPerspective().getVisualization().onDragListener(action);
+                    action.setType(Action.Type.MOVE);
+                    getPerspective().getVisualization().onMoveListener(action);
                 }
 
                 break;
@@ -102,11 +102,15 @@ public class Body {
                 // Stop listening for a hold action
                 interaction.timerHandler.removeCallbacks(interaction.timerRunnable);
 
-                if (interaction.getDuration() < Action.MAX_TAP_DURATION) {
-                    getPerspective().getVisualization().onTapListener(action);
-                } else {
-                    getPerspective().getVisualization().onReleaseListener(action);
-                }
+//                if (interaction.getDuration() < Action.MAX_TAP_DURATION) {
+//                    action.setType(Action.Type.TOUCH);
+//                    getPerspective().getVisualization().onTapListener(action);
+//                } else {
+//                    action.setType(Action.Type.RELEASE);
+//                    getPerspective().getVisualization().onReleaseListener(action);
+//                }
+
+                getPerspective().getVisualization().onReleaseListener(action);
 
                 break;
             }
