@@ -24,7 +24,7 @@ public class Interaction {
     // TODO: (cont'd) Note can have multiple sequences per finger in an thisInteraction,
     // TODO: (cont'd) so consider remodeling as per-finger thisInteraction and treat each finger
     // TODO: (cont'd) as an individual actor.
-    public boolean[] isHolding = new boolean[Action.MAX_TOUCH_POINT_COUNT];
+    private boolean[] isHolding = new boolean[Action.MAX_TOUCH_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAX_TOUCH_POINT_COUNT];
     private double[] dragDistance = new double[Action.MAX_TOUCH_POINT_COUNT];
 
@@ -40,11 +40,14 @@ public class Interaction {
         public void run() {
 
             int pointerIndex = 0;
+
             if (getFirst().isTouching[pointerIndex]) {
                 if (getDragDistance() < Action.MIN_DRAG_DISTANCE) {
 
                     // TODO: Make this less ugly! It's so ugly.
-                    getFirst().getBody().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+                    // getFirst().getBody().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+
+                    thisInteraction.isHolding[pointerIndex] = true;
 
                 }
             }
@@ -151,6 +154,10 @@ public class Interaction {
             touchPositions.add(actions.get(i).getPosition());
         }
         return touchPositions;
+    }
+
+    public boolean isHolding() {
+        return isHolding[0];
     }
 
     public boolean isDragging() {

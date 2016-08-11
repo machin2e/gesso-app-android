@@ -73,6 +73,18 @@ public class Visualization extends Image {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
+                    if (perspective.isAdjustable()) {
+
+//                        perspective.setScale(0.9f);
+//                        perspective.setOffset(
+//                                action.getPosition().getX() - interaction.getFirst().getPosition().getX(),
+//                                action.getPosition().getY() - interaction.getFirst().getPosition().getY()
+//                        );
+
+                        perspective.focusOnVisualization(interaction);
+
+                    }
+
                 } else if (action.getType() == Action.Type.RELEASE) {
 
                     action.setType(Action.Type.RELEASE);
@@ -89,6 +101,8 @@ public class Visualization extends Image {
                         PortImage sourcePortImage = (PortImage) action.getInteraction().getFirst().getTarget();
 
                         if (sourcePortImage.getCandidatePeripheralVisibility() == Visibility.VISIBLE) {
+
+                            Log.v("IASM", "(1) touch patch to select from store or (2) drag signal to frame or (3) touch elsewhere to cancel");
 
                             // Model
                             Patch patch = new Patch();
@@ -376,8 +390,8 @@ public class Visualization extends Image {
         for (Integer index : getLayerIndices()) {
             Layer layer = getLayer(index);
             if (layer != null) {
-                for (Image image : layer.getImages()) {
-                    image.draw(surface);
+                for (int i = 0; i < layer.getImages().size(); i++) {
+                    layer.getImages().get(i).draw(surface);
                 }
             }
         }
@@ -489,23 +503,9 @@ public class Visualization extends Image {
 
     }
 
-    public void onHoldListener(Action action) {
-
-        Interaction interaction = action.getInteraction();
-
-        action.setType(Action.Type.HOLD);
-
-        Image targetImage = getImageByPosition(action.getPosition());
-        action.setTarget(targetImage);
-
-        interaction.isHolding[action.pointerIndex] = true;
-    }
-
     public void onMoveListener(Action action) {
 
         Interaction interaction = action.getInteraction();
-
-        action.setType(Action.Type.MOVE);
 
         Image targetImage = getImageByPosition(action.getPosition());
         action.setTarget(targetImage);
@@ -524,7 +524,7 @@ public class Visualization extends Image {
         }
 
         // Holding
-        if (interaction.isHolding[action.pointerIndex]) {
+        if (interaction.isHolding()) {
 
             // Holding and dragging
 
@@ -540,7 +540,6 @@ public class Visualization extends Image {
             } else if (action.getTarget() instanceof PortImage) {
 
                 // Port
-
                 PortImage portImage = (PortImage) action.getTarget();
 
                 portImage.setDragging(true);
@@ -549,18 +548,7 @@ public class Visualization extends Image {
             } else if (action.getTarget() instanceof Visualization) {
 
                 // Visualization
-
-                if (perspective.isAdjustable()) {
-
-//                        perspective.setScale(0.9f);
-//                        perspective.setOffset(
-//                                action.getPosition().getX() - interaction.getFirst().getPosition().getX(),
-//                                action.getPosition().getY() - interaction.getFirst().getPosition().getY()
-//                        );
-
-                    perspective.focusOnVisualization(interaction);
-
-                }
+                action.getTarget().processAction(action);
 
             }
 

@@ -1,5 +1,7 @@
 package camp.computer.clay.visualization.architecture;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.model.interactivity.ActionListener;
+import camp.computer.clay.visualization.util.Color;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 import camp.computer.clay.visualization.util.geometry.Rectangle;
@@ -165,7 +168,6 @@ public abstract class Image {
 
     public abstract boolean containsPoint(Point point, double padding);
 
-    // TODO: change this to addOnTouchListener (since have abstract onAction)... and call at end of that
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
@@ -178,6 +180,15 @@ public abstract class Image {
 
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
+
+        /*
+        for (int i = 0; i < shapes.size(); i++) {
+            int intColor = android.graphics.Color.parseColor(shapes.get(i).getColor());
+            intColor = Color.setTransparency(intColor, this.targetTransparency);
+            shapes.get(i).setColor(Color.getHexColorString(intColor));
+        }
+        */
+
         this.transparency = transparency;
     }
 
@@ -189,12 +200,7 @@ public abstract class Image {
             pointList.addAll(shape.getVertices());
         }
 
-//        Log.v("Bounds", "vertex #: " + pointList.size());
-
         return Geometry.calculateBoundingBox(pointList);
-
-//        return new Rectangle(250, 250);
-
     }
 
 }

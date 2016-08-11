@@ -15,7 +15,6 @@ public abstract class Shape {
     protected String color = "#f7f7f7";
     protected String outlineColor = "#000000";
     protected double outlineThickness = 1.0;
-    protected double transparency = 1.0;
 
     public Shape() {
     }

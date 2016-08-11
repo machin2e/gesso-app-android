@@ -64,8 +64,6 @@ public class PatchImage extends Image {
                     Image targetImage = visualization.getImageByPosition(action.getPosition());
                     action.setTarget(targetImage);
 
-                    Perspective perspective = action.getBody().getPerspective();
-
                     if (interaction.getDuration() < Action.MAX_TAP_DURATION) {
 
                         Log.v("Action", "Tapped patch. Port image count: " + getPortImages().size());
