@@ -11,7 +11,7 @@ import java.util.UUID;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.host.TcpMessageClientHost;
 
-// TODO: Integrate with Frame in new model. Also separate the model (descriptive information that
+// TODO: Integrate with Frame in new construct. Also separate the construct (descriptive information that
 // TODO: (cont'd) provides a lookup table of sorts, and the simulation (includes virtual
 // TODO: (cont'd) communications interfaces such as TCP).
 
@@ -29,7 +29,7 @@ public class Device {
 
     private Date timeOfLastContact = null;
 
-    // TODO: Cache/model the unit's state and behavior
+    // TODO: Cache/construct the unit's state and behavior
 
     private TcpMessageClientHost tcpMessageClientHost;
 

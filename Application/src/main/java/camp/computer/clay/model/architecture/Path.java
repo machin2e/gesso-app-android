@@ -1,6 +1,6 @@
 package camp.computer.clay.model.architecture;
 
-public class Path extends Model {
+public class Path extends Construct {
 
     // TODO: Physical dimensions (distance between boards)
 

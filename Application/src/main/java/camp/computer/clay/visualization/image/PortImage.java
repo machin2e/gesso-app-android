@@ -333,9 +333,9 @@ public class PortImage extends Image {
 
 //                if (sourcePortImage.getCandidatePeripheralVisibility() == true) {
 //
-//                    // Model
+//                    // Construct
 //                    Patch peripheral = new Patch();
-//                    getPerspective().getVisualization().getEnvironment().addPatch(peripheral);
+//                    getPerspective().getVisualization().getModel().addPatch(peripheral);
 //
 //                    // Visualization (Layer)
 //                    String layerTag = "peripherals";
@@ -426,7 +426,7 @@ public class PortImage extends Image {
 
                             if (!useNearbyPortImage) {
 
-                                Port port = (Port) sourcePortImage.getModel();
+                                Port port = (Port) sourcePortImage.getConstruct();
 
                                 port.setDirection(Port.Direction.INPUT);
 
@@ -444,9 +444,9 @@ public class PortImage extends Image {
 //                ArrayList<Image> pathPortImages = getVisualization().getImages(pathPorts);
 //                ArrayList<Point> pathPortPositions = Visualization.getPositions(pathPortImages);
 //                Rectangle boundingBox = Geometry.getBoundingBox(pathPortPositions);
-//                getVisualization().getEnvironment().getBody(0).getPerspective().adjustScale(boundingBox);
+//                getVisualization().getModel().getBody(0).getPerspective().adjustScale(boundingBox);
 //
-//                getVisualization().getEnvironment().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+//                getVisualization().getModel().getBody(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
 //                action.setTarget(interaction.getFirst().getImageByPosition());
 //                action.setType(Action.Type.RELEASE);
@@ -469,7 +469,7 @@ public class PortImage extends Image {
     }
 
     public Port getPort() {
-        Port port = (Port) getModel();
+        Port port = (Port) getConstruct();
         return port;
     }
 

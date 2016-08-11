@@ -737,7 +737,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     @Override
     public void refreshListViewFromData(Device device) {
-        // TODO: Update the view to reflect the latest state of the object model
+        // TODO: Update the view to reflect the latest state of the object construct
     }
 
     // TODO: Rename to something else and make a getDisplay() function specific to the

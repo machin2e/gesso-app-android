@@ -81,7 +81,7 @@ public class Timeline {
 //
 //                @Override
 //                public void onFailure() {
-//                    // TODO: Remove from object model and cache, even if it couldn't be removed from the store.
+//                    // TODO: Remove from object construct and cache, even if it couldn't be removed from the store.
 //                    // TODO: Log failure here in text file for final logging of error. This should help debugging.
 //                }
 //            });

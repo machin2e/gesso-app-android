@@ -286,8 +286,8 @@ public class Perspective {
 
                     /*
                     // Show the ports in the path
-                    List<Path> portPaths = getPerspective().getVisualization().getEnvironment().getGraph(port);
-                    List<Port> portConnections = getPerspective().getVisualization().getEnvironment().getPorts(portPaths);
+                    List<Path> portPaths = getPerspective().getVisualization().getModel().getGraph(port);
+                    List<Port> portConnections = getPerspective().getVisualization().getModel().getPorts(portPaths);
                     for (Port portConnection: portConnections) {
                         PortImage portImageConnection = (PortImage) getPerspective().getVisualization().getImage(portConnection);
                         portImageConnection.setVisibility(true);

@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.Surface;
-import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Construct;
 import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.model.interactivity.ActionListener;
 import camp.computer.clay.visualization.util.Color;
@@ -32,19 +32,19 @@ public abstract class Image {
 
     protected double transparency = targetTransparency;
 
-    protected Model model = null;
+    protected Construct construct = null;
 
     protected Visualization visualization = null;
 
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Image(Model model) {
-        this.model = model;
+    public Image(Construct construct) {
+        this.construct = construct;
     }
 
-    public Model getModel() {
-        return this.model;
+    public Construct getConstruct() {
+        return this.construct;
     }
 
     public void setVisualization(Visualization visualization) {
@@ -56,9 +56,9 @@ public abstract class Image {
     }
 
     public Image getParentImage() {
-        if (getModel().hasParent()) {
-            Model parentModel = getModel().getParent();
-            return getVisualization().getImage(parentModel);
+        if (getConstruct().hasParent()) {
+            Construct parentConstruct = getConstruct().getParent();
+            return getVisualization().getImage(parentConstruct);
         }
         return null;
     }
@@ -181,15 +181,19 @@ public abstract class Image {
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
 
-        /*
         for (int i = 0; i < shapes.size(); i++) {
+            // Color
             int intColor = android.graphics.Color.parseColor(shapes.get(i).getColor());
             intColor = Color.setTransparency(intColor, this.targetTransparency);
             shapes.get(i).setColor(Color.getHexColorString(intColor));
-        }
-        */
 
-        this.transparency = transparency;
+            // Outline Color
+            int outlineColorIndex = android.graphics.Color.parseColor(shapes.get(i).getOutlineColor());
+            outlineColorIndex = Color.setTransparency(outlineColorIndex, this.targetTransparency);
+            shapes.get(i).setOutlineColor(Color.getHexColorString(outlineColorIndex));
+        }
+
+        this.transparency = this.targetTransparency;
     }
 
     public Rectangle getBoundingRectangle() {

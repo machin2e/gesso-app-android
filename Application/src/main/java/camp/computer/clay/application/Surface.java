@@ -143,8 +143,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-//                (float) originPosition.getY() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+//                (float) originPosition.getX() + (float) visualization.getModel().getBody(0).getPerspective().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+//                (float) originPosition.getY() + (float) visualization.getModel().getBody(0).getPerspective().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
                 (float) originPosition.getX() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getX(),
                 (float) originPosition.getY() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getY()
         );
@@ -155,8 +155,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         );
         // </PERSPECTIVE>
 
-        // TODO: Get Environment
-        // TODO: Get Environment's selected Visualization
+        // TODO: Get Model
+        // TODO: Get Model's selected Visualization
 
         // Draw the background
         canvas.drawColor(Color.WHITE);
@@ -242,7 +242,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //----------------------------------------------------------------------------------------------
-    // Action Model
+    // Action Construct
     //----------------------------------------------------------------------------------------------
 
     @Override

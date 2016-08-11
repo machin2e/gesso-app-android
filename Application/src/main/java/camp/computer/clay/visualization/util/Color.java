@@ -50,7 +50,7 @@ public abstract class Color {
     }
 
     public static int setTransparency(int color, double factor) {
-        int alpha = Math.round(android.graphics.Color.alpha(color) * (float) factor);
+        int alpha = (int) (255.0 * factor); // Math.round(android.graphics.Color.alpha(color) * (float) factor);
         int red = android.graphics.Color.red(color);
         int green = android.graphics.Color.green(color);
         int blue = android.graphics.Color.blue(color);

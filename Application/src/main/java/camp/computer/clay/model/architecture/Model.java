@@ -1,30 +1,82 @@
 package camp.computer.clay.model.architecture;
 
-public abstract class Model {
-    // TODO: UUID.
-    // TODO: Tag.
-    // TODO: Physical dimensions (of actual physical object). Add it as a tag-like property.
+import java.util.ArrayList;
+import java.util.List;
 
-    private Model parent;
+/**
+ * {@code Model} is a simulation of the environmental context.
+ */
+public class Model extends Construct {
 
-    public Model() {
+    private System system = new System();
+
+    private List<Body> bodies = new ArrayList<>();
+
+    private List<Frame> frames = new ArrayList<>();
+
+    private List<Patch> patches = new ArrayList<>();
+
+    public void addBody(Body body) {
+        this.bodies.add(body);
     }
 
-    // TODO: Get serialized model (e.g., from redis database)
-    // TODO: Alternavively, pass in a JavaScript method that simulates the model. This would be
-    // TODO: (cont'd) after loading it from redis.
-    public Model(String serializedModel) {
+    public Body getBody(int index) {
+        return this.bodies.get(index);
     }
 
-    public void setParent(Model parent) {
-        this.parent = parent;
+    public List<Body> getBodies() {
+        return this.bodies;
     }
 
-    public boolean hasParent() {
-        return (this.parent != null);
+    public void setSystem(System system) {
+        this.system = system;
     }
 
-    public Model getParent() {
-        return this.parent;
+    public System getSystem() {
+        return this.system;
+    }
+
+    public void addFrame(Frame frame) {
+        this.frames.add(frame);
+        frame.setParent(this);
+    }
+
+    public Frame getFrame(int index) {
+        return this.frames.get(index);
+    }
+
+    public List<Frame> getFrames() {
+        return this.frames;
+    }
+
+    public List<Port> getPorts() {
+        List<Port> ports = new ArrayList<>();
+        for (Frame frame : this.frames) {
+            ports.addAll(frame.getPorts());
+        }
+        return ports;
+    }
+
+    public List<Path> getPaths() {
+        List<Path> paths = new ArrayList<>();
+        for (Frame frame : this.frames) {
+            for (Port port : frame.getPorts()) {
+                paths.addAll(port.getPaths());
+            }
+        }
+        return paths;
+    }
+
+    public void addPatch(Patch patch) {
+        this.patches.add(patch);
+        patch.setParent(this);
+    }
+
+    public Patch getPatch(int index) {
+        return this.patches.get(index);
+    }
+
+    public List<Patch> getPatches() {
+        return this.patches;
     }
 }

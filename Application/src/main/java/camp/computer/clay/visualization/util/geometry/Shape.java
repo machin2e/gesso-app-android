@@ -1,5 +1,7 @@
 package camp.computer.clay.visualization.util.geometry;
 
+import android.util.Log;
+
 import java.util.List;
 
 import camp.computer.clay.visualization.util.Visibility;
@@ -12,8 +14,8 @@ public abstract class Shape {
 
     protected Point position = new Point(0, 0);
 
-    protected String color = "#f7f7f7";
-    protected String outlineColor = "#000000";
+    protected String color = "#fff7f7f7";
+    protected String outlineColor = "#ff000000";
     protected double outlineThickness = 1.0;
 
     public Shape() {

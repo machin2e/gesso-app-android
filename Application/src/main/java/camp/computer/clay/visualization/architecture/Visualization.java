@@ -11,7 +11,7 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.Surface;
-import camp.computer.clay.model.architecture.Environment;
+import camp.computer.clay.model.architecture.Construct;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
@@ -42,8 +42,8 @@ public class Visualization extends Image {
 
     private List<Layer> layers = new ArrayList<>();
 
-    public Visualization(Environment environment) {
-        super(environment);
+    public Visualization(Model model) {
+        super(model);
         setup();
     }
 
@@ -104,11 +104,11 @@ public class Visualization extends Image {
 
                             Log.v("IASM", "(1) touch patch to select from store or (2) drag signal to frame or (3) touch elsewhere to cancel");
 
-                            // Model
+                            // Construct
                             Patch patch = new Patch();
-                            // patch.setParent(getEnvironment());
+                            // patch.setParent(getModel());
 
-                            // Add port to model
+                            // Add port to construct
                             // for (int j = 0; j < 3; j++) {
                             for (int j = 0; j < 1; j++) {
                                 Port port = new Port();
@@ -209,8 +209,8 @@ public class Visualization extends Image {
         getLayer(layerTag).add(image);
 
         // Update perspective
-//        getEnvironment().getBody(0).getPerspective().adjustScale(0);
-        // getEnvironment().getBody(0).getPerspective().setPosition(getEnvironment().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).getCenterPoint());
+//        getModel().getBody(0).getPerspective().adjustScale(0);
+        // getModel().getBody(0).getPerspective().setPosition(getModel().getBody(0).getPerspective().getVisualization().getImages().filterType(FrameImage.TYPE).getCenterPoint());
         getEnvironment().getBody(0).getPerspective().adjustPosition();
     }
 
@@ -276,9 +276,9 @@ public class Visualization extends Image {
         image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    public Image getImage(Model model) {
+    public Image getImage(Construct construct) {
         for (Layer layer : getLayers()) {
-            Image image = layer.getImage(model);
+            Image image = layer.getImage(construct);
             if (image != null) {
                 return image;
             }
@@ -286,11 +286,11 @@ public class Visualization extends Image {
         return null;
     }
 
-    public Model getModel(Image image) {
+    public Construct getModel(Image image) {
         for (Layer layer : getLayers()) {
-            Model model = layer.getModel(image);
-            if (model != null) {
-                return model;
+            Construct construct = layer.getModel(image);
+            if (construct != null) {
+                return construct;
             }
         }
         return null;
@@ -330,7 +330,7 @@ public class Visualization extends Image {
         List<Image> images = new ArrayList<>();
         for (Layer layer : getLayers()) {
             for (T model : models) {
-                Image image = layer.getImage((Model) model);
+                Image image = layer.getImage((Construct) model);
                 if (image != null) {
                     images.add(image);
                 }
@@ -359,8 +359,8 @@ public class Visualization extends Image {
         return this;
     }
 
-    public Environment getEnvironment() {
-        return (Environment) getModel();
+    public Model getEnvironment() {
+        return (Model) getConstruct();
     }
 
     public void update() {

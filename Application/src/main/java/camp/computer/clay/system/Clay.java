@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.model.architecture.Environment;
-import camp.computer.clay.model.interactivity.Perspective;
+import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Body;
 import camp.computer.clay.model.architecture.Frame;
 import camp.computer.clay.model.architecture.Port;
@@ -25,7 +24,6 @@ import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.old_model.Descriptor;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.old_model.Event;
-import camp.computer.clay.visualization.architecture.Layer;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.image.FrameImage;
 import camp.computer.clay.visualization.image.PortImage;
@@ -42,7 +40,7 @@ public class Clay {
 
     private SQLiteStoreHost storeHost = null;
 
-    private Environment environment;
+    private Model model;
 
     private Visualization visualization;
 
@@ -65,11 +63,11 @@ public class Clay {
         descriptor = new Descriptor("clay", "");
         descriptor.list("devices");
 
-        // Environment
-        this.environment = new Environment();
+        // Model
+        this.model = new Model();
 
         // Visualization
-        this.visualization = new Visualization (environment);
+        this.visualization = new Visualization (model);
 
 //        setupSimulation();
 
@@ -77,8 +75,8 @@ public class Clay {
         Body body = new Body();
         body.getPerspective().setVisualization(visualization);
 
-        // Add body to environment
-        environment.addBody(body);
+        // Add body to model
+        model.addBody(body);
 
         Application.getDisplay().getSurface().setVisualization(visualization);
 
@@ -88,8 +86,8 @@ public class Clay {
 
     }
 
-    public Environment getEnvironment() {
-        return this.environment;
+    public Model getModel() {
+        return this.model;
     }
 
     public Visualization getVisualization () {
@@ -106,7 +104,7 @@ public class Clay {
 //        final int PORT_COUNT = 12;
 //        // </FORM_CONFIGURATION>
 //
-//        // TODO: Move Environment/Frame this into Environment or _Ecology (in Environment) --- maybe combine Environment+_Ecology
+//        // TODO: Move Model/Frame this into Model or _Ecology (in Model) --- maybe combine Model+_Ecology
 //        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 //        int letterIndex = 0;
 //        for (int i = 0; i < SIMULATED_FORM_COUNT; i++) {
@@ -118,7 +116,7 @@ public class Clay {
 //                form.addTag(alphabet.substring(letterIndex, letterIndex + 1));
 //                letterIndex = letterIndex % alphabet.length();
 //            }
-//            environment.addFrame(form);
+//            model.addFrame(form);
 //        }
 //    }
 
@@ -137,7 +135,7 @@ public class Clay {
             frame.addPort(port);
         }
 
-        environment.addFrame(frame);
+        model.addFrame(frame);
 
         // Create frame images
         FrameImage frameImage = new FrameImage(frame);
@@ -244,7 +242,7 @@ public class Clay {
     }
 
     /**
-     * Adds the specified unit to Clay's operating environment.
+     * Adds the specified unit to Clay's operating model.
      */
     public Device addDevice(final UUID deviceUuid, final String internetAddress) {
 
@@ -347,7 +345,7 @@ public class Clay {
                 this.devices.add (device);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getDisplay().mapView.getEnvironment().simulateFrame(new Frame());
+//                ApplicationView.getDisplay().mapView.getModel().simulateFrame(new Frame());
 
                 // Add timelines to attached displays
                 for (DisplayHostInterface view : this.displays) {

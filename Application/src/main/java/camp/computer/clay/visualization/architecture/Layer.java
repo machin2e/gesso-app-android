@@ -1,10 +1,9 @@
 package camp.computer.clay.visualization.architecture;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Construct;
 
 public class Layer {
 
@@ -49,19 +48,19 @@ public class Layer {
         image.setVisualization(visualization);
     }
 
-    public Image getImage(Model model) {
+    public Image getImage(Construct construct) {
         for (Image image : images) {
-            if (image.getModel() == model) {
+            if (image.getConstruct() == construct) {
                 return image;
             }
         }
         return null;
     }
 
-    public Model getModel(Image image) {
+    public Construct getModel(Image image) {
         for (int i = 0; i < images.size(); i++) {
             if (images.get(i) == image) {
-                return images.get(i).getModel();
+                return images.get(i).getConstruct();
             }
         }
         return null;

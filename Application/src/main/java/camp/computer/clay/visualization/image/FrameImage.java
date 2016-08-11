@@ -222,7 +222,7 @@ public class FrameImage extends Image {
     }
 
     public Frame getFrame() {
-        return (Frame) getModel();
+        return (Frame) getConstruct();
     }
 
     public List<PortImage> getPortImages() {

@@ -15,7 +15,6 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interactivity.Action;
 import camp.computer.clay.model.interactivity.ActionListener;
 import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.model.interactivity.Perspective;
 import camp.computer.clay.visualization.architecture.Image;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
@@ -107,7 +106,7 @@ public class PatchImage extends Image {
     }
 
     public Patch getPatch() {
-        return (Patch) getModel();
+        return (Patch) getConstruct();
     }
 
     public List<PortImage> getPortImages() {

@@ -3,7 +3,7 @@ package camp.computer.clay.model.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Frame extends Model {
+public class Frame extends Construct {
 
     // has Script (i.e., Frame runs a Script)
 
@@ -31,20 +31,4 @@ public class Frame extends Model {
         }
         return paths;
     }
-
-    // <TAG_INTERFACE>
-    private List<String> tags = new ArrayList<>();
-
-    public List<String> getTags() {
-        return this.tags;
-    }
-
-    public void addTag(String tag) {
-        this.tags.add(tag);
-    }
-
-    public String getNameTag() {
-        return getTags().get(0);
-    }
-    // </TAG_INTERFACE>
 }

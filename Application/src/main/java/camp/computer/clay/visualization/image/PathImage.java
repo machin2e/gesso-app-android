@@ -71,7 +71,7 @@ public class PathImage extends Image {
     }
 
     public Path getPath() {
-        return (Path) getModel();
+        return (Path) getConstruct();
     }
 
     public void drawTrianglePath(Surface surface) {

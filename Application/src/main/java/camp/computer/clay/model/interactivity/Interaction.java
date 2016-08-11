@@ -14,9 +14,9 @@ import camp.computer.clay.visualization.util.geometry.Point;
  */
 public class Interaction {
 
-    // TODO: Model this with a "touchPoints thisInteraction envelope" or "thisInteraction envelope".
-    // TODO: Model voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
-    // TODO: (?) Model data transmissions as actions in the same way?
+    // TODO: Construct this with a "touchPoints thisInteraction envelope" or "thisInteraction envelope".
+    // TODO: Construct voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
+    // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
