@@ -105,9 +105,14 @@ public class Point {
      * @return Absolute x coordinate.
      */
     public double getX() {
+//        if (referencePoint != null) {
+//            return referencePoint.getX() + this.x;
+////            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getX();
+//        } else {
+//            return this.x;
+//        }
         if (referencePoint != null) {
             return referencePoint.getX() + this.x;
-//            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getX();
         } else {
             return this.x;
         }
@@ -126,11 +131,11 @@ public class Point {
     }
 
     public double getRotation() {
-        if (referencePoint != null) {
-            return referencePoint.getRotation() + this.rotation;
-        } else {
+//        if (referencePoint != null) {
+//            return referencePoint.getRotation() + this.rotation;
+//        } else {
             return this.rotation;
-        }
+//        }
     }
 
     /**
@@ -173,11 +178,11 @@ public class Point {
     }
 
     public void setRotation(double rotation) {
-        if (referencePoint != null) {
-            this.rotation = rotation - referencePoint.getRotation();
-        } else {
+//        if (referencePoint != null) {
+//            this.rotation = rotation - referencePoint.getRotation();
+//        } else {
             this.rotation = rotation;
-        }
+//        }
     }
 
 }

@@ -367,8 +367,10 @@ public class Visualization extends Image {
 
         getEnvironment().getBody(0).getPerspective().update();
 
-        for (Layer layer : getLayers()) {
-            for (Image image : layer.getImages()) {
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
+            for (int j = 0; j < layer.getImages().size(); j++) {
+                Image image = layer.getImages().get(j);
                 image.update();
             }
         }
@@ -381,8 +383,8 @@ public class Visualization extends Image {
             // <AXES_ANNOTATION>
             surface.getPaint().setColor(Color.CYAN);
             surface.getPaint().setStrokeWidth(1.0f);
-            surface.getCanvas().drawLine(-1000, 0, 1000, 0, surface.getPaint());
-            surface.getCanvas().drawLine(0, -1000, 0, 1000, surface.getPaint());
+            surface.getCanvas().drawLine(-5000, 0, 5000, 0, surface.getPaint());
+            surface.getCanvas().drawLine(0, -5000, 0, 5000, surface.getPaint());
             // </AXES_ANNOTATION>
         }
 
@@ -433,7 +435,7 @@ public class Visualization extends Image {
             surface.getCanvas().drawText(text, (float) centroidPosition.getX() + 20, (float) centroidPosition.getY() + bounds.height() / 2.0f, surface.getPaint());
             // </CENTROID_ANNOTATION>
 
-            // <CENTROID_ANNOTATION>
+            // <CENTER_ANNOTATION>
             List<Point> formImagePositions = getImages().filterType(FrameImage.class).getPositions();
             Point formImagesCenterPosition = Geometry.calculateCenterPosition(formImagePositions);
             surface.getPaint().setColor(Color.RED);
@@ -447,18 +449,41 @@ public class Visualization extends Image {
             Rect centerLabelTextBounds = new Rect();
             surface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
             surface.getCanvas().drawText(centerLabeltext, (float) formImagesCenterPosition.getX() + 20, (float) formImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, surface.getPaint());
-            // </CENTROID_ANNOTATION>
+            // </CENTER_ANNOTATION>
 
             // <CONVEX_HULL>
-            List<Point> formPositions = Visualization.getPositions(getFrameImages());
-            List<Point> convexHullVertices = Geometry.computeConvexHull(formPositions);
+            //List<Point> framePositions = Visualization.getPositions(getFrameImages());
+            List<Point> frameVertices = getImages().filterType(FrameImage.class).getAbsoluteVertices();
+
+            // Hull vertices
+            for (int i = 0; i < frameVertices.size() - 1; i++) {
+
+                surface.getPaint().setStrokeWidth(1.0f);
+                surface.getPaint().setColor(Color.parseColor("#FF2828"));
+                surface.getPaint().setStyle(Paint.Style.FILL);
+
+                Point frameVertex = frameVertices.get(i);
+                Surface.drawCircle(frameVertex, 5, 0, surface);
+            }
+
+            List<Point> convexHullVertices = Geometry.computeConvexHull(frameVertices);
 
             surface.getPaint().setStrokeWidth(1.0f);
-            surface.getPaint().setColor(Color.RED);
+            surface.getPaint().setColor(Color.parseColor("#2D92FF"));
             surface.getPaint().setStyle(Paint.Style.STROKE);
 
+            // Hull edges
+            Surface.drawPolygon(convexHullVertices, surface);
+
+            // Hull vertices
             for (int i = 0; i < convexHullVertices.size() - 1; i++) {
-                Surface.drawPolygon(convexHullVertices, surface);
+
+                surface.getPaint().setStrokeWidth(1.0f);
+                surface.getPaint().setColor(Color.parseColor("#FF2828"));
+                surface.getPaint().setStyle(Paint.Style.STROKE);
+
+                Point vertex = convexHullVertices.get(i);
+                Surface.drawCircle(vertex, 20, 0, surface);
             }
             // </CONVEX_HULL>
 

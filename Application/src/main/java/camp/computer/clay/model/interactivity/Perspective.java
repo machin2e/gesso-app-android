@@ -14,7 +14,6 @@ import camp.computer.clay.visualization.architecture.ImageSet;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.image.PatchImage;
 import camp.computer.clay.visualization.image.FrameImage;
-import camp.computer.clay.visualization.image.PathImage;
 import camp.computer.clay.visualization.image.PortImage;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
@@ -466,7 +465,7 @@ public class Perspective {
             patchImage.setTransparency(1.0);
         }
 
-        List<Point> frameImagePositions = getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
+        List<Point> frameImagePositions = getVisualization().getImages().filterType(FrameImage.class).getAbsoluteVertices(); // getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
         Point formImagesCenterPosition = Geometry.calculateCenterPosition(frameImagePositions);
 
         adjustScale();
@@ -491,9 +490,11 @@ public class Perspective {
     }
 
     public void adjustScale(double duration) {
-        List<Point> imagePositions = getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
-        if (imagePositions.size() > 0) {
-            Rectangle boundingBox = Geometry.calculateBoundingBox(imagePositions);
+        //List<Point> imagePositions = getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getPositions();
+        List<Point> imageVertices = getVisualization().getImages().filterType(FrameImage.class).getAbsoluteVertices(); // getVisualization().getImages().filterType(FrameImage.class, PatchImage.class).getAbsoluteVertices();
+        if (imageVertices.size() > 0) {
+            //Rectangle boundingBox = Geometry.calculateBoundingBox(imageVertices);
+            Rectangle boundingBox = getVisualization().getImages().filterType(FrameImage.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }
     }
@@ -510,12 +511,21 @@ public class Perspective {
         double horizontalScale = getWidth() / boundingBox.getWidth();
         double verticalScale = getHeight() / boundingBox.getHeight();
 
-        if (horizontalDifference > 0 && horizontalDifference > verticalDifference) {
+        Log.v("ScaleRatio", "h: " + horizontalScale);
+        Log.v("ScaleRatio", "v: " + verticalScale);
+
+        if (horizontalScale < verticalScale) {
             setScale(horizontalScale, duration);
-        } else if (verticalDifference > 0 && verticalDifference > horizontalDifference) {
-            setScale(verticalScale, duration);
         } else {
-            setScale(1.0f, duration);
+            setScale(verticalScale, duration);
         }
+
+//        if (horizontalDifference > 0 && horizontalDifference > verticalDifference) {
+//            setScale(horizontalScale, duration);
+//        } else if (verticalDifference > 0 && verticalDifference > horizontalDifference) {
+//            setScale(verticalScale, duration);
+//        } else {
+//            setScale(1.0f, duration);
+//        }
     }
 }

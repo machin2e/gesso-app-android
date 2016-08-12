@@ -49,7 +49,8 @@ public class Layer {
     }
 
     public Image getImage(Construct construct) {
-        for (Image image : images) {
+        for (int i = 0; i < images.size(); i++) {
+            Image image = images.get(i);
             if (image.getConstruct() == construct) {
                 return image;
             }

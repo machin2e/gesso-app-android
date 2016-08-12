@@ -1,7 +1,6 @@
 package camp.computer.clay.visualization.util.geometry;
 
-import android.util.Log;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.visualization.util.Visibility;
@@ -42,6 +41,51 @@ public abstract class Shape {
     }
 
     abstract public List<Point> getVertices();
+
+    /**
+     * Returns the axis-aligned minimum bounding box for the set of vertices that define the shape.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/Minimum_bounding_box">Minimum bounding box</a>
+     *
+     * @return A {@code Rectangle} representing the minimum bounding box.
+     */
+    public Rectangle getBoundingBox() {
+        return Geometry.calculateBoundingBox(getVertices());
+    }
+
+//    public List<Point> getAbsoluteVertices() {
+//
+//        // Get absolute center position
+//        Point rotatedPosition = null;
+//        if (getPosition().getReferencePoint() != null) {
+//            rotatedPosition = Geometry.calculatePoint(getPosition().getReferencePoint(), getPosition().getReferencePoint().getRotation() + Geometry.calculateRotationAngle(getPosition().getReferencePoint(), getPosition()), Geometry.calculateDistance(getPosition().getReferencePoint(), getPosition()));
+//        } else {
+//            rotatedPosition = new Point(getPosition());
+//        }
+//
+////        // Calculate points before rotation
+////        Rectangle boundingBox = getBoundingBox();
+////        Point topLeft = new Point(rotatedPosition.getX() - (boundingBox.getWidth() / 2.0f), rotatedPosition.getY() - (boundingBox.getHeight() / 2.0f));
+////        Point topRight = new Point(rotatedPosition.getX() + (boundingBox.getWidth() / 2.0f), rotatedPosition.getY() - (boundingBox.getHeight() / 2.0f));
+////        Point bottomRight = new Point(rotatedPosition.getX() + (boundingBox.getWidth() / 2.0f), rotatedPosition.getY() + (boundingBox.getHeight() / 2.0f));
+////        Point bottomLeft = new Point(rotatedPosition.getX() - (boundingBox.getWidth() / 2.0f), rotatedPosition.getY() + (boundingBox.getHeight() / 2.0f));
+//
+//        List<Point> shapeVertices = getVertices();
+//        List<Point> rotatedVertices = new ArrayList<>();
+//        for (int i = 0; i < shapeVertices.size(); i++) {
+//            Point vertex = shapeVertices.get(i);
+//            Point rotatedVertex = Geometry.calculatePoint(rotatedPosition, getRotation() + Geometry.calculateRotationAngle(rotatedPosition, vertex), Geometry.calculateDistance(rotatedPosition, vertex));
+//            rotatedVertices.add(rotatedVertex);
+//        }
+//
+////        // Calculate points after rotation
+////        Point rotatedTopLeft = Geometry.calculatePoint(rotatedPosition, getRotation() + Geometry.calculateRotationAngle(rotatedPosition, topLeft), Geometry.calculateDistance(rotatedPosition, topLeft));
+////        Point rotatedTopRight = Geometry.calculatePoint(rotatedPosition, getRotation() + Geometry.calculateRotationAngle(rotatedPosition, topRight), Geometry.calculateDistance(rotatedPosition, topRight));
+////        Point rotatedBottomRight = Geometry.calculatePoint(rotatedPosition, getRotation() + Geometry.calculateRotationAngle(rotatedPosition, bottomRight), Geometry.calculateDistance(rotatedPosition, bottomRight));
+////        Point rotatedBottomLeft = Geometry.calculatePoint(rotatedPosition, getRotation() + Geometry.calculateRotationAngle(rotatedPosition, bottomLeft), Geometry.calculateDistance(rotatedPosition, bottomLeft));
+//
+//        return rotatedVertices;
+//    }
 
     abstract public List<Line> getSegments();
 

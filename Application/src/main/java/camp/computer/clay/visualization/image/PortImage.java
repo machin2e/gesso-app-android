@@ -364,7 +364,7 @@ public class PortImage extends Image {
                                         nearbyFrameImage.getPosition()
                                 );
 
-                                if (distanceToFrameImage < nearbyFrameImage.getBoundingRectangle().getHeight() + 50) {
+                                if (distanceToFrameImage < nearbyFrameImage.getBoundingBox().getHeight() + 50) {
 
                                     Log.v("Action", "B");
 

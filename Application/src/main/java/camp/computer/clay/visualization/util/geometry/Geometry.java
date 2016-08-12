@@ -74,7 +74,7 @@ public abstract class Geometry {
      * @return
      */
     public static Point calculateRotatedPoint(Point originPoint, double angle, Point point) {
-        return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), (double) Geometry.calculateDistance(originPoint, point));
+        return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), Geometry.calculateDistance(originPoint, point));
     }
 
     public static Point calculatePoint(Point originPoint, double rotation, double distance) {
@@ -374,7 +374,7 @@ public abstract class Geometry {
                         sortedPositions.get(j).getY() - sortedPositions.get(i).getY()
                 );
 
-                double r = (sortedImages.get(i).getBoundingRectangle().getWidth() / 2.0f) + (sortedImages.get(i).getBoundingRectangle().getWidth() / 2.0f);
+                double r = (sortedImages.get(i).getBoundingBox().getWidth() / 2.0f) + (sortedImages.get(i).getBoundingBox().getWidth() / 2.0f);
 
                 // Length squared = (dx * dx) + (dy * dy);
                 double vectorABLength = Geometry.calculateDistance(sortedPositions.get(i), sortedPositions.get(j));

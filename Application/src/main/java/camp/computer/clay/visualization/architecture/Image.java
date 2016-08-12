@@ -1,7 +1,5 @@
 package camp.computer.clay.visualization.architecture;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -196,7 +194,34 @@ public abstract class Image {
         this.transparency = this.targetTransparency;
     }
 
-    public Rectangle getBoundingRectangle() {
+    public List<Point> getVertices() {
+        List<Point> positions = new LinkedList<>();
+        for (Shape shape : shapes) {
+            positions.addAll(shape.getVertices());
+        }
+        return positions;
+    }
+
+    public List<Point> getAbsoluteVertices() {
+        List<Point> positions = new LinkedList<>();
+        for (Shape shape : shapes) {
+            // positions.addAll(shape.getVertices());
+            for (Point shapeVertex : shape.getVertices()) {
+
+                // Rotate shape about its center point
+                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getPosition(), shape.getRotation(), shapeVertex);
+
+                // Rotate shape vertices about the shape's reference point
+                Point referencePoint = position;
+                absoluteVertex = Geometry.calculateRotatedPoint(referencePoint, getRotation(), absoluteVertex);
+                positions.add(absoluteVertex);
+//                positions.add(vertex);
+            }
+        }
+        return positions;
+    }
+
+    public Rectangle getBoundingBox() {
 
         List<Point> pointList = new LinkedList<>();
 

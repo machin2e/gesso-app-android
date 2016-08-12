@@ -83,6 +83,8 @@ public class Clay {
         simulateFrame();
         simulateFrame();
         simulateFrame();
+        simulateFrame();
+        simulateFrame();
 
     }
 

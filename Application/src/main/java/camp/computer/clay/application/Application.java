@@ -47,7 +47,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // </Settings>
 
     // <Style>
-    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = false;
+    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
 
     /**
      * Hides the operating system's status and navigation bars. Setting this to false is helpful

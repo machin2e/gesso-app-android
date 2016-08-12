@@ -118,6 +118,14 @@ public class ImageSet {
         return positions;
     }
 
+    public List<Point> getAbsoluteVertices() {
+        List<Point> positions = new LinkedList<>();
+        for (Image image : images) {
+            positions.addAll(image.getAbsoluteVertices());
+        }
+        return positions;
+    }
+
     public Point getCenterPoint() {
         return Geometry.calculateCenterPosition(getPositions());
     }
@@ -127,7 +135,7 @@ public class ImageSet {
     }
 
     public Rectangle getBoundingBox() {
-        return Geometry.calculateBoundingBox(getPositions());
+        return Geometry.calculateBoundingBox(getAbsoluteVertices());
     }
 
     public List<Point> getBoundingPolygon() {
