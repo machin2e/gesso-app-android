@@ -14,15 +14,13 @@ import camp.computer.clay.visualization.util.geometry.Rectangle;
 import camp.computer.clay.visualization.util.geometry.Shape;
 import camp.computer.clay.visualization.util.Visibility;
 
-public abstract class Image {
+public abstract class Figure {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-    protected Point position = new Point(0, 0); // Image position
+    protected Point position = new Point(0, 0); // Figure position
 
-    protected double scale = 1.0; // Image scale factor
-
-    protected double rotation = 0.0; // Image heading rotation
+    protected double scale = 1.0; // Figure scale factor
 
     protected Visibility visibility = Visibility.VISIBLE;
 
@@ -37,7 +35,7 @@ public abstract class Image {
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Image(Construct construct) {
+    public Figure(Construct construct) {
         this.construct = construct;
     }
 
@@ -53,10 +51,10 @@ public abstract class Image {
         return this.visualization;
     }
 
-    public Image getParentImage() {
+    public Figure getParentFigure() {
         if (getConstruct().hasParent()) {
             Construct parentConstruct = getConstruct().getParent();
-            return getVisualization().getImage(parentConstruct);
+            return getVisualization().getFigure(parentConstruct);
         }
         return null;
     }
@@ -66,18 +64,7 @@ public abstract class Image {
     }
 
     public double getRotation() {
-        return rotation;
-    }
-
-    public double old_getAbsoluteRotation() {
-        double absoluteRotation = 0;
-        Image parentImage = getParentImage();
-        if (parentImage != null) {
-            absoluteRotation = parentImage.old_getAbsoluteRotation() + getRotation();
-        } else {
-            return getRotation();
-        }
-        return absoluteRotation;
+        return this.position.getRotation();
     }
 
     public double getScale() {
@@ -88,31 +75,7 @@ public abstract class Image {
         this.position.set(position.getX(), position.getY());
     }
 
-    /**
-     * Absolute position calculated from relative position.
-     */
-    public void old_setRelativePosition(Point position) {
-        Point absolutePosition = new Point();
-        Image parentImage = getParentImage();
-        if (parentImage != null) {
-            Point relativePositionFromRelativePosition = Geometry.calculatePoint(
-                    parentImage.getPosition(),
-                    Geometry.calculateRotationAngle(parentImage.getPosition(), position),
-                    Geometry.calculateDistance(parentImage.getPosition(), position)
-            );
-            absolutePosition.setX(parentImage.getPosition().getX() + relativePositionFromRelativePosition.getX());
-            absolutePosition.setY(parentImage.getPosition().getY() + relativePositionFromRelativePosition.getY());
-        } else {
-            // TODO: This should get the absolute position of the root sprite relative to the origin point on the coordinate system/canvas
-            absolutePosition.setX(position.getX());
-            absolutePosition.setY(position.getY());
-        }
-        this.position.setX(absolutePosition.getX());
-        this.position.setY(absolutePosition.getY());
-    }
-
     public void setRotation(double angle) {
-        this.rotation = angle;
         this.position.setRotation(angle);
     }
 
@@ -133,6 +96,12 @@ public abstract class Image {
     }
 
     public void addShape(Shape shape) {
+        shape.getPosition().setReferencePoint(getPosition());
+        shapes.add(shape);
+    }
+
+    public void addShape(Shape shape, String label) {
+        shape.setLabel(label);
         shape.getPosition().setReferencePoint(getPosition());
         shapes.add(shape);
     }
@@ -205,7 +174,6 @@ public abstract class Image {
     public List<Point> getAbsoluteVertices() {
         List<Point> positions = new LinkedList<>();
         for (Shape shape : shapes) {
-            // positions.addAll(shape.getVertices());
             for (Point shapeVertex : shape.getVertices()) {
 
                 // Rotate shape about its center point
@@ -215,7 +183,6 @@ public abstract class Image {
                 Point referencePoint = position;
                 absoluteVertex = Geometry.calculateRotatedPoint(referencePoint, getRotation(), absoluteVertex);
                 positions.add(absoluteVertex);
-//                positions.add(vertex);
             }
         }
         return positions;
@@ -223,13 +190,19 @@ public abstract class Image {
 
     public Rectangle getBoundingBox() {
 
-        List<Point> pointList = new LinkedList<>();
+        List<Point> boundingBoxVertices = new LinkedList<>();
 
-        for (Shape shape : shapes) {
-            pointList.addAll(shape.getVertices());
+        for (int i = 0; i < shapes.size(); i++) {
+
+            Shape shape = shapes.get(i);
+            List<Point> shapeVertices = shape.getVertices();
+
+            for (int j = 0; j < shapeVertices.size(); j++) {
+                boundingBoxVertices.add(shapeVertices.get(j));
+            }
         }
 
-        return Geometry.calculateBoundingBox(pointList);
+        return Geometry.calculateBoundingBox(boundingBoxVertices);
     }
 
 }

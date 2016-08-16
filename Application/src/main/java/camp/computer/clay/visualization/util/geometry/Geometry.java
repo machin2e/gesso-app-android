@@ -3,12 +3,26 @@ package camp.computer.clay.visualization.util.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.visualization.architecture.Figure;
 import camp.computer.clay.visualization.architecture.Visualization;
 
 public abstract class Geometry {
 
-    public static double DEGREES_IN_CIRCLE = 360.0;
+    /**
+     * Returns the sum of the degrees of in a shape (or polygon) with the number of segments
+     * {@code segmentCount}.
+     *
+     * @param segmentCount The number of segments in a shape (or polygon).
+     * @return The degrees in a shape with the number of segments {@code segmentCount}.
+     * @see <a href="http://www.mathsisfun.com/geometry/interior-angles-polygons.html">Interior Angles of Polygons</a>
+     */
+    public static int calculateDegreesInShape(int segmentCount) {
+        if (segmentCount > 2) {
+            return (segmentCount - 2) * 180;
+        } else {
+            return 0;
+        }
+    }
 
     public static double calculateDistance(Point source, Point target) {
         return calculateDistance(source.getX(), source.getY(), target.getX(), target.getY());
@@ -136,15 +150,23 @@ public abstract class Geometry {
     }
 
     public static Point calculateCentroidPosition(List<Point> points) {
+
         Point centroidPosition = new Point(0, 0);
 
-        for (Point point : points) {
-            centroidPosition.setX(centroidPosition.getX() + point.getX());
-            centroidPosition.setY(centroidPosition.getY() + point.getY());
+        for (int i = 0; i < points.size(); i++) {
+
+            Point point = points.get(i);
+
+            centroidPosition.set(
+                    centroidPosition.getX() + point.getX(),
+                    centroidPosition.getY() + point.getY()
+            );
         }
 
-        centroidPosition.setX(centroidPosition.getX() / points.size());
-        centroidPosition.setY(centroidPosition.getY() / points.size());
+        centroidPosition.set(
+                centroidPosition.getX() / points.size(),
+                centroidPosition.getY() / points.size()
+        );
 
         return centroidPosition;
     }
@@ -185,8 +207,11 @@ public abstract class Geometry {
         double nearestDistance = Geometry.calculateDistance(sourcePoint, nearestPoint);
 
         // Search for the nearest point
-        for (Point point : points) {
+        for (int i = 0; i < points.size(); i++) {
+
+            Point point = points.get(i);
             double distance = Geometry.calculateDistance(sourcePoint, point);
+
             if (distance < nearestDistance) {
                 nearestPoint.set(point);
             }
@@ -350,7 +375,7 @@ public abstract class Geometry {
      * @param positions
      * @return
      */
-    public static <T extends Image> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
+    public static <T extends Figure> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
 
         // Sort points based on distance from center
         List<T> sortedImages = sortByDistanceToPoint(positions, packingCenter);
@@ -440,7 +465,7 @@ public abstract class Geometry {
 
     }
 
-    public static <T extends Image> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
+    public static <T extends Figure> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
 
         // Initialize with unsorted list of points
         List<T> sortedList = new ArrayList(positions);
@@ -460,7 +485,7 @@ public abstract class Geometry {
         }
 
 //        String sortedListResult = "";
-//        for (Image p: sortedList) {
+//        for (Figure p: sortedList) {
 //            sortedListResult += calculateDistance(p.getPosition(), point) + ", ";
 //        }
 //        Log.v("Sort", sortedListResult);

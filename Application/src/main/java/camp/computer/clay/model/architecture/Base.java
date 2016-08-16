@@ -3,9 +3,9 @@ package camp.computer.clay.model.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Frame extends Construct {
+public class Base extends Construct {
 
-    // has Script (i.e., Frame runs a Script)
+    // has Script (i.e., Base runs a Script)
 
     private List<Port> ports = new ArrayList<>();
 

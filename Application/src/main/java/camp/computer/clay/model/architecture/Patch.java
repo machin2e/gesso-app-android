@@ -5,6 +5,11 @@ import java.util.List;
 
 public class Patch extends Construct {
 
+    // Servo: GND, 3.3V, PWM
+    // DC Motor: GND, 5V
+    // IR Rangefinder: GND, 3.3V, Signal (analog)
+    // Potentiometer: GND, 3.3V, Signal (analog)
+
     private List<Port> ports = new ArrayList<>();
 
     public void addPort(Port port) {

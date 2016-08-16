@@ -10,22 +10,22 @@ public class Model extends Construct {
 
     private System system = new System();
 
-    private List<Body> bodies = new ArrayList<>();
+    private List<Actor> actors = new ArrayList<>();
 
-    private List<Frame> frames = new ArrayList<>();
+    private List<Base> bases = new ArrayList<>();
 
     private List<Patch> patches = new ArrayList<>();
 
-    public void addBody(Body body) {
-        this.bodies.add(body);
+    public void addActor(Actor actor) {
+        this.actors.add(actor);
     }
 
-    public Body getBody(int index) {
-        return this.bodies.get(index);
+    public Actor getActor(int index) {
+        return this.actors.get(index);
     }
 
-    public List<Body> getBodies() {
-        return this.bodies;
+    public List<Actor> getActors() {
+        return this.actors;
     }
 
     public void setSystem(System system) {
@@ -36,31 +36,31 @@ public class Model extends Construct {
         return this.system;
     }
 
-    public void addFrame(Frame frame) {
-        this.frames.add(frame);
-        frame.setParent(this);
+    public void addBase(Base base) {
+        this.bases.add(base);
+        base.setParent(this);
     }
 
-    public Frame getFrame(int index) {
-        return this.frames.get(index);
+    public Base getBase(int index) {
+        return this.bases.get(index);
     }
 
-    public List<Frame> getFrames() {
-        return this.frames;
+    public List<Base> getBases() {
+        return this.bases;
     }
 
     public List<Port> getPorts() {
         List<Port> ports = new ArrayList<>();
-        for (Frame frame : this.frames) {
-            ports.addAll(frame.getPorts());
+        for (Base base : this.bases) {
+            ports.addAll(base.getPorts());
         }
         return ports;
     }
 
     public List<Path> getPaths() {
         List<Path> paths = new ArrayList<>();
-        for (Frame frame : this.frames) {
-            for (Port port : frame.getPorts()) {
+        for (Base base : this.bases) {
+            for (Port port : base.getPorts()) {
                 paths.addAll(port.getPaths());
             }
         }

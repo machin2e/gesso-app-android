@@ -9,15 +9,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.List;
 
+import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.architecture.Body;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.geometry.Circle;
 import camp.computer.clay.visualization.util.geometry.Geometry;
@@ -143,15 +142,15 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) visualization.getModel().getBody(0).getPerspective().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-//                (float) originPosition.getY() + (float) visualization.getModel().getBody(0).getPerspective().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
-                (float) originPosition.getX() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getX(),
-                (float) originPosition.getY() + (float) visualization.getEnvironment().getBody(0).getPerspective().getPosition().getY()
+//                (float) originPosition.getX() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+//                (float) originPosition.getY() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+                (float) originPosition.getX() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getX(),
+                (float) originPosition.getY() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getY()
         );
         // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
         canvas.scale(
-                (float) visualization.getEnvironment().getBody(0).getPerspective().getScale(),
-                (float) visualization.getEnvironment().getBody(0).getPerspective().getScale()
+                (float) visualization.getModel().getActor(0).getPerspective().getScale(),
+                (float) visualization.getModel().getActor(0).getPerspective().getScale()
         );
         // </PERSPECTIVE>
 
@@ -233,8 +232,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-        visualization.getEnvironment().getBody(0).getPerspective().setWidth(screenWidth);
-        visualization.getEnvironment().getBody(0).getPerspective().setHeight(screenHeight);
+        visualization.getModel().getActor(0).getPerspective().setWidth(screenWidth);
+        visualization.getModel().getActor(0).getPerspective().setHeight(screenHeight);
     }
 
     public Visualization getVisualization() {
@@ -268,25 +267,25 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
             return false;
         }
 
-        // Log.v("InteractionHistory", "Started touchPoints composition.");
+        // Log.v("InteractionHistory", "Started points composition.");
 
-        // Get active body
-        Body body = visualization.getEnvironment().getBody(0);
+        // Get active actor
+        Actor actor = visualization.getModel().getActor(0);
 
-        // Create touchPoints action
+        // Create points action
         Action action = new Action();
 
-        if (pointerCount <= Action.MAX_TOUCH_POINT_COUNT) {
-            if (pointerIndex <= Action.MAX_TOUCH_POINT_COUNT - 1) {
+        if (pointerCount <= Action.MAXIMUM_POINT_COUNT) {
+            if (pointerIndex <= Action.MAXIMUM_POINT_COUNT - 1) {
 
                 // Current
-                // Update touchPoints state based the points given by the host OS (e.g., Android).
+                // Update points state based the points given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Point perspectivePosition = body.getPerspective().getPosition();
-                    double perspectiveScale = body.getPerspective().getScale();
-                    action.touchPoints[id].setX((motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
-                    action.touchPoints[id].setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                    Point perspectivePosition = actor.getPerspective().getPosition();
+                    double perspectiveScale = actor.getPerspective().getScale();
+                    action.points[id].setX((motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
+                    action.points[id].setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }
 
                 // ACTION_DOWN is called only for the first pointer that touches the screen. This
@@ -307,23 +306,23 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 // REFERENCES:
                 // - https://developer.android.com/training/gestures/multi.html
 
-                // Update the state of the touched object based on the current touchPoints action state.
+                // Update the state of the touched object based on the current points action state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
                     action.setType(Action.Type.TOUCH);
                     action.pointerIndex = pointerId;
-                    body.onAction(action);
+                    actor.onAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO: Handle additional pointers after the first touchPoints!
+                    // TODO: Handle additional pointers after the first points!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     action.setType(Action.Type.MOVE);
                     action.pointerIndex = pointerId;
-                    body.onAction(action);
+                    actor.onAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     action.setType(Action.Type.RELEASE);
                     action.pointerIndex = pointerId;
-                    body.onAction(action);
+                    actor.onAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO: Handle additional pointers after the first touchPoints!
+                    // TODO: Handle additional pointers after the first points!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:
                 } else {

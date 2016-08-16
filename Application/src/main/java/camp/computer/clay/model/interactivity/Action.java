@@ -1,14 +1,14 @@
 package camp.computer.clay.model.interactivity;
 
-import camp.computer.clay.model.architecture.Body;
-import camp.computer.clay.visualization.architecture.Image;
+import camp.computer.clay.model.architecture.Actor;
+import camp.computer.clay.visualization.architecture.Figure;
 import camp.computer.clay.visualization.util.Time;
 import camp.computer.clay.visualization.util.geometry.Point;
 
 public class Action {
 
     // TODO: Rename "Type" to "Stage" or "Phase". Type should be "Touch", "Sound", "Motion", etc.
-    // TODO: Increase MAX_TOUCH_POINT_COUNT to 10
+    // TODO: Increase MAXIMUM_POINT_COUNT to 10
     // TODO: Associate with broader context (e.g., sensor data, including 3D rotation, brightness.
 
     public enum Type {
@@ -16,34 +16,38 @@ public class Action {
         NONE,
         TOUCH,
         HOLD,
-        MOVE, // TODO: Remove this. Instead, use MOVE and Interaction.getDistance()/getCardinality()/getSum(":dragDelta").
+        MOVE,
         RELEASE;
-        //TAP; // TODO: Remove this. Instead, put logic in RELEASE and use Interaction.getDuration().
 
         Type() {
         }
 
     }
 
-    public static int MAX_TOUCH_POINT_COUNT = 1;
+    public static int MAXIMUM_POINT_COUNT = 1;
 
-    public static int MAX_TAP_DURATION = 200;
+    public static int MAXIMUM_TAP_DURATION = 200;
 
-    public static int MIN_HOLD_DURATION = 600;
+    public static int MINIMUM_HOLD_DURATION = 600;
 
-    public static int MIN_DRAG_DISTANCE = 35;
+    public static int MINIMUM_DRAG_DISTANCE = 35;
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    public Point[] touchPoints = new Point[MAX_TOUCH_POINT_COUNT];
+    private Interaction parentInteraction = null;
 
-    public boolean[] isTouching = new boolean[MAX_TOUCH_POINT_COUNT];
+    /**
+     * The points at which actions were performed (e.g., the touch points on a touchscreen).
+     */
+    public Point[] points = new Point[MAXIMUM_POINT_COUNT];
 
-    private Interaction interaction = null;
+    public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
+
+    private Figure[] targetFigure = new Figure[MAXIMUM_POINT_COUNT];
 
     private Type type = null;
 
-    private Body body = null;
+    private Actor actor = null;
 
     private long timestamp = DEFAULT_TIMESTAMP;
 
@@ -55,16 +59,16 @@ public class Action {
     }
 
     private void setup() {
-        for (int i = 0; i < MAX_TOUCH_POINT_COUNT; i++) {
-            touchPoints[i] = new Point(0, 0);
-            touchedImage[i] = null;
-            isTouching[i] = false;
+        for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
+            points[i] = new Point(0, 0);
+            targetFigure[i] = null;
+            isPointing[i] = false;
         }
     }
 
-    public boolean hasTouches() {
-        for (int i = 0; i < MAX_TOUCH_POINT_COUNT; i++) {
-            if (isTouching[i]) {
+    public boolean hasPoints() { // was hasTouches
+        for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
+            if (isPointing[i]) {
                 return true;
             }
         }
@@ -72,23 +76,23 @@ public class Action {
     }
 
     public boolean hasInteraction() {
-        return interaction != null;
+        return parentInteraction != null;
     }
 
     public void setInteraction(Interaction interaction) {
-        this.interaction = interaction;
+        this.parentInteraction = interaction;
     }
 
     public Interaction getInteraction() {
-        return this.interaction;
+        return this.parentInteraction;
     }
 
-    public void setBody(Body body) {
-        this.body = body;
+    public void setActor(Actor actor) {
+        this.actor = actor;
     }
 
-    public Body getBody() {
-        return this.body;
+    public Actor getActor() {
+        return this.actor;
     }
 
     public Type getType() {
@@ -100,39 +104,37 @@ public class Action {
     }
 
     public Point getPosition() {
-        return this.touchPoints[0];
+        return this.points[0];
     }
 
     public long getTimestamp() {
         return this.timestamp;
     }
 
-    private Image[] touchedImage = new Image[Action.MAX_TOUCH_POINT_COUNT];
-
-    public boolean isTouching(int fingerIndex) {
-        return this.touchedImage[fingerIndex] != null;
+    public boolean isPointing(int fingerIndex) { // was isTouching
+        return this.targetFigure[fingerIndex] != null;
     }
 
-    public void setTarget(int fingerIndex, Image image) {
-        this.touchedImage[fingerIndex] = image;
+    public void setTarget(int fingerIndex, Figure figure) {
+        this.targetFigure[fingerIndex] = figure;
     }
 
-    public Image getTarget(int fingerIndex) {
-        return this.touchedImage[fingerIndex];
+    public Figure getTarget(int fingerIndex) {
+        return this.targetFigure[fingerIndex];
     }
 
-    public boolean isTouching() {
-        return isTouching(0);
+    public boolean isPointing() { // was isTouching
+        return isPointing(0);
     }
 
-    public void setTarget(Image image) {
-        setTarget(0, image);
-        if (image != null) {
-            isTouching[0] = true;
+    public void setTarget(Figure figure) {
+        setTarget(0, figure);
+        if (figure != null) {
+            isPointing[0] = true;
         }
     }
 
-    public Image getTarget() {
+    public Figure getTarget() {
         return getTarget(0);
     }
 }

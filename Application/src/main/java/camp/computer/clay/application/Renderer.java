@@ -44,7 +44,7 @@ public class Renderer extends Thread {
     @Override
     public void run () {
 
-        long framePeriod = 1000 / targetFramesPerSecond; // Frame period in milliseconds
+        long framePeriod = 1000 / targetFramesPerSecond; // Base period in milliseconds
         long frameStartTime;
         long frameStopTime;
         long frameSleepTime;

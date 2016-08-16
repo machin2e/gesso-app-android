@@ -84,6 +84,29 @@ public class Port extends Construct {
 
     public void setType(Type type) {
         this.type = type;
+
+        Log.v("TouchPort", "path count: " + paths.size());
+
+        // Recursively set physically connected ports to the same type
+        for (int i = 0; i < this.paths.size(); i++) {
+            Path path = this.paths.get(i);
+            if (path.getType() == Path.Type.ELECTRONIC) {
+
+                Log.v("TouchPort", "path type: " + path.getType());
+
+                if (path.getSource() == this) {
+                    if (path.getTarget().getType() != type) {
+                        path.getTarget().setType(type);
+                    }
+                }
+
+                if (path.getTarget() == this) {
+                    if (path.getSource().getType() != type) {
+                        path.getSource().setType(type);
+                    }
+                }
+            }
+        }
     }
 
     public Direction getDirection() {

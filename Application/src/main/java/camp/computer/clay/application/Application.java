@@ -1,6 +1,8 @@
 package camp.computer.clay.application;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -47,7 +50,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // </Settings>
 
     // <Style>
-    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = true;
+    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = false;
 
     /**
      * Hides the operating system's status and navigation bars. Setting this to false is helpful
@@ -157,7 +160,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount();
 
-                // Update the state of the touched object based on the current touchPoints interaction state.
+                // Update the state of the touched object based on the current points interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -288,7 +291,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount ();
 
-                // Update the state of the touched object based on the current touchPoints interaction state.
+                // Update the state of the touched object based on the current points interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -314,7 +317,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler
 //                timelineButton.setInputType(inType); // restore input type
-//                return true; // consume touchPoints even
+//                return true; // consume points even
 //            }
         });
 
@@ -642,7 +645,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private void startFullscreenService() {
         enableFullscreenService = true;
-        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Action.MIN_HOLD_DURATION);
+        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Action.MINIMUM_HOLD_DURATION);
     }
 
     public void stopFullscreenService() {
@@ -762,5 +765,54 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     public SensorAdapter getSensorAdapter() {
         return this.sensorAdapter;
+    }
+
+    public void displayOptionsDialog() {
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        // builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Select the patch to connect");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.select_dialog_item);
+
+        arrayAdapter.add("Servo");
+        arrayAdapter.add("IR Rangefinder");
+
+        builderSingle.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        final Context appContext = this;
+
+        builderSingle.setAdapter(
+                arrayAdapter,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String strName = arrayAdapter.getItem(which);
+                        AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
+                        builderInner.setMessage(strName);
+                        builderInner.setTitle("Connecting patch");
+                        builderInner.setPositiveButton(
+                                "Ok",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(
+                                            DialogInterface dialog,
+                                            int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builderInner.show();
+                    }
+                });
+        builderSingle.show();
     }
 }
