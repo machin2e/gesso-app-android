@@ -1,9 +1,9 @@
 package camp.computer.clay.visualization.architecture;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Construct;
 
 public class Layer {
 
@@ -17,7 +17,7 @@ public class Layer {
 
     private String tag = "default";
 
-    private List<Image> images = new ArrayList<>();
+    private List<Figure> figures = new LinkedList<>();
 
     public Layer(Visualization visualization) {
         this.visualization = visualization;
@@ -43,33 +43,35 @@ public class Layer {
         return this.visualization;
     }
 
-    public void add(Model model, Image image) {
-        images.add(image);
+    public void add(Figure figure) {
+        figures.add(figure);
+        figure.setVisualization(visualization);
     }
 
-    public Image getImage(Model model) {
-        for (Image image : images) {
-            if (image.getModel() == model) {
-                return image;
+    public Figure getFigure(Construct construct) {
+        for (int i = 0; i < figures.size(); i++) {
+            Figure figure = figures.get(i);
+            if (figure.getConstruct() == construct) {
+                return figure;
             }
         }
         return null;
     }
 
-    public Model getModel(Image image) {
-        for (int i = 0; i < images.size(); i++) {
-            if (images.get(i) == image) {
-                return images.get(i).getModel();
+    public Construct getModel(Figure figure) {
+        for (int i = 0; i < figures.size(); i++) {
+            if (figures.get(i) == figure) {
+                return figures.get(i).getConstruct();
             }
         }
         return null;
     }
 
-    public ArrayList<Image> getImages() {
-        return new ArrayList<>(this.images);
+    public List<Figure> getFigures() {
+        return figures;
     }
 
     public int getCardinality() {
-        return this.images.size();
+        return this.figures.size();
     }
 }

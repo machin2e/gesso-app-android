@@ -1,0 +1,39 @@
+{
+  "patches": [
+    {
+      "name": "Servo",
+      "ports": [
+        {
+          "direction": "input",
+          "type": "common"
+        },
+        {
+          "direction": "input",
+          "type": "power_3.3v"
+        },
+        {
+          "direction": "input",
+          "type": "pulse"
+        }
+      ]
+    },
+    {
+      "name": "IR Rangefinder",
+      "ports": [
+        {
+          "direction": "input",
+          "type": "common"
+        },
+        {
+          "direction": "input",
+          "type": "power",
+          "value": "3.3"
+        },
+        {
+          "direction": "output",
+          "type": "wave"
+        }
+      ]
+    }
+  ]
+}

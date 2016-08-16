@@ -3,7 +3,7 @@ package camp.computer.clay.visualization.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.visualization.image.PortImage;
+import camp.computer.clay.visualization.figure.PortFigure;
 
 public abstract class Color {
 
@@ -21,9 +21,9 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<PortImage, Integer> colorMap = new HashMap<PortImage, Integer>();
+    private static HashMap<PortFigure, Integer> colorMap = new HashMap<PortFigure, Integer>();
 
-    public static int getUniqueColor(PortImage portSprite) {
+    public static int getUniqueColor(PortFigure portSprite) {
 
         if (colorMap.containsKey(portSprite)) {
             return colorMap.get(portSprite);
@@ -49,11 +49,15 @@ public abstract class Color {
         }
     }
 
-    public static int setTransparency(int color, float factor) {
-        int alpha = Math.round(android.graphics.Color.alpha(color) * factor);
+    public static int setTransparency(int color, double factor) {
+        int alpha = (int) (255.0 * factor); // Math.round(android.graphics.Color.alpha(color) * (float) factor);
         int red = android.graphics.Color.red(color);
         int green = android.graphics.Color.green(color);
         int blue = android.graphics.Color.blue(color);
         return android.graphics.Color.argb(alpha, red, green, blue);
+    }
+
+    public static String getHexColorString(int color) {
+        return String.format("#%08X", (0xFFFFFFFF & color));
     }
 }

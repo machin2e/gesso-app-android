@@ -5,15 +5,21 @@ import java.util.List;
 
 import camp.computer.clay.model.interactivity.*;
 import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.visualization.util.geometry.Geometry;
 
-public class Body {
+public class Actor {
 
     private Perspective perspective = null;
 
     public List<Interaction> interactions = new LinkedList<>();
 
-    public Body() {
+    public Actor() {
+        setup();
+    }
+
+    private void setup() {
+        // Perspective
+        Perspective perspective = new Perspective();
+        setPerspective(perspective);
     }
 
     public void setPerspective(Perspective perspective) {
@@ -43,7 +49,7 @@ public class Body {
 
     public void onAction(Action action) {
 
-        action.setBody(this);
+        action.setActor(this);
 
         switch (action.getType()) {
 
@@ -78,11 +84,12 @@ public class Body {
                 interaction.add(action);
 
                 // Current
-                action.isTouching[action.pointerIndex] = true;
+                action.isPointing[action.pointerIndex] = true;
 
                 // Classify/Callback
-                if (interaction.getDragDistance() > Action.MIN_DRAG_DISTANCE) {
-                    getPerspective().getVisualization().onDragListener(action);
+                if (interaction.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
+                    action.setType(Action.Type.MOVE);
+                    getPerspective().getVisualization().onMoveListener(action);
                 }
 
                 break;
@@ -94,16 +101,20 @@ public class Body {
                 interaction.add(action);
 
                 // Current
-                action.isTouching[action.pointerIndex] = false;
+                action.isPointing[action.pointerIndex] = false;
 
                 // Stop listening for a hold action
                 interaction.timerHandler.removeCallbacks(interaction.timerRunnable);
 
-                if (interaction.getDuration() < Action.MAX_TAP_DURATION) {
-                    getPerspective().getVisualization().onTapListener(action);
-                } else {
-                    getPerspective().getVisualization().onReleaseListener(action);
-                }
+//                if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+//                    action.setType(Action.Type.TOUCH);
+//                    getPerspective().getVisualization().onTapListener(action);
+//                } else {
+//                    action.setType(Action.Type.RELEASE);
+//                    getPerspective().getVisualization().onReleaseListener(action);
+//                }
+
+                getPerspective().getVisualization().onReleaseListener(action);
 
                 break;
             }

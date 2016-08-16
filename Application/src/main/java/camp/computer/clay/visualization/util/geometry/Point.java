@@ -16,6 +16,8 @@ public class Point {
     private double x = 0;
     private double y = 0;
 
+    private double rotation = 0;
+
     /**
      * Rotation rotation in degrees
      */
@@ -69,6 +71,10 @@ public class Point {
         return y;
     }
 
+    public double getRelativeAngle() {
+        return rotation;
+    }
+
     public void setRelative(Point point) {
         this.x = point.x;
         this.y = point.y;
@@ -80,6 +86,10 @@ public class Point {
 
     public void setRelativeY(double y) {
         this.y = y;
+    }
+
+    public void setRelativeAngle(double angle) {
+        this.rotation = angle;
     }
 
     /**
@@ -95,6 +105,12 @@ public class Point {
      * @return Absolute x coordinate.
      */
     public double getX() {
+//        if (referencePoint != null) {
+//            return referencePoint.getX() + this.x;
+////            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getX();
+//        } else {
+//            return this.x;
+//        }
         if (referencePoint != null) {
             return referencePoint.getX() + this.x;
         } else {
@@ -108,9 +124,18 @@ public class Point {
     public double getY() {
         if (referencePoint != null) {
             return referencePoint.getY() + this.y;
+//            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getY();
         } else {
             return this.y;
         }
+    }
+
+    public double getRotation() {
+//        if (referencePoint != null) {
+//            return referencePoint.getRotation() + this.rotation;
+//        } else {
+            return this.rotation;
+//        }
     }
 
     /**
@@ -150,6 +175,14 @@ public class Point {
         } else {
             this.y = y;
         }
+    }
+
+    public void setRotation(double rotation) {
+//        if (referencePoint != null) {
+//            this.rotation = rotation - referencePoint.getRotation();
+//        } else {
+            this.rotation = rotation;
+//        }
     }
 
 }

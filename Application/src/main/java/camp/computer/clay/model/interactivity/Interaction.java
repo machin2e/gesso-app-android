@@ -14,9 +14,9 @@ import camp.computer.clay.visualization.util.geometry.Point;
  */
 public class Interaction {
 
-    // TODO: Model this with a "touchPoints thisInteraction envelope" or "thisInteraction envelope".
-    // TODO: Model voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
-    // TODO: (?) Model data transmissions as actions in the same way?
+    // TODO: Construct this with a "points thisInteraction envelope" or "thisInteraction envelope".
+    // TODO: Construct voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
+    // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
@@ -24,9 +24,9 @@ public class Interaction {
     // TODO: (cont'd) Note can have multiple sequences per finger in an thisInteraction,
     // TODO: (cont'd) so consider remodeling as per-finger thisInteraction and treat each finger
     // TODO: (cont'd) as an individual actor.
-    public boolean[] isHolding = new boolean[Action.MAX_TOUCH_POINT_COUNT];
-    private boolean[] isDragging = new boolean[Action.MAX_TOUCH_POINT_COUNT];
-    private double[] dragDistance = new double[Action.MAX_TOUCH_POINT_COUNT];
+    private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
+    private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
+    private double[] dragDistance = new double[Action.MAXIMUM_POINT_COUNT];
 
     public double offsetX = 0;
     public double offsetY = 0;
@@ -40,11 +40,14 @@ public class Interaction {
         public void run() {
 
             int pointerIndex = 0;
-            if (getFirst().isTouching[pointerIndex]) {
-                if (getDragDistance() < Action.MIN_DRAG_DISTANCE) {
+
+            if (getFirst().isPointing[pointerIndex]) {
+                if (getDragDistance() < Action.MINIMUM_DRAG_DISTANCE) {
 
                     // TODO: Make this less ugly! It's so ugly.
-                    getFirst().getBody().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+                    // getFirst().getActor().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+
+                    thisInteraction.isHolding[pointerIndex] = true;
 
                 }
             }
@@ -56,7 +59,7 @@ public class Interaction {
     }
 
     private void setup() {
-        for (int i = 0; i < Action.MAX_TOUCH_POINT_COUNT; i++) {
+        for (int i = 0; i < Action.MAXIMUM_POINT_COUNT; i++) {
             isHolding[i] = false;
             isDragging[i] = false;
             dragDistance[i] = 0;
@@ -80,14 +83,14 @@ public class Interaction {
 
             // Start timer to check for hold
             timerHandler.removeCallbacks(timerRunnable);
-            timerHandler.postDelayed(timerRunnable, Action.MIN_HOLD_DURATION);
+            timerHandler.postDelayed(timerRunnable, Action.MINIMUM_HOLD_DURATION);
 
         } else if (actions.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), getFirst().touchPoints[action.pointerIndex]);
+            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), getFirst().points[action.pointerIndex]);
 
-            if (getDragDistance() > Action.MIN_DRAG_DISTANCE) {
+            if (getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                 isDragging[action.pointerIndex] = true;
             }
 
@@ -151,6 +154,10 @@ public class Interaction {
             touchPositions.add(actions.get(i).getPosition());
         }
         return touchPositions;
+    }
+
+    public boolean isHolding() {
+        return isHolding[0];
     }
 
     public boolean isDragging() {

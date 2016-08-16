@@ -5,7 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Port extends Model {
+public class Port extends Construct {
 
     public enum Direction {
 
@@ -59,8 +59,8 @@ public class Port extends Model {
 
     public void addPath(Path path) {
         if (!hasPath(path)) {
-            path.setParent(this);
             this.paths.add(path);
+            path.setParent(this);
         }
     }
 
@@ -84,6 +84,29 @@ public class Port extends Model {
 
     public void setType(Type type) {
         this.type = type;
+
+        Log.v("TouchPort", "path count: " + paths.size());
+
+        // Recursively set physically connected ports to the same type
+        for (int i = 0; i < this.paths.size(); i++) {
+            Path path = this.paths.get(i);
+            if (path.getType() == Path.Type.ELECTRONIC) {
+
+                Log.v("TouchPort", "path type: " + path.getType());
+
+                if (path.getSource() == this) {
+                    if (path.getTarget().getType() != type) {
+                        path.getTarget().setType(type);
+                    }
+                }
+
+                if (path.getTarget() == this) {
+                    if (path.getSource().getType() != type) {
+                        path.getSource().setType(type);
+                    }
+                }
+            }
+        }
     }
 
     public Direction getDirection() {
@@ -121,9 +144,9 @@ public class Port extends Model {
 
     public List<Path> getAncestorPaths() {
 
-        Environment environment = (Environment) getParent().getParent();
+        Model model = (Model) getParent().getParent();
         //List<Path> paths = getPaths();
-        List<Path> paths = environment.getPaths();
+        List<Path> paths = model.getPaths();
 
         List<Path> ancestorPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -154,7 +177,7 @@ public class Port extends Model {
 
     public List<Path> getDescendantPaths() {
 
-//        Environment simulation = (Environment) getParent().getParent();
+//        Model simulation = (Model) getParent().getParent();
 //        //List<Path> paths = getPaths();
 //        List<Path> paths = simulation.getPaths();
         List<Path> descendantPaths = new ArrayList<>();
