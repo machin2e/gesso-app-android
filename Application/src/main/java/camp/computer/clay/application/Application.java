@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
@@ -778,7 +778,10 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 android.R.layout.select_dialog_item);
 
         arrayAdapter.add("Servo");
+        arrayAdapter.add("Servo with Analog Feedback");
         arrayAdapter.add("IR Rangefinder");
+        arrayAdapter.add("Ultrasonic Rangefinder");
+        arrayAdapter.add("Stepper Motor");
 
         builderSingle.setNegativeButton(
                 "Cancel",

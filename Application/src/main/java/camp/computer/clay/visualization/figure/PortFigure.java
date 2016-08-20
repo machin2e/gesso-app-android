@@ -14,10 +14,10 @@ import camp.computer.clay.model.architecture.Base;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
-import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.model.interactivity.Perspective;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Gesture;
+import camp.computer.clay.model.interaction.Perspective;
 import camp.computer.clay.visualization.architecture.Figure;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.Visibility;
@@ -166,14 +166,14 @@ public class PortFigure extends Figure {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    Interaction interaction = action.getInteraction();
+                    Gesture gesture = action.getGesture();
 
                     Figure targetFigure = visualization.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     Perspective perspective = action.getActor().getPerspective();
 
-                    if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (gesture.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         Port port = getPort();
 
@@ -277,7 +277,7 @@ public class PortFigure extends Figure {
                         // ...last processAction was on a port image.
 
                         // PortFigure portImage = (PortFigure) action.getFigureByPosition();
-                        PortFigure sourcePortImage = (PortFigure) action.getInteraction().getFirst().getTarget();
+                        PortFigure sourcePortImage = (PortFigure) action.getGesture().getFirst().getTarget();
 
                         if (sourcePortImage.isDragging()) {
 
@@ -446,7 +446,7 @@ public class PortFigure extends Figure {
 //
 //                getVisualization().getModel().getActor(0).getPerspective().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
-//                action.setTarget(interaction.getFirst().getFigureByPosition());
+//                action.setTarget(gesture.getFirst().getFigureByPosition());
 //                action.setType(Action.Type.RELEASE);
 //                Log.v("onHoldListener", "Source port: " + action.getFigureByPosition());
 //                targetFigure.processAction(action);

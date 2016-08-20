@@ -5,8 +5,8 @@ import android.graphics.Paint;
 
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.visualization.architecture.Figure;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;

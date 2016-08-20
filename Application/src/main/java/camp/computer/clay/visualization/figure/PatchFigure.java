@@ -12,9 +12,9 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
-import camp.computer.clay.model.interactivity.Interaction;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Gesture;
 import camp.computer.clay.visualization.architecture.Figure;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
@@ -58,12 +58,12 @@ public class PatchFigure extends Figure {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    Interaction interaction = action.getInteraction();
+                    Gesture gesture = action.getGesture();
 
                     Figure targetFigure = visualization.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (gesture.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         Log.v("Action", "Tapped patch. Port figure count: " + getPortFigures().size());
                         Port port = new Port();
@@ -99,7 +99,7 @@ public class PatchFigure extends Figure {
                 } else if (action.getType() == Action.Type.RELEASE) {
 
                     // Update Figure
-                    PortFigure sourcePortFigure = (PortFigure) action.getInteraction().getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) action.getGesture().getFirst().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
                     sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
 

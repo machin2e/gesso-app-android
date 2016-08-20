@@ -5,8 +5,8 @@ import java.util.List;
 
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Construct;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.visualization.util.Color;
 import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
@@ -14,7 +14,7 @@ import camp.computer.clay.visualization.util.geometry.Rectangle;
 import camp.computer.clay.visualization.util.geometry.Shape;
 import camp.computer.clay.visualization.util.Visibility;
 
-public abstract class Figure {
+public abstract class Figure<T extends Construct> {
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -28,18 +28,18 @@ public abstract class Figure {
 
     protected double transparency = targetTransparency;
 
-    protected Construct construct = null;
+    protected T construct = null;
 
     protected Visualization visualization = null;
 
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Figure(Construct construct) {
+    public Figure(T construct) {
         this.construct = construct;
     }
 
-    public Construct getConstruct() {
+    public T getConstruct() {
         return this.construct;
     }
 

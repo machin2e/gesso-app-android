@@ -3,14 +3,14 @@ package camp.computer.clay.model.architecture;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.interactivity.*;
-import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interaction.*;
+import camp.computer.clay.model.interaction.Action;
 
 public class Actor {
 
     private Perspective perspective = null;
 
-    public List<Interaction> interactions = new LinkedList<>();
+    public List<Gesture> gestures = new LinkedList<>();
 
     public Actor() {
         setup();
@@ -39,9 +39,9 @@ public class Actor {
      *
      * @return The most recent interaction.
      */
-    private Interaction getInteraction() {
-        if (interactions.size() > 0) {
-            return interactions.get(interactions.size() - 1);
+    private Gesture getGesture() {
+        if (gestures.size() > 0) {
+            return gestures.get(gestures.size() - 1);
         } else {
             return null;
         }
@@ -58,18 +58,18 @@ public class Actor {
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
 
-                // Start a new interaction
-                Interaction interaction = new Interaction();
-                interactions.add(interaction);
+                // Start a new gesture
+                Gesture gesture = new Gesture();
+                gestures.add(gesture);
 
-                // Add action to interaction
-                interaction.add(action);
+                // Add action to gesture
+                gesture.add(action);
 
-                // Record interactions on timeline
-                // TODO: Cache and store the processAction interactions before deleting them completely! Do it in
+                // Record gestures on timeline
+                // TODO: Cache and store the processAction gestures before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
-                if (interactions.size() > 3) {
-                    interactions.remove(0);
+                if (gestures.size() > 3) {
+                    gestures.remove(0);
                 }
 
                 // Process the action
@@ -80,14 +80,14 @@ public class Actor {
 
             case MOVE: {
 
-                Interaction interaction = getInteraction();
-                interaction.add(action);
+                Gesture gesture = getGesture();
+                gesture.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = true;
 
                 // Classify/Callback
-                if (interaction.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
+                if (gesture.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                     action.setType(Action.Type.MOVE);
                     getPerspective().getVisualization().onMoveListener(action);
                 }
@@ -97,16 +97,16 @@ public class Actor {
 
             case RELEASE: {
 
-                Interaction interaction = getInteraction();
-                interaction.add(action);
+                Gesture gesture = getGesture();
+                gesture.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = false;
 
                 // Stop listening for a hold action
-                interaction.timerHandler.removeCallbacks(interaction.timerRunnable);
+                gesture.timerHandler.removeCallbacks(gesture.timerRunnable);
 
-//                if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+//                if (gesture.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 //                    action.setType(Action.Type.TOUCH);
 //                    getPerspective().getVisualization().onTapListener(action);
 //                } else {

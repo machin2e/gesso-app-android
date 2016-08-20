@@ -16,7 +16,7 @@ import android.view.SurfaceView;
 import java.util.List;
 
 import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.visualization.architecture.Visualization;
 import camp.computer.clay.visualization.util.geometry.Circle;
 import camp.computer.clay.visualization.util.geometry.Geometry;

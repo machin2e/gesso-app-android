@@ -12,10 +12,10 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Base;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
-import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.model.interactivity.Perspective;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Gesture;
+import camp.computer.clay.model.interaction.Perspective;
 import camp.computer.clay.visualization.architecture.Figure;
 import camp.computer.clay.visualization.util.Visibility;
 import camp.computer.clay.visualization.util.geometry.Geometry;
@@ -178,14 +178,14 @@ public class BaseFigure extends Figure {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    Interaction interaction = action.getInteraction();
+                    Gesture gesture = action.getGesture();
 
                     Figure targetFigure = visualization.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     Perspective perspective = action.getActor().getPerspective();
 
-                    if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (gesture.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched form
                         showPathFigures();

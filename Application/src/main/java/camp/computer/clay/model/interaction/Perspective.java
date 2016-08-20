@@ -1,4 +1,4 @@
-package camp.computer.clay.model.interactivity;
+package camp.computer.clay.model.interaction;
 
 import android.util.Log;
 
@@ -25,7 +25,7 @@ public class Perspective {
 
     public static double MAXIMUM_SCALE = 1.0;
 
-    private double width; // Width of perspective --- interactions (e.g., touches) are interpreted relative to this point
+    private double width; // Width of perspective --- gestures (e.g., touches) are interpreted relative to this point
 
     private double height; // Height of perspective
 
@@ -50,8 +50,6 @@ public class Perspective {
 
     // Focus in Perspective
     private Figure focusFigure = null;
-
-    private boolean isAdjustable = true;
 
     public Perspective() {
     }
@@ -89,14 +87,22 @@ public class Perspective {
 
     public void setPosition(Point targetPosition, double duration) {
 
+        Log.v("Perspective", "position x: " + position.getX() + ", y: " + position.getY());
+        Log.v("Perspective", "originalPosition x: " + originalPosition.getX() + ", y: " + originalPosition.getY());
+        Log.v("Perspective", "targetPosition x: " + targetPosition.getX() + ", y: " + targetPosition.getY());
+        Log.v("Perspective", "-");
+
         if (targetPosition.getX() == position.getX() && targetPosition.getY() == position.getY()) {
+
             return;
         }
 
         if (duration == 0) {
 
-            this.targetPosition.setX(-targetPosition.getX());
-            this.targetPosition.setY(-targetPosition.getY());
+            this.targetPosition.set(
+                    -targetPosition.getX(),
+                    -targetPosition.getY()
+            );
 
             this.originalPosition.set(targetPosition);
 
@@ -110,8 +116,10 @@ public class Perspective {
             // this.targetPosition.setY(-targetPosition.getY() * targetScale);
             */
 
-            this.targetPosition.setX(-targetPosition.getX());
-            this.targetPosition.setY(-targetPosition.getY());
+            this.targetPosition.set(
+                    -targetPosition.getX(),
+                    -targetPosition.getY()
+            );
 
             // <PLAN_ANIMATION>
             originalPosition.set(position);
@@ -206,14 +214,6 @@ public class Perspective {
 
     }
 
-    public void setAdjustability(boolean isAdjustable) {
-        this.isAdjustable = isAdjustable;
-    }
-
-    public boolean isAdjustable() {
-        return isAdjustable;
-    }
-
     public void setVisualization(Visualization visualization) {
         this.visualization = visualization;
     }
@@ -295,18 +295,18 @@ public class Perspective {
 
     public void focusMovePerspective(Action action) {
 
-        Interaction interaction = action.getInteraction();
+        Gesture gesture = action.getGesture();
 
         // Move perspective
-        setOffset(interaction.offsetX, interaction.offsetY);
+        setOffset(gesture.offsetX, gesture.offsetY);
     }
 
     public void focusSelectBase(Action action) {
 
         Actor actor = action.getActor();
-        Interaction interaction = action.getInteraction();
+        Gesture gesture = action.getGesture();
 
-        if (interaction.isDragging()) {
+        if (gesture.isDragging()) {
 
             // Zoom out to show overview
             setScale(0.8);
@@ -326,16 +326,16 @@ public class Perspective {
                 otherBaseFigure.setTransparency(0.1f);
             }
 
-            Interaction previousInteraction = null;
-            if (actor.interactions.size() > 1) {
-                previousInteraction = actor.interactions.get(actor.interactions.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousInteraction.getFirst().getTarget());
+            Gesture previousGesture = null;
+            if (actor.gestures.size() > 1) {
+                previousGesture = actor.gestures.get(actor.gestures.size() - 2);
+                Log.v("PreviousTouch", "Previous: " + previousGesture.getFirst().getTarget());
                 Log.v("PreviousTouch", "Current: " + action.getTarget());
             }
 
             // Perspective
             if (baseFigure.getBase().getPaths().size() > 0
-                    && (previousInteraction != null && previousInteraction.getFirst().getTarget() != action.getTarget())) {
+                    && (previousGesture != null && previousGesture.getFirst().getTarget() != action.getTarget())) {
 
                 Log.v("Touch_", "A");
 
@@ -373,7 +373,6 @@ public class Perspective {
                 List<Point> formPortPositions = Visualization.getPositions(formPathPortFigures);
                 Rectangle boundingBox = Geometry.calculateBoundingBox(formPortPositions);
 
-                setAdjustability(false);
                 adjustScale(boundingBox);
                 setPosition(boundingBox.getPosition());
 
@@ -395,7 +394,6 @@ public class Perspective {
                 // TODO: (on second press, also hide external ports, send peripherals) getPerspective().setScale(1.2f);
                 // TODO: (cont'd) getPerspective().setPosition(baseImage.getPosition());
 
-                setAdjustability(false);
                 setScale(1.2f);
                 setPosition(baseFigure.getPosition());
             }
@@ -459,18 +457,9 @@ public class Perspective {
             patchFigure.setTransparency(1.0);
         }
 
-        FigureSet figures = getVisualization().getFigures().filterType(BaseFigure.class, PatchFigure.class);
-        List<Point> figurePositions = figures.getVertices();
-        Point figuresCenterPosition = Geometry.calculateCenterPosition(figurePositions);
-
         adjustScale();
 
-        //getPerspective().setPosition(getPerspective().getVisualization().getList().filterType(BaseFigure.TYPE).getCentroidPoint());
-        setPosition(figuresCenterPosition);
-
-        // Reset adjustability
-        setAdjustability(true);
-
+        adjustPosition();
     }
 
     public void adjustPosition() {

@@ -1,4 +1,4 @@
-package camp.computer.clay.model.interactivity;
+package camp.computer.clay.model.interaction;
 
 import android.os.Handler;
 
@@ -10,19 +10,19 @@ import camp.computer.clay.visualization.util.geometry.Geometry;
 import camp.computer.clay.visualization.util.geometry.Point;
 
 /**
- * An thisInteraction is a temporal sequence of one or more actions.
+ * An thisGesture is a temporal sequence of one or more actions.
  */
-public class Interaction {
+public class Gesture {
 
-    // TODO: Construct this with a "points thisInteraction envelope" or "thisInteraction envelope".
-    // TODO: Construct voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
+    // TODO: Construct this with a "points thisGesture envelope" or "thisGesture envelope".
+    // TODO: Construct voice thisGesture in the same way. Generify to Gesture<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an thisInteraction,
-    // TODO: (cont'd) so consider remodeling as per-finger thisInteraction and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisGesture,
+    // TODO: (cont'd) so consider remodeling as per-finger thisGesture and treat each finger
     // TODO: (cont'd) as an individual actor.
     private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
@@ -33,7 +33,7 @@ public class Interaction {
 
     public Handler timerHandler = new Handler();
 
-    Interaction thisInteraction = this;
+    Gesture thisGesture = this;
 
     public Runnable timerRunnable = new Runnable() {
         @Override
@@ -44,17 +44,20 @@ public class Interaction {
             if (getFirst().isPointing[pointerIndex]) {
                 if (getDragDistance() < Action.MINIMUM_DRAG_DISTANCE) {
 
+                    // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    // getFirst().getActor().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+                    thisGesture.getFirst().setType(Action.Type.HOLD);
+                    getFirst().getActor().getPerspective().getVisualization().onHoldListener(thisGesture.getFirst());
+                    // </HACK>
 
-                    thisInteraction.isHolding[pointerIndex] = true;
+                    thisGesture.isHolding[pointerIndex] = true;
 
                 }
             }
         }
     };
 
-    public Interaction() {
+    public Gesture() {
         setup();
     }
 
@@ -72,7 +75,7 @@ public class Interaction {
 
     public void add(Action action) {
 
-        action.setInteraction(this);
+        action.setGesture(this);
 
         actions.add(action);
 

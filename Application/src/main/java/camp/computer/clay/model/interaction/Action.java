@@ -1,4 +1,4 @@
-package camp.computer.clay.model.interactivity;
+package camp.computer.clay.model.interaction;
 
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.visualization.architecture.Figure;
@@ -34,7 +34,7 @@ public class Action {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    private Interaction parentInteraction = null;
+    private Gesture parentGesture = null;
 
     /**
      * The points at which actions were performed (e.g., the touch points on a touchscreen).
@@ -75,16 +75,16 @@ public class Action {
         return false;
     }
 
-    public boolean hasInteraction() {
-        return parentInteraction != null;
+    public boolean hasGesture() {
+        return parentGesture != null;
     }
 
-    public void setInteraction(Interaction interaction) {
-        this.parentInteraction = interaction;
+    public void setGesture(Gesture gesture) {
+        this.parentGesture = gesture;
     }
 
-    public Interaction getInteraction() {
-        return this.parentInteraction;
+    public Gesture getGesture() {
+        return this.parentGesture;
     }
 
     public void setActor(Actor actor) {
