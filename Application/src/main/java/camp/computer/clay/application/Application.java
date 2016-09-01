@@ -132,7 +132,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         setContentView(R.layout.activity_main);
 
-        // Visualization Surface
+        // Scene Surface
         surface = (Surface) findViewById (R.id.app_surface_view);
         surface.onResume();
 
@@ -312,7 +312,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             }
 
 //            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
+//            public boolean onTouch(Camera v, MotionEvent event) {
 //                int inType = timelineButton.getInputType(); // backup the input type
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler

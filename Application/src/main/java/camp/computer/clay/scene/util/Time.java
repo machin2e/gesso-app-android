@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.util;
+package camp.computer.clay.scene.util;
 
 public abstract class Time {
 

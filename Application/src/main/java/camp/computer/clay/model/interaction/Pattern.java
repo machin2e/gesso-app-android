@@ -6,23 +6,23 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
 
 /**
- * An thisGesture is a temporal sequence of one or more actions.
+ * An thisPattern is a temporal sequence of one or more actions.
  */
-public class Gesture {
+public class Pattern { // TODO: Rename Activity. Previously Gesture.
 
-    // TODO: Construct this with a "points thisGesture envelope" or "thisGesture envelope".
-    // TODO: Construct voice thisGesture in the same way. Generify to Gesture<T> or subclass.
+    // TODO: Construct this with a "points thisPattern envelope" or "thisPattern envelope".
+    // TODO: Construct voice thisPattern in the same way. Generify to Pattern<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an thisGesture,
-    // TODO: (cont'd) so consider remodeling as per-finger thisGesture and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisPattern,
+    // TODO: (cont'd) so consider remodeling as per-finger thisPattern and treat each finger
     // TODO: (cont'd) as an individual actor.
     private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
@@ -33,7 +33,7 @@ public class Gesture {
 
     public Handler timerHandler = new Handler();
 
-    Gesture thisGesture = this;
+    Pattern thisPattern = this;
 
     public Runnable timerRunnable = new Runnable() {
         @Override
@@ -46,18 +46,18 @@ public class Gesture {
 
                     // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    thisGesture.getFirst().setType(Action.Type.HOLD);
-                    getFirst().getActor().getPerspective().getVisualization().onHoldListener(thisGesture.getFirst());
+                    thisPattern.getFirst().setType(Action.Type.HOLD);
+                    getFirst().getActor().getCamera().getScene().onHoldListener(thisPattern.getFirst());
                     // </HACK>
 
-                    thisGesture.isHolding[pointerIndex] = true;
+                    thisPattern.isHolding[pointerIndex] = true;
 
                 }
             }
         }
     };
 
-    public Gesture() {
+    public Pattern() {
         setup();
     }
 
@@ -75,7 +75,7 @@ public class Gesture {
 
     public void add(Action action) {
 
-        action.setGesture(this);
+        action.setPattern(this);
 
         actions.add(action);
 

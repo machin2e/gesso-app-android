@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.util.geometry;
+package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 

@@ -1,12 +1,12 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.scene.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.visualization.util.Visibility;
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
-import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Rectangle;
 
 /**
  * FigureSet is an interface for managing and manipulating sets of figures.

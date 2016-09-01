@@ -1,12 +1,12 @@
-package camp.computer.clay.visualization.util.geometry;
+package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 
-import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.scene.util.Visibility;
 
 public abstract class Shape {
 
-    protected String label = null;
+    protected String label = "";
 
     protected Visibility visibility = Visibility.VISIBLE;
 

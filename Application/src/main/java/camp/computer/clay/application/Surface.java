@@ -17,15 +17,16 @@ import java.util.List;
 
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.visualization.architecture.Visualization;
-import camp.computer.clay.visualization.util.geometry.Circle;
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
-import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.scene.architecture.Scene;
+import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.scene.util.geometry.Circle;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Rectangle;
 
 public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
-    // Visualization Rendering Context
+    // Scene Rendering Context
     private Bitmap canvasBitmap = null;
     private Canvas canvas = null;
     private int canvasWidth;
@@ -33,15 +34,15 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Matrix identityMatrix;
 
-    // Visualization Renderer
+    // Scene Renderer
     private SurfaceHolder surfaceHolder;
     private Renderer renderer;
 
     // Coordinate System (Grid)
     private Point originPosition = new Point();
 
-    // Visualization
-    private Visualization visualization;
+    // Scene
+    private Scene scene;
 
     public Surface(Context context) {
         super(context);
@@ -68,7 +69,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
         identityMatrix = new Matrix();
 
-        // Center the visualization coordinate system
+        // Center the scene coordinate system
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
@@ -134,7 +135,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     protected void doDraw(Canvas canvas) {
         setCanvas(canvas);
 
-        if (this.visualization == null || this.canvas == null) {
+        if (this.scene == null || this.canvas == null) {
             return;
         }
 
@@ -142,30 +143,88 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-//                (float) originPosition.getY() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
-                (float) originPosition.getX() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getX(),
-                (float) originPosition.getY() + (float) visualization.getModel().getActor(0).getPerspective().getPosition().getY()
+//                (float) originPosition.getX() + (float) scene.getModel().getActor(0).getCamera().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+//                (float) originPosition.getY() + (float) scene.getModel().getActor(0).getCamera().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+                (float) originPosition.getX() + (float) scene.getModel().getActor(0).getCamera().getPosition().getX(),
+                (float) originPosition.getY() + (float) scene.getModel().getActor(0).getCamera().getPosition().getY()
         );
         // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
         canvas.scale(
-                (float) visualization.getModel().getActor(0).getPerspective().getScale(),
-                (float) visualization.getModel().getActor(0).getPerspective().getScale()
+                (float) scene.getModel().getActor(0).getCamera().getScale(),
+                (float) scene.getModel().getActor(0).getCamera().getScale()
         );
         // </PERSPECTIVE>
 
         // TODO: Get Model
-        // TODO: Get Model's selected Visualization
+        // TODO: Get Model's selected Scene
 
         // Draw the background
         canvas.drawColor(Color.WHITE);
 
         // Scene
-        getVisualization().draw(this);
+        canvas.save();
+        getScene().draw(this);
+        canvas.restore();
+
+        canvas.restore();
+
+        // Annotation
+        if (scene.goalVisibility == Visibility.VISIBLE) {
+
+            canvas.save();
+
+            // Project Title
+            paint.setColor(Color.BLACK);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTextSize(100);
+
+            String projectTitleText = "GOAL";
+            Rect projectTitleTextBounds = new Rect();
+            paint.getTextBounds(projectTitleText, 0, projectTitleText.length(), projectTitleTextBounds);
+            canvas.drawText(
+                    projectTitleText,
+                    (getWidth() / 2.0f) - (projectTitleTextBounds.width() / 2.0f),
+                    (250) - (projectTitleTextBounds.height() / 2.0f),
+                    paint
+            );
+
+            // Menu
+            paint.setColor(Color.BLACK);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setStrokeWidth(5.0f);
+
+            canvas.drawLine(
+                    (getWidth() / 2.0f) - 75f,
+                    getHeight() - 250f,
+                    (getWidth() / 2.0f) + 75f,
+                    getHeight() - 250f,
+                    paint
+
+            );
+
+            canvas.drawLine(
+                    (getWidth() / 2.0f) - 75f,
+                    getHeight() - 215f,
+                    (getWidth() / 2.0f) + 75f,
+                    getHeight() - 215f,
+                    paint
+
+            );
+
+            canvas.drawLine(
+                    (getWidth() / 2.0f) - 75f,
+                    getHeight() - 180f,
+                    (getWidth() / 2.0f) + 75f,
+                    getHeight() - 180f,
+                    paint
+
+            );
+
+            canvas.restore();
+        }
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap(canvasBitmap, identityMatrix, null);
-        canvas.restore();
 
         /*
         // Alternative to the above
@@ -181,7 +240,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
      */
     public void update() {
 
-        if (visualization == null) {
+        if (scene == null) {
             return;
         }
 
@@ -194,7 +253,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 synchronized (getHolder()) {
 
                     // Update
-                    visualization.update();
+                    scene.update();
 
                     // Draw
                     doDraw(canvas);
@@ -223,8 +282,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         return this.paint;
     }
 
-    public void setVisualization(Visualization visualization) {
-        this.visualization = visualization;
+    public void setScene(Scene scene) {
+        this.scene = scene;
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
@@ -232,12 +291,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-        visualization.getModel().getActor(0).getPerspective().setWidth(screenWidth);
-        visualization.getModel().getActor(0).getPerspective().setHeight(screenHeight);
+        scene.getModel().getActor(0).getCamera().setWidth(screenWidth);
+        scene.getModel().getActor(0).getCamera().setHeight(screenHeight);
     }
 
-    public Visualization getVisualization() {
-        return this.visualization;
+    public Scene getScene() {
+        return this.scene;
     }
 
     //----------------------------------------------------------------------------------------------
@@ -263,14 +322,14 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
         int pointerCount = motionEvent.getPointerCount();
 
-        if (this.visualization == null) {
+        if (this.scene == null) {
             return false;
         }
 
         // Log.v("InteractionHistory", "Started points composition.");
 
         // Get active actor
-        Actor actor = visualization.getModel().getActor(0);
+        Actor actor = scene.getModel().getActor(0);
 
         // Create points action
         Action action = new Action();
@@ -282,8 +341,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 // Update points state based the points given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Point perspectivePosition = actor.getPerspective().getPosition();
-                    double perspectiveScale = actor.getPerspective().getScale();
+                    Point perspectivePosition = actor.getCamera().getPosition();
+                    double perspectiveScale = actor.getCamera().getScale();
                     action.points[id].setX((motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
                     action.points[id].setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }

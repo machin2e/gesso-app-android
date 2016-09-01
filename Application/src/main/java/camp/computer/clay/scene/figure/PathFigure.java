@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.figure;
+package camp.computer.clay.scene.figure;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -7,12 +7,12 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.visualization.architecture.Figure;
-import camp.computer.clay.visualization.util.Visibility;
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
 
-public class PathFigure extends Figure {
+public class PathFigure extends Figure<Path> {
 
     // </STYLE>
     public boolean showDocks = true;
@@ -27,10 +27,10 @@ public class PathFigure extends Figure {
     }
 
     private void setup() {
-        setupInteractions();
+        setupActions();
     }
 
-    private void setupInteractions() {
+    private void setupActions() {
         setOnActionListener(new ActionListener() {
             @Override
             public void onAction(Action action) {
@@ -70,8 +70,9 @@ public class PathFigure extends Figure {
         }
     }
 
+    // TODO: Delete
     public Path getPath() {
-        return (Path) getConstruct();
+        return getConstruct();
     }
 
     public void drawTrianglePath(Surface surface) {
@@ -81,8 +82,8 @@ public class PathFigure extends Figure {
 
         Path path = getPath();
 
-        PortFigure sourcePortImage = (PortFigure) getVisualization().getFigure(path.getSource());
-        PortFigure targetPortImage = (PortFigure) getVisualization().getFigure(path.getTarget());
+        PortFigure sourcePortImage = (PortFigure) getScene().getFigure(path.getSource());
+        PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getTarget());
 
         // Show target port
         targetPortImage.setVisibility(Visibility.VISIBLE);
@@ -151,8 +152,8 @@ public class PathFigure extends Figure {
 
         Path path = getPath();
 
-        PortFigure sourcePortImage = (PortFigure) getVisualization().getFigure(path.getSource());
-        PortFigure targetPortImage = (PortFigure) getVisualization().getFigure(path.getTarget());
+        PortFigure sourcePortImage = (PortFigure) getScene().getFigure(path.getSource());
+        PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getTarget());
 
         // Show target port
         targetPortImage.setVisibility(Visibility.VISIBLE);
@@ -246,8 +247,8 @@ public class PathFigure extends Figure {
 //            Log.v("Touch_", "FLOOOO");
 //            Path path = getPath();
 //
-//            PortFigure sourcePortImage = (PortFigure) getVisualization().getFigure(path.getSource());
-//            PortFigure targetPortImage = (PortFigure) getVisualization().getFigure(path.getFigureByPosition());
+//            PortFigure sourcePortImage = (PortFigure) getScene().getFigure(path.getSource());
+//            PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getFigureByPosition());
 //
 //            double distanceToLine = Geometry.calculateLineToPointDistance(
 //                    sourcePortImage.getPosition(),

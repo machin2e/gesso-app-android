@@ -1,11 +1,11 @@
 package camp.computer.clay.application;
 
-import camp.computer.clay.visualization.util.Time;
+import camp.computer.clay.scene.util.Time;
 
 /**
- * Renderer is a background thread that periodically updates the visualization state
+ * Renderer is a background thread that periodically updates the scene state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
- * visualization's state then re-rendering it.
+ * scene's state then re-rendering it.
  */
 public class Renderer extends Thread {
 
@@ -53,7 +53,7 @@ public class Renderer extends Thread {
 
             frameStartTime = Time.getCurrentTime();
 
-            // Advance the visualization state
+            // Advance the scene state
             surface.update();
 
             frameStopTime = Time.getCurrentTime();
