@@ -1,4 +1,4 @@
-package camp.computer.clay.model.interactivity;
+package camp.computer.clay.model.interaction;
 
 import android.os.Handler;
 
@@ -6,23 +6,23 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
 
 /**
- * An thisInteraction is a temporal sequence of one or more actions.
+ * An thisPattern is a temporal sequence of one or more actions.
  */
-public class Interaction {
+public class Pattern { // TODO: Rename Activity. Previously Gesture.
 
-    // TODO: Construct this with a "points thisInteraction envelope" or "thisInteraction envelope".
-    // TODO: Construct voice thisInteraction in the same way. Generify to Interaction<T> or subclass.
+    // TODO: Construct this with a "points thisPattern envelope" or "thisPattern envelope".
+    // TODO: Construct voice thisPattern in the same way. Generify to Pattern<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an thisInteraction,
-    // TODO: (cont'd) so consider remodeling as per-finger thisInteraction and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisPattern,
+    // TODO: (cont'd) so consider remodeling as per-finger thisPattern and treat each finger
     // TODO: (cont'd) as an individual actor.
     private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
@@ -33,7 +33,7 @@ public class Interaction {
 
     public Handler timerHandler = new Handler();
 
-    Interaction thisInteraction = this;
+    Pattern thisPattern = this;
 
     public Runnable timerRunnable = new Runnable() {
         @Override
@@ -44,17 +44,20 @@ public class Interaction {
             if (getFirst().isPointing[pointerIndex]) {
                 if (getDragDistance() < Action.MINIMUM_DRAG_DISTANCE) {
 
+                    // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    // getFirst().getActor().getPerspective().getVisualization().onHoldListener(thisInteraction.getFirst());
+                    thisPattern.getFirst().setType(Action.Type.HOLD);
+                    getFirst().getActor().getCamera().getScene().onHoldListener(thisPattern.getFirst());
+                    // </HACK>
 
-                    thisInteraction.isHolding[pointerIndex] = true;
+                    thisPattern.isHolding[pointerIndex] = true;
 
                 }
             }
         }
     };
 
-    public Interaction() {
+    public Pattern() {
         setup();
     }
 
@@ -72,7 +75,7 @@ public class Interaction {
 
     public void add(Action action) {
 
-        action.setInteraction(this);
+        action.setPattern(this);
 
         actions.add(action);
 

@@ -3,35 +3,49 @@ package camp.computer.clay.model.architecture;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.interactivity.*;
-import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interaction.*;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.scene.architecture.Scene;
 
-public class Actor {
+public class Actor { // Controller
 
-    private Perspective perspective = null;
+    private Camera camera = null;
 
-    public List<Interaction> interactions = new LinkedList<>();
+    // PatternSet (Smart querying interface)
+    public List<Pattern> patterns = new LinkedList<>();
 
     public Actor() {
         setup();
     }
 
     private void setup() {
-        // Perspective
-        Perspective perspective = new Perspective();
-        setPerspective(perspective);
+        // Camera
+        Camera camera = new Camera();
+        setCamera(camera);
     }
 
-    public void setPerspective(Perspective perspective) {
-        this.perspective = perspective;
+    public void setCamera(Camera camera) {
+        this.camera = camera;
     }
 
-    public boolean hasPerspective() {
-        return perspective != null;
+    public boolean hasView() {
+        return camera != null;
     }
 
-    public Perspective getPerspective() {
-        return this.perspective;
+    public Camera getCamera() {
+        return this.camera;
+    }
+
+    /**
+     * Conveninece function.
+     *
+     * @return
+     */
+    public Scene getScene() {
+        if (camera != null) {
+            return camera.getScene();
+        }
+        return null;
     }
 
     /**
@@ -39,9 +53,9 @@ public class Actor {
      *
      * @return The most recent interaction.
      */
-    private Interaction getInteraction() {
-        if (interactions.size() > 0) {
-            return interactions.get(interactions.size() - 1);
+    private Pattern getPattern() {
+        if (patterns.size() > 0) {
+            return patterns.get(patterns.size() - 1);
         } else {
             return null;
         }
@@ -58,38 +72,38 @@ public class Actor {
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
 
-                // Start a new interaction
-                Interaction interaction = new Interaction();
-                interactions.add(interaction);
+                // Start a new pattern
+                Pattern pattern = new Pattern();
+                patterns.add(pattern);
 
-                // Add action to interaction
-                interaction.add(action);
+                // Add action to pattern
+                pattern.add(action);
 
-                // Record interactions on timeline
-                // TODO: Cache and store the processAction interactions before deleting them completely! Do it in
+                // Record patterns on timeline
+                // TODO: Cache and store the processAction patterns before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
-                if (interactions.size() > 3) {
-                    interactions.remove(0);
+                if (patterns.size() > 3) {
+                    patterns.remove(0);
                 }
 
                 // Process the action
-                getPerspective().getVisualization().onTouchListener(action);
+                getCamera().getScene().onTouchListener(action);
 
                 break;
             }
 
             case MOVE: {
 
-                Interaction interaction = getInteraction();
-                interaction.add(action);
+                Pattern pattern = getPattern();
+                pattern.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = true;
 
                 // Classify/Callback
-                if (interaction.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
+                if (pattern.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                     action.setType(Action.Type.MOVE);
-                    getPerspective().getVisualization().onMoveListener(action);
+                    getCamera().getScene().onMoveListener(action);
                 }
 
                 break;
@@ -97,24 +111,24 @@ public class Actor {
 
             case RELEASE: {
 
-                Interaction interaction = getInteraction();
-                interaction.add(action);
+                Pattern pattern = getPattern();
+                pattern.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = false;
 
                 // Stop listening for a hold action
-                interaction.timerHandler.removeCallbacks(interaction.timerRunnable);
+                pattern.timerHandler.removeCallbacks(pattern.timerRunnable);
 
-//                if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+//                if (pattern.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 //                    action.setType(Action.Type.TOUCH);
-//                    getPerspective().getVisualization().onTapListener(action);
+//                    getCamera().getScene().onTapListener(action);
 //                } else {
 //                    action.setType(Action.Type.RELEASE);
-//                    getPerspective().getVisualization().onReleaseListener(action);
+//                    getCamera().getScene().onReleaseListener(action);
 //                }
 
-                getPerspective().getVisualization().onReleaseListener(action);
+                getCamera().getScene().onReleaseListener(action);
 
                 break;
             }

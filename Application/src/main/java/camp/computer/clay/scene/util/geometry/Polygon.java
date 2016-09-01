@@ -1,9 +1,7 @@
-package camp.computer.clay.visualization.util.geometry;
+package camp.computer.clay.scene.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import camp.computer.clay.visualization.architecture.Visualization;
 
 public class Polygon extends Shape {
 

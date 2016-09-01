@@ -1,9 +1,9 @@
-package camp.computer.clay.model.interactivity;
+package camp.computer.clay.model.interaction;
 
 import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.visualization.architecture.Figure;
-import camp.computer.clay.visualization.util.Time;
-import camp.computer.clay.visualization.util.geometry.Point;
+import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.util.Time;
+import camp.computer.clay.scene.util.geometry.Point;
 
 public class Action {
 
@@ -14,10 +14,10 @@ public class Action {
     public enum Type {
 
         NONE,
-        TOUCH,
+        TOUCH, // Consider renaming to CONNECT or ATTACH or ENGAGE
         HOLD,
         MOVE,
-        RELEASE;
+        RELEASE; // Consider renaming to DISCONNECT or DETACH or DISENGAGE
 
         Type() {
         }
@@ -34,7 +34,7 @@ public class Action {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    private Interaction parentInteraction = null;
+    private Pattern parentPattern = null;
 
     /**
      * The points at which actions were performed (e.g., the touch points on a touchscreen).
@@ -75,16 +75,16 @@ public class Action {
         return false;
     }
 
-    public boolean hasInteraction() {
-        return parentInteraction != null;
+    public boolean hasPattern() {
+        return parentPattern != null;
     }
 
-    public void setInteraction(Interaction interaction) {
-        this.parentInteraction = interaction;
+    public void setPattern(Pattern pattern) {
+        this.parentPattern = pattern;
     }
 
-    public Interaction getInteraction() {
-        return this.parentInteraction;
+    public Pattern getPattern() {
+        return this.parentPattern;
     }
 
     public void setActor(Actor actor) {

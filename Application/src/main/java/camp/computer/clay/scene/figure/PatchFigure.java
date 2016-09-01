@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.figure;
+package camp.computer.clay.scene.figure;
 
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,16 +12,16 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
-import camp.computer.clay.model.interactivity.Interaction;
-import camp.computer.clay.visualization.architecture.Figure;
-import camp.computer.clay.visualization.util.Visibility;
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
-import camp.computer.clay.visualization.util.geometry.Rectangle;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Pattern;
+import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Rectangle;
 
-public class PatchFigure extends Figure {
+public class PatchFigure extends Figure<Patch> {
 
     // Shapes
     private Rectangle boardShape = null;
@@ -33,7 +33,7 @@ public class PatchFigure extends Figure {
 
     private void setup() {
         setupShapes();
-        setupInteractions();
+        setupActions();
     }
 
     private void setupShapes() {
@@ -46,7 +46,7 @@ public class PatchFigure extends Figure {
 
     }
 
-    private void setupInteractions() {
+    private void setupActions() {
 
         setOnActionListener(new ActionListener() {
             @Override
@@ -58,17 +58,12 @@ public class PatchFigure extends Figure {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    Interaction interaction = action.getInteraction();
+                    Pattern pattern = action.getPattern();
 
-                    Figure targetFigure = visualization.getFigureByPosition(action.getPosition());
+                    Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    if (interaction.getDuration() < Action.MAXIMUM_TAP_DURATION) {
-
-                        Log.v("Action", "Tapped patch. Port figure count: " + getPortFigures().size());
-                        Port port = new Port();
-                        getPatch().addPort(port);
-                        visualization.addConstruct(port);
+                    if (pattern.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched form
                         showPathFigures();
@@ -83,23 +78,28 @@ public class PatchFigure extends Figure {
                             for (Path path : paths) {
 
                                 // Show ports
-                                visualization.getFigure(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                visualization.getFigure(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                scene.getFigure(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                scene.getFigure(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                 // Show path
-                                visualization.getFigure(path).setVisibility(Visibility.VISIBLE);
+                                scene.getFigure(path).setVisibility(Visibility.VISIBLE);
                             }
                         }
                     }
 
                 } else if (action.getType() == Action.Type.HOLD) {
 
+                    Log.v("Action", "Tapped patch. Port figure count: " + getPortFigures().size());
+                    Port port = new Port();
+                    getPatch().addPort(port);
+                    scene.addConstruct(port);
+
                 } else if (action.getType() == Action.Type.MOVE) {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
                     // Update Figure
-                    PortFigure sourcePortFigure = (PortFigure) action.getInteraction().getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) action.getPattern().getFirst().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
                     sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
 
@@ -108,8 +108,9 @@ public class PatchFigure extends Figure {
         });
     }
 
+    // TODO: Delete
     public Patch getPatch() {
-        return (Patch) getConstruct();
+        return getConstruct();
     }
 
     public List<PortFigure> getPortFigures() {
@@ -117,7 +118,7 @@ public class PatchFigure extends Figure {
         Patch patch = getPatch();
 
         for (Port port : patch.getPorts()) {
-            PortFigure portFigure = (PortFigure) visualization.getFigure(port);
+            PortFigure portFigure = (PortFigure) scene.getFigure(port);
             portFigures.add(portFigure);
         }
 
@@ -126,7 +127,7 @@ public class PatchFigure extends Figure {
 
     // TODO: Remove this! Store Port index/id
     public int getPortFigureIndex(PortFigure portFigure) {
-        Port port = (Port) visualization.getModel(portFigure);
+        Port port = (Port) scene.getModel(portFigure);
         if (getPatch().getPorts().contains(port)) {
             return this.getPatch().getPorts().indexOf(port);
         }

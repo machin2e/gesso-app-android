@@ -1,9 +1,9 @@
-package camp.computer.clay.visualization.util;
+package camp.computer.clay.scene.util;
 
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.visualization.figure.PortFigure;
+import camp.computer.clay.scene.figure.PortFigure;
 
 public abstract class Color {
 

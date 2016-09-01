@@ -31,7 +31,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import camp.computer.clay.model.interactivity.Action;
+import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.resource.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
@@ -132,7 +132,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         setContentView(R.layout.activity_main);
 
-        // Visualization Surface
+        // Scene Surface
         surface = (Surface) findViewById (R.id.app_surface_view);
         surface.onResume();
 
@@ -312,7 +312,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             }
 
 //            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
+//            public boolean onTouch(Camera v, MotionEvent event) {
 //                int inType = timelineButton.getInputType(); // backup the input type
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler
@@ -778,7 +778,10 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 android.R.layout.select_dialog_item);
 
         arrayAdapter.add("Servo");
+        arrayAdapter.add("Servo with Analog Feedback");
         arrayAdapter.add("IR Rangefinder");
+        arrayAdapter.add("Ultrasonic Rangefinder");
+        arrayAdapter.add("Stepper Motor");
 
         builderSingle.setNegativeButton(
                 "Cancel",

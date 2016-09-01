@@ -1,6 +1,4 @@
-package camp.computer.clay.visualization.util.geometry;
-
-import android.graphics.PointF;
+package camp.computer.clay.scene.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;

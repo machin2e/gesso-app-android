@@ -24,7 +24,7 @@ import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.old_model.Descriptor;
 import camp.computer.clay.system.old_model.Device;
 import camp.computer.clay.system.old_model.Event;
-import camp.computer.clay.visualization.architecture.Visualization;
+import camp.computer.clay.scene.architecture.Scene;
 
 public class Clay {
 
@@ -40,7 +40,7 @@ public class Clay {
 
     private Model model;
 
-    private Visualization visualization;
+    private Scene scene;
 
     // Group of discovered touchscreen devices
     private List<DisplayHostInterface> displays = new ArrayList<>();
@@ -64,19 +64,19 @@ public class Clay {
         // Model
         this.model = new Model();
 
-        // Visualization
-        this.visualization = new Visualization (model);
+        // Scene
+        this.scene = new Scene(model);
 
 //        setupSimulation();
 
         // Create actor and set perspective
         Actor actor = new Actor();
-        actor.getPerspective().setVisualization(visualization);
+        actor.getCamera().setScene(scene);
 
         // Add actor to model
         model.addActor(actor);
 
-        Application.getDisplay().getSurface().setVisualization(visualization);
+        Application.getDisplay().getSurface().setScene(scene);
 
         simulateBase();
         simulateBase();
@@ -90,8 +90,8 @@ public class Clay {
         return this.model;
     }
 
-    public Visualization getVisualization () {
-        return this.visualization;
+    public Scene getScene() {
+        return this.scene;
     }
 
 //    private void setupSimulation() {
@@ -144,12 +144,12 @@ public class Clay {
 //        // Add a port sprite for each of the associated base's ports
 //        for (Port port : base.getPorts()) {
 //            PortFigure portImage = new PortFigure(port);
-//            visualization.addImage(portImage, "ports");
+//            scene.addImage(portImage, "ports");
 //        }
 //
-//        visualization.addImage(baseImage, "bases");
+//        scene.addImage(baseImage, "bases");
 
-        visualization.addConstruct(base);
+        scene.addConstruct(base);
     }
 
     public Descriptor getDescriptor() {

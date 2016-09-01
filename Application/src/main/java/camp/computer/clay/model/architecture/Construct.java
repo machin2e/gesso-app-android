@@ -13,7 +13,7 @@ public abstract class Construct {
     // TODO: Get serialized construct (e.g., from redis database)
     // TODO: Alternavively, pass in a JavaScript method that simulates the construct. This would be
     // TODO: (cont'd) after loading it from redis.
-    public Construct(String serializedModel) {
+    public Construct(String serializedConstruct) {
     }
 
     public void setParent(Construct parent) {

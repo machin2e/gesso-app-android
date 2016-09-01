@@ -1,4 +1,4 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.scene.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +9,7 @@ public class Layer {
 
     private static int LAYER_ID_COUNT = 0;
 
-    private Visualization visualization;
+    private Scene scene;
 
     // TODO: Replace this with UUID
     // TODO: Add tags (can search by tags)
@@ -19,8 +19,8 @@ public class Layer {
 
     private List<Figure> figures = new LinkedList<>();
 
-    public Layer(Visualization visualization) {
-        this.visualization = visualization;
+    public Layer(Scene scene) {
+        this.scene = scene;
 
         // Set the layer ID
         this.id = LAYER_ID_COUNT;
@@ -39,13 +39,13 @@ public class Layer {
         this.tag = tag;
     }
 
-    public Visualization getVisualization() {
-        return this.visualization;
+    public Scene getScene() {
+        return this.scene;
     }
 
     public void add(Figure figure) {
         figures.add(figure);
-        figure.setVisualization(visualization);
+        figure.setScene(scene);
     }
 
     public Figure getFigure(Construct construct) {

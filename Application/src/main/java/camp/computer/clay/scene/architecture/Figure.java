@@ -1,20 +1,20 @@
-package camp.computer.clay.visualization.architecture;
+package camp.computer.clay.scene.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Construct;
-import camp.computer.clay.model.interactivity.Action;
-import camp.computer.clay.model.interactivity.ActionListener;
-import camp.computer.clay.visualization.util.Color;
-import camp.computer.clay.visualization.util.geometry.Geometry;
-import camp.computer.clay.visualization.util.geometry.Point;
-import camp.computer.clay.visualization.util.geometry.Rectangle;
-import camp.computer.clay.visualization.util.geometry.Shape;
-import camp.computer.clay.visualization.util.Visibility;
+import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.scene.util.Color;
+import camp.computer.clay.scene.util.geometry.Geometry;
+import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Rectangle;
+import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.scene.util.Visibility;
 
-public abstract class Figure {
+public abstract class Figure<T extends Construct> {
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -28,33 +28,33 @@ public abstract class Figure {
 
     protected double transparency = targetTransparency;
 
-    protected Construct construct = null;
+    protected T construct = null;
 
-    protected Visualization visualization = null;
+    protected Scene scene = null;
 
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Figure(Construct construct) {
+    public Figure(T construct) {
         this.construct = construct;
     }
 
-    public Construct getConstruct() {
+    public T getConstruct() {
         return this.construct;
     }
 
-    public void setVisualization(Visualization visualization) {
-        this.visualization = visualization;
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
-    public Visualization getVisualization() {
-        return this.visualization;
+    public Scene getScene() {
+        return this.scene;
     }
 
     public Figure getParentFigure() {
         if (getConstruct().hasParent()) {
             Construct parentConstruct = getConstruct().getParent();
-            return getVisualization().getFigure(parentConstruct);
+            return getScene().getFigure(parentConstruct);
         }
         return null;
     }
@@ -95,6 +95,14 @@ public abstract class Figure {
         return visibility;
     }
 
+    public void show() {
+        setVisibility(Visibility.VISIBLE);
+    }
+
+    public void hide() {
+        setVisibility(Visibility.INVISIBLE);
+    }
+
     public void addShape(Shape shape) {
         shape.getPosition().setReferencePoint(getPosition());
         shapes.add(shape);
@@ -122,6 +130,8 @@ public abstract class Figure {
     public List<Shape> getShapes() {
         return shapes;
     }
+
+    // TODO: public List<Shape> getShapes(String regex) --- e.g., "getShapes("LED [0-9]+") or ("LED <number>")
 
     public Shape removeShape(int index) {
         return shapes.remove(index);
