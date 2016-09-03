@@ -3,6 +3,7 @@ package camp.computer.clay.scene.architecture;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.model.architecture.Construct;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
@@ -45,13 +46,16 @@ public class FigureSet {
      * @param types
      * @return
      */
-    public <T extends Figure> FigureSet filterType(Class<?>... types) {
+    public <T extends Construct> FigureSet filterType(Class<?>... types) {
 
         FigureSet figureSet = new FigureSet();
 
         for (int i = 0; i < this.figures.size(); i++) {
-            for (Class<?> type : types) {
-                if (this.figures.get(i).getClass() == type) {
+            for (int j = 0; j < types.length; j++) {
+                Class<?> type = types[j];
+                //for (Class<?> type : types) {
+                //if (this.figures.get(i).getClass() == type) {
+                if (this.figures.get(i).getConstruct().getClass() == type) {
                     figureSet.add(this.figures.get(i));
                 }
             }

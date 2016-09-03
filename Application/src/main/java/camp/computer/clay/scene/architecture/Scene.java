@@ -33,14 +33,6 @@ import camp.computer.clay.scene.util.geometry.Rectangle;
 
 public class Scene extends Figure<Model> {
 
-    public static <T extends Figure> List<Point> getPositions(List<T> figures) {
-        List<Point> positions = new ArrayList<>();
-        for (T figure : figures) {
-            positions.add(figure.getPosition());
-        }
-        return positions;
-    }
-
     private List<Layer> layers = new ArrayList<>();
 
     public Scene(Model model) {
@@ -291,7 +283,7 @@ public class Scene extends Figure<Model> {
         // Calculate random positions separated by minimum distance
         final float figureSeparationDistance = 550; // 500;
 
-        List<Point> figurePositions = getFigures().filterType(BaseFigure.class).getPositions();
+        List<Point> figurePositions = getFigures().filterType(Base.class).getPositions();
 
         Point position = null;
         boolean foundPoint = false;
@@ -360,36 +352,6 @@ public class Scene extends Figure<Model> {
         return null;
     }
 
-    public List<BaseFigure> getBaseFigures() {
-
-        List<BaseFigure> figures = new ArrayList<>();
-
-        for (Layer layer : getLayers()) {
-            for (Figure figure : layer.getFigures()) {
-                if (figure instanceof BaseFigure) {
-                    figures.add((BaseFigure) figure);
-                }
-            }
-        }
-
-        return figures;
-    }
-
-    public List<PortFigure> getPortFigures() {
-
-        List<PortFigure> sprites = new ArrayList<>();
-
-        for (Layer layer : getLayers()) {
-            for (Figure figure : layer.getFigures()) {
-                if (figure instanceof PortFigure) {
-                    sprites.add((PortFigure) figure);
-                }
-            }
-        }
-
-        return sprites;
-    }
-
     public <T> List<Figure> getFigures(List<T> models) {
         List<Figure> figures = new ArrayList<>();
         for (Layer layer : getLayers()) {
@@ -414,7 +376,7 @@ public class Scene extends Figure<Model> {
         return figureSet;
     }
 
-    public <T extends Figure> FigureSet getFigures(Class<?>... types) {
+    public <T extends Construct> FigureSet getFigures(Class<?>... types) {
         return getFigures().filterType(types);
     }
 
@@ -429,6 +391,14 @@ public class Scene extends Figure<Model> {
 
     public Model getModel() {
         return getConstruct();
+    }
+
+    public static <T extends Figure> List<Point> getPositions(List<T> figures) {
+        List<Point> positions = new ArrayList<>();
+        for (T figure : figures) {
+            positions.add(figure.getPosition());
+        }
+        return positions;
     }
 
     public void update() {
@@ -509,7 +479,7 @@ public class Scene extends Figure<Model> {
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
 
             // <FPS_ANNOTATION>
-            Point fpsPosition = getFigures().filterType(BaseFigure.class).getCenterPoint();
+            Point fpsPosition = getFigures().filterType(Base.class).getCenterPoint();
             fpsPosition.setY(fpsPosition.getY() - 200);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
@@ -525,7 +495,7 @@ public class Scene extends Figure<Model> {
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            Point centroidPosition = getFigures().filterType(BaseFigure.class).getCentroidPoint();
+            Point centroidPosition = getFigures().filterType(Base.class).getCentroidPoint();
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, surface.getPaint());
@@ -540,7 +510,7 @@ public class Scene extends Figure<Model> {
             // </CENTROID_ANNOTATION>
 
             // <CENTER_ANNOTATION>
-            List<Point> figurePositions = getFigures().filterType(BaseFigure.class, PatchFigure.class).getPositions();
+            List<Point> figurePositions = getFigures().filterType(Base.class, Patch.class).getPositions();
             Point baseFiguresCenterPosition = Geometry.calculateCenterPosition(figurePositions);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
@@ -557,7 +527,7 @@ public class Scene extends Figure<Model> {
 
             // <CONVEX_HULL>
             //List<Point> basePositions = Scene.getPositions(getBaseFigures());
-            List<Point> baseVertices = getFigures().filterType(BaseFigure.class, PatchFigure.class).getVertices();
+            List<Point> baseVertices = getFigures().filterType(Base.class, Patch.class).getVertices();
 
             // Hull vertices
             for (int i = 0; i < baseVertices.size() - 1; i++) {
@@ -596,7 +566,7 @@ public class Scene extends Figure<Model> {
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = getFigures().filterType(BaseFigure.class).getBoundingBox();
+            Rectangle boundingBox = getFigures().filterType(Base.class).getBoundingBox();
             Surface.drawPolygon(boundingBox.getVertices(), surface);
             // </BOUNDING_BOX>
         }

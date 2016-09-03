@@ -7,6 +7,8 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.model.architecture.Actor;
+import camp.computer.clay.model.architecture.Base;
+import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.scene.architecture.Figure;
@@ -229,9 +231,9 @@ public class Camera {
         PortFigure portFigure = (PortFigure) action.getTarget();
 
         // Show ports of nearby forms
-        FigureSet nearbyFigures = getScene().getFigures(BaseFigure.class, PatchFigure.class).filterProximity(action.getPosition(), 200 + 60);
+        FigureSet nearbyFigures = getScene().getFigures(Base.class, Patch.class).filterProximity(action.getPosition(), 200 + 60);
 
-        List<Figure> figures = getScene().getFigures(BaseFigure.class, PatchFigure.class).getList();
+        List<Figure> figures = getScene().getFigures(Base.class, Patch.class).getList();
         for (int i = 0; i < figures.size(); i++) {
             Figure figure = figures.get(i);
 
@@ -263,7 +265,7 @@ public class Camera {
         }
 
         // Check if a machine sprite was nearby
-        Figure nearestFormFigure = getScene().getFigures().filterType(BaseFigure.class).getNearest(action.getPosition());
+        Figure nearestFormFigure = getScene().getFigures().filterType(Base.class).getNearest(action.getPosition());
         if (nearestFormFigure != null) {
 
             // TODO: Vibrate
@@ -279,7 +281,7 @@ public class Camera {
             portFigure.showPaths();
 
             // Adjust perspective
-            Point centerPoint = getScene().getFigures(BaseFigure.class).getCenterPoint();
+            Point centerPoint = getScene().getFigures(Base.class).getCenterPoint();
             double scale = 0.6;
             setPosition(centerPoint);
             setScale(scale); // Zoom out to show overview
@@ -324,7 +326,7 @@ public class Camera {
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
-            FigureSet otherFormFigures = getScene().getFigures().filterType(BaseFigure.class, PatchFigure.class).remove(baseFigure);
+            FigureSet otherFormFigures = getScene().getFigures().filterType(Base.class, Patch.class).remove(baseFigure);
             for (Figure figure : otherFormFigures.getList()) {
 //                figure.hidePortFigures();
 //                figure.hidePathFigures();
@@ -410,7 +412,9 @@ public class Camera {
     public void focusSelectPath(Port port) {
 
         // Remove focus from other forms and their ports
-        for (BaseFigure baseFigure : getScene().getBaseFigures()) {
+        List<Figure> baseFigures = getScene().getFigures(Base.class).getList();
+        for (int i = 0; i < baseFigures.size(); i++) {
+            BaseFigure baseFigure = (BaseFigure) baseFigures.get(i);
             baseFigure.setTransparency(0.05f);
             baseFigure.hidePortFigures();
             baseFigure.hidePathFigures();
@@ -444,8 +448,8 @@ public class Camera {
 
     public void focusSelectVisualization() { // Previously called "focusReset"
 
-        FigureSet baseFigures = getScene().getFigures().filterType(BaseFigure.class);
-        FigureSet patchFigures = getScene().getFigures().filterType(PatchFigure.class);
+        FigureSet baseFigures = getScene().getFigures().filterType(Base.class);
+        FigureSet patchFigures = getScene().getFigures().filterType(Patch.class);
 
         // No points on board or port. Touch is on map. So hide ports.
         for (int i = 0; i < baseFigures.getList().size(); i++) {
@@ -468,7 +472,7 @@ public class Camera {
     }
 
     public void adjustPosition() {
-        List<Point> figurePositions = getScene().getFigures().filterType(BaseFigure.class, PatchFigure.class).getPositions();
+        List<Point> figurePositions = getScene().getFigures().filterType(Base.class, Patch.class).getPositions();
         Point centerPosition = Geometry.calculateCenterPosition(figurePositions);
         setPosition(centerPosition);
     }
@@ -478,9 +482,9 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-        List<Point> figureVertices = getScene().getFigures().filterType(BaseFigure.class, PatchFigure.class).getVertices();
+        List<Point> figureVertices = getScene().getFigures().filterType(Base.class, Patch.class).getVertices();
         if (figureVertices.size() > 0) {
-            Rectangle boundingBox = getScene().getFigures().filterType(BaseFigure.class, PatchFigure.class).getBoundingBox();
+            Rectangle boundingBox = getScene().getFigures().filterType(Base.class, Patch.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }
     }

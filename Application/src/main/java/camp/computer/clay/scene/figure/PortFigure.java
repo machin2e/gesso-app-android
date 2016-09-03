@@ -135,7 +135,7 @@ public class PortFigure extends Figure<Port> {
                     // Candidate Patch Visibility
 
                     boolean isCreatePatchAction = true;
-                    List<Figure> figures = getScene().getFigures(BaseFigure.class, PatchFigure.class).getList();
+                    List<Figure> figures = getScene().getFigures(Base.class, Patch.class).getList();
                     for (int i = 0; i < figures.size(); i++) {
                         Figure nearbyFigure = figures.get(i);
 
@@ -211,13 +211,15 @@ public class PortFigure extends Figure<Port> {
                             // TODO: If second press, change the channel.
 
                             // Remove focus from other machines and their ports.
-                            for (BaseFigure baseImage : getScene().getBaseFigures()) {
-                                baseImage.setTransparency(0.1);
-                                baseImage.hidePortFigures();
-                                baseImage.hidePathFigures();
+                            List<Figure> baseFigures = getScene().getFigures(Base.class).getList();
+                            for (int i = 0; i < baseFigures.size(); i++) {
+                                BaseFigure baseFigure = (BaseFigure) baseFigures.get(i);
+                                baseFigure.setTransparency(0.1);
+                                baseFigure.hidePortFigures();
+                                baseFigure.hidePathFigures();
                             }
 
-                            for (Figure patchFigure2 : getScene().getFigures().filterType(PatchFigure.class).getList()) {
+                            for (Figure patchFigure2 : getScene().getFigures().filterType(Patch.class).getList()) {
                                 PatchFigure patchImage = (PatchFigure) patchFigure2;
                                 if (patchImage.getPatch() != getParentFigure().getConstruct()) {
                                     patchImage.setTransparency(0.1);
@@ -286,7 +288,7 @@ public class PortFigure extends Figure<Port> {
                         if (sourcePortImage.isDragging()) {
 
                             // Get nearest port image
-                            PortFigure nearestPortImage = (PortFigure) getScene().getFigures(PortFigure.class).getNearest(action.getPosition());
+                            PortFigure nearestPortImage = (PortFigure) getScene().getFigures(Port.class).getNearest(action.getPosition());
                             Port nearestPort = nearestPortImage.getPort();
                             Log.v("DND", "nearestPort: " + nearestPort);
 
@@ -363,7 +365,7 @@ public class PortFigure extends Figure<Port> {
                             // TODO: Use overlappedImage instanceof PortFigure
 
                             //for (PortFigure nearbyPortImage : nearbyBaseImage.getPortFigures()) {
-                            List<Figure> nearbyPortFigures = getScene().getFigures(PortFigure.class).getList();
+                            List<Figure> nearbyPortFigures = getScene().getFigures(Port.class).getList();
                             for (int i = 0; i < nearbyPortFigures.size(); i++) {
                                 PortFigure nearbyPortImage = (PortFigure) nearbyPortFigures.get(i);
 
