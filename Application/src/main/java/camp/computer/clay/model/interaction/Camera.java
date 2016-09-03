@@ -224,18 +224,6 @@ public class Camera {
         return this.scene;
     }
 
-    public Figure getFocus() {
-        return this.focusFigure;
-    }
-
-    public boolean hasFocus() {
-        return this.focusFigure != null;
-    }
-
-    public void setFocus(Figure figure) {
-        this.focusFigure = figure;
-    }
-
     public void focusCreatePath(Action action) {
 
         PortFigure portFigure = (PortFigure) action.getTarget();
@@ -243,7 +231,7 @@ public class Camera {
         // Show ports of nearby forms
         FigureSet nearbyFigures = getScene().getFigures(BaseFigure.class, PatchFigure.class).filterProximity(action.getPosition(), 200 + 60);
 
-        List<Figure> figures = getScene().getFigures().filterType(BaseFigure.class, PatchFigure.class).getList();
+        List<Figure> figures = getScene().getFigures(BaseFigure.class, PatchFigure.class).getList();
         for (int i = 0; i < figures.size(); i++) {
             Figure figure = figures.get(i);
 

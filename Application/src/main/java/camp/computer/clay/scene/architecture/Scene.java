@@ -92,7 +92,6 @@ public class Scene extends Figure<Model> {
                     action.setType(Action.Type.RELEASE);
 
                     Log.v("Action", "onRelease");
-                    Log.v("Action", "focus: " + camera.getFocus());
                     Log.v("Action", "processAction: " + action.getTarget());
                     Log.v("Action", "-");
 
@@ -740,7 +739,6 @@ public class Scene extends Figure<Model> {
         Camera camera = action.getActor().getCamera();
 
         Log.v("Action", "onRelease");
-        Log.v("Action", "focus: " + camera.getFocus());
         Log.v("Action", "processAction: " + action.getTarget());
         Log.v("Action", "-");
 

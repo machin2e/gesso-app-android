@@ -1,4 +1,4 @@
-package camp.computer.clay.resource;
+package camp.computer.clay.system.host;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;

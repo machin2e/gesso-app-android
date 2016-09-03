@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.resource.NetworkResource;
+import camp.computer.clay.system.host.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
