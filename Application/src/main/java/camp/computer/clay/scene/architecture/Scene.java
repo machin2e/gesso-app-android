@@ -19,8 +19,8 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.ActionSequence;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.model.interaction.Pattern;
 import camp.computer.clay.scene.figure.BaseFigure;
 import camp.computer.clay.scene.figure.PatchFigure;
 import camp.computer.clay.scene.figure.PathFigure;
@@ -32,14 +32,6 @@ import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 
 public class Scene extends Figure<Model> {
-
-    public static <T extends Figure> List<Point> getPositions(List<T> figures) {
-        List<Point> positions = new ArrayList<>();
-        for (T figure : figures) {
-            positions.add(figure.getPosition());
-        }
-        return positions;
-    }
 
     private List<Layer> layers = new ArrayList<>();
 
@@ -61,7 +53,7 @@ public class Scene extends Figure<Model> {
             @Override
             public void onAction(Action action) {
 
-                Pattern pattern = action.getPattern();
+                ActionSequence actionSequence = action.getActionSequence();
 
                 Figure targetFigure = getFigureByPosition(action.getPosition());
                 action.setTarget(targetFigure);
@@ -75,14 +67,14 @@ public class Scene extends Figure<Model> {
                 } else if (action.getType() == Action.Type.HOLD) {
 
                     // Select patch to connect
-                    Application.getDisplay().displayOptionsDialog();
+                    Application.getDisplay().displayChooseDialog();
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
 //                    camera.setScale(0.9f);
 //                    camera.setOffset(
-//                            action.getPosition().getX() - pattern.getFirst().getPosition().getX(),
-//                            action.getPosition().getY() - pattern.getFirst().getPosition().getY()
+//                            action.getPosition().getX() - actionSequence.getFirst().getPosition().getX(),
+//                            action.getPosition().getY() - actionSequence.getFirst().getPosition().getY()
 //                    );
 
                     camera.focusMoveView(action);
@@ -92,11 +84,10 @@ public class Scene extends Figure<Model> {
                     action.setType(Action.Type.RELEASE);
 
                     Log.v("Action", "onRelease");
-                    Log.v("Action", "focus: " + camera.getFocus());
                     Log.v("Action", "processAction: " + action.getTarget());
                     Log.v("Action", "-");
 
-                    if (pattern.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
 //                        if (goalVisibility == Visibility.INVISIBLE) {
 //                            goalVisibility = Visibility.VISIBLE;
@@ -106,7 +97,7 @@ public class Scene extends Figure<Model> {
 
                     } else {
 
-                        PortFigure sourcePortFigure = (PortFigure) action.getPattern().getFirst().getTarget();
+                        PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirst().getTarget();
 
                         if (sourcePortFigure.getCandidatePatchVisibility() == Visibility.VISIBLE) {
 
@@ -251,7 +242,7 @@ public class Scene extends Figure<Model> {
 
         // Position figure
         if (figure instanceof BaseFigure) {
-            locateFigurePosition(figure);
+            adjustFigurePosition(figure);
         }
 
         // Add figure
@@ -264,7 +255,6 @@ public class Scene extends Figure<Model> {
 //        getModel().getActor(0).getCamera().adjustScale(0);
         // getModel().getActor(0).getCamera().setPosition(getModel().getActor(0).getCamera().getScene().getFigures().filterType(BaseFigure.TYPE).getCenterPoint());
 //        getModel().getActor(0).getCamera().adjustPosition();
-
 
         getModel().getActor(0).getCamera().focusSelectVisualization();
     }
@@ -287,12 +277,17 @@ public class Scene extends Figure<Model> {
         return null;
     }
 
-    private void locateFigurePosition(Figure figure) {
+    /**
+     * Automatically determines and assigns a valid position for the specified {@code Figure}.
+     *
+     * @param figure The {@code Figure} for which the position will be adjusted.
+     */
+    private void adjustFigurePosition(Figure figure) {
 
         // Calculate random positions separated by minimum distance
         final float figureSeparationDistance = 550; // 500;
 
-        List<Point> figurePositions = getFigures().filterType(BaseFigure.class).getPositions();
+        List<Point> figurePositions = getFigures().filterType(Base.class).getPositions();
 
         Point position = null;
         boolean foundPoint = false;
@@ -331,7 +326,16 @@ public class Scene extends Figure<Model> {
         figure.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    public boolean hasFigure(Construct construct) {
+    /**
+     * Returns {@code true} if the {@code Scene} contains a {@code Figure} corresponding to the
+     * specified {@code Construct}.
+     *
+     * @param construct The {@code Construct} for which the corresponding {@code Figure} will be
+     * returned, if any.
+     * @return The {@code Figure} corresponding to the specified {@code Construct}, if one is
+     * present. If one is not present, this method returns {@code null}.
+     */
+    public boolean contains(Construct construct) {
         for (Layer layer : getLayers()) {
             Figure figure = layer.getFigure(construct);
             if (figure != null) {
@@ -361,36 +365,6 @@ public class Scene extends Figure<Model> {
         return null;
     }
 
-    public List<BaseFigure> getBaseFigures() {
-
-        List<BaseFigure> figures = new ArrayList<>();
-
-        for (Layer layer : getLayers()) {
-            for (Figure figure : layer.getFigures()) {
-                if (figure instanceof BaseFigure) {
-                    figures.add((BaseFigure) figure);
-                }
-            }
-        }
-
-        return figures;
-    }
-
-    public List<PortFigure> getPortFigures() {
-
-        List<PortFigure> sprites = new ArrayList<>();
-
-        for (Layer layer : getLayers()) {
-            for (Figure figure : layer.getFigures()) {
-                if (figure instanceof PortFigure) {
-                    sprites.add((PortFigure) figure);
-                }
-            }
-        }
-
-        return sprites;
-    }
-
     public <T> List<Figure> getFigures(List<T> models) {
         List<Figure> figures = new ArrayList<>();
         for (Layer layer : getLayers()) {
@@ -415,13 +389,13 @@ public class Scene extends Figure<Model> {
         return figureSet;
     }
 
-    public <T extends Figure> FigureSet getFigures(Class<?>... types) {
+    public <T extends Construct> FigureSet getFigures(Class<?>... types) {
         return getFigures().filterType(types);
     }
 
     public Figure getFigureByPosition(Point point) {
         for (Figure figure : getFigures().filterVisibility(Visibility.VISIBLE).getList()) {
-            if (figure.containsPoint(point)) {
+            if (figure.contains(point)) {
                 return figure;
             }
         }
@@ -430,6 +404,14 @@ public class Scene extends Figure<Model> {
 
     public Model getModel() {
         return getConstruct();
+    }
+
+    public static <T extends Figure> List<Point> getPositions(List<T> figures) {
+        List<Point> positions = new ArrayList<>();
+        for (T figure : figures) {
+            positions.add(figure.getPosition());
+        }
+        return positions;
     }
 
     public void update() {
@@ -510,7 +492,7 @@ public class Scene extends Figure<Model> {
         if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
 
             // <FPS_ANNOTATION>
-            Point fpsPosition = getFigures().filterType(BaseFigure.class).getCenterPoint();
+            Point fpsPosition = getFigures().filterType(Base.class).getCenterPoint();
             fpsPosition.setY(fpsPosition.getY() - 200);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
@@ -526,7 +508,7 @@ public class Scene extends Figure<Model> {
             // </FPS_ANNOTATION>
 
             // <CENTROID_ANNOTATION>
-            Point centroidPosition = getFigures().filterType(BaseFigure.class).getCentroidPoint();
+            Point centroidPosition = getFigures().filterType(Base.class).getCentroidPoint();
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, surface.getPaint());
@@ -541,7 +523,7 @@ public class Scene extends Figure<Model> {
             // </CENTROID_ANNOTATION>
 
             // <CENTER_ANNOTATION>
-            List<Point> figurePositions = getFigures().filterType(BaseFigure.class, PatchFigure.class).getPositions();
+            List<Point> figurePositions = getFigures().filterType(Base.class, Patch.class).getPositions();
             Point baseFiguresCenterPosition = Geometry.calculateCenterPosition(figurePositions);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
@@ -558,7 +540,7 @@ public class Scene extends Figure<Model> {
 
             // <CONVEX_HULL>
             //List<Point> basePositions = Scene.getPositions(getBaseFigures());
-            List<Point> baseVertices = getFigures().filterType(BaseFigure.class, PatchFigure.class).getVertices();
+            List<Point> baseVertices = getFigures().filterType(Base.class, Patch.class).getVertices();
 
             // Hull vertices
             for (int i = 0; i < baseVertices.size() - 1; i++) {
@@ -597,7 +579,7 @@ public class Scene extends Figure<Model> {
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = getFigures().filterType(BaseFigure.class).getBoundingBox();
+            Rectangle boundingBox = getFigures().filterType(Base.class).getBoundingBox();
             Surface.drawPolygon(boundingBox.getVertices(), surface);
             // </BOUNDING_BOX>
         }
@@ -617,12 +599,12 @@ public class Scene extends Figure<Model> {
     }
 
     @Override
-    public boolean containsPoint(Point point) {
+    public boolean contains(Point point) {
         return false;
     }
 
     @Override
-    public boolean containsPoint(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         return false;
     }
 
@@ -646,19 +628,19 @@ public class Scene extends Figure<Model> {
 
     public void onMoveListener(Action action) {
 
-        Pattern pattern = action.getPattern();
+        ActionSequence actionSequence = action.getActionSequence();
 
         Figure targetFigure = getFigureByPosition(action.getPosition());
         action.setTarget(targetFigure);
 
         Camera camera = action.getActor().getCamera();
 
-        if (pattern.getSize() > 1) {
-            action.setTarget(pattern.getFirst().getTarget());
+        if (actionSequence.getSize() > 1) {
+            action.setTarget(actionSequence.getFirst().getTarget());
         }
 
         // Holding
-        if (pattern.isHolding()) {
+        if (actionSequence.isHolding()) {
 
             // Holding and dragging
 
@@ -716,10 +698,10 @@ public class Scene extends Figure<Model> {
             } else if (action.getTarget() instanceof Scene) {
 
                 // Camera
-                if (pattern.getSize() > 1) {
+                if (actionSequence.getSize() > 1) {
                     camera.setOffset(
-                            action.getPosition().getX() - pattern.getFirst().getPosition().getX(),
-                            action.getPosition().getY() - pattern.getFirst().getPosition().getY()
+                            action.getPosition().getX() - actionSequence.getFirst().getPosition().getX(),
+                            action.getPosition().getY() - actionSequence.getFirst().getPosition().getY()
                     );
 
                 }
@@ -730,7 +712,7 @@ public class Scene extends Figure<Model> {
 
     public void onReleaseListener(Action action) {
 
-        Pattern pattern = action.getPattern();
+        ActionSequence actionSequence = action.getActionSequence();
 
         action.setType(Action.Type.RELEASE);
 
@@ -740,12 +722,11 @@ public class Scene extends Figure<Model> {
         Camera camera = action.getActor().getCamera();
 
         Log.v("Action", "onRelease");
-        Log.v("Action", "focus: " + camera.getFocus());
         Log.v("Action", "processAction: " + action.getTarget());
         Log.v("Action", "-");
 
 
-        if (pattern.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+        if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
             if (action.getTarget() instanceof BaseFigure) {
 
@@ -796,12 +777,12 @@ public class Scene extends Figure<Model> {
             // onSequence (BaseFigure.class, *, Figure.class, null, ) { ... }
 
             // First processAction was on a base figure...
-            if (pattern.getFirst().getTarget() instanceof BaseFigure) {
+            if (actionSequence.getFirst().getTarget() instanceof BaseFigure) {
 
                 if (action.getTarget() instanceof BaseFigure) {
 
                     // If first processAction was on the same form, then respond
-                    if (pattern.getFirst().isPointing() && pattern.getFirst().getTarget() instanceof BaseFigure) {
+                    if (actionSequence.getFirst().isPointing() && actionSequence.getFirst().getTarget() instanceof BaseFigure) {
 
                         // Base
                         action.getTarget().processAction(action);
@@ -813,11 +794,11 @@ public class Scene extends Figure<Model> {
                 } else if (action.getTarget() instanceof Scene) {
 
                     // Base
-                    pattern.getFirst().getTarget().processAction(action);
+                    actionSequence.getFirst().getTarget().processAction(action);
 
                 }
 
-            } else if (pattern.getFirst().getTarget() instanceof PortFigure) {
+            } else if (actionSequence.getFirst().getTarget() instanceof PortFigure) {
 
                 // First processAction was on a port figure...
 
@@ -825,7 +806,7 @@ public class Scene extends Figure<Model> {
 
                     // ...last processAction was on a base figure.
 
-                    PortFigure sourcePortFigure = (PortFigure) pattern.getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) actionSequence.getFirst().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
 
                 } else if (action.getTarget() instanceof PortFigure) {
@@ -844,7 +825,7 @@ public class Scene extends Figure<Model> {
 
                 }
 
-            } else if (pattern.getFirst().getTarget() instanceof PathFigure) {
+            } else if (actionSequence.getFirst().getTarget() instanceof PathFigure) {
 
                 // Path --> ?
 
@@ -853,13 +834,13 @@ public class Scene extends Figure<Model> {
                     PathFigure pathFigure = (PathFigure) action.getTarget();
                 }
 
-            } else if (pattern.getFirst().getTarget() instanceof Scene) {
+            } else if (actionSequence.getFirst().getTarget() instanceof Scene) {
 
                 // Scene --> ?
 
                 // Check if first processAction was on an figure
-                if (pattern.getFirst().getTarget() instanceof PortFigure) {
-                    ((PortFigure) pattern.getFirst().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
+                if (actionSequence.getFirst().getTarget() instanceof PortFigure) {
+                    ((PortFigure) actionSequence.getFirst().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
                 }
 
 //                camera.focusSelectVisualization();

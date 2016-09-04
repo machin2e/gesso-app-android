@@ -241,7 +241,7 @@ public class PathFigure extends Figure<Path> {
     }
 
     @Override
-    public boolean containsPoint(Point point) {
+    public boolean contains(Point point) {
 
 //        if (isVisible()) {
 //            Log.v("Touch_", "FLOOOO");
@@ -266,7 +266,7 @@ public class PathFigure extends Figure<Path> {
         return false;
     }
 
-    public boolean containsPoint(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         return false;
     }
 }

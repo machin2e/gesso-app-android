@@ -108,7 +108,7 @@ public abstract class Figure<T extends Construct> {
         shapes.add(shape);
     }
 
-    public void addShape(Shape shape, String label) {
+    public <T extends Shape> void addShape(T shape, String label) {
         shape.setLabel(label);
         shape.getPosition().setReferencePoint(getPosition());
         shapes.add(shape);
@@ -119,7 +119,8 @@ public abstract class Figure<T extends Construct> {
     }
 
     public Shape getShape(String label) {
-        for (Shape shape : shapes) {
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
             if (shape.getLabel().equals(label)) {
                 return shape;
             }
@@ -141,9 +142,9 @@ public abstract class Figure<T extends Construct> {
 
     public abstract void draw(Surface surface);
 
-    public abstract boolean containsPoint(Point point);
+    public abstract boolean contains(Point point);
 
-    public abstract boolean containsPoint(Point point, double padding);
+    public abstract boolean contains(Point point, double padding);
 
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;

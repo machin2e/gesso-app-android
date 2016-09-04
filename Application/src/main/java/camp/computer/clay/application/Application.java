@@ -18,10 +18,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -30,9 +33,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.resource.NetworkResource;
+import camp.computer.clay.system.host.NetworkResource;
 import camp.computer.clay.system.host.DatagramHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
@@ -767,22 +772,37 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return this.sensorAdapter;
     }
 
-    public void displayOptionsDialog() {
+    public void displayChooseDialog() {
 
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
-        // builderSingle.setIcon(R.drawable.ic_launcher);
-        builderSingle.setTitle("Select the patch to connect");
+        final Context appContext = this;
 
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+        // Items
+        List<String> options = new ArrayList<>();
+        options.add("Servo");
+        options.add("Servo with Analog Feedback");
+        options.add("IR Rangefinder");
+        options.add("Ultrasonic Rangefinder");
+        options.add("Stepper Motor");
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        // dialogBuilder.setIcon(R.drawable.ic_launcher);
+        dialogBuilder.setTitle("Select a patch to connect:");
+
+        // Add data adapter
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
-                android.R.layout.select_dialog_item);
+                android.R.layout.select_dialog_item
+        );
 
-        arrayAdapter.add("Servo");
-        arrayAdapter.add("Servo with Analog Feedback");
-        arrayAdapter.add("IR Rangefinder");
-        arrayAdapter.add("Ultrasonic Rangefinder");
-        arrayAdapter.add("Stepper Motor");
+        // Add data to adapter. These are the options.
+        for (int i = 0; i < options.size(); i++) {
+            arrayAdapter.add(options.get(i));
+        }
 
+        // Apply the adapter to the dialog
+        dialogBuilder.setAdapter(arrayAdapter, null);
+
+        /*
         builderSingle.setNegativeButton(
                 "Cancel",
                 new DialogInterface.OnClickListener() {
@@ -791,15 +811,94 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                         dialog.dismiss();
                     }
                 });
+        */
+
+        final AlertDialog dialog = dialogBuilder.create();
+
+        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String strName = arrayAdapter.getItem(position);
+
+                // Response
+                /*
+                AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
+                builderInner.setMessage(strName);
+                builderInner.setTitle("Connecting patch");
+                builderInner.setPositiveButton(
+                        "Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(
+                                    DialogInterface dialog,
+                                    int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                dialog.dismiss();
+                builderInner.show();
+                */
+
+                dialog.dismiss();
+
+                displayTasksDialog();
+            }
+        });
+
+        dialog.show();
+    }
+
+    // Break multi-step tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
+    // displayFloatingTaskDialog(<task list>, <task step to display>)
+
+    public void displayTasksDialog() {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        // builderSingle.setIcon(R.drawable.ic_launcher);
+        dialogBuilder.setTitle("Complete these steps to assemble");
+
+        // TODO: Difficulty
+        // TODO: Average Time
+
+        // Create data adapter
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_multichoice
+        );
+
+        // Add data to adapter
+        arrayAdapter.add("Task 1");
+        arrayAdapter.add("Task 2");
+        arrayAdapter.add("Task 3");
+        arrayAdapter.add("Task 4");
+        arrayAdapter.add("Task 5");
 
         final Context appContext = this;
 
-        builderSingle.setAdapter(
-                arrayAdapter,
+        /*
+        builderSingle.setNegativeButton(
+                "Cancel",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String strName = arrayAdapter.getItem(which);
+                        dialog.dismiss();
+                    }
+                });
+        */
+
+        // Positive button
+        dialogBuilder.setPositiveButton(
+                "Start",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+//                        String strName = arrayAdapter.getItem(which);
+
+                        // Response
+                        /*
                         AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
                         builderInner.setMessage(strName);
                         builderInner.setTitle("Connecting patch");
@@ -813,9 +912,118 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                                         dialog.dismiss();
                                     }
                                 });
+
+                        dialog.dismiss();
                         builderInner.show();
+                        */
+
+//                        displayTasksDialog();
+
+
+                        displayTaskDialog();
                     }
                 });
-        builderSingle.show();
+
+        // Set data adapter
+        dialogBuilder.setAdapter(
+                arrayAdapter,
+                null
+        );
+
+
+        AlertDialog dialog = dialogBuilder.create();
+
+        dialog.getListView().setItemsCanFocus(false);
+        dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Manage selected items here
+                System.out.println("clicked" + position);
+                CheckedTextView textView = (CheckedTextView) view;
+                if(textView.isChecked()) {
+
+                } else {
+
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    public void displayTaskDialog() {
+
+        final Context appContext = this;
+
+        // Items
+        List<String> options = new ArrayList<>();
+        options.add("Task 1");
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        // dialogBuilder.setIcon(R.drawable.ic_launcher);
+        dialogBuilder.setTitle("Do this task");
+
+        // Add data adapter
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.select_dialog_singlechoice
+        );
+
+        // Add data to adapter. These are the options.
+        for (int i = 0; i < options.size(); i++) {
+            arrayAdapter.add(options.get(i));
+        }
+
+        // Apply the adapter to the dialog
+        dialogBuilder.setAdapter(arrayAdapter, null);
+
+        /*
+        // "Back" Button
+        builderSingle.setNegativeButton(
+                "Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        */
+
+        final AlertDialog dialog = dialogBuilder.create();
+
+        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String itemLabel = arrayAdapter.getItem(position);
+
+                // Response
+                /*
+                AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
+                builderInner.setMessage(strName);
+                builderInner.setTitle("Connecting patch");
+                builderInner.setPositiveButton(
+                        "Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(
+                                    DialogInterface dialog,
+                                    int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                dialog.dismiss();
+                builderInner.show();
+                */
+
+                dialog.dismiss();
+
+                displayTaskDialog();
+            }
+        });
+
+        dialog.show();
     }
 }

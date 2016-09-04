@@ -10,19 +10,19 @@ import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 
 /**
- * An thisPattern is a temporal sequence of one or more actions.
+ * An thisActionSequence is a temporal sequence of one or more actions.
  */
-public class Pattern { // TODO: Rename Activity. Previously Gesture.
+public class ActionSequence { // TODO: Rename Activity. Previously Gesture.
 
-    // TODO: Construct this with a "points thisPattern envelope" or "thisPattern envelope".
-    // TODO: Construct voice thisPattern in the same way. Generify to Pattern<T> or subclass.
+    // TODO: Construct this with a "points thisActionSequence envelope" or "thisActionSequence envelope".
+    // TODO: Construct voice thisActionSequence in the same way. Generify to ActionSequence<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an thisPattern,
-    // TODO: (cont'd) so consider remodeling as per-finger thisPattern and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisActionSequence,
+    // TODO: (cont'd) so consider remodeling as per-finger thisActionSequence and treat each finger
     // TODO: (cont'd) as an individual actor.
     private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
@@ -33,7 +33,7 @@ public class Pattern { // TODO: Rename Activity. Previously Gesture.
 
     public Handler timerHandler = new Handler();
 
-    Pattern thisPattern = this;
+    ActionSequence thisActionSequence = this;
 
     public Runnable timerRunnable = new Runnable() {
         @Override
@@ -46,18 +46,18 @@ public class Pattern { // TODO: Rename Activity. Previously Gesture.
 
                     // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    thisPattern.getFirst().setType(Action.Type.HOLD);
-                    getFirst().getActor().getCamera().getScene().onHoldListener(thisPattern.getFirst());
+                    thisActionSequence.getFirst().setType(Action.Type.HOLD);
+                    getFirst().getActor().getCamera().getScene().onHoldListener(thisActionSequence.getFirst());
                     // </HACK>
 
-                    thisPattern.isHolding[pointerIndex] = true;
+                    thisActionSequence.isHolding[pointerIndex] = true;
 
                 }
             }
         }
     };
 
-    public Pattern() {
+    public ActionSequence() {
         setup();
     }
 
