@@ -17,7 +17,7 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.model.interaction.Pattern;
+import camp.computer.clay.model.interaction.ActionSequence;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.Visibility;
@@ -28,12 +28,11 @@ import camp.computer.clay.scene.util.geometry.Rectangle;
 
 public class PortFigure extends Figure<Port> {
 
+    double shapeRadius = 40.0;
+
     public static double DISTANCE_FROM_BOARD = 45.0f;
     public static double DISTANCE_BETWEEN_NODES = 15.0f;
     public static int FLOW_PATH_COLOR_NONE = Color.parseColor("#efefef");
-
-    public double shapeRadius = 40.0f;
-    private boolean showShapeOutline = false;
 
     private int uniqueColor = Color.BLACK;
 
@@ -98,7 +97,9 @@ public class PortFigure extends Figure<Port> {
     private void setupShapes() {
 
         // Create shapes for image
+        double shapeRadius = 40.0f;
         Circle portCircle = new Circle(shapeRadius);
+        portCircle.setLabel("Port");
         portCircle.setColor("#f7f7f7");
         portCircle.setOutlineThickness(0);
         addShape(portCircle);
@@ -111,8 +112,11 @@ public class PortFigure extends Figure<Port> {
     }
 
     private void setupData() {
-        for (int i = 0; i < this.portDataSamples.length; i++) {
-            this.portDataSamples[i] = -(this.shapeRadius / 2.0f) + 0;
+        Circle portCircle = (Circle) getShape("Port");
+        if (portCircle != null) {
+            for (int i = 0; i < this.portDataSamples.length; i++) {
+                this.portDataSamples[i] = -(portCircle.getRadius() / 2.0f) + 0;
+            }
         }
     }
 
@@ -170,14 +174,14 @@ public class PortFigure extends Figure<Port> {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    Pattern pattern = action.getPattern();
+                    ActionSequence actionSequence = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     Camera camera = action.getActor().getCamera();
 
-                    if (pattern.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         Port port = getPort();
 
@@ -283,7 +287,7 @@ public class PortFigure extends Figure<Port> {
                         // ...last processAction was on a port image.
 
                         // PortFigure portImage = (PortFigure) action.getFigureByPosition();
-                        PortFigure sourcePortImage = (PortFigure) action.getPattern().getFirst().getTarget();
+                        PortFigure sourcePortImage = (PortFigure) action.getActionSequence().getFirst().getTarget();
 
                         if (sourcePortImage.isDragging()) {
 
@@ -370,7 +374,7 @@ public class PortFigure extends Figure<Port> {
                                 PortFigure nearbyPortImage = (PortFigure) nearbyPortFigures.get(i);
 
                                 if (nearbyPortImage != sourcePortImage) {
-                                    if (nearbyPortImage.containsPoint(action.getPosition(), 50)) {
+                                    if (nearbyPortImage.contains(action.getPosition(), 50)) {
 
                                         Log.v("Action", "C");
 
@@ -452,7 +456,7 @@ public class PortFigure extends Figure<Port> {
 //
 //                getScene().getModel().getActor(0).getCamera().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
-//                action.setTarget(pattern.getFirst().getFigureByPosition());
+//                action.setTarget(actionSequence.getFirst().getFigureByPosition());
 //                action.setType(Action.Type.RELEASE);
 //                Log.v("onHoldListener", "Source port: " + action.getFigureByPosition());
 //                targetFigure.processAction(action);
@@ -477,7 +481,7 @@ public class PortFigure extends Figure<Port> {
         return getConstruct();
     }
 
-    public List<PathFigure> getPathImages() {
+    public List<PathFigure> getPathFigures() {
         List<PathFigure> pathImages = new ArrayList<>();
         for (Path path : getPort().getPaths()) {
             PathFigure pathImage = (PathFigure) getScene().getFigure(path);
@@ -500,7 +504,7 @@ public class PortFigure extends Figure<Port> {
     }
 
     public void showPaths() {
-        for (PathFigure pathImage : getPathImages()) {
+        for (PathFigure pathImage : getPathFigures()) {
             pathImage.showDocks = false;
 
             // Deep
@@ -510,7 +514,7 @@ public class PortFigure extends Figure<Port> {
     }
 
     public void showDocks() {
-        for (PathFigure pathImage : getPathImages()) {
+        for (PathFigure pathImage : getPathFigures()) {
             pathImage.showDocks = true;
 
             // Deep
@@ -526,8 +530,8 @@ public class PortFigure extends Figure<Port> {
             Surface.drawCircle((Circle) shapes.get(0), surface);
 
             drawStyle(surface);
-            drawData(surface);
-            drawAnnotation(surface);
+//            drawData(surface);
+//            drawAnnotation(surface);
 
             // Candidate Path
             drawCandidatePathImages(surface);
@@ -555,6 +559,7 @@ public class PortFigure extends Figure<Port> {
             Surface.drawCircle(getPosition(), shapeRadius, getRotation(), surface);
 
             // Outline
+            boolean showShapeOutline = false;
             if (showShapeOutline) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(3);
@@ -877,7 +882,7 @@ public class PortFigure extends Figure<Port> {
     }
 
     public void setPathVisibility(Visibility visibility) {
-        for (PathFigure pathImage : getPathImages()) {
+        for (PathFigure pathImage : getPathFigures()) {
             pathImage.setVisibility(visibility);
 
             // Deep
@@ -887,7 +892,7 @@ public class PortFigure extends Figure<Port> {
     }
 
     public boolean hasVisiblePaths() {
-        for (PathFigure pathImage : getPathImages()) {
+        for (PathFigure pathImage : getPathFigures()) {
             if (pathImage.isVisible() && !pathImage.showDocks) {
                 return true;
             }
@@ -908,7 +913,7 @@ public class PortFigure extends Figure<Port> {
 
     public List<PathFigure> getVisiblePaths() {
         List<PathFigure> visiblePathImages = new ArrayList<>();
-        for (PathFigure pathImage : getPathImages()) {
+        for (PathFigure pathImage : getPathFigures()) {
             if (pathImage.isVisible()) {
                 visiblePathImages.add(pathImage);
             }
@@ -917,7 +922,7 @@ public class PortFigure extends Figure<Port> {
     }
 
     @Override
-    public boolean containsPoint(Point point) {
+    public boolean contains(Point point) {
         if (isVisible()) {
             return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + PortFigure.DISTANCE_BETWEEN_NODES));
         } else {
@@ -925,7 +930,7 @@ public class PortFigure extends Figure<Port> {
         }
     }
 
-    public boolean containsPoint(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         if (isVisible()) {
             return (Geometry.calculateDistance(point, this.getPosition()) < (this.shapeRadius + padding));
         } else {

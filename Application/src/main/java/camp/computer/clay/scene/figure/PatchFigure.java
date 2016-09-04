@@ -14,7 +14,7 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Pattern;
+import camp.computer.clay.model.interaction.ActionSequence;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -58,12 +58,12 @@ public class PatchFigure extends Figure<Patch> {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    Pattern pattern = action.getPattern();
+                    ActionSequence actionSequence = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    if (pattern.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched form
                         showPathFigures();
@@ -99,7 +99,7 @@ public class PatchFigure extends Figure<Patch> {
                 } else if (action.getType() == Action.Type.RELEASE) {
 
                     // Update Figure
-                    PortFigure sourcePortFigure = (PortFigure) action.getPattern().getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirst().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
                     sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
 
@@ -190,7 +190,7 @@ public class PatchFigure extends Figure<Patch> {
         }
     }
 
-    public boolean containsPoint(Point point) {
+    public boolean contains(Point point) {
         if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
         } else {
@@ -198,7 +198,7 @@ public class PatchFigure extends Figure<Patch> {
         }
     }
 
-    public boolean containsPoint(Point point, double padding) {
+    public boolean contains(Point point, double padding) {
         if (isVisible()) {
             return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
         } else {

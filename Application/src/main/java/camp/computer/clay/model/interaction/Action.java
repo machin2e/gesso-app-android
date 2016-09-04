@@ -34,7 +34,7 @@ public class Action {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    private Pattern parentPattern = null;
+    private ActionSequence parentActionSequence = null;
 
     /**
      * The points at which actions were performed (e.g., the touch points on a touchscreen).
@@ -76,15 +76,15 @@ public class Action {
     }
 
     public boolean hasPattern() {
-        return parentPattern != null;
+        return parentActionSequence != null;
     }
 
-    public void setPattern(Pattern pattern) {
-        this.parentPattern = pattern;
+    public void setPattern(ActionSequence actionSequence) {
+        this.parentActionSequence = actionSequence;
     }
 
-    public Pattern getPattern() {
-        return this.parentPattern;
+    public ActionSequence getActionSequence() {
+        return this.parentActionSequence;
     }
 
     public void setActor(Actor actor) {
