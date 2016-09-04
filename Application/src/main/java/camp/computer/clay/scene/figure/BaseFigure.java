@@ -15,9 +15,10 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.ActionSequence;
+import camp.computer.clay.model.interaction.Transcript;
 import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
@@ -167,6 +168,10 @@ public class BaseFigure extends Figure<Base> {
             @Override
             public void onAction(Action action) {
 
+                Transcript transcript = action.getActionSequence();
+
+                Camera camera = action.getActor().getCamera();
+
                 if (action.getType() == Action.Type.NONE) {
 
                 } else if (action.getType() == Action.Type.TOUCH) {
@@ -175,27 +180,39 @@ public class BaseFigure extends Figure<Base> {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                    // Update position
-                    // action.getTarget().setPosition(action.getPosition());
+                    // Holding
+                    if (transcript.isHolding()) {
 
-                    hidePortFigures();
-                    hidePathFigures();
+                        // Holding and dragging
 
-                    candidatePatchPosition.set(action.getPosition());
+                        // Base
+                        action.getTarget().processAction(action);
+                        action.getTarget().setPosition(action.getPosition());
 
-                    setCandidatePatchVisibility(Visibility.VISIBLE);
+                        // Camera
+                        camera.focusSelectBase(action);
 
+                    } else {
+
+
+                        // Update position
+                        // action.getTarget().setPosition(action.getPosition());
+
+                        hidePortFigures();
+                        hidePathFigures();
+
+                        candidatePatchPosition.set(action.getPosition());
+
+                        setCandidatePatchVisibility(Visibility.VISIBLE);
+
+                    }
 
                 } else if (action.getType() == Action.Type.RELEASE) {
-
-                    ActionSequence actionSequence = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    Camera camera = action.getActor().getCamera();
-
-                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (transcript.isTap()) {
 
                         // Focus on touched form
                         showPathFigures();
@@ -220,9 +237,35 @@ public class BaseFigure extends Figure<Base> {
                             }
                         }
 
+                        // Camera
+                        camera.focusSelectBase(action);
+
                     } else {
 
                         // TODO: Release longer than tap!
+
+                        if (transcript.getFirst().getTarget() instanceof BaseFigure) {
+
+                            if (action.getTarget() instanceof BaseFigure) {
+
+                                // If first processAction was on the same form, then respond
+                                if (transcript.getFirst().isPointing() && transcript.getFirst().getTarget() instanceof BaseFigure) {
+
+                                    // Base
+                                    action.getTarget().processAction(action);
+
+                                    // Camera
+//                        camera.focusSelectVisualization();
+                                }
+
+                            } else if (action.getTarget() instanceof Scene) {
+
+                                // Base
+                                transcript.getFirst().getTarget().processAction(action);
+
+                            }
+
+                        }
 
                     }
 

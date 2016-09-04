@@ -44,7 +44,7 @@ public class MessageHost {
         public void handleMessage (android.os.Message msg) {
 //            Log.v("Clay_Time", "addPatch called");
 
-            // Process the incoming message's data.
+            // Transcript the incoming message's data.
             Bundle bundle = msg.getData();
             String serializedMessageObject = bundle.getString("serializedMessageObject");
 
@@ -336,7 +336,7 @@ public class MessageHost {
                     message = dequeueOutgoingMessage();
                 }
 
-                // Process the message
+                // Transcript the message
                 messageManager.process (message);
             }
         }
@@ -362,10 +362,10 @@ public class MessageHost {
 
     public void processMessage() {
 
-        // Process incoming messages
+        // Transcript incoming messages
         processIncomingMessages();
 
-        // Process outgoing messages
+        // Transcript outgoing messages
         processOutgoingMessages();
     }
 }

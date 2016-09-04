@@ -17,7 +17,7 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.model.interaction.ActionSequence;
+import camp.computer.clay.model.interaction.Transcript;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.Visibility;
@@ -132,56 +132,75 @@ public class PortFigure extends Figure<Port> {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                    // Candidate Path Visibility
-                    setCandidatePathDestinationPosition(action.getPosition());
-                    setCandidatePathVisibility(Visibility.VISIBLE);
+                    Transcript transcript = action.getActionSequence();
 
-                    // Candidate Patch Visibility
+                    if (transcript.isHolding()) {
 
-                    boolean isCreatePatchAction = true;
-                    List<Figure> figures = getScene().getFigures(Base.class, Patch.class).getList();
-                    for (int i = 0; i < figures.size(); i++) {
-                        Figure nearbyFigure = figures.get(i);
+                        // Holding and dragging
 
-                        // Update style of nearby machines
-                        double distanceToBaseImage = Geometry.calculateDistance(
-                                action.getPosition(), //candidatePathDestinationPosition,
-                                nearbyFigure.getPosition()
-                        );
+                        // Port
+                        PortFigure portFigure = (PortFigure) action.getTarget();
 
-                        if (distanceToBaseImage < 500) {
-                            isCreatePatchAction = false;
-                            break;
+                        portFigure.setDragging(true);
+                        portFigure.setPosition(action.getPosition());
+
+                    } else {
+
+                        // Candidate Path Visibility
+                        setCandidatePathDestinationPosition(action.getPosition());
+                        setCandidatePathVisibility(Visibility.VISIBLE);
+
+                        // Candidate Patch Visibility
+
+                        boolean isCreatePatchAction = true;
+                        List<Figure> figures = getScene().getFigures(Base.class, Patch.class).getList();
+                        for (int i = 0; i < figures.size(); i++) {
+                            Figure nearbyFigure = figures.get(i);
+
+                            // Update style of nearby machines
+                            double distanceToBaseImage = Geometry.calculateDistance(
+                                    action.getPosition(), //candidatePathDestinationPosition,
+                                    nearbyFigure.getPosition()
+                            );
+
+                            if (distanceToBaseImage < 500) {
+                                isCreatePatchAction = false;
+                                break;
+                            }
+
+                            // TODO: if distance > 800: connect to cloud service
                         }
 
-                        // TODO: if distance > 800: connect to cloud service
-                    }
+                        if (isCreatePatchAction) {
+                            setCandidatePatchVisibility(Visibility.VISIBLE);
+                        } else {
+                            setCandidatePatchVisibility(Visibility.INVISIBLE);
+                        }
 
-                    if (isCreatePatchAction) {
-                        setCandidatePatchVisibility(Visibility.VISIBLE);
-                    } else {
-                        setCandidatePatchVisibility(Visibility.INVISIBLE);
-                    }
+                        // Port type and flow direction
+                        Port port = getPort();
+                        if (port.getDirection() == Port.Direction.NONE) {
+                            port.setDirection(Port.Direction.INPUT);
+                        }
+                        if (port.getType() == Port.Type.NONE) {
+                            port.setType(Port.Type.next(port.getType()));
+                        }
 
-                    // Port type and flow direction
-                    Port port = getPort();
-                    if (port.getDirection() == Port.Direction.NONE) {
-                        port.setDirection(Port.Direction.INPUT);
-                    }
-                    if (port.getType() == Port.Type.NONE) {
-                        port.setType(Port.Type.next(port.getType()));
+                        // Camera
+                        Camera camera = action.getActor().getCamera();
+                        camera.focusCreatePath(action);
                     }
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    ActionSequence actionSequence = action.getActionSequence();
+                    Transcript transcript = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     Camera camera = action.getActor().getCamera();
 
-                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         Port port = getPort();
 
@@ -284,21 +303,35 @@ public class PortFigure extends Figure<Port> {
 
                     } else {
 
-                        // ...last processAction was on a port image.
+                        if (transcript.getFirst().getTarget() instanceof PortFigure) {
 
-                        // PortFigure portImage = (PortFigure) action.getFigureByPosition();
-                        PortFigure sourcePortImage = (PortFigure) action.getActionSequence().getFirst().getTarget();
+                            // First processAction was on a port figure...
 
-                        if (sourcePortImage.isDragging()) {
+                            if (action.getTarget() instanceof BaseFigure) {
 
-                            // Get nearest port image
-                            PortFigure nearestPortImage = (PortFigure) getScene().getFigures(Port.class).getNearest(action.getPosition());
-                            Port nearestPort = nearestPortImage.getPort();
-                            Log.v("DND", "nearestPort: " + nearestPort);
+//                                // ...last processAction was on a base figure.
+//
+//                                PortFigure sourcePortFigure = (PortFigure) transcript.getFirst().getTarget();
+//                                sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
 
-                            // TODO: When dragging, enable pushing ports?
+                            } else if (action.getTarget() instanceof PortFigure) {
 
-                            // Remove the paths from the port and move them to the selected port
+                                // Port
+                                // ...last processAction was on a port image.
+
+                                // PortFigure portImage = (PortFigure) action.getFigureByPosition();
+                                PortFigure sourcePortImage = (PortFigure) action.getActionSequence().getFirst().getTarget();
+
+                                if (sourcePortImage.isDragging()) {
+
+                                    // Get nearest port image
+                                    PortFigure nearestPortImage = (PortFigure) getScene().getFigures(Port.class).getNearest(action.getPosition());
+                                    Port nearestPort = nearestPortImage.getPort();
+                                    Log.v("DND", "nearestPort: " + nearestPort);
+
+                                    // TODO: When dragging, enable pushing ports?
+
+                                    // Remove the paths from the port and move them to the selected port
 //                        Port nearestPort = nearestPortImage.getPort();
 //                        while (sourcePortImage.getPort().getPaths().size() > 0) {
 //                            Path path = sourcePortImage.getPort().getPaths().remove(0);
@@ -306,52 +339,52 @@ public class PortFigure extends Figure<Port> {
 //                            nearestPort.addPath(path);
 //                        }
 
-                            Port sourcePort = sourcePortImage.getPort();
+                                    Port sourcePort = sourcePortImage.getPort();
 
-                            List<Path> paths = getScene().getModel().getPaths();
+                                    List<Path> paths = getScene().getModel().getPaths();
 
-                            // Copy configuration
-                            nearestPort.setDirection(sourcePort.getDirection());
-                            nearestPort.setType(sourcePort.getType());
-                            nearestPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+                                    // Copy configuration
+                                    nearestPort.setDirection(sourcePort.getDirection());
+                                    nearestPort.setType(sourcePort.getType());
+                                    nearestPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
 
-                            // Reset port configuration
-                            sourcePort.setDirection(Port.Direction.NONE);
-                            sourcePort.setType(Port.Type.NONE);
-                            sourcePortImage.updateUniqueColor();
+                                    // Reset port configuration
+                                    sourcePort.setDirection(Port.Direction.NONE);
+                                    sourcePort.setType(Port.Type.NONE);
+                                    sourcePortImage.updateUniqueColor();
 
-                            // Clear the port's list of paths
-                            sourcePort.getPaths().clear();
+                                    // Clear the port's list of paths
+                                    sourcePort.getPaths().clear();
 
-                            // Copy paths
-                            for (Path path : paths) {
+                                    // Copy paths
+                                    for (Path path : paths) {
 
-                                // Update source
-                                if (path.getSource() == sourcePort) {
-                                    path.setSource(nearestPort);
-                                    Log.v("DND", "Updating source");
-                                }
+                                        // Update source
+                                        if (path.getSource() == sourcePort) {
+                                            path.setSource(nearestPort);
+                                            Log.v("DND", "Updating source");
+                                        }
 
-                                // Update target
-                                if (path.getTarget() == sourcePort) {
-                                    path.setTarget(nearestPort);
-                                    Log.v("DND", "Updating target");
-                                }
+                                        // Update target
+                                        if (path.getTarget() == sourcePort) {
+                                            path.setTarget(nearestPort);
+                                            Log.v("DND", "Updating target");
+                                        }
 
-                                nearestPort.addPath(path);
+                                        nearestPort.addPath(path);
 
-                            }
+                                    }
 
-                            // Restore port image's position
-                            sourcePortImage.setDragging(false);
+                                    // Restore port image's position
+                                    sourcePortImage.setDragging(false);
 
-                            // Camera
-                            action.getActor().getCamera().focusSelectPath(sourcePort);
+                                    // Camera
+                                    action.getActor().getCamera().focusSelectPath(sourcePort);
 
-                        } else {
+                                } else {
 
-                            // Show ports of nearby forms
-                            boolean useNearbyPortImage = false;
+                                    // Show ports of nearby forms
+                                    boolean useNearbyPortImage = false;
 //                            for (BaseFigure nearbyBaseImage : getScene().getBaseFigures()) {
 //
 //                                Log.v("Action", "A");
@@ -364,108 +397,121 @@ public class PortFigure extends Figure<Port> {
 //
 //                                if (distanceToFrameImage < nearbyBaseImage.getBoundingBox().getHeight() + 50) {
 
-                            Log.v("Action", "B");
+                                    Log.v("Action", "B");
 
-                            // TODO: Use overlappedImage instanceof PortFigure
+                                    // TODO: Use overlappedImage instanceof PortFigure
 
-                            //for (PortFigure nearbyPortImage : nearbyBaseImage.getPortFigures()) {
-                            List<Figure> nearbyPortFigures = getScene().getFigures(Port.class).getList();
-                            for (int i = 0; i < nearbyPortFigures.size(); i++) {
-                                PortFigure nearbyPortImage = (PortFigure) nearbyPortFigures.get(i);
+                                    //for (PortFigure nearbyPortImage : nearbyBaseImage.getPortFigures()) {
+                                    List<Figure> nearbyPortFigures = getScene().getFigures(Port.class).getList();
+                                    for (int i = 0; i < nearbyPortFigures.size(); i++) {
+                                        PortFigure nearbyPortImage = (PortFigure) nearbyPortFigures.get(i);
 
-                                if (nearbyPortImage != sourcePortImage) {
-                                    if (nearbyPortImage.contains(action.getPosition(), 50)) {
+                                        if (nearbyPortImage != sourcePortImage) {
+                                            if (nearbyPortImage.contains(action.getPosition(), 50)) {
 
-                                        Log.v("Action", "C");
+                                                Log.v("Action", "C");
 
-                                        Port port = sourcePortImage.getPort();
-                                        Port nearbyPort = nearbyPortImage.getPort();
+                                                Port port = sourcePortImage.getPort();
+                                                Port nearbyPort = nearbyPortImage.getPort();
 
-                                        useNearbyPortImage = true;
+                                                useNearbyPortImage = true;
 
-                                        if (port.getDirection() == Port.Direction.NONE) {
-                                            port.setDirection(Port.Direction.INPUT);
-                                        }
-                                        if (port.getType() == Port.Type.NONE) {
-                                            port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                                        }
+                                                if (port.getDirection() == Port.Direction.NONE) {
+                                                    port.setDirection(Port.Direction.INPUT);
+                                                }
+                                                if (port.getType() == Port.Type.NONE) {
+                                                    port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                                }
 
-                                        nearbyPort.setDirection(Port.Direction.OUTPUT);
-                                        nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
+                                                nearbyPort.setDirection(Port.Direction.OUTPUT);
+                                                nearbyPort.setType(Port.Type.next(nearbyPort.getType()));
 
-                                        // Create and add path to port
-                                        Port sourcePort = (Port) getScene().getModel(sourcePortImage);
-                                        Port targetPort = (Port) getScene().getModel(nearbyPortImage);
+                                                // Create and add path to port
+                                                Port sourcePort = (Port) getScene().getModel(sourcePortImage);
+                                                Port targetPort = (Port) getScene().getModel(nearbyPortImage);
 
-                                        if (!sourcePort.hasAncestor(targetPort)) {
+                                                if (!sourcePort.hasAncestor(targetPort)) {
 
-                                            Log.v("Action", "D.1");
+                                                    Log.v("Action", "D.1");
 
-                                            Path path = new Path(sourcePort, targetPort);
+                                                    Path path = new Path(sourcePort, targetPort);
 
-                                            if (sourcePort.getParent() instanceof Patch || targetPort.getParent() instanceof Patch) {
-                                                path.setType(Path.Type.ELECTRONIC);
-                                            } else {
-                                                path.setType(Path.Type.MESH);
-                                            }
+                                                    if (sourcePort.getParent() instanceof Patch || targetPort.getParent() instanceof Patch) {
+                                                        path.setType(Path.Type.ELECTRONIC);
+                                                    } else {
+                                                        path.setType(Path.Type.MESH);
+                                                    }
 
-                                            sourcePort.addPath(path);
+                                                    sourcePort.addPath(path);
 
-                                            scene.addConstruct(path);
+                                                    scene.addConstruct(path);
 //                                                    PathFigure pathImage = new PathFigure(path);
 ////                                        pathImage.setScene(getScene());
 //                                                    getScene().addImage(pathImage, "paths");
 
-                                            PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getTarget());
-                                            targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+                                                    PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getTarget());
+                                                    targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
 
-                                            // Camera
-                                            action.getActor().getCamera().focusSelectPath(sourcePort);
+                                                    // Camera
+                                                    action.getActor().getCamera().focusSelectPath(sourcePort);
+                                                }
+
+                                                break;
+                                            }
                                         }
-
-                                        break;
                                     }
-                                }
-                            }
 //                                }
 //                            }
 
 //                portImage.processAction(action);
 
-                            if (!useNearbyPortImage) {
+                                    if (!useNearbyPortImage) {
 
-                                Port port = (Port) sourcePortImage.getConstruct();
+                                        Port port = (Port) sourcePortImage.getConstruct();
 
-                                port.setDirection(Port.Direction.INPUT);
+                                        port.setDirection(Port.Direction.INPUT);
 
-                                if (port.getType() == Port.Type.NONE) {
-                                    port.setType(Port.Type.next(port.getType()));
-                                }
-                            }
+                                        if (port.getType() == Port.Type.NONE) {
+                                            port.setType(Port.Type.next(port.getType()));
+                                        }
+                                    }
 
-                            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+                                    sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
 
-                            // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. points another board.");
+                                    // ApplicationView.getDisplay().speakPhrase("setting as input. you can send the data to another board if you want. points another board.");
 
 //                // Camera
 //                ArrayList<Port> pathPorts = port.getPorts(paths);
 //                ArrayList<Figure> pathPortImages = getScene().getFigures(pathPorts);
 //                ArrayList<Point> pathPortPositions = Scene.getPositions(pathPortImages);
 //                Rectangle boundingBox = Geometry.getBoundingBox(pathPortPositions);
-//                getScene().getModel().getActor(0).getCamera().adjustScale(boundingBox);
+//                getScene().getUniverse().getActor(0).getCamera().adjustScale(boundingBox);
 //
-//                getScene().getModel().getActor(0).getCamera().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+//                getScene().getUniverse().getActor(0).getCamera().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
-//                action.setTarget(actionSequence.getFirst().getFigureByPosition());
+//                action.setTarget(transcript.getFirst().getFigureByPosition());
 //                action.setType(Action.Type.RELEASE);
 //                Log.v("onHoldListener", "Source port: " + action.getFigureByPosition());
 //                targetFigure.processAction(action);
 
+                                }
+
+
+                                setCandidatePathVisibility(Visibility.INVISIBLE);
+                                setCandidatePatchVisibility(Visibility.INVISIBLE);
+
+                            } else if (action.getTarget() instanceof PatchFigure) {
+
+                                // Patch
+//                                action.getTarget().processAction(action);
+
+                            } else if (action.getTarget() instanceof Scene) {
+
+//                                action.getTarget().processAction(action);
+
+                            }
+
                         }
-
-
-                        setCandidatePathVisibility(Visibility.INVISIBLE);
-                        setCandidatePatchVisibility(Visibility.INVISIBLE);
                     }
                 }
             }

@@ -144,9 +144,9 @@ public class Port extends Construct {
 
     public List<Path> getAncestorPaths() {
 
-        Model model = (Model) getParent().getParent();
+        Universe universe = (Universe) getParent().getParent();
         //List<Path> paths = getPaths();
-        List<Path> paths = model.getPaths();
+        List<Path> paths = universe.getPaths();
 
         List<Path> ancestorPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -177,7 +177,7 @@ public class Port extends Construct {
 
     public List<Path> getDescendantPaths() {
 
-//        Model simulation = (Model) getParent().getParent();
+//        Universe simulation = (Universe) getParent().getParent();
 //        //List<Path> paths = getPaths();
 //        List<Path> paths = simulation.getPaths();
         List<Path> descendantPaths = new ArrayList<>();

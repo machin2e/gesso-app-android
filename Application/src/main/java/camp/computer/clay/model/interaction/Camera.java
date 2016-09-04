@@ -29,7 +29,7 @@ public class Camera {
 
     public static double MAXIMUM_SCALE = 1.0;
 
-    private double width; // Width of perspective --- actionSequences (e.g., touches) are interpreted relative to this point
+    private double width; // Width of perspective --- transcripts (e.g., touches) are interpreted relative to this point
 
     private double height; // Height of perspective
 
@@ -290,8 +290,8 @@ public class Camera {
 
         /*
         // Show the ports in the path
-        List<Path> portPaths = getCamera().getScene().getModel().getGraph(port);
-        List<Port> portConnections = getCamera().getScene().getModel().getPorts(portPaths);
+        List<Path> portPaths = getCamera().getScene().getUniverse().getGraph(port);
+        List<Port> portConnections = getCamera().getScene().getUniverse().getPorts(portPaths);
         for (Port portConnection: portConnections) {
             PortFigure portFigureConnection = (PortFigure) getCamera().getScene().getFigure(portConnection);
             portFigureConnection.setVisibility(true);
@@ -304,16 +304,16 @@ public class Camera {
     public void focusMoveView(Action action) {
 
         // Move perspective
-        ActionSequence actionSequence = action.getActionSequence();
-        setOffset(actionSequence.offsetX, actionSequence.offsetY);
+        Transcript transcript = action.getActionSequence();
+        setOffset(transcript.offsetX, transcript.offsetY);
     }
 
     public void focusSelectBase(Action action) {
 
         Actor actor = action.getActor();
-        ActionSequence actionSequence = action.getActionSequence();
+        Transcript transcript = action.getActionSequence();
 
-        if (actionSequence.isDragging()) {
+        if (transcript.isDragging()) {
 
             // Zoom out to show overview
             setScale(0.8);
@@ -332,16 +332,16 @@ public class Camera {
                 figure.setTransparency(0.1f);
             }
 
-            ActionSequence previousActionSequence = null;
-            if (actor.actionSequences.size() > 1) {
-                previousActionSequence = actor.actionSequences.get(actor.actionSequences.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousActionSequence.getFirst().getTarget());
+            Transcript previousTranscript = null;
+            if (actor.transcripts.size() > 1) {
+                previousTranscript = actor.transcripts.get(actor.transcripts.size() - 2);
+                Log.v("PreviousTouch", "Previous: " + previousTranscript.getFirst().getTarget());
                 Log.v("PreviousTouch", "Current: " + action.getTarget());
             }
 
             // Camera
             if (baseFigure.getBase().getPaths().size() > 0
-                    && (previousActionSequence != null && previousActionSequence.getFirst().getTarget() != action.getTarget())) {
+                    && (previousTranscript != null && previousTranscript.getFirst().getTarget() != action.getTarget())) {
 
                 Log.v("Touch_", "A");
 

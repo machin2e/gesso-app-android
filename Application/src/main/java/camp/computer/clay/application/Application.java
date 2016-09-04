@@ -706,7 +706,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
-            // Process the outgoing messages
+            // Transcript the outgoing messages
             clay.step();
 
             // Repeat this the same runnable code block again another 2 seconds

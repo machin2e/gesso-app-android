@@ -143,8 +143,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) scene.getModel().getActor(0).getCamera().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-//                (float) originPosition.getY() + (float) scene.getModel().getActor(0).getCamera().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
+//                (float) originPosition.getX() + (float) scene.getUniverse().getActor(0).getCamera().getPosition().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
+//                (float) originPosition.getY() + (float) scene.getUniverse().getActor(0).getCamera().getPosition().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
                 (float) originPosition.getX() + (float) scene.getModel().getActor(0).getCamera().getPosition().getX(),
                 (float) originPosition.getY() + (float) scene.getModel().getActor(0).getCamera().getPosition().getY()
         );
@@ -155,8 +155,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         );
         // </PERSPECTIVE>
 
-        // TODO: Get Model
-        // TODO: Get Model's selected Scene
+        // TODO: Get Universe
+        // TODO: Get Universe's selected Scene
 
         // Draw the background
         canvas.drawColor(Color.WHITE);

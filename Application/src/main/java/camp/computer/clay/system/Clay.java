@@ -12,7 +12,7 @@ import java.util.UUID;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.architecture.Base;
-import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Universe;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.system.host.CacheHost;
 import camp.computer.clay.system.host.DisplayHostInterface;
@@ -38,7 +38,7 @@ public class Clay {
 
     private SQLiteStoreHost storeHost = null;
 
-    private Model model;
+    private Universe universe;
 
     private Scene scene;
 
@@ -61,11 +61,11 @@ public class Clay {
         descriptor = new Descriptor("clay", "");
         descriptor.list("devices");
 
-        // Model
-        this.model = new Model();
+        // Universe
+        this.universe = new Universe();
 
         // Scene
-        this.scene = new Scene(model);
+        this.scene = new Scene(universe);
 
 //        setupSimulation();
 
@@ -73,8 +73,8 @@ public class Clay {
         Actor actor = new Actor();
         actor.getCamera().setScene(scene);
 
-        // Add actor to model
-        model.addActor(actor);
+        // Add actor to universe
+        universe.addActor(actor);
 
         Application.getDisplay().getSurface().setScene(scene);
 
@@ -86,8 +86,8 @@ public class Clay {
 
     }
 
-    public Model getModel() {
-        return this.model;
+    public Universe getUniverse() {
+        return this.universe;
     }
 
     public Scene getScene() {
@@ -104,7 +104,7 @@ public class Clay {
 //        final int PORT_COUNT = 12;
 //        // </FORM_CONFIGURATION>
 //
-//        // TODO: Move Model/Base this into Model or _Ecology (in Model) --- maybe combine Model+_Ecology
+//        // TODO: Move Universe/Base this into Universe or _Ecology (in Universe) --- maybe combine Universe+_Ecology
 //        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 //        int letterIndex = 0;
 //        for (int i = 0; i < SIMULATED_FORM_COUNT; i++) {
@@ -116,7 +116,7 @@ public class Clay {
 //                form.addTag(alphabet.substring(letterIndex, letterIndex + 1));
 //                letterIndex = letterIndex % alphabet.length();
 //            }
-//            model.addBase(form);
+//            universe.addBase(form);
 //        }
 //    }
 
@@ -135,7 +135,7 @@ public class Clay {
             base.addPort(port);
         }
 
-        model.addBase(base);
+        universe.addBase(base);
 
 //        // Create base images
 //        BaseFigure baseImage = new BaseFigure(base);
@@ -244,7 +244,7 @@ public class Clay {
     }
 
     /**
-     * Adds the specified unit to Clay's operating model.
+     * Adds the specified unit to Clay's operating universe.
      */
     public Device addDevice(final UUID deviceUuid, final String internetAddress) {
 
@@ -347,7 +347,7 @@ public class Clay {
                 this.devices.add (device);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getDisplay().mapView.getModel().simulateBase(new Base());
+//                ApplicationView.getDisplay().mapView.getUniverse().simulateBase(new Base());
 
                 // Add timelines to attached displays
                 for (DisplayHostInterface view : this.displays) {

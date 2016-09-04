@@ -5,6 +5,8 @@ import java.util.List;
 
 import camp.computer.clay.model.interaction.*;
 import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.Transcript;
+import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.architecture.Scene;
 
 public class Actor { // Controller
@@ -12,7 +14,7 @@ public class Actor { // Controller
     private Camera camera = null;
 
     // PatternSet (Smart querying interface)
-    public List<ActionSequence> actionSequences = new LinkedList<>();
+    public List<Transcript> transcripts = new LinkedList<>();
 
     public Actor() {
         setup();
@@ -53,9 +55,9 @@ public class Actor { // Controller
      *
      * @return The most recent interaction.
      */
-    private ActionSequence getPattern() {
-        if (actionSequences.size() > 0) {
-            return actionSequences.get(actionSequences.size() - 1);
+    private Transcript getPattern() {
+        if (transcripts.size() > 0) {
+            return transcripts.get(transcripts.size() - 1);
         } else {
             return null;
         }
@@ -72,38 +74,58 @@ public class Actor { // Controller
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
 
-                // Start a new actionSequence
-                ActionSequence actionSequence = new ActionSequence();
-                actionSequences.add(actionSequence);
+                // Start a new transcript
+                Transcript transcript = new Transcript();
+                transcripts.add(transcript);
 
-                // Add action to actionSequence
-                actionSequence.add(action);
+                // Add action to transcript
+                transcript.add(action);
 
-                // Record actionSequences on timeline
-                // TODO: Cache and store the processAction actionSequences before deleting them completely! Do it in
+                // Record transcripts on timeline
+                // TODO: Cache and store the processAction transcripts before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
-                if (actionSequences.size() > 3) {
-                    actionSequences.remove(0);
+                if (transcripts.size() > 3) {
+                    transcripts.remove(0);
                 }
 
-                // Process the action
-                getCamera().getScene().onTouchListener(action);
+                // Transcript the action
+
+                // Set the target
+                Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
+                action.setTarget(targetFigure);
+
+                action.getTarget().processAction(action);
+
+                //getCamera().getScene().onTouchListener(action);
 
                 break;
             }
 
             case MOVE: {
 
-                ActionSequence actionSequence = getPattern();
-                actionSequence.add(action);
+                Transcript transcript = getPattern();
+                transcript.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = true;
 
                 // Classify/Callback
-                if (actionSequence.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
-                    action.setType(Action.Type.MOVE);
-                    getCamera().getScene().onMoveListener(action);
+                if (transcript.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
+                    // action.setType(Action.Type.MOVE);
+
+                    Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
+                    action.setTarget(targetFigure);
+
+                    // <HACK>
+                    //Transcript transcript = action.getActionSequence();
+                    if (transcript.getSize() > 1) {
+                        action.setTarget(transcript.getFirst().getTarget());
+                    }
+                    // </HACK>
+
+                    action.getTarget().processAction(action);
+
+//                    getCamera().getScene().onMoveListener(action);
                 }
 
                 break;
@@ -111,16 +133,16 @@ public class Actor { // Controller
 
             case RELEASE: {
 
-                ActionSequence actionSequence = getPattern();
-                actionSequence.add(action);
+                Transcript transcript = getPattern();
+                transcript.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = false;
 
                 // Stop listening for a hold action
-                actionSequence.timerHandler.removeCallbacks(actionSequence.timerRunnable);
+                transcript.timerHandler.removeCallbacks(transcript.timerRunnable);
 
-//                if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+//                if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 //                    action.setType(Action.Type.TOUCH);
 //                    getCamera().getScene().onTapListener(action);
 //                } else {
@@ -128,7 +150,13 @@ public class Actor { // Controller
 //                    getCamera().getScene().onReleaseListener(action);
 //                }
 
-                getCamera().getScene().onReleaseListener(action);
+                // Set the target
+                Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
+                action.setTarget(targetFigure);
+
+                action.getTarget().processAction(action);
+
+//                getCamera().getScene().onReleaseListener(action);
 
                 break;
             }

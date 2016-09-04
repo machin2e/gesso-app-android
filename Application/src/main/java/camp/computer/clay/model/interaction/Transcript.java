@@ -6,23 +6,25 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.model.architecture.Construct;
+import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 
 /**
- * An thisActionSequence is a temporal sequence of one or more actions.
+ * An thisTranscript is a temporal sequence of one or more actions.
  */
-public class ActionSequence { // TODO: Rename Activity. Previously Gesture.
+public class Transcript { // TODO: Rename Activity. Previously Gesture.
 
-    // TODO: Construct this with a "points thisActionSequence envelope" or "thisActionSequence envelope".
-    // TODO: Construct voice thisActionSequence in the same way. Generify to ActionSequence<T> or subclass.
+    // TODO: Construct this with a "points thisTranscript envelope" or "thisTranscript envelope".
+    // TODO: Construct voice thisTranscript in the same way. Generify to Transcript<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an thisActionSequence,
-    // TODO: (cont'd) so consider remodeling as per-finger thisActionSequence and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisTranscript,
+    // TODO: (cont'd) so consider remodeling as per-finger thisTranscript and treat each finger
     // TODO: (cont'd) as an individual actor.
     private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
@@ -33,7 +35,7 @@ public class ActionSequence { // TODO: Rename Activity. Previously Gesture.
 
     public Handler timerHandler = new Handler();
 
-    ActionSequence thisActionSequence = this;
+    Transcript thisTranscript = this;
 
     public Runnable timerRunnable = new Runnable() {
         @Override
@@ -46,18 +48,24 @@ public class ActionSequence { // TODO: Rename Activity. Previously Gesture.
 
                     // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    thisActionSequence.getFirst().setType(Action.Type.HOLD);
-                    getFirst().getActor().getCamera().getScene().onHoldListener(thisActionSequence.getFirst());
+                    thisTranscript.getFirst().setType(Action.Type.HOLD);
+//                    getFirst().getActor().getCamera().getScene().onHoldListener(thisTranscript.getFirst());
+
+                    Action action = thisTranscript.getFirst();
+                    Figure targetFigure = getFirst().getActor().getScene().getFigureByPosition(action.getPosition());
+                    action.setTarget(targetFigure);
+
+                    action.getTarget().processAction(action);
                     // </HACK>
 
-                    thisActionSequence.isHolding[pointerIndex] = true;
+                    thisTranscript.isHolding[pointerIndex] = true;
 
                 }
             }
         }
     };
 
-    public ActionSequence() {
+    public Transcript() {
         setup();
     }
 
@@ -139,6 +147,22 @@ public class ActionSequence { // TODO: Rename Activity. Previously Gesture.
         return null;
     }
 
+    public Construct getSource() {
+        Action action = getFirst();
+        if (action != null) {
+            return action.getTarget().getConstruct();
+        }
+        return null;
+    }
+
+    public Construct getTarget() {
+        Action action = getLast();
+        if (action != null) {
+            return action.getTarget().getConstruct();
+        }
+        return null;
+    }
+
     public long getStartTime() {
         return getFirst().getTimestamp();
     }
@@ -169,6 +193,10 @@ public class ActionSequence { // TODO: Rename Activity. Previously Gesture.
 
     public double getDragDistance() {
         return dragDistance[getLast().pointerIndex];
+    }
+
+    public boolean isTap() {
+        return getDuration() < Action.MAXIMUM_TAP_DURATION;
     }
 
     // <CLASSIFIER>

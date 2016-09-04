@@ -13,13 +13,13 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Base;
 import camp.computer.clay.model.architecture.Construct;
-import camp.computer.clay.model.architecture.Model;
+import camp.computer.clay.model.architecture.Universe;
 import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.ActionSequence;
+import camp.computer.clay.model.interaction.Transcript;
 import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.scene.figure.BaseFigure;
 import camp.computer.clay.scene.figure.PatchFigure;
@@ -31,12 +31,12 @@ import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 
-public class Scene extends Figure<Model> {
+public class Scene extends Figure<Universe> {
 
     private List<Layer> layers = new ArrayList<>();
 
-    public Scene(Model model) {
-        super(model);
+    public Scene(Universe universe) {
+        super(universe);
         setup();
     }
 
@@ -53,7 +53,7 @@ public class Scene extends Figure<Model> {
             @Override
             public void onAction(Action action) {
 
-                ActionSequence actionSequence = action.getActionSequence();
+                Transcript transcript = action.getActionSequence();
 
                 Figure targetFigure = getFigureByPosition(action.getPosition());
                 action.setTarget(targetFigure);
@@ -64,6 +64,13 @@ public class Scene extends Figure<Model> {
 
                 } else if (action.getType() == Action.Type.TOUCH) {
 
+                    if (transcript.isTap()) {
+
+                        // Camera
+                        camera.focusSelectVisualization();
+
+                    }
+
                 } else if (action.getType() == Action.Type.HOLD) {
 
                     // Select patch to connect
@@ -71,23 +78,39 @@ public class Scene extends Figure<Model> {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
+                    if (transcript.isHolding()) {
+
+                        // Scene
+                        action.getTarget().processAction(action);
+
+                    } else {
+
+//                        camera.focusMoveView(action);
+
+                        // Camera
+                        if (transcript.getSize() > 1) {
+                            camera.setOffset(
+                                    action.getPosition().getX() - transcript.getFirst().getPosition().getX(),
+                                    action.getPosition().getY() - transcript.getFirst().getPosition().getY()
+                            );
+
+                        }
+
 //                    camera.setScale(0.9f);
 //                    camera.setOffset(
-//                            action.getPosition().getX() - actionSequence.getFirst().getPosition().getX(),
-//                            action.getPosition().getY() - actionSequence.getFirst().getPosition().getY()
+//                            action.getPosition().getX() - transcript.getFirst().getPosition().getX(),
+//                            action.getPosition().getY() - transcript.getFirst().getPosition().getY()
 //                    );
 
-                    camera.focusMoveView(action);
+                    }
 
                 } else if (action.getType() == Action.Type.RELEASE) {
-
-                    action.setType(Action.Type.RELEASE);
 
                     Log.v("Action", "onRelease");
                     Log.v("Action", "processAction: " + action.getTarget());
                     Log.v("Action", "-");
 
-                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (transcript.isTap()) {
 
 //                        if (goalVisibility == Visibility.INVISIBLE) {
 //                            goalVisibility = Visibility.VISIBLE;
@@ -97,83 +120,123 @@ public class Scene extends Figure<Model> {
 
                     } else {
 
-                        PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirst().getTarget();
+                        if (transcript.getSource() instanceof Base) {
 
-                        if (sourcePortFigure.getCandidatePatchVisibility() == Visibility.VISIBLE) {
+                            Log.v("Test","Create Patch from Base");
 
-                            Log.v("IASM", "(1) touch patch to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+                            // Select patch to connect
+                            Application.getDisplay().displayChooseDialog();
 
-                            // Construct
-                            Patch patch = new Patch();
+//                            if (action.getTarget() instanceof BaseFigure) {
+//
+//                                Log.v("Test","T1");
+//
+//                                Log.v("Test","isPointing: " + transcript.getFirst().isPointing());
+//                                Log.v("Test","getTarget: " + transcript.getFirst().getTarget());
+//
+//                                // If first processAction was on the same form, then respond
+//                                if (transcript.getFirst().isPointing() && transcript.getFirst().getTarget() instanceof BaseFigure) {
+//
+//                                    Log.v("Test","T2");
+//
+//                                    // Base
+//                                    action.getTarget().processAction(action);
+//
+//                                    // Camera
+////                        camera.focusSelectVisualization();
+//                                }
+//
+//                            } else if (action.getTarget() instanceof Scene) {
+//
+//                                Log.v("Test","T3");
+//
+//                                // Base
+////                                transcript.getFirst().getTarget().processAction(action);
+//
+//                            }
 
-                            // Add port to construct
-                            // for (int j = 0; j < 3; j++) {
-                            for (int j = 0; j < 1; j++) {
-                                Port port = new Port();
-                                patch.addPort(port);
-                            }
+                        } else if (transcript.getSource() instanceof Port) {
 
-                            getModel().addPatch(patch);
+                            Log.v("Test","Create Patch from Port");
 
-                            // Create Patch Figure
-                            PatchFigure patchFigure = new PatchFigure(patch);
-                            patchFigure.setPosition(action.getPosition());
+                            PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirst().getTarget();
 
-                            // Set Rotation
-                            double patchRotation = Geometry.calculateRotationAngle(
-                                    sourcePortFigure.getPosition(),
-                                    patchFigure.getPosition()
-                            );
-                            patchFigure.setRotation(patchRotation + 90);
+                            if (sourcePortFigure.getCandidatePatchVisibility() == Visibility.VISIBLE) {
+
+                                Log.v("IASM", "(1) touch patch to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+
+                                // Construct
+                                Patch patch = new Patch();
+
+                                // Add port to construct
+                                // for (int j = 0; j < 3; j++) {
+                                for (int j = 0; j < 1; j++) {
+                                    Port port = new Port();
+                                    patch.addPort(port);
+                                }
+
+                                getModel().addPatch(patch);
+
+                                // Create Patch Figure
+                                PatchFigure patchFigure = new PatchFigure(patch);
+                                patchFigure.setPosition(action.getPosition());
+
+                                // Set Rotation
+                                double patchRotation = Geometry.calculateRotationAngle(
+                                        sourcePortFigure.getPosition(),
+                                        patchFigure.getPosition()
+                                );
+                                patchFigure.setRotation(patchRotation + 90);
 
 //                            Base sourceBase = (Base) sourcePortFigure.getConstruct().getParent();
 //                            BaseFigure sourceBaseFigure = (BaseFigure) getFigure(sourceBase);
 //                            patchFigure.setRotation(sourceBaseFigure.getRotation() + 180);
 
-                            // Create Port Figures for each of Patch's Ports
-                            for (Port port : patch.getPorts()) {
-                                PortFigure portFigure = new PortFigure(port);
-                                addFigure(portFigure, "ports");
-                            }
+                                // Create Port Figures for each of Patch's Ports
+                                for (Port port : patch.getPorts()) {
+                                    PortFigure portFigure = new PortFigure(port);
+                                    addFigure(portFigure, "ports");
+                                }
 
-                            // Add Patch Figure to Scene
-                            addFigure(patchFigure, "patches");
+                                // Add Patch Figure to Scene
+                                addFigure(patchFigure, "patches");
 
-                            // Configure Ports
-                            Port sourcePort = sourcePortFigure.getPort();
-                            Port destinationPort = patch.getPorts().get(0);
+                                // Configure Ports
+                                Port sourcePort = sourcePortFigure.getPort();
+                                Port destinationPort = patch.getPorts().get(0);
 
-                            if (sourcePort.getDirection() == Port.Direction.NONE) {
-                                sourcePort.setDirection(Port.Direction.OUTPUT);
-                            }
+                                if (sourcePort.getDirection() == Port.Direction.NONE) {
+                                    sourcePort.setDirection(Port.Direction.OUTPUT);
+                                }
 //                        if (sourcePort.getType() == Port.Type.NONE) {
-                            //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
-                            sourcePort.setType(Port.Type.POWER_REFERENCE);
+                                //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                sourcePort.setType(Port.Type.POWER_REFERENCE);
 //                        }
 
-                            destinationPort.setDirection(Port.Direction.INPUT);
-                            //destinationPort.setType(Port.Type.next(destinationPort.getType()));
-                            destinationPort.setType(sourcePort.getType());
+                                destinationPort.setDirection(Port.Direction.INPUT);
+                                //destinationPort.setType(Port.Type.next(destinationPort.getType()));
+                                destinationPort.setType(sourcePort.getType());
 
-                            // Create Path
-                            Path path = new Path(sourcePortFigure.getPort(), patch.getPorts().get(0));
-                            path.setType(Path.Type.ELECTRONIC);
-                            sourcePort.addPath(path);
+                                // Create Path
+                                Path path = new Path(sourcePortFigure.getPort(), patch.getPorts().get(0));
+                                path.setType(Path.Type.ELECTRONIC);
+                                sourcePort.addPath(path);
 
-                            PathFigure pathFigure = new PathFigure(path);
-                            addFigure(pathFigure, "paths");
+                                PathFigure pathFigure = new PathFigure(path);
+                                addFigure(pathFigure, "paths");
 
-                            PortFigure targetPortFigure = (PortFigure) getFigure(path.getTarget());
-                            targetPortFigure.setUniqueColor(sourcePortFigure.getUniqueColor());
+                                PortFigure targetPortFigure = (PortFigure) getFigure(path.getTarget());
+                                targetPortFigure.setUniqueColor(sourcePortFigure.getUniqueColor());
 
-                            // Update Camera
-                            camera.focusSelectPath(sourcePortFigure.getPort());
+                                // Update Camera
+                                camera.focusSelectPath(sourcePortFigure.getPort());
 
+                            }
+
+                            // Update Figure
+                            sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
+                            sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
                         }
-
-                        // Update Figure
-                        sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
-                        sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
                     }
                 }
             }
@@ -252,9 +315,9 @@ public class Scene extends Figure<Model> {
         getLayer(layerTag).add(figure);
 
         // Update perspective
-//        getModel().getActor(0).getCamera().adjustScale(0);
-        // getModel().getActor(0).getCamera().setPosition(getModel().getActor(0).getCamera().getScene().getFigures().filterType(BaseFigure.TYPE).getCenterPoint());
-//        getModel().getActor(0).getCamera().adjustPosition();
+//        getUniverse().getActor(0).getCamera().adjustScale(0);
+        // getUniverse().getActor(0).getCamera().setPosition(getUniverse().getActor(0).getCamera().getScene().getFigures().filterType(BaseFigure.TYPE).getCenterPoint());
+//        getUniverse().getActor(0).getCamera().adjustPosition();
 
         getModel().getActor(0).getCamera().focusSelectVisualization();
     }
@@ -402,7 +465,7 @@ public class Scene extends Figure<Model> {
         return this;
     }
 
-    public Model getModel() {
+    public Universe getModel() {
         return getConstruct();
     }
 
@@ -608,111 +671,111 @@ public class Scene extends Figure<Model> {
         return false;
     }
 
-    public void onTouchListener(Action action) {
+//    public void onTouchListener(Action action) {
+//
+//        Figure targetFigure = getFigureByPosition(action.getPosition());
+//        action.setTarget(targetFigure);
+//
+//        action.getTarget().processAction(action);
+//
+//    }
+//
+//    public void onHoldListener(Action action) {
+//
+//        Figure targetFigure = getFigureByPosition(action.getPosition());
+//        action.setTarget(targetFigure);
+//
+//        action.getTarget().processAction(action);
+//
+//    }
 
-        Figure targetFigure = getFigureByPosition(action.getPosition());
-        action.setTarget(targetFigure);
-
-        action.getTarget().processAction(action);
-
-    }
-
-    public void onHoldListener(Action action) {
-
-        Figure targetFigure = getFigureByPosition(action.getPosition());
-        action.setTarget(targetFigure);
-
-        action.getTarget().processAction(action);
-
-    }
-
-    public void onMoveListener(Action action) {
-
-        ActionSequence actionSequence = action.getActionSequence();
-
-        Figure targetFigure = getFigureByPosition(action.getPosition());
-        action.setTarget(targetFigure);
-
-        Camera camera = action.getActor().getCamera();
-
-        if (actionSequence.getSize() > 1) {
-            action.setTarget(actionSequence.getFirst().getTarget());
-        }
-
-        // Holding
-        if (actionSequence.isHolding()) {
-
-            // Holding and dragging
-
-            if (action.getTarget() instanceof BaseFigure) {
-
-                // Base
-                action.getTarget().processAction(action);
-                action.getTarget().setPosition(action.getPosition());
-
-                // Camera
-                camera.focusSelectBase(action);
-
-            } else if (action.getTarget() instanceof PortFigure) {
-
-                // Port
-                PortFigure portFigure = (PortFigure) action.getTarget();
-
-                portFigure.setDragging(true);
-                portFigure.setPosition(action.getPosition());
-
-            } else if (action.getTarget() instanceof Scene) {
-
-                // Scene
-                action.getTarget().processAction(action);
-
-            }
-
-        } else {
-
-            // Not holding. Drag was detected prior to the hold duration threshold.
-
-            if (action.getTarget() instanceof BaseFigure) {
-
-                // Base
-                action.getTarget().processAction(action);
-
-                // Camera
-                camera.focusSelectBase(action);
-
-            } else if (action.getTarget() instanceof PortFigure) {
-
-                // Port
-                PortFigure portFigure = (PortFigure) action.getTarget();
-                portFigure.processAction(action);
-
-                // Camera
-                camera.focusCreatePath(action);
-
-            } else if (action.getTarget() instanceof PatchFigure) {
-
-                // Patch
-                action.getTarget().setPosition(action.getPosition());
-                action.getTarget().processAction(action);
-
-            } else if (action.getTarget() instanceof Scene) {
-
-                // Camera
-                if (actionSequence.getSize() > 1) {
-                    camera.setOffset(
-                            action.getPosition().getX() - actionSequence.getFirst().getPosition().getX(),
-                            action.getPosition().getY() - actionSequence.getFirst().getPosition().getY()
-                    );
-
-                }
-
-            }
-        }
-    }
+//    public void onMoveListener(Action action) {
+//
+//        Transcript actionSequence = action.getActionSequence();
+//
+//        Figure targetFigure = getFigureByPosition(action.getPosition());
+//        action.setTarget(targetFigure);
+//
+//        Camera camera = action.getActor().getCamera();
+//
+//        if (actionSequence.getSize() > 1) {
+//            action.setTarget(actionSequence.getFirst().getTarget());
+//        }
+//
+//        // Holding
+//        if (actionSequence.isHolding()) {
+//
+//            // Holding and dragging
+//
+//            if (action.getTarget() instanceof BaseFigure) {
+//
+////                // Base
+////                action.getTarget().processAction(action);
+////                action.getTarget().setPosition(action.getPosition());
+////
+////                // Camera
+////                camera.focusSelectBase(action);
+//
+//            } else if (action.getTarget() instanceof PortFigure) {
+//
+////                // Port
+////                PortFigure portFigure = (PortFigure) action.getTarget();
+////
+////                portFigure.setDragging(true);
+////                portFigure.setPosition(action.getPosition());
+//
+//            } else if (action.getTarget() instanceof Scene) {
+//
+//                // Scene
+////                action.getTarget().processAction(action);
+//
+//            }
+//
+//        } else {
+//
+//            // Not holding. Drag was detected prior to the hold duration threshold.
+//
+//            if (action.getTarget() instanceof BaseFigure) {
+//
+////                // Base
+////                action.getTarget().processAction(action);
+////
+////                // Camera
+////                camera.focusSelectBase(action);
+//
+//            } else if (action.getTarget() instanceof PortFigure) {
+//
+////                // Port
+////                PortFigure portFigure = (PortFigure) action.getTarget();
+////                portFigure.processAction(action);
+////
+////                // Camera
+////                camera.focusCreatePath(action);
+//
+//            } else if (action.getTarget() instanceof PatchFigure) {
+//
+////                // Patch
+////                action.getTarget().setPosition(action.getPosition());
+////                action.getTarget().processAction(action);
+//
+//            } else if (action.getTarget() instanceof Scene) {
+//
+////                // Camera
+////                if (actionSequence.getSize() > 1) {
+////                    camera.setOffset(
+////                            action.getPosition().getX() - actionSequence.getFirst().getPosition().getX(),
+////                            action.getPosition().getY() - actionSequence.getFirst().getPosition().getY()
+////                    );
+////
+////                }
+//
+//            }
+//        }
+//    }
 
     public void onReleaseListener(Action action) {
 
-        ActionSequence actionSequence = action.getActionSequence();
+        Transcript transcript = action.getActionSequence();
 
         action.setType(Action.Type.RELEASE);
 
@@ -726,40 +789,40 @@ public class Scene extends Figure<Model> {
         Log.v("Action", "-");
 
 
-        if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+        if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
-            if (action.getTarget() instanceof BaseFigure) {
-
-                // Base
-                action.getTarget().processAction(action);
-
-                // Camera
-                camera.focusSelectBase(action);
-
-            } else if (action.getTarget() instanceof PortFigure) {
-
-                // Port
-                action.getTarget().processAction(action);
-
-            } else if (action.getTarget() instanceof PathFigure) {
-
-                // Path
-                action.getTarget().processAction(action);
-
-            } else if (action.getTarget() instanceof PatchFigure) {
-
-                // Patch
-                action.getTarget().processAction(action);
-
-            } else if (action.getTarget() instanceof Scene) {
-
-                // Scene
-                action.getTarget().processAction(action);
-
-                // Camera
-                camera.focusSelectVisualization();
-
-            }
+//            if (action.getTarget() instanceof BaseFigure) {
+//
+////                // Base
+////                action.getTarget().processAction(action);
+////
+////                // Camera
+////                camera.focusSelectBase(action);
+//
+//            } else if (action.getTarget() instanceof PortFigure) {
+//
+//                // Port
+////                action.getTarget().processAction(action);
+//
+//            } else if (action.getTarget() instanceof PathFigure) {
+//
+//                // Path
+////                action.getTarget().processAction(action);
+//
+//            } else if (action.getTarget() instanceof PatchFigure) {
+//
+//                // Patch
+////                action.getTarget().processAction(action);
+//
+//            } else if (action.getTarget() instanceof Scene) {
+//
+////                // Scene
+////                action.getTarget().processAction(action);
+////
+////                // Camera
+////                camera.focusSelectVisualization();
+//
+//            }
 
         } else {
 
@@ -777,12 +840,12 @@ public class Scene extends Figure<Model> {
             // onSequence (BaseFigure.class, *, Figure.class, null, ) { ... }
 
             // First processAction was on a base figure...
-            if (actionSequence.getFirst().getTarget() instanceof BaseFigure) {
+            if (transcript.getFirst().getTarget() instanceof BaseFigure) {
 
                 if (action.getTarget() instanceof BaseFigure) {
 
                     // If first processAction was on the same form, then respond
-                    if (actionSequence.getFirst().isPointing() && actionSequence.getFirst().getTarget() instanceof BaseFigure) {
+                    if (transcript.getFirst().isPointing() && transcript.getFirst().getTarget() instanceof BaseFigure) {
 
                         // Base
                         action.getTarget().processAction(action);
@@ -794,11 +857,11 @@ public class Scene extends Figure<Model> {
                 } else if (action.getTarget() instanceof Scene) {
 
                     // Base
-                    actionSequence.getFirst().getTarget().processAction(action);
+                    transcript.getFirst().getTarget().processAction(action);
 
                 }
 
-            } else if (actionSequence.getFirst().getTarget() instanceof PortFigure) {
+            } else if (transcript.getFirst().getTarget() instanceof PortFigure) {
 
                 // First processAction was on a port figure...
 
@@ -806,7 +869,7 @@ public class Scene extends Figure<Model> {
 
                     // ...last processAction was on a base figure.
 
-                    PortFigure sourcePortFigure = (PortFigure) actionSequence.getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) transcript.getFirst().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
 
                 } else if (action.getTarget() instanceof PortFigure) {
@@ -825,7 +888,7 @@ public class Scene extends Figure<Model> {
 
                 }
 
-            } else if (actionSequence.getFirst().getTarget() instanceof PathFigure) {
+            } else if (transcript.getFirst().getTarget() instanceof PathFigure) {
 
                 // Path --> ?
 
@@ -834,13 +897,13 @@ public class Scene extends Figure<Model> {
                     PathFigure pathFigure = (PathFigure) action.getTarget();
                 }
 
-            } else if (actionSequence.getFirst().getTarget() instanceof Scene) {
+            } else if (transcript.getFirst().getTarget() instanceof Scene) {
 
                 // Scene --> ?
 
                 // Check if first processAction was on an figure
-                if (actionSequence.getFirst().getTarget() instanceof PortFigure) {
-                    ((PortFigure) actionSequence.getFirst().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
+                if (transcript.getFirst().getTarget() instanceof PortFigure) {
+                    ((PortFigure) transcript.getFirst().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
                 }
 
 //                camera.focusSelectVisualization();

@@ -14,7 +14,7 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.ActionSequence;
+import camp.computer.clay.model.interaction.Transcript;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -58,12 +58,12 @@ public class PatchFigure extends Figure<Patch> {
 
                 } else if (action.getType() == Action.Type.RELEASE) {
 
-                    ActionSequence actionSequence = action.getActionSequence();
+                    Transcript transcript = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched form
                         showPathFigures();
