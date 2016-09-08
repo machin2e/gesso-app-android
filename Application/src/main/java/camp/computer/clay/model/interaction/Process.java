@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.architecture.Construct;
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 
@@ -52,8 +52,8 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
 //                    getFirstAction().getActor().getCamera().getScene().onHoldListener(thisProcess.getFirstAction());
 
                     Action action = thisProcess.getFirstAction();
-                    Figure targetFigure = getFirstAction().getActor().getScene().getFigureByPosition(action.getPosition());
-                    action.setTarget(targetFigure);
+                    Image targetImage = getFirstAction().getActor().getScene().getImageByPosition(action.getPosition());
+                    action.setTarget(targetImage);
 
                     action.getTarget().processAction(action);
                     // </HACK>

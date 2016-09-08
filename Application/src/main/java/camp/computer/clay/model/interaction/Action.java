@@ -1,7 +1,7 @@
 package camp.computer.clay.model.interaction;
 
 import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Time;
 import camp.computer.clay.scene.util.geometry.Point;
 
@@ -43,7 +43,7 @@ public class Action {
 
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
 
-    private Figure[] targetFigure = new Figure[MAXIMUM_POINT_COUNT];
+    private Image[] targetImage = new Image[MAXIMUM_POINT_COUNT];
 
     private Type type = null;
 
@@ -61,7 +61,7 @@ public class Action {
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
             points[i] = new Point(0, 0);
-            targetFigure[i] = null;
+            targetImage[i] = null;
             isPointing[i] = false;
         }
     }
@@ -112,29 +112,29 @@ public class Action {
     }
 
     public boolean isPointing(int fingerIndex) { // was isTouching
-        return this.targetFigure[fingerIndex] != null;
+        return this.targetImage[fingerIndex] != null;
     }
 
-    public void setTarget(int fingerIndex, Figure figure) {
-        this.targetFigure[fingerIndex] = figure;
+    public void setTarget(int fingerIndex, Image image) {
+        this.targetImage[fingerIndex] = image;
     }
 
-    public Figure getTarget(int fingerIndex) {
-        return this.targetFigure[fingerIndex];
+    public Image getTarget(int fingerIndex) {
+        return this.targetImage[fingerIndex];
     }
 
     public boolean isPointing() { // was isTouching
         return isPointing(0);
     }
 
-    public void setTarget(Figure figure) {
-        setTarget(0, figure);
-        if (figure != null) {
+    public void setTarget(Image image) {
+        setTarget(0, image);
+        if (image != null) {
             isPointing[0] = true;
         }
     }
 
-    public Figure getTarget() {
+    public Image getTarget() {
         return getTarget(0);
     }
 }

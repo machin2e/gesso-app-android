@@ -64,7 +64,7 @@ public class Message {
         return this.source;
     }
 
-    // TODO: getFigureByPosition().getAddress()
+    // TODO: getImageByPosition().getAddress()
     public String getTargetAddress() {
         return this.target;
     }

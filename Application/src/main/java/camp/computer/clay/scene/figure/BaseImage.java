@@ -17,7 +17,7 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -25,9 +25,9 @@ import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 import camp.computer.clay.scene.util.geometry.Shape;
 
-public class BaseFigure extends Figure<Base> {
+public class BaseImage extends Image<Base> {
 
-    public BaseFigure(Base base) {
+    public BaseImage(Base base) {
         super(base);
         setup();
     }
@@ -209,8 +209,8 @@ public class BaseFigure extends Figure<Base> {
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
 
-                    Figure targetFigure = scene.getFigureByPosition(action.getPosition());
-                    action.setTarget(targetFigure);
+                    Image targetImage = scene.getImageByPosition(action.getPosition());
+                    action.setTarget(targetImage);
 
                     if (process.isTap()) {
 
@@ -224,17 +224,17 @@ public class BaseFigure extends Figure<Base> {
 
                         // Show ports and paths of touched form
                         for (int i = 0; i < getPortFigures().size(); i++) {
-                            PortFigure portFigure = getPortFigures().get(i);
+                            PortImage portFigure = getPortFigures().get(i);
                             List<Path> paths = portFigure.getPort().getGraph();
                             Log.v("TouchFrame", "\tpaths.size = " + paths.size());
                             for (Path path : paths) {
                                 Log.v("TouchFrame", "\t\tsource = " + path.getSource());
                                 Log.v("TouchFrame", "\t\ttarget = " + path.getTarget());
                                 // Show ports
-                                getScene().getFigure(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                getScene().getFigure(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                getScene().getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                getScene().getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
                                 // Show path
-                                getScene().getFigure(path).setVisibility(Visibility.VISIBLE);
+                                getScene().getImage(path).setVisibility(Visibility.VISIBLE);
                             }
                         }
 
@@ -245,18 +245,18 @@ public class BaseFigure extends Figure<Base> {
 
                         // TODO: Release longer than tap!
 
-                        if (process.getFirstAction().getTarget() instanceof BaseFigure) {
+                        if (process.getFirstAction().getTarget() instanceof BaseImage) {
 
-                            if (action.getTarget() instanceof BaseFigure) {
+                            if (action.getTarget() instanceof BaseImage) {
 
                                 // If getFirstAction processAction was on the same form, then respond
-                                if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseFigure) {
+                                if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseImage) {
 
                                     // Base
                                     action.getTarget().processAction(action);
 
                                     // Camera
-//                        camera.focusSelectVisualization();
+//                        camera.focusSelectScene();
                                 }
 
                             } else if (action.getTarget() instanceof Scene) {
@@ -290,11 +290,11 @@ public class BaseFigure extends Figure<Base> {
         return getConstruct();
     }
 
-    public List<PortFigure> getPortFigures() {
-        List<PortFigure> portFigures = new ArrayList<>();
+    public List<PortImage> getPortFigures() {
+        List<PortImage> portFigures = new ArrayList<>();
 
         for (Port port : getBase().getPorts()) {
-            PortFigure portFigure = (PortFigure) getScene().getFigure(port);
+            PortImage portFigure = (PortImage) getScene().getImage(port);
             portFigures.add(portFigure);
         }
 
@@ -302,7 +302,7 @@ public class BaseFigure extends Figure<Base> {
     }
 
     // TODO: Remove this! Store Port index/id
-    public int getPortFigureIndex(PortFigure portFigure) {
+    public int getPortFigureIndex(PortImage portFigure) {
         Port port = (Port) getScene().getModel(portFigure);
         if (getBase().getPorts().contains(port)) {
             return this.getBase().getPorts().indexOf(port);
@@ -334,7 +334,7 @@ public class BaseFigure extends Figure<Base> {
                 String hexColor = camp.computer.clay.scene.util.Color.getHexColorString(intColor);
                 lightShapes[i].setColor(hexColor);
             } else {
-                lightShapes[i].setColor(camp.computer.clay.scene.util.Color.getHexColorString(PortFigure.FLOW_PATH_COLOR_NONE));
+                lightShapes[i].setColor(camp.computer.clay.scene.util.Color.getHexColorString(PortImage.FLOW_PATH_COLOR_NONE));
             }
         }
 
@@ -360,8 +360,8 @@ public class BaseFigure extends Figure<Base> {
                 Surface.drawRectangle((Rectangle) shapes.get(i), surface);
             }
 
-            // Annotations
-            if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
+            // Labels
+            if (Application.ENABLE_GEOMETRY_LABELS) {
                 surface.getPaint().setColor(Color.GREEN);
                 surface.getPaint().setStyle(Paint.Style.STROKE);
                 Rectangle boardShape = (Rectangle) getShape("board");
@@ -369,31 +369,32 @@ public class BaseFigure extends Figure<Base> {
                 Surface.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, surface);
             }
 
+            // Draw patches
             drawCandidatePatchImage(surface);
         }
     }
 
     public void showPortFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setVisibility(Visibility.VISIBLE);
             portFigure.showDocks();
         }
     }
 
     public void hidePortFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void showPathFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setPathVisibility(Visibility.VISIBLE);
         }
     }
 
     public void hidePathFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setPathVisibility(Visibility.INVISIBLE);
             portFigure.showDocks();
         }

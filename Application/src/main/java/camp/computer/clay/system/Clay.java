@@ -138,12 +138,12 @@ public class Clay {
         universe.addBase(base);
 
 //        // Create base images
-//        BaseFigure baseImage = new BaseFigure(base);
+//        BaseImage baseImage = new BaseImage(base);
 //
 //        // Setup base's port images
 //        // Add a port sprite for each of the associated base's ports
 //        for (Port port : base.getPorts()) {
-//            PortFigure portImage = new PortFigure(port);
+//            PortImage portImage = new PortImage(port);
 //            scene.addImage(portImage, "ports");
 //        }
 //

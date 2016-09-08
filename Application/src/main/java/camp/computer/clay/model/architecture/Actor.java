@@ -6,7 +6,7 @@ import java.util.List;
 import camp.computer.clay.model.interaction.*;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Process;
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.Scene;
 
 /**
@@ -101,8 +101,8 @@ public class Actor { // Controller
                 // Process the action
 
                 // Set the target
-                Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
-                action.setTarget(targetFigure);
+                Image targetImage = getCamera().getScene().getImageByPosition(action.getPosition());
+                action.setTarget(targetImage);
 
                 action.getTarget().processAction(action);
 
@@ -123,8 +123,8 @@ public class Actor { // Controller
                 if (process.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                     // action.setType(Action.Type.MOVE);
 
-                    Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
-                    action.setTarget(targetFigure);
+                    Image targetImage = getCamera().getScene().getImageByPosition(action.getPosition());
+                    action.setTarget(targetImage);
 
                     // <HACK>
                     //Process process = action.getActionSequence();
@@ -161,8 +161,8 @@ public class Actor { // Controller
 //                }
 
                 // Set the target
-                Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
-                action.setTarget(targetFigure);
+                Image targetImage = getCamera().getScene().getImageByPosition(action.getPosition());
+                action.setTarget(targetImage);
 
                 action.getTarget().processAction(action);
 

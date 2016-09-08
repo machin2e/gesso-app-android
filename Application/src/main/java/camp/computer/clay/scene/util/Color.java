@@ -3,7 +3,7 @@ package camp.computer.clay.scene.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.scene.figure.PortFigure;
+import camp.computer.clay.scene.figure.PortImage;
 
 public abstract class Color {
 
@@ -21,9 +21,9 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<PortFigure, Integer> colorMap = new HashMap<PortFigure, Integer>();
+    private static HashMap<PortImage, Integer> colorMap = new HashMap<PortImage, Integer>();
 
-    public static int getUniqueColor(PortFigure portSprite) {
+    public static int getUniqueColor(PortImage portSprite) {
 
         if (colorMap.containsKey(portSprite)) {
             return colorMap.get(portSprite);

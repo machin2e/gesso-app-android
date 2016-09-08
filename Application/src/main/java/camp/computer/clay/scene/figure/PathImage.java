@@ -7,12 +7,12 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 
-public class PathFigure extends Figure<Path> {
+public class PathImage extends Image<Path> {
 
     // </STYLE>
     public boolean showDocks = true;
@@ -21,7 +21,7 @@ public class PathFigure extends Figure<Path> {
     private double triangleSpacing = 35;
     // </STYLE>
 
-    public PathFigure(Path path) {
+    public PathImage(Path path) {
         super(path);
         setup();
     }
@@ -82,8 +82,8 @@ public class PathFigure extends Figure<Path> {
 
         Path path = getPath();
 
-        PortFigure sourcePortImage = (PortFigure) getScene().getFigure(path.getSource());
-        PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getTarget());
+        PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
+        PortImage targetPortImage = (PortImage) getScene().getImage(path.getTarget());
 
         // Show target port
         targetPortImage.setVisibility(Visibility.VISIBLE);
@@ -152,8 +152,8 @@ public class PathFigure extends Figure<Path> {
 
         Path path = getPath();
 
-        PortFigure sourcePortImage = (PortFigure) getScene().getFigure(path.getSource());
-        PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getTarget());
+        PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
+        PortImage targetPortImage = (PortImage) getScene().getImage(path.getTarget());
 
         // Show target port
         targetPortImage.setVisibility(Visibility.VISIBLE);
@@ -247,8 +247,8 @@ public class PathFigure extends Figure<Path> {
 //            Log.v("Touch_", "FLOOOO");
 //            Path path = getPath();
 //
-//            PortFigure sourcePortImage = (PortFigure) getScene().getFigure(path.getSource());
-//            PortFigure targetPortImage = (PortFigure) getScene().getFigure(path.getFigureByPosition());
+//            PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
+//            PortImage targetPortImage = (PortImage) getScene().getImage(path.getImageByPosition());
 //
 //            double distanceToLine = Geometry.calculateLineToPointDistance(
 //                    sourcePortImage.getPosition(),

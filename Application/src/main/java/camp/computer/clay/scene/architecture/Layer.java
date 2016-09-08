@@ -17,7 +17,7 @@ public class Layer {
 
     private String tag = "default";
 
-    private List<Figure> figures = new LinkedList<>();
+    private List<Image> images = new LinkedList<>();
 
     public Layer(Scene scene) {
         this.scene = scene;
@@ -43,35 +43,35 @@ public class Layer {
         return this.scene;
     }
 
-    public void add(Figure figure) {
-        figures.add(figure);
-        figure.setScene(scene);
+    public void add(Image image) {
+        images.add(image);
+        image.setScene(scene);
     }
 
-    public Figure getFigure(Construct construct) {
-        for (int i = 0; i < figures.size(); i++) {
-            Figure figure = figures.get(i);
-            if (figure.getConstruct() == construct) {
-                return figure;
+    public Image getImage(Construct construct) {
+        for (int i = 0; i < images.size(); i++) {
+            Image image = images.get(i);
+            if (image.getConstruct() == construct) {
+                return image;
             }
         }
         return null;
     }
 
-    public Construct getModel(Figure figure) {
-        for (int i = 0; i < figures.size(); i++) {
-            if (figures.get(i) == figure) {
-                return figures.get(i).getConstruct();
+    public Construct getModel(Image image) {
+        for (int i = 0; i < images.size(); i++) {
+            if (images.get(i) == image) {
+                return images.get(i).getConstruct();
             }
         }
         return null;
     }
 
-    public List<Figure> getFigures() {
-        return figures;
+    public List<Image> getImages() {
+        return images;
     }
 
     public int getCardinality() {
-        return this.figures.size();
+        return this.images.size();
     }
 }

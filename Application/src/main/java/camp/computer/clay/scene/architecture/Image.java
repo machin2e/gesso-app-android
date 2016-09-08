@@ -14,13 +14,13 @@ import camp.computer.clay.scene.util.geometry.Rectangle;
 import camp.computer.clay.scene.util.geometry.Shape;
 import camp.computer.clay.scene.util.Visibility;
 
-public abstract class Figure<T extends Construct> {
+public abstract class Image<T extends Construct> {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-    protected Point position = new Point(0, 0); // Figure position
+    protected Point position = new Point(0, 0); // Image position
 
-    protected double scale = 1.0; // Figure scale factor
+    protected double scale = 1.0; // Image scale factor
 
     protected Visibility visibility = Visibility.VISIBLE;
 
@@ -35,7 +35,7 @@ public abstract class Figure<T extends Construct> {
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Figure(T construct) {
+    public Image(T construct) {
         this.construct = construct;
     }
 
@@ -51,10 +51,10 @@ public abstract class Figure<T extends Construct> {
         return this.scene;
     }
 
-    public Figure getParentFigure() {
+    public Image getParentImage() {
         if (getConstruct().hasParent()) {
             Construct parentConstruct = getConstruct().getParent();
-            return getScene().getFigure(parentConstruct);
+            return getScene().getImage(parentConstruct);
         }
         return null;
     }

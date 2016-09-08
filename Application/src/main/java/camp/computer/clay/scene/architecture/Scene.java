@@ -21,17 +21,17 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.scene.figure.BaseFigure;
-import camp.computer.clay.scene.figure.PatchFigure;
-import camp.computer.clay.scene.figure.PathFigure;
-import camp.computer.clay.scene.figure.PortFigure;
+import camp.computer.clay.scene.figure.BaseImage;
+import camp.computer.clay.scene.figure.PatchImage;
+import camp.computer.clay.scene.figure.PathImage;
+import camp.computer.clay.scene.figure.PortImage;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.Probability;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 
-public class Scene extends Figure<Universe> {
+public class Scene extends Image<Universe> {
 
     private List<Layer> layers = new ArrayList<>();
 
@@ -55,8 +55,8 @@ public class Scene extends Figure<Universe> {
 
                 Process process = action.getActionSequence();
 
-                Figure targetFigure = getFigureByPosition(action.getPosition());
-                action.setTarget(targetFigure);
+                Image targetImage = getImageByPosition(action.getPosition());
+                action.setTarget(targetImage);
 
                 Camera camera = action.getActor().getCamera();
 
@@ -67,7 +67,7 @@ public class Scene extends Figure<Universe> {
                     if (process.isTap()) {
 
                         // Camera
-                        camera.focusSelectVisualization();
+                        camera.focusSelectScene();
 
                     }
 
@@ -127,7 +127,7 @@ public class Scene extends Figure<Universe> {
                             // Select patch to connect
                             Application.getDisplay().displayChooseDialog();
 
-//                            if (action.getTarget() instanceof BaseFigure) {
+//                            if (action.getTarget() instanceof BaseImage) {
 //
 //                                Log.v("Test","T1");
 //
@@ -135,7 +135,7 @@ public class Scene extends Figure<Universe> {
 //                                Log.v("Test","getTarget: " + process.getFirstAction().getTarget());
 //
 //                                // If getFirstAction processAction was on the same form, then respond
-//                                if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseFigure) {
+//                                if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseImage) {
 //
 //                                    Log.v("Test","T2");
 //
@@ -143,7 +143,7 @@ public class Scene extends Figure<Universe> {
 //                                    action.getTarget().processAction(action);
 //
 //                                    // Camera
-////                        camera.focusSelectVisualization();
+////                        camera.focusSelectScene();
 //                                }
 //
 //                            } else if (action.getTarget() instanceof Scene) {
@@ -159,9 +159,9 @@ public class Scene extends Figure<Universe> {
 
                             Log.v("Test","Create Patch from Port");
 
-                            PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirstAction().getTarget();
+                            PortImage sourcePortImage = (PortImage) action.getActionSequence().getFirstAction().getTarget();
 
-                            if (sourcePortFigure.getCandidatePatchVisibility() == Visibility.VISIBLE) {
+                            if (sourcePortImage.getCandidatePatchVisibility() == Visibility.VISIBLE) {
 
                                 Log.v("IASM", "(1) touch patch to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
@@ -177,33 +177,33 @@ public class Scene extends Figure<Universe> {
 
                                 getModel().addPatch(patch);
 
-                                // Create Patch Figure
-                                PatchFigure patchFigure = new PatchFigure(patch);
-                                patchFigure.setPosition(action.getPosition());
+                                // Create Patch Image
+                                PatchImage patchImage = new PatchImage(patch);
+                                patchImage.setPosition(action.getPosition());
 
                                 // Set Rotation
                                 double patchRotation = Geometry.calculateRotationAngle(
-                                        sourcePortFigure.getPosition(),
-                                        patchFigure.getPosition()
+                                        sourcePortImage.getPosition(),
+                                        patchImage.getPosition()
                                 );
-                                patchFigure.setRotation(patchRotation + 90);
+                                patchImage.setRotation(patchRotation + 90);
 
 //                            Base sourceBase = (Base) sourcePortFigure.getConstruct().getParent();
-//                            BaseFigure sourceBaseFigure = (BaseFigure) getFigure(sourceBase);
+//                            BaseImage sourceBaseFigure = (BaseImage) getImage(sourceBase);
 //                            patchFigure.setRotation(sourceBaseFigure.getRotation() + 180);
 
                                 // Create Port Figures for each of Patch's Ports
                                 for (int i = 0; i < patch.getPorts().size(); i++) {
                                     Port port = patch.getPorts().get(i);
-                                    PortFigure portFigure = new PortFigure(port);
-                                    addFigure(portFigure, "ports");
+                                    PortImage portImage = new PortImage(port);
+                                    addImage(portImage, "ports");
                                 }
 
-                                // Add Patch Figure to Scene
-                                addFigure(patchFigure, "patches");
+                                // Add Patch Image to Scene
+                                addImage(patchImage, "patches");
 
                                 // Configure Ports
-                                Port sourcePort = sourcePortFigure.getPort();
+                                Port sourcePort = sourcePortImage.getPort();
                                 Port destinationPort = patch.getPorts().get(0);
 
                                 if (sourcePort.getDirection() == Port.Direction.NONE) {
@@ -219,24 +219,24 @@ public class Scene extends Figure<Universe> {
                                 destinationPort.setType(sourcePort.getType());
 
                                 // Create Path
-                                Path path = new Path(sourcePortFigure.getPort(), patch.getPorts().get(0));
+                                Path path = new Path(sourcePortImage.getPort(), patch.getPorts().get(0));
                                 path.setType(Path.Type.ELECTRONIC);
                                 sourcePort.addPath(path);
 
-                                PathFigure pathFigure = new PathFigure(path);
-                                addFigure(pathFigure, "paths");
+                                PathImage pathImage = new PathImage(path);
+                                addImage(pathImage, "paths");
 
-                                PortFigure targetPortFigure = (PortFigure) getFigure(path.getTarget());
-                                targetPortFigure.setUniqueColor(sourcePortFigure.getUniqueColor());
+                                PortImage targetPortImage = (PortImage) getImage(path.getTarget());
+                                targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
 
                                 // Update Camera
-                                camera.focusSelectPath(sourcePortFigure.getPort());
+                                camera.focusSelectPath(sourcePortImage.getPort());
 
                             }
 
-                            // Update Figure
-                            sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
-                            sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
+                            // Update Image
+                            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+                            sourcePortImage.setCandidatePatchVisibility(Visibility.INVISIBLE);
                         }
                     }
                 }
@@ -268,61 +268,59 @@ public class Scene extends Figure<Universe> {
             Base base = (Base) construct;
 
             // Create base figures
-            BaseFigure baseFigure = new BaseFigure(base);
+            BaseImage baseImage = new BaseImage(base);
 
             // Setup base's port figures
             // Add a port sprite for each of the associated base's ports
 //            for (Port port : base.getPorts()) {
             for (int i = 0; i < base.getPorts().size(); i++) {
                 Port port = base.getPorts().get(i);
-//                PortFigure portFigure = new PortFigure(port);
-//                scene.addFigure(portFigure, "ports");
+//                PortImage portFigure = new PortImage(port);
+//                scene.addImage(portFigure, "ports");
 
                 addConstruct(port);
 
             }
 
-            addFigure(baseFigure, "bases");
+            addImage(baseImage, "bases");
 
         } else if (construct instanceof Port) {
 
             Port port = (Port) construct;
 
-            PortFigure portFigure = new PortFigure(port);
-            addFigure(portFigure, "ports");
+            PortImage portImage = new PortImage(port);
+            addImage(portImage, "ports");
 
         } else if (construct instanceof Path) {
 
             Path path = (Path) construct;
 
-            PathFigure pathFigure = new PathFigure(path);
+            PathImage pathImage = new PathImage(path);
             // pathFigure.setScene(getScene());
-            addFigure(pathFigure, "paths");
+            addImage(pathImage, "paths");
 
         }
 
     }
 
-    // TODO: Remove Figure parameter. Create that and return it.
-    private void addFigure(Figure figure, String layerTag) {
+    // TODO: Remove Image parameter. Create that and return it.
+    private void addImage(Image image, String layerTag) {
 
-        // Position figure
-        if (figure instanceof BaseFigure) {
-            adjustFigurePosition(figure);
-        }
-
-        // Add figure
+        // Add layer (if it doesn't exist)
         if (!hasLayer(layerTag)) {
             addLayer(layerTag);
         }
-        getLayer(layerTag).add(figure);
+
+        // Add image
+        getLayer(layerTag).add(image);
+
+        // Position image
+        if (image instanceof BaseImage) {
+            adjustImagePosition(image);
+        }
 
         // Update perspective
-//        getUniverse().getActor(0).getCamera().adjustScale(0);
-        // getUniverse().getActor(0).getCamera().setPosition(getUniverse().getActor(0).getCamera().getScene().getFigures().filterType(BaseFigure.TYPE).getCenterPoint());
-//        getUniverse().getActor(0).getCamera().adjustPosition();
-
-        getModel().getActor(0).getCamera().focusSelectVisualization();
+        getModel().getActor(0).getCamera().focusSelectScene();
     }
 
     public Layer getLayer(String tag) {
@@ -345,89 +343,116 @@ public class Scene extends Figure<Universe> {
     }
 
     /**
-     * Automatically determines and assigns a valid position for the specified {@code Figure}.
+     * Automatically determines and assigns a valid position for the specified {@code Image}.
      *
-     * @param figure The {@code Figure} for which the position will be adjusted.
+     * @param image The {@code Image} for which the position will be adjusted.
      */
-    private void adjustFigurePosition(Figure figure) {
+    private void adjustImagePosition(Image image) {
 
-        // Calculate random positions separated by minimum distance
-        final float figureSeparationDistance = 550; // 500;
+        int adjustmentMethod = 1;
 
-        List<Point> figurePositions = getFigures().filterType(Base.class).getPositions();
+        if (adjustmentMethod == 0) {
 
-        Point position = null;
-        boolean foundPoint = false;
+            // Calculate random positions separated by minimum distance
+            final float imageSeparationDistance = 550; // 500;
 
-        Log.v("Position", "figurePositions.size = " + figurePositions.size());
+            List<Point> imagePositions = getImages().filterType(Base.class).getPositions();
 
-        if (figurePositions.size() == 0) {
+            Point position = null;
+            boolean foundPoint = false;
 
-            position = new Point(0, 0);
+            Log.v("Position", "figurePositions.size = " + imagePositions.size());
 
-        } else if (figurePositions.size() == 1) {
+            if (imagePositions.size() == 0) {
 
-            position = Geometry.calculatePoint(
-                    figurePositions.get(0),
-                    Probability.generateRandomInteger(0, 360),
-                    figureSeparationDistance
-            );
+                position = new Point(0, 0);
 
-        } else {
+            } else if (imagePositions.size() == 1) {
 
-            List<Point> hullPoints = Geometry.computeConvexHull(figurePositions);
+                position = Geometry.calculatePoint(
+                        imagePositions.get(0),
+                        Probability.generateRandomInteger(0, 360),
+                        imageSeparationDistance
+                );
 
-            int sourceIndex = Probability.generateRandomInteger(0, hullPoints.size() - 1);
-            int targetIndex = sourceIndex + 1;
+            } else {
 
-            Point midpoint = Geometry.calculateMidpoint(hullPoints.get(sourceIndex), hullPoints.get(targetIndex));
-            position = Geometry.calculatePoint(
-                    midpoint,
-                    Geometry.calculateRotationAngle(hullPoints.get(sourceIndex), hullPoints.get(targetIndex)) + 90,
-                    figureSeparationDistance
-            );
+                List<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
+
+                int sourceIndex = Probability.generateRandomInteger(0, hullPoints.size() - 1);
+                int targetIndex = sourceIndex + 1;
+
+                Point midpoint = Geometry.calculateMidpoint(hullPoints.get(sourceIndex), hullPoints.get(targetIndex));
+                position = Geometry.calculatePoint(
+                        midpoint,
+                        Geometry.calculateRotationAngle(hullPoints.get(sourceIndex), hullPoints.get(targetIndex)) + 90,
+                        imageSeparationDistance
+                );
+            }
+
+            // Assign the found position to the image
+            image.setPosition(position);
+            image.setRotation(Probability.getRandomGenerator().nextInt(360));
         }
 
-        // Assign the found position to the figure
-        figure.setPosition(position);
-        figure.setRotation(Probability.getRandomGenerator().nextInt(360));
+        if (adjustmentMethod == 1) {
+
+            List<Image> figurePositions = getImages().filterType(Base.class).getList();
+
+            // Set position
+            if (figurePositions.size() == 1) {
+                figurePositions.get(0).setPosition(new Point(0, 0));
+            } else if (figurePositions.size() == 2) {
+                figurePositions.get(0).setPosition(new Point(-300, 0));
+                figurePositions.get(1).setPosition(new Point(300, 0));
+            } else if (figurePositions.size() == 5) {
+                figurePositions.get(0).setPosition(new Point(-300, -600));
+                figurePositions.get(1).setPosition(new Point(300, -600));
+                figurePositions.get(2).setPosition(new Point(-300, 0));
+                figurePositions.get(3).setPosition(new Point(300, 0));
+                figurePositions.get(4).setPosition(new Point(-300, 600));
+            }
+
+            // Set rotation
+            image.setRotation(Probability.getRandomGenerator().nextInt(360));
+        }
     }
 
     /**
-     * Returns {@code true} if the {@code Scene} contains a {@code Figure} corresponding to the
+     * Returns {@code true} if the {@code Scene} contains a {@code Image} corresponding to the
      * specified {@code Construct}.
      *
-     * @param construct The {@code Construct} for which the corresponding {@code Figure} will be
+     * @param construct The {@code Construct} for which the corresponding {@code Image} will be
      * returned, if any.
-     * @return The {@code Figure} corresponding to the specified {@code Construct}, if one is
+     * @return The {@code Image} corresponding to the specified {@code Construct}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
     public boolean contains(Construct construct) {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            Figure figure = layer.getFigure(construct);
-            if (figure != null) {
+            Image image = layer.getImage(construct);
+            if (image != null) {
                 return true;
             }
         }
         return false;
     }
 
-    public Figure getFigure(Construct construct) {
+    public Image getImage(Construct construct) {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            Figure figure = layer.getFigure(construct);
-            if (figure != null) {
-                return figure;
+            Image image = layer.getImage(construct);
+            if (image != null) {
+                return image;
             }
         }
         return null;
     }
 
-    public Construct getModel(Figure figure) {
+    public Construct getModel(Image image) {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            Construct construct = layer.getModel(figure);
+            Construct construct = layer.getModel(image);
             if (construct != null) {
                 return construct;
             }
@@ -435,44 +460,44 @@ public class Scene extends Figure<Universe> {
         return null;
     }
 
-    public <T> List<Figure> getFigures(List<T> models) {
-        List<Figure> figures = new ArrayList<>();
+    public <T> List<Image> getImages(List<T> models) {
+        List<Image> images = new ArrayList<>();
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             for (int j = 0; j < models.size(); j++) {
                 T model = models.get(j);
-                Figure figure = layer.getFigure((Construct) model);
-                if (figure != null) {
-                    figures.add(figure);
+                Image image = layer.getImage((Construct) model);
+                if (image != null) {
+                    images.add(image);
                 }
             }
         }
-        return figures;
+        return images;
     }
 
-    public FigureGroup getFigures() {
-        FigureGroup figureGroup = new FigureGroup();
+    public ImageGroup getImages() {
+        ImageGroup imageGroup = new ImageGroup();
         List<Integer> indices = getLayerIndices();
         for (int i = 0; i < indices.size(); i++) {
             Integer index = indices.get(i);
             Layer layer = getLayer(index);
             if (layer != null) {
-                figureGroup.add(layer.getFigures());
+                imageGroup.add(layer.getImages());
             }
         }
-        return figureGroup;
+        return imageGroup;
     }
 
-    public <T extends Construct> FigureGroup getFigures(Class<?>... types) {
-        return getFigures().filterType(types);
+    public <T extends Construct> ImageGroup getImages(Class<?>... types) {
+        return getImages().filterType(types);
     }
 
-    public Figure getFigureByPosition(Point point) {
-        List<Figure> figures = getFigures().filterVisibility(Visibility.VISIBLE).getList();
-        for (int i = 0; i < figures.size(); i++) {
-            Figure figure = figures.get(i);
-            if (figure.contains(point)) {
-                return figure;
+    public Image getImageByPosition(Point point) {
+        List<Image> images = getImages().filterVisibility(Visibility.VISIBLE).getList();
+        for (int i = 0; i < images.size(); i++) {
+            Image image = images.get(i);
+            if (image.contains(point)) {
+                return image;
             }
         }
         return this;
@@ -482,7 +507,7 @@ public class Scene extends Figure<Universe> {
         return getConstruct();
     }
 
-    public static <T extends Figure> List<Point> getPositions(List<T> figures) {
+    public static <T extends Image> List<Point> getPositions(List<T> figures) {
         List<Point> positions = new ArrayList<>();
         for (int i = 0; i < figures.size(); i++) {
             T figure = figures.get(i);
@@ -499,77 +524,67 @@ public class Scene extends Figure<Universe> {
         // Update figures
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            for (int j = 0; j < layer.getFigures().size(); j++) {
-                Figure figure = layer.getFigures().get(j);
-                figure.update();
+            for (int j = 0; j < layer.getImages().size(); j++) {
+                Image image = layer.getImages().get(j);
+                image.update();
             }
         }
+
+        // Update figure layout
+        // Geometry.computeCirclePacking(getImages().filterType(BaseImage.class, PatchImage.class).getList(), 200, getImages().filterType(BaseImage.class, PatchImage.class).getCentroidPoint());
     }
 
     @Override
     public void draw(Surface surface) {
 
-        if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
-            // <AXES_ANNOTATION>
+        // <DEBUG_LABEL>
+        if (Application.ENABLE_GEOMETRY_LABELS) {
+
+            // <AXES_LABEL>
             surface.getPaint().setColor(Color.CYAN);
             surface.getPaint().setStrokeWidth(1.0f);
             surface.getCanvas().drawLine(-5000, 0, 5000, 0, surface.getPaint());
             surface.getCanvas().drawLine(0, -5000, 0, 5000, surface.getPaint());
-            // </AXES_ANNOTATION>
-        }
+            // </AXES_LABEL>
 
-        // Draw figures
-//        for (Integer index : getLayerIndices()) {
-//            Layer layer = getLayer(index);
-//            if (layer != null) {
-//                for (int i = 0; i < layer.getFigures().size(); i++) {
-//                    layer.getFigures().getAction(i).draw(surface);
-//                }
-//            }
+        }
+        // </DEBUG_LABEL>
 
         Layer layer = null;
 
         layer = getLayer("bases");
         if (layer != null) {
-            for (int i = 0; i < layer.getFigures().size(); i++) {
-                layer.getFigures().get(i).draw(surface);
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
             }
         }
 
         layer = getLayer("paths");
         if (layer != null) {
-            for (int i = 0; i < layer.getFigures().size(); i++) {
-                layer.getFigures().get(i).draw(surface);
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
             }
         }
 
         layer = getLayer("patches");
         if (layer != null) {
-            for (int i = 0; i < layer.getFigures().size(); i++) {
-                layer.getFigures().get(i).draw(surface);
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
             }
         }
 
         layer = getLayer("ports");
         if (layer != null) {
-            for (int i = 0; i < layer.getFigures().size(); i++) {
-                layer.getFigures().get(i).draw(surface);
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
             }
         }
 
-//            getLayer("paths").getFigures().getAction(i).draw(surface);
-//            getLayer("patches").getFigures().getAction(i).draw(surface);
-//            getLayer("ports").getFigures().getAction(i).draw(surface);
-//        }
+        // <DEBUG_LABEL>
+        if (Application.ENABLE_GEOMETRY_LABELS) {
 
-        // Layout figures
-//        Geometry.computeCirclePacking(getFigures().filterType(BaseFigure.class, PatchFigure.class).getList(), 200, getFigures().filterType(BaseFigure.class, PatchFigure.class).getCentroidPoint());
-
-        // Draw annotations
-        if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
-
-            // <FPS_ANNOTATION>
-            Point fpsPosition = getFigures().filterType(Base.class).getCenterPoint();
+            // <FPS_LABEL>
+            Point fpsPosition = getImages().filterType(Base.class).getCenterPoint();
             fpsPosition.setY(fpsPosition.getY() - 200);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
@@ -582,10 +597,10 @@ public class Scene extends Figure<Universe> {
             Rect fpsTextBounds = new Rect();
             surface.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
             surface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20, (float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, surface.getPaint());
-            // </FPS_ANNOTATION>
+            // </FPS_LABEL>
 
-            // <CENTROID_ANNOTATION>
-            Point centroidPosition = getFigures().filterType(Base.class).getCentroidPoint();
+            // <CENTROID_LABEL>
+            Point centroidPosition = getImages().filterType(Base.class).getCentroidPoint();
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, surface.getPaint());
@@ -597,14 +612,14 @@ public class Scene extends Figure<Universe> {
             Rect bounds = new Rect();
             surface.getPaint().getTextBounds(text, 0, text.length(), bounds);
             surface.getCanvas().drawText(text, (float) centroidPosition.getX() + 20, (float) centroidPosition.getY() + bounds.height() / 2.0f, surface.getPaint());
-            // </CENTROID_ANNOTATION>
+            // </CENTROID_LABEL>
 
-            // <CENTER_ANNOTATION>
-            List<Point> figurePositions = getFigures().filterType(Base.class, Patch.class).getPositions();
-            Point baseFiguresCenterPosition = Geometry.calculateCenterPosition(figurePositions);
+            // <CENTER_LABEL>
+            List<Point> figurePositions = getImages().filterType(Base.class, Patch.class).getPositions();
+            Point baseImagesCenterPosition = Geometry.calculateCenterPosition(figurePositions);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
-            surface.getCanvas().drawCircle((float) baseFiguresCenterPosition.getX(), (float) baseFiguresCenterPosition.getY(), 10, surface.getPaint());
+            surface.getCanvas().drawCircle((float) baseImagesCenterPosition.getX(), (float) baseImagesCenterPosition.getY(), 10, surface.getPaint());
 
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getPaint().setTextSize(35);
@@ -612,12 +627,11 @@ public class Scene extends Figure<Universe> {
             String centerLabeltext = "CENTER";
             Rect centerLabelTextBounds = new Rect();
             surface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-            surface.getCanvas().drawText(centerLabeltext, (float) baseFiguresCenterPosition.getX() + 20, (float) baseFiguresCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, surface.getPaint());
-            // </CENTER_ANNOTATION>
+            surface.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterPosition.getX() + 20, (float) baseImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, surface.getPaint());
+            // </CENTER_LABEL>
 
-            // <CONVEX_HULL>
-            //List<Point> basePositions = Scene.getPositions(getBaseFigures());
-            List<Point> baseVertices = getFigures().filterType(Base.class, Patch.class).getVertices();
+            // <CONVEX_HULL_LABEL>
+            List<Point> baseVertices = getImages().filterType(Base.class, Patch.class).getVertices();
 
             // Hull vertices
             for (int i = 0; i < baseVertices.size() - 1; i++) {
@@ -649,17 +663,19 @@ public class Scene extends Figure<Universe> {
                 Point vertex = convexHullVertices.get(i);
                 Surface.drawCircle(vertex, 20, 0, surface);
             }
-            // </CONVEX_HULL>
+            // </CONVEX_HULL_LABEL>
 
-            // <BOUNDING_BOX>
+            // <BOUNDING_BOX_LABEL>
             surface.getPaint().setStrokeWidth(1.0f);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.STROKE);
 
-            Rectangle boundingBox = getFigures().filterType(Base.class).getBoundingBox();
+            Rectangle boundingBox = getImages().filterType(Base.class).getBoundingBox();
             Surface.drawPolygon(boundingBox.getVertices(), surface);
-            // </BOUNDING_BOX>
+            // </BOUNDING_BOX_LABEL>
+
         }
+        // </DEBUG_LABEL>
     }
 
     public List<Integer> getLayerIndices() {
@@ -688,7 +704,7 @@ public class Scene extends Figure<Universe> {
 
 //    public void onTouchListener(Action action) {
 //
-//        Figure targetFigure = getFigureByPosition(action.getPosition());
+//        Image targetFigure = getImageByPosition(action.getPosition());
 //        action.setTarget(targetFigure);
 //
 //        action.getTarget().processAction(action);
@@ -697,7 +713,7 @@ public class Scene extends Figure<Universe> {
 //
 //    public void onHoldListener(Action action) {
 //
-//        Figure targetFigure = getFigureByPosition(action.getPosition());
+//        Image targetFigure = getImageByPosition(action.getPosition());
 //        action.setTarget(targetFigure);
 //
 //        action.getTarget().processAction(action);
@@ -708,7 +724,7 @@ public class Scene extends Figure<Universe> {
 //
 //        Process actionSequence = action.getActionSequence();
 //
-//        Figure targetFigure = getFigureByPosition(action.getPosition());
+//        Image targetFigure = getImageByPosition(action.getPosition());
 //        action.setTarget(targetFigure);
 //
 //        Camera camera = action.getActor().getCamera();
@@ -722,7 +738,7 @@ public class Scene extends Figure<Universe> {
 //
 //            // Holding and dragging
 //
-//            if (action.getTarget() instanceof BaseFigure) {
+//            if (action.getTarget() instanceof BaseImage) {
 //
 ////                // Base
 ////                action.getTarget().processAction(action);
@@ -731,10 +747,10 @@ public class Scene extends Figure<Universe> {
 ////                // Camera
 ////                camera.focusSelectBase(action);
 //
-//            } else if (action.getTarget() instanceof PortFigure) {
+//            } else if (action.getTarget() instanceof PortImage) {
 //
 ////                // Port
-////                PortFigure portFigure = (PortFigure) action.getTarget();
+////                PortImage portFigure = (PortImage) action.getTarget();
 ////
 ////                portFigure.setDragging(true);
 ////                portFigure.setPosition(action.getPosition());
@@ -750,7 +766,7 @@ public class Scene extends Figure<Universe> {
 //
 //            // Not holding. Drag was detected prior to the hold duration threshold.
 //
-//            if (action.getTarget() instanceof BaseFigure) {
+//            if (action.getTarget() instanceof BaseImage) {
 //
 ////                // Base
 ////                action.getTarget().processAction(action);
@@ -758,16 +774,16 @@ public class Scene extends Figure<Universe> {
 ////                // Camera
 ////                camera.focusSelectBase(action);
 //
-//            } else if (action.getTarget() instanceof PortFigure) {
+//            } else if (action.getTarget() instanceof PortImage) {
 //
 ////                // Port
-////                PortFigure portFigure = (PortFigure) action.getTarget();
+////                PortImage portFigure = (PortImage) action.getTarget();
 ////                portFigure.processAction(action);
 ////
 ////                // Camera
 ////                camera.focusCreatePath(action);
 //
-//            } else if (action.getTarget() instanceof PatchFigure) {
+//            } else if (action.getTarget() instanceof PatchImage) {
 //
 ////                // Patch
 ////                action.getTarget().setPosition(action.getPosition());
@@ -794,8 +810,8 @@ public class Scene extends Figure<Universe> {
 
         action.setType(Action.Type.UNSELECT);
 
-        Figure targetFigure = getFigureByPosition(action.getPosition());
-        action.setTarget(targetFigure);
+        Image targetImage = getImageByPosition(action.getPosition());
+        action.setTarget(targetImage);
 
         Camera camera = action.getActor().getCamera();
 
@@ -806,7 +822,7 @@ public class Scene extends Figure<Universe> {
 
         if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
-//            if (action.getTarget() instanceof BaseFigure) {
+//            if (action.getTarget() instanceof BaseImage) {
 //
 ////                // Base
 ////                action.getTarget().processAction(action);
@@ -814,17 +830,17 @@ public class Scene extends Figure<Universe> {
 ////                // Camera
 ////                camera.focusSelectBase(action);
 //
-//            } else if (action.getTarget() instanceof PortFigure) {
+//            } else if (action.getTarget() instanceof PortImage) {
 //
 //                // Port
 ////                action.getTarget().processAction(action);
 //
-//            } else if (action.getTarget() instanceof PathFigure) {
+//            } else if (action.getTarget() instanceof PathImage) {
 //
 //                // Path
 ////                action.getTarget().processAction(action);
 //
-//            } else if (action.getTarget() instanceof PatchFigure) {
+//            } else if (action.getTarget() instanceof PatchImage) {
 //
 //                // Patch
 ////                action.getTarget().processAction(action);
@@ -835,7 +851,7 @@ public class Scene extends Figure<Universe> {
 ////                action.getTarget().processAction(action);
 ////
 ////                // Camera
-////                camera.focusSelectVisualization();
+////                camera.focusSelectScene();
 //
 //            }
 
@@ -851,22 +867,22 @@ public class Scene extends Figure<Universe> {
 //                    Action.Type.UNSELECT
 //            );
 
-            // onSequence (BaseFigure.class, ..., Figure.class, null, ) { ... }
-            // onSequence (BaseFigure.class, *, Figure.class, null, ) { ... }
+            // onSequence (BaseImage.class, ..., Image.class, null, ) { ... }
+            // onSequence (BaseImage.class, *, Image.class, null, ) { ... }
 
             // First processAction was on a base figure...
-            if (process.getFirstAction().getTarget() instanceof BaseFigure) {
+            if (process.getFirstAction().getTarget() instanceof BaseImage) {
 
-                if (action.getTarget() instanceof BaseFigure) {
+                if (action.getTarget() instanceof BaseImage) {
 
                     // If getFirstAction processAction was on the same form, then respond
-                    if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseFigure) {
+                    if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseImage) {
 
                         // Base
                         action.getTarget().processAction(action);
 
                         // Camera
-//                        camera.focusSelectVisualization();
+//                        camera.focusSelectScene();
                     }
 
                 } else if (action.getTarget() instanceof Scene) {
@@ -876,23 +892,23 @@ public class Scene extends Figure<Universe> {
 
                 }
 
-            } else if (process.getFirstAction().getTarget() instanceof PortFigure) {
+            } else if (process.getFirstAction().getTarget() instanceof PortImage) {
 
                 // First processAction was on a port figure...
 
-                if (action.getTarget() instanceof BaseFigure) {
+                if (action.getTarget() instanceof BaseImage) {
 
                     // ...getLastAction processAction was on a base figure.
 
-                    PortFigure sourcePortFigure = (PortFigure) process.getFirstAction().getTarget();
-                    sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
+                    PortImage sourcePortImage = (PortImage) process.getFirstAction().getTarget();
+                    sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
 
-                } else if (action.getTarget() instanceof PortFigure) {
+                } else if (action.getTarget() instanceof PortImage) {
 
                     // Port
                     action.getTarget().processAction(action);
 
-                } else if (action.getTarget() instanceof PatchFigure) {
+                } else if (action.getTarget() instanceof PatchImage) {
 
                     // Patch
                     action.getTarget().processAction(action);
@@ -903,13 +919,13 @@ public class Scene extends Figure<Universe> {
 
                 }
 
-            } else if (process.getFirstAction().getTarget() instanceof PathFigure) {
+            } else if (process.getFirstAction().getTarget() instanceof PathImage) {
 
                 // Path --> ?
 
-                if (action.getTarget() instanceof PathFigure) {
+                if (action.getTarget() instanceof PathImage) {
                     // Path --> Path
-                    PathFigure pathFigure = (PathFigure) action.getTarget();
+                    PathImage pathImage = (PathImage) action.getTarget();
                 }
 
             } else if (process.getFirstAction().getTarget() instanceof Scene) {
@@ -917,11 +933,11 @@ public class Scene extends Figure<Universe> {
                 // Scene --> ?
 
                 // Check if getFirstAction processAction was on an figure
-                if (process.getFirstAction().getTarget() instanceof PortFigure) {
-                    ((PortFigure) process.getFirstAction().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
+                if (process.getFirstAction().getTarget() instanceof PortImage) {
+                    ((PortImage) process.getFirstAction().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
                 }
 
-//                camera.focusSelectVisualization();
+//                camera.focusSelectScene();
 
             }
 

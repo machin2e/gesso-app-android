@@ -15,18 +15,18 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Process;
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 
-public class PatchFigure extends Figure<Patch> {
+public class PatchImage extends Image<Patch> {
 
     // Shapes
     private Rectangle boardShape = null;
 
-    public PatchFigure(Patch patch) {
+    public PatchImage(Patch patch) {
         super(patch);
         setup();
     }
@@ -60,8 +60,8 @@ public class PatchFigure extends Figure<Patch> {
 
                     Process process = action.getActionSequence();
 
-                    Figure targetFigure = scene.getFigureByPosition(action.getPosition());
-                    action.setTarget(targetFigure);
+                    Image targetImage = scene.getImageByPosition(action.getPosition());
+                    action.setTarget(targetImage);
 
                     if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
@@ -73,16 +73,16 @@ public class PatchFigure extends Figure<Patch> {
                         // TODO: Speak "choose a channel to getAction data."
 
                         // Show ports and paths of touched form
-                        for (PortFigure portFigure : getPortFigures()) {
+                        for (PortImage portFigure : getPortFigures()) {
                             List<Path> paths = portFigure.getPort().getGraph();
                             for (Path path : paths) {
 
                                 // Show ports
-                                scene.getFigure(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                scene.getFigure(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                scene.getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                scene.getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                 // Show path
-                                scene.getFigure(path).setVisibility(Visibility.VISIBLE);
+                                scene.getImage(path).setVisibility(Visibility.VISIBLE);
                             }
                         }
                     }
@@ -98,8 +98,8 @@ public class PatchFigure extends Figure<Patch> {
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
 
-                    // Update Figure
-                    PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirstAction().getTarget();
+                    // Update Image
+                    PortImage sourcePortFigure = (PortImage) action.getActionSequence().getFirstAction().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
                     sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
 
@@ -113,12 +113,12 @@ public class PatchFigure extends Figure<Patch> {
         return getConstruct();
     }
 
-    public List<PortFigure> getPortFigures() {
-        List<PortFigure> portFigures = new ArrayList<>();
+    public List<PortImage> getPortFigures() {
+        List<PortImage> portFigures = new ArrayList<>();
         Patch patch = getPatch();
 
         for (Port port : patch.getPorts()) {
-            PortFigure portFigure = (PortFigure) scene.getFigure(port);
+            PortImage portFigure = (PortImage) scene.getImage(port);
             portFigures.add(portFigure);
         }
 
@@ -126,7 +126,7 @@ public class PatchFigure extends Figure<Patch> {
     }
 
     // TODO: Remove this! Store Port index/id
-    public int getPortFigureIndex(PortFigure portFigure) {
+    public int getPortFigureIndex(PortImage portFigure) {
         Port port = (Port) scene.getModel(portFigure);
         if (getPatch().getPorts().contains(port)) {
             return this.getPatch().getPorts().indexOf(port);
@@ -151,7 +151,7 @@ public class PatchFigure extends Figure<Patch> {
                 Surface.drawRectangle((Rectangle) shapes.get(i), surface);
             }
 
-            if (Application.ENABLE_GEOMETRY_ANNOTATIONS) {
+            if (Application.ENABLE_GEOMETRY_LABELS) {
                 surface.getPaint().setColor(Color.GREEN);
                 surface.getPaint().setStyle(Paint.Style.STROKE);
                 Surface.drawCircle(getPosition(), boardShape.getWidth(), 0, surface);
@@ -165,26 +165,26 @@ public class PatchFigure extends Figure<Patch> {
     }
 
     public void showPortFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setVisibility(Visibility.VISIBLE);
             portFigure.showDocks();
         }
     }
 
     public void hidePortFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void showPathFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setPathVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void hidePathFigures() {
-        for (PortFigure portFigure : getPortFigures()) {
+        for (PortImage portFigure : getPortFigures()) {
             portFigure.setPathVisibility(Visibility.INVISIBLE);
             portFigure.showDocks();
         }

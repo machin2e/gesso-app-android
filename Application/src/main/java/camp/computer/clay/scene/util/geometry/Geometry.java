@@ -3,7 +3,7 @@ package camp.computer.clay.scene.util.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.scene.architecture.Figure;
+import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.Scene;
 
 public abstract class Geometry {
@@ -375,7 +375,7 @@ public abstract class Geometry {
      * @param positions
      * @return
      */
-    public static <T extends Figure> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
+    public static <T extends Image> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
 
         // Sort points based on distance from center
         List<T> sortedImages = sortByDistanceToPoint(positions, packingCenter);
@@ -465,7 +465,7 @@ public abstract class Geometry {
 
     }
 
-    public static <T extends Figure> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
+    public static <T extends Image> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
 
         // Initialize with unsorted list of points
         List<T> sortedList = new ArrayList(positions);
@@ -485,7 +485,7 @@ public abstract class Geometry {
         }
 
 //        String sortedListResult = "";
-//        for (Figure p: sortedList) {
+//        for (Image p: sortedList) {
 //            sortedListResult += calculateDistance(p.getPosition(), point) + ", ";
 //        }
 //        Log.v("Sort", sortedListResult);

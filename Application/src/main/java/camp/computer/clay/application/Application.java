@@ -55,7 +55,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // </Settings>
 
     // <Style>
-    public static boolean ENABLE_GEOMETRY_ANNOTATIONS = false;
+    public static boolean ENABLE_GEOMETRY_LABELS = false;
 
     /**
      * Hides the operating system's status and navigation bars. Setting this to false is helpful
@@ -448,6 +448,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         messageKeyboardLayout.requestLayout();
         messageKeyboardLayout.invalidate();
+    }
+
+    public camp.computer.clay.scene.util.geometry.Point convertToVisiblePosition(Point point) {
+        camp.computer.clay.scene.util.geometry.Point visiblePosition = new camp.computer.clay.scene.util.geometry.Point();
+        return visiblePosition;
     }
 
     public float convertDipToPx(float dip) {
