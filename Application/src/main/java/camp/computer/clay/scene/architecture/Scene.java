@@ -21,10 +21,10 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.scene.figure.BaseImage;
-import camp.computer.clay.scene.figure.PatchImage;
-import camp.computer.clay.scene.figure.PathImage;
-import camp.computer.clay.scene.figure.PortImage;
+import camp.computer.clay.scene.image.BaseImage;
+import camp.computer.clay.scene.image.PatchImage;
+import camp.computer.clay.scene.image.PathImage;
+import camp.computer.clay.scene.image.PortImage;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.Probability;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -55,7 +55,7 @@ public class Scene extends Image<Universe> {
 
                 Process process = action.getActionSequence();
 
-                Image targetImage = getImageByPosition(action.getPosition());
+                Image targetImage = getImageByCoordinate(action.getCoordinate());
                 action.setTarget(targetImage);
 
                 Camera camera = action.getActor().getCamera();
@@ -90,16 +90,16 @@ public class Scene extends Image<Universe> {
                         // Camera
                         if (process.getSize() > 1) {
                             camera.setOffset(
-                                    action.getPosition().getX() - process.getFirstAction().getPosition().getX(),
-                                    action.getPosition().getY() - process.getFirstAction().getPosition().getY()
+                                    action.getCoordinate().getX() - process.getFirstAction().getCoordinate().getX(),
+                                    action.getCoordinate().getY() - process.getFirstAction().getCoordinate().getY()
                             );
 
                         }
 
 //                    camera.setScale(0.9f);
 //                    camera.setOffset(
-//                            action.getPosition().getX() - process.getFirstAction().getPosition().getX(),
-//                            action.getPosition().getY() - process.getFirstAction().getPosition().getY()
+//                            action.getCoordinate().getX() - process.getFirstAction().getCoordinate().getX(),
+//                            action.getCoordinate().getY() - process.getFirstAction().getCoordinate().getY()
 //                    );
 
                     }
@@ -122,7 +122,7 @@ public class Scene extends Image<Universe> {
 
                         if (process.getSource() instanceof Base) {
 
-                            Log.v("Test","Create Patch from Base");
+                            Log.v("Test", "Create Patch from Base");
 
                             // Select patch to connect
                             Application.getDisplay().displayChooseDialog();
@@ -157,7 +157,7 @@ public class Scene extends Image<Universe> {
 
                         } else if (process.getSource() instanceof Port) {
 
-                            Log.v("Test","Create Patch from Port");
+                            Log.v("Test", "Create Patch from Port");
 
                             PortImage sourcePortImage = (PortImage) action.getActionSequence().getFirstAction().getTarget();
 
@@ -179,12 +179,12 @@ public class Scene extends Image<Universe> {
 
                                 // Create Patch Image
                                 PatchImage patchImage = new PatchImage(patch);
-                                patchImage.setPosition(action.getPosition());
+                                patchImage.setCoordinate(action.getCoordinate());
 
                                 // Set Rotation
                                 double patchRotation = Geometry.calculateRotationAngle(
-                                        sourcePortImage.getPosition(),
-                                        patchImage.getPosition()
+                                        sourcePortImage.getCoordinate(),
+                                        patchImage.getCoordinate()
                                 );
                                 patchImage.setRotation(patchRotation + 90);
 
@@ -314,9 +314,9 @@ public class Scene extends Image<Universe> {
         // Add image
         getLayer(layerTag).add(image);
 
-        // Position image
+        // Coordinate image
         if (image instanceof BaseImage) {
-            adjustImagePosition(image);
+            adjustImageCoordinate(image);
         }
 
         // Update perspective
@@ -347,7 +347,7 @@ public class Scene extends Image<Universe> {
      *
      * @param image The {@code Image} for which the position will be adjusted.
      */
-    private void adjustImagePosition(Image image) {
+    private void adjustImageCoordinate(Image image) {
 
         int adjustmentMethod = 1;
 
@@ -356,28 +356,28 @@ public class Scene extends Image<Universe> {
             // Calculate random positions separated by minimum distance
             final float imageSeparationDistance = 550; // 500;
 
-            List<Point> imagePositions = getImages().filterType(Base.class).getPositions();
+            List<Point> imageCoordinates = getImages().filterType(Base.class).getCoordinates();
 
             Point position = null;
             boolean foundPoint = false;
 
-            Log.v("Position", "figurePositions.size = " + imagePositions.size());
+            Log.v("Coordinate", "imageCoordinates.size = " + imageCoordinates.size());
 
-            if (imagePositions.size() == 0) {
+            if (imageCoordinates.size() == 0) {
 
                 position = new Point(0, 0);
 
-            } else if (imagePositions.size() == 1) {
+            } else if (imageCoordinates.size() == 1) {
 
                 position = Geometry.calculatePoint(
-                        imagePositions.get(0),
+                        imageCoordinates.get(0),
                         Probability.generateRandomInteger(0, 360),
                         imageSeparationDistance
                 );
 
             } else {
 
-                List<Point> hullPoints = Geometry.computeConvexHull(imagePositions);
+                List<Point> hullPoints = Geometry.computeConvexHull(imageCoordinates);
 
                 int sourceIndex = Probability.generateRandomInteger(0, hullPoints.size() - 1);
                 int targetIndex = sourceIndex + 1;
@@ -391,26 +391,26 @@ public class Scene extends Image<Universe> {
             }
 
             // Assign the found position to the image
-            image.setPosition(position);
+            image.setCoordinate(position);
             image.setRotation(Probability.getRandomGenerator().nextInt(360));
         }
 
         if (adjustmentMethod == 1) {
 
-            List<Image> figurePositions = getImages().filterType(Base.class).getList();
+            List<Image> imageCoordinates = getImages().filterType(Base.class).getList();
 
             // Set position
-            if (figurePositions.size() == 1) {
-                figurePositions.get(0).setPosition(new Point(0, 0));
-            } else if (figurePositions.size() == 2) {
-                figurePositions.get(0).setPosition(new Point(-300, 0));
-                figurePositions.get(1).setPosition(new Point(300, 0));
-            } else if (figurePositions.size() == 5) {
-                figurePositions.get(0).setPosition(new Point(-300, -600));
-                figurePositions.get(1).setPosition(new Point(300, -600));
-                figurePositions.get(2).setPosition(new Point(-300, 0));
-                figurePositions.get(3).setPosition(new Point(300, 0));
-                figurePositions.get(4).setPosition(new Point(-300, 600));
+            if (imageCoordinates.size() == 1) {
+                imageCoordinates.get(0).setCoordinate(new Point(0, 0));
+            } else if (imageCoordinates.size() == 2) {
+                imageCoordinates.get(0).setCoordinate(new Point(-300, 0));
+                imageCoordinates.get(1).setCoordinate(new Point(300, 0));
+            } else if (imageCoordinates.size() == 5) {
+                imageCoordinates.get(0).setCoordinate(new Point(-300, -600));
+                imageCoordinates.get(1).setCoordinate(new Point(300, -600));
+                imageCoordinates.get(2).setCoordinate(new Point(-300, 0));
+                imageCoordinates.get(3).setCoordinate(new Point(300, 0));
+                imageCoordinates.get(4).setCoordinate(new Point(-300, 600));
             }
 
             // Set rotation
@@ -423,7 +423,7 @@ public class Scene extends Image<Universe> {
      * specified {@code Construct}.
      *
      * @param construct The {@code Construct} for which the corresponding {@code Image} will be
-     * returned, if any.
+     *                  returned, if any.
      * @return The {@code Image} corresponding to the specified {@code Construct}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
@@ -492,7 +492,7 @@ public class Scene extends Image<Universe> {
         return getImages().filterType(types);
     }
 
-    public Image getImageByPosition(Point point) {
+    public Image getImageByCoordinate(Point point) {
         List<Image> images = getImages().filterVisibility(Visibility.VISIBLE).getList();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
@@ -507,11 +507,11 @@ public class Scene extends Image<Universe> {
         return getConstruct();
     }
 
-    public static <T extends Image> List<Point> getPositions(List<T> figures) {
+    public static <T extends Image> List<Point> getCoordinates(List<T> figures) {
         List<Point> positions = new ArrayList<>();
         for (int i = 0; i < figures.size(); i++) {
             T figure = figures.get(i);
-            positions.add(figure.getPosition());
+            positions.add(figure.getCoordinate());
         }
         return positions;
     }
@@ -550,45 +550,18 @@ public class Scene extends Image<Universe> {
         }
         // </DEBUG_LABEL>
 
-        Layer layer = null;
-
-        layer = getLayer("bases");
-        if (layer != null) {
-            for (int i = 0; i < layer.getImages().size(); i++) {
-                layer.getImages().get(i).draw(surface);
-            }
-        }
-
-        layer = getLayer("paths");
-        if (layer != null) {
-            for (int i = 0; i < layer.getImages().size(); i++) {
-                layer.getImages().get(i).draw(surface);
-            }
-        }
-
-        layer = getLayer("patches");
-        if (layer != null) {
-            for (int i = 0; i < layer.getImages().size(); i++) {
-                layer.getImages().get(i).draw(surface);
-            }
-        }
-
-        layer = getLayer("ports");
-        if (layer != null) {
-            for (int i = 0; i < layer.getImages().size(); i++) {
-                layer.getImages().get(i).draw(surface);
-            }
-        }
+        // Draw Layers
+        drawLayers(surface);
 
         // <DEBUG_LABEL>
         if (Application.ENABLE_GEOMETRY_LABELS) {
 
             // <FPS_LABEL>
-            Point fpsPosition = getImages().filterType(Base.class).getCenterPoint();
-            fpsPosition.setY(fpsPosition.getY() - 200);
+            Point fpsCoordinate = getImages().filterType(Base.class).getCenterPoint();
+            fpsCoordinate.setY(fpsCoordinate.getY() - 200);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
-            surface.getCanvas().drawCircle((float) fpsPosition.getX(), (float) fpsPosition.getY(), 10, surface.getPaint());
+            surface.getCanvas().drawCircle((float) fpsCoordinate.getX(), (float) fpsCoordinate.getY(), 10, surface.getPaint());
 
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getPaint().setTextSize(35);
@@ -596,14 +569,14 @@ public class Scene extends Image<Universe> {
             String fpsText = "FPS: " + (int) surface.getRenderer().getFramesPerSecond();
             Rect fpsTextBounds = new Rect();
             surface.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-            surface.getCanvas().drawText(fpsText, (float) fpsPosition.getX() + 20, (float) fpsPosition.getY() + fpsTextBounds.height() / 2.0f, surface.getPaint());
+            surface.getCanvas().drawText(fpsText, (float) fpsCoordinate.getX() + 20, (float) fpsCoordinate.getY() + fpsTextBounds.height() / 2.0f, surface.getPaint());
             // </FPS_LABEL>
 
             // <CENTROID_LABEL>
-            Point centroidPosition = getImages().filterType(Base.class).getCentroidPoint();
+            Point centroidCoordinate = getImages().filterType(Base.class).getCentroidPoint();
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
-            surface.getCanvas().drawCircle((float) centroidPosition.getX(), (float) centroidPosition.getY(), 10, surface.getPaint());
+            surface.getCanvas().drawCircle((float) centroidCoordinate.getX(), (float) centroidCoordinate.getY(), 10, surface.getPaint());
 
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getPaint().setTextSize(35);
@@ -611,15 +584,15 @@ public class Scene extends Image<Universe> {
             String text = "CENTROID";
             Rect bounds = new Rect();
             surface.getPaint().getTextBounds(text, 0, text.length(), bounds);
-            surface.getCanvas().drawText(text, (float) centroidPosition.getX() + 20, (float) centroidPosition.getY() + bounds.height() / 2.0f, surface.getPaint());
+            surface.getCanvas().drawText(text, (float) centroidCoordinate.getX() + 20, (float) centroidCoordinate.getY() + bounds.height() / 2.0f, surface.getPaint());
             // </CENTROID_LABEL>
 
             // <CENTER_LABEL>
-            List<Point> figurePositions = getImages().filterType(Base.class, Patch.class).getPositions();
-            Point baseImagesCenterPosition = Geometry.calculateCenterPosition(figurePositions);
+            List<Point> figureCoordinates = getImages().filterType(Base.class, Patch.class).getCoordinates();
+            Point baseImagesCenterCoordinate = Geometry.calculateCenterCoordinate(figureCoordinates);
             surface.getPaint().setColor(Color.RED);
             surface.getPaint().setStyle(Paint.Style.FILL);
-            surface.getCanvas().drawCircle((float) baseImagesCenterPosition.getX(), (float) baseImagesCenterPosition.getY(), 10, surface.getPaint());
+            surface.getCanvas().drawCircle((float) baseImagesCenterCoordinate.getX(), (float) baseImagesCenterCoordinate.getY(), 10, surface.getPaint());
 
             surface.getPaint().setStyle(Paint.Style.FILL);
             surface.getPaint().setTextSize(35);
@@ -627,7 +600,7 @@ public class Scene extends Image<Universe> {
             String centerLabeltext = "CENTER";
             Rect centerLabelTextBounds = new Rect();
             surface.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-            surface.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterPosition.getX() + 20, (float) baseImagesCenterPosition.getY() + centerLabelTextBounds.height() / 2.0f, surface.getPaint());
+            surface.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterCoordinate.getX() + 20, (float) baseImagesCenterCoordinate.getY() + centerLabelTextBounds.height() / 2.0f, surface.getPaint());
             // </CENTER_LABEL>
 
             // <CONVEX_HULL_LABEL>
@@ -678,6 +651,39 @@ public class Scene extends Image<Universe> {
         // </DEBUG_LABEL>
     }
 
+    private void drawLayers(Surface surface) {
+
+        Layer layer = null;
+
+        layer = getLayer("bases");
+        if (layer != null) {
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
+            }
+        }
+
+        layer = getLayer("paths");
+        if (layer != null) {
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
+            }
+        }
+
+        layer = getLayer("patches");
+        if (layer != null) {
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
+            }
+        }
+
+        layer = getLayer("ports");
+        if (layer != null) {
+            for (int i = 0; i < layer.getImages().size(); i++) {
+                layer.getImages().get(i).draw(surface);
+            }
+        }
+    }
+
     public List<Integer> getLayerIndices() {
         List<Integer> layerIndices = new ArrayList<>();
         for (int i = 0; i < layers.size(); i++) {
@@ -704,7 +710,7 @@ public class Scene extends Image<Universe> {
 
 //    public void onTouchListener(Action action) {
 //
-//        Image targetFigure = getImageByPosition(action.getPosition());
+//        Image targetFigure = getImageByCoordinate(action.getCoordinate());
 //        action.setTarget(targetFigure);
 //
 //        action.getTarget().processAction(action);
@@ -713,7 +719,7 @@ public class Scene extends Image<Universe> {
 //
 //    public void onHoldListener(Action action) {
 //
-//        Image targetFigure = getImageByPosition(action.getPosition());
+//        Image targetFigure = getImageByCoordinate(action.getCoordinate());
 //        action.setTarget(targetFigure);
 //
 //        action.getTarget().processAction(action);
@@ -724,7 +730,7 @@ public class Scene extends Image<Universe> {
 //
 //        Process actionSequence = action.getActionSequence();
 //
-//        Image targetFigure = getImageByPosition(action.getPosition());
+//        Image targetFigure = getImageByCoordinate(action.getCoordinate());
 //        action.setTarget(targetFigure);
 //
 //        Camera camera = action.getActor().getCamera();
@@ -742,7 +748,7 @@ public class Scene extends Image<Universe> {
 //
 ////                // Base
 ////                action.getTarget().processAction(action);
-////                action.getTarget().setPosition(action.getPosition());
+////                action.getTarget().setCoordinate(action.getCoordinate());
 ////
 ////                // Camera
 ////                camera.focusSelectBase(action);
@@ -753,7 +759,7 @@ public class Scene extends Image<Universe> {
 ////                PortImage portFigure = (PortImage) action.getTarget();
 ////
 ////                portFigure.setDragging(true);
-////                portFigure.setPosition(action.getPosition());
+////                portFigure.setCoordinate(action.getCoordinate());
 //
 //            } else if (action.getTarget() instanceof Scene) {
 //
@@ -786,7 +792,7 @@ public class Scene extends Image<Universe> {
 //            } else if (action.getTarget() instanceof PatchImage) {
 //
 ////                // Patch
-////                action.getTarget().setPosition(action.getPosition());
+////                action.getTarget().setCoordinate(action.getCoordinate());
 ////                action.getTarget().processAction(action);
 //
 //            } else if (action.getTarget() instanceof Scene) {
@@ -794,8 +800,8 @@ public class Scene extends Image<Universe> {
 ////                // Camera
 ////                if (actionSequence.getSize() > 1) {
 ////                    camera.setOffset(
-////                            action.getPosition().getX() - actionSequence.getFirstAction().getPosition().getX(),
-////                            action.getPosition().getY() - actionSequence.getFirstAction().getPosition().getY()
+////                            action.getCoordinate().getX() - actionSequence.getFirstAction().getCoordinate().getX(),
+////                            action.getCoordinate().getY() - actionSequence.getFirstAction().getCoordinate().getY()
 ////                    );
 ////
 ////                }
@@ -810,7 +816,7 @@ public class Scene extends Image<Universe> {
 
         action.setType(Action.Type.UNSELECT);
 
-        Image targetImage = getImageByPosition(action.getPosition());
+        Image targetImage = getImageByCoordinate(action.getCoordinate());
         action.setTarget(targetImage);
 
         Camera camera = action.getActor().getCamera();

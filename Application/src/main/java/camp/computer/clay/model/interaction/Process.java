@@ -52,7 +52,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
 //                    getFirstAction().getActor().getCamera().getScene().onHoldListener(thisProcess.getFirstAction());
 
                     Action action = thisProcess.getFirstAction();
-                    Image targetImage = getFirstAction().getActor().getScene().getImageByPosition(action.getPosition());
+                    Image targetImage = getFirstAction().getActor().getScene().getImageByCoordinate(action.getCoordinate());
                     action.setTarget(targetImage);
 
                     action.getTarget().processAction(action);
@@ -83,8 +83,8 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
 
         actions.add(action);
 
-        offsetX += action.getPosition().getX();
-        offsetY += action.getPosition().getY();
+        offsetX += action.getCoordinate().getX();
+        offsetY += action.getCoordinate().getY();
 
         if (actions.size() == 1) {
 
@@ -95,7 +95,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
         } else if (actions.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), getFirstAction().points[action.pointerIndex]);
+            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getCoordinate(), getFirstAction().points[action.pointerIndex]);
 
             if (getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                 isDragging[action.pointerIndex] = true;
@@ -157,11 +157,11 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
     }
 
     public ArrayList<Point> getTouchPath() {
-        ArrayList<Point> touchPositions = new ArrayList<>();
+        ArrayList<Point> touchCoordinates = new ArrayList<>();
         for (int i = 0; i < actions.size(); i++) {
-            touchPositions.add(actions.get(i).getPosition());
+            touchCoordinates.add(actions.get(i).getCoordinate());
         }
-        return touchPositions;
+        return touchCoordinates;
     }
 
     public boolean isHolding() {
@@ -189,8 +189,8 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
         Action firstAction = getFirstAction();
         Action lastAction = getLastAction();
         double distance = Geometry.calculateDistance(
-                firstAction.getPosition(),
-                lastAction.getPosition()
+                firstAction.getCoordinate(),
+                lastAction.getCoordinate()
         );
         return distance;
     }

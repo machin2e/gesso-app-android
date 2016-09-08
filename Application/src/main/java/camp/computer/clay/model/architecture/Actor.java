@@ -101,7 +101,7 @@ public class Actor { // Controller
                 // Process the action
 
                 // Set the target
-                Image targetImage = getCamera().getScene().getImageByPosition(action.getPosition());
+                Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
                 action.setTarget(targetImage);
 
                 action.getTarget().processAction(action);
@@ -123,7 +123,7 @@ public class Actor { // Controller
                 if (process.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                     // action.setType(Action.Type.MOVE);
 
-                    Image targetImage = getCamera().getScene().getImageByPosition(action.getPosition());
+                    Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
                     action.setTarget(targetImage);
 
                     // <HACK>
@@ -161,7 +161,7 @@ public class Actor { // Controller
 //                }
 
                 // Set the target
-                Image targetImage = getCamera().getScene().getImageByPosition(action.getPosition());
+                Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
                 action.setTarget(targetImage);
 
                 action.getTarget().processAction(action);

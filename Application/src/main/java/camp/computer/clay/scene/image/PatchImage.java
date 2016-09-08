@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.figure;
+package camp.computer.clay.scene.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -60,7 +60,7 @@ public class PatchImage extends Image<Patch> {
 
                     Process process = action.getActionSequence();
 
-                    Image targetImage = scene.getImageByPosition(action.getPosition());
+                    Image targetImage = scene.getImageByCoordinate(action.getCoordinate());
                     action.setTarget(targetImage);
 
                     if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
@@ -154,8 +154,8 @@ public class PatchImage extends Image<Patch> {
             if (Application.ENABLE_GEOMETRY_LABELS) {
                 surface.getPaint().setColor(Color.GREEN);
                 surface.getPaint().setStyle(Paint.Style.STROKE);
-                Surface.drawCircle(getPosition(), boardShape.getWidth(), 0, surface);
-                Surface.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, surface);
+                Surface.drawCircle(getCoordinate(), boardShape.getWidth(), 0, surface);
+                Surface.drawCircle(getCoordinate(), boardShape.getWidth() / 2.0f, 0, surface);
             }
         }
     }
@@ -192,7 +192,7 @@ public class PatchImage extends Image<Patch> {
 
     public boolean contains(Point point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
+            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
         } else {
             return false;
         }
@@ -200,7 +200,7 @@ public class PatchImage extends Image<Patch> {
 
     public boolean contains(Point point, double padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
+            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
         } else {
             return false;
         }

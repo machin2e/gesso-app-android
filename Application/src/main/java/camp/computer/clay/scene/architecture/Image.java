@@ -59,7 +59,7 @@ public abstract class Image<T extends Construct> {
         return null;
     }
 
-    public Point getPosition() {
+    public Point getCoordinate() {
         return this.position;
     }
 
@@ -71,7 +71,7 @@ public abstract class Image<T extends Construct> {
         return this.scale;
     }
 
-    public void setPosition(Point position) {
+    public void setCoordinate(Point position) {
         this.position.set(position.getX(), position.getY());
     }
 
@@ -104,13 +104,13 @@ public abstract class Image<T extends Construct> {
     }
 
     public void addShape(Shape shape) {
-        shape.getPosition().setReferencePoint(getPosition());
+        shape.getCoordinate().setReferencePoint(getCoordinate());
         shapes.add(shape);
     }
 
     public <T extends Shape> void addShape(T shape, String label) {
         shape.setLabel(label);
-        shape.getPosition().setReferencePoint(getPosition());
+        shape.getCoordinate().setReferencePoint(getCoordinate());
         shapes.add(shape);
     }
 
@@ -188,7 +188,7 @@ public abstract class Image<T extends Construct> {
             for (Point shapeVertex : shape.getVertices()) {
 
                 // Rotate shape about its center point
-                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getPosition(), shape.getRotation(), shapeVertex);
+                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getCoordinate(), shape.getRotation(), shapeVertex);
 
                 // Rotate shape vertices about the shape's reference point
                 Point referencePoint = position;

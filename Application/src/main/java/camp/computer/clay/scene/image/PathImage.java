@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.figure;
+package camp.computer.clay.scene.image;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -95,20 +95,20 @@ public class PathImage extends Image<Path> {
         paint.setColor(sourcePortImage.getUniqueColor());
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortImage.getPosition(),
-                targetPortImage.getPosition()
+                sourcePortImage.getCoordinate(),
+                targetPortImage.getCoordinate()
         );
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
-        Point pathStartPosition = Geometry.calculatePoint(
-                sourcePortImage.getPosition(),
+        Point pathStartCoordinate = Geometry.calculatePoint(
+                sourcePortImage.getCoordinate(),
                 pathRotationAngle,
                 2 * triangleSpacing
         );
 
-        Point pathStopPosition = Geometry.calculatePoint(
-                targetPortImage.getPosition(),
+        Point pathStopCoordinate = Geometry.calculatePoint(
+                targetPortImage.getCoordinate(),
                 pathRotationAngle + 180,
                 2 * triangleSpacing
         );
@@ -117,7 +117,7 @@ public class PathImage extends Image<Path> {
 
             paint.setStyle(Paint.Style.FILL);
             Surface.drawTriangle(
-                    pathStartPosition,
+                    pathStartCoordinate,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
@@ -126,7 +126,7 @@ public class PathImage extends Image<Path> {
 
             paint.setStyle(Paint.Style.FILL);
             Surface.drawTriangle(
-                    pathStopPosition,
+                    pathStopCoordinate,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
@@ -136,8 +136,8 @@ public class PathImage extends Image<Path> {
         } else {
 
             Surface.drawTrianglePath(
-                    pathStartPosition,
-                    pathStopPosition,
+                    pathStartCoordinate,
+                    pathStopCoordinate,
                     triangleWidth,
                     triangleHeight,
                     surface
@@ -165,8 +165,8 @@ public class PathImage extends Image<Path> {
         paint.setColor(sourcePortImage.getUniqueColor());
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortImage.getPosition(),
-                targetPortImage.getPosition()
+                sourcePortImage.getCoordinate(),
+                targetPortImage.getCoordinate()
         );
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
@@ -174,13 +174,13 @@ public class PathImage extends Image<Path> {
 //        if (showDocks) {
 //
 //            Point pathStartPosition = Geometry.calculatePoint(
-//                    sourcePortImage.getPosition(),
+//                    sourcePortImage.getCoordinate(),
 //                    pathRotationAngle,
 //                    1.4 * triangleSpacing
 //            );
 //
 //            Point pathStopPosition = Geometry.calculatePoint(
-//                    targetPortImage.getPosition(),
+//                    targetPortImage.getCoordinate(),
 //                    pathRotationAngle + 180,
 //                    1.4 * triangleSpacing
 //            );
@@ -219,21 +219,21 @@ public class PathImage extends Image<Path> {
 //
 //        } else {
 
-            Point pathStartPosition = Geometry.calculatePoint(
-                    sourcePortImage.getPosition(),
+            Point pathStartCoordinate = Geometry.calculatePoint(
+                    sourcePortImage.getCoordinate(),
                     pathRotationAngle,
                     0
             );
 
-            Point pathStopPosition = Geometry.calculatePoint(
-                    targetPortImage.getPosition(),
+            Point pathStopCoordinate = Geometry.calculatePoint(
+                    targetPortImage.getCoordinate(),
                     pathRotationAngle + 180,
                     0
             );
 
             Surface.drawLine(
-                    pathStartPosition,
-                    pathStopPosition,
+                    pathStartCoordinate,
+                    pathStopCoordinate,
                     surface
             );
 //        }
@@ -248,11 +248,11 @@ public class PathImage extends Image<Path> {
 //            Path path = getPath();
 //
 //            PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
-//            PortImage targetPortImage = (PortImage) getScene().getImage(path.getImageByPosition());
+//            PortImage targetPortImage = (PortImage) getScene().getImage(path.getImageByCoordinate());
 //
 //            double distanceToLine = Geometry.calculateLineToPointDistance(
-//                    sourcePortImage.getPosition(),
-//                    targetPortImage.getPosition(),
+//                    sourcePortImage.getCoordinate(),
+//                    targetPortImage.getCoordinate(),
 //                    point,
 //                    true
 //            );

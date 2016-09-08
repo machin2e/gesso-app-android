@@ -3,7 +3,7 @@ package camp.computer.clay.scene.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.scene.figure.PortImage;
+import camp.computer.clay.scene.image.PortImage;
 
 public abstract class Color {
 

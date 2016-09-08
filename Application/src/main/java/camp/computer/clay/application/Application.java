@@ -49,7 +49,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     // <Settings>
     private static final boolean ENABLE_TONE_GENERATOR = false;
     private static final boolean ENABLE_SPEECH_GENERATOR = false;
-    private static final boolean ENABLE_MOTION_SENSOR = false;
+    private static final boolean ENABLE_MOTION_SENSOR = true;
 
     private static final long MESSAGE_SEND_FREQUENCY = 500;
     // </Settings>

@@ -23,11 +23,11 @@ public abstract class Shape {
         this.position.set(position);
     }
 
-    public Point getPosition() {
+    public Point getCoordinate() {
         return position;
     }
 
-    public void setPosition(double x, double y) {
+    public void setCoordinate(double x, double y) {
         this.position.set(x, y);
     }
 

@@ -103,7 +103,7 @@ public class Action {
         this.type = type;
     }
 
-    public Point getPosition() {
+    public Point getCoordinate() {
         return this.points[0];
     }
 

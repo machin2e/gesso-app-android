@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.figure;
+package camp.computer.clay.scene.image;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -39,126 +39,117 @@ public class BaseImage extends Image<Base> {
 
     private void setupShapes() {
 
+        Rectangle rectangle = null;
+
         // Create shapes for figure
-        Rectangle boardShape = new Rectangle(250, 250);
-        boardShape.setLabel("board");
-        boardShape.setColor("#f7f7f7");
-        boardShape.setOutlineThickness(1);
-        addShape(boardShape);
+        rectangle = new Rectangle(250, 250);
+        rectangle.setLabel("board");
+        rectangle.setColor("#f7f7f7");
+        rectangle.setOutlineThickness(1);
+        addShape(rectangle);
 
         // Headers
-        Rectangle headerShape1 = new Rectangle(50, 14);
-        headerShape1.setPosition(0, 132);
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header 1");
+        rectangle.setCoordinate(0, 132);
         // headerShape1.setRotation(0);
-        headerShape1.setColor("#3b3b3b");
-        headerShape1.setOutlineThickness(0);
-        addShape(headerShape1);
+        rectangle.setColor("#3b3b3b");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
 
-        Rectangle headerShape2 = new Rectangle(50, 14);
-        headerShape2.setPosition(132, 0);
-        headerShape2.setRotation(90);
-        headerShape2.setColor("#3b3b3b");
-        headerShape2.setOutlineThickness(0);
-        addShape(headerShape2);
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header 2");
+        rectangle.setCoordinate(132, 0);
+        rectangle.setRotation(90);
+        rectangle.setColor("#3b3b3b");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
 
-        Rectangle headerShape3 = new Rectangle(50, 14);
-        headerShape3.setPosition(0, -132);
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header 3");
+        rectangle.setCoordinate(0, -132);
         // headerShape3.setRotation(180);
-        headerShape3.setColor("#3b3b3b");
-        headerShape3.setOutlineThickness(0);
-        addShape(headerShape3);
+        rectangle.setColor("#3b3b3b");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
 
-        Rectangle headerShape4 = new Rectangle(50, 14);
-        headerShape4.setPosition(-132, 0);
-        headerShape4.setRotation(90);
-        headerShape4.setColor("#3b3b3b");
-        headerShape4.setOutlineThickness(0);
-        addShape(headerShape4);
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header 4");
+        rectangle.setCoordinate(-132, 0);
+        rectangle.setRotation(90);
+        rectangle.setColor("#3b3b3b");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
 
         // Lights
-        Rectangle light1 = new Rectangle(12, 20);
-        light1.setLabel("LED 1");
-        light1.setPosition(-20, 105);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 1");
+        rectangle.setCoordinate(-20, 105);
         // light1.setRotation(90);
-//        lightShapes.add(light1);
-        addShape(light1);
+        addShape(rectangle);
 
-        Rectangle light2 = new Rectangle(12, 20);
-        light2.setLabel("LED 2");
-        light2.setPosition(0, 105);
-//        light2.setRotation(90);
-//        lightShapes.add(light2);
-        addShape(light2);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 2");
+        rectangle.setCoordinate(0, 105);
+        // light1.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light3 = new Rectangle(12, 20);
-        light3.setLabel("LED 3");
-        light3.setPosition(20, 105);
-//        light3.setRotation(90);
-//        lightShapes.add(light3);
-        addShape(light3);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 3");
+        rectangle.setCoordinate(20, 105);
+        // light1.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light4 = new Rectangle(12, 20);
-        light4.setLabel("LED 4");
-        light4.setPosition(105, 20);
-        light4.setRotation(90);
-//        lightShapes.add(light4);
-        addShape(light4);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 4");
+        rectangle.setCoordinate(105, 20);
+        rectangle.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light5 = new Rectangle(12, 20);
-        light5.setLabel("LED 5");
-        light5.setPosition(105, 0);
-        light5.setRotation(90);
-//        lightShapes.add(light5);
-        addShape(light5);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 5");
+        rectangle.setCoordinate(105, 0);
+        rectangle.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light6 = new Rectangle(12, 20);
-        light6.setLabel("LED 6");
-        light6.setPosition(105, -20);
-        light6.setRotation(90);
-//        lightShapes.add(light6);
-        addShape(light6);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 6");
+        rectangle.setCoordinate(105, -20);
+        rectangle.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light7 = new Rectangle(12, 20);
-        light7.setLabel("LED 7");
-        light7.setPosition(20, -105);
-//        light7.setRotation(90);
-//        lightShapes.add(light7);
-        addShape(light7);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 7");
+        rectangle.setCoordinate(20, -105);
+        addShape(rectangle);
 
-        Rectangle light8 = new Rectangle(12, 20);
-        light8.setLabel("LED 8");
-        light8.setPosition(0, -105);
-//        light8.setRotation(90);
-//        lightShapes.add(light8);
-        addShape(light8);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 8");
+        rectangle.setCoordinate(0, -105);
+        addShape(rectangle);
 
-        Rectangle light9 = new Rectangle(12, 20);
-        light9.setLabel("LED 9");
-        light9.setPosition(-20, -105);
-//        light9.setRotation(90);
-//        lightShapes.add(light9);
-        addShape(light9);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 9");
+        rectangle.setCoordinate(-20, -105);
+        addShape(rectangle);
 
-        Rectangle light10 = new Rectangle(12, 20);
-        light10.setLabel("LED 10");
-        light10.setPosition(-105, -20);
-        light10.setRotation(90);
-//        lightShapes.add(light10);
-        addShape(light10);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 10");
+        rectangle.setCoordinate(-105, -20);
+        rectangle.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light11 = new Rectangle(12, 20);
-        light11.setLabel("LED 11");
-        light11.setPosition(-105, 0);
-        light11.setRotation(90);
-//        lightShapes.add(light11);
-        addShape(light11);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 11");
+        rectangle.setCoordinate(-105, 0);
+        rectangle.setRotation(90);
+        addShape(rectangle);
 
-        Rectangle light12 = new Rectangle(12, 20);
-        light12.setLabel("LED 12");
-        light12.setPosition(-105, 20);
-        light12.setRotation(90);
-//        lightShapes.add(light12);
-        addShape(light12);
+        rectangle = new Rectangle(12, 20);
+        rectangle.setLabel("LED 12");
+        rectangle.setCoordinate(-105, 20);
+        rectangle.setRotation(90);
+        addShape(rectangle);
 
     }
 
@@ -187,7 +178,7 @@ public class BaseImage extends Image<Base> {
 
                         // Base
                         action.getTarget().processAction(action);
-                        action.getTarget().setPosition(action.getPosition());
+                        action.getTarget().setCoordinate(action.getCoordinate());
 
                         // Camera
                         camera.focusSelectBase(action);
@@ -196,12 +187,12 @@ public class BaseImage extends Image<Base> {
 
 
                         // Update position
-                        // action.getTarget().setPosition(action.getPosition());
+                        // action.getTarget().setCoordinate(action.getCoordinate());
 
-                        hidePortFigures();
-                        hidePathFigures();
+                        hidePortImages();
+                        hidePathImages();
 
-                        candidatePatchPosition.set(action.getPosition());
+                        candidatePatchCoordinate.set(action.getCoordinate());
 
                         setCandidatePatchVisibility(Visibility.VISIBLE);
 
@@ -209,25 +200,26 @@ public class BaseImage extends Image<Base> {
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
 
-                    Image targetImage = scene.getImageByPosition(action.getPosition());
+                    Image targetImage = scene.getImageByCoordinate(action.getCoordinate());
                     action.setTarget(targetImage);
 
                     if (process.isTap()) {
 
                         // Focus on touched form
-                        showPathFigures();
-                        showPortFigures();
+                        showPathImages();
+                        showPortImages();
 
                         setTransparency(1.0);
 
                         // TODO: Speak "choose a channel to getAction data."
 
                         // Show ports and paths of touched form
-                        for (int i = 0; i < getPortFigures().size(); i++) {
-                            PortImage portFigure = getPortFigures().get(i);
-                            List<Path> paths = portFigure.getPort().getGraph();
+                        for (int i = 0; i < getPortImages().size(); i++) {
+                            PortImage portImage = getPortImages().get(i);
+                            List<Path> paths = portImage.getPort().getGraph();
                             Log.v("TouchFrame", "\tpaths.size = " + paths.size());
-                            for (Path path : paths) {
+                            for (int j = 0; j < paths.size(); j++) {
+                                Path path = paths.get(j);
                                 Log.v("TouchFrame", "\t\tsource = " + path.getSource());
                                 Log.v("TouchFrame", "\t\ttarget = " + path.getTarget());
                                 // Show ports
@@ -290,20 +282,21 @@ public class BaseImage extends Image<Base> {
         return getConstruct();
     }
 
-    public List<PortImage> getPortFigures() {
-        List<PortImage> portFigures = new ArrayList<>();
+    public List<PortImage> getPortImages() {
+        List<PortImage> portImages = new ArrayList<>();
 
-        for (Port port : getBase().getPorts()) {
-            PortImage portFigure = (PortImage) getScene().getImage(port);
-            portFigures.add(portFigure);
+        for (int i = 0; i < getBase().getPorts().size(); i++) {
+            Port port = getBase().getPorts().get(i);
+            PortImage portImage = (PortImage) getScene().getImage(port);
+            portImages.add(portImage);
         }
 
-        return portFigures;
+        return portImages;
     }
 
     // TODO: Remove this! Store Port index/id
-    public int getPortFigureIndex(PortImage portFigure) {
-        Port port = (Port) getScene().getModel(portFigure);
+    public int getPortImageIndex(PortImage portImage) {
+        Port port = (Port) getScene().getModel(portImage);
         if (getBase().getPorts().contains(port)) {
             return this.getBase().getPorts().indexOf(port);
         }
@@ -330,7 +323,7 @@ public class BaseImage extends Image<Base> {
         for (int i = 0; i < lightShapes.length; i++) {
             Port port = getBase().getPort(i);
             if (port.getType() != Port.Type.NONE) {
-                int intColor = getPortFigures().get(i).getUniqueColor();
+                int intColor = getPortImages().get(i).getUniqueColor();
                 String hexColor = camp.computer.clay.scene.util.Color.getHexColorString(intColor);
                 lightShapes[i].setColor(hexColor);
             } else {
@@ -365,8 +358,8 @@ public class BaseImage extends Image<Base> {
                 surface.getPaint().setColor(Color.GREEN);
                 surface.getPaint().setStyle(Paint.Style.STROKE);
                 Rectangle boardShape = (Rectangle) getShape("board");
-                Surface.drawCircle(getPosition(), boardShape.getWidth(), 0, surface);
-                Surface.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, surface);
+                Surface.drawCircle(getCoordinate(), boardShape.getWidth(), 0, surface);
+                Surface.drawCircle(getCoordinate(), boardShape.getWidth() / 2.0f, 0, surface);
             }
 
             // Draw patches
@@ -374,35 +367,43 @@ public class BaseImage extends Image<Base> {
         }
     }
 
-    public void showPortFigures() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setVisibility(Visibility.VISIBLE);
-            portFigure.showDocks();
+    public void showPortImages() {
+        List<PortImage> portImages = getPortImages();
+        for (int i = 0; i < portImages.size(); i++) {
+            PortImage portImage = portImages.get(i);
+            portImage.setVisibility(Visibility.VISIBLE);
+            portImage.showDocks();
         }
     }
 
-    public void hidePortFigures() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setVisibility(Visibility.INVISIBLE);
+    public void hidePortImages() {
+        List<PortImage> portImages = getPortImages();
+        for (int i = 0; i < portImages.size(); i++) {
+            PortImage portImage = portImages.get(i);
+            portImage.setVisibility(Visibility.INVISIBLE);
         }
     }
 
-    public void showPathFigures() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setPathVisibility(Visibility.VISIBLE);
+    public void showPathImages() {
+        List<PortImage> portImages = getPortImages();
+        for (int i = 0; i < portImages.size(); i++) {
+            PortImage portImage = portImages.get(i);
+            portImage.setPathVisibility(Visibility.VISIBLE);
         }
     }
 
-    public void hidePathFigures() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setPathVisibility(Visibility.INVISIBLE);
-            portFigure.showDocks();
+    public void hidePathImages() {
+        List<PortImage> portImages = getPortImages();
+        for (int i = 0; i < portImages.size(); i++) {
+            PortImage portImage = portImages.get(i);
+            portImage.setPathVisibility(Visibility.INVISIBLE);
+            portImage.showDocks();
         }
     }
 
     public boolean contains(Point point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("board")).getHeight() / 2.0f);
+            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("board")).getHeight() / 2.0f);
         } else {
             return false;
         }
@@ -410,7 +411,7 @@ public class BaseImage extends Image<Base> {
 
     public boolean contains(Point point, double padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("board")).getHeight() / 2.0f + padding);
+            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("board")).getHeight() / 2.0f + padding);
         } else {
             return false;
         }
@@ -418,7 +419,7 @@ public class BaseImage extends Image<Base> {
 
 
     private Visibility candidatePatchVisibility = Visibility.INVISIBLE;
-    private Point candidatePatchPosition = new Point(40, 80);
+    private Point candidatePatchCoordinate = new Point(40, 80);
 
     public void setCandidatePatchVisibility(Visibility visibility) {
         candidatePatchVisibility = visibility;
@@ -436,13 +437,13 @@ public class BaseImage extends Image<Base> {
             Paint paint = surface.getPaint();
 
             double pathRotationAngle = Geometry.calculateRotationAngle(
-                    getPosition(),
-                    candidatePatchPosition
+                    getCoordinate(),
+                    candidatePatchCoordinate
             );
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.CYAN); // paint.setColor(getUniqueColor());
-            Surface.drawRectangle(candidatePatchPosition, pathRotationAngle + 180, 250, 250, surface);
+            Surface.drawRectangle(candidatePatchCoordinate, pathRotationAngle + 180, 250, 250, surface);
 
         }
 

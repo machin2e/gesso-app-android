@@ -96,7 +96,7 @@ public class ImageGroup {
 
             double distanceToImage = Geometry.calculateDistance(
                     point,
-                    image.getPosition()
+                    image.getCoordinate()
             );
 
             if (distanceToImage < distance) {
@@ -121,7 +121,7 @@ public class ImageGroup {
 
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            if (shape.contains(image.getPosition())) {
+            if (shape.contains(image.getCoordinate())) {
                 imageGroup.add(image);
             }
         }
@@ -148,11 +148,11 @@ public class ImageGroup {
         return images;
     }
 
-    public List<Point> getPositions() {
+    public List<Point> getCoordinates() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
+            positions.add(new Point(image.getCoordinate().getX(), image.getCoordinate().getY()));
         }
         return positions;
     }
@@ -167,11 +167,11 @@ public class ImageGroup {
     }
 
     public Point getCenterPoint() {
-        return Geometry.calculateCenterPosition(getPositions());
+        return Geometry.calculateCenterCoordinate(getCoordinates());
     }
 
     public Point getCentroidPoint() {
-        return Geometry.calculateCentroidPosition(getPositions());
+        return Geometry.calculateCentroidCoordinate(getCoordinates());
     }
 
     public Rectangle getBoundingBox() {
@@ -179,7 +179,7 @@ public class ImageGroup {
     }
 
     public List<Point> getBoundingShape() {
-        return Geometry.computeConvexHull(getPositions());
+        return Geometry.computeConvexHull(getCoordinates());
     }
 
     /**
@@ -196,7 +196,7 @@ public class ImageGroup {
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
 
-            double currentDistance = Geometry.calculateDistance(position, image.getPosition());
+            double currentDistance = Geometry.calculateDistance(position, image.getCoordinate());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;
