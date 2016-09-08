@@ -12,19 +12,19 @@ import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 
 /**
- * An thisTranscript is a temporal sequence of one or more actions.
+ * An thisProcess is a temporal sequence of one or more actions.
  */
-public class Transcript { // TODO: Rename Activity. Previously Gesture.
+public class Process { // TODO: Rename Activity. Previously Gesture.
 
-    // TODO: Construct this with a "points thisTranscript envelope" or "thisTranscript envelope".
-    // TODO: Construct voice thisTranscript in the same way. Generify to Transcript<T> or subclass.
+    // TODO: Construct this with a "points thisProcess envelope" or "thisProcess envelope".
+    // TODO: Construct voice thisProcess in the same way. Generify to Process<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
     private List<Action> actions = new LinkedList<>();
 
     // TODO: Classify these! Every time an Action is added!
-    // TODO: (cont'd) Note can have multiple sequences per finger in an thisTranscript,
-    // TODO: (cont'd) so consider remodeling as per-finger thisTranscript and treat each finger
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisProcess,
+    // TODO: (cont'd) so consider remodeling as per-finger thisProcess and treat each finger
     // TODO: (cont'd) as an individual actor.
     private boolean[] isHolding = new boolean[Action.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Action.MAXIMUM_POINT_COUNT];
@@ -35,7 +35,7 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
 
     public Handler timerHandler = new Handler();
 
-    Transcript thisTranscript = this;
+    Process thisProcess = this;
 
     public Runnable timerRunnable = new Runnable() {
         @Override
@@ -43,29 +43,29 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
 
             int pointerIndex = 0;
 
-            if (getFirst().isPointing[pointerIndex]) {
+            if (getFirstAction().isPointing[pointerIndex]) {
                 if (getDragDistance() < Action.MINIMUM_DRAG_DISTANCE) {
 
                     // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    thisTranscript.getFirst().setType(Action.Type.HOLD);
-//                    getFirst().getActor().getCamera().getScene().onHoldListener(thisTranscript.getFirst());
+                    thisProcess.getFirstAction().setType(Action.Type.HOLD);
+//                    getFirstAction().getActor().getCamera().getScene().onHoldListener(thisProcess.getFirstAction());
 
-                    Action action = thisTranscript.getFirst();
-                    Figure targetFigure = getFirst().getActor().getScene().getFigureByPosition(action.getPosition());
+                    Action action = thisProcess.getFirstAction();
+                    Figure targetFigure = getFirstAction().getActor().getScene().getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     action.getTarget().processAction(action);
                     // </HACK>
 
-                    thisTranscript.isHolding[pointerIndex] = true;
+                    thisProcess.isHolding[pointerIndex] = true;
 
                 }
             }
         }
     };
 
-    public Transcript() {
+    public Process() {
         setup();
     }
 
@@ -77,13 +77,9 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
         }
     }
 
-    public int getSize() {
-        return this.actions.size();
-    }
-
     public void add(Action action) {
 
-        action.setPattern(this);
+        action.setProcess(this);
 
         actions.add(action);
 
@@ -99,7 +95,7 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
         } else if (actions.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), getFirst().points[action.pointerIndex]);
+            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getPosition(), getFirstAction().points[action.pointerIndex]);
 
             if (getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                 isDragging[action.pointerIndex] = true;
@@ -108,11 +104,11 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
         }
     }
 
-    public Action get(int index) {
+    public Action getAction(int index) {
         return this.actions.get(index);
     }
 
-    public Action getFirst() {
+    public Action getFirstAction() {
         if (actions.size() > 0) {
             return actions.get(0);
         } else {
@@ -120,7 +116,7 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
         }
     }
 
-    public Action getLast() {
+    public Action getLastAction() {
         if (actions.size() > 0) {
             return actions.get(actions.size() - 1);
         } else {
@@ -128,35 +124,16 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
         }
     }
 
-    public Action getPrevious(Action action) {
-        for (int i = 0; i < actions.size() - 1; i++) {
-            if (actions.get(i + 1) == action) {
-                return actions.get(i);
-            }
-        }
-        return null;
-    }
-
-    public Action getPrevious() {
-//        for (int i = 0; i < actions.size() - 1; i++) {
-        if (actions.size() > 1) {
-//            if (actions.get(i + 1) == getLast()) {
-            return actions.get(actions.size() - 1);
-//            }
-        }
-        return null;
-    }
-
+    // TODO: Remove this? Or make it complement the updated getTarget() which returns the Construct that the process targeted.
     public Construct getSource() {
-        Action action = getFirst();
-        if (action != null) {
-            return action.getTarget().getConstruct();
+        if (actions.size() > 0) {
+            return getAction(0).getTarget().getConstruct();
         }
         return null;
     }
 
     public Construct getTarget() {
-        Action action = getLast();
+        Action action = getLastAction();
         if (action != null) {
             return action.getTarget().getConstruct();
         }
@@ -164,15 +141,19 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
     }
 
     public long getStartTime() {
-        return getFirst().getTimestamp();
+        return getFirstAction().getTimestamp();
     }
 
     public long getStopTime() {
-        return getLast().getTimestamp();
+        return getLastAction().getTimestamp();
+    }
+
+    public int getSize() {
+        return this.actions.size();
     }
 
     public long getDuration() {
-        return getLast().getTimestamp() - getFirst().getTimestamp();
+        return getLastAction().getTimestamp() - getFirstAction().getTimestamp();
     }
 
     public ArrayList<Point> getTouchPath() {
@@ -188,15 +169,30 @@ public class Transcript { // TODO: Rename Activity. Previously Gesture.
     }
 
     public boolean isDragging() {
-        return isDragging[getLast().pointerIndex];
+        return isDragging[getLastAction().pointerIndex];
     }
 
     public double getDragDistance() {
-        return dragDistance[getLast().pointerIndex];
+        return dragDistance[getLastAction().pointerIndex];
     }
 
     public boolean isTap() {
         return getDuration() < Action.MAXIMUM_TAP_DURATION;
+    }
+
+    /**
+     * Returns point-to-point distance between getFirstAction and getLastAction action positions.
+     *
+     * @return Point-to-point distance between the getFirstAction and getLastAction actions' positions.
+     */
+    public double getDistance() {
+        Action firstAction = getFirstAction();
+        Action lastAction = getLastAction();
+        double distance = Geometry.calculateDistance(
+                firstAction.getPosition(),
+                lastAction.getPosition()
+        );
+        return distance;
     }
 
     // <CLASSIFIER>

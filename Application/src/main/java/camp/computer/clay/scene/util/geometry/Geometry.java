@@ -426,12 +426,12 @@ public abstract class Geometry {
                     vectorAB.setX(vectorAB.getX() * (double) ((r - Math.sqrt(d)) * 0.5f));
                     vectorAB.setY(vectorAB.getY() * (double) ((r - Math.sqrt(d)) * 0.5f));
 
-//                    if (positions.get(j) != mDraggingCircle)
-                    // TODO: positions.get(j).mCenter += AB;
+//                    if (positions.getAction(j) != mDraggingCircle)
+                    // TODO: positions.getAction(j).mCenter += AB;
                     sortedPositions.get(j).setX(sortedPositions.get(j).getX() + vectorAB.getX());
                     sortedPositions.get(j).setY(sortedPositions.get(j).getY() + vectorAB.getY());
-//                    if (positions.get(i) != mDraggingCircle)
-                    // TODO: positions.get(i).mCenter -= AB;
+//                    if (positions.getAction(i) != mDraggingCircle)
+                    // TODO: positions.getAction(i).mCenter -= AB;
                     sortedPositions.get(i).setX(sortedPositions.get(i).getX() - vectorAB.getX());
                     sortedPositions.get(i).setY(sortedPositions.get(i).getY() - vectorAB.getY());
                 }
@@ -515,8 +515,8 @@ public abstract class Geometry {
 //                }
 //
 //                Point vectorAB = new Point();
-//                vectorAB.getX() = sortedPoints.get(j).getX() - sortedPoints.get(i).getX();
-//                vectorAB.getY() = sortedPoints.get(j).getY() - sortedPoints.get(i).getX();
+//                vectorAB.getX() = sortedPoints.getAction(j).getX() - sortedPoints.getAction(i).getX();
+//                vectorAB.getY() = sortedPoints.getAction(j).getY() - sortedPoints.getAction(i).getX();
 //
 //                double radiusSum = distance + distance;
 //
@@ -538,14 +538,14 @@ public abstract class Geometry {
 //                    unitVectorAB.getX() *= (double)((radiusSum - Math.sqrt(d)) * 0.5f);
 //                    unitVectorAB.getY() *= (double)((radiusSum - Math.sqrt(d)) * 0.5f);
 //
-////                    if (positions.get(j) != mDraggingCircle)
-//                        // TODO: positions.get(j).mCenter += AB;
-//                    sortedPoints.get(j).getX() += unitVectorAB.getX();
-//                    sortedPoints.get(j).getY() += unitVectorAB.getY();
-////                    if (positions.get(i) != mDraggingCircle)
-//                        // TODO: positions.get(i).mCenter -= AB;
-//                    sortedPoints.get(i).getX() -= unitVectorAB.getX();
-//                    sortedPoints.get(i).getY() -= unitVectorAB.getY();
+////                    if (positions.getAction(j) != mDraggingCircle)
+//                        // TODO: positions.getAction(j).mCenter += AB;
+//                    sortedPoints.getAction(j).getX() += unitVectorAB.getX();
+//                    sortedPoints.getAction(j).getY() += unitVectorAB.getY();
+////                    if (positions.getAction(i) != mDraggingCircle)
+//                        // TODO: positions.getAction(i).mCenter -= AB;
+//                    sortedPoints.getAction(i).getX() -= unitVectorAB.getX();
+//                    sortedPoints.getAction(i).getY() -= unitVectorAB.getY();
 //                }
 //
 //            }
@@ -559,16 +559,16 @@ public abstract class Geometry {
 ////            {
 //                // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
 //                Point v = new Point(0, 0);
-//                v.getX() = sortedPoints.get(i).getX() - packingCenter.getX();
-//                v.getY() = sortedPoints.get(i).getY() - packingCenter.getY();
+//                v.getX() = sortedPoints.getAction(i).getX() - packingCenter.getX();
+//                v.getY() = sortedPoints.getAction(i).getY() - packingCenter.getY();
 //
 //                // TODO: v *= damping;
 //                v.getX() *= damping;
 //                v.getY() *= damping;
 //
 //                // TODO: mCircles[i].mCenter -= v;
-//                sortedPoints.get(i).getX() -= v.getX();
-//                sortedPoints.get(i).getY() -= v.getY();
+//                sortedPoints.getAction(i).getX() -= v.getX();
+//                sortedPoints.getAction(i).getY() -= v.getY();
 ////            }
 //        }
 //
@@ -584,8 +584,8 @@ public abstract class Geometry {
 //        for (int i = 0; i < sortedList.size(); i++) {
 //            for (int j = i + 1; j < sortedList.size(); j++) {
 //
-//                Point p1 = positions.get(i);
-//                Point p2 = positions.get(j);
+//                Point p1 = positions.getAction(i);
+//                Point p2 = positions.getAction(j);
 //
 //                if (Geometry.calculateDistance(p1, point) > Geometry.calculateDistance(p2, point)) {
 //                    positions.remove(i);

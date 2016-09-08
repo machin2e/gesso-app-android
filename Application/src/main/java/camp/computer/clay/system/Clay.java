@@ -424,7 +424,7 @@ public class Clay {
 //    public void simulateSession (boolean addBehaviorToTimeline, int behaviorCount, boolean addAbstractBehaviorToTimeline) {
 //        Log.v("Content_Manager", "simulateSession");
 //
-//        // Discover first device
+//        // Discover getFirstAction device
 //        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
 //        getClay().addPatch(unitUuidA, "10.1.10.29");
 //        Patch foundUnit = getDeviceByUuid(unitUuidA);
@@ -439,9 +439,9 @@ public class Clay {
 //                Log.v("Content_Manager", "> Creating action");
 //                Random r = new Random();
 //                int selectedBehaviorIndex = r.nextInt(getClay().getCache().getActions().size());
-////                Script selectedBehaviorScript = getClay().getCache().getScripts().get(selectedBehaviorIndex);
+////                Script selectedBehaviorScript = getClay().getCache().getScripts().getAction(selectedBehaviorIndex);
 ////                Action action = new Action(selectedBehaviorScript);
-//                Action action = getClay().getCache().getActions().get(selectedBehaviorIndex);
+//                Action action = getClay().getCache().getActions().getAction(selectedBehaviorIndex);
 //                getClay().getStore().storeAction(action);
 //
 //                // Create event for the action and add it to the unit's timeline
@@ -458,21 +458,21 @@ public class Clay {
 //            Log.v("Content_Manager", "> Creating action");
 ////            Action action = new Action("so high");
 ////            action.setDescription("oh yeah!");
-////            action.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
-////            action.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+////            action.addAction(foundUnit.getTimeline().getEvents().getAction(0).getAction());
+////            action.addAction(foundUnit.getTimeline().getEvents().getAction(1).getAction());
 ////            getClay().getStore().storeAction(action);
 //            List<Action> children = new ArrayList<Action>();
 //            List<State> states = new ArrayList<State>();
-//            children.add(foundUnit.getTimeline().getEvents().get(0).getAction());
-//            states.addAll(foundUnit.getTimeline().getEvents().get(0).getState());
-//            children.add(foundUnit.getTimeline().getEvents().get(1).getAction());
-//            states.addAll(foundUnit.getTimeline().getEvents().get(1).getState());
+//            children.add(foundUnit.getTimeline().getEvents().getAction(0).getAction());
+//            states.addAll(foundUnit.getTimeline().getEvents().getAction(0).getState());
+//            children.add(foundUnit.getTimeline().getEvents().getAction(1).getAction());
+//            states.addAll(foundUnit.getTimeline().getEvents().getAction(1).getState());
 //            Action action = getClay().getStore().getActionComposition(children);
 //
 //            // remove events for abstracted actions
-//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0));
+//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().getAction(0));
 //            foundUnit.getTimeline().getEvents().remove(0); // if storeHost action successful
-//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1));
+//            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().getAction(1));
 //            foundUnit.getTimeline().getEvents().remove(1); // if storeHost action successful
 //
 //            // Create event for the action and add it to the unit's timeline
@@ -496,10 +496,10 @@ public class Clay {
 ////            Log.v("Content_Manager", "> Creating behavior");
 ////            Action behavior = new Action("so so high");
 ////            behavior.setDescription("oh yeah!");
-////            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(0), null);
-////            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(0).getAction());
-////            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().get(1), null);
-////            behavior.cacheAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+////            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().getAction(0), null);
+////            behavior.cacheAction(foundUnit.getTimeline().getEvents().getAction(0).getAction());
+////            getClay().getStore().removeEvent(foundUnit.getTimeline().getEvents().getAction(1), null);
+////            behavior.cacheAction(foundUnit.getTimeline().getEvents().getAction(1).getAction());
 ////            getClay().getStore().storeAction(behavior);
 ////            // remove events for abstracted actions
 ////            foundUnit.getTimeline().getEvents().remove(0); // if storeHost behavior successful

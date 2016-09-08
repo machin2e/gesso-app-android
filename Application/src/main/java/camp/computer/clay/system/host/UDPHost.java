@@ -14,7 +14,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.system.old_model.Message;
 import camp.computer.clay.system.host.util.CRC16;
 
-public class DatagramHost extends Thread implements MessageHostInterface {
+public class UDPHost extends Thread implements MessageHostInterface {
 
     private static final int MAX_UDP_DATAGRAM_LEN = 1500;
 
@@ -33,7 +33,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
     private String type;
 
-    public DatagramHost(String type) {
+    public UDPHost(String type) {
         this.type = type;
     }
 
@@ -213,7 +213,7 @@ public class DatagramHost extends Thread implements MessageHostInterface {
 
             // Send the datagram.
             // formerly "sendDatagram(...)"
-            //sendDatagram (DatagramHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getDescriptor());
+            //sendDatagram (UDPHost.getIpAsString(message.getTargetAddress()), MESSAGE_PORT, message.getDescriptor());
             sendDatagram(message.getTargetAddress(), MESSAGE_PORT, message.getContent());
 //            Log.v("UDP", "from: " + message.getSourceAddress());
 //            Log.v("UDP", "to: " + message.getTargetAddress());

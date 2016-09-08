@@ -37,13 +37,13 @@ public class PathFigure extends Figure<Path> {
 
                 if (action.getType() == Action.Type.NONE) {
 
-                } else if (action.getType() == Action.Type.TOUCH) {
+                } else if (action.getType() == Action.Type.SELECT) {
 
                 } else if (action.getType() == Action.Type.HOLD) {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                } else if (action.getType() == Action.Type.RELEASE) {
+                } else if (action.getType() == Action.Type.UNSELECT) {
 
                 }
             }

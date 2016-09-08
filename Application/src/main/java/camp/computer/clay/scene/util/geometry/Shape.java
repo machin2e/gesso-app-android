@@ -61,7 +61,7 @@ public abstract class Shape {
 
     abstract public List<Line> getSegments();
 
-    public boolean containsPoint(Point point) {
+    public boolean contains(Point point) {
         return Geometry.containsPoint(getVertices(), point);
     }
 

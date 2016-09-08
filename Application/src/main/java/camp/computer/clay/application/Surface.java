@@ -307,7 +307,7 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
         // - Motion events contain information about all of the pointers that are currently active
-        //   even if some of them have not moved since the last event was delivered.
+        //   even if some of them have not moved since the getLastAction event was delivered.
         //
         // - The number of pointers only ever changes by one as individual pointers go up and down,
         //   except when the gesture is canceled.
@@ -347,12 +347,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                     action.points[id].setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }
 
-                // ACTION_DOWN is called only for the first pointer that touches the screen. This
+                // ACTION_DOWN is called only for the getFirstAction pointer that touches the screen. This
                 // starts the gesture. The pointer data for this pointer is always at index 0 in
                 // the MotionEvent.
                 //
                 // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
-                // the first. The pointer data for this pointer is at the index returned by
+                // the getFirstAction. The pointer data for this pointer is at the index returned by
                 // getActionIndex().
                 //
                 // ACTION_MOVE is sent when a change has happened during a press gesture for any
@@ -360,28 +360,28 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 //
                 // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
                 //
-                // ACTION_UP is sent when the last pointer leaves the screen.
+                // ACTION_UP is sent when the getLastAction pointer leaves the screen.
                 //
                 // REFERENCES:
                 // - https://developer.android.com/training/gestures/multi.html
 
                 // Update the state of the touched object based on the current points action state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    action.setType(Action.Type.TOUCH);
+                    action.setType(Action.Type.SELECT);
                     action.pointerIndex = pointerId;
-                    actor.onAction(action);
+                    actor.doAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO: Handle additional pointers after the first points!
+                    // TODO: Handle additional pointers after the getFirstAction points!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     action.setType(Action.Type.MOVE);
                     action.pointerIndex = pointerId;
-                    actor.onAction(action);
+                    actor.doAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    action.setType(Action.Type.RELEASE);
+                    action.setType(Action.Type.UNSELECT);
                     action.pointerIndex = pointerId;
-                    actor.onAction(action);
+                    actor.doAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO: Handle additional pointers after the first points!
+                    // TODO: Handle additional pointers after the getFirstAction points!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:
                 } else {

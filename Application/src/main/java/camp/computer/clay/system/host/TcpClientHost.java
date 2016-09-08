@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class TcpClientHost {
+public class TCPClientHost {
 
     private InetAddress remoteAddress;
     private int remotePort;
@@ -29,7 +29,7 @@ public class TcpClientHost {
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TcpClientHost(InetAddress inetAddress, int port) {
+    public TCPClientHost(InetAddress inetAddress, int port) {
 
         this.remoteAddress = inetAddress;
         this.remotePort = port;

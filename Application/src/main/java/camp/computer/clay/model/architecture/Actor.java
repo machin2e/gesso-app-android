@@ -5,16 +5,21 @@ import java.util.List;
 
 import camp.computer.clay.model.interaction.*;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.Transcript;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.architecture.Scene;
 
+/**
+ * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
+ * based on the actions recognized on one of the {@code Device} objects associated with the
+ * {@code Actor}.
+ */
 public class Actor { // Controller
 
     private Camera camera = null;
 
-    // PatternSet (Smart querying interface)
-    public List<Transcript> transcripts = new LinkedList<>();
+    // Process (Smart querying interface)
+    public List<Process> processes = new LinkedList<>();
 
     public Actor() {
         setup();
@@ -26,11 +31,16 @@ public class Actor { // Controller
         setCamera(camera);
     }
 
+    /**
+     * Sets the {@code Camera} that defines the {@code Actor}'s viewing area onto the {@code Scene}.
+     *
+     * @param camera The {@code Camera} to use to define the viewing area onto the {@code Scene}.
+     */
     public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
-    public boolean hasView() {
+    public boolean hasCamera() {
         return camera != null;
     }
 
@@ -39,7 +49,7 @@ public class Actor { // Controller
     }
 
     /**
-     * Conveninece function.
+     * Convenience method.
      *
      * @return
      */
@@ -55,40 +65,40 @@ public class Actor { // Controller
      *
      * @return The most recent interaction.
      */
-    private Transcript getPattern() {
-        if (transcripts.size() > 0) {
-            return transcripts.get(transcripts.size() - 1);
+    private Process getProcess() {
+        if (processes.size() > 0) {
+            return processes.get(processes.size() - 1);
         } else {
             return null;
         }
     }
 
-    public void onAction(Action action) {
+    public void doAction(Action action) { // TODO: Rename to doAction()
 
         action.setActor(this);
 
         switch (action.getType()) {
 
-            case TOUCH: {
+            case SELECT: {
 
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
 
-                // Start a new transcript
-                Transcript transcript = new Transcript();
-                transcripts.add(transcript);
+                // Start a new process
+                Process process = new Process();
+                processes.add(process);
 
-                // Add action to transcript
-                transcript.add(action);
+                // Add action to process
+                process.add(action);
 
-                // Record transcripts on timeline
-                // TODO: Cache and store the processAction transcripts before deleting them completely! Do it in
+                // Record processes on timeline
+                // TODO: Cache and store the processAction processes before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
-                if (transcripts.size() > 3) {
-                    transcripts.remove(0);
+                if (processes.size() > 3) {
+                    processes.remove(0);
                 }
 
-                // Transcript the action
+                // Process the action
 
                 // Set the target
                 Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
@@ -103,23 +113,23 @@ public class Actor { // Controller
 
             case MOVE: {
 
-                Transcript transcript = getPattern();
-                transcript.add(action);
+                Process process = getProcess();
+                process.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = true;
 
                 // Classify/Callback
-                if (transcript.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
+                if (process.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                     // action.setType(Action.Type.MOVE);
 
                     Figure targetFigure = getCamera().getScene().getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     // <HACK>
-                    //Transcript transcript = action.getActionSequence();
-                    if (transcript.getSize() > 1) {
-                        action.setTarget(transcript.getFirst().getTarget());
+                    //Process process = action.getActionSequence();
+                    if (process.getSize() > 1) {
+                        action.setTarget(process.getFirstAction().getTarget());
                     }
                     // </HACK>
 
@@ -131,22 +141,22 @@ public class Actor { // Controller
                 break;
             }
 
-            case RELEASE: {
+            case UNSELECT: {
 
-                Transcript transcript = getPattern();
-                transcript.add(action);
+                Process process = getProcess();
+                process.add(action);
 
                 // Current
                 action.isPointing[action.pointerIndex] = false;
 
                 // Stop listening for a hold action
-                transcript.timerHandler.removeCallbacks(transcript.timerRunnable);
+                process.timerHandler.removeCallbacks(process.timerRunnable);
 
-//                if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
-//                    action.setType(Action.Type.TOUCH);
+//                if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+//                    action.setType(Action.Type.SELECT);
 //                    getCamera().getScene().onTapListener(action);
 //                } else {
-//                    action.setType(Action.Type.RELEASE);
+//                    action.setType(Action.Type.UNSELECT);
 //                    getCamera().getScene().onReleaseListener(action);
 //                }
 

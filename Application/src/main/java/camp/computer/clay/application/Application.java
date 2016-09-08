@@ -38,7 +38,7 @@ import java.util.List;
 
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.system.host.NetworkResource;
-import camp.computer.clay.system.host.DatagramHost;
+import camp.computer.clay.system.host.UDPHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.old_model.Device;
@@ -78,7 +78,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private Clay clay;
 
-    private DatagramHost datagramHost;
+    private UDPHost UDPHost;
 
     private NetworkResource networkResource;
 
@@ -101,7 +101,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
     }
 
-    /** Called when the activity is first created. */
+    /** Called when the activity is getFirstAction created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,10 +226,10 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         clay.addDisplay(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
-        if (datagramHost == null) {
-            datagramHost = new DatagramHost("udp");
-            clay.addHost(this.datagramHost);
-            datagramHost.startServer ();
+        if (UDPHost == null) {
+            UDPHost = new UDPHost("udp");
+            clay.addHost(this.UDPHost);
+            UDPHost.startServer ();
         }
 
         // Internet Network Interface
@@ -687,11 +687,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     protected void onResume() {
         super.onResume();
 
-        if (datagramHost == null) {
-            datagramHost = new DatagramHost("udp");
+        if (UDPHost == null) {
+            UDPHost = new UDPHost("udp");
         }
-        if (!datagramHost.isActive()) {
-            datagramHost.startServer();
+        if (!UDPHost.isActive()) {
+            UDPHost.startServer();
         }
 
         // <VISUALIZATION>
@@ -706,7 +706,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
-            // Transcript the outgoing messages
+            // Process the outgoing messages
             clay.step();
 
             // Repeat this the same runnable code block again another 2 seconds

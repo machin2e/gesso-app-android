@@ -477,7 +477,7 @@ public class SQLiteStoreHost {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get actions with parent with root UUID, addPatch to parent's list of
+        // - For each root, getAction actions with parent with root UUID, addPatch to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -513,7 +513,7 @@ public class SQLiteStoreHost {
             // if any, in the correct order.
             String sortOrder = ActionEntry.COLUMN_NAME_SIBLING_INDEX + " ASC";
 
-            // Only get the actions with no parent (the root actions).
+            // Only getAction the actions with no parent (the root actions).
             String selection = null;
             String[] selectionArgs = null; // { timeline.getUuid().toString() };
             if (parentAction == null) {
@@ -567,7 +567,7 @@ public class SQLiteStoreHost {
                 // Recursive call to reconstruct the action's children
                 Log.v("flem", "action.getUuid(): " + action.getUuid());
                 if (isParentAction(action.getUuid())) {
-                    // Recursive query to get the children of the action just created.
+                    // Recursive query to getAction the children of the action just created.
                     queryActions(action);
                 } else {
                     // Basic action, so set script.
@@ -588,7 +588,7 @@ public class SQLiteStoreHost {
             }
         }
 
-        // TODO: queryScripts () // Get all actions, for use to create the first actions in the database.
+        // TODO: queryScripts () // Get all actions, for use to create the getFirstAction actions in the database.
 
         /** Action Script */
 
@@ -807,7 +807,7 @@ public class SQLiteStoreHost {
 
             // Get the behavior and behavior script from the cache. Here, these are assumed to
             // be available in the cache, since it is assumed they are loaded and cached when
-            // Clay is first opened.
+            // Clay is getFirstAction opened.
             Script behaviorScript = getClay ().getCache ().getScript(UUID.fromString(behaviorScriptUuidString));
             Action behavior = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
             behavior.setScript(behaviorScript);
@@ -877,7 +877,7 @@ public class SQLiteStoreHost {
 
                 // Get the behavior and behavior script from the cache. Here, these are assumed to
                 // be available in the cache, since it is assumed they are loaded and cached when
-                // Clay is first opened.
+                // Clay is getFirstAction opened.
 //            Script behaviorScript = getClay().getCache().getScript(UUID.fromString(behaviorScriptUuidString));
 //            Log.v ("Content_Manager", "> behavior: " + behavior.getUuid());
 //            behavior.setScript(behaviorScript);
@@ -1132,7 +1132,7 @@ public class SQLiteStoreHost {
             // Specify how to sort the retrieved data
             String sortOrder = null;
 
-            // TODO: if parentUuid is null, then compare the tag, and get the UUID if exists, for reuse
+            // TODO: if parentUuid is null, then compare the tag, and getAction the UUID if exists, for reuse
 
             String selection = null;
             String[] selectionArgs = null;
@@ -1214,7 +1214,7 @@ public class SQLiteStoreHost {
 //                String sortOrder = ActionEntry.COLUMN_NAME_PARENT_UUID + " ASC, "
 //                        + ActionEntry.COLUMN_NAME_SIBLING_INDEX + " ASC";
 
-                // TODO: if parentUuid is null, then compare the tag, and get the UUID if exists, for reuse
+                // TODO: if parentUuid is null, then compare the tag, and getAction the UUID if exists, for reuse
 
                 String selection = null;
                 String[] selectionArgs = null;
@@ -1275,8 +1275,8 @@ public class SQLiteStoreHost {
                 for (Action childAction : children) {
                     parentAction.addAction(childAction);
                 }
-//                parentAction.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
-//                parentAction.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+//                parentAction.addAction(foundUnit.getTimeline().getEvents().getAction(0).getAction());
+//                parentAction.addAction(foundUnit.getTimeline().getEvents().getAction(1).getAction());
 
 //                storeAction(parentAction);
 //
@@ -1313,7 +1313,7 @@ public class SQLiteStoreHost {
             // Specify how to sort the retrieved data
             String sortOrder = null;
 
-            // TODO: if parentUuid is null, then compare the tag, and get the UUID if exists, for reuse
+            // TODO: if parentUuid is null, then compare the tag, and getAction the UUID if exists, for reuse
 
             String selection = null;
             String[] selectionArgs = null;
@@ -1492,7 +1492,7 @@ public class SQLiteStoreHost {
 
                 // Get the Action and Script objects. These are assumed to be
                 // available in the cache at this point, since they should be loaded when Clay
-                // is first oepned.
+                // is getFirstAction oepned.
                 //Action action = getClay ().getAction (UUID.fromString (behaviorUuidString));
 
                 // Reconstruct the associated action
@@ -1670,7 +1670,7 @@ public class SQLiteStoreHost {
 
     /**
      * Store the action. Recursively stores the action tree graph by performing a breadth
-     * first traversal.
+     * getFirstAction traversal.
      * @param action The action to store.
      */
     public void storeAction(Action action) {
@@ -1700,7 +1700,7 @@ public class SQLiteStoreHost {
 
         Log.v ("Content_Manager", "storeActionTree");
 
-        // Breadth first storage, to ensure that a relation to a action's children can be
+        // Breadth getFirstAction storage, to ensure that a relation to a action's children can be
         // created. The parent must be in the database before children can store a relation to
         // their parent.
 

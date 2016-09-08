@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.host.TcpMessageClientHost;
+import camp.computer.clay.system.host.TCPMessageClientHost;
 
 // TODO: Integrate with Base in new construct. Also separate the construct (descriptive information that
 // TODO: (cont'd) provides a lookup table of sorts, and the simulation (includes virtual
@@ -31,7 +31,7 @@ public class Device {
 
     // TODO: Cache/construct the unit's state and behavior
 
-    private TcpMessageClientHost tcpMessageClientHost;
+    private TCPMessageClientHost TCPMessageClientHost;
 
     private ArrayList<String> tags;
 
@@ -53,7 +53,7 @@ public class Device {
     }
 
 //    public long getTimeSinceLastMessage () {
-////        Log.v ("Clay_Time", "Time since last message: " + this.timeOfLastContact);
+////        Log.v ("Clay_Time", "Time since getLastAction message: " + this.timeOfLastContact);
 //        Date currentTime = Calendar.getInstance().getTime ();
 //
 //        if (timeOfLastContact != null) {
@@ -128,8 +128,8 @@ public class Device {
 
     public void connectTcp() {
 
-        if (tcpMessageClientHost == null) {
-            tcpMessageClientHost = new TcpMessageClientHost();
+        if (TCPMessageClientHost == null) {
+            TCPMessageClientHost = new TCPMessageClientHost();
         }
 
         try {
@@ -137,7 +137,7 @@ public class Device {
                 Log.v ("TCP", "internetAddress: " + this.internetAddress);
                 InetAddress inetAddress = InetAddress.getByName(this.internetAddress);
                 Log.v ("TCP", "inetAddress: " + inetAddress);
-                tcpMessageClientHost.connect(inetAddress);
+                TCPMessageClientHost.connect(inetAddress);
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -156,6 +156,6 @@ public class Device {
         Message message = new Message("tcp", source, destination, content);
         message.setDeliveryGuaranteed(true);
 
-        tcpMessageClientHost.enqueueMessage(message);
+        TCPMessageClientHost.enqueueMessage(message);
     }
 }

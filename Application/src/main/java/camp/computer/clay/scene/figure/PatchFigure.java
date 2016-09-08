@@ -14,7 +14,7 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Transcript;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -54,23 +54,23 @@ public class PatchFigure extends Figure<Patch> {
 
                 if (action.getType() == Action.Type.NONE) {
 
-                } else if (action.getType() == Action.Type.TOUCH) {
+                } else if (action.getType() == Action.Type.SELECT) {
 
-                } else if (action.getType() == Action.Type.RELEASE) {
+                } else if (action.getType() == Action.Type.UNSELECT) {
 
-                    Transcript transcript = action.getActionSequence();
+                    Process process = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched form
                         showPathFigures();
                         showPortFigures();
                         setTransparency(1.0);
 
-                        // TODO: Speak "choose a channel to get data."
+                        // TODO: Speak "choose a channel to getAction data."
 
                         // Show ports and paths of touched form
                         for (PortFigure portFigure : getPortFigures()) {
@@ -96,10 +96,10 @@ public class PatchFigure extends Figure<Patch> {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                } else if (action.getType() == Action.Type.RELEASE) {
+                } else if (action.getType() == Action.Type.UNSELECT) {
 
                     // Update Figure
-                    PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirstAction().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
                     sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
 

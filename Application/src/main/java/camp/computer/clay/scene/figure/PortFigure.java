@@ -17,7 +17,7 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Camera;
-import camp.computer.clay.model.interaction.Transcript;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.Visibility;
@@ -128,13 +128,13 @@ public class PortFigure extends Figure<Port> {
 
                 if (action.getType() == Action.Type.NONE) {
 
-                } else if (action.getType() == Action.Type.TOUCH) {
+                } else if (action.getType() == Action.Type.SELECT) {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                    Transcript transcript = action.getActionSequence();
+                    Process process = action.getActionSequence();
 
-                    if (transcript.isHolding()) {
+                    if (process.isHolding()) {
 
                         // Holding and dragging
 
@@ -191,16 +191,16 @@ public class PortFigure extends Figure<Port> {
                         camera.focusCreatePath(action);
                     }
 
-                } else if (action.getType() == Action.Type.RELEASE) {
+                } else if (action.getType() == Action.Type.UNSELECT) {
 
-                    Transcript transcript = action.getActionSequence();
+                    Process process = action.getActionSequence();
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
                     Camera camera = action.getActor().getCamera();
 
-                    if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+                    if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
                         Port port = getPort();
 
@@ -303,24 +303,24 @@ public class PortFigure extends Figure<Port> {
 
                     } else {
 
-                        if (transcript.getFirst().getTarget() instanceof PortFigure) {
+                        if (process.getFirstAction().getTarget() instanceof PortFigure) {
 
                             // First processAction was on a port figure...
 
                             if (action.getTarget() instanceof BaseFigure) {
 
-//                                // ...last processAction was on a base figure.
+//                                // ...getLastAction processAction was on a base figure.
 //
-//                                PortFigure sourcePortFigure = (PortFigure) transcript.getFirst().getTarget();
+//                                PortFigure sourcePortFigure = (PortFigure) process.getFirstAction().getTarget();
 //                                sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
 
                             } else if (action.getTarget() instanceof PortFigure) {
 
                                 // Port
-                                // ...last processAction was on a port image.
+                                // ...getLastAction processAction was on a port image.
 
                                 // PortFigure portImage = (PortFigure) action.getFigureByPosition();
-                                PortFigure sourcePortImage = (PortFigure) action.getActionSequence().getFirst().getTarget();
+                                PortFigure sourcePortImage = (PortFigure) action.getActionSequence().getFirstAction().getTarget();
 
                                 if (sourcePortImage.isDragging()) {
 
@@ -420,7 +420,7 @@ public class PortFigure extends Figure<Port> {
                                                     port.setDirection(Port.Direction.INPUT);
                                                 }
                                                 if (port.getType() == Port.Type.NONE) {
-                                                    port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                                    port.setType(Port.Type.next(port.getType())); // (machineSprite.channelTypes.getAction(i) + 1) % machineSprite.channelTypeColors.length
                                                 }
 
                                                 nearbyPort.setDirection(Port.Direction.OUTPUT);
@@ -489,8 +489,8 @@ public class PortFigure extends Figure<Port> {
 //
 //                getScene().getUniverse().getActor(0).getCamera().setPosition(Geometry.calculateCenterPosition(pathPortPositions));
 
-//                action.setTarget(transcript.getFirst().getFigureByPosition());
-//                action.setType(Action.Type.RELEASE);
+//                action.setTarget(process.getFirstAction().getFigureByPosition());
+//                action.setType(Action.Type.UNSELECT);
 //                Log.v("onHoldListener", "Source port: " + action.getFigureByPosition());
 //                targetFigure.processAction(action);
 

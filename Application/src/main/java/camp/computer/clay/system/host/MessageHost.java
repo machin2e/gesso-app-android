@@ -44,7 +44,7 @@ public class MessageHost {
         public void handleMessage (android.os.Message msg) {
 //            Log.v("Clay_Time", "addPatch called");
 
-            // Transcript the incoming message's data.
+            // Process the incoming message's data.
             Bundle bundle = msg.getData();
             String serializedMessageObject = bundle.getString("serializedMessageObject");
 
@@ -73,7 +73,7 @@ public class MessageHost {
             // Insert the message into the incoming message queue.
             queueIncomingMessage (message);
             if (incomingMessages.size () > 0) {
-//                Log.v("Clay Datagram Server", "myKey = " + incomingMessages.get(incomingMessages.size() - 1));
+//                Log.v("Clay Datagram Server", "myKey = " + incomingMessages.getAction(incomingMessages.size() - 1));
             }
         }
     };
@@ -285,8 +285,8 @@ public class MessageHost {
             Message outgoingMessage = peekOutgoingMessage ();
 
 //            Log.v("UDP", "                 Message: " + outgoingMessage.getDescriptor());
-//            Log.v("UDP", "Time since last dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-//            Log.v("UDP", " Time since last message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+//            Log.v("UDP", "Time since getLastAction dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+//            Log.v("UDP", " Time since getLastAction message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
 //            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
 //            Log.v("UDP", "-----");
 
@@ -336,7 +336,7 @@ public class MessageHost {
                     message = dequeueOutgoingMessage();
                 }
 
-                // Transcript the message
+                // Process the message
                 messageManager.process (message);
             }
         }
@@ -362,10 +362,10 @@ public class MessageHost {
 
     public void processMessage() {
 
-        // Transcript incoming messages
+        // Process incoming messages
         processIncomingMessages();
 
-        // Transcript outgoing messages
+        // Process outgoing messages
         processOutgoingMessages();
     }
 }

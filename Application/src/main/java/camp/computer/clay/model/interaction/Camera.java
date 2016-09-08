@@ -12,7 +12,7 @@ import camp.computer.clay.model.architecture.Patch;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.scene.architecture.Figure;
-import camp.computer.clay.scene.architecture.FigureSet;
+import camp.computer.clay.scene.architecture.FigureGroup;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.figure.BaseFigure;
 import camp.computer.clay.scene.figure.PatchFigure;
@@ -29,7 +29,7 @@ public class Camera {
 
     public static double MAXIMUM_SCALE = 1.0;
 
-    private double width; // Width of perspective --- transcripts (e.g., touches) are interpreted relative to this point
+    private double width; // Width of perspective --- processes (e.g., touches) are interpreted relative to this point
 
     private double height; // Height of perspective
 
@@ -231,7 +231,7 @@ public class Camera {
         PortFigure portFigure = (PortFigure) action.getTarget();
 
         // Show ports of nearby forms
-        FigureSet nearbyFigures = getScene().getFigures(Base.class, Patch.class).filterProximity(action.getPosition(), 200 + 60);
+        FigureGroup nearbyFigures = getScene().getFigures(Base.class, Patch.class).filterArea(action.getPosition(), 200 + 60);
 
         List<Figure> figures = getScene().getFigures(Base.class, Patch.class).getList();
         for (int i = 0; i < figures.size(); i++) {
@@ -304,16 +304,16 @@ public class Camera {
     public void focusMoveView(Action action) {
 
         // Move perspective
-        Transcript transcript = action.getActionSequence();
-        setOffset(transcript.offsetX, transcript.offsetY);
+        Process process = action.getActionSequence();
+        setOffset(process.offsetX, process.offsetY);
     }
 
     public void focusSelectBase(Action action) {
 
         Actor actor = action.getActor();
-        Transcript transcript = action.getActionSequence();
+        Process process = action.getActionSequence();
 
-        if (transcript.isDragging()) {
+        if (process.isDragging()) {
 
             // Zoom out to show overview
             setScale(0.8);
@@ -325,23 +325,23 @@ public class Camera {
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
-            FigureSet otherFormFigures = getScene().getFigures().filterType(Base.class, Patch.class).remove(baseFigure);
+            FigureGroup otherFormFigures = getScene().getFigures().filterType(Base.class, Patch.class).remove(baseFigure);
             for (Figure figure : otherFormFigures.getList()) {
 //                figure.hidePortFigures();
 //                figure.hidePathFigures();
                 figure.setTransparency(0.1f);
             }
 
-            Transcript previousTranscript = null;
-            if (actor.transcripts.size() > 1) {
-                previousTranscript = actor.transcripts.get(actor.transcripts.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousTranscript.getFirst().getTarget());
+            Process previousProcess = null;
+            if (actor.processes.size() > 1) {
+                previousProcess = actor.processes.get(actor.processes.size() - 2);
+                Log.v("PreviousTouch", "Previous: " + previousProcess.getFirstAction().getTarget());
                 Log.v("PreviousTouch", "Current: " + action.getTarget());
             }
 
             // Camera
             if (baseFigure.getBase().getPaths().size() > 0
-                    && (previousTranscript != null && previousTranscript.getFirst().getTarget() != action.getTarget())) {
+                    && (previousProcess != null && previousProcess.getFirstAction().getTarget() != action.getTarget())) {
 
                 Log.v("Touch_", "A");
 
@@ -447,7 +447,7 @@ public class Camera {
     public void focusSelectVisualization() { // Previously called "focusReset"
 
         // No points on board or port. Touch is on map. So hide ports.
-        FigureSet baseFigures = getScene().getFigures(Base.class);
+        FigureGroup baseFigures = getScene().getFigures(Base.class);
         for (int i = 0; i < baseFigures.getList().size(); i++) {
             BaseFigure baseFigure = (BaseFigure) baseFigures.get(i);
             baseFigure.hidePortFigures();
@@ -455,7 +455,7 @@ public class Camera {
             baseFigure.setTransparency(1.0);
         }
 
-        FigureSet patchFigures = getScene().getFigures(Patch.class);
+        FigureGroup patchFigures = getScene().getFigures(Patch.class);
         for (int i = 0; i < patchFigures.getList().size(); i++) {
             PatchFigure patchFigure = (PatchFigure) patchFigures.get(i);
             patchFigure.hidePortFigures();

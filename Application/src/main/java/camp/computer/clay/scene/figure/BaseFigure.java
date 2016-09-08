@@ -15,7 +15,7 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Transcript;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.scene.architecture.Figure;
 import camp.computer.clay.scene.architecture.Scene;
@@ -168,20 +168,20 @@ public class BaseFigure extends Figure<Base> {
             @Override
             public void onAction(Action action) {
 
-                Transcript transcript = action.getActionSequence();
+                Process process = action.getActionSequence();
 
                 Camera camera = action.getActor().getCamera();
 
                 if (action.getType() == Action.Type.NONE) {
 
-                } else if (action.getType() == Action.Type.TOUCH) {
+                } else if (action.getType() == Action.Type.SELECT) {
 
                 } else if (action.getType() == Action.Type.HOLD) {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
                     // Holding
-                    if (transcript.isHolding()) {
+                    if (process.isHolding()) {
 
                         // Holding and dragging
 
@@ -207,12 +207,12 @@ public class BaseFigure extends Figure<Base> {
 
                     }
 
-                } else if (action.getType() == Action.Type.RELEASE) {
+                } else if (action.getType() == Action.Type.UNSELECT) {
 
                     Figure targetFigure = scene.getFigureByPosition(action.getPosition());
                     action.setTarget(targetFigure);
 
-                    if (transcript.isTap()) {
+                    if (process.isTap()) {
 
                         // Focus on touched form
                         showPathFigures();
@@ -220,10 +220,11 @@ public class BaseFigure extends Figure<Base> {
 
                         setTransparency(1.0);
 
-                        // TODO: Speak "choose a channel to get data."
+                        // TODO: Speak "choose a channel to getAction data."
 
                         // Show ports and paths of touched form
-                        for (PortFigure portFigure : getPortFigures()) {
+                        for (int i = 0; i < getPortFigures().size(); i++) {
+                            PortFigure portFigure = getPortFigures().get(i);
                             List<Path> paths = portFigure.getPort().getGraph();
                             Log.v("TouchFrame", "\tpaths.size = " + paths.size());
                             for (Path path : paths) {
@@ -244,12 +245,12 @@ public class BaseFigure extends Figure<Base> {
 
                         // TODO: Release longer than tap!
 
-                        if (transcript.getFirst().getTarget() instanceof BaseFigure) {
+                        if (process.getFirstAction().getTarget() instanceof BaseFigure) {
 
                             if (action.getTarget() instanceof BaseFigure) {
 
-                                // If first processAction was on the same form, then respond
-                                if (transcript.getFirst().isPointing() && transcript.getFirst().getTarget() instanceof BaseFigure) {
+                                // If getFirstAction processAction was on the same form, then respond
+                                if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseFigure) {
 
                                     // Base
                                     action.getTarget().processAction(action);
@@ -261,7 +262,7 @@ public class BaseFigure extends Figure<Base> {
                             } else if (action.getTarget() instanceof Scene) {
 
                                 // Base
-                                transcript.getFirst().getTarget().processAction(action);
+                                process.getFirstAction().getTarget().processAction(action);
 
                             }
 

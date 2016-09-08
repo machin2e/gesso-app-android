@@ -14,10 +14,10 @@ public class Action {
     public enum Type {
 
         NONE,
-        TOUCH, // Consider renaming to CONNECT or ATTACH or ENGAGE
+        SELECT, // Consider renaming to CONNECT or ATTACH or ENGAGE
         HOLD,
         MOVE,
-        RELEASE; // Consider renaming to DISCONNECT or DETACH or DISENGAGE
+        UNSELECT; // Consider renaming to DISCONNECT or DETACH or DISENGAGE
 
         Type() {
         }
@@ -34,7 +34,7 @@ public class Action {
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 
-    private Transcript parentTranscript = null;
+    private Process parentProcess = null;
 
     /**
      * The points at which actions were performed (e.g., the touch points on a touchscreen).
@@ -76,15 +76,15 @@ public class Action {
     }
 
     public boolean hasPattern() {
-        return parentTranscript != null;
+        return parentProcess != null;
     }
 
-    public void setPattern(Transcript transcript) {
-        this.parentTranscript = transcript;
+    public void setProcess(Process process) {
+        this.parentProcess = process;
     }
 
-    public Transcript getActionSequence() {
-        return this.parentTranscript;
+    public Process getActionSequence() {
+        return this.parentProcess;
     }
 
     public void setActor(Actor actor) {

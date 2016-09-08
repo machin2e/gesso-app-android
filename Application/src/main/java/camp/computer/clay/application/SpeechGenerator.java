@@ -52,11 +52,11 @@ public class SpeechGenerator implements TextToSpeech.OnInitListener {
 //
 ////            for (Voice voice : voices) {
 //////                // Set the chosen voice's synthesis characteristics
-//////                voice.get
+//////                voice.getAction
 ////            }
 //
 ////            // Set the chosen voice's synthesis characteristics
-////            voice.get
+////            voice.getAction
 //        }
     }
 

@@ -8,15 +8,16 @@ import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
+import camp.computer.clay.scene.util.geometry.Shape;
 
 /**
- * FigureSet is an interface for managing and manipulating sets of figures.
+ * FigureGroup is an interface for managing and manipulating sets of figures.
  */
-public class FigureSet {
+public class FigureGroup {
 
     private List<Figure> figures = new LinkedList<>();
 
-    public FigureSet() {
+    public FigureGroup() {
     }
 
     public void add(Figure figure) {
@@ -31,7 +32,7 @@ public class FigureSet {
         return figures.contains(figure);
     }
 
-    public FigureSet remove(Figure figure) {
+    public FigureGroup remove(Figure figure) {
         figures.remove(figure);
         return this;
     }
@@ -40,28 +41,42 @@ public class FigureSet {
         return figures.get(index);
     }
 
+    public Figure getFirst() {
+        if (figures.size() > 0) {
+            return figures.get(0);
+        }
+        return null;
+    }
+
+    public Figure getLast() {
+        if (figures.size() > 0) {
+            return figures.get(figures.size() - 1);
+        }
+        return null;
+    }
+
     /**
      * Removes all elements except those with the specified type.
      *
      * @param types
      * @return
      */
-    public <T extends Construct> FigureSet filterType(Class<?>... types) {
+    public <T extends Construct> FigureGroup filterType(Class<?>... types) {
 
-        FigureSet figureSet = new FigureSet();
+        FigureGroup figureGroup = new FigureGroup();
 
         for (int i = 0; i < this.figures.size(); i++) {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
                 //for (Class<?> type : types) {
-                //if (this.figures.get(i).getClass() == type) {
+                //if (this.figures.getAction(i).getClass() == type) {
                 if (this.figures.get(i).getConstruct().getClass() == type) {
-                    figureSet.add(this.figures.get(i));
+                    figureGroup.add(this.figures.get(i));
                 }
             }
         }
 
-        return figureSet;
+        return figureGroup;
     }
 
     /**
@@ -71,9 +86,9 @@ public class FigureSet {
      * @param distance
      * @return
      */
-    public FigureSet filterProximity(Point point, double distance) {
+    public FigureGroup filterArea(Point point, double distance) {
 
-        FigureSet figureSet = new FigureSet();
+        FigureGroup figureGroup = new FigureGroup();
 
         for (int i = 0; i < figures.size(); i++) {
 
@@ -85,29 +100,48 @@ public class FigureSet {
             );
 
             if (distanceToImage < distance) {
-                figureSet.add(figure);
+                figureGroup.add(figure);
             }
 
         }
 
-        return figureSet;
+        return figureGroup;
 
     }
 
-    public FigureSet filterVisibility(Visibility visibility) {
+    /**
+     * Filters figures that fall within the area defined by {@code shape}.
+     *
+     * @param shape The {@code Shape} covering the area to filter.
+     * @return The {@code FigureGroup} containing the area covered by {@code shape}.
+     */
+    public FigureGroup filterArea(Shape shape) {
 
-        FigureSet figureSet = new FigureSet();
+        FigureGroup figureGroup = new FigureGroup();
+
         for (int i = 0; i < figures.size(); i++) {
-
             Figure figure = figures.get(i);
+            if (shape.contains(figure.getPosition())) {
+                figureGroup.add(figure);
+            }
+        }
 
+        return figureGroup;
+    }
+
+    public FigureGroup filterVisibility(Visibility visibility) {
+
+        FigureGroup figureGroup = new FigureGroup();
+
+        for (int i = 0; i < figures.size(); i++) {
+            Figure figure = figures.get(i);
             if (figure.getVisibility() == visibility) {
-                figureSet.add(figure);
+                figureGroup.add(figure);
             }
 
         }
 
-        return figureSet;
+        return figureGroup;
     }
 
     public List<Figure> getList() {
@@ -116,7 +150,8 @@ public class FigureSet {
 
     public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
-        for (Figure figure : figures) {
+        for (int i = 0; i < figures.size(); i++) {
+            Figure figure = figures.get(i);
             positions.add(new Point(figure.getPosition().getX(), figure.getPosition().getY()));
         }
         return positions;
@@ -124,7 +159,8 @@ public class FigureSet {
 
     public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
-        for (Figure figure : figures) {
+        for (int i = 0; i < figures.size(); i++) {
+            Figure figure = figures.get(i);
             positions.addAll(figure.getAbsoluteVertices());
         }
         return positions;
@@ -142,7 +178,7 @@ public class FigureSet {
         return Geometry.calculateBoundingBox(getVertices());
     }
 
-    public List<Point> getBoundingPolygon() {
+    public List<Point> getBoundingShape() {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -157,7 +193,8 @@ public class FigureSet {
         double shortestDistance = Float.MAX_VALUE;
         Figure nearestFigure = null;
 
-        for (Figure figure : figures) {
+        for (int i = 0; i < figures.size(); i++) {
+            Figure figure = figures.get(i);
 
             double currentDistance = Geometry.calculateDistance(position, figure.getPosition());
 

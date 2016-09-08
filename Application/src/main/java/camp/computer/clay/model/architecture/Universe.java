@@ -51,7 +51,8 @@ public class Universe extends Construct {
 
     public List<Port> getPorts() {
         List<Port> ports = new ArrayList<>();
-        for (Base base : this.bases) {
+        for (int i = 0; i < this.bases.size(); i++) {
+            Base base = this.bases.get(i);
             ports.addAll(base.getPorts());
         }
         return ports;
@@ -59,8 +60,10 @@ public class Universe extends Construct {
 
     public List<Path> getPaths() {
         List<Path> paths = new ArrayList<>();
-        for (Base base : this.bases) {
-            for (Port port : base.getPorts()) {
+        for (int i = 0; i < this.bases.size(); i++) {
+            Base base = this.bases.get(i);
+            for (int j = 0; j < base.getPorts().size(); j++) {
+                Port port = base.getPorts().get(j);
                 paths.addAll(port.getPaths());
             }
         }

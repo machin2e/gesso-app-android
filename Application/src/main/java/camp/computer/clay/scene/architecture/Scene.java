@@ -19,7 +19,7 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Transcript;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.scene.figure.BaseFigure;
 import camp.computer.clay.scene.figure.PatchFigure;
@@ -53,7 +53,7 @@ public class Scene extends Figure<Universe> {
             @Override
             public void onAction(Action action) {
 
-                Transcript transcript = action.getActionSequence();
+                Process process = action.getActionSequence();
 
                 Figure targetFigure = getFigureByPosition(action.getPosition());
                 action.setTarget(targetFigure);
@@ -62,9 +62,9 @@ public class Scene extends Figure<Universe> {
 
                 if (action.getType() == Action.Type.NONE) {
 
-                } else if (action.getType() == Action.Type.TOUCH) {
+                } else if (action.getType() == Action.Type.SELECT) {
 
-                    if (transcript.isTap()) {
+                    if (process.isTap()) {
 
                         // Camera
                         camera.focusSelectVisualization();
@@ -78,7 +78,7 @@ public class Scene extends Figure<Universe> {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                    if (transcript.isHolding()) {
+                    if (process.isHolding()) {
 
                         // Scene
                         action.getTarget().processAction(action);
@@ -88,29 +88,29 @@ public class Scene extends Figure<Universe> {
 //                        camera.focusMoveView(action);
 
                         // Camera
-                        if (transcript.getSize() > 1) {
+                        if (process.getSize() > 1) {
                             camera.setOffset(
-                                    action.getPosition().getX() - transcript.getFirst().getPosition().getX(),
-                                    action.getPosition().getY() - transcript.getFirst().getPosition().getY()
+                                    action.getPosition().getX() - process.getFirstAction().getPosition().getX(),
+                                    action.getPosition().getY() - process.getFirstAction().getPosition().getY()
                             );
 
                         }
 
 //                    camera.setScale(0.9f);
 //                    camera.setOffset(
-//                            action.getPosition().getX() - transcript.getFirst().getPosition().getX(),
-//                            action.getPosition().getY() - transcript.getFirst().getPosition().getY()
+//                            action.getPosition().getX() - process.getFirstAction().getPosition().getX(),
+//                            action.getPosition().getY() - process.getFirstAction().getPosition().getY()
 //                    );
 
                     }
 
-                } else if (action.getType() == Action.Type.RELEASE) {
+                } else if (action.getType() == Action.Type.UNSELECT) {
 
                     Log.v("Action", "onRelease");
                     Log.v("Action", "processAction: " + action.getTarget());
                     Log.v("Action", "-");
 
-                    if (transcript.isTap()) {
+                    if (process.isTap()) {
 
 //                        if (goalVisibility == Visibility.INVISIBLE) {
 //                            goalVisibility = Visibility.VISIBLE;
@@ -120,7 +120,7 @@ public class Scene extends Figure<Universe> {
 
                     } else {
 
-                        if (transcript.getSource() instanceof Base) {
+                        if (process.getSource() instanceof Base) {
 
                             Log.v("Test","Create Patch from Base");
 
@@ -131,11 +131,11 @@ public class Scene extends Figure<Universe> {
 //
 //                                Log.v("Test","T1");
 //
-//                                Log.v("Test","isPointing: " + transcript.getFirst().isPointing());
-//                                Log.v("Test","getTarget: " + transcript.getFirst().getTarget());
+//                                Log.v("Test","isPointing: " + process.getFirstAction().isPointing());
+//                                Log.v("Test","getTarget: " + process.getFirstAction().getTarget());
 //
-//                                // If first processAction was on the same form, then respond
-//                                if (transcript.getFirst().isPointing() && transcript.getFirst().getTarget() instanceof BaseFigure) {
+//                                // If getFirstAction processAction was on the same form, then respond
+//                                if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseFigure) {
 //
 //                                    Log.v("Test","T2");
 //
@@ -151,15 +151,15 @@ public class Scene extends Figure<Universe> {
 //                                Log.v("Test","T3");
 //
 //                                // Base
-////                                transcript.getFirst().getTarget().processAction(action);
+////                                process.getFirstAction().getTarget().processAction(action);
 //
 //                            }
 
-                        } else if (transcript.getSource() instanceof Port) {
+                        } else if (process.getSource() instanceof Port) {
 
                             Log.v("Test","Create Patch from Port");
 
-                            PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirst().getTarget();
+                            PortFigure sourcePortFigure = (PortFigure) action.getActionSequence().getFirstAction().getTarget();
 
                             if (sourcePortFigure.getCandidatePatchVisibility() == Visibility.VISIBLE) {
 
@@ -193,7 +193,8 @@ public class Scene extends Figure<Universe> {
 //                            patchFigure.setRotation(sourceBaseFigure.getRotation() + 180);
 
                                 // Create Port Figures for each of Patch's Ports
-                                for (Port port : patch.getPorts()) {
+                                for (int i = 0; i < patch.getPorts().size(); i++) {
+                                    Port port = patch.getPorts().get(i);
                                     PortFigure portFigure = new PortFigure(port);
                                     addFigure(portFigure, "ports");
                                 }
@@ -209,7 +210,7 @@ public class Scene extends Figure<Universe> {
                                     sourcePort.setDirection(Port.Direction.OUTPUT);
                                 }
 //                        if (sourcePort.getType() == Port.Type.NONE) {
-                                //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.get(i) + 1) % machineSprite.channelTypeColors.length
+                                //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.getAction(i) + 1) % machineSprite.channelTypeColors.length
                                 sourcePort.setType(Port.Type.POWER_REFERENCE);
 //                        }
 
@@ -271,7 +272,9 @@ public class Scene extends Figure<Universe> {
 
             // Setup base's port figures
             // Add a port sprite for each of the associated base's ports
-            for (Port port : base.getPorts()) {
+//            for (Port port : base.getPorts()) {
+            for (int i = 0; i < base.getPorts().size(); i++) {
+                Port port = base.getPorts().get(i);
 //                PortFigure portFigure = new PortFigure(port);
 //                scene.addFigure(portFigure, "ports");
 
@@ -332,7 +335,8 @@ public class Scene extends Figure<Universe> {
     }
 
     public Layer getLayer(int id) {
-        for (Layer layer : getLayers()) {
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
             if (layer.getIndex() == id) {
                 return layer;
             }
@@ -399,7 +403,8 @@ public class Scene extends Figure<Universe> {
      * present. If one is not present, this method returns {@code null}.
      */
     public boolean contains(Construct construct) {
-        for (Layer layer : getLayers()) {
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
             Figure figure = layer.getFigure(construct);
             if (figure != null) {
                 return true;
@@ -409,7 +414,8 @@ public class Scene extends Figure<Universe> {
     }
 
     public Figure getFigure(Construct construct) {
-        for (Layer layer : getLayers()) {
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
             Figure figure = layer.getFigure(construct);
             if (figure != null) {
                 return figure;
@@ -419,7 +425,8 @@ public class Scene extends Figure<Universe> {
     }
 
     public Construct getModel(Figure figure) {
-        for (Layer layer : getLayers()) {
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
             Construct construct = layer.getModel(figure);
             if (construct != null) {
                 return construct;
@@ -430,8 +437,10 @@ public class Scene extends Figure<Universe> {
 
     public <T> List<Figure> getFigures(List<T> models) {
         List<Figure> figures = new ArrayList<>();
-        for (Layer layer : getLayers()) {
-            for (T model : models) {
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
+            for (int j = 0; j < models.size(); j++) {
+                T model = models.get(j);
                 Figure figure = layer.getFigure((Construct) model);
                 if (figure != null) {
                     figures.add(figure);
@@ -441,23 +450,27 @@ public class Scene extends Figure<Universe> {
         return figures;
     }
 
-    public FigureSet getFigures() {
-        FigureSet figureSet = new FigureSet();
-        for (Integer index : getLayerIndices()) {
+    public FigureGroup getFigures() {
+        FigureGroup figureGroup = new FigureGroup();
+        List<Integer> indices = getLayerIndices();
+        for (int i = 0; i < indices.size(); i++) {
+            Integer index = indices.get(i);
             Layer layer = getLayer(index);
             if (layer != null) {
-                figureSet.add(layer.getFigures());
+                figureGroup.add(layer.getFigures());
             }
         }
-        return figureSet;
+        return figureGroup;
     }
 
-    public <T extends Construct> FigureSet getFigures(Class<?>... types) {
+    public <T extends Construct> FigureGroup getFigures(Class<?>... types) {
         return getFigures().filterType(types);
     }
 
     public Figure getFigureByPosition(Point point) {
-        for (Figure figure : getFigures().filterVisibility(Visibility.VISIBLE).getList()) {
+        List<Figure> figures = getFigures().filterVisibility(Visibility.VISIBLE).getList();
+        for (int i = 0; i < figures.size(); i++) {
+            Figure figure = figures.get(i);
             if (figure.contains(point)) {
                 return figure;
             }
@@ -471,7 +484,8 @@ public class Scene extends Figure<Universe> {
 
     public static <T extends Figure> List<Point> getPositions(List<T> figures) {
         List<Point> positions = new ArrayList<>();
-        for (T figure : figures) {
+        for (int i = 0; i < figures.size(); i++) {
+            T figure = figures.get(i);
             positions.add(figure.getPosition());
         }
         return positions;
@@ -509,7 +523,7 @@ public class Scene extends Figure<Universe> {
 //            Layer layer = getLayer(index);
 //            if (layer != null) {
 //                for (int i = 0; i < layer.getFigures().size(); i++) {
-//                    layer.getFigures().get(i).draw(surface);
+//                    layer.getFigures().getAction(i).draw(surface);
 //                }
 //            }
 
@@ -543,9 +557,9 @@ public class Scene extends Figure<Universe> {
             }
         }
 
-//            getLayer("paths").getFigures().get(i).draw(surface);
-//            getLayer("patches").getFigures().get(i).draw(surface);
-//            getLayer("ports").getFigures().get(i).draw(surface);
+//            getLayer("paths").getFigures().getAction(i).draw(surface);
+//            getLayer("patches").getFigures().getAction(i).draw(surface);
+//            getLayer("ports").getFigures().getAction(i).draw(surface);
 //        }
 
         // Layout figures
@@ -649,16 +663,17 @@ public class Scene extends Figure<Universe> {
     }
 
     public List<Integer> getLayerIndices() {
-        List<Integer> layers = new ArrayList<>();
-        for (Layer layer : getLayers()) {
-            layers.add(layer.getIndex());
+        List<Integer> layerIndices = new ArrayList<>();
+        for (int i = 0; i < layers.size(); i++) {
+            Layer layer = layers.get(i);
+            layerIndices.add(layer.getIndex());
         }
-        Collections.sort(layers);
-        return layers;
+        Collections.sort(layerIndices);
+        return layerIndices;
     }
 
     public List<Layer> getLayers() {
-        return new ArrayList<>(this.layers);
+        return layers;
     }
 
     @Override
@@ -691,7 +706,7 @@ public class Scene extends Figure<Universe> {
 
 //    public void onMoveListener(Action action) {
 //
-//        Transcript actionSequence = action.getActionSequence();
+//        Process actionSequence = action.getActionSequence();
 //
 //        Figure targetFigure = getFigureByPosition(action.getPosition());
 //        action.setTarget(targetFigure);
@@ -699,7 +714,7 @@ public class Scene extends Figure<Universe> {
 //        Camera camera = action.getActor().getCamera();
 //
 //        if (actionSequence.getSize() > 1) {
-//            action.setTarget(actionSequence.getFirst().getTarget());
+//            action.setTarget(actionSequence.getFirstAction().getTarget());
 //        }
 //
 //        // Holding
@@ -763,8 +778,8 @@ public class Scene extends Figure<Universe> {
 ////                // Camera
 ////                if (actionSequence.getSize() > 1) {
 ////                    camera.setOffset(
-////                            action.getPosition().getX() - actionSequence.getFirst().getPosition().getX(),
-////                            action.getPosition().getY() - actionSequence.getFirst().getPosition().getY()
+////                            action.getPosition().getX() - actionSequence.getFirstAction().getPosition().getX(),
+////                            action.getPosition().getY() - actionSequence.getFirstAction().getPosition().getY()
 ////                    );
 ////
 ////                }
@@ -775,9 +790,9 @@ public class Scene extends Figure<Universe> {
 
     public void onReleaseListener(Action action) {
 
-        Transcript transcript = action.getActionSequence();
+        Process process = action.getActionSequence();
 
-        action.setType(Action.Type.RELEASE);
+        action.setType(Action.Type.UNSELECT);
 
         Figure targetFigure = getFigureByPosition(action.getPosition());
         action.setTarget(targetFigure);
@@ -789,7 +804,7 @@ public class Scene extends Figure<Universe> {
         Log.v("Action", "-");
 
 
-        if (transcript.getDuration() < Action.MAXIMUM_TAP_DURATION) {
+        if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
 //            if (action.getTarget() instanceof BaseFigure) {
 //
@@ -826,26 +841,26 @@ public class Scene extends Figure<Universe> {
 
         } else {
 
-            action.setType(Action.Type.RELEASE);
+            action.setType(Action.Type.UNSELECT);
 
 //            action.setTrigger(
 //                    Action.Type.NONE,
-//                    Action.Type.TOUCH,
+//                    Action.Type.SELECT,
 //                    Action.Type.MOVE,
 //                    *,
-//                    Action.Type.RELEASE
+//                    Action.Type.UNSELECT
 //            );
 
             // onSequence (BaseFigure.class, ..., Figure.class, null, ) { ... }
             // onSequence (BaseFigure.class, *, Figure.class, null, ) { ... }
 
             // First processAction was on a base figure...
-            if (transcript.getFirst().getTarget() instanceof BaseFigure) {
+            if (process.getFirstAction().getTarget() instanceof BaseFigure) {
 
                 if (action.getTarget() instanceof BaseFigure) {
 
-                    // If first processAction was on the same form, then respond
-                    if (transcript.getFirst().isPointing() && transcript.getFirst().getTarget() instanceof BaseFigure) {
+                    // If getFirstAction processAction was on the same form, then respond
+                    if (process.getFirstAction().isPointing() && process.getFirstAction().getTarget() instanceof BaseFigure) {
 
                         // Base
                         action.getTarget().processAction(action);
@@ -857,19 +872,19 @@ public class Scene extends Figure<Universe> {
                 } else if (action.getTarget() instanceof Scene) {
 
                     // Base
-                    transcript.getFirst().getTarget().processAction(action);
+                    process.getFirstAction().getTarget().processAction(action);
 
                 }
 
-            } else if (transcript.getFirst().getTarget() instanceof PortFigure) {
+            } else if (process.getFirstAction().getTarget() instanceof PortFigure) {
 
                 // First processAction was on a port figure...
 
                 if (action.getTarget() instanceof BaseFigure) {
 
-                    // ...last processAction was on a base figure.
+                    // ...getLastAction processAction was on a base figure.
 
-                    PortFigure sourcePortFigure = (PortFigure) transcript.getFirst().getTarget();
+                    PortFigure sourcePortFigure = (PortFigure) process.getFirstAction().getTarget();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
 
                 } else if (action.getTarget() instanceof PortFigure) {
@@ -888,7 +903,7 @@ public class Scene extends Figure<Universe> {
 
                 }
 
-            } else if (transcript.getFirst().getTarget() instanceof PathFigure) {
+            } else if (process.getFirstAction().getTarget() instanceof PathFigure) {
 
                 // Path --> ?
 
@@ -897,13 +912,13 @@ public class Scene extends Figure<Universe> {
                     PathFigure pathFigure = (PathFigure) action.getTarget();
                 }
 
-            } else if (transcript.getFirst().getTarget() instanceof Scene) {
+            } else if (process.getFirstAction().getTarget() instanceof Scene) {
 
                 // Scene --> ?
 
-                // Check if first processAction was on an figure
-                if (transcript.getFirst().getTarget() instanceof PortFigure) {
-                    ((PortFigure) transcript.getFirst().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
+                // Check if getFirstAction processAction was on an figure
+                if (process.getFirstAction().getTarget() instanceof PortFigure) {
+                    ((PortFigure) process.getFirstAction().getTarget()).setCandidatePathVisibility(Visibility.INVISIBLE);
                 }
 
 //                camera.focusSelectVisualization();

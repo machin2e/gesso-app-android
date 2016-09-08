@@ -164,7 +164,7 @@ public class Port extends Construct {
                 if (path.getTarget() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
                     // TODO: ancestorPaths.add(path.getSource().getDescendantPaths()) will allow to
-                    // TODO: (cont'd) get complete ancestor graph.
+                    // TODO: (cont'd) getAction complete ancestor graph.
                     searchablePorts.add(path.getSource()); // Queue the source port in the search
                 }
             }
