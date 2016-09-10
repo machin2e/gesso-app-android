@@ -53,7 +53,7 @@ public class Device {
     }
 
 //    public long getTimeSinceLastMessage () {
-////        Log.v ("Clay_Time", "Time since getLastAction message: " + this.timeOfLastContact);
+////        Log.v ("Clay_Time", "Time since getStopAction message: " + this.timeOfLastContact);
 //        Date currentTime = Calendar.getInstance().getTime ();
 //
 //        if (timeOfLastContact != null) {

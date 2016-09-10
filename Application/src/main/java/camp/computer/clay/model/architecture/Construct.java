@@ -3,7 +3,7 @@ package camp.computer.clay.model.architecture;
 public abstract class Construct {
     // TODO: UUID.
     // TODO: Tag.
-    // TODO: Physical dimensions (of actual physical object). Add it as a tag-like property.
+    // TODO: Physical dimensions (of actual physical object). Add it as a label-like property.
 
     private Construct parent;
 

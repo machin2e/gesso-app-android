@@ -1,5 +1,7 @@
 package camp.computer.clay.model.architecture;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.Scene;
+import camp.computer.clay.scene.util.geometry.Shape;
 
 /**
  * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
@@ -98,13 +101,16 @@ public class Actor { // Controller
                     processes.remove(0);
                 }
 
-                // Process the action
-
-                // Set the target
+                // Set the target image
                 Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
-                action.setTarget(targetImage);
+                action.setTargetImage(targetImage);
 
-                action.getTarget().processAction(action);
+                // Set the target shape
+                Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
+                action.setTargetShape(targetShape);
+
+                // Process the action
+                action.getTargetImage().processAction(action);
 
                 //getCamera().getScene().onTouchListener(action);
 
@@ -121,21 +127,25 @@ public class Actor { // Controller
 
                 // Classify/Callback
                 if (process.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
-                    // action.setType(Action.Type.MOVE);
 
+                    // Set the target image
                     Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
-                    action.setTarget(targetImage);
+                    action.setTargetImage(targetImage);
+
+                    // Set the target shape
+                    Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
+                    action.setTargetShape(targetShape);
 
                     // <HACK>
-                    //Process process = action.getActionSequence();
+                    // TODO: Update handlers and Delete!
+                    //Process process = action.getProcess();
                     if (process.getSize() > 1) {
-                        action.setTarget(process.getFirstAction().getTarget());
+                        action.setTargetImage(process.getStartAction().getTargetImage());
+                        action.setTargetShape(process.getStartAction().getTargetShape());
                     }
                     // </HACK>
 
-                    action.getTarget().processAction(action);
-
-//                    getCamera().getScene().onMoveListener(action);
+                    action.getTargetImage().processAction(action);
                 }
 
                 break;
@@ -160,11 +170,15 @@ public class Actor { // Controller
 //                    getCamera().getScene().onReleaseListener(action);
 //                }
 
-                // Set the target
+                // Set the target image
                 Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
-                action.setTarget(targetImage);
+                action.setTargetImage(targetImage);
 
-                action.getTarget().processAction(action);
+                // Set the target shape
+                Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
+                action.setTargetShape(targetShape);
+
+                action.getTargetImage().processAction(action);
 
 //                getCamera().getScene().onReleaseListener(action);
 

@@ -37,7 +37,7 @@ public class Renderer extends Thread {
     // <STATISTICS>
     private double currentFramesPerSecond = 0;
     private int fpsSampleIndex = 0;
-    private final int fpsSampleLimit = DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT; // Moving FPS average for getLastAction second.
+    private final int fpsSampleLimit = DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT; // Moving FPS average for getStopAction second.
     private double[] fpsSamples = new double[fpsSampleLimit];
     // </STATISTICS>
 

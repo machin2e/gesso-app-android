@@ -2,6 +2,7 @@ package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 
+import camp.computer.clay.application.Surface;
 import camp.computer.clay.scene.util.Visibility;
 
 public abstract class Shape {
@@ -40,11 +41,11 @@ public abstract class Shape {
     }
 
     public void setOrigin(Point point) {
-        this.position.setReferencePoint(point);
+        this.position.setOrigin(point);
     }
 
     public Point getOrigin() {
-        return this.position.getReferencePoint();
+        return this.position.getOrigin();
     }
 
     abstract public List<Point> getVertices();
@@ -64,6 +65,14 @@ public abstract class Shape {
     public boolean contains(Point point) {
         return Geometry.containsPoint(getVertices(), point);
     }
+
+//    public boolean contains(Point point) {
+//        if (isVisible()) {
+//            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("Board")).getHeight() / 2.0f);
+//        } else {
+//            return false;
+//        }
+//    }
 
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
@@ -112,4 +121,6 @@ public abstract class Shape {
     public String getLabel() {
         return this.label;
     }
+
+    public abstract void draw(Surface surface);
 }

@@ -4,11 +4,11 @@ import java.util.List;
 
 import camp.computer.clay.application.Surface;
 
-public class Line extends Shape {
+public class Text extends Shape {
     private Point source = new Point(0, 0);
     private Point target = new Point(0, 0);
 
-    public Line () {}
+    public Text() {}
 
     @Override
     public List<Point> getVertices() {
@@ -22,12 +22,10 @@ public class Line extends Shape {
 
     @Override
     public void draw(Surface surface) {
-        if (isVisible()) {
-            Surface.drawLine(this, surface);
-        }
+
     }
 
-    public Line (Point source, Point target) {
+    public Text(Point source, Point target) {
         this.source = source;
         this.target = target;
     }

@@ -11,7 +11,7 @@ public class Point {
     /**
      * The {@code Point} relative to which this point will be positioned.
      */
-    protected Point referencePoint = null;
+    protected Point referenceCoordinate = null;
 
     private double x = 0;
     private double y = 0;
@@ -43,24 +43,24 @@ public class Point {
     }
 
     /**
-     * Creates a new {@code Point} positioned relative to {@code referencePoint}.
+     * Creates a new {@code Point} positioned relative to {@code referenceCoordinate}.
      *
-     * @param x The x coordinate of this {@code Point} relative to {@code referencePoint}.
-     * @param y The y coordinate of this {@code Point} relative to {@code referencePoint}.
-     * @param referencePoint
+     * @param x The x coordinate of this {@code Point} relative to {@code referenceCoordinate}.
+     * @param y The y coordinate of this {@code Point} relative to {@code referenceCoordinate}.
+     * @param referenceCoordinate
      */
-    public Point(double x, double y, Point referencePoint) {
-        setReferencePoint(referencePoint);
+    public Point(double x, double y, Point referenceCoordinate) {
+        setOrigin(referenceCoordinate);
         setRelativeX(x);
         setRelativeY(y);
     }
 
-    public Point getReferencePoint() {
-        return referencePoint;
+    public Point getOrigin() {
+        return referenceCoordinate;
     }
 
-    public void setReferencePoint(Point referencePoint) {
-        this.referencePoint = referencePoint;
+    public void setOrigin(Point referenceCoordinate) {
+        this.referenceCoordinate = referenceCoordinate;
     }
 
     public double getRelativeX() {
@@ -105,14 +105,14 @@ public class Point {
      * @return Absolute x coordinate.
      */
     public double getX() {
-//        if (referencePoint != null) {
-//            return referencePoint.getX() + this.x;
-////            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getX();
+//        if (referenceCoordinate != null) {
+//            return referenceCoordinate.getX() + this.x;
+////            return Geometry.calculateRotatedPoint(referenceCoordinate, getRotation(), this).getX();
 //        } else {
 //            return this.x;
 //        }
-        if (referencePoint != null) {
-            return referencePoint.getX() + this.x;
+        if (referenceCoordinate != null) {
+            return referenceCoordinate.getX() + this.x;
         } else {
             return this.x;
         }
@@ -122,17 +122,17 @@ public class Point {
      * @return Absolute y coordinate.
      */
     public double getY() {
-        if (referencePoint != null) {
-            return referencePoint.getY() + this.y;
-//            return Geometry.calculateRotatedPoint(referencePoint, getRotation(), this).getY();
+        if (referenceCoordinate != null) {
+            return referenceCoordinate.getY() + this.y;
+//            return Geometry.calculateRotatedPoint(referenceCoordinate, getRotation(), this).getY();
         } else {
             return this.y;
         }
     }
 
     public double getRotation() {
-//        if (referencePoint != null) {
-//            return referencePoint.getRotation() + this.rotation;
+//        if (referenceCoordinate != null) {
+//            return referenceCoordinate.getRotation() + this.rotation;
 //        } else {
             return this.rotation;
 //        }
@@ -159,8 +159,8 @@ public class Point {
      * @param x Absolute x coordinate. Converted to a relative x position internally.
      */
     public void setX(double x) {
-        if (referencePoint != null) {
-            this.x = x - referencePoint.getX();
+        if (referenceCoordinate != null) {
+            this.x = x - referenceCoordinate.getX();
         } else {
             this.x = x;
         }
@@ -170,16 +170,16 @@ public class Point {
      * @param y Absolute y coordinate. Converted to a relative y position internally.
      */
     public void setY(double y) {
-        if (referencePoint != null) {
-            this.y = y - referencePoint.getY();
+        if (referenceCoordinate != null) {
+            this.y = y - referenceCoordinate.getY();
         } else {
             this.y = y;
         }
     }
 
     public void setRotation(double rotation) {
-//        if (referencePoint != null) {
-//            this.rotation = rotation - referencePoint.getRotation();
+//        if (referenceCoordinate != null) {
+//            this.rotation = rotation - referenceCoordinate.getRotation();
 //        } else {
             this.rotation = rotation;
 //        }

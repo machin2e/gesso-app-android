@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code Universe} is a simulation of the environmental context.
+ * {@code Space} is a simulation of the environmental context.
  */
-public class Universe extends Construct {
+public class Space extends Construct {
 
     private System system = new System();
 

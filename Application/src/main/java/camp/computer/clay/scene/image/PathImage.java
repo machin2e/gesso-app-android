@@ -239,34 +239,4 @@ public class PathImage extends Image<Path> {
 //        }
 
     }
-
-    @Override
-    public boolean contains(Point point) {
-
-//        if (isVisible()) {
-//            Log.v("Touch_", "FLOOOO");
-//            Path path = getPath();
-//
-//            PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
-//            PortImage targetPortImage = (PortImage) getScene().getImage(path.getImageByCoordinate());
-//
-//            double distanceToLine = Geometry.calculateLineToPointDistance(
-//                    sourcePortImage.getCoordinate(),
-//                    targetPortImage.getCoordinate(),
-//                    point,
-//                    true
-//            );
-//
-//            if (distanceToLine < 60) {
-//                return true;
-//            } else {
-//                return false;
-//            }
-//        }
-        return false;
-    }
-
-    public boolean contains(Point point, double padding) {
-        return false;
-    }
 }

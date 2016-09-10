@@ -588,7 +588,7 @@ public class SQLiteStoreHost {
             }
         }
 
-        // TODO: queryScripts () // Get all actions, for use to create the getFirstAction actions in the database.
+        // TODO: queryScripts () // Get all actions, for use to create the getStartAction actions in the database.
 
         /** Action Script */
 
@@ -807,7 +807,7 @@ public class SQLiteStoreHost {
 
             // Get the behavior and behavior script from the cache. Here, these are assumed to
             // be available in the cache, since it is assumed they are loaded and cached when
-            // Clay is getFirstAction opened.
+            // Clay is getStartAction opened.
             Script behaviorScript = getClay ().getCache ().getScript(UUID.fromString(behaviorScriptUuidString));
             Action behavior = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
             behavior.setScript(behaviorScript);
@@ -877,7 +877,7 @@ public class SQLiteStoreHost {
 
                 // Get the behavior and behavior script from the cache. Here, these are assumed to
                 // be available in the cache, since it is assumed they are loaded and cached when
-                // Clay is getFirstAction opened.
+                // Clay is getStartAction opened.
 //            Script behaviorScript = getClay().getCache().getScript(UUID.fromString(behaviorScriptUuidString));
 //            Log.v ("Content_Manager", "> behavior: " + behavior.getUuid());
 //            behavior.setScript(behaviorScript);
@@ -1219,9 +1219,9 @@ public class SQLiteStoreHost {
                 String selection = null;
                 String[] selectionArgs = null;
 //                if (parentUuid == null) {
-//                    Log.v("New_Behavior", "adding new behavior with tag " + behavior.getTag());
+//                    Log.v("New_Behavior", "adding new behavior with tag " + behavior.getLabel());
 //                    selection = ActionEntry.COLUMN_NAME_TAG + " = ?";
-//                    selectionArgs = new String[]{behavior.getTag()};
+//                    selectionArgs = new String[]{behavior.getLabel()};
 //                } else {
                     selection = ActionEntry.COLUMN_NAME_UUID + " LIKE ? AND "
                             + ActionEntry.COLUMN_NAME_SIBLING_INDEX + " = ?";
@@ -1319,9 +1319,9 @@ public class SQLiteStoreHost {
             String[] selectionArgs = null;
             // TODO!!!!!!!!!!!! Check if action exists (by structure, varies for leaf/basic, intermediate, root)
 //            if (parentUuid == null) {
-//                Log.v ("New_Behavior", "adding new action with tag " + action.getTag());
+//                Log.v ("New_Behavior", "adding new action with tag " + action.getLabel());
 //                selection = ActionEntry.COLUMN_NAME_TAG + " = ?";
-//                selectionArgs = new String[] { action.getTag() };
+//                selectionArgs = new String[] { action.getLabel() };
 //            } else {
                 selection = ActionEntry.COLUMN_NAME_UUID + " LIKE ? AND "
                         + ActionEntry.COLUMN_NAME_PARENT_UUID + " LIKE ?";
@@ -1492,7 +1492,7 @@ public class SQLiteStoreHost {
 
                 // Get the Action and Script objects. These are assumed to be
                 // available in the cache at this point, since they should be loaded when Clay
-                // is getFirstAction oepned.
+                // is getStartAction oepned.
                 //Action action = getClay ().getAction (UUID.fromString (behaviorUuidString));
 
                 // Reconstruct the associated action
@@ -1670,7 +1670,7 @@ public class SQLiteStoreHost {
 
     /**
      * Store the action. Recursively stores the action tree graph by performing a breadth
-     * getFirstAction traversal.
+     * getStartAction traversal.
      * @param action The action to store.
      */
     public void storeAction(Action action) {
@@ -1700,7 +1700,7 @@ public class SQLiteStoreHost {
 
         Log.v ("Content_Manager", "storeActionTree");
 
-        // Breadth getFirstAction storage, to ensure that a relation to a action's children can be
+        // Breadth getStartAction storage, to ensure that a relation to a action's children can be
         // created. The parent must be in the database before children can store a relation to
         // their parent.
 

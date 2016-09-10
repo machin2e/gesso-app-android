@@ -2,6 +2,8 @@ package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 
+import camp.computer.clay.application.Surface;
+
 public class Triangle extends Shape {
 
     private Point a = new Point(0, 0);
@@ -32,5 +34,12 @@ public class Triangle extends Shape {
     @Override
     public List<Line> getSegments() {
         return null;
+    }
+
+    @Override
+    public void draw(Surface surface) {
+        if (isVisible()) {
+            Surface.drawTriangle(this, surface);
+        }
     }
 }

@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
-        android:tag="@string/application_name"
+        android:label="@string/application_name"
         android:icon="@drawable/ic_launcher">
         <activity android:name="camp.computer.clay.application.Application"
             android:theme="@style/SplashTheme"

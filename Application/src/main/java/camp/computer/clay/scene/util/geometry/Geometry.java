@@ -40,7 +40,7 @@ public abstract class Geometry {
      * 0 and 360 degrees represents NORTH,
      * 90 degrees represents EAST, etc...
      * <p>
-     * Assumes all points are in the same coordinate space.  If they are not,
+     * Assumes all pointerCoordinates are in the same coordinate space.  If they are not,
      * you will need to call SwingUtilities.convertPointToScreen or equivalent
      * on all arguments before passing them  to this function.
      *
@@ -52,7 +52,7 @@ public abstract class Geometry {
 
         // calculate the rotation theta from the deltaY and deltaX values
         // (atan2 returns radians values from [-PI,PI])
-        // 0 currently points EAST.
+        // 0 currently pointerCoordinates EAST.
         // NOTE: By preserving Y and X param order to atan2,  we are expecting
         // a CLOCKWISE rotation direction.
         double theta = Math.atan2(target.getY() - source.getY(), target.getX() - source.getX());
@@ -234,7 +234,7 @@ public abstract class Geometry {
         List<Point> convexHull = new ArrayList<>();
 
         if (points.size() < 3) {
-            //return (ArrayList) points.clone();
+            //return (ArrayList) pointerCoordinates.clone();
             for (int i = 0; i < points.size(); i++) {
                 Point pointCopy = new Point(points.get(i));
                 convexHull.add(pointCopy);
@@ -362,7 +362,7 @@ public abstract class Geometry {
     }
 
     /**
-     * Compute list of points that are separated by a minimal distance. Based on circle packing
+     * Compute list of pointerCoordinates that are separated by a minimal distance. Based on circle packing
      * algorithm.
      * <p>
      * References:
@@ -377,7 +377,7 @@ public abstract class Geometry {
      */
     public static <T extends Image> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
 
-        // Sort points based on distance from center
+        // Sort pointerCoordinates based on distance from center
         List<T> sortedImages = sortByDistanceToPoint(positions, packingCenter);
         List<Point> sortedPositions = Scene.getCoordinates(sortedImages);
 
@@ -392,7 +392,7 @@ public abstract class Geometry {
                     continue;
                 }
 
-                // Vector/Segment connecting a pair of points
+                // Vector/Segment connecting a pair of pointerCoordinates
                 // TODO: Vector2 AB = mCircles[j].mCenter - mCircles[i].mCenter;
                 Point vectorAB = new Point(
                         sortedPositions.get(j).getX() - sortedPositions.get(i).getX(),
@@ -467,7 +467,7 @@ public abstract class Geometry {
 
     public static <T extends Image> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
 
-        // Initialize with unsorted list of points
+        // Initialize with unsorted list of pointerCoordinates
         List<T> sortedList = new ArrayList(positions);
 
         for (int i = 0; i < sortedList.size(); i++) {
@@ -495,14 +495,14 @@ public abstract class Geometry {
     }
 
 //    /**
-//     * Compute list of points that are separated by a minimal distance. Based on circle packing
+//     * Compute list of pointerCoordinates that are separated by a minimal distance. Based on circle packing
 //     * algorithm.
 //     * @param positions
 //     * @return
 //     */
 //    public static ArrayList<Point> computeCirclePacking(ArrayList<Point> positions, double distance, Point packingCenter) {
 //
-//        // Sort points based on distance from center
+//        // Sort pointerCoordinates based on distance from center
 //        ArrayList<Point> sortedPoints = sortByDistanceToPoint(positions, packingCenter);
 //
 //        double minSeparationSq = distance * distance;
@@ -578,7 +578,7 @@ public abstract class Geometry {
 //
 //    public static ArrayList<Point> sortByDistanceToPoint(ArrayList<Point> positions, Point point) {
 //
-//        // Initialize with unsorted list of points
+//        // Initialize with unsorted list of pointerCoordinates
 //        ArrayList<Point> sortedList = new ArrayList(positions);
 //
 //        for (int i = 0; i < sortedList.size(); i++) {
@@ -607,7 +607,7 @@ public abstract class Geometry {
 
     /**
      * General-purpose function that returns true if the given point is contained inside the shape
-     * defined by the boundary points.
+     * defined by the boundary pointerCoordinates.
      *
      * @param vertices The vertices defining the boundary polygon
      * @param point The point to check
@@ -660,7 +660,7 @@ public abstract class Geometry {
 
             vertices.add(vertexPosition);
 
-            // Draw points in shape
+            // Draw pointerCoordinates in shape
             path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
             if (i == 0) {
                 path.moveTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
@@ -674,16 +674,16 @@ public abstract class Geometry {
         return vertices;
     }
 
-    // TODO: Detect if a point falls within a shape defined by list of points.
+    // TODO: Detect if a point falls within a shape defined by list of pointerCoordinates.
     // TODO: (cont'd) - http://alienryderflex.com/polygon/
     // TODO: (cont'd) - http://stackoverflow.com/questions/8721406/how-to-determine-if-a-point-is-inside-a-2d-convex-polygon
     // TODO: (cont'd) - http://math.stackexchange.com/questions/193606/detect-when-a-point-belongs-to-a-bounding-box-with-distances?lq=1
     // TODO: (cont'd) - http://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
 
-    // TODO: Detect minimum bounding box rotating to fit list of points
+    // TODO: Detect minimum bounding box rotating to fit list of pointerCoordinates
     // TODO: (cont'd) - http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points
 
-    // TODO: Classify shape given a list of points (2D point cloud). (Use this rather than instanceof?)
+    // TODO: Classify shape given a list of pointerCoordinates (2D point cloud). (Use this rather than instanceof?)
     // TODO: (cont'd) - http://stat.fsu.edu/~anuj/pdf/papers/Y2012/Su_CSDA_2012_Paper.pdf
     // TODO: (cont'd) - http://homepages.inf.ed.ac.uk/svijayak/publications/mcneill-IJCAI2005.pdf
     // TODO: (cont'd) - http://www.cs.umd.edu/~djacobs/pubs_files/ID-pami-8.pdf

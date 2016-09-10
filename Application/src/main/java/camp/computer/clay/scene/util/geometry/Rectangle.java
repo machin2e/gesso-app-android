@@ -1,11 +1,16 @@
 package camp.computer.clay.scene.util.geometry;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import camp.computer.clay.application.Surface;
 
 public class Rectangle extends Shape {
 
     private double width = 1.0;
+
     private double height = 1.0;
 
     public Rectangle(double width, double height) {
@@ -42,6 +47,16 @@ public class Rectangle extends Shape {
         segments.add(new Line(getBottomRight(), getBottomLeft()));
         segments.add(new Line(getBottomLeft(), getTopLeft()));
         return segments;
+    }
+
+    @Override
+    public void draw(Surface surface) {
+        if (isVisible()) {
+            Surface.drawRectangle(this, surface);
+
+            surface.getPaint().setColor(Color.GREEN);
+            Surface.drawRectangle(position, getRotation(), width, height, surface);
+        }
     }
 
     public double getWidth() {

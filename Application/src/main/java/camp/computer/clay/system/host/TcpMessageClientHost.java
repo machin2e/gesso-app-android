@@ -101,7 +101,7 @@ public class TCPMessageClientHost {
 
             while (runTask) {
 
-                // Update time since getLastAction message was sent
+                // Update time since getStopAction message was sent
                 currentTime = Calendar.getInstance();
                 long timeSinceSend = currentTime.getTime().getTime() - previousSendTime.getTime();
 

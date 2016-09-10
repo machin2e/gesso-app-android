@@ -16,7 +16,7 @@ import camp.computer.clay.scene.util.geometry.Point;
  */
 public class Process { // TODO: Rename Activity. Previously Gesture.
 
-    // TODO: Construct this with a "points thisProcess envelope" or "thisProcess envelope".
+    // TODO: Construct this with a "pointerCoordinates thisProcess envelope" or "thisProcess envelope".
     // TODO: Construct voice thisProcess in the same way. Generify to Process<T> or subclass.
     // TODO: (?) Construct data transmissions as actions in the same way?
 
@@ -43,19 +43,19 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
 
             int pointerIndex = 0;
 
-            if (getFirstAction().isPointing[pointerIndex]) {
+            if (getStartAction().isPointing[pointerIndex]) {
                 if (getDragDistance() < Action.MINIMUM_DRAG_DISTANCE) {
 
                     // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
-                    thisProcess.getFirstAction().setType(Action.Type.HOLD);
-//                    getFirstAction().getActor().getCamera().getScene().onHoldListener(thisProcess.getFirstAction());
+                    thisProcess.getStartAction().setType(Action.Type.HOLD);
+//                    getStartAction().getActor().getCamera().getScene().onHoldListener(thisProcess.getStartAction());
 
-                    Action action = thisProcess.getFirstAction();
-                    Image targetImage = getFirstAction().getActor().getScene().getImageByCoordinate(action.getCoordinate());
-                    action.setTarget(targetImage);
+                    Action action = thisProcess.getStartAction();
+                    Image targetImage = getStartAction().getActor().getScene().getImageByCoordinate(action.getCoordinate());
+                    action.setTargetImage(targetImage);
 
-                    action.getTarget().processAction(action);
+                    action.getTargetImage().processAction(action);
                     // </HACK>
 
                     thisProcess.isHolding[pointerIndex] = true;
@@ -95,7 +95,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
         } else if (actions.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getCoordinate(), getFirstAction().points[action.pointerIndex]);
+            this.dragDistance[action.pointerIndex] = Geometry.calculateDistance(action.getCoordinate(), getStartAction().pointerCoordinates[action.pointerIndex]);
 
             if (getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
                 isDragging[action.pointerIndex] = true;
@@ -108,7 +108,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
         return this.actions.get(index);
     }
 
-    public Action getFirstAction() {
+    public Action getStartAction() {
         if (actions.size() > 0) {
             return actions.get(0);
         } else {
@@ -116,7 +116,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
         }
     }
 
-    public Action getLastAction() {
+    public Action getStopAction() {
         if (actions.size() > 0) {
             return actions.get(actions.size() - 1);
         } else {
@@ -124,28 +124,28 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
         }
     }
 
-    // TODO: Remove this? Or make it complement the updated getTarget() which returns the Construct that the process targeted.
-    public Construct getSource() {
+    // TODO: Remove this? Or make it complement the updated getTargetImage() which returns the Construct that the process targeted.
+    public Construct getSource() { // getOrigin
         if (actions.size() > 0) {
-            return getAction(0).getTarget().getConstruct();
+            return getAction(0).getTargetImage().getConstruct();
         }
         return null;
     }
 
-    public Construct getTarget() {
-        Action action = getLastAction();
+    public Construct getTarget() { // getTarget
+        Action action = getStopAction();
         if (action != null) {
-            return action.getTarget().getConstruct();
+            return action.getTargetImage().getConstruct();
         }
         return null;
     }
 
     public long getStartTime() {
-        return getFirstAction().getTimestamp();
+        return getStartAction().getTimestamp();
     }
 
     public long getStopTime() {
-        return getLastAction().getTimestamp();
+        return getStopAction().getTimestamp();
     }
 
     public int getSize() {
@@ -153,7 +153,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
     }
 
     public long getDuration() {
-        return getLastAction().getTimestamp() - getFirstAction().getTimestamp();
+        return getStopAction().getTimestamp() - getStartAction().getTimestamp();
     }
 
     public ArrayList<Point> getTouchPath() {
@@ -169,11 +169,11 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
     }
 
     public boolean isDragging() {
-        return isDragging[getLastAction().pointerIndex];
+        return isDragging[getStopAction().pointerIndex];
     }
 
     public double getDragDistance() {
-        return dragDistance[getLastAction().pointerIndex];
+        return dragDistance[getStopAction().pointerIndex];
     }
 
     public boolean isTap() {
@@ -181,13 +181,13 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
     }
 
     /**
-     * Returns point-to-point distance between getFirstAction and getLastAction action positions.
+     * Returns point-to-point distance between getStartAction and getStopAction action positions.
      *
-     * @return Point-to-point distance between the getFirstAction and getLastAction actions' positions.
+     * @return Point-to-point distance between the getStartAction and getStopAction actions' positions.
      */
     public double getDistance() {
-        Action firstAction = getFirstAction();
-        Action lastAction = getLastAction();
+        Action firstAction = getStartAction();
+        Action lastAction = getStopAction();
         double distance = Geometry.calculateDistance(
                 firstAction.getCoordinate(),
                 lastAction.getCoordinate()
@@ -198,4 +198,12 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
     // <CLASSIFIER>
     // TODO: Implement classifiers (inc. $1).
     // </CLASSIFIER>
+
+    public boolean startsWith(Action action) {
+        return false;
+    }
+
+    public boolean stopsWith(Action action) {
+        return false;
+    }
 }

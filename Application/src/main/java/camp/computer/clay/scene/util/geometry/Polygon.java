@@ -3,6 +3,8 @@ package camp.computer.clay.scene.util.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.application.Surface;
+
 public class Polygon extends Shape {
 
     private List<Point> vertices = new ArrayList<>();
@@ -33,6 +35,13 @@ public class Polygon extends Shape {
             segments.add(new Line(vertices.get(i), vertices.get(i + 1)));
         }
         return segments;
+    }
+
+    @Override
+    public void draw(Surface surface) {
+        if (isVisible()) {
+            Surface.drawPolygon(this, surface);
+        }
     }
 
 }

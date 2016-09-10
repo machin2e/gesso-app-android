@@ -1,7 +1,11 @@
 package camp.computer.clay.scene.util.geometry;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import camp.computer.clay.application.Surface;
 
 /**
  * Circle. By default, objects are unit circles.
@@ -35,7 +39,7 @@ public class Circle extends Shape {
     }
 
     /**
-     * Returns list of points on the perimeter of the circle that define a regular polygon that
+     * Returns list of pointerCoordinates on the perimeter of the circle that define a regular polygon that
      * approximates the circle.
      *
      * @return
@@ -53,5 +57,15 @@ public class Circle extends Shape {
             segments.add(new Line(vertices.get(i), vertices.get(i + 1)));
         }
         return segments;
+    }
+
+    @Override
+    public void draw(Surface surface) {
+        if (isVisible()) {
+            Surface.drawCircle(this, surface);
+
+            surface.getPaint().setColor(Color.GREEN);
+            Surface.drawCircle(position, this.radius / 2, 0, surface);
+        }
     }
 }

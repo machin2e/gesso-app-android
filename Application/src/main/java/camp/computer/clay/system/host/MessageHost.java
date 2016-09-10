@@ -285,8 +285,8 @@ public class MessageHost {
             Message outgoingMessage = peekOutgoingMessage ();
 
 //            Log.v("UDP", "                 Message: " + outgoingMessage.getDescriptor());
-//            Log.v("UDP", "Time since getLastAction dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-//            Log.v("UDP", " Time since getLastAction message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+//            Log.v("UDP", "Time since getStopAction dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+//            Log.v("UDP", " Time since getStopAction message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
 //            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
 //            Log.v("UDP", "-----");
 

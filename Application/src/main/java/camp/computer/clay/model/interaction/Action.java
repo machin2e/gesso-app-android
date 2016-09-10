@@ -4,6 +4,7 @@ import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Time;
 import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Shape;
 
 public class Action {
 
@@ -14,14 +15,13 @@ public class Action {
     public enum Type {
 
         NONE,
-        SELECT, // Consider renaming to CONNECT or ATTACH or ENGAGE
+        SELECT,
         HOLD,
         MOVE,
-        UNSELECT; // Consider renaming to DISCONNECT or DETACH or DISENGAGE
+        UNSELECT;
 
         Type() {
         }
-
     }
 
     public static int MAXIMUM_POINT_COUNT = 1;
@@ -37,13 +37,16 @@ public class Action {
     private Process parentProcess = null;
 
     /**
-     * The points at which actions were performed (e.g., the touch points on a touchscreen).
+     * The pointerCoordinates at which actions were performed (e.g., the touch pointerCoordinates on a touchscreen).
      */
-    public Point[] points = new Point[MAXIMUM_POINT_COUNT];
+    public Point[] pointerCoordinates = new Point[MAXIMUM_POINT_COUNT];
 
+    // TODO: Delete this!
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
 
-    private Image[] targetImage = new Image[MAXIMUM_POINT_COUNT];
+    private Image[] targetImages = new Image[MAXIMUM_POINT_COUNT];
+
+    private Shape[] targetShapes = new Shape[MAXIMUM_POINT_COUNT];
 
     private Type type = null;
 
@@ -60,8 +63,9 @@ public class Action {
 
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
-            points[i] = new Point(0, 0);
-            targetImage[i] = null;
+            pointerCoordinates[i] = new Point(0, 0);
+            targetImages[i] = null;
+            targetShapes[i] = null;
             isPointing[i] = false;
         }
     }
@@ -75,7 +79,7 @@ public class Action {
         return false;
     }
 
-    public boolean hasPattern() {
+    public boolean hasProcess() {
         return parentProcess != null;
     }
 
@@ -83,7 +87,7 @@ public class Action {
         this.parentProcess = process;
     }
 
-    public Process getActionSequence() {
+    public Process getProcess() {
         return this.parentProcess;
     }
 
@@ -104,37 +108,56 @@ public class Action {
     }
 
     public Point getCoordinate() {
-        return this.points[0];
+        return this.pointerCoordinates[0];
     }
 
     public long getTimestamp() {
         return this.timestamp;
     }
 
-    public boolean isPointing(int fingerIndex) { // was isTouching
-        return this.targetImage[fingerIndex] != null;
-    }
-
-    public void setTarget(int fingerIndex, Image image) {
-        this.targetImage[fingerIndex] = image;
-    }
-
-    public Image getTarget(int fingerIndex) {
-        return this.targetImage[fingerIndex];
+    public boolean isPointing(int pointerIndex) { // was isTouching
+        return this.targetImages[pointerIndex] != null;
     }
 
     public boolean isPointing() { // was isTouching
         return isPointing(0);
     }
 
-    public void setTarget(Image image) {
-        setTarget(0, image);
+    public void setTargetImage(int pointerIndex, Image image) {
+        this.targetImages[pointerIndex] = image;
+    }
+
+    public void setTargetImage(Image image) {
+        setTargetImage(0, image);
         if (image != null) {
             isPointing[0] = true;
         }
     }
 
-    public Image getTarget() {
-        return getTarget(0);
+    public Image getTargetImage(int pointerIndex) {
+        return this.targetImages[pointerIndex];
+    }
+
+    public Image getTargetImage() {
+        return getTargetImage(0);
+    }
+
+    public void setTargetShape(int pointerIndex, Shape shape) {
+        this.targetShapes[pointerIndex] = shape;
+    }
+
+    public void setTargetShape(Shape shape) {
+        setTargetShape(0, shape);
+        if (shape != null) {
+            isPointing[0] = true;
+        }
+    }
+
+    public Shape getTargetShape(int pointerIndex) {
+        return this.targetShapes[pointerIndex];
+    }
+
+    public Shape getTargetShape() {
+        return getTargetShape(0);
     }
 }

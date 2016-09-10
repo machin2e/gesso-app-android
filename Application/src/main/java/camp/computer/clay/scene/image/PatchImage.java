@@ -58,14 +58,14 @@ public class PatchImage extends Image<Patch> {
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
 
-                    Process process = action.getActionSequence();
+                    Process process = action.getProcess();
 
                     Image targetImage = scene.getImageByCoordinate(action.getCoordinate());
-                    action.setTarget(targetImage);
+                    action.setTargetImage(targetImage);
 
                     if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
 
-                        // Focus on touched form
+                        // Focus on touched base
                         showPathFigures();
                         showPortFigures();
                         setTransparency(1.0);
@@ -74,7 +74,7 @@ public class PatchImage extends Image<Patch> {
 
                         // Show ports and paths of touched form
                         for (PortImage portFigure : getPortFigures()) {
-                            List<Path> paths = portFigure.getPort().getGraph();
+                            List<Path> paths = portFigure.getPort().getNetwork();
                             for (Path path : paths) {
 
                                 // Show ports
@@ -99,7 +99,7 @@ public class PatchImage extends Image<Patch> {
                 } else if (action.getType() == Action.Type.UNSELECT) {
 
                     // Update Image
-                    PortImage sourcePortFigure = (PortImage) action.getActionSequence().getFirstAction().getTarget();
+                    PortImage sourcePortFigure = (PortImage) action.getProcess().getStartAction().getTargetImage();
                     sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
                     sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
 

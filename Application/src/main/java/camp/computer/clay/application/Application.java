@@ -101,7 +101,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
     }
 
-    /** Called when the activity is getFirstAction created. */
+    /** Called when the activity is getStartAction created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,7 +165,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount();
 
-                // Update the state of the touched object based on the current points interaction state.
+                // Update the state of the touched object based on the current pointerCoordinates interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -296,7 +296,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount ();
 
-                // Update the state of the touched object based on the current points interaction state.
+                // Update the state of the touched object based on the current pointerCoordinates interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
@@ -322,7 +322,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler
 //                timelineButton.setInputType(inType); // restore input type
-//                return true; // consume points even
+//                return true; // consume pointerCoordinates even
 //            }
         });
 

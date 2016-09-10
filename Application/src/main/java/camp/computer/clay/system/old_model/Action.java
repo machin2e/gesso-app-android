@@ -49,7 +49,7 @@ public class Action {
 //
 //        this.uuid = UUID.randomUUID();
 //
-//        this.tag = script.getTag();
+//        this.tag = script.getLabel();
 //
 //        this.description = "";
 //

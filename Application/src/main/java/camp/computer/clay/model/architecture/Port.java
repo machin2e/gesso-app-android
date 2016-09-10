@@ -15,14 +15,14 @@ public class Port extends Construct {
         BOTH("both"); // e.g., I2C, etc.
 
         // TODO: Change the index to a UUID?
-        String tag;
+        String label;
 
-        Direction(String tag) {
-            this.tag = tag;
+        Direction(String label) {
+            this.label = label;
         }
 
-        public String getTag() {
-            return this.tag;
+        public String getLabel() {
+            return this.label;
         }
     }
 
@@ -38,14 +38,14 @@ public class Port extends Construct {
         POWER_TTL("+5v"); // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
 
         // TODO: Change the index to a UUID?
-        String tag;
+        String label;
 
-        Type(String tag) {
-            this.tag = tag;
+        Type(String label) {
+            this.label = label;
         }
 
-        public String getTag() {
-            return this.tag;
+        public String getLabel() {
+            return this.label;
         }
 
         public static Type next(Type currentType) {
@@ -135,7 +135,7 @@ public class Port extends Construct {
      *
      * @return List of paths in the graph containing the port.
      */
-    public List<Path> getGraph() {
+    public List<Path> getNetwork() {
         List<Path> connectedPaths = new ArrayList<>();
         connectedPaths.addAll(getAncestorPaths());
         connectedPaths.addAll(getDescendantPaths());
@@ -144,9 +144,8 @@ public class Port extends Construct {
 
     public List<Path> getAncestorPaths() {
 
-        Universe universe = (Universe) getParent().getParent();
-        //List<Path> paths = getPaths();
-        List<Path> paths = universe.getPaths();
+        Space space = (Space) getParent().getParent();
+        List<Path> paths = space.getPaths();
 
         List<Path> ancestorPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -160,7 +159,8 @@ public class Port extends Construct {
             Port dequeuedPort = searchablePorts.remove(0);
 
             // Search for direct ancestor paths from port
-            for (Path path : paths) {
+            for (int i = 0; i < paths.size(); i++) {
+                Path path = paths.get(i);
                 if (path.getTarget() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
                     // TODO: ancestorPaths.add(path.getSource().getDescendantPaths()) will allow to
@@ -177,9 +177,6 @@ public class Port extends Construct {
 
     public List<Path> getDescendantPaths() {
 
-//        Universe simulation = (Universe) getParent().getParent();
-//        //List<Path> paths = getPaths();
-//        List<Path> paths = simulation.getPaths();
         List<Path> descendantPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
 
@@ -190,7 +187,8 @@ public class Port extends Construct {
         // Search descendant paths from port
         while (searchablePorts.size() > 0) {
             Port dequeuedPort = searchablePorts.remove(0);
-            for (Path path : dequeuedPort.getPaths()) {
+            for (int i = 0; i < dequeuedPort.getPaths().size(); i++) {
+                Path path = dequeuedPort.getPaths().get(i);
                 descendantPaths.add(path); // Store the path
                 searchablePorts.add(path.getTarget()); // Queue the target port in the search
             }
@@ -201,7 +199,8 @@ public class Port extends Construct {
 
     public boolean hasAncestor(Port port) {
         List<Path> ancestorPaths = getAncestorPaths();
-        for (Path ancestorPath : ancestorPaths) {
+        for (int i = 0; i < ancestorPaths.size(); i++) {
+            Path ancestorPath = ancestorPaths.get(i);
             if (ancestorPath.getSource() == port || ancestorPath.getTarget() == port) {
                 return true;
             }
@@ -211,7 +210,8 @@ public class Port extends Construct {
 
     public boolean hasDescendant(Port port) {
         List<Path> descendantPaths = getDescendantPaths();
-        for (Path descendantPath : descendantPaths) {
+        for (int i = 0; i < descendantPaths.size(); i++) {
+            Path descendantPath = descendantPaths.get(i);
             if (descendantPath.getSource() == port || descendantPath.getTarget() == port) {
                 return true;
             }
@@ -227,7 +227,8 @@ public class Port extends Construct {
      */
     public List<Port> getPorts(List<Path> paths) {
         List<Port> ports = new ArrayList<>();
-        for (Path path : paths) {
+        for (int i = 0; i < paths.size(); i++) {
+            Path path = paths.get(i);
             if (!ports.contains(path.getSource())) {
                 ports.add(path.getSource());
             }

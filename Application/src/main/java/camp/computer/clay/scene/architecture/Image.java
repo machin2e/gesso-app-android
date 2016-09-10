@@ -104,13 +104,13 @@ public abstract class Image<T extends Construct> {
     }
 
     public void addShape(Shape shape) {
-        shape.getCoordinate().setReferencePoint(getCoordinate());
+        shape.getCoordinate().setOrigin(getCoordinate());
         shapes.add(shape);
     }
 
     public <T extends Shape> void addShape(T shape, String label) {
         shape.setLabel(label);
-        shape.getCoordinate().setReferencePoint(getCoordinate());
+        shape.getCoordinate().setOrigin(getCoordinate());
         shapes.add(shape);
     }
 
@@ -128,6 +128,19 @@ public abstract class Image<T extends Construct> {
         return null;
     }
 
+    public Shape getShapeByCoordinate(Point point) {
+        // TODO: List<Image> images = getShapes().filterVisibility(Visibility.VISIBLE).getList();
+        List<Shape> shapes = getShapes(); //.filterVisibility(Visibility.VISIBLE).getList();
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
+            if (shape.contains(point)) {
+                return shape;
+            }
+        }
+        return null;
+    }
+
+    // TODO: Replace with method that returns ShapeGroup with filters, etc.
     public List<Shape> getShapes() {
         return shapes;
     }
@@ -142,9 +155,20 @@ public abstract class Image<T extends Construct> {
 
     public abstract void draw(Surface surface);
 
-    public abstract boolean contains(Point point);
+//    public abstract boolean contains(Point point);
 
-    public abstract boolean contains(Point point, double padding);
+//    public abstract boolean contains(Point point, double padding);
+
+    public boolean contains(Point point) {
+        if (isVisible()) {
+            for (int i = 0; i < shapes.size(); i++) {
+                if (shapes.get(i).contains(point)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
