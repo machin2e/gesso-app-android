@@ -65,7 +65,9 @@ public class Circle extends Shape {
             Surface.drawCircle(this, surface);
 
             surface.getPaint().setColor(Color.GREEN);
-            Surface.drawCircle(position, this.radius / 2, 0, surface);
+            //Surface.drawCircle(position, this.radius / 2, getRotation(), surface);
+
+            Surface.drawPolygon(getVertices(), surface);
         }
     }
 }

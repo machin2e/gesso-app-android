@@ -409,7 +409,7 @@ public class Scene extends Image<Space> {
                 imageCoordinates.get(0).setCoordinate(new Point(-300, -600));
                 imageCoordinates.get(0).setRotation(0);
                 imageCoordinates.get(1).setCoordinate(new Point(300, -600));
-                imageCoordinates.get(1).setRotation(20);
+                imageCoordinates.get(1).setRotation(0);
                 imageCoordinates.get(2).setCoordinate(new Point(-300, 0));
                 imageCoordinates.get(2).setRotation(40);
                 imageCoordinates.get(3).setCoordinate(new Point(300, 0));

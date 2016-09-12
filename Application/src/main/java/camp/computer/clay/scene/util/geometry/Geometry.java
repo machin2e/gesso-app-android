@@ -650,26 +650,23 @@ public abstract class Geometry {
 
         List<Point> vertices = new ArrayList<>();
 
-        android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < segmentCount; i++) {
 
+            // Calculate point prior to rotation
             Point vertexPosition = new Point(
-                    (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)),
-                    (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount))
+//                    (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)),
+//                    (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)),
+                    (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeAngle())),
+                    (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeAngle())),
+                    position
             );
 
+            // Calculate rotated point
+            //Point rotatedPoint = Geometry.calculateRotatedPoint(position, position.getRotation(), vertexPosition);
+
+            //vertices.add(vertexPosition);
             vertices.add(vertexPosition);
-
-            // Draw pointerCoordinates in shape
-            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-            if (i == 0) {
-                path.moveTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
-            }
-
-            path.lineTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
         }
-
-        path.close();
 
         return vertices;
     }
