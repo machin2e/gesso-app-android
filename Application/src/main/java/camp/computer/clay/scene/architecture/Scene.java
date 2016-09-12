@@ -190,7 +190,7 @@ public class Scene extends Image<Space> {
 
 //                            Base sourceBase = (Base) sourcePortFigure.getConstruct().getParent();
 //                            BaseImage sourceBaseFigure = (BaseImage) getImage(sourceBase);
-//                            patchFigure.setRotation(sourceBaseFigure.getRotation() + 180);
+//                            patchFigure.setRelativeRotation(sourceBaseFigure.getRotation() + 180);
 
                                 // Create Port Figures for each of Patch's Ports
                                 for (int i = 0; i < patch.getPorts().size(); i++) {
@@ -407,14 +407,19 @@ public class Scene extends Image<Space> {
                 imageCoordinates.get(1).setCoordinate(new Point(300, 0));
             } else if (imageCoordinates.size() == 5) {
                 imageCoordinates.get(0).setCoordinate(new Point(-300, -600));
+                imageCoordinates.get(0).setRotation(0);
                 imageCoordinates.get(1).setCoordinate(new Point(300, -600));
+                imageCoordinates.get(1).setRotation(20);
                 imageCoordinates.get(2).setCoordinate(new Point(-300, 0));
+                imageCoordinates.get(2).setRotation(40);
                 imageCoordinates.get(3).setCoordinate(new Point(300, 0));
+                imageCoordinates.get(3).setRotation(60);
                 imageCoordinates.get(4).setCoordinate(new Point(-300, 600));
+                imageCoordinates.get(4).setRotation(80);
             }
 
             // Set rotation
-            image.setRotation(Probability.getRandomGenerator().nextInt(360));
+//            image.setRelativeRotation(Probability.getRandomGenerator().nextInt(360));
         }
     }
 
@@ -649,6 +654,85 @@ public class Scene extends Image<Space> {
 
         }
         // </DEBUG_LABEL>
+
+        // Test Case
+//        Point p1 = new Point(0, 0);
+//        p1.setRelativeRotation(0);
+//        Point p2 = new Point(0, 0, p1);
+//        p2.setRelativeRotation(20);
+//        Point p3 = new Point(0, 0, p2);
+//        p3.setRelativeRotation(20);
+//        Point p4 = new Point(0, 0, p3);
+//        p4.setRelativeRotation(20);
+//        Point p5 = new Point(0, 0, p4);
+//        p5.setRelativeRotation(20);
+
+        // Test Case
+        Point p1 = new Point(0, 0);
+        p1.setRelativeRotation(0);
+        Point p2 = new Point(200, 400, p1);
+        p2.setRelativeRotation(20);
+        Point p3 = new Point(-250, 0, p2);
+        p3.setRelativeRotation(0);
+        Point p4 = new Point(0, 150, p3);
+        p4.setRelativeRotation(0);
+        Point p5 = new Point(0, 0, p4);
+        p5.setRelativeRotation(20);
+
+        Log.v("Points", "p2: " + p2.getX() + ", " + p2.getY());
+
+//        // Test Case
+//        Point p1 = new Point(0, 0);
+//        p1.setRelativeRotation(0);
+//        Point p2 = new Point(200 + 150, 0, p1);
+//        p2.setRelativeRotation(20);
+//        Point p3 = new Point(0, 0, p2);
+//        p3.setRelativeRotation(20);
+//        Point p4 = new Point(0, 0, p3);
+//        p4.setRelativeRotation(20);
+//        Point p5 = new Point(0, 0, p4);
+//        p5.setRelativeRotation(20);
+
+        // Test Case
+//        Point p1 = new Point();
+//        p1.setRelativeRotation(0);
+//        Point p2 = new Point(200 + 150, 0, p1);
+//        p2.setRelativeRotation(0);
+//        Point p3 = new Point(-200 + -150, 0, p2);
+//        p3.setRelativeRotation(0);
+//        Point p4 = new Point(200 + 150, 0, p3);
+//        p4.setRelativeRotation(0);
+
+        // Test Case
+//        Point p1 = new Point();
+//        p1.setRelativeRotation(0);
+//        Point p2 = new Point(0, 0, p1);
+//        p2.setRelativeRotation(45);
+//        Point p3 = new Point(0, 0, p2);
+//        p3.setRelativeRotation(0);
+//        Point p4 = new Point(283, 0, p3);
+//        p4.setRelativeRotation(0);
+
+        surface.getPaint().setStyle(Paint.Style.STROKE);
+        surface.getPaint().setColor(Color.RED);
+        surface.getPaint().setStrokeWidth(1.0f);
+        surface.getCanvas().drawRect(-200, -800, 200, -400, surface.getPaint());
+
+        surface.getPaint().setStyle(Paint.Style.FILL);
+        surface.getPaint().setColor(Color.RED);
+        surface.drawRectangle(p1, p1.getRotation(), 400, 400, surface);
+
+        surface.getPaint().setColor(Color.GREEN);
+        surface.drawRectangle(p2, p2.getRotation(), 300, 300, surface);
+
+        surface.getPaint().setColor(Color.BLUE);
+        surface.drawRectangle(p3, p3.getRotation(), 200, 200, surface);
+
+        surface.getPaint().setColor(Color.MAGENTA);
+        surface.drawRectangle(p4, p4.getRotation(), 100, 100, surface);
+
+        surface.getPaint().setColor(Color.CYAN);
+        surface.drawRectangle(p5, p5.getRotation(), 50, 50, surface);
     }
 
     private void drawLayers(Surface surface) {

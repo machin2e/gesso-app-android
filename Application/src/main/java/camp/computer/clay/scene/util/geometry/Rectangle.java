@@ -55,7 +55,7 @@ public class Rectangle extends Shape {
             Surface.drawRectangle(this, surface);
 
             surface.getPaint().setColor(Color.GREEN);
-            Surface.drawRectangle(position, getRotation(), width, height, surface);
+//            Surface.drawRectangle(position, getRotation(), width, height, surface);
         }
     }
 

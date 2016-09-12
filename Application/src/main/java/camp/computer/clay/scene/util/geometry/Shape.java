@@ -33,7 +33,7 @@ public abstract class Shape {
     }
 
     public void setRotation(double angle) {
-        this.position.setRotation(angle);
+        this.position.setRelativeRotation(angle);
     }
 
     public double getRotation() {

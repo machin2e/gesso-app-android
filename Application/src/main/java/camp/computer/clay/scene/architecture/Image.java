@@ -51,6 +51,7 @@ public abstract class Image<T extends Construct> {
         return this.scene;
     }
 
+    // TODO: Delete this after deleting PortImage
     public Image getParentImage() {
         if (getConstruct().hasParent()) {
             Construct parentConstruct = getConstruct().getParent();
@@ -76,7 +77,7 @@ public abstract class Image<T extends Construct> {
     }
 
     public void setRotation(double angle) {
-        this.position.setRotation(angle);
+        this.position.setRelativeRotation(angle);
     }
 
     public void setScale(double scale) {

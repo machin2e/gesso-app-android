@@ -65,26 +65,28 @@ public class BaseImage extends Image<Base> {
         rectangle = new Rectangle(50, 14);
         rectangle.setLabel("Header 1");
         rectangle.setCoordinate(0, 132);
-        // headerShape1.setRotation(0);
+        // headerShape1.setRelativeRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
+        addShape(rectangle);
         rectangle.setLabel("Header 2");
         rectangle.setCoordinate(132, 0);
         rectangle.setRotation(90);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-        addShape(rectangle);
+//        addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
+        addShape(rectangle);
         rectangle.setLabel("Header 3");
         rectangle.setCoordinate(0, -132);
-        // headerShape3.setRotation(180);
+        // headerShape3.setRelativeRotation(180);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-        addShape(rectangle);
+//        addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
         rectangle.setLabel("Header 4");
@@ -98,19 +100,19 @@ public class BaseImage extends Image<Base> {
         rectangle = new Rectangle(12, 20);
         rectangle.setLabel("LED 1");
         rectangle.setCoordinate(-20, 105);
-        // light1.setRotation(90);
+        // light1.setRelativeRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
         rectangle.setLabel("LED 2");
         rectangle.setCoordinate(0, 105);
-        // light1.setRotation(90);
+        // light1.setRelativeRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
         rectangle.setLabel("LED 3");
         rectangle.setCoordinate(20, 105);
-        // light1.setRotation(90);
+        // light1.setRelativeRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
@@ -168,7 +170,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 1");
         circle.setCoordinate(-90, 300);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#3f3f3f");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -177,7 +179,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 2");
         circle.setCoordinate(0, 300);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -186,7 +188,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 3");
         circle.setCoordinate(90, 300);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -195,7 +197,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 4");
         circle.setCoordinate(300, 90);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -204,7 +206,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 5");
         circle.setCoordinate(300, 0);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -213,7 +215,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 6");
         circle.setCoordinate(300, -90);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -222,7 +224,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 7");
         circle.setCoordinate(90, -300);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -231,7 +233,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 8");
         circle.setCoordinate(0, -300);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -240,7 +242,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 9");
         circle.setCoordinate(-90, -300);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -249,7 +251,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 10");
         circle.setCoordinate(-300, -90);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -258,7 +260,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 11");
         circle.setCoordinate(-300, 0);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
@@ -267,7 +269,7 @@ public class BaseImage extends Image<Base> {
         circle = new Circle(40);
         circle.setLabel("Port 12");
         circle.setCoordinate(-300, 90);
-        // circle.setRotation(0);
+        // circle.setRelativeRotation(0);
         circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
