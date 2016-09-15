@@ -328,13 +328,13 @@ public class BaseImage extends Image<Base> {
 
                         if (process.isHolding()) {
 
-                            // Holding and dragging
-
-                            // Port
-                            PortImage portFigure = (PortImage) action.getTargetImage();
-
-                            portFigure.setDragging(true);
-                            portFigure.setCoordinate(action.getCoordinate());
+//                            // Holding and dragging
+//
+//                            // Port
+//                            PortImage portImage = (PortImage) action.getTargetImage();
+//
+//                            portImage.setDragging(true);
+//                            portImage.setCoordinate(action.getCoordinate());
 
                         } else {
 
@@ -343,7 +343,7 @@ public class BaseImage extends Image<Base> {
                             setCandidatePathVisibility(Visibility.VISIBLE);
 
 
-                            candidatePathSourceCoordinate = new Point(process.getStartAction().getTargetShape().getCoordinate());
+                            candidatePathSourceCoordinate = process.getStartAction().getTargetShape().getCoordinate();
 
                             // Candidate Patch Visibility
 
