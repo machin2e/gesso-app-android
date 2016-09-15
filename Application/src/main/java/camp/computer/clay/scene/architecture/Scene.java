@@ -409,7 +409,7 @@ public class Scene extends Image<Space> {
                 imageCoordinates.get(0).setCoordinate(new Point(-300, -600));
                 imageCoordinates.get(0).setRotation(0);
                 imageCoordinates.get(1).setCoordinate(new Point(300, -600));
-                imageCoordinates.get(1).setRotation(0);
+                imageCoordinates.get(1).setRotation(20);
                 imageCoordinates.get(2).setCoordinate(new Point(-300, 0));
                 imageCoordinates.get(2).setRotation(40);
                 imageCoordinates.get(3).setCoordinate(new Point(300, 0));
@@ -676,10 +676,20 @@ public class Scene extends Image<Space> {
         p3.setRelativeRotation(0);
         Point p4 = new Point(0, 150, p3);
         p4.setRelativeRotation(0);
-        Point p5 = new Point(0, 0, p4);
+        Point p5 = new Point(0, -75, p4);
         p5.setRelativeRotation(20);
 
         Log.v("Points", "p2: " + p2.getX() + ", " + p2.getY());
+
+        Log.v("Points2", "angle(A,B): " + Geometry.calculateRotationAngle(p1, p2));
+        Log.v("Points2", "distance(A,B): " + Geometry.calculateDistance(p1, p2));
+        Log.v("Points2", "angle(B,C): " + Geometry.calculateRotationAngle(p2, p3));
+        Log.v("Points2", "distance(B,C): " + Geometry.calculateDistance(p2, p3));
+        Log.v("Points2", "angle(C,D): " + Geometry.calculateRotationAngle(p3, p4));
+        Log.v("Points2", "distance(C,D): " + Geometry.calculateDistance(p3, p4));
+        Log.v("Points2", "angle(D,E): " + Geometry.calculateRotationAngle(p4, p5));
+        Log.v("Points2", "distance(D,E): " + Geometry.calculateDistance(p4, p5));
+        Log.v("Points2", "---");
 
 //        // Test Case
 //        Point p1 = new Point(0, 0);
@@ -713,10 +723,12 @@ public class Scene extends Image<Space> {
 //        Point p4 = new Point(283, 0, p3);
 //        p4.setRelativeRotation(0);
 
+        /*
         surface.getPaint().setStyle(Paint.Style.STROKE);
         surface.getPaint().setColor(Color.RED);
         surface.getPaint().setStrokeWidth(1.0f);
         surface.getCanvas().drawRect(-200, -800, 200, -400, surface.getPaint());
+        */
 
         surface.getPaint().setStyle(Paint.Style.FILL);
         surface.getPaint().setColor(Color.RED);
@@ -733,6 +745,42 @@ public class Scene extends Image<Space> {
 
         surface.getPaint().setColor(Color.CYAN);
         surface.drawRectangle(p5, p5.getRotation(), 50, 50, surface);
+
+        //-----
+
+        Rectangle r1 = new Rectangle(p1, 100, 100);
+        surface.drawRectangle(r1, surface);
+
+        Rectangle r2 = new Rectangle(p2, 100, 100);
+        surface.drawRectangle(r2, surface);
+
+        List<Point> points = r2.getVertices();
+        for (int i = 0; i < points.size(); i++) {
+            Point p = points.get(i);
+            surface.drawRectangle(p, p.getRotation(), 25, 25, surface);
+
+        }
+
+        Rectangle r3 = new Rectangle(p3, 100, 100);
+        surface.drawRectangle(r3, surface);
+        Log.v("r3", "center x: " + r3.getCoordinate().getX() + ", y: " + r3.getCoordinate().getY());
+        Log.v("r3", "topLeft x: " + r3.getTopLeft().getX() + ", y: " + r3.getTopLeft().getY());
+        Log.v("r3", "topRight x: " + r3.getTopRight().getX() + ", y: " + r3.getTopRight().getY());
+        Log.v("r3", "bottomRight x: " + r3.getBottomRight().getX() + ", y: " + r3.getBottomRight().getY());
+        Log.v("r3", "bottomLeft x: " + r3.getBottomLeft().getX() + ", y: " + r3.getBottomLeft().getY());
+
+        points = r3.getVertices();
+        for (int i = 0; i < points.size(); i++) {
+            Point p = points.get(i);
+            surface.drawRectangle(p, p.getRotation(), 25, 25, surface);
+
+        }
+
+        Rectangle r4 = new Rectangle(p4, 100, 100);
+        surface.drawRectangle(r4, surface);
+
+        Rectangle r5 = new Rectangle(p5, 100, 100);
+        surface.drawRectangle(r5, surface);
     }
 
     private void drawLayers(Surface surface) {

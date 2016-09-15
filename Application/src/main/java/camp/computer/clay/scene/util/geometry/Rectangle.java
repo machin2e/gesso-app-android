@@ -31,6 +31,24 @@ public class Rectangle extends Shape {
         this.height = (bottom - top);
     }
 
+    public List<Point> getRelativeVertices() {
+        ArrayList<Point> vertices = new ArrayList<>();
+        vertices.add(getRelativeTopLeft());
+        vertices.add(getRelativeTopRight());
+        vertices.add(getRelativeBottomRight());
+        vertices.add(getRelativeBottomLeft());
+        return vertices;
+    }
+
+    public List<Line> getRelativeSegments() {
+        ArrayList<Line> segments = new ArrayList<>();
+        segments.add(new Line(getRelativeTopLeft(), getRelativeTopRight()));
+        segments.add(new Line(getRelativeTopRight(), getRelativeBottomRight()));
+        segments.add(new Line(getRelativeBottomRight(), getRelativeBottomLeft()));
+        segments.add(new Line(getRelativeBottomLeft(), getRelativeTopLeft()));
+        return segments;
+    }
+
     public List<Point> getVertices() {
         ArrayList<Point> vertices = new ArrayList<>();
         vertices.add(getTopLeft());
@@ -75,36 +93,54 @@ public class Rectangle extends Shape {
         this.height = height;
     }
 
-    public double getLeft() {
-        return this.position.getX() - (width / 2.0f);
+    public double getRelativeLeft() {
+        return 0 - (width / 2.0f);
     }
 
-    public double getTop() {
-        return this.position.getY() - (height / 2.0f);
+    public double getRelativeTop() {
+        return 0 - (height / 2.0f);
     }
 
-    public double getRight() {
-        return this.position.getX() + (width / 2.0f);
+    public double getRelativeRight() {
+//        return this.position.getRelativeX() + (width / 2.0f);
+        return 0 + (width / 2.0f);
     }
 
-    public double getBottom() {
-        return this.position.getY() + (height / 2.0f);
+    public double getRelativeBottom() {
+//        return this.position.getRelativeY() + (height / 2.0f);
+        return 0 + (height / 2.0f);
+    }
+
+    public Point getRelativeTopLeft() {
+        return new Point(getRelativeLeft(), getRelativeTop());
+    }
+
+    public Point getRelativeTopRight() {
+        return new Point(getRelativeRight(), getRelativeTop());
+    }
+
+    public Point getRelativeBottomRight() {
+        return new Point(getRelativeRight(), getRelativeBottom());
+    }
+
+    public Point getRelativeBottomLeft() {
+        return new Point(getRelativeLeft(), getRelativeBottom());
     }
 
     public Point getTopLeft() {
-        return new Point(getLeft(), getTop());
+        return new Point(getRelativeLeft(), getRelativeTop(), position);
     }
 
     public Point getTopRight() {
-        return new Point(getRight(), getTop());
+        return new Point(getRelativeRight(), getRelativeTop(), position);
     }
 
     public Point getBottomRight() {
-        return new Point(getRight(), getBottom());
+        return new Point(getRelativeRight(), getRelativeBottom(), position);
     }
 
     public Point getBottomLeft() {
-        return new Point(getLeft(), getBottom());
+        return new Point(getRelativeLeft(), getRelativeBottom(), position);
     }
 
     public double getArea() {
