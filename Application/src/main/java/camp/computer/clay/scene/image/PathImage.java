@@ -7,6 +7,7 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -33,7 +34,9 @@ public class PathImage extends Image<Path> {
     private void setupActions() {
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Process process) {
+
+                Action action = process.getStopAction();
 
                 if (action.getType() == Action.Type.NONE) {
 

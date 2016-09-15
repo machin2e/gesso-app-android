@@ -124,15 +124,15 @@ public class PortImage extends Image<Port> {
 
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Process process) {
+
+                Action action = process.getStopAction();
 
                 if (action.getType() == Action.Type.NONE) {
 
                 } else if (action.getType() == Action.Type.SELECT) {
 
                 } else if (action.getType() == Action.Type.MOVE) {
-
-                    Process process = action.getProcess();
 
                     if (process.isHolding()) {
 
@@ -188,12 +188,10 @@ public class PortImage extends Image<Port> {
 
                         // Camera
                         Camera camera = action.getActor().getCamera();
-                        camera.focusCreatePath(action);
+                        camera.focusCreatePath(process);
                     }
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
-
-                    Process process = action.getProcess();
 
                     Image targetImage = scene.getImageByCoordinate(action.getCoordinate());
                     action.setTargetImage(targetImage);

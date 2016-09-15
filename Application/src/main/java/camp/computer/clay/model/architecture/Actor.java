@@ -76,7 +76,7 @@ public class Actor { // Controller
         }
     }
 
-    public void doAction(Action action) { // TODO: Rename to doAction()
+    public void processAction(Action action) { // TODO: Rename to processAction()
 
         action.setActor(this);
 
@@ -110,7 +110,7 @@ public class Actor { // Controller
                 action.setTargetShape(targetShape);
 
                 // Process the action
-                action.getTargetImage().processAction(action);
+                action.getTargetImage().processAction(process);
 
                 //getCamera().getScene().onTouchListener(action);
 
@@ -136,16 +136,17 @@ public class Actor { // Controller
                     Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
                     action.setTargetShape(targetShape);
 
-                    // <HACK>
-                    // TODO: Update handlers and Delete!
-                    //Process process = action.getProcess();
-                    if (process.getSize() > 1) {
-                        action.setTargetImage(process.getStartAction().getTargetImage());
-                        action.setTargetShape(process.getStartAction().getTargetShape());
-                    }
-                    // </HACK>
+//                    // <HACK>
+//                    // TODO: Update handlers and Delete!
+//                    //Process process = action.getProcess();
+//                    if (process.getSize() > 1) {
+//                        action.setTargetImage(process.getStartAction().getTargetImage());
+//                        action.setTargetShape(process.getStartAction().getTargetShape());
+//                    }
+//                    // </HACK>
 
-                    action.getTargetImage().processAction(action);
+                    //action.getTargetImage().processAction(process);
+                    process.getStartAction().getTargetImage().processAction(process);
                 }
 
                 break;
@@ -178,7 +179,8 @@ public class Actor { // Controller
                 Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
                 action.setTargetShape(targetShape);
 
-                action.getTargetImage().processAction(action);
+                //action.getTargetImage().processAction(process);
+                process.getStartAction().getTargetImage().processAction(process);
 
 //                getCamera().getScene().onReleaseListener(action);
 

@@ -226,7 +226,9 @@ public class Camera {
         return this.scene;
     }
 
-    public void focusCreatePath(Action action) {
+    public void focusCreatePath(Process process) {
+
+        Action action = process.getStartAction();
 
         BaseImage boardImage = (BaseImage) action.getTargetImage();
         ImageGroup nearbyImages = getScene().getImages(Base.class, Patch.class).filterArea(action.getCoordinate(), 200 + 60);

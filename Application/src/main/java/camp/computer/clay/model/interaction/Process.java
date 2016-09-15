@@ -55,7 +55,7 @@ public class Process { // TODO: Rename Activity. Previously Gesture.
                     Image targetImage = getStartAction().getActor().getScene().getImageByCoordinate(action.getCoordinate());
                     action.setTargetImage(targetImage);
 
-                    action.getTargetImage().processAction(action);
+                    action.getTargetImage().processAction(thisProcess);
                     // </HACK>
 
                     thisProcess.isHolding[pointerIndex] = true;

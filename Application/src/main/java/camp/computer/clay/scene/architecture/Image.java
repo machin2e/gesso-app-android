@@ -7,6 +7,7 @@ import camp.computer.clay.application.Surface;
 import camp.computer.clay.model.architecture.Construct;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.util.Color;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
@@ -175,9 +176,9 @@ public abstract class Image<T extends Construct> {
         this.actionListener = actionListener;
     }
 
-    public void processAction(Action action) {
+    public void processAction(Process process) {
         if (actionListener != null) {
-            actionListener.onAction(action);
+            actionListener.onAction(process);
         }
     }
 

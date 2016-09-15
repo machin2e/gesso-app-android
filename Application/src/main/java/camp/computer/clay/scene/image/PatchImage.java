@@ -50,15 +50,15 @@ public class PatchImage extends Image<Patch> {
 
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Process process) {
+
+                Action action = process.getStopAction();
 
                 if (action.getType() == Action.Type.NONE) {
 
                 } else if (action.getType() == Action.Type.SELECT) {
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
-
-                    Process process = action.getProcess();
 
                     Image targetImage = scene.getImageByCoordinate(action.getCoordinate());
                     action.setTargetImage(targetImage);

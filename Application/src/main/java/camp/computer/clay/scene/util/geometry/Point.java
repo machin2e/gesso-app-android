@@ -115,16 +115,19 @@ public class Point {
 
             Point localOrigin = new Point(0, 0);
             Point localPoint = new Point(x, y);
-            Point rotatedLocalPoint = new Point();
+//            Point rotatedLocalPoint = new Point();
 
-            double xOffset = Geometry.calculateDistance(localOrigin, localPoint);
-            double rotationOffset = Geometry.calculateRotationAngle(localOrigin, localPoint);
+//            double xOffset = Geometry.calculateDistance(localOrigin, localPoint);
+//            double rotationOffset = Geometry.calculateRotationAngle(localOrigin, localPoint);
 
-            rotatedLocalPoint.setX(0 + xOffset * Math.cos(Math.toRadians(rotationOffset)));
+//            rotatedLocalPoint.setX(0 + xOffset * Math.cos(Math.toRadians(rotationOffset)));
 
-            Point rotatedPoint = Geometry.calculateRotatedPoint(localOrigin, referenceCoordinate.getRotation(), localPoint);
+            //Point rotatedPoint = Geometry.calculateRotatedPoint(0, 0, referenceCoordinate.getRotation(), x, y);
+            //Point rotatedPoint = Geometry.calculatePoint(0, 0, referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y), Geometry.calculateDistance(0, 0, x, y));
 
-            return referenceCoordinate.getX() + rotatedPoint.getX();
+            double globalX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+
+            return referenceCoordinate.getX() + globalX;
 
         } else {
             return this.x;
@@ -137,18 +140,22 @@ public class Point {
     public double getY() {
         if (referenceCoordinate != null) {
 
-            Point localOrigin = new Point();
-            Point localPoint = new Point(x, y);
-            Point rotatedLocalPoint = new Point();
+//            Point localOrigin = new Point();
+//            Point localPoint = new Point(x, y);
+//            Point rotatedLocalPoint = new Point();
 
-            double yOffset = Geometry.calculateDistance(localOrigin, localPoint);
-            double rotationOffset = Geometry.calculateRotationAngle(localOrigin, localPoint);
+//            double yOffset = Geometry.calculateDistance(localOrigin, localPoint);
+//            double rotationOffset = Geometry.calculateRotationAngle(localOrigin, localPoint);
 
-            rotatedLocalPoint.setY(0 + yOffset * Math.sin(Math.toRadians(rotationOffset)));
+//            rotatedLocalPoint.setY(0 + yOffset * Math.sin(Math.toRadians(rotationOffset)));
 
-            Point rotatedPoint = Geometry.calculateRotatedPoint(localOrigin, referenceCoordinate.getRotation(), localPoint);
+            //Point rotatedPoint = Geometry.calculateRotatedPoint(0, 0, referenceCoordinate.getRotation(), x, y);
+            //Point rotatedPoint = Geometry.calculatePoint(0, 0, referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y), Geometry.calculateDistance(0, 0, x, y));
+            //point.setX(x + distance * Math.cos(Math.toRadians(rotation)));
+            //point.setY(y + Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y))));
 
-            return referenceCoordinate.getY() + rotatedPoint.getY();
+            double globalY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            return referenceCoordinate.getY() + globalY;
 
         } else {
             return this.y;

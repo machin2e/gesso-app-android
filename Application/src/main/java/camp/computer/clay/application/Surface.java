@@ -372,17 +372,17 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
                     action.setType(Action.Type.SELECT);
                     action.pointerIndex = pointerId;
-                    actor.doAction(action);
+                    actor.processAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getStartAction pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     action.setType(Action.Type.MOVE);
                     action.pointerIndex = pointerId;
-                    actor.doAction(action);
+                    actor.processAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     action.setType(Action.Type.UNSELECT);
                     action.pointerIndex = pointerId;
-                    actor.doAction(action);
+                    actor.processAction(action);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getStartAction pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
@@ -433,23 +433,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         Canvas canvas = surface.getCanvas();
         Paint paint = surface.getPaint();
 
-//        // Calculate rotated coordinate
-//        Point rotatedPosition = null;
-//        if (position.getOrigin() != null) {
-////            Log.v("RectDraw", "!= null");
-////            rotatedPosition = Geometry.calculatePoint(circle.getCoordinate().getOrigin(), circle.getRotation() + Geometry.calculateRotationAngle(position.getOrigin(), position), Geometry.calculateDistance(position.getOrigin(), position));
-//            rotatedPosition = Geometry.calculateRotatedPoint(position.getOrigin(), position.getOrigin().getRotation(), position);
-//        } else {
-////            Log.v("RectDraw", "NULL");
-//            rotatedPosition = new Point(position);
-//        }
-
-        Point rotatedPosition = position;
-
         // Color
         canvas.drawCircle(
-                (float) rotatedPosition.getX(),
-                (float) rotatedPosition.getY(),
+                (float) position.getX(),
+                (float) position.getY(),
                 (float) radius,
                 paint
         );
@@ -461,26 +448,13 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         Canvas canvas = surface.getCanvas();
         Paint paint = surface.getPaint();
 
-        // Calculate rotated coordinate
-//        Point rotatedPosition = null;
-//        if (circle.getCoordinate().getOrigin() != null) {
-////            Log.v("RectDraw", "!= null");
-////            rotatedPosition = Geometry.calculatePoint(circle.getCoordinate().getOrigin(), circle.getRotation() + Geometry.calculateRotationAngle(position.getOrigin(), position), Geometry.calculateDistance(position.getOrigin(), position));
-//            rotatedPosition = Geometry.calculateRotatedPoint(circle.getCoordinate().getOrigin(), circle.getCoordinate().getOrigin().getRotation(), circle.getCoordinate());
-//        } else {
-////            Log.v("RectDraw", "NULL");
-//            rotatedPosition = new Point(circle.getCoordinate());
-//        }
-
-        Point rotatedPosition = circle.getCoordinate();
-
         // Color
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.parseColor(circle.getColor()));
 
         canvas.drawCircle(
-                (float) rotatedPosition.getX(),
-                (float) rotatedPosition.getY(),
+                (float) circle.getCoordinate().getX(),
+                (float) circle.getCoordinate().getY(),
                 (float) circle.getRadius(),
                 paint
         );
@@ -492,8 +466,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
             paint.setStrokeWidth((float) circle.getOutlineThickness());
 
             canvas.drawCircle(
-                    (float) rotatedPosition.getX(),
-                    (float) rotatedPosition.getY(),
+                    (float) circle.getCoordinate().getX(),
+                    (float) circle.getCoordinate().getY(),
                     (float) circle.getRadius(),
                     paint
             );

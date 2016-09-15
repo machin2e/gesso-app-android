@@ -28,8 +28,8 @@ public abstract class Geometry {
         return calculateDistance(source.getX(), source.getY(), target.getX(), target.getY());
     }
 
-    public static double calculateDistance(double x, double y, double x2, double y2) {
-        double distanceSquare = Math.pow(x - x2, 2) + Math.pow(y - y2, 2);
+    public static double calculateDistance(double x1, double y1, double x2, double y2) {
+        double distanceSquare = Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
         double distance = Math.sqrt(distanceSquare);
         return distance;
     }
@@ -78,6 +78,36 @@ public abstract class Geometry {
         return angle;
     }
 
+    public static double calculateRotationAngle(double x1, double y1, double x2, double y2) {
+
+        // calculate the rotation theta from the deltaY and deltaX values
+        // (atan2 returns radians values from [-PI,PI])
+        // 0 currently pointerCoordinates EAST.
+        // NOTE: By preserving Y and X param order to atan2,  we are expecting
+        // a CLOCKWISE rotation direction.
+        double theta = Math.atan2(y2 - y1, x2 - x1);
+
+        // rotate the theta rotation clockwise by 90 degrees
+        // (this makes 0 point NORTH)
+        // NOTE: adding to an rotation rotates it clockwise.
+        // subtracting would rotate it counter-clockwise
+//        theta += Math.PI / 2.0;
+
+        // convert from radians to degrees
+        // this will give you an rotation from [0->270],[-180,0]
+        double angle = Math.toDegrees(theta);
+
+        // convert to positive range [0-360)
+        // since we want to prevent negative angles, adjust them now.
+        // we can assume that atan2 will not return a negative value
+        // greater than one partial rotation
+//        if (rotation < 0) {
+//            rotation += 360;
+//        }
+
+        return angle;
+    }
+
     /**
      * Calculates coordinates of a point rotated about about another origin point by a given number
      * of degrees.
@@ -91,10 +121,21 @@ public abstract class Geometry {
         return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), Geometry.calculateDistance(originPoint, point));
     }
 
+    public static Point calculateRotatedPoint(double x1, double y1, double angle, double x2, double y2) {
+        return Geometry.calculatePoint(x1, y1, angle + Geometry.calculateRotationAngle(x1, y1, x2, y2), Geometry.calculateDistance(x1, y1, x2, y2));
+    }
+
     public static Point calculatePoint(Point originPoint, double rotation, double distance) {
         Point point = new Point();
         point.setX(originPoint.getX() + distance * Math.cos(Math.toRadians(rotation)));
         point.setY(originPoint.getY() + distance * Math.sin(Math.toRadians(rotation)));
+        return point;
+    }
+
+    public static Point calculatePoint(double x, double y, double rotation, double distance) {
+        Point point = new Point();
+        point.setX(x + distance * Math.cos(Math.toRadians(rotation)));
+        point.setY(y + distance * Math.sin(Math.toRadians(rotation)));
         return point;
     }
 

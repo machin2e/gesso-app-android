@@ -51,9 +51,9 @@ public class Scene extends Image<Space> {
         // Setup interactivity
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Process process) {
 
-                Process process = action.getProcess();
+                Action action = process.getStopAction();
 
                 Image targetImage = getImageByCoordinate(action.getCoordinate());
                 action.setTargetImage(targetImage);
@@ -81,7 +81,7 @@ public class Scene extends Image<Space> {
                     if (process.isHolding()) {
 
                         // Scene
-                        action.getTargetImage().processAction(action);
+                        action.getTargetImage().processAction(process);
 
                     } else {
 
@@ -655,6 +655,7 @@ public class Scene extends Image<Space> {
         }
         // </DEBUG_LABEL>
 
+        /*
         // Test Case
 //        Point p1 = new Point(0, 0);
 //        p1.setRelativeRotation(0);
@@ -723,13 +724,6 @@ public class Scene extends Image<Space> {
 //        Point p4 = new Point(283, 0, p3);
 //        p4.setRelativeRotation(0);
 
-        /*
-        surface.getPaint().setStyle(Paint.Style.STROKE);
-        surface.getPaint().setColor(Color.RED);
-        surface.getPaint().setStrokeWidth(1.0f);
-        surface.getCanvas().drawRect(-200, -800, 200, -400, surface.getPaint());
-        */
-
         surface.getPaint().setStyle(Paint.Style.FILL);
         surface.getPaint().setColor(Color.RED);
         surface.drawRectangle(p1, p1.getRotation(), 400, 400, surface);
@@ -781,6 +775,7 @@ public class Scene extends Image<Space> {
 
         Rectangle r5 = new Rectangle(p5, 100, 100);
         surface.drawRectangle(r5, surface);
+        */
     }
 
     private void drawLayers(Surface surface) {
@@ -1017,7 +1012,7 @@ public class Scene extends Image<Space> {
                     if (process.getStartAction().isPointing() && process.getStartAction().getTargetImage() instanceof BaseImage) {
 
                         // Base
-                        action.getTargetImage().processAction(action);
+                        action.getTargetImage().processAction(process);
 
                         // Camera
 //                        camera.focusSelectScene();
@@ -1026,7 +1021,7 @@ public class Scene extends Image<Space> {
                 } else if (action.getTargetImage() instanceof Scene) {
 
                     // Base
-                    process.getStartAction().getTargetImage().processAction(action);
+                    process.getStartAction().getTargetImage().processAction(process);
 
                 }
 
@@ -1044,16 +1039,16 @@ public class Scene extends Image<Space> {
                 } else if (action.getTargetImage() instanceof PortImage) {
 
                     // Port
-                    action.getTargetImage().processAction(action);
+                    action.getTargetImage().processAction(process);
 
                 } else if (action.getTargetImage() instanceof PatchImage) {
 
                     // Patch
-                    action.getTargetImage().processAction(action);
+                    action.getTargetImage().processAction(process);
 
                 } else if (action.getTargetImage() instanceof Scene) {
 
-                    action.getTargetImage().processAction(action);
+                    action.getTargetImage().processAction(process);
 
                 }
 

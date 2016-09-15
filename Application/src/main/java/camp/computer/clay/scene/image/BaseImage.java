@@ -171,7 +171,8 @@ public class BaseImage extends Image<Base> {
         circle.setLabel("Port 1");
         circle.setCoordinate(-90, 300);
         // circle.setRelativeRotation(0);
-        circle.setColor("#3f3f3f");
+//        circle.setColor("#3f3f3f");
+        circle.setColor("#efefef");
         circle.setOutlineThickness(0);
         circle.setVisibility(Visibility.INVISIBLE);
         addShape(circle);
@@ -281,9 +282,9 @@ public class BaseImage extends Image<Base> {
 
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Process process) {
 
-                Process process = action.getProcess();
+                Action action = process.getStopAction();
 
                 Camera camera = action.getActor().getCamera();
 
@@ -295,7 +296,14 @@ public class BaseImage extends Image<Base> {
 
                 } else if (action.getType() == Action.Type.MOVE) {
 
-                    if (action.getTargetShape().getLabel().equals("Board")) {
+                    if (process.getStartAction().getTargetShape() == null) {
+                        return;
+                    }
+
+                    //if (action.getTargetShape().getLabel().equals("Board")) {
+                    if (process.getStartAction().getTargetShape().getLabel().equals("Board")) {
+
+                        Log.v("Path2", "Board!!");
 
                         // Holding
                         if (process.isHolding()) {
@@ -303,7 +311,7 @@ public class BaseImage extends Image<Base> {
                             // Holding and dragging
 
                             // Base
-                            action.getTargetImage().processAction(action);
+                            action.getTargetImage().processAction(process);
                             action.getTargetImage().setCoordinate(action.getCoordinate());
 
                             // Camera
@@ -324,7 +332,8 @@ public class BaseImage extends Image<Base> {
 
                         }
 
-                    } else if (action.getTargetShape().getLabel().startsWith("Port")) {
+                    //} else if (action.getTargetShape().getLabel().startsWith("Port")) {
+                    } else if (process.getStartAction().getTargetShape().getLabel().startsWith("Port")) {
 
                         if (process.isHolding()) {
 
@@ -342,6 +351,7 @@ public class BaseImage extends Image<Base> {
                             setCandidatePathDestinationCoordinate(action.getCoordinate());
                             setCandidatePathVisibility(Visibility.VISIBLE);
 
+                            Log.v("Path2", "Port!!");
 
                             candidatePathSourceCoordinate = process.getStartAction().getTargetShape().getCoordinate();
 
@@ -383,7 +393,7 @@ public class BaseImage extends Image<Base> {
 
                             // Camera
 //                            Camera camera = action.getActor().getCamera();
-                            camera.focusCreatePath(action);
+                            camera.focusCreatePath(process);
                         }
 
                     } else if (action.getTargetShape().getLabel().startsWith("LED")) {
@@ -392,10 +402,12 @@ public class BaseImage extends Image<Base> {
 
                 } else if (action.getType() == Action.Type.UNSELECT) {
 
+                    if (process.getStartAction().getTargetShape() == null) {
+                        return;
+                    }
+
                     Image targetImage = scene.getImageByCoordinate(action.getCoordinate());
                     action.setTargetImage(targetImage);
-
-
 
                     // Check if shapes are touched...
 //                    for (int i = 0; i < shapes.size(); i++) {
@@ -408,11 +420,13 @@ public class BaseImage extends Image<Base> {
 //                        }
 //                    }
 
-                    if (action.getTargetShape().getLabel().startsWith("Port")) {
+                    if (process.getStartAction().getTargetShape().getLabel().startsWith("Port")) {
 
-                        action.getTargetShape().setColor("#ff00ffff");
+                        process.getStartAction().getTargetShape().setColor("#ff00ffff");
 
-                    } else if (action.getTargetShape().getLabel().equals("Board")) {
+                        setCandidatePathVisibility(Visibility.INVISIBLE);
+
+                    } else if (process.getStartAction().getTargetShape().getLabel().equals("Board")) {
 
                         if (process.isTap()) {
 
@@ -456,7 +470,7 @@ public class BaseImage extends Image<Base> {
                                     if (process.getStartAction().isPointing() && process.getStartAction().getTargetImage() instanceof BaseImage) {
 
                                         // Base
-                                        action.getTargetImage().processAction(action);
+                                        action.getTargetImage().processAction(process);
 
                                         // Camera
 //                        camera.focusSelectScene();
@@ -465,7 +479,7 @@ public class BaseImage extends Image<Base> {
                                 } else if (action.getTargetImage() instanceof Scene) {
 
                                     // Base
-                                    process.getStartAction().getTargetImage().processAction(action);
+                                    process.getStartAction().getTargetImage().processAction(process);
 
                                 }
 
