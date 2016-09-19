@@ -140,6 +140,9 @@ public class Port extends Feature {
      * @return List of paths in the graph containing the port.
      */
     public List<Path> getCompletePath() {
+
+        // TODO: Replace List<Path> with PathGroup with filters
+
         List<Path> connectedPaths = new ArrayList<>();
         connectedPaths.addAll(getAncestorPaths());
         connectedPaths.addAll(getDescendantPaths());

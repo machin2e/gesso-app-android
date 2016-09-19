@@ -37,7 +37,7 @@ public class HostImage extends Image<Host> {
     private Point candidateExtensionPosition = new Point();
 
     private Visibility candidatePathVisibility = Visibility.INVISIBLE;
-    private Point candidatePathSourceCoordinate = new Point(40, 80);
+    private Point candidatePathSourcePosition = new Point(40, 80);
     private Point candidatePathDestinationCoordinate = new Point(40, 80);
     double shapeRadius = 40.0;
 
@@ -380,30 +380,28 @@ public class HostImage extends Image<Host> {
                                             if (!action.isHolding()) {
 
                                                 // Candidate Path Visibility
-                                                setCandidatePathDestinationCoordinate(event.getPosition());
+                                                candidatePathSourcePosition = action.getFirstEvent().getTargetShape().getPosition();
+                                                setCandidatePathDestinationPosition(event.getPosition());
                                                 setCandidatePathVisibility(Visibility.VISIBLE);
 
-                                                candidatePathSourceCoordinate = action.getFirstEvent().getTargetShape().getPosition();
-
                                                 // Candidate Extension Visibility
-
                                                 boolean isCreateExtensionAction = true;
-                                                List<Image> images = getScene().getImages(Host.class, Extension.class).getList();
-                                                for (int i = 0; i < images.size(); i++) {
-                                                    Image nearbyImage = images.get(i);
+                                                ImageGroup imageGroup = getScene().getImages(Host.class, Extension.class);
+                                                for (int i = 0; i < imageGroup.size(); i++) {
+                                                    Image otherImage = imageGroup.get(i);
 
                                                     // Update style of nearby machines
-                                                    double distanceToBaseImage = Geometry.calculateDistance(
+                                                    double distanceToHostImage = Geometry.calculateDistance(
                                                             event.getPosition(), //candidatePathDestinationCoordinate,
-                                                            nearbyImage.getPosition()
+                                                            otherImage.getPosition()
                                                     );
 
-                                                    if (distanceToBaseImage < 500) {
+                                                    if (distanceToHostImage < 500) {
                                                         isCreateExtensionAction = false;
                                                         break;
                                                     }
 
-                                                    // TODO: if distance > 800: connect to cloud service
+                                                    // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
                                                 }
 
                                                 if (isCreateExtensionAction) {
@@ -414,7 +412,7 @@ public class HostImage extends Image<Host> {
                                                     setCandidateExtensionVisibility(Visibility.INVISIBLE);
                                                 }
 
-                                                // Get port associated with the touched port shape
+                                                // Get Port associated with the touched Port's shape
                                                 // TODO: Refactor
                                                 Port port = (Port) action.getFirstEvent().getTargetShape().getFeature();
 
@@ -429,19 +427,17 @@ public class HostImage extends Image<Host> {
                                                     }
                                                 }
 
-                                                // Show nearby ports
+                                                // Show Ports of nearby Hosts and Extensions
                                                 Port sourcePort = (Port) action.getFirstEvent().getTargetShape().getFeature();
                                                 Event lastEvent = action.getLastEvent();
 
-                                                ImageGroup nearbyImages = getScene().getImages(Host.class, Extension.class).filterArea(lastEvent.getPosition(), 200 + 60);
-                                                List<Image> images2 = getScene().getImages(Host.class, Extension.class).getList();
+                                                double nearbyThreshold = 200 + 60;
+                                                ImageGroup nearbyImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyThreshold);
 
-                                                // Show ports of nearby forms
-                                                for (int i = 0; i < images2.size(); i++) {
-                                                    Image image = images2.get(i);
+                                                // Show Ports of nearby Hosts
+                                                for (int i = 0; i < imageGroup.size(); i++) {
+                                                    Image image = imageGroup.get(i);
 
-                                                    //if (image == portFigure.getParentImage() || nearbyImages.contains(image)) {
-                                                    //if (image == boardImage /* || nearbyImages.contains(image) */) {
                                                     if (image.getFeature() == sourcePort.getParent() || nearbyImages.contains(image)) {
 
                                                         // <HACK>
@@ -486,8 +482,6 @@ public class HostImage extends Image<Host> {
                                             // Camera
                                             camera.focusCreatePath(action);
 
-                                        } else if (event.getTargetShape().getLabel().startsWith("LED")) {
-
                                         }
 
                                     } else if (event.getType() == Event.Type.UNSELECT) {
@@ -526,10 +520,7 @@ public class HostImage extends Image<Host> {
 
                                                         Log.v("TouchPort", "B");
 
-                                                        // TODO: Replace with state of camera. i.e., Check if seeing a single path.
-
                                                         Port.Type nextType = port.getType();
-                                                        //while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
                                                         while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
                                                             nextType = Port.Type.next(nextType);
                                                         }
@@ -539,8 +530,8 @@ public class HostImage extends Image<Host> {
 
                                                         Log.v("TouchPort", "C");
 
-                                                        // Remove focus from other hosts and their ports
-                                                        List<Image> hostImages = getScene().getImages(Host.class).getList();
+                                                        // Remove focus from other Hosts and their Ports
+                                                        ImageGroup hostImages = getScene().getImages(Host.class);
                                                         for (int i = 0; i < hostImages.size(); i++) {
                                                             HostImage hostImage = (HostImage) hostImages.get(i);
                                                             hostImage.hidePortShapes();
@@ -551,17 +542,17 @@ public class HostImage extends Image<Host> {
                                                             shapes.setTransparency(0.1);
                                                         }
 
-                                                        List<Image> extensionImages = getScene().getImages().filterType(Extension.class).getList();
+                                                        ImageGroup extensionImages = getScene().getImages().filterType(Extension.class);
                                                         for (int i = 0; i < extensionImages.size(); i++) {
                                                             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-                                                            if (extensionImage.getExtension() != getParentImage().getFeature()) {
-                                                                extensionImage.setTransparency(0.1);
-                                                                extensionImage.hidePortShapes();
-                                                                extensionImage.hidePathImages();
-                                                            }
+//                                                            if (extensionImage.getExtension() != getParentImage().getFeature()) {
+                                                            extensionImage.setTransparency(0.1);
+                                                            extensionImage.hidePortShapes();
+                                                            extensionImage.hidePathImages();
+//                                                            }
                                                         }
 
-                                                        // Focus on the port
+                                                        // Update the Port's style. Show the Port's Paths.
                                                         showPaths(port);
                                                         setVisibility(Visibility.VISIBLE);
                                                         setPathVisibility(port, Visibility.VISIBLE);
@@ -582,10 +573,9 @@ public class HostImage extends Image<Host> {
                                                         // TODO: Put this code in Camera
                                                         // Camera
                                                         List<Port> pathPorts = port.getPorts(paths);
-                                                        List<Point> pathPortPositions = getScene().getShapes().filterFeature(pathPorts).getCoordinates();
-                                                        Rectangle boundingBox = getScene().getShapes().filterFeature(pathPorts).getBoundingBox();
-                                                        getScene().getFeature().getActor(0).getCamera().adjustScale(boundingBox);
-                                                        getScene().getFeature().getActor(0).getCamera().setPosition(Geometry.calculateCenterCoordinate(pathPortPositions));
+                                                        ShapeGroup pathPortShapes = getScene().getShapes().filterFeature(pathPorts);
+                                                        getScene().getFeature().getActor(0).getCamera().adjustScale(pathPortShapes.getBoundingBox());
+                                                        getScene().getFeature().getActor(0).getCamera().setPosition(pathPortShapes.getCenterPosition());
                                                         // </HACK>
 
                                                     } else if (hasVisiblePaths(portIndex) || hasVisibleAncestorPaths(portIndex)) {
@@ -594,8 +584,6 @@ public class HostImage extends Image<Host> {
 
                                                         // Paths are being shown. Touching a port changes the port type. This will also
                                                         // updates the corresponding path requirement.
-
-                                                        // TODO: Replace with state of camera. i.e., Check if seeing a single path.
 
                                                         Port.Type nextType = port.getType();
                                                         while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
@@ -626,7 +614,7 @@ public class HostImage extends Image<Host> {
 
                                                         if (targetPort == null) {
 
-                                                            // targetPort is null, meaning that no target port shape was found
+                                                            // targetPort is null, meaning that a target Port shape was not found
 
                                                             Log.v("Events", "C.1");
 
@@ -640,7 +628,7 @@ public class HostImage extends Image<Host> {
 
                                                         } else {
 
-                                                            // targetPort is not null, meaning a target port shape was found
+                                                            // targetPort is not null, meaning a target Port shape was found
 
                                                             Log.v("Events", "C.2");
 
@@ -660,8 +648,6 @@ public class HostImage extends Image<Host> {
                                                                 targetPort.setType(sourcePort.getType());
                                                             }
 
-                                                            Log.v("Events", "targetPort: " + targetPort);
-
                                                             if (!sourcePort.hasAncestor(targetPort)) {
 
                                                                 Log.v("Events", "D.1");
@@ -676,6 +662,7 @@ public class HostImage extends Image<Host> {
                                                                 }
 
                                                                 sourcePort.addPath(path);
+
                                                                 scene.addFeature(path);
                                                             }
 
@@ -706,8 +693,9 @@ public class HostImage extends Image<Host> {
                                                     // Create the Extension
                                                     Extension extension = new Extension();
 
+                                                    // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
+
                                                     // Create Ports and add them to the Extension
-                                                    // for (int j = 0; j < 3; j++) {
                                                     for (int j = 0; j < 1; j++) {
                                                         Port port = new Port();
                                                         extension.addPort(port);
@@ -731,6 +719,7 @@ public class HostImage extends Image<Host> {
                                                     );
                                                     extensionImage.setRotation(extensionImageRotation + 90);
 //
+                                                    // <HACK>
                                                     // Create Port shapes for each of Extension's Ports
                                                     for (int i = 0; i < extension.getPorts().size(); i++) {
                                                         Port port = extension.getPorts().get(i);
@@ -749,6 +738,7 @@ public class HostImage extends Image<Host> {
 
                                                         extensionImage.addShape(circle);
                                                     }
+                                                    // </HACK>
 
                                                     // Configure Host's Port (i.e., the Path's source Port)
                                                     Port hostPort = (Port) sourcePortShape.getFeature();
@@ -771,10 +761,6 @@ public class HostImage extends Image<Host> {
                                                     // Add Path to Scene
                                                     scene.addFeature(path);
 
-                                                    //Shape targetPortShape =  getScene().getShape(path.getTarget());
-                                                    //targetPortShape.setColor(sourcePortShape.getColor());
-                                                    //targetPortShape.setUniqueColor(sourcePortShape.getUniqueColor());
-
                                                     // Update Camera
                                                     camera.focusSelectPath(hostPort);
 
@@ -783,9 +769,6 @@ public class HostImage extends Image<Host> {
                                                 // Update Image
                                                 setCandidatePathVisibility(Visibility.INVISIBLE);
                                                 setCandidateExtensionVisibility(Visibility.INVISIBLE);
-
-//                                                setCandidateExtensionVisibility(Visibility.INVISIBLE);
-
 
                                             } else {
 
@@ -1146,13 +1129,13 @@ public class HostImage extends Image<Host> {
 
             double pathRotationAngle = Geometry.calculateRotationAngle(
                     //getPosition(),
-                    candidatePathSourceCoordinate,
+                    candidatePathSourcePosition,
                     candidatePathDestinationCoordinate
             );
 
             Point pathStartCoordinate = Geometry.calculatePoint(
                     // getPosition(),
-                    candidatePathSourceCoordinate,
+                    candidatePathSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
@@ -1187,7 +1170,7 @@ public class HostImage extends Image<Host> {
         return candidatePathVisibility;
     }
 
-    public void setCandidatePathDestinationCoordinate(Point position) {
+    public void setCandidatePathDestinationPosition(Point position) {
         this.candidatePathDestinationCoordinate.set(position);
     }
 

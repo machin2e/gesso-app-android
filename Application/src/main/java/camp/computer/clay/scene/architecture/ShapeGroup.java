@@ -217,7 +217,7 @@ public class ShapeGroup {
         return shapes;
     }
 
-    public List<Point> getCoordinates() {
+    public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
@@ -235,12 +235,12 @@ public class ShapeGroup {
         return positions;
     }
 
-    public Point getCenterPoint() {
-        return Geometry.calculateCenterCoordinate(getCoordinates());
+    public Point getCenterPosition() {
+        return Geometry.calculateCenterPosition(getPositions());
     }
 
-    public Point getCentroidPoint() {
-        return Geometry.calculateCentroidCoordinate(getCoordinates());
+    public Point getCentroidPosition() {
+        return Geometry.calculateCentroidCoordinate(getPositions());
     }
 
     public Rectangle getBoundingBox() {
@@ -248,7 +248,7 @@ public class ShapeGroup {
     }
 
     public List<Point> getBoundingShape() {
-        return Geometry.computeConvexHull(getCoordinates());
+        return Geometry.computeConvexHull(getPositions());
     }
 
     /**

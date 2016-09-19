@@ -307,7 +307,7 @@ public class Camera {
 //            portFigure.showPaths();
 //
 //            // Adjust perspective
-//            Point centerPoint = getScene().getImages(Host.class).getCenterPoint();
+//            Point centerPoint = getScene().getImages(Host.class).getCenterPosition();
 //            double scale = 0.6;
 //            setPosition(centerPoint);
 //            setScale(scale); // Zoom out to show overview
@@ -352,7 +352,9 @@ public class Camera {
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
             ImageGroup otherHostImages = getScene().getImages().filterType(Host.class, Extension.class).remove(hostImage);
-            for (Image otherHostImage : otherHostImages.getList()) {
+            List<Image> list = otherHostImages.getList();
+            for (int i = 0; i < list.size(); i++) {
+                Image otherHostImage = list.get(i);
 //                image.hidePortShapes();
 //                image.hidePathImages();
                 otherHostImage.setTransparency(0.1f);
@@ -381,7 +383,9 @@ public class Camera {
 
                 // Get ports along every path connected to the ports on the touched form
                 List<Port> formPathPorts = new ArrayList<>();
-                for (Port port : hostImage.getHost().getPorts()) {
+                List<Port> ports = hostImage.getHost().getPorts();
+                for (int i = 0; i < ports.size(); i++) {
+                    Port port = ports.get(i);
 
                     // TODO: ((PortImage) getCamera().getScene().getImage(port)).getVisiblePaths()
 
@@ -390,7 +394,8 @@ public class Camera {
                     }
 
                     List<Path> portPaths = port.getCompletePath();
-                    for (Path path : portPaths) {
+                    for (int i1 = 0; i1 < portPaths.size(); i1++) {
+                        Path path = portPaths.get(i1);
                         if (!formPathPorts.contains(path.getSource())) {
                             formPathPorts.add(path.getSource());
                         }
@@ -403,7 +408,7 @@ public class Camera {
                 // Camera
                 //List<Image> hostPathPortShapes = getScene().getImages(formPathPorts);
                 ShapeGroup hostPathPortShapes = getScene().getShapes().filterFeature(formPathPorts);
-                Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getCoordinates());
+                Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
 
                 adjustScale(boundingBox);
                 setPosition(boundingBox.getPosition());
@@ -446,13 +451,10 @@ public class Camera {
         }
 
         List<Path> paths = port.getCompletePath();
-        for (Path connectedPath : paths) {
+        for (int i = 0; i < paths.size(); i++) {
+            Path connectedPath = paths.get(i);
 
             // Show ports
-//            ((PortImage) getScene().getImage(connectedPath.getSource())).setVisibility(Visibility.VISIBLE);
-//            ((PortImage) getScene().getImage(connectedPath.getSource())).showPaths();
-//            ((PortImage) getScene().getImage(connectedPath.getTarget())).setVisibility(Visibility.VISIBLE);
-//            ((PortImage) getScene().getImage(connectedPath.getTarget())).showPaths();
             getScene().getShape(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
             //TODO:((PortImage) getScene().getImage(connectedPath.getSource())).showPaths();
             getScene().getShape(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
@@ -472,7 +474,7 @@ public class Camera {
         adjustScale(boundingBox);
 
         // Camera Position
-        setPosition(Geometry.calculateCenterCoordinate(pathPortPositions));
+        setPosition(Geometry.calculateCenterPosition(pathPortPositions));
     }
 
     public void focusSelectScene() { // Previously called "focusReset"
@@ -489,8 +491,8 @@ public class Camera {
         ImageGroup extensionImages = getScene().getImages(Extension.class);
         for (int i = 0; i < extensionImages.getList().size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-            ////extensionImage.hidePortShapes();
-            ////extensionImage.hidePathImages();
+            //// TODO: extensionImage.hidePortShapes();
+            //// TODO: extensionImage.hidePathImages();
             extensionImage.setTransparency(1.0);
         }
 
@@ -501,7 +503,7 @@ public class Camera {
 
     public void adjustPosition() {
         List<Point> figurePositions = getScene().getImages().filterType(Host.class, Extension.class).getCoordinates();
-        Point centerPosition = Geometry.calculateCenterCoordinate(figurePositions);
+        Point centerPosition = Geometry.calculateCenterPosition(figurePositions);
         setPosition(centerPosition);
     }
 

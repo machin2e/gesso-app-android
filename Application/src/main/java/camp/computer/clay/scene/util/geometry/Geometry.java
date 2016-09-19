@@ -237,7 +237,7 @@ public abstract class Geometry {
         return new Rectangle(minX, minY, maxX, maxY);
     }
 
-    public static Point calculateCenterCoordinate(List<Point> points) {
+    public static Point calculateCenterPosition(List<Point> points) {
         return calculateBoundingBox(points).getPosition();
     }
 

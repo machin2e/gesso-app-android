@@ -53,15 +53,6 @@ public abstract class Image<T extends Feature> {
         return this.scene;
     }
 
-    // TODO: Delete this after deleting PortImage
-    public Image getParentImage() {
-        if (getFeature().hasParent()) {
-            Feature parentFeature = getFeature().getParent();
-            return getScene().getImage(parentFeature);
-        }
-        return null;
-    }
-
     public Point getPosition() {
         return this.position;
     }

@@ -45,7 +45,7 @@ public class Layer {
     }
 
     public void add(Image image) {
-        images.add(image);
+        this.images.add(image);
         image.setScene(scene);
     }
 

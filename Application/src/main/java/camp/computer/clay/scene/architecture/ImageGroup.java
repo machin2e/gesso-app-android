@@ -55,6 +55,10 @@ public class ImageGroup {
         return null;
     }
 
+    public int size() {
+        return this.images.size();
+    }
+
     /**
      * Removes all elements except those with the specified type.
      *
@@ -167,7 +171,7 @@ public class ImageGroup {
     }
 
     public Point getCenterPoint() {
-        return Geometry.calculateCenterCoordinate(getCoordinates());
+        return Geometry.calculateCenterPosition(getCoordinates());
     }
 
     public Point getCentroidPoint() {
