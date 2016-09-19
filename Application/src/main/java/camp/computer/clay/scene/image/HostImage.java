@@ -33,7 +33,6 @@ import camp.computer.clay.scene.util.geometry.Shape;
 public class HostImage extends Image<Host> {
 
     private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
-    private Point candidateExtensionSourcePosition = new Point();
     private Point candidateExtensionPosition = new Point();
 
     private Visibility candidatePathVisibility = Visibility.INVISIBLE;
@@ -371,7 +370,7 @@ public class HostImage extends Image<Host> {
                                                 setPortVisibility(Visibility.INVISIBLE);
                                                 setPathVisibility(Visibility.INVISIBLE);
 
-                                                candidateExtensionPosition.set(event.getPosition());
+                                                setCandidateExtensionPosition(event.getPosition());
 
                                                 setCandidateExtensionVisibility(Visibility.VISIBLE);
 
@@ -382,7 +381,7 @@ public class HostImage extends Image<Host> {
                                             if (!action.isHolding()) {
 
                                                 // Candidate Path Visibility
-                                                candidatePathSourcePosition = action.getFirstEvent().getTargetShape().getPosition();
+                                                setCandidatePathSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
                                                 setCandidatePathDestinationPosition(event.getPosition());
                                                 setCandidatePathVisibility(Visibility.VISIBLE);
 
@@ -392,7 +391,7 @@ public class HostImage extends Image<Host> {
                                                 for (int i = 0; i < imageGroup.size(); i++) {
                                                     Image otherImage = imageGroup.get(i);
 
-                                                    // Update style of nearby machines
+                                                    // Update style of nearby Hosts
                                                     double distanceToHostImage = Geometry.calculateDistance(
                                                             event.getPosition(), //candidatePathDestinationCoordinate,
                                                             otherImage.getPosition()
@@ -408,8 +407,8 @@ public class HostImage extends Image<Host> {
 
                                                 if (isCreateExtensionAction) {
                                                     setCandidateExtensionVisibility(Visibility.VISIBLE);
-                                                    candidateExtensionSourcePosition.set(action.getFirstEvent().getTargetShape().getPosition());
-                                                    candidateExtensionPosition.set(event.getPosition());
+                                                    setCandidatePathSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                    setCandidateExtensionPosition(event.getPosition());
                                                 } else {
                                                     setCandidateExtensionVisibility(Visibility.INVISIBLE);
                                                 }
@@ -433,8 +432,8 @@ public class HostImage extends Image<Host> {
                                                 Port sourcePort = (Port) action.getFirstEvent().getTargetShape().getFeature();
                                                 Event lastEvent = action.getLastEvent();
 
-                                                double nearbyThreshold = 200 + 60;
-                                                ImageGroup nearbyImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyThreshold);
+                                                double nearbyRadiusThreshold = 200 + 60;
+                                                ImageGroup nearbyImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
 
                                                 // Show Ports of nearby Hosts
                                                 for (int i = 0; i < imageGroup.size(); i++) {
@@ -1081,7 +1080,7 @@ public class HostImage extends Image<Host> {
             Paint paint = display.getPaint();
 
             double pathRotationAngle = Geometry.calculateRotationAngle(
-                    candidateExtensionSourcePosition,
+                    candidatePathSourcePosition,
                     candidateExtensionPosition
             );
 
@@ -1155,8 +1154,16 @@ public class HostImage extends Image<Host> {
         return candidatePathVisibility;
     }
 
+    public void setCandidatePathSourcePosition(Point position) {
+        this.candidatePathSourcePosition.set(position);
+    }
+
     public void setCandidatePathDestinationPosition(Point position) {
         this.candidatePathDestinationCoordinate.set(position);
+    }
+
+    public void setCandidateExtensionPosition(Point position) {
+        this.candidateExtensionPosition.set(position);
     }
 
     public void setCandidateExtensionVisibility(Visibility visibility) {

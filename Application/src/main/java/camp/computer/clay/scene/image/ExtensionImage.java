@@ -26,9 +26,6 @@ import camp.computer.clay.scene.util.geometry.Shape;
 
 public class ExtensionImage extends Image<Extension> {
 
-    // Shapes
-    private Rectangle boardShape = null;
-
     private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
     private Point candidateExtensionSourcePosition = new Point();
     private Point candidateExtensionPosition = new Point();
@@ -49,11 +46,14 @@ public class ExtensionImage extends Image<Extension> {
 
     private void setupShapes() {
 
+        Rectangle rectangle;
+
         // Create Shapes for Image
-        boardShape = new Rectangle(200, 200);
-        boardShape.setColor("#f7f7f7");
-        boardShape.setOutlineThickness(1);
-        addShape(boardShape);
+        rectangle = new Rectangle(200, 200);
+        rectangle.setLabel("Board");
+        rectangle.setColor("#f7f7f7");
+        rectangle.setOutlineThickness(1);
+        addShape(rectangle);
 
     }
 
@@ -92,11 +92,11 @@ public class ExtensionImage extends Image<Extension> {
                                 Path path = paths.get(j);
 
                                 // Show ports
-                                scene.getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                scene.getImage(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                getScene().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                getScene().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                 // Show path
-                                scene.getImage(path).setVisibility(Visibility.VISIBLE);
+                                getScene().getImage(path).setVisibility(Visibility.VISIBLE);
                             }
                         }
                     }
@@ -144,22 +144,17 @@ public class ExtensionImage extends Image<Extension> {
     public void draw(Display display) {
         if (isVisible()) {
 
-            // Color
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);
             }
 
-            if (Launcher.ENABLE_GEOMETRY_LABELS) {
-                display.getPaint().setColor(Color.GREEN);
-                display.getPaint().setStyle(Paint.Style.STROKE);
-                Display.drawCircle(getPosition(), boardShape.getWidth(), 0, display);
-                Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
-            }
+//            if (Launcher.ENABLE_GEOMETRY_LABELS) {
+//                display.getPaint().setColor(Color.GREEN);
+//                display.getPaint().setStyle(Paint.Style.STROKE);
+//                Display.drawCircle(getPosition(), boardShape.getWidth(), 0, display);
+//                Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
+//            }
         }
-    }
-
-    public Rectangle getShape() {
-        return this.boardShape;
     }
 
     public void showPortShapes() {
@@ -250,21 +245,21 @@ public class ExtensionImage extends Image<Extension> {
         return pathImages;
     }
 
-    public boolean contains(Point point) {
-        if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
-        } else {
-            return false;
-        }
-    }
-
-    public boolean contains(Point point, double padding) {
-        if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
-        } else {
-            return false;
-        }
-    }
+//    public boolean contains(Point point) {
+//        if (isVisible()) {
+//            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    public boolean contains(Point point, double padding) {
+//        if (isVisible()) {
+//            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
+//        } else {
+//            return false;
+//        }
+//    }
 
     public void setCandidatePathVisibility(Visibility visibility) {
         candidatePathVisibility = visibility;
