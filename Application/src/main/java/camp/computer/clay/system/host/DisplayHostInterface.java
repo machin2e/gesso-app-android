@@ -1,7 +1,7 @@
 package camp.computer.clay.system.host;
 
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.old_model.Device;
+import camp.computer.clay.system.old_model.Host;
 
 public interface DisplayHostInterface {
 
@@ -10,13 +10,13 @@ public interface DisplayHostInterface {
     public Clay getClay();
 
     /**
-     * Defines a timeline view and associated data structures for the specified device.
-     * @param device
+     * Defines a timeline view and associated data structures for the specified host.
+     * @param host
      */
-    public void addDeviceView(Device device);
+    public void addDeviceView(Host host);
 
-    public void refreshListViewFromData(Device device);
+    public void refreshListViewFromData(Host host);
 
-    // TODO: removeTimelineView (Patch unit);
-    // TODO: hideTimelineView (Patch unit);
+    // TODO: removeTimelineView (Extension unit);
+    // TODO: hideTimelineView (Extension unit);
 }

@@ -3,9 +3,9 @@
 Designer is a mobile design environment for Clay.
 
 You use Designer to define
-process, interconnectivity, and intelligence into your own projects
+action, interconnectivity, and intelligence into your own projects
 made with Clay devices. You can, for example, define connectivity across
-Clay devices, controlling electronic peripherals connected to a patch and
+Clay devices, controlling electronic peripherals connected to a extension and
 communications between devices. In simple terms, Designer visualizes your
 system and gives you tools for manipulating the data structures that underly
 your project's system behavior by creating, copy, and curating from other

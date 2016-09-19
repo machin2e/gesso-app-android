@@ -59,7 +59,7 @@ public class Message {
         return this.type;
     }
 
-    // TODO: getSource().getAddress()
+    // TODO: getSourceFeature().getAddress()
     public String getSourceAddress() {
         return this.source;
     }

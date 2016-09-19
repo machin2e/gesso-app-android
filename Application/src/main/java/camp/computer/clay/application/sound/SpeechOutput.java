@@ -1,4 +1,4 @@
-package camp.computer.clay.application;
+package camp.computer.clay.application.sound;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
-public class SpeechGenerator implements TextToSpeech.OnInitListener {
+public class SpeechOutput implements TextToSpeech.OnInitListener {
 
     // <SETTINGS>
     public static final int CHECK_CODE = 0x1;
@@ -30,7 +30,7 @@ public class SpeechGenerator implements TextToSpeech.OnInitListener {
     private boolean isAllowed = false;
     // </STATE>
 
-    public SpeechGenerator(Context context) {
+    public SpeechOutput(Context context) {
         tts = new TextToSpeech(context, this);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -52,11 +52,11 @@ public class SpeechGenerator implements TextToSpeech.OnInitListener {
 //
 ////            for (Voice voice : voices) {
 //////                // Set the chosen voice's synthesis characteristics
-//////                voice.getAction
+//////                voice.getEvent
 ////            }
 //
 ////            // Set the chosen voice's synthesis characteristics
-////            voice.getAction
+////            voice.getEvent
 //        }
     }
 

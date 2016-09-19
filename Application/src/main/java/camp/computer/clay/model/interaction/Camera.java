@@ -5,18 +5,17 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.Application;
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.model.architecture.Base;
-import camp.computer.clay.model.architecture.Patch;
+import camp.computer.clay.model.architecture.Extension;
+import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.ImageGroup;
 import camp.computer.clay.scene.architecture.Scene;
-import camp.computer.clay.scene.image.BaseImage;
-import camp.computer.clay.scene.image.PatchImage;
-import camp.computer.clay.scene.image.PortImage;
+import camp.computer.clay.scene.image.HostImage;
+import camp.computer.clay.scene.image.ExtensionImage;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
@@ -29,7 +28,7 @@ public class Camera {
 
     public static double MAXIMUM_SCALE = 1.0;
 
-    private double width; // Width of perspective --- processes (e.g., touches) are interpreted relative to this point
+    private double width; // Width of perspective --- actions (e.g., touches) are interpreted relative to this point
 
     private double height; // Height of perspective
 
@@ -128,7 +127,7 @@ public class Camera {
             // <PLAN_ANIMATION>
             originalPosition.set(position);
 
-            positionFrameLimit = (int) (Application.getDisplay().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
+            positionFrameLimit = (int) (Launcher.getLauncherView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             positionFrameIndex = 0;
             // </PLAN_ANIMATION>
@@ -152,7 +151,7 @@ public class Camera {
         if (duration == 0) {
             this.scale = scale;
         } else {
-            double frameCount = Application.getDisplay().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
+            double frameCount = Launcher.getLauncherView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             scaleDelta = Math.abs(scale - this.scale) / frameCount;
         }
@@ -226,48 +225,12 @@ public class Camera {
         return this.scene;
     }
 
-    public void focusCreatePath(Process process) {
+    public void focusCreatePath(Action action) {
 
-        Action action = process.getStartAction();
-
-        BaseImage boardImage = (BaseImage) action.getTargetImage();
-        ImageGroup nearbyImages = getScene().getImages(Base.class, Patch.class).filterArea(action.getCoordinate(), 200 + 60);
-        List<Image> images = getScene().getImages(Base.class, Patch.class).getList();
-
-        // Show ports of nearby forms
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
-
-            //if (image == portFigure.getParentImage() || nearbyFigures.contains(image)) {
-            if (image == boardImage /* || nearbyImages.contains(image) */) {
-
-                if (image instanceof BaseImage) {
-                    BaseImage nearbyFigure = (BaseImage) image;
-                    nearbyFigure.setTransparency(1.0f);
-                    nearbyFigure.showPortImages();
-                } else if (image instanceof PatchImage) {
-                    PatchImage nearbyFigure = (PatchImage) image;
-                    nearbyFigure.setTransparency(1.0f);
-                    nearbyFigure.showPortFigures();
-                }
-
-            } else {
-
-                if (image instanceof BaseImage) {
-                    BaseImage nearbyFigure = (BaseImage) image;
-                    nearbyFigure.setTransparency(0.1f);
-                    nearbyFigure.hidePortImages();
-                } else if (image instanceof PatchImage) {
-                    PatchImage nearbyFigure = (PatchImage) image;
-                    nearbyFigure.setTransparency(0.1f);
-                    nearbyFigure.hidePortFigures();
-                }
-
-            }
-        }
+        Event lastEvent = action.getLastEvent();
 
         // Check if a machine sprite was nearby
-        Image nearestFormImage = getScene().getImages().filterType(Base.class).getNearest(action.getCoordinate());
+        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(lastEvent.getCoordinate());
         if (nearestFormImage != null) {
 
             // TODO: Vibrate
@@ -283,51 +246,51 @@ public class Camera {
 //            boardImage.showPaths();
 
             // Adjust perspective
-            Point centerPoint = getScene().getImages(Base.class).getCenterPoint();
+            Point centerPoint = getScene().getImages(Host.class).getCenterPoint();
             double scale = 0.6;
             setCoordinate(centerPoint);
             setScale(scale); // Zoom out to show overview
 
         }
 
-//        PortImage portFigure = (PortImage) action.getTargetImage();
+//        PortImage portFigure = (PortImage) event.getTargetImage();
 //
 //        // Show ports of nearby forms
-//        ImageGroup nearbyFigures = getScene().getImages(Base.class, Patch.class).filterArea(action.getCoordinate(), 200 + 60);
+//        ImageGroup nearbyFigures = getScene().getImages(Host.class, Extension.class).filterArea(event.getCoordinate(), 200 + 60);
 //
-//        List<Image> images = getScene().getImages(Base.class, Patch.class).getList();
+//        List<Image> images = getScene().getImages(Host.class, Extension.class).getList();
 //        for (int i = 0; i < images.size(); i++) {
 //            Image image = images.get(i);
 //
 //            if (image == portFigure.getParentImage() || nearbyFigures.contains(image)) {
 //
-//                if (image instanceof BaseImage) {
-//                    BaseImage nearbyFigure = (BaseImage) image;
+//                if (image instanceof HostImage) {
+//                    HostImage nearbyFigure = (HostImage) image;
 //                    nearbyFigure.setTransparency(1.0f);
-//                    nearbyFigure.showPortImages();
-//                } else if (image instanceof PatchImage) {
-//                    PatchImage nearbyFigure = (PatchImage) image;
+//                    nearbyFigure.showPortShapes();
+//                } else if (image instanceof ExtensionImage) {
+//                    ExtensionImage nearbyFigure = (ExtensionImage) image;
 //                    nearbyFigure.setTransparency(1.0f);
 //                    nearbyFigure.showPortFigures();
 //                }
 //
 //            } else {
 //
-//                if (image instanceof BaseImage) {
-//                    BaseImage nearbyFigure = (BaseImage) image;
+//                if (image instanceof HostImage) {
+//                    HostImage nearbyFigure = (HostImage) image;
+//                    nearbyFigure.setTransparency(0.1f);
+//                    nearbyFigure.hidePortShapes();
+//                } else if (image instanceof ExtensionImage) {
+//                    ExtensionImage nearbyFigure = (ExtensionImage) image;
 //                    nearbyFigure.setTransparency(0.1f);
 //                    nearbyFigure.hidePortImages();
-//                } else if (image instanceof PatchImage) {
-//                    PatchImage nearbyFigure = (PatchImage) image;
-//                    nearbyFigure.setTransparency(0.1f);
-//                    nearbyFigure.hidePortFigures();
 //                }
 //
 //            }
 //        }
 //
 //        // Check if a machine sprite was nearby
-//        Image nearestFormImage = getScene().getImages().filterType(Base.class).getNearest(action.getCoordinate());
+//        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(event.getCoordinate());
 //        if (nearestFormImage != null) {
 //
 //            // TODO: Vibrate
@@ -343,7 +306,7 @@ public class Camera {
 //            portFigure.showPaths();
 //
 //            // Adjust perspective
-//            Point centerPoint = getScene().getImages(Base.class).getCenterPoint();
+//            Point centerPoint = getScene().getImages(Host.class).getCenterPoint();
 //            double scale = 0.6;
 //            setCoordinate(centerPoint);
 //            setScale(scale); // Zoom out to show overview
@@ -352,8 +315,8 @@ public class Camera {
 
         /*
         // Show the ports in the path
-        List<Path> portPaths = getCamera().getScene().getSpace().getNetwork(port);
-        List<Port> portConnections = getCamera().getScene().getSpace().getPorts(portPaths);
+        List<Path> portPaths = getCamera().getScene().getFeature().getAllPaths(port);
+        List<Port> portConnections = getCamera().getScene().getFeature().getPorts(portPaths);
         for (Port portConnection: portConnections) {
             PortImage portFigureConnection = (PortImage) getCamera().getScene().getImage(portConnection);
             portFigureConnection.setVisibility(true);
@@ -363,19 +326,19 @@ public class Camera {
 
     }
 
-    public void focusMoveView(Action action) {
+    public void focusMoveCamera(Event event) {
 
         // Move perspective
-        Process process = action.getProcess();
-        setOffset(process.offsetX, process.offsetY);
+        Action action = event.getAction();
+        setOffset(action.offsetX, action.offsetY);
     }
 
-    public void focusSelectBase(Action action) {
+    public void focusSelectHost(Event event) {
 
-        Actor actor = action.getActor();
-        Process process = action.getProcess();
+        Actor actor = event.getActor();
+        Action action = event.getAction();
 
-        if (process.isDragging()) {
+        if (action.isDragging()) {
 
             // Zoom out to show overview
             setScale(0.8);
@@ -383,32 +346,33 @@ public class Camera {
 
         } else {
 
-            BaseImage baseFigure = (BaseImage) action.getTargetImage();
+            HostImage hostImage = (HostImage) event.getTargetImage();
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
-            ImageGroup otherFormFigures = getScene().getImages().filterType(Base.class, Patch.class).remove(baseFigure);
-            for (Image image : otherFormFigures.getList()) {
-//                image.hidePortImages();
+            ImageGroup otherHostImages = getScene().getImages().filterType(Host.class, Extension.class).remove(hostImage);
+            for (Image otherHostImage : otherHostImages.getList()) {
+//                image.hidePortShapes();
 //                image.hidePathImages();
-                image.setTransparency(0.1f);
+                otherHostImage.setTransparency(0.1f);
+//                TODO: Set <Rectangle> for Host; remove <Feature> from Image
             }
 
-            Process previousProcess = null;
-            if (actor.processes.size() > 1) {
-                previousProcess = actor.processes.get(actor.processes.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousProcess.getStartAction().getTargetImage());
-                Log.v("PreviousTouch", "Current: " + action.getTargetImage());
+            Action previousAction = null;
+            if (actor.actions.size() > 1) {
+                previousAction = actor.actions.get(actor.actions.size() - 2);
+                Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
+                Log.v("PreviousTouch", "Current: " + event.getTargetImage());
             }
 
             // Camera
-            if (baseFigure.getBase().getPaths().size() > 0
-                    && (previousProcess != null && previousProcess.getStartAction().getTargetImage() != action.getTargetImage())) {
+            if (hostImage.getHost().getPaths().size() > 0
+                    && (previousAction != null && previousAction.getFirstEvent().getTargetImage() != event.getTargetImage())) {
 
                 Log.v("Touch_", "A");
 
-//                for (PortImage portImage : baseImage.getPortImages()) {
-//                    List<PathImage> pathImages = portImage.getPathFigures();
+//                for (PortImage portImage : baseImage.getPortShapes()) {
+//                    List<PathImage> pathImages = portImage.getPathImages();
 //                    for (PathImage pathImage : pathImages) {
 //                        pathImage.setVisibility(Visibility.INVISIBLE);
 //                    }
@@ -416,7 +380,7 @@ public class Camera {
 
                 // Get ports along every path connected to the ports on the touched form
                 List<Port> formPathPorts = new ArrayList<>();
-                for (Port port : baseFigure.getBase().getPorts()) {
+                for (Port port : hostImage.getHost().getPorts()) {
 
                     // TODO: ((PortImage) getCamera().getScene().getImage(port)).getVisiblePaths()
 
@@ -424,7 +388,7 @@ public class Camera {
                         formPathPorts.add(port);
                     }
 
-                    List<Path> portPaths = port.getNetwork();
+                    List<Path> portPaths = port.getAllPaths();
                     for (Path path : portPaths) {
                         if (!formPathPorts.contains(path.getSource())) {
                             formPathPorts.add(path.getSource());
@@ -451,8 +415,8 @@ public class Camera {
                 // This provides lookahead, so you can be triggered to processAction again to recover
                 // the perspective.
 
-//                for (PortImage portImage : baseImage.getPortImages()) {
-//                    List<PathImage> pathImages = portImage.getPathFigures();
+//                for (PortImage portImage : baseImage.getPortShapes()) {
+//                    List<PathImage> pathImages = portImage.getPathImages();
 //                    for (PathImage pathImage : pathImages) {
 //                        pathImage.setVisibility(Visibility.INVISIBLE);
 //                    }
@@ -462,7 +426,7 @@ public class Camera {
                 // TODO: (cont'd) getCamera().setCoordinate(baseImage.getCoordinate());
 
                 setScale(1.2f);
-                setCoordinate(baseFigure.getCoordinate());
+                setCoordinate(hostImage.getCoordinate());
             }
             // </UPDATE_PERSPECTIVE>
         }
@@ -472,22 +436,26 @@ public class Camera {
     public void focusSelectPath(Port port) {
 
         // Remove focus from other forms and their ports
-        List<Image> baseImages = getScene().getImages(Base.class).getList();
-        for (int i = 0; i < baseImages.size(); i++) {
-            BaseImage baseFigure = (BaseImage) baseImages.get(i);
-            baseFigure.setTransparency(0.05f);
-            baseFigure.hidePortImages();
-            baseFigure.hidePathImages();
+        List<Image> hostImages = getScene().getImages(Host.class).getList();
+        for (int i = 0; i < hostImages.size(); i++) {
+            HostImage hostImage = (HostImage) hostImages.get(i);
+            hostImage.setTransparency(0.05f);
+            hostImage.hidePortShapes();
+            hostImage.hidePathImages();
         }
 
-        List<Path> paths = port.getNetwork();
+        List<Path> paths = port.getAllPaths();
         for (Path connectedPath : paths) {
 
             // Show ports
-            ((PortImage) getScene().getImage(connectedPath.getSource())).setVisibility(Visibility.VISIBLE);
-            ((PortImage) getScene().getImage(connectedPath.getSource())).showPaths();
-            ((PortImage) getScene().getImage(connectedPath.getTarget())).setVisibility(Visibility.VISIBLE);
-            ((PortImage) getScene().getImage(connectedPath.getTarget())).showPaths();
+//            ((PortImage) getScene().getImage(connectedPath.getSource())).setVisibility(Visibility.VISIBLE);
+//            ((PortImage) getScene().getImage(connectedPath.getSource())).showPaths();
+//            ((PortImage) getScene().getImage(connectedPath.getTarget())).setVisibility(Visibility.VISIBLE);
+//            ((PortImage) getScene().getImage(connectedPath.getTarget())).showPaths();
+            getScene().getShape(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
+            //TODO:((PortImage) getScene().getImage(connectedPath.getSource())).showPaths();
+            getScene().getShape(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
+            //TODO:((PortImage) getScene().getImage(connectedPath.getTarget())).showPaths();
 
             // Show path
             getScene().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
@@ -509,19 +477,19 @@ public class Camera {
     public void focusSelectScene() { // Previously called "focusReset"
 
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
-        ImageGroup baseFigures = getScene().getImages(Base.class);
-        for (int i = 0; i < baseFigures.getList().size(); i++) {
-            BaseImage baseFigure = (BaseImage) baseFigures.get(i);
-            baseFigure.hidePortImages();
-            baseFigure.hidePathImages();
-            baseFigure.setTransparency(1.0);
+        ImageGroup hostImages = getScene().getImages(Host.class);
+        for (int i = 0; i < hostImages.getList().size(); i++) {
+            HostImage hostImage = (HostImage) hostImages.get(i);
+            hostImage.hidePortShapes();
+            hostImage.hidePathImages();
+            hostImage.setTransparency(1.0);
         }
 
-        ImageGroup patchFigures = getScene().getImages(Patch.class);
+        ImageGroup patchFigures = getScene().getImages(Extension.class);
         for (int i = 0; i < patchFigures.getList().size(); i++) {
-            PatchImage patchFigure = (PatchImage) patchFigures.get(i);
-            patchFigure.hidePortFigures();
-            patchFigure.hidePathFigures();
+            ExtensionImage patchFigure = (ExtensionImage) patchFigures.get(i);
+            patchFigure.hidePortImages();
+            patchFigure.hidePathImages();
             patchFigure.setTransparency(1.0);
         }
 
@@ -531,7 +499,7 @@ public class Camera {
     }
 
     public void adjustPosition() {
-        List<Point> figurePositions = getScene().getImages().filterType(Base.class, Patch.class).getCoordinates();
+        List<Point> figurePositions = getScene().getImages().filterType(Host.class, Extension.class).getCoordinates();
         Point centerPosition = Geometry.calculateCenterCoordinate(figurePositions);
         setCoordinate(centerPosition);
     }
@@ -541,9 +509,9 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-        List<Point> figureVertices = getScene().getImages().filterType(Base.class, Patch.class).getVertices();
+        List<Point> figureVertices = getScene().getImages().filterType(Host.class, Extension.class).getVertices();
         if (figureVertices.size() > 0) {
-            Rectangle boundingBox = getScene().getImages().filterType(Base.class, Patch.class).getBoundingBox();
+            Rectangle boundingBox = getScene().getImages().filterType(Host.class, Extension.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }
     }

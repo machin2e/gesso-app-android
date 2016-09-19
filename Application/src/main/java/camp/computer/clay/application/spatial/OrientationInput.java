@@ -1,4 +1,4 @@
-package camp.computer.clay.application;
+package camp.computer.clay.application.spatial;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -8,11 +8,11 @@ import android.hardware.SensorManager;
 
 import static android.content.Context.SENSOR_SERVICE;
 
-public class SensorAdapter implements SensorEventListener {
+public class OrientationInput implements SensorEventListener {
 
     SensorManager sm;
 
-    public SensorAdapter(Context context) {
+    public OrientationInput(Context context) {
 
         sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
 

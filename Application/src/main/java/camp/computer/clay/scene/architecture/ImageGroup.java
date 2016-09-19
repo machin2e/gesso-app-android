@@ -3,7 +3,7 @@ package camp.computer.clay.scene.architecture;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Construct;
+import camp.computer.clay.model.architecture.Feature;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
@@ -61,7 +61,7 @@ public class ImageGroup {
      * @param types
      * @return
      */
-    public <T extends Construct> ImageGroup filterType(Class<?>... types) {
+    public <T extends Feature> ImageGroup filterType(Class<?>... types) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -69,8 +69,8 @@ public class ImageGroup {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
                 //for (Class<?> type : types) {
-                //if (this.images.getAction(i).getClass() == type) {
-                if (this.images.get(i).getConstruct().getClass() == type) {
+                //if (this.images.getEvent(i).getClass() == type) {
+                if (this.images.get(i).getFeature().getClass() == type) {
                     imageGroup.add(this.images.get(i));
                 }
             }

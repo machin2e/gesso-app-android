@@ -5,12 +5,13 @@ import android.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.Surface;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Feature;
 
 /**
  * Circle. By default, objects are unit circles.
  */
-public class Circle extends Shape {
+public class Circle<T extends Feature> extends Shape<T> {
 
     /**
      * The number of vertices to use to approximate the circle. By default, this is set to 12,
@@ -23,6 +24,10 @@ public class Circle extends Shape {
     public Circle(double radius) {
         super(new Point(0, 0));
         this.radius = radius;
+    }
+
+    public Circle(T feature) {
+        this.feature = feature;
     }
 
     public Circle(Point position, double radius) {
@@ -60,11 +65,11 @@ public class Circle extends Shape {
     }
 
     @Override
-    public void draw(Surface surface) {
+    public void draw(Display display) {
         if (isVisible()) {
-            Surface.drawCircle(this, surface);
+            Display.drawCircle(this, display);
 
-            surface.getPaint().setColor(Color.GREEN);
+            display.getPaint().setColor(Color.GREEN);
             //Surface.drawCircle(position, this.radius / 2, getRotation(), surface);
 
             //Surface.drawPolygon(getVertices(), surface);

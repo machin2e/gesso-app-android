@@ -101,7 +101,7 @@ public class TCPMessageClientHost {
 
             while (runTask) {
 
-                // Update time since getStopAction message was sent
+                // Update time since getLastEvent message was sent
                 currentTime = Calendar.getInstance();
                 long timeSinceSend = currentTime.getTime().getTime() - previousSendTime.getTime();
 
@@ -199,7 +199,7 @@ public class TCPMessageClientHost {
                     message.setDeliveryGuaranteed(true);
 
                     // Enqueue message
-                    incomingMessages.add (message);
+                    incomingMessages.addEvent (message);
                     */
                 }
             });

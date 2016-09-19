@@ -5,7 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Port extends Construct {
+public class Port extends Feature {
 
     public enum Direction {
 
@@ -135,7 +135,7 @@ public class Port extends Construct {
      *
      * @return List of paths in the graph containing the port.
      */
-    public List<Path> getNetwork() {
+    public List<Path> getAllPaths() {
         List<Path> connectedPaths = new ArrayList<>();
         connectedPaths.addAll(getAncestorPaths());
         connectedPaths.addAll(getDescendantPaths());
@@ -144,8 +144,8 @@ public class Port extends Construct {
 
     public List<Path> getAncestorPaths() {
 
-        Space space = (Space) getParent().getParent();
-        List<Path> paths = space.getPaths();
+        Model model = (Model) getParent().getParent();
+        List<Path> paths = model.getPaths();
 
         List<Path> ancestorPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -163,8 +163,8 @@ public class Port extends Construct {
                 Path path = paths.get(i);
                 if (path.getTarget() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
-                    // TODO: ancestorPaths.add(path.getSource().getDescendantPaths()) will allow to
-                    // TODO: (cont'd) getAction complete ancestor graph.
+                    // TODO: ancestorPaths.addEvent(path.getSourceFeature().getDescendantPaths()) will allow to
+                    // TODO: (cont'd) getEvent complete ancestor graph.
                     searchablePorts.add(path.getSource()); // Queue the source port in the search
                 }
             }

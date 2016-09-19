@@ -2,13 +2,18 @@ package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 
-import camp.computer.clay.application.Surface;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Feature;
 
-public class Triangle extends Shape {
+public class Triangle<T extends Feature> extends Shape<T> {
 
     private Point a = new Point(0, 0);
     private Point b = new Point(0, 0);
     private Point c = new Point(0, 0);
+
+    public Triangle(T feature) {
+        this.feature = feature;
+    }
 
     public Triangle(Point position) {
         super(position);
@@ -37,9 +42,9 @@ public class Triangle extends Shape {
     }
 
     @Override
-    public void draw(Surface surface) {
+    public void draw(Display display) {
         if (isVisible()) {
-            Surface.drawTriangle(this, surface);
+            Display.drawTriangle(this, display);
         }
     }
 }

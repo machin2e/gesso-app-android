@@ -3,16 +3,22 @@ package camp.computer.clay.model.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Base extends Construct {
+/**
+ * {@code Extension} represents a <em>host extension</em>.
+ */
+public class Extension extends Feature {
 
-    // has Script (i.e., Base runs a Script)
+    // Servo: GND, 3.3V, PWM
+    // DC Motor: GND, 5V
+    // IR Rangefinder: GND, 3.3V, Signal (analog)
+    // Potentiometer: GND, 3.3V, Signal (analog)
 
     private List<Port> ports = new ArrayList<>();
 
     public void addPort(Port port) {
         if (!this.ports.contains(port)) {
-            this.ports.add(port);
             port.setParent(this);
+            this.ports.add(port);
         }
     }
 
@@ -26,9 +32,10 @@ public class Base extends Construct {
 
     public List<Path> getPaths() {
         List<Path> paths = new ArrayList<>();
-        for (Port port: getPorts()) {
-            paths.addAll (port.getPaths());
+        for (Port port : getPorts()) {
+            paths.addAll(port.getPaths());
         }
         return paths;
     }
+
 }

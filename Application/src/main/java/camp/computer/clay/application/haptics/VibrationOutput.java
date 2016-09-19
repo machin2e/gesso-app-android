@@ -1,6 +1,6 @@
-package camp.computer.clay.application;
+package camp.computer.clay.application.haptics;
 
-public class HapticsGenerator {
+public class VibrationOutput {
 
 //    public void vibrate() {
 //        Vibrator v = (Vibrator) ApplicationView.getContext().getSystemService(Context.VIBRATOR_SERVICE);

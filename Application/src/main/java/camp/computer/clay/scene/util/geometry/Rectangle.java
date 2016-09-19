@@ -5,13 +5,18 @@ import android.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.Surface;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Feature;
 
-public class Rectangle extends Shape {
+public class Rectangle<T extends Feature> extends Shape<T> {
 
     private double width = 1.0;
 
     private double height = 1.0;
+
+    public Rectangle(T feature) {
+        this.feature = feature;
+    }
 
     public Rectangle(double width, double height) {
         super();
@@ -31,6 +36,7 @@ public class Rectangle extends Shape {
         this.height = (bottom - top);
     }
 
+    // TODO: Delete?
     public List<Point> getRelativeVertices() {
         ArrayList<Point> vertices = new ArrayList<>();
         vertices.add(getRelativeTopLeft());
@@ -40,6 +46,7 @@ public class Rectangle extends Shape {
         return vertices;
     }
 
+    // TODO: Delete?
     public List<Line> getRelativeSegments() {
         ArrayList<Line> segments = new ArrayList<>();
         segments.add(new Line(getRelativeTopLeft(), getRelativeTopRight()));
@@ -68,11 +75,11 @@ public class Rectangle extends Shape {
     }
 
     @Override
-    public void draw(Surface surface) {
+    public void draw(Display display) {
         if (isVisible()) {
-            Surface.drawRectangle(this, surface);
+            Display.drawRectangle(this, display);
 
-            surface.getPaint().setColor(Color.GREEN);
+            display.getPaint().setColor(Color.GREEN);
 //            Surface.drawRectangle(position, getRotation(), width, height, surface);
         }
     }

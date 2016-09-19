@@ -1,22 +1,22 @@
 package camp.computer.clay.model.architecture;
 
-public abstract class Construct {
+public abstract class Feature { // was Feature
     // TODO: UUID.
     // TODO: Tag.
     // TODO: Physical dimensions (of actual physical object). Add it as a label-like property.
 
-    private Construct parent;
+    private Feature parent;
 
-    public Construct() {
+    public Feature() {
     }
 
-    // TODO: Get serialized construct (e.g., from redis database)
-    // TODO: Alternavively, pass in a JavaScript method that simulates the construct. This would be
+    // TODO: Get serialized feature (e.g., from redis database)
+    // TODO: Alternavively, pass in a JavaScript method that simulates the feature. This would be
     // TODO: (cont'd) after loading it from redis.
-    public Construct(String serializedConstruct) {
+    public Feature(String serializedConstruct) {
     }
 
-    public void setParent(Construct parent) {
+    public void setParent(Feature parent) {
         this.parent = parent;
     }
 
@@ -24,7 +24,7 @@ public abstract class Construct {
         return (this.parent != null);
     }
 
-    public Construct getParent() {
+    public Feature getParent() {
         return this.parent;
     }
 }

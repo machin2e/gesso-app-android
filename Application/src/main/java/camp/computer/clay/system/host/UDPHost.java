@@ -10,7 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import camp.computer.clay.application.Application;
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.system.old_model.Message;
 import camp.computer.clay.system.host.util.CRC16;
 
@@ -102,7 +102,7 @@ public class UDPHost extends Thread implements MessageHostInterface {
                     content = content.substring(1);
                     String[] terms = content.split("\t");
 
-                    // TODO: Extract checksum, compute new one, and compare. If equal, add message.
+                    // TODO: Extract checksum, compute new one, and compare. If equal, addEvent message.
                     String incomingMessageSize = terms[0];
                     int incomingChecksum = Integer.parseInt(terms[1]);
 
@@ -153,7 +153,7 @@ public class UDPHost extends Thread implements MessageHostInterface {
 
         // Acquire a multicast lock to enable receiving broadcast packets
         if (multicastLock == null) {
-            WifiManager wm = (WifiManager) Application.getContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wm = (WifiManager) Launcher.getContext().getSystemService(Context.WIFI_SERVICE);
             multicastLock = wm.createMulticastLock ("mydebuginfo");
             multicastLock.acquire ();
         }

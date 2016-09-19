@@ -9,31 +9,31 @@ public class Timeline {
 
     private ArrayList<Event> events = new ArrayList<Event>();
 
-    private Device device = null;
+    private Host host = null;
 
     public Timeline (UUID uuid) {
         this.uuid = uuid;
     }
 
-    public Timeline(Device device) {
+    public Timeline(Host host) {
         super();
 
         this.uuid = UUID.randomUUID();
 
-        this.device = device;
+        this.host = host;
     }
 
     public UUID getUuid () {
         return this.uuid;
     }
 
-    public Device getDevice() {
-        return this.device;
+    public Host getHost() {
+        return this.host;
     }
 
     // <HACK>
-    public void setDevice(Device device) {
-        this.device = device;
+    public void setHost(Host host) {
+        this.host = host;
     }
     // </HACK>
 
@@ -71,7 +71,7 @@ public class Timeline {
         }
 
 //        if (event != null) {
-//            getPatch().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
+//            getExtension().getClay().getStore().removeEvent(event, new ContentManagerInterface.Callback() {
 //                @Override
 //                public void onSuccess(Object object) {
 //                    Log.v("Content_Manager", "Deleted event from database.");
@@ -81,7 +81,7 @@ public class Timeline {
 //
 //                @Override
 //                public void onFailure() {
-//                    // TODO: Remove from object construct and cache, even if it couldn't be removed from the store.
+//                    // TODO: Remove from object feature and cache, even if it couldn't be removed from the store.
 //                    // TODO: Log failure here in text file for final logging of error. This should help debugging.
 //                }
 //            });

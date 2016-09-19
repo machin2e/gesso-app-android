@@ -36,15 +36,20 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.application.sound.SpeechOutput;
+import camp.computer.clay.application.sound.ToneOutput;
+import camp.computer.clay.application.spatial.OrientationInput;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.system.host.NetworkResource;
 import camp.computer.clay.system.host.UDPHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.old_model.Device;
+import camp.computer.clay.system.old_model.Host;
 import camp.computer.clay.system.host.DisplayHostInterface;
 
-public class Application extends FragmentActivity implements DisplayHostInterface {
+public class Launcher extends FragmentActivity implements DisplayHostInterface { // was Launcher
+    // rename Launcher to Setup? to provide analog to "setup" functions in classes?
 
     // <Settings>
     private static final boolean ENABLE_TONE_GENERATOR = false;
@@ -64,17 +69,17 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_FULLSCREEN = true;
     // </Style>
 
-    public Surface surface;
+    public Display display;
 
-    private SpeechGenerator speechGenerator;
+    private SpeechOutput speechOutput;
 
-    private ToneGenerator toneGenerator;
+    private ToneOutput toneOutput;
 
-    private SensorAdapter sensorAdapter;
+    private OrientationInput orientationInput;
 
     private static Context context;
 
-    private static Application applicationView;
+    private static Launcher launcherView;
 
     private Clay clay;
 
@@ -90,9 +95,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == SpeechGenerator.CHECK_CODE) {
+        if(requestCode == SpeechOutput.CHECK_CODE) {
             if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                speechGenerator = new SpeechGenerator(this);
+                speechOutput = new SpeechOutput(this);
             } else {
                 Intent install = new Intent();
                 install.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
@@ -101,16 +106,16 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
     }
 
-    /** Called when the activity is getStartAction created. */
+    /** Called when the activity is getFirstEvent created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Application.context = getApplicationContext();
+        Launcher.context = getApplicationContext();
 
         // Sensor Interface
         if (ENABLE_MOTION_SENSOR) {
-            sensorAdapter = new SensorAdapter(getApplicationContext());
+            orientationInput = new OrientationInput(getApplicationContext());
         }
 
         if (ENABLE_FULLSCREEN) {
@@ -118,7 +123,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // Display Interface
-        Application.applicationView = this;
+        Launcher.launcherView = this;
 
 //        for (int i = 0; i < 100; i++) {
 //            String outgoingMessage = "announce device " + UUID.randomUUID();
@@ -138,8 +143,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         setContentView(R.layout.activity_main);
 
         // Scene Surface
-        surface = (Surface) findViewById (R.id.app_surface_view);
-        surface.onResume();
+        display = (Display) findViewById (R.id.app_surface_view);
+        display.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
@@ -161,7 +166,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
                 int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
                 int pointerId = motionEvent.getPointerId(pointerIndex);
-                //int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+                //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
                 int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount();
 
@@ -292,7 +297,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
                 int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
                 int pointerId = motionEvent.getPointerId (pointerIndex);
-                //int touchAction = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
+                //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
                 int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
                 int pointCount = motionEvent.getPointerCount ();
 
@@ -349,7 +354,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
                     // Get screen width and height of the device
                     DisplayMetrics metrics = new DisplayMetrics();
-                    Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    Launcher.getLauncherView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                     int screenWidth = metrics.widthPixels;
                     int screenHeight = metrics.heightPixels;
 
@@ -395,11 +400,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         // Check availability of speech synthesis engine on Android host device.
         if (ENABLE_SPEECH_GENERATOR) {
-            SpeechGenerator.checkAvailability(this);
+            SpeechOutput.checkAvailability(this);
         }
 
         if (ENABLE_TONE_GENERATOR) {
-            toneGenerator = new ToneGenerator();
+            toneOutput = new ToneOutput();
         }
 
         hideChat();
@@ -594,7 +599,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private void addPathPatchAction() {
 
         final TextView actionConstruct = new TextView(getContext());
-        actionConstruct.setText("Action (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
+        actionConstruct.setText("Event (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
         int horizontalPadding = (int) convertDipToPx(20);
         int verticalPadding = (int) convertDipToPx(10);
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
@@ -655,7 +660,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private void startFullscreenService() {
         enableFullscreenService = true;
-        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Action.MINIMUM_HOLD_DURATION);
+        fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Event.MINIMUM_HOLD_DURATION);
     }
 
     public void stopFullscreenService() {
@@ -684,7 +689,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onPause();
 
         // <VISUALIZATION>
-        surface.onPause();
+        display.onPause();
         // </VISUALIZATION>
     }
 
@@ -700,7 +705,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // <VISUALIZATION>
-        surface.onResume();
+        display.onResume();
         // </VISUALIZATION>
     }
 
@@ -711,7 +716,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
-            // Process the outgoing messages
+            // Action the outgoing messages
             clay.step();
 
             // Repeat this the same runnable code block again another 2 seconds
@@ -724,13 +729,13 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onDestroy();
 
         // Stop speech generator
-        if (speechGenerator != null) {
-            speechGenerator.destroy();
+        if (speechOutput != null) {
+            speechOutput.destroy();
         }
     }
 
     public static Context getContext() {
-        return Application.context;
+        return Launcher.context;
     }
 
     @Override
@@ -744,37 +749,37 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     }
 
     @Override
-    public void addDeviceView(Device device) {
+    public void addDeviceView(Host host) {
 
     }
 
     @Override
-    public void refreshListViewFromData(Device device) {
-        // TODO: Update the view to reflect the latest state of the object construct
+    public void refreshListViewFromData(Host host) {
+        // TODO: Update the view to reflect the latest state of the object feature
     }
 
-    // TODO: Rename to something else and make a getDisplay() function specific to the
+    // TODO: Rename to something else and make a getLauncherView() function specific to the
     // TODO: (cont'd) display interface.
-    public static Application getDisplay() { return Application.applicationView; }
+    public static Launcher getLauncherView() { return Launcher.launcherView; }
 
-    public Surface getSurface() {
-        return this.surface;
+    public Display getDisplay() {
+        return this.display;
     }
 
     public double getFramesPerSecond () {
-        return getSurface().getRenderer().getFramesPerSecond();
+        return getDisplay().getDisplayOutput().getFramesPerSecond();
     }
 
-    public SpeechGenerator getSpeechGenerator() {
-        return this.speechGenerator;
+    public SpeechOutput getSpeechOutput() {
+        return this.speechOutput;
     }
 
-    public ToneGenerator getToneGenerator() {
-        return this.toneGenerator;
+    public ToneOutput getToneOutput() {
+        return this.toneOutput;
     }
 
-    public SensorAdapter getSensorAdapter() {
-        return this.sensorAdapter;
+    public OrientationInput getOrientationInput() {
+        return this.orientationInput;
     }
 
     public void displayChooseDialog() {

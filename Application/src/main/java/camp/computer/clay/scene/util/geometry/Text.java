@@ -2,7 +2,7 @@ package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 
-import camp.computer.clay.application.Surface;
+import camp.computer.clay.application.visual.Display;
 
 public class Text extends Shape {
     private Point source = new Point(0, 0);
@@ -21,7 +21,7 @@ public class Text extends Shape {
     }
 
     @Override
-    public void draw(Surface surface) {
+    public void draw(Display display) {
 
     }
 

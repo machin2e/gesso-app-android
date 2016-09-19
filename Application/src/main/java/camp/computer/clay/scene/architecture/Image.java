@@ -1,13 +1,14 @@
 package camp.computer.clay.scene.architecture;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.Surface;
-import camp.computer.clay.model.architecture.Construct;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Feature;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Process;
+import camp.computer.clay.model.interaction.EventListener;
 import camp.computer.clay.scene.util.Color;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
@@ -15,7 +16,7 @@ import camp.computer.clay.scene.util.geometry.Rectangle;
 import camp.computer.clay.scene.util.geometry.Shape;
 import camp.computer.clay.scene.util.Visibility;
 
-public abstract class Image<T extends Construct> {
+public abstract class Image<T extends Feature> {
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -29,19 +30,19 @@ public abstract class Image<T extends Construct> {
 
     protected double transparency = targetTransparency;
 
-    protected T construct = null;
+    protected T feature = null;
 
     protected Scene scene = null;
 
     // TODO: Make this an interface? Move interface out of class.
-    protected ActionListener actionListener;
+    protected EventListener eventListener;
 
-    public Image(T construct) {
-        this.construct = construct;
+    public Image(T feature) {
+        this.feature = feature;
     }
 
-    public T getConstruct() {
-        return this.construct;
+    public T getFeature() {
+        return this.feature;
     }
 
     public void setScene(Scene scene) {
@@ -54,9 +55,9 @@ public abstract class Image<T extends Construct> {
 
     // TODO: Delete this after deleting PortImage
     public Image getParentImage() {
-        if (getConstruct().hasParent()) {
-            Construct parentConstruct = getConstruct().getParent();
-            return getScene().getImage(parentConstruct);
+        if (getFeature().hasParent()) {
+            Feature parentFeature = getFeature().getParent();
+            return getScene().getImage(parentFeature);
         }
         return null;
     }
@@ -130,9 +131,18 @@ public abstract class Image<T extends Construct> {
         return null;
     }
 
+    public Shape getShape(Feature feature) {
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
+            if (shape.getFeature() == feature) {
+                return shape;
+            }
+        }
+        return null;
+    }
+
     public Shape getShapeByCoordinate(Point point) {
-        // TODO: List<Image> images = getShapes().filterVisibility(Visibility.VISIBLE).getList();
-        List<Shape> shapes = getShapes(); //.filterVisibility(Visibility.VISIBLE).getList();
+        List<Shape> shapes = getShapes().getList();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.contains(point)) {
@@ -142,9 +152,14 @@ public abstract class Image<T extends Construct> {
         return null;
     }
 
-    // TODO: Replace with method that returns ShapeGroup with filters, etc.
-    public List<Shape> getShapes() {
-        return shapes;
+    public ShapeGroup getShapes() {
+        ShapeGroup shapeGroup = new ShapeGroup();
+        shapeGroup.add(this.shapes);
+        return shapeGroup;
+    }
+
+    public <T extends Feature> ShapeGroup getShapes(Class<?>... types) {
+        return getShapes().filterType(types);
     }
 
     // TODO: public List<Shape> getShapes(String regex) --- e.g., "getShapes("LED [0-9]+") or ("LED <number>")
@@ -155,7 +170,7 @@ public abstract class Image<T extends Construct> {
 
     public abstract void update();
 
-    public abstract void draw(Surface surface);
+    public abstract void draw(Display display);
 
 //    public abstract boolean contains(Point point);
 
@@ -172,29 +187,33 @@ public abstract class Image<T extends Construct> {
         return false;
     }
 
-    public void setOnActionListener(ActionListener actionListener) {
-        this.actionListener = actionListener;
+    public void setOnActionListener(EventListener eventListener) {
+        this.eventListener = eventListener;
     }
 
-    public void processAction(Process process) {
-        if (actionListener != null) {
-            actionListener.onAction(process);
+    public void processAction(Action action) {
+        if (eventListener != null) {
+            eventListener.onAction(action);
         }
     }
 
+    // TODO: Delete?
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
 
         for (int i = 0; i < shapes.size(); i++) {
+
+            Shape shape = shapes.get(i);
+
             // Color
             int intColor = android.graphics.Color.parseColor(shapes.get(i).getColor());
             intColor = Color.setTransparency(intColor, this.targetTransparency);
-            shapes.get(i).setColor(Color.getHexColorString(intColor));
+            shape.setColor(Color.getHexColorString(intColor));
 
             // Outline Color
             int outlineColorIndex = android.graphics.Color.parseColor(shapes.get(i).getOutlineColor());
             outlineColorIndex = Color.setTransparency(outlineColorIndex, this.targetTransparency);
-            shapes.get(i).setOutlineColor(Color.getHexColorString(outlineColorIndex));
+            shape.setOutlineColor(Color.getHexColorString(outlineColorIndex));
         }
 
         this.transparency = this.targetTransparency;
@@ -208,10 +227,12 @@ public abstract class Image<T extends Construct> {
         return positions;
     }
 
+    // Delete? The above getVertices() should be enough now that Point is refactored! Maybe add getRelativeVertices() if needed.
     public List<Point> getAbsoluteVertices() {
         List<Point> positions = new LinkedList<>();
         for (Shape shape : shapes) {
-            for (Point shapeVertex : shape.getVertices()) {
+            List<Point> vertices = shape.getVertices();
+            for (Point shapeVertex : vertices) {
 
                 // Rotate shape about its center point
                 Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getCoordinate(), shape.getRotation(), shapeVertex);

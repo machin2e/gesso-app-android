@@ -1,10 +1,10 @@
-package camp.computer.clay.application;
+package camp.computer.clay.application.sound;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 
-public class ToneGenerator {
+public class ToneOutput {
 
     /**
      * Reference: http://stackoverflow.com/questions/2413426/playing-an-arbitrary-tone-with-android
@@ -39,7 +39,7 @@ public class ToneGenerator {
             double dVal = sample[i];
             // Ramp up to maximum
             final short val = (short) ((dVal * 32767 * i / ramp));
-            // in 16 bit wav PCM, getStartAction byte is the low order byte
+            // in 16 bit wav PCM, getFirstEvent byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
         }
@@ -49,7 +49,7 @@ public class ToneGenerator {
             double dVal = sample[i];
             // scale to maximum amplitude
             final short val = (short) ((dVal * 32767));
-            // in 16 bit wav PCM, getStartAction byte is the low order byte
+            // in 16 bit wav PCM, getFirstEvent byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
         }
@@ -58,7 +58,7 @@ public class ToneGenerator {
             double dVal = sample[i];
             // Ramp down to zero
             final short val = (short) ((dVal * 32767 * (numSamples - i) / ramp));
-            // in 16 bit wav PCM, getStartAction byte is the low order byte
+            // in 16 bit wav PCM, getFirstEvent byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
         }

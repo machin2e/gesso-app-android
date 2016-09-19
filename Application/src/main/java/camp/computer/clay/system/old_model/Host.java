@@ -11,11 +11,11 @@ import java.util.UUID;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.host.TCPMessageClientHost;
 
-// TODO: Integrate with Base in new construct. Also separate the construct (descriptive information that
+// TODO: Integrate with Host in new feature. Also separate the feature (descriptive information that
 // TODO: (cont'd) provides a lookup table of sorts, and the simulation (includes virtual
 // TODO: (cont'd) communications interfaces such as TCP).
 
-public class Device {
+public class Host {
 
     private Clay clay = null;
 
@@ -29,16 +29,16 @@ public class Device {
 
     private Date timeOfLastContact = null;
 
-    // TODO: Cache/construct the unit's state and behavior
+    // TODO: Cache/feature the unit's state and behavior
 
     private TCPMessageClientHost TCPMessageClientHost;
 
     private ArrayList<String> tags;
 
-    public Device() {
+    public Host() {
     }
 
-    public Device(Clay clay, UUID uuid) {
+    public Host(Clay clay, UUID uuid) {
         this.clay = clay;
 
         this.uuid = uuid;
@@ -53,7 +53,7 @@ public class Device {
     }
 
 //    public long getTimeSinceLastMessage () {
-////        Log.v ("Clay_Time", "Time since getStopAction message: " + this.timeOfLastContact);
+////        Log.v ("Clay_Time", "Time since getLastEvent message: " + this.timeOfLastContact);
 //        Date currentTime = Calendar.getInstance().getTime ();
 //
 //        if (timeOfLastContact != null) {
@@ -123,7 +123,7 @@ public class Device {
 
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
-        this.timeline.setDevice(this);
+        this.timeline.setHost(this);
     }
 
     public void connectTcp() {

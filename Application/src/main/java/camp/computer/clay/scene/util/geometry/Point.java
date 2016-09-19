@@ -1,7 +1,5 @@
 package camp.computer.clay.scene.util.geometry;
 
-import android.util.Log;
-
 public class Point {
     //
     // TODO: Update to use numbers that can be composed and given dependencies (used in
@@ -10,10 +8,12 @@ public class Point {
     //
     // TODO: Refactor to support N dimensions, including rotation angles accordingly.
 
+    // private static Point origin = new Point(0, 0);
+
     /**
      * The {@code Point} relative to which this point will be positioned.
      */
-    protected Point referenceCoordinate = null;
+    protected Point referencePoint = null;
 
     private double x = 0;
     private double y = 0;
@@ -49,24 +49,24 @@ public class Point {
     }
 
     /**
-     * Creates a new {@code Point} positioned relative to {@code referenceCoordinate}.
+     * Creates a new {@code Point} positioned relative to {@code referencePoint}.
      *
-     * @param x                   The x coordinate of this {@code Point} relative to {@code referenceCoordinate}.
-     * @param y                   The y coordinate of this {@code Point} relative to {@code referenceCoordinate}.
-     * @param referenceCoordinate
+     * @param x                   The x coordinate of this {@code Point} relative to {@code referencePoint}.
+     * @param y                   The y coordinate of this {@code Point} relative to {@code referencePoint}.
+     * @param referencePoint
      */
-    public Point(double x, double y, Point referenceCoordinate) {
-        setOrigin(referenceCoordinate);
+    public Point(double x, double y, Point referencePoint) {
+        setOrigin(referencePoint);
         setRelativeX(x);
         setRelativeY(y);
     }
 
     public Point getOrigin() {
-        return referenceCoordinate;
+        return referencePoint;
     }
 
     public void setOrigin(Point referenceCoordinate) {
-        this.referenceCoordinate = referenceCoordinate;
+        this.referencePoint = referenceCoordinate;
     }
 
     public double getRelativeX() {
@@ -111,23 +111,14 @@ public class Point {
      * @return Absolute x coordinate.
      */
     public double getX() {
-        if (referenceCoordinate != null) {
 
-            Point localOrigin = new Point(0, 0);
-            Point localPoint = new Point(x, y);
-//            Point rotatedLocalPoint = new Point();
+        if (referencePoint != null) {
 
-//            double xOffset = Geometry.calculateDistance(localOrigin, localPoint);
-//            double rotationOffset = Geometry.calculateRotationAngle(localOrigin, localPoint);
+            double globalX = Geometry.calculateDistance(0, 0, x, y)
+                    * Math.cos(Math.toRadians(referencePoint.getRotation()
+                    + Geometry.calculateRotationAngle(0, 0, x, y)));
 
-//            rotatedLocalPoint.setX(0 + xOffset * Math.cos(Math.toRadians(rotationOffset)));
-
-            //Point rotatedPoint = Geometry.calculateRotatedPoint(0, 0, referenceCoordinate.getRotation(), x, y);
-            //Point rotatedPoint = Geometry.calculatePoint(0, 0, referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y), Geometry.calculateDistance(0, 0, x, y));
-
-            double globalX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
-
-            return referenceCoordinate.getX() + globalX;
+            return referencePoint.getX() + globalX;
 
         } else {
             return this.x;
@@ -138,24 +129,13 @@ public class Point {
      * @return Absolute y coordinate.
      */
     public double getY() {
-        if (referenceCoordinate != null) {
+        if (referencePoint != null) {
 
-//            Point localOrigin = new Point();
-//            Point localPoint = new Point(x, y);
-//            Point rotatedLocalPoint = new Point();
+            double globalY = Geometry.calculateDistance(0, 0, x, y)
+                    * Math.sin(Math.toRadians(referencePoint.getRotation()
+                    + Geometry.calculateRotationAngle(0, 0, x, y)));
 
-//            double yOffset = Geometry.calculateDistance(localOrigin, localPoint);
-//            double rotationOffset = Geometry.calculateRotationAngle(localOrigin, localPoint);
-
-//            rotatedLocalPoint.setY(0 + yOffset * Math.sin(Math.toRadians(rotationOffset)));
-
-            //Point rotatedPoint = Geometry.calculateRotatedPoint(0, 0, referenceCoordinate.getRotation(), x, y);
-            //Point rotatedPoint = Geometry.calculatePoint(0, 0, referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y), Geometry.calculateDistance(0, 0, x, y));
-            //point.setX(x + distance * Math.cos(Math.toRadians(rotation)));
-            //point.setY(y + Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y))));
-
-            double globalY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referenceCoordinate.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
-            return referenceCoordinate.getY() + globalY;
+            return referencePoint.getY() + globalY;
 
         } else {
             return this.y;
@@ -164,8 +144,8 @@ public class Point {
 
     public double getRotation() {
 //        return this.rotation;
-        if (referenceCoordinate != null) {
-            return referenceCoordinate.getRotation() + this.rotation;
+        if (referencePoint != null) {
+            return referencePoint.getRotation() + this.rotation;
         } else {
             return this.rotation;
         }
@@ -202,13 +182,13 @@ public class Point {
      * @param x Absolute x coordinate. Converted to a relative x position internally.
      */
     public void setX(double x) {
-        if (referenceCoordinate != null) {
+        if (referencePoint != null) {
 
 //            Point newPoint = new Point(x, getY());
-//            Point rotatedPoint = Geometry.calculateRotatedPoint(referenceCoordinate, referenceCoordinate.getRotation(), newPoint);
-//            this.x = rotatedPoint.getX() - referenceCoordinate.getX();
+//            Point rotatedPoint = Geometry.calculateRotatedPoint(referencePoint, referencePoint.getRotation(), newPoint);
+//            this.x = rotatedPoint.getX() - referencePoint.getX();
 
-            this.x = x - referenceCoordinate.getX();
+            this.x = x - referencePoint.getX();
         } else {
             this.x = x;
         }
@@ -218,21 +198,21 @@ public class Point {
      * @param y Absolute y coordinate. Converted to a relative y position internally.
      */
     public void setY(double y) {
-        if (referenceCoordinate != null) {
+        if (referencePoint != null) {
 
 //            Point newPoint = new Point(getX(), y);
-//            Point rotatedPoint = Geometry.calculateRotatedPoint(referenceCoordinate, referenceCoordinate.getRotation(), newPoint);
-//            this.x = rotatedPoint.getY() - referenceCoordinate.getY();
+//            Point rotatedPoint = Geometry.calculateRotatedPoint(referencePoint, referencePoint.getRotation(), newPoint);
+//            this.x = rotatedPoint.getY() - referencePoint.getY();
 
-            this.y = y - referenceCoordinate.getY();
+            this.y = y - referencePoint.getY();
         } else {
             this.y = y;
         }
     }
 
     public void setRelativeRotation(double rotation) {
-//        if (referenceCoordinate != null) {
-//            this.rotation = rotation - referenceCoordinate.getRotation();
+//        if (referencePoint != null) {
+//            this.rotation = rotation - referencePoint.getRotation();
 //        } else {
         this.rotation = rotation;
 //        }

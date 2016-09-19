@@ -3,7 +3,8 @@ package camp.computer.clay.scene.architecture;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Construct;
+import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.scene.util.geometry.Shape;
 
 public class Layer {
 
@@ -48,20 +49,33 @@ public class Layer {
         image.setScene(scene);
     }
 
-    public Image getImage(Construct construct) {
+    public Image getImage(Feature feature) {
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            if (image.getConstruct() == construct) {
+            if (image.getFeature() == feature) {
                 return image;
             }
         }
         return null;
     }
 
-    public Construct getModel(Image image) {
+    public Feature getFeature(Image image) {
         for (int i = 0; i < images.size(); i++) {
             if (images.get(i) == image) {
-                return images.get(i).getConstruct();
+                return images.get(i).getFeature();
+            }
+        }
+        return null;
+    }
+
+    // TODO: (?) Call into Image.getFeature(Shape)
+    public Feature getFeature(Shape shape) {
+        for (int i = 0; i < images.size(); i++) {
+            List<Shape> shapeList = images.get(i).getShapes().getList();
+            for (int j = 0; j < shapeList.size(); j++) {
+                if (shapeList.get(i) == shape) {
+                    return images.get(i).getFeature();
+                }
             }
         }
         return null;
@@ -71,7 +85,7 @@ public class Layer {
         return images;
     }
 
-    public int getCardinality() {
+    public int getSize() {
         return this.images.size();
     }
 }

@@ -1,13 +1,13 @@
-package camp.computer.clay.application;
+package camp.computer.clay.application.visual;
 
 import camp.computer.clay.scene.util.Time;
 
 /**
- * Renderer is a background thread that periodically updates the scene state
+ * DisplayOutput is a background thread that periodically updates the scene state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
  * scene's state then re-rendering it.
  */
-public class Renderer extends Thread {
+public class DisplayOutput extends Thread {
 
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
@@ -21,13 +21,13 @@ public class Renderer extends Thread {
     private int targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
     // </SETTINGS>
 
-    private Surface surface;
+    private Display display;
 
     private boolean isRunning = false;
 
-    Renderer(Surface surface) {
+    DisplayOutput(Display display) {
         super();
-        this.surface = surface;
+        this.display = display;
     }
 
     public void setRunning (boolean isRunning) {
@@ -37,14 +37,14 @@ public class Renderer extends Thread {
     // <STATISTICS>
     private double currentFramesPerSecond = 0;
     private int fpsSampleIndex = 0;
-    private final int fpsSampleLimit = DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT; // Moving FPS average for getStopAction second.
+    private final int fpsSampleLimit = DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT; // Moving FPS average for getLastEvent second.
     private double[] fpsSamples = new double[fpsSampleLimit];
     // </STATISTICS>
 
     @Override
     public void run () {
 
-        long framePeriod = 1000 / targetFramesPerSecond; // Base period in milliseconds
+        long framePeriod = 1000 / targetFramesPerSecond; // Host period in milliseconds
         long frameStartTime;
         long frameStopTime;
         long frameSleepTime;
@@ -54,7 +54,7 @@ public class Renderer extends Thread {
             frameStartTime = Time.getCurrentTime();
 
             // Advance the scene state
-            surface.update();
+            display.update();
 
             frameStopTime = Time.getCurrentTime();
 

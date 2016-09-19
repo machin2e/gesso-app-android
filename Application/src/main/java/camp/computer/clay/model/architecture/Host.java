@@ -3,19 +3,16 @@ package camp.computer.clay.model.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Patch extends Construct {
+public class Host extends Feature {
 
-    // Servo: GND, 3.3V, PWM
-    // DC Motor: GND, 5V
-    // IR Rangefinder: GND, 3.3V, Signal (analog)
-    // Potentiometer: GND, 3.3V, Signal (analog)
+    // has Script (i.e., Host runs a Script)
 
     private List<Port> ports = new ArrayList<>();
 
     public void addPort(Port port) {
         if (!this.ports.contains(port)) {
-            port.setParent(this);
             this.ports.add(port);
+            port.setParent(this);
         }
     }
 
@@ -29,10 +26,9 @@ public class Patch extends Construct {
 
     public List<Path> getPaths() {
         List<Path> paths = new ArrayList<>();
-        for (Port port : getPorts()) {
-            paths.addAll(port.getPaths());
+        for (Port port: getPorts()) {
+            paths.addAll (port.getPaths());
         }
         return paths;
     }
-
 }

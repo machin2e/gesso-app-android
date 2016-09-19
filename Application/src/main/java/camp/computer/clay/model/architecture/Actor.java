@@ -1,28 +1,26 @@
 package camp.computer.clay.model.architecture;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.interaction.*;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.Process;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.geometry.Shape;
 
 /**
  * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
- * based on the actions recognized on one of the {@code Device} objects associated with the
+ * based on the actions recognized on one of the {@code Host} objects associated with the
  * {@code Actor}.
  */
 public class Actor { // Controller
 
     private Camera camera = null;
 
-    // Process (Smart querying interface)
-    public List<Process> processes = new LinkedList<>();
+    // Action (Smart querying interface)
+    public List<Action> actions = new LinkedList<>();
 
     public Actor() {
         setup();
@@ -68,85 +66,85 @@ public class Actor { // Controller
      *
      * @return The most recent interaction.
      */
-    private Process getProcess() {
-        if (processes.size() > 0) {
-            return processes.get(processes.size() - 1);
+    private Action getProcess() {
+        if (actions.size() > 0) {
+            return actions.get(actions.size() - 1);
         } else {
             return null;
         }
     }
 
-    public void processAction(Action action) { // TODO: Rename to processAction()
+    public void processAction(Event event) { // TODO: Rename to processAction()
 
-        action.setActor(this);
+        event.setActor(this);
 
-        switch (action.getType()) {
+        switch (event.getType()) {
 
             case SELECT: {
 
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
 
-                // Start a new process
-                Process process = new Process();
-                processes.add(process);
+                // Start a new action
+                Action action = new Action();
+                actions.add(action);
 
-                // Add action to process
-                process.add(action);
+                // Add event to action
+                action.addEvent(event);
 
-                // Record processes on timeline
-                // TODO: Cache and store the processAction processes before deleting them completely! Do it in
+                // Record actions on timeline
+                // TODO: Cache and store the processAction actions before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
-                if (processes.size() > 3) {
-                    processes.remove(0);
+                if (actions.size() > 3) {
+                    actions.remove(0);
                 }
 
                 // Set the target image
-                Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
-                action.setTargetImage(targetImage);
+                Image targetImage = getCamera().getScene().getImageByCoordinate(event.getCoordinate());
+                event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
-                action.setTargetShape(targetShape);
+                Shape targetShape = targetImage.getShapeByCoordinate(event.getCoordinate());
+                event.setTargetShape(targetShape);
 
-                // Process the action
-                action.getTargetImage().processAction(process);
+                // Action the event
+                event.getTargetImage().processAction(action);
 
-                //getCamera().getScene().onTouchListener(action);
+                //getCamera().getScene().onTouchListener(event);
 
                 break;
             }
 
             case MOVE: {
 
-                Process process = getProcess();
-                process.add(action);
+                Action action = getProcess();
+                action.addEvent(event);
 
                 // Current
-                action.isPointing[action.pointerIndex] = true;
+                event.isPointing[event.pointerIndex] = true;
 
                 // Classify/Callback
-                if (process.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
+                if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
-                    Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
-                    action.setTargetImage(targetImage);
+                    Image targetImage = getCamera().getScene().getImageByCoordinate(event.getCoordinate());
+                    event.setTargetImage(targetImage);
 
                     // Set the target shape
-                    Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
-                    action.setTargetShape(targetShape);
+                    Shape targetShape = targetImage.getShapeByCoordinate(event.getCoordinate());
+                    event.setTargetShape(targetShape);
 
 //                    // <HACK>
 //                    // TODO: Update handlers and Delete!
-//                    //Process process = action.getProcess();
-//                    if (process.getSize() > 1) {
-//                        action.setTargetImage(process.getStartAction().getTargetImage());
-//                        action.setTargetShape(process.getStartAction().getTargetShape());
+//                    //Action action = event.getAction();
+//                    if (action.getSize() > 1) {
+//                        event.setTargetImage(action.getFirstEvent().getTargetImage());
+//                        event.setTargetShape(action.getFirstEvent().getTargetShape());
 //                    }
 //                    // </HACK>
 
-                    //action.getTargetImage().processAction(process);
-                    process.getStartAction().getTargetImage().processAction(process);
+                    //event.getTargetImage().processAction(action);
+                    action.getFirstEvent().getTargetImage().processAction(action);
                 }
 
                 break;
@@ -154,35 +152,35 @@ public class Actor { // Controller
 
             case UNSELECT: {
 
-                Process process = getProcess();
-                process.add(action);
+                Action action = getProcess();
+                action.addEvent(event);
 
                 // Current
-                action.isPointing[action.pointerIndex] = false;
+                event.isPointing[event.pointerIndex] = false;
 
-                // Stop listening for a hold action
-                process.timerHandler.removeCallbacks(process.timerRunnable);
+                // Stop listening for a hold event
+                action.timerHandler.removeCallbacks(action.timerRunnable);
 
-//                if (process.getDuration() < Action.MAXIMUM_TAP_DURATION) {
-//                    action.setType(Action.Type.SELECT);
-//                    getCamera().getScene().onTapListener(action);
+//                if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
+//                    event.setType(Event.Type.SELECT);
+//                    getCamera().getScene().onTapListener(event);
 //                } else {
-//                    action.setType(Action.Type.UNSELECT);
-//                    getCamera().getScene().onReleaseListener(action);
+//                    event.setType(Event.Type.UNSELECT);
+//                    getCamera().getScene().onReleaseListener(event);
 //                }
 
                 // Set the target image
-                Image targetImage = getCamera().getScene().getImageByCoordinate(action.getCoordinate());
-                action.setTargetImage(targetImage);
+                Image targetImage = getCamera().getScene().getImageByCoordinate(event.getCoordinate());
+                event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShapeByCoordinate(action.getCoordinate());
-                action.setTargetShape(targetShape);
+                Shape targetShape = targetImage.getShapeByCoordinate(event.getCoordinate());
+                event.setTargetShape(targetShape);
 
-                //action.getTargetImage().processAction(process);
-                process.getStartAction().getTargetImage().processAction(process);
+                //event.getTargetImage().processAction(action);
+                action.getFirstEvent().getTargetImage().processAction(action);
 
-//                getCamera().getScene().onReleaseListener(action);
+//                getCamera().getScene().onReleaseListener(event);
 
                 break;
             }

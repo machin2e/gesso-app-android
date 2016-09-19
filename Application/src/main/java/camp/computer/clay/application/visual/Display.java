@@ -1,4 +1,4 @@
-package camp.computer.clay.application;
+package camp.computer.clay.application.visual;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,8 +15,9 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.scene.architecture.Scene;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Circle;
@@ -27,7 +28,7 @@ import camp.computer.clay.scene.util.geometry.Polygon;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 import camp.computer.clay.scene.util.geometry.Triangle;
 
-public class Surface extends SurfaceView implements SurfaceHolder.Callback {
+public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     // Scene Rendering Context
     private Bitmap canvasBitmap = null;
@@ -37,9 +38,9 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Matrix identityMatrix;
 
-    // Scene Renderer
+    // Scene DisplayOutput
     private SurfaceHolder surfaceHolder;
-    private Renderer renderer;
+    private DisplayOutput displayOutput;
 
     // Coordinate System (Grid)
     private Point originPosition = new Point();
@@ -47,17 +48,16 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     // Scene
     private Scene scene;
 
-    public Surface(Context context) {
+    public Display(Context context) {
         super(context);
-
         setFocusable(true);
     }
 
-    public Surface(Context context, AttributeSet attrs) {
+    public Display(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public Surface(Context context, AttributeSet attrs, int defStyle) {
+    public Display(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -85,10 +85,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
 //        // Kill the background Thread
 //        boolean retry = true;
-//        // renderer.setRunning (false);
+//        // displayOutput.setRunning (false);
 //        while (retry) {
 //            try {
-//                renderer.join ();
+//                displayOutput.join ();
 //                retry = false;
 //            } catch (InterruptedException e) {
 //                e.printStackTrace ();
@@ -103,9 +103,9 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
 
         // Create and start background Thread
-        renderer = new Renderer(this);
-        renderer.setRunning(true);
-        renderer.start();
+        displayOutput = new DisplayOutput(this);
+        displayOutput.setRunning(true);
+        displayOutput.start();
 
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
@@ -123,11 +123,11 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
         // Kill the background Thread
         boolean retry = true;
-        renderer.setRunning(false);
+        displayOutput.setRunning(false);
 
         while (retry) {
             try {
-                renderer.join();
+                displayOutput.join();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -146,20 +146,20 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) scene.getSpace().getActor(0).getCamera().getCoordinate().getX() + (float) Application.getDisplay().getSensorAdapter().getRotationY(),
-//                (float) originPosition.getY() + (float) scene.getSpace().getActor(0).getCamera().getCoordinate().getY() - (float) Application.getDisplay().getSensorAdapter().getRotationX()
-                (float) originPosition.getX() + (float) scene.getModel().getActor(0).getCamera().getPosition().getX(),
-                (float) originPosition.getY() + (float) scene.getModel().getActor(0).getCamera().getPosition().getY()
+//                (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getCoordinate().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(),
+//                (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getCoordinate().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX()
+                (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getX(),
+                (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getY()
         );
-        // this.canvas.rotate((float) ApplicationView.getDisplay().getSensorAdapter().getRotationZ());
+        // this.canvas.rotate((float) ApplicationView.getLauncherView().getOrientationInput().getRotationZ());
         canvas.scale(
-                (float) scene.getModel().getActor(0).getCamera().getScale(),
-                (float) scene.getModel().getActor(0).getCamera().getScale()
+                (float) scene.getFeature().getActor(0).getCamera().getScale(),
+                (float) scene.getFeature().getActor(0).getCamera().getScale()
         );
         // </PERSPECTIVE>
 
-        // TODO: Get Space
-        // TODO: Get Space's selected Scene
+        // TODO: Get Model
+        // TODO: Get Model's selected Scene
 
         // Draw the background
         canvas.drawColor(Color.WHITE);
@@ -269,8 +269,8 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public Renderer getRenderer() {
-        return this.renderer;
+    public DisplayOutput getDisplayOutput() {
+        return this.displayOutput;
     }
 
     private void setCanvas(Canvas canvas) {
@@ -290,12 +290,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
-        Application.getDisplay().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Launcher.getLauncherView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-        scene.getModel().getActor(0).getCamera().setWidth(screenWidth);
-        scene.getModel().getActor(0).getCamera().setHeight(screenHeight);
+        scene.getFeature().getActor(0).getCamera().setWidth(screenWidth);
+        scene.getFeature().getActor(0).getCamera().setHeight(screenHeight);
     }
 
     public Scene getScene() {
@@ -303,14 +303,14 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //----------------------------------------------------------------------------------------------
-    // Action Construct
+    // Event Feature
     //----------------------------------------------------------------------------------------------
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
         // - Motion events contain information about all of the pointers that are currently active
-        //   even if some of them have not moved since the getStopAction event was delivered.
+        //   even if some of them have not moved since the getLastEvent event was delivered.
         //
         // - The number of pointers only ever changes by one as individual pointers go up and down,
         //   except when the gesture is canceled.
@@ -332,13 +332,13 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         // Log.v("InteractionHistory", "Started pointerCoordinates composition.");
 
         // Get active actor
-        Actor actor = scene.getModel().getActor(0);
+        Actor actor = scene.getFeature().getActor(0);
 
-        // Create pointerCoordinates action
-        Action action = new Action();
+        // Create pointerCoordinates event
+        Event event = new Event();
 
-        if (pointerCount <= Action.MAXIMUM_POINT_COUNT) {
-            if (pointerIndex <= Action.MAXIMUM_POINT_COUNT - 1) {
+        if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
+            if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
@@ -346,16 +346,16 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                     int id = motionEvent.getPointerId(i);
                     Point perspectivePosition = actor.getCamera().getPosition();
                     double perspectiveScale = actor.getCamera().getScale();
-                    action.pointerCoordinates[id].setX((motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
-                    action.pointerCoordinates[id].setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                    event.pointerCoordinates[id].setX((motionEvent.getX(i) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
+                    event.pointerCoordinates[id].setY((motionEvent.getY(i) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
                 }
 
-                // ACTION_DOWN is called only for the getStartAction pointer that touches the screen. This
+                // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
                 // starts the gesture. The pointer data for this pointer is always at index 0 in
                 // the MotionEvent.
                 //
                 // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
-                // the getStartAction. The pointer data for this pointer is at the index returned by
+                // the getFirstEvent. The pointer data for this pointer is at the index returned by
                 // getActionIndex().
                 //
                 // ACTION_MOVE is sent when a change has happened during a press gesture for any
@@ -363,28 +363,28 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
                 //
                 // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
                 //
-                // ACTION_UP is sent when the getStopAction pointer leaves the screen.
+                // ACTION_UP is sent when the getLastEvent pointer leaves the screen.
                 //
                 // REFERENCES:
                 // - https://developer.android.com/training/gestures/multi.html
 
-                // Update the state of the touched object based on the current pointerCoordinates action state.
+                // Update the state of the touched object based on the current pointerCoordinates event state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    action.setType(Action.Type.SELECT);
-                    action.pointerIndex = pointerId;
-                    actor.processAction(action);
+                    event.setType(Event.Type.SELECT);
+                    event.pointerIndex = pointerId;
+                    actor.processAction(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO: Handle additional pointers after the getStartAction pointerCoordinates!
+                    // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
-                    action.setType(Action.Type.MOVE);
-                    action.pointerIndex = pointerId;
-                    actor.processAction(action);
+                    event.setType(Event.Type.MOVE);
+                    event.pointerIndex = pointerId;
+                    actor.processAction(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    action.setType(Action.Type.UNSELECT);
-                    action.pointerIndex = pointerId;
-                    actor.processAction(action);
+                    event.setType(Event.Type.UNSELECT);
+                    event.pointerIndex = pointerId;
+                    actor.processAction(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO: Handle additional pointers after the getStartAction pointerCoordinates!
+                    // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
                     // TODO:
                 } else {
@@ -396,10 +396,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public static void drawLine(Line line, Surface surface) {
+    public static void drawLine(Line line, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Color
         canvas.drawLine(
@@ -412,10 +412,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawLine(Point source, Point target, Surface surface) {
+    public static void drawLine(Point source, Point target, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Color
         canvas.drawLine(
@@ -428,10 +428,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawCircle(Point position, double radius, double angle, Surface surface) {
+    public static void drawCircle(Point position, double radius, double angle, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Color
         canvas.drawCircle(
@@ -443,10 +443,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawCircle(Circle circle, Surface surface) {
+    public static void drawCircle(Circle circle, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Color
         paint.setStyle(Paint.Style.FILL);
@@ -475,10 +475,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawText(Point position, String text, double size, Surface surface) {
+    public static void drawText(Point position, String text, double size, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Style
         paint.setTextSize((float) size);
@@ -494,12 +494,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //public static void drawRectangle(Point position, double angle, double width, double height, Surface surface) {
-    public static void drawRectangle(Point position2, double angle, double width, double height, Surface surface) {
+    public static void drawRectangle(Point position2, double angle, double width, double height, Display display) {
 
         // TODO: Absolute rotate at 0,0; Translate with position. (or, make algorithm to translate WRT another reference point)
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Calculate center point
         Point referencePoint = position2.getOrigin();
@@ -582,12 +582,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawRectangle(Rectangle rectangle, Surface surface) {
+    public static void drawRectangle(Rectangle rectangle, Display display) {
 
         if (rectangle.isVisible()) {
 
-            Canvas canvas = surface.getCanvas();
-            Paint paint = surface.getPaint();
+            Canvas canvas = display.getCanvas();
+            Paint paint = display.getPaint();
 
             // Rotate shape about its center point
             /*
@@ -670,10 +670,10 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Surface surface) {
+    public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
                 startPosition,
@@ -700,12 +700,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
             );
 
             paint.setStyle(Paint.Style.FILL);
-            Surface.drawTriangle(
+            Display.drawTriangle(
                     triangleCenterPosition2,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    surface
+                    display
             );
         }
     }
@@ -719,12 +719,12 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
      * @param position
      * @param radius
      * @param sideCount
-     * @param surface
+     * @param display
      */
-    public static void drawRegularPolygon(Point position, int radius, int sideCount, Surface surface) {
+    public static void drawRegularPolygon(Point position, int radius, int sideCount, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < sideCount; i++) {
@@ -749,14 +749,14 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawPolygon(Polygon polygon, Surface surface) {
-        drawPolygon(polygon.getVertices(), surface);
+    public static void drawPolygon(Polygon polygon, Display display) {
+        drawPolygon(polygon.getVertices(), display);
     }
 
-    public static void drawPolygon(List<Point> vertices, Surface surface) {
+    public static void drawPolygon(List<Point> vertices, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < vertices.size(); i++) {
@@ -775,14 +775,14 @@ public class Surface extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawTriangle(Triangle triangle, Surface surface) {
+    public static void drawTriangle(Triangle triangle, Display display) {
         // TODO:
     }
 
-    public static void drawTriangle(Point position, double angle, double width, double height, Surface surface) {
+    public static void drawTriangle(Point position, double angle, double width, double height, Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         // Calculate pointerCoordinates before rotation
         Point p1 = new Point(position.getX() + -(width / 2.0f), position.getY() + (height / 2.0f));

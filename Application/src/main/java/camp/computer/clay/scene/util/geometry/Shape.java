@@ -2,14 +2,18 @@ package camp.computer.clay.scene.util.geometry;
 
 import java.util.List;
 
-import camp.computer.clay.application.Surface;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.scene.util.Color;
 import camp.computer.clay.scene.util.Visibility;
 
-public abstract class Shape {
+public abstract class Shape<T extends Feature> {
 
     protected String label = "";
 
     protected Visibility visibility = Visibility.VISIBLE;
+    protected double targetTransparency = 1.0;
+    protected double transparency = targetTransparency;
 
     protected Point position = new Point(0, 0);
 
@@ -17,11 +21,21 @@ public abstract class Shape {
     protected String outlineColor = "#ff000000";
     protected double outlineThickness = 1.0;
 
+    protected T feature = null;
+
     public Shape() {
+    }
+
+    public Shape(T feature) {
+        this.feature = feature;
     }
 
     public Shape(Point position) {
         this.position.set(position);
+    }
+
+    public T getFeature() {
+        return this.feature;
     }
 
     public Point getCoordinate() {
@@ -94,6 +108,22 @@ public abstract class Shape {
         return color;
     }
 
+    public void setTransparency(final double transparency) {
+        this.targetTransparency = transparency;
+
+        // Color
+        int intColor = android.graphics.Color.parseColor(getColor());
+        intColor = Color.setTransparency(intColor, this.targetTransparency);
+        setColor(Color.getHexColorString(intColor));
+
+        // Outline Color
+        int outlineColorIndex = android.graphics.Color.parseColor(getOutlineColor());
+        outlineColorIndex = Color.setTransparency(outlineColorIndex, this.targetTransparency);
+        setOutlineColor(Color.getHexColorString(outlineColorIndex));
+
+        this.transparency = this.targetTransparency;
+    }
+
     public void setOutlineColor(String color) {
         this.outlineColor = color;
     }
@@ -122,5 +152,5 @@ public abstract class Shape {
         return this.label;
     }
 
-    public abstract void draw(Surface surface);
+    public abstract void draw(Display display);
 }

@@ -2,7 +2,6 @@ package camp.computer.clay.system.host;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.old_model.Device;
+import camp.computer.clay.system.old_model.Host;
 import camp.computer.clay.system.old_model.Message;
 
 public class MessageHost {
@@ -44,7 +43,7 @@ public class MessageHost {
         public void handleMessage (android.os.Message msg) {
 //            Log.v("Clay_Time", "addPatch called");
 
-            // Process the incoming message's data.
+            // Action the incoming message's data.
             Bundle bundle = msg.getData();
             String serializedMessageObject = bundle.getString("serializedMessageObject");
 
@@ -58,22 +57,22 @@ public class MessageHost {
             // Create the message
             Message message = new Message ("udp", senderAddress, null, tokens[1]);
 
-            // Update the unit construct associated with the message
+            // Update the unit feature associated with the message
             if (getClay ().hasDeviceByAddress(tokens[0])) {
 
-                // Get the device associated with the received message
-                Device device = getClay ().getDeviceByAddress(tokens[0]);
+                // Get the host associated with the received message
+                Host host = getClay ().getDeviceByAddress(tokens[0]);
 
                 // Set time that this message was added to the message queue.
                 // NOTE: This is NOT the time that the message was received! It is probably shortly thereafter, though!
                 Calendar currentTime = Calendar.getInstance();
-                device.setTimeOfLastContact(currentTime.getTime());
+                host.setTimeOfLastContact(currentTime.getTime());
             }
 
             // Insert the message into the incoming message queue.
             queueIncomingMessage (message);
             if (incomingMessages.size () > 0) {
-//                Log.v("Clay Datagram Server", "myKey = " + incomingMessages.getAction(incomingMessages.size() - 1));
+//                Log.v("Clay Datagram Server", "myKey = " + incomingMessages.getEvent(incomingMessages.size() - 1));
             }
         }
     };
@@ -190,7 +189,7 @@ public class MessageHost {
 
         } else if (message.getContent().startsWith("announce device ")) {
 
-//            Log.v ("UDP", "Trying to add a device.");
+//            Log.v ("UDP", "Trying to addEvent a device.");
 
             // e.g., "announce device <uuid>"
 
@@ -207,10 +206,10 @@ public class MessageHost {
                     getClay().addDevice(deviceUuid, unitAddress);
 
                 } else {
-//                    Log.v("Clay", "Updating state of existing Patch with address " + unitAddress);
+//                    Log.v("Clay", "Updating state of existing Extension with address " + unitAddress);
 
                     UUID deviceUuid = UUID.fromString(unitUuid);
-                    Device device = getClay().getDeviceByUuid(deviceUuid);
+                    Host host = getClay().getDeviceByUuid(deviceUuid);
                 }
             }
 
@@ -285,8 +284,8 @@ public class MessageHost {
             Message outgoingMessage = peekOutgoingMessage ();
 
 //            Log.v("UDP", "                 Message: " + outgoingMessage.getDescriptor());
-//            Log.v("UDP", "Time since getStopAction dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-//            Log.v("UDP", " Time since getStopAction message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+//            Log.v("UDP", "Time since getLastEvent dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+//            Log.v("UDP", " Time since getLastEvent message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
 //            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
 //            Log.v("UDP", "-----");
 
@@ -336,7 +335,7 @@ public class MessageHost {
                     message = dequeueOutgoingMessage();
                 }
 
-                // Process the message
+                // Action the message
                 messageManager.process (message);
             }
         }
@@ -362,10 +361,10 @@ public class MessageHost {
 
     public void processMessage() {
 
-        // Process incoming messages
+        // Action incoming messages
         processIncomingMessages();
 
-        // Process outgoing messages
+        // Action outgoing messages
         processOutgoingMessages();
     }
 }

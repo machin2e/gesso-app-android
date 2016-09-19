@@ -3,15 +3,16 @@ package camp.computer.clay.scene.image;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import camp.computer.clay.application.Surface;
+import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Process;
+import camp.computer.clay.model.interaction.Event;
+import camp.computer.clay.model.interaction.EventListener;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.scene.util.geometry.Shape;
 
 public class PathImage extends Image<Path> {
 
@@ -32,21 +33,21 @@ public class PathImage extends Image<Path> {
     }
 
     private void setupActions() {
-        setOnActionListener(new ActionListener() {
+        setOnActionListener(new EventListener() {
             @Override
-            public void onAction(Process process) {
+            public void onAction(Action action) {
 
-                Action action = process.getStopAction();
+                Event event = action.getLastEvent();
 
-                if (action.getType() == Action.Type.NONE) {
+                if (event.getType() == Event.Type.NONE) {
 
-                } else if (action.getType() == Action.Type.SELECT) {
+                } else if (event.getType() == Event.Type.SELECT) {
 
-                } else if (action.getType() == Action.Type.HOLD) {
+                } else if (event.getType() == Event.Type.HOLD) {
 
-                } else if (action.getType() == Action.Type.MOVE) {
+                } else if (event.getType() == Event.Type.MOVE) {
 
-                } else if (action.getType() == Action.Type.UNSELECT) {
+                } else if (event.getType() == Event.Type.UNSELECT) {
 
                 }
             }
@@ -60,58 +61,59 @@ public class PathImage extends Image<Path> {
         this.visibility = visibility;
     }
 
-    public void draw(Surface surface) {
+    public void draw(Display display) {
 
         if (isVisible()) {
             // Draw path between ports with style dependant on path type
             Path path = getPath();
             if (path.getType() == Path.Type.MESH) {
-                drawTrianglePath(surface);
+                drawTrianglePath(display);
             } else if (path.getType() == Path.Type.ELECTRONIC) {
-                drawLinePath(surface);
+                drawLinePath(display);
             }
         }
     }
 
     // TODO: Delete
     public Path getPath() {
-        return getConstruct();
+        return getFeature();
     }
 
-    public void drawTrianglePath(Surface surface) {
+    // TODO: Refactor. Put in Geometry/Shape.
+    public void drawTrianglePath(Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         Path path = getPath();
 
-        PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
-        PortImage targetPortImage = (PortImage) getScene().getImage(path.getTarget());
+        Shape sourcePortShape = getScene().getShape(path.getSource());
+        Shape targetPortShape = getScene().getShape(path.getTarget());
 
         // Show target port
-        targetPortImage.setVisibility(Visibility.VISIBLE);
-        targetPortImage.setPathVisibility(Visibility.VISIBLE);
+        targetPortShape.setVisibility(Visibility.VISIBLE);
+        // TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
-        paint.setColor(sourcePortImage.getUniqueColor());
+        //paint.setColor(sourcePortShape.getUniqueColor());
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortImage.getCoordinate(),
-                targetPortImage.getCoordinate()
+                sourcePortShape.getCoordinate(),
+                targetPortShape.getCoordinate()
         );
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
         Point pathStartCoordinate = Geometry.calculatePoint(
-                sourcePortImage.getCoordinate(),
+                sourcePortShape.getCoordinate(),
                 pathRotationAngle,
                 2 * triangleSpacing
         );
 
         Point pathStopCoordinate = Geometry.calculatePoint(
-                targetPortImage.getCoordinate(),
+                targetPortShape.getCoordinate(),
                 pathRotationAngle + 180,
                 2 * triangleSpacing
         );
@@ -119,39 +121,39 @@ public class PathImage extends Image<Path> {
         if (showDocks) {
 
             paint.setStyle(Paint.Style.FILL);
-            Surface.drawTriangle(
+            Display.drawTriangle(
                     pathStartCoordinate,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    surface
+                    display
             );
 
             paint.setStyle(Paint.Style.FILL);
-            Surface.drawTriangle(
+            Display.drawTriangle(
                     pathStopCoordinate,
                     triangleRotationAngle,
                     triangleWidth,
                     triangleHeight,
-                    surface
+                    display
             );
 
         } else {
 
-            Surface.drawTrianglePath(
+            Display.drawTrianglePath(
                     pathStartCoordinate,
                     pathStopCoordinate,
                     triangleWidth,
                     triangleHeight,
-                    surface
+                    display
             );
         }
     }
 
-    private void drawLinePath(Surface surface) {
+    private void drawLinePath(Display display) {
 
-        Canvas canvas = surface.getCanvas();
-        Paint paint = surface.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
         Path path = getPath();
 
@@ -234,10 +236,10 @@ public class PathImage extends Image<Path> {
                     0
             );
 
-            Surface.drawLine(
+            Display.drawLine(
                     pathStartCoordinate,
                     pathStopCoordinate,
-                    surface
+                    display
             );
 //        }
 

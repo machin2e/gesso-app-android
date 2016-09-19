@@ -140,7 +140,7 @@ public class CacheHost {
         for (int i = 0; i < tabCount; i++) {
             tabString += "\t";
         }
-        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
+        Log.v ("Content_Manager", tabString + "Event (UUID: " + action.getUuid() + ")");
         if (!action.hasScript()) {
             for (Action childAction : action.getActions()) {
                 printBehavior(childAction, tabCount + 1);
@@ -156,7 +156,7 @@ public class CacheHost {
         for (int i = 0; i < tabCount; i++) {
             tabString += "\t";
         }
-        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
+        Log.v ("Content_Manager", tabString + "Event (UUID: " + action.getUuid() + ")");
         if (!action.hasScript()) {
             for (Action childAction : action.getActions()) {
                 printBehavior(childAction, tabCount + 1);
