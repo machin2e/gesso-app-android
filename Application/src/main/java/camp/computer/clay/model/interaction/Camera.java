@@ -272,7 +272,7 @@ public class Camera {
 //                } else if (image instanceof ExtensionImage) {
 //                    ExtensionImage nearbyFigure = (ExtensionImage) image;
 //                    nearbyFigure.setTransparency(1.0f);
-//                    nearbyFigure.showPortImages();
+//                    nearbyFigure.showPortShapes();
 //                }
 //
 //            } else {
@@ -284,7 +284,7 @@ public class Camera {
 //                } else if (image instanceof ExtensionImage) {
 //                    ExtensionImage nearbyFigure = (ExtensionImage) image;
 //                    nearbyFigure.setTransparency(0.1f);
-//                    nearbyFigure.hidePortImages();
+//                    nearbyFigure.hidePortShapes();
 //                }
 //
 //            }
@@ -489,7 +489,7 @@ public class Camera {
         ImageGroup extensionImages = getScene().getImages(Extension.class);
         for (int i = 0; i < extensionImages.getList().size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-            ////extensionImage.hidePortImages();
+            ////extensionImage.hidePortShapes();
             ////extensionImage.hidePathImages();
             extensionImage.setTransparency(1.0);
         }

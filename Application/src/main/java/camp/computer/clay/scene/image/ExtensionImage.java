@@ -5,11 +5,13 @@ import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
+import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
@@ -20,6 +22,7 @@ import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
+import camp.computer.clay.scene.util.geometry.Shape;
 
 public class ExtensionImage extends Image<Extension> {
 
@@ -67,14 +70,18 @@ public class ExtensionImage extends Image<Extension> {
 
                         // Focus on touched base
                         showPathImages();
-                        showPortImages();
+                        showPortShapes();
                         setTransparency(1.0);
 
                         // TODO: Speak "choose a channel to getEvent data."
 
                         // Show ports and paths of touched form
-                        for (PortImage portImage : getPortImages()) {
-                            List<Path> paths = portImage.getPort().getCompletePath();
+                        List<Shape> portShapes = getPortShapes();
+                        for (int i = 0; i < portShapes.size(); i++) {
+                            Shape portShape = portShapes.get(i);
+                            Port port = (Port) portShape.getFeature();
+
+                            List<Path> paths = port.getCompletePath();
                             for (Path path : paths) {
 
                                 // Show ports
@@ -89,7 +96,7 @@ public class ExtensionImage extends Image<Extension> {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
-                    Log.v("Event", "Tapped patch. Port image count: " + getPortImages().size());
+                    Log.v("Event", "Tapped patch. Port image count: " + getPortShapes().size());
                     Port port = new Port();
                     getExtension().addPort(port);
                     scene.addFeature(port);
@@ -99,13 +106,41 @@ public class ExtensionImage extends Image<Extension> {
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
                     // Update Image
-                    PortImage sourcePortImage = (PortImage) event.getAction().getFirstEvent().getTargetImage();
-                    sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
-                    sourcePortImage.setCandidatePatchVisibility(Visibility.INVISIBLE);
+                    Shape sourcePortImage = event.getAction().getFirstEvent().getTargetShape();
+                    setCandidatePathVisibility(Visibility.INVISIBLE);
+                    setCandidateExtensionVisibility(Visibility.INVISIBLE);
 
                 }
             }
         });
+    }
+
+    private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
+    private Point candidateExtensionSourcePosition = new Point();
+    private Point candidateExtensionPosition = new Point();
+
+    private Visibility candidatePathVisibility = Visibility.INVISIBLE;
+    private Point candidatePathSourceCoordinate = new Point(40, 80);
+    private Point candidatePathDestinationCoordinate = new Point(40, 80);
+
+    public void setCandidatePathVisibility(Visibility visibility) {
+        candidatePathVisibility = visibility;
+    }
+
+    public Visibility getCandidatePathVisibility() {
+        return candidatePathVisibility;
+    }
+
+    public void setCandidatePathDestinationCoordinate(Point position) {
+        this.candidatePathDestinationCoordinate.set(position);
+    }
+
+    public void setCandidateExtensionVisibility(Visibility visibility) {
+        candidateExtensionVisibility = visibility;
+    }
+
+    public Visibility getCandidateExtensionVisibility() {
+        return candidateExtensionVisibility;
     }
 
     // TODO: Delete
@@ -113,25 +148,17 @@ public class ExtensionImage extends Image<Extension> {
         return getFeature();
     }
 
-    public List<PortImage> getPortImages() {
-        List<PortImage> portShapes = new ArrayList<>();
-        Extension extension = getExtension();
+    public List<Shape> getPortShapes() {
+        List<Shape> portShapes = new LinkedList<>();
 
-        for (Port port : extension.getPorts()) {
-            PortImage portShape = (PortImage) scene.getImage(port);
-            portShapes.add(portShape);
+        for (int i = 0; i < this.shapes.size(); i++) {
+            Shape shape = this.shapes.get(i);
+            if (shape.getLabel().startsWith("Port ")) {
+                portShapes.add(shape);
+            }
         }
 
         return portShapes;
-    }
-
-    // TODO: Remove this! Store Port index/id
-    public int getPortImageIndex(PortImage portImage) {
-        Port port = (Port) scene.getFeature(portImage);
-        if (getExtension().getPorts().contains(port)) {
-            return this.getExtension().getPorts().indexOf(port);
-        }
-        return -1;
     }
 
     public void update() {
@@ -164,30 +191,118 @@ public class ExtensionImage extends Image<Extension> {
         return this.boardShape;
     }
 
-    public void showPortImages() {
-        for (PortImage portImage : getPortImages()) {
-            portImage.setVisibility(Visibility.VISIBLE);
-            portImage.showDocks();
-        }
+    public void showPortShapes() {
+        getShapes("^Port (1[0-2]|[1-9])$").setVisibility(Visibility.VISIBLE);
     }
 
-    public void hidePortImages() {
-        for (PortImage portImage : getPortImages()) {
-            portImage.setVisibility(Visibility.INVISIBLE);
-        }
+    public void hidePortShapes() {
+        getShapes("^Port (1[0-2]|[1-9])$").setVisibility(Visibility.INVISIBLE);
     }
+
+//    public void showPortShapes() {
+//        for (PortImage portImage : getPortImages()) {
+//            portImage.setVisibility(Visibility.VISIBLE);
+//            portImage.showDocks();
+//        }
+//    }
+//
+//    public void hidePortShapes() {
+//        for (PortImage portImage : getPortImages()) {
+//            portImage.setVisibility(Visibility.INVISIBLE);
+//        }
+//    }
+
+//    public void showPathImages() {
+//        for (PortImage portImage : getPortImages()) {
+//            portImage.setPathVisibility(Visibility.INVISIBLE);
+//        }
+//    }
+//
+//    public void hidePathImages() {
+//        for (PortImage portImage : getPortImages()) {
+//            portImage.setPathVisibility(Visibility.INVISIBLE);
+//            portImage.showDocks();
+//        }
+//    }
 
     public void showPathImages() {
-        for (PortImage portImage : getPortImages()) {
-            portImage.setPathVisibility(Visibility.INVISIBLE);
+        List<Port> ports = getFeature().getPorts();
+        for (int i = 0; i < ports.size(); i++) {
+            Port port = ports.get(i);
+
+            setPathVisibility(port, Visibility.VISIBLE);
         }
     }
 
     public void hidePathImages() {
-        for (PortImage portImage : getPortImages()) {
-            portImage.setPathVisibility(Visibility.INVISIBLE);
-            portImage.showDocks();
+        List<Port> ports = getFeature().getPorts();
+        for (int i = 0; i < ports.size(); i++) {
+            Port port = ports.get(i);
+
+            setPathVisibility(port, Visibility.INVISIBLE);
+            showDocks(port);
         }
+    }
+
+    public void showDocks(Port port) {
+        List<PathImage> pathImages = getPathImages(port);
+        for (int i = 0; i < pathImages.size(); i++) {
+            PathImage pathImage = pathImages.get(i);
+
+            pathImage.showDocks = true;
+
+            // Deep
+//            PortImage targetPortImage = (PortImage) getScene().getImage(pathImage.getPath().getTarget());
+//            targetPortImage.showDocks();
+            Port targetPort = pathImage.getPath().getTarget();
+            // <HACK>
+            if (targetPort.getParent() instanceof Host) {
+                Host targetHost = (Host) targetPort.getParent();
+                HostImage targetHostImage = (HostImage) getScene().getImage(targetHost);
+                targetHostImage.showDocks(targetPort);
+            } else if (targetPort.getParent() instanceof Extension) {
+                Extension targetHost = (Extension) targetPort.getParent();
+                ExtensionImage targetHostImage = (ExtensionImage) getScene().getImage(targetHost);
+                //targetHostImage.showDocks(targetPort);
+            }
+            // </HACK>
+        }
+    }
+
+    // TODO: Replace with ImageGroup.filter().setVisibility()
+    public void setPathVisibility(Port port, Visibility visibility) {
+        List<PathImage> pathImages = getPathImages(port);
+        for (int i = 0; i < pathImages.size(); i++) {
+            PathImage pathImage = pathImages.get(i);
+
+            pathImage.setVisibility(visibility);
+
+            // Deep
+            Port targetPort = pathImage.getPath().getTarget();
+            // <HACK>
+            if (targetPort.getParent() instanceof Host) {
+                Host targetHost = (Host) targetPort.getParent();
+                HostImage targetHostImage = (HostImage) getScene().getImage(targetHost);
+                targetHostImage.setPathVisibility(targetPort, visibility);
+            } else if (targetPort.getParent() instanceof Extension) {
+                Extension targetHost = (Extension) targetPort.getParent();
+                ExtensionImage targetHostImage = (ExtensionImage) getScene().getImage(targetHost);
+                //targetHostImage.setPathVisibility(targetPort, visibility);
+            }
+            // </HACK>
+        }
+    }
+
+    public List<PathImage> getPathImages(Port port) {
+        List<PathImage> pathImages = new ArrayList<>();
+        List<Path> paths = port.getPaths();
+        for (int i = 0; i < paths.size(); i++) {
+            Path path = paths.get(i);
+            PathImage pathImage = (PathImage) getScene().getImage(path);
+            pathImages.add(pathImage);
+        }
+
+        return pathImages;
     }
 
     public boolean contains(Point point) {

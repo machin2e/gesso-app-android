@@ -465,7 +465,7 @@ public class HostImage extends Image<Host> {
                                                         } else if (image instanceof ExtensionImage) {
                                                             ExtensionImage nearbyFigure = (ExtensionImage) image;
                                                             nearbyFigure.setTransparency(0.1f);
-                                                            //// TODO: nearbyFigure.hidePortImages();
+                                                            //// TODO: nearbyFigure.hidePortShapes();
                                                         }
                                                         // </HACK>
 
@@ -556,7 +556,7 @@ public class HostImage extends Image<Host> {
                                                             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
                                                             if (extensionImage.getExtension() != getParentImage().getFeature()) {
                                                                 extensionImage.setTransparency(0.1);
-                                                                extensionImage.hidePortImages();
+                                                                extensionImage.hidePortShapes();
                                                                 extensionImage.hidePathImages();
                                                             }
                                                         }
@@ -1106,14 +1106,6 @@ public class HostImage extends Image<Host> {
         }
     }
 
-    public void setCandidateExtensionVisibility(Visibility visibility) {
-        candidateExtensionVisibility = visibility;
-    }
-
-    public Visibility getCandidateExtensionVisibility() {
-        return candidateExtensionVisibility;
-    }
-
     private void drawCandidateExtensionImage(Display display) {
 
         if (candidateExtensionVisibility == Visibility.VISIBLE) {
@@ -1197,6 +1189,14 @@ public class HostImage extends Image<Host> {
 
     public void setCandidatePathDestinationCoordinate(Point position) {
         this.candidatePathDestinationCoordinate.set(position);
+    }
+
+    public void setCandidateExtensionVisibility(Visibility visibility) {
+        candidateExtensionVisibility = visibility;
+    }
+
+    public Visibility getCandidateExtensionVisibility() {
+        return candidateExtensionVisibility;
     }
 }
 

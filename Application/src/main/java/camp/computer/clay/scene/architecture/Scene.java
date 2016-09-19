@@ -24,7 +24,6 @@ import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.scene.image.ExtensionImage;
 import camp.computer.clay.scene.image.HostImage;
 import camp.computer.clay.scene.image.PathImage;
-import camp.computer.clay.scene.image.PortImage;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.Probability;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -1110,7 +1109,7 @@ public class Scene extends Image<Model> {
 
                 }
 
-            } else if (action.getFirstEvent().getTargetImage() instanceof PortImage) {
+            } /* else if (action.getFirstEvent().getTargetImage() instanceof PortImage) {
 
                 // First processAction was on a port figure...
 
@@ -1118,10 +1117,10 @@ public class Scene extends Image<Model> {
 
                     // ...getLastEvent processAction was on a base figure.
 
-                    PortImage sourcePortImage = (PortImage) action.getFirstEvent().getTargetImage();
-                    sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+                    //// TODO: PortImage sourcePortImage = (PortImage) action.getFirstEvent().getTargetImage();
+                    //// TODO: sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
 
-                } else if (event.getTargetImage() instanceof PortImage) {
+                    //// TODO: } else if (event.getTargetImage() instanceof PortImage) {
 
                     // Port
                     event.getTargetImage().processAction(action);
@@ -1137,7 +1136,7 @@ public class Scene extends Image<Model> {
 
                 }
 
-            } else if (action.getFirstEvent().getTargetImage() instanceof PathImage) {
+            } */ else if (action.getFirstEvent().getTargetImage() instanceof PathImage) {
 
                 // Path --> ?
 
@@ -1150,10 +1149,10 @@ public class Scene extends Image<Model> {
 
                 // Scene --> ?
 
-                // Check if getFirstEvent processAction was on an figure
-                if (action.getFirstEvent().getTargetImage() instanceof PortImage) {
-                    ((PortImage) action.getFirstEvent().getTargetImage()).setCandidatePathVisibility(Visibility.INVISIBLE);
-                }
+//                // Check if getFirstEvent processAction was on an figure
+//                if (action.getFirstEvent().getTargetImage() instanceof PortImage) {
+//                    //// TODO: ((PortImage) action.getFirstEvent().getTargetImage()).setCandidatePathVisibility(Visibility.INVISIBLE);
+//                }
 
 //                camera.focusSelectScene();
 
