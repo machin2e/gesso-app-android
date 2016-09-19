@@ -96,7 +96,7 @@ public class ImageGroup {
 
             double distanceToImage = Geometry.calculateDistance(
                     point,
-                    image.getCoordinate()
+                    image.getPosition()
             );
 
             if (distanceToImage < distance) {
@@ -121,7 +121,7 @@ public class ImageGroup {
 
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            if (shape.contains(image.getCoordinate())) {
+            if (shape.contains(image.getPosition())) {
                 imageGroup.add(image);
             }
         }
@@ -152,7 +152,7 @@ public class ImageGroup {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            positions.add(new Point(image.getCoordinate().getX(), image.getCoordinate().getY()));
+            positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
         }
         return positions;
     }
@@ -196,7 +196,7 @@ public class ImageGroup {
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
 
-            double currentDistance = Geometry.calculateDistance(position, image.getCoordinate());
+            double currentDistance = Geometry.calculateDistance(position, image.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;

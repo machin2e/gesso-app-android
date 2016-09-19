@@ -1,9 +1,9 @@
 package camp.computer.clay.scene.architecture;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Feature;
@@ -62,7 +62,7 @@ public abstract class Image<T extends Feature> {
         return null;
     }
 
-    public Point getCoordinate() {
+    public Point getPosition() {
         return this.position;
     }
 
@@ -74,7 +74,7 @@ public abstract class Image<T extends Feature> {
         return this.scale;
     }
 
-    public void setCoordinate(Point position) {
+    public void setPosition(Point position) {
         this.position.set(position.getX(), position.getY());
     }
 
@@ -107,13 +107,13 @@ public abstract class Image<T extends Feature> {
     }
 
     public void addShape(Shape shape) {
-        shape.getCoordinate().setOrigin(getCoordinate());
+        shape.getPosition().setOrigin(getPosition());
         shapes.add(shape);
     }
 
     public <T extends Shape> void addShape(T shape, String label) {
         shape.setLabel(label);
-        shape.getCoordinate().setOrigin(getCoordinate());
+        shape.getPosition().setOrigin(getPosition());
         shapes.add(shape);
     }
 
@@ -141,7 +141,7 @@ public abstract class Image<T extends Feature> {
         return null;
     }
 
-    public Shape getShapeByCoordinate(Point point) {
+    public Shape getShapeByPosition(Point point) {
         List<Shape> shapes = getShapes().getList();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
@@ -162,7 +162,34 @@ public abstract class Image<T extends Feature> {
         return getShapes().filterType(types);
     }
 
-    // TODO: public List<Shape> getShapes(String regex) --- e.g., "getShapes("LED [0-9]+") or ("LED <number>")
+    /**
+     * Removes elements <em>that do not match</em> the regular expressions defined in
+     * {@code labels}.
+     *
+     * @param labels The list of {@code Shape} objects matching the regular expressions list.
+     * @return A list of {@code Shape} objects.
+     */
+    public ShapeGroup getShapes(String... labels) {
+
+        ShapeGroup shapeGroup = new ShapeGroup();
+
+        for (int i = 0; i < this.shapes.size(); i++) {
+            for (int j = 0; j < labels.length; j++) {
+
+                Pattern pattern = Pattern.compile(labels[j]);
+                Matcher matcher = pattern.matcher(this.shapes.get(i).getLabel());
+
+                boolean isMatch = matcher.matches();
+
+//                if (this.shapes.get(i).getLabel().equals(labels[j])) {
+                if (isMatch) {
+                    shapeGroup.add(this.shapes.get(i));
+                }
+            }
+        }
+
+        return shapeGroup;
+    }
 
     public Shape removeShape(int index) {
         return shapes.remove(index);
@@ -235,7 +262,7 @@ public abstract class Image<T extends Feature> {
             for (Point shapeVertex : vertices) {
 
                 // Rotate shape about its center point
-                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getCoordinate(), shape.getRotation(), shapeVertex);
+                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getPosition(), shape.getRotation(), shapeVertex);
 
                 // Rotate shape vertices about the shape's reference point
                 Point referencePoint = position;

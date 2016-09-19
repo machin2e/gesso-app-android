@@ -477,7 +477,7 @@ public class SQLiteStoreHost {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, getEvent actions with parent with root UUID, addPatch to parent's list of
+        // - For each root, getEvent actions with parent with root UUID, addExtension to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -1712,7 +1712,7 @@ public class SQLiteStoreHost {
         // TODO: ...before saving a action tree, not just the action node UUID.
         if (!db.queryActionExists(action, parentAction)) {
 
-            // TODO: Update the basic action that has a script, addPatch a parent! Yes, the action can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic action that has a script, addExtension a parent! Yes, the action can have both a parent and a script! (leaf node!)
 
             db.saveAction(action, parentAction);
         } else {

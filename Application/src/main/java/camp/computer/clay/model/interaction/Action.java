@@ -12,9 +12,9 @@ import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 
 /**
- * An thisAction is a temporal sequence of one or more events.
+ * An Action is a sequence of one or more events.
  */
-public class Action { // TODO: Rename Activity. Previously Gesture.
+public class Action {
 
     // TODO: Feature this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
     // TODO: Feature voice thisAction in the same way. Generify to Action<T> or subclass.
@@ -29,6 +29,7 @@ public class Action { // TODO: Rename Activity. Previously Gesture.
     private boolean[] isHolding = new boolean[Event.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Event.MAXIMUM_POINT_COUNT];
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
+    // TODO: private double[] touchPressure = new double[Event.MAXIMUM_POINT_COUNT]; // Reference: http://stackoverflow.com/questions/17540058/android-detect-touch-pressure-on-capacitive-touch-screen
 
     public double offsetX = 0;
     public double offsetY = 0;
@@ -52,7 +53,7 @@ public class Action { // TODO: Rename Activity. Previously Gesture.
 //                    getFirstEvent().getActor().getCamera().getScene().onHoldListener(thisAction.getFirstEvent());
 
                     Event event = thisAction.getFirstEvent();
-                    Image targetImage = getFirstEvent().getActor().getScene().getImageByCoordinate(event.getCoordinate());
+                    Image targetImage = getFirstEvent().getActor().getScene().getImageByPosition(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     event.getTargetImage().processAction(thisAction);
@@ -83,8 +84,8 @@ public class Action { // TODO: Rename Activity. Previously Gesture.
 
         events.add(event);
 
-        offsetX += event.getCoordinate().getX();
-        offsetY += event.getCoordinate().getY();
+        offsetX += event.getPosition().getX();
+        offsetY += event.getPosition().getY();
 
         if (events.size() == 1) {
 
@@ -95,7 +96,7 @@ public class Action { // TODO: Rename Activity. Previously Gesture.
         } else if (events.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[event.pointerIndex] = Geometry.calculateDistance(event.getCoordinate(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
+            this.dragDistance[event.pointerIndex] = Geometry.calculateDistance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
 
             if (getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
                 isDragging[event.pointerIndex] = true;
@@ -172,7 +173,7 @@ public class Action { // TODO: Rename Activity. Previously Gesture.
     public ArrayList<Point> getTouchPath() {
         ArrayList<Point> touchCoordinates = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
-            touchCoordinates.add(events.get(i).getCoordinate());
+            touchCoordinates.add(events.get(i).getPosition());
         }
         return touchCoordinates;
     }
@@ -202,8 +203,8 @@ public class Action { // TODO: Rename Activity. Previously Gesture.
         Event firstEvent = getFirstEvent();
         Event lastEvent = getLastEvent();
         double distance = Geometry.calculateDistance(
-                firstEvent.getCoordinate(),
-                lastEvent.getCoordinate()
+                firstEvent.getPosition(),
+                lastEvent.getPosition()
         );
         return distance;
     }

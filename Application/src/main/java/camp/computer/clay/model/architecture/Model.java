@@ -71,7 +71,7 @@ public class Model extends Feature {
         return paths;
     }
 
-    public void addPatch(Extension extension) {
+    public void addExtension(Extension extension) {
         this.extensions.add(extension);
         extension.setParent(this);
     }

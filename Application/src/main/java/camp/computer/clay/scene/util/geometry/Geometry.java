@@ -238,7 +238,7 @@ public abstract class Geometry {
     }
 
     public static Point calculateCenterCoordinate(List<Point> points) {
-        return calculateBoundingBox(points).getCoordinate();
+        return calculateBoundingBox(points).getPosition();
     }
 
     public static Point calculateNearestPoint(Point sourcePoint, List<Point> points) {
@@ -498,7 +498,7 @@ public abstract class Geometry {
             sortedPositions.get(i).setX(sortedPositions.get(i).getX() - v.getX());
             sortedPositions.get(i).setY(sortedPositions.get(i).getY() - v.getY());
 
-            sortedImages.get(i).setCoordinate(sortedPositions.get(i));
+            sortedImages.get(i).setPosition(sortedPositions.get(i));
 //            }
         }
 
@@ -517,7 +517,7 @@ public abstract class Geometry {
                 T p1 = sortedList.get(j - 1);
                 T p2 = sortedList.get(j);
 
-                if (Geometry.calculateDistance(p1.getCoordinate(), point) > Geometry.calculateDistance(p2.getCoordinate(), point)) {
+                if (Geometry.calculateDistance(p1.getPosition(), point) > Geometry.calculateDistance(p2.getPosition(), point)) {
                     sortedList.remove(j - 1);
                     sortedList.add(j, p1);
                 }
@@ -527,7 +527,7 @@ public abstract class Geometry {
 
 //        String sortedListResult = "";
 //        for (Image p: sortedList) {
-//            sortedListResult += calculateDistance(p.getCoordinate(), point) + ", ";
+//            sortedListResult += calculateDistance(p.getPosition(), point) + ", ";
 //        }
 //        Log.v("Sort", sortedListResult);
 

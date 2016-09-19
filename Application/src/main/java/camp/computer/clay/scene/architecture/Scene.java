@@ -56,7 +56,7 @@ public class Scene extends Image<Model> {
 
                 Event event = action.getLastEvent();
 
-                Image targetImage = getImageByCoordinate(event.getCoordinate());
+                Image targetImage = getImageByPosition(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 Camera camera = event.getActor().getCamera();
@@ -91,16 +91,16 @@ public class Scene extends Image<Model> {
                         // Camera
                         if (action.getSize() > 1) {
                             camera.setOffset(
-                                    event.getCoordinate().getX() - action.getFirstEvent().getCoordinate().getX(),
-                                    event.getCoordinate().getY() - action.getFirstEvent().getCoordinate().getY()
+                                    event.getPosition().getX() - action.getFirstEvent().getPosition().getX(),
+                                    event.getPosition().getY() - action.getFirstEvent().getPosition().getY()
                             );
 
                         }
 
 //                    camera.setScale(0.9f);
 //                    camera.setOffset(
-//                            event.getCoordinate().getX() - action.getFirstEvent().getCoordinate().getX(),
-//                            event.getCoordinate().getY() - action.getFirstEvent().getCoordinate().getY()
+//                            event.getPosition().getX() - action.getFirstEvent().getPosition().getX(),
+//                            event.getPosition().getY() - action.getFirstEvent().getPosition().getY()
 //                    );
 
                     }
@@ -158,91 +158,95 @@ public class Scene extends Image<Model> {
 
                         } else if (action.getSourceFeature() instanceof Port) {
 
-                            Log.v("Test", "Create Extension from Port");
-
-                            PortImage sourcePortImage = (PortImage) event.getAction().getFirstEvent().getTargetImage();
-
-                            if (sourcePortImage.getCandidatePatchVisibility() == Visibility.VISIBLE) {
-
-                                Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
-
-                                // Feature
-                                Extension extension = new Extension();
-
-                                // Add port to feature
-                                // for (int j = 0; j < 3; j++) {
-                                for (int j = 0; j < 1; j++) {
-                                    Port port = new Port();
-                                    extension.addPort(port);
-                                }
-
-                                getFeature().addPatch(extension);
-
-                                // Create Extension Image
-                                ExtensionImage extensionImage = new ExtensionImage(extension);
-                                extensionImage.setCoordinate(event.getCoordinate());
-
-                                // Set Rotation
-                                double patchRotation = Geometry.calculateRotationAngle(
-                                        sourcePortImage.getCoordinate(),
-                                        extensionImage.getCoordinate()
-                                );
-                                extensionImage.setRotation(patchRotation + 90);
-
-//                            Host sourceBase = (Host) sourcePortFigure.getFeature().getParent();
-//                            HostImage sourceBaseFigure = (HostImage) getImage(sourceBase);
-//                            patchFigure.setRelativeRotation(sourceBaseFigure.getRotation() + 180);
-
-                                // Create Port Figures for each of Extension's Ports
-                                for (int i = 0; i < extension.getPorts().size(); i++) {
-                                    Port port = extension.getPorts().get(i);
-                                    PortImage portImage = new PortImage(port);
-                                    addImage(portImage, "ports");
-                                }
-
-                                // Add Extension Image to Scene
-                                addImage(extensionImage, "patches");
-
-                                // Configure Ports
-                                Port sourcePort = sourcePortImage.getPort();
-                                Port destinationPort = extension.getPorts().get(0);
-
-                                if (sourcePort.getDirection() == Port.Direction.NONE) {
-                                    sourcePort.setDirection(Port.Direction.OUTPUT);
-                                }
-//                        if (sourcePort.getType() == Port.Type.NONE) {
-                                //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.getEvent(i) + 1) % machineSprite.channelTypeColors.length
-                                sourcePort.setType(Port.Type.POWER_REFERENCE);
-//                        }
-
-                                destinationPort.setDirection(Port.Direction.INPUT);
-                                //destinationPort.setType(Port.Type.next(destinationPort.getType()));
-                                destinationPort.setType(sourcePort.getType());
-
-                                // Create Path
-                                Path path = new Path(sourcePortImage.getPort(), extension.getPorts().get(0));
-                                path.setType(Path.Type.ELECTRONIC);
-                                sourcePort.addPath(path);
-
-                                PathImage pathImage = new PathImage(path);
-                                addImage(pathImage, "paths");
-
-                                PortImage targetPortImage = (PortImage) getImage(path.getTarget());
-                                targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
-
-                                // Update Camera
-                                camera.focusSelectPath(sourcePortImage.getPort());
-
-                            }
-
-                            // Update Image
-                            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
-                            sourcePortImage.setCandidatePatchVisibility(Visibility.INVISIBLE);
+//                            Log.v("Test", "Create Extension from Port");
+//
+//                            PortImage sourcePortImage = (PortImage) event.getAction().getFirstEvent().getTargetImage();
+//
+//                            if (sourcePortImage.getCandidatePatchVisibility() == Visibility.VISIBLE) {
+//
+//                                Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+//
+//                                // Feature
+//                                Extension extension = new Extension();
+//
+//                                // Add port to feature
+//                                // for (int j = 0; j < 3; j++) {
+//                                for (int j = 0; j < 1; j++) {
+//                                    Port port = new Port();
+//                                    extension.addPort(port);
+//                                }
+//
+//                                getFeature().addExtension(extension);
+//
+//                                // Create Extension Image
+//                                ExtensionImage extensionImage = new ExtensionImage(extension);
+//                                extensionImage.setPosition(event.getPosition());
+//
+//                                // Set Rotation
+//                                double patchRotation = Geometry.calculateRotationAngle(
+//                                        sourcePortImage.getPosition(),
+//                                        extensionImage.getPosition()
+//                                );
+//                                extensionImage.setRotation(patchRotation + 90);
+//
+////                            Host sourceBase = (Host) sourcePortFigure.getFeature().getParent();
+////                            HostImage sourceBaseFigure = (HostImage) getImage(sourceBase);
+////                            patchFigure.setRelativeRotation(sourceBaseFigure.getRotation() + 180);
+//
+//                                // Create Port Figures for each of Extension's Ports
+//                                for (int i = 0; i < extension.getPorts().size(); i++) {
+//                                    Port port = extension.getPorts().get(i);
+//                                    PortImage portImage = new PortImage(port);
+//                                    addImage(portImage, "ports");
+//                                }
+//
+//                                // Add Extension Image to Scene
+//                                addImage(extensionImage, "patches");
+//
+//                                // Configure Ports
+//                                Port sourcePort = sourcePortImage.getPort();
+//                                Port destinationPort = extension.getPorts().get(0);
+//
+//                                if (sourcePort.getDirection() == Port.Direction.NONE) {
+//                                    sourcePort.setDirection(Port.Direction.OUTPUT);
+//                                }
+////                        if (sourcePort.getType() == Port.Type.NONE) {
+//                                //sourcePort.setType(Port.Type.next(sourcePort.getType())); // (machineSprite.channelTypes.getEvent(i) + 1) % machineSprite.channelTypeColors.length
+//                                sourcePort.setType(Port.Type.POWER_REFERENCE);
+////                        }
+//
+//                                destinationPort.setDirection(Port.Direction.INPUT);
+//                                //destinationPort.setType(Port.Type.next(destinationPort.getType()));
+//                                destinationPort.setType(sourcePort.getType());
+//
+//                                // Create Path
+//                                Path path = new Path(sourcePortImage.getPort(), extension.getPorts().get(0));
+//                                path.setType(Path.Type.ELECTRONIC);
+//                                sourcePort.addPath(path);
+//
+//                                PathImage pathImage = new PathImage(path);
+//                                addImage(pathImage, "paths");
+//
+//                                PortImage targetPortImage = (PortImage) getImage(path.getTarget());
+//                                targetPortImage.setUniqueColor(sourcePortImage.getUniqueColor());
+//
+//                                // Update Camera
+//                                camera.focusSelectPath(sourcePortImage.getPort());
+//
+//                            }
+//
+//                            // Update Image
+//                            sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+//                            sourcePortImage.setCandidatePatchVisibility(Visibility.INVISIBLE);
                         }
                     }
                 }
             }
         });
+    }
+
+    public Model getModel() {
+        return getFeature();
     }
 
     private boolean hasLayer(String tag) {
@@ -268,22 +272,40 @@ public class Scene extends Image<Model> {
 
             Host host = (Host) feature;
 
-            // Create host figures
+            // Create Host Image
             HostImage hostImage = new HostImage(host);
 
-            // Setup host's port figures
-            // Add a port sprite for each of the associated host's ports
-//            for (Port port : host.getPorts()) {
+            // Create Port Shapes for each of the Host's Ports
             for (int i = 0; i < host.getPorts().size(); i++) {
                 Port port = host.getPorts().get(i);
-//                PortImage portFigure = new PortImage(port);
-//                scene.addImage(portFigure, "ports");
-
                 addFeature(port);
-
             }
 
+            // Add Host Image to Scene
             addImage(hostImage, "bases");
+
+        } else if (feature instanceof Extension) {
+
+            Extension extension = (Extension) feature;
+
+            // Create Extension Image
+            ExtensionImage extensionImage = new ExtensionImage(extension);
+//            extensionImage.setPosition(event.getPosition());
+
+//                            Host sourceBase = (Host) sourcePortFigure.getFeature().getParent();
+//                            HostImage sourceBaseFigure = (HostImage) getImage(sourceBase);
+//                            patchFigure.setRelativeRotation(sourceBaseFigure.getRotation() + 180);
+
+            // Create Port Shapes for each of the Extension's Ports
+            for (int i = 0; i < extension.getPorts().size(); i++) {
+                Port port = extension.getPorts().get(i);
+                //PortImage portImage = new PortImage(port);
+                //addImage(portImage, "ports");
+                addFeature(port);
+            }
+
+            // Add Extension Image to Scene
+            addImage(extensionImage, "patches");
 
         } else if (feature instanceof Port) {
 
@@ -297,11 +319,9 @@ public class Scene extends Image<Model> {
             Path path = (Path) feature;
 
             PathImage pathImage = new PathImage(path);
-            // pathFigure.setScene(getScene());
             addImage(pathImage, "paths");
 
         }
-
     }
 
     // TODO: Remove Image parameter. Create that and return it.
@@ -392,7 +412,7 @@ public class Scene extends Image<Model> {
             }
 
             // Assign the found position to the image
-            image.setCoordinate(position);
+            image.setPosition(position);
             image.setRotation(Probability.getRandomGenerator().nextInt(360));
         }
 
@@ -402,20 +422,20 @@ public class Scene extends Image<Model> {
 
             // Set position
             if (imageCoordinates.size() == 1) {
-                imageCoordinates.get(0).setCoordinate(new Point(0, 0));
+                imageCoordinates.get(0).setPosition(new Point(0, 0));
             } else if (imageCoordinates.size() == 2) {
-                imageCoordinates.get(0).setCoordinate(new Point(-300, 0));
-                imageCoordinates.get(1).setCoordinate(new Point(300, 0));
+                imageCoordinates.get(0).setPosition(new Point(-300, 0));
+                imageCoordinates.get(1).setPosition(new Point(300, 0));
             } else if (imageCoordinates.size() == 5) {
-                imageCoordinates.get(0).setCoordinate(new Point(-300, -600));
+                imageCoordinates.get(0).setPosition(new Point(-300, -600));
                 imageCoordinates.get(0).setRotation(0);
-                imageCoordinates.get(1).setCoordinate(new Point(300, -600));
+                imageCoordinates.get(1).setPosition(new Point(300, -600));
                 imageCoordinates.get(1).setRotation(20);
-                imageCoordinates.get(2).setCoordinate(new Point(-300, 0));
+                imageCoordinates.get(2).setPosition(new Point(-300, 0));
                 imageCoordinates.get(2).setRotation(40);
-                imageCoordinates.get(3).setCoordinate(new Point(300, 0));
+                imageCoordinates.get(3).setPosition(new Point(300, 0));
                 imageCoordinates.get(3).setRotation(60);
-                imageCoordinates.get(4).setCoordinate(new Point(-300, 600));
+                imageCoordinates.get(4).setPosition(new Point(-300, 600));
                 imageCoordinates.get(4).setRotation(80);
             }
 
@@ -429,7 +449,7 @@ public class Scene extends Image<Model> {
      * specified {@code Feature}.
      *
      * @param feature The {@code Feature} for which the corresponding {@code Image} will be
-     *                  returned, if any.
+     *                returned, if any.
      * @return The {@code Image} corresponding to the specified {@code Feature}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
@@ -488,7 +508,7 @@ public class Scene extends Image<Model> {
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
-    public Image getImageByCoordinate(Point point) {
+    public Image getImageByPosition(Point point) {
         List<Image> images = getImages().filterVisibility(Visibility.VISIBLE).getList();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
@@ -497,6 +517,17 @@ public class Scene extends Image<Model> {
             }
         }
         return this;
+    }
+
+    public ShapeGroup getShapes() {
+        ShapeGroup shapeGroup = new ShapeGroup();
+        List<Image> imageList = getImages().getList();
+
+        for (int i = 0; i < imageList.size(); i++) {
+            shapeGroup.add(imageList.get(i).getShapes());
+        }
+
+        return shapeGroup;
     }
 
     // TODO: Refactor to be cleaner and leverage other classes...
@@ -512,6 +543,21 @@ public class Scene extends Image<Model> {
 
         return shapeGroup.filterType(types);
     }
+
+//    public <T> List<Image> getShapes(List<T> features)
+//        List<Image> images = new ArrayList<>();
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            for (int j = 0; j < features.size(); j++) {
+//                T model = features.get(j);
+//                Image image = layer.getImage((Feature) model);
+//                if (image != null) {
+//                    images.add(image);
+//                }
+//            }
+//        }
+//        return images;
+//    }
 
     public Shape getShape(Feature feature) {
         List<Image> imageList = getImages().getList();
@@ -551,11 +597,11 @@ public class Scene extends Image<Model> {
         return null;
     }
 
-    public static <T extends Image> List<Point> getCoordinates(List<T> figures) {
+    public static <T extends Image> List<Point> getCoordinates(List<T> images) {
         List<Point> positions = new ArrayList<>();
-        for (int i = 0; i < figures.size(); i++) {
-            T figure = figures.get(i);
-            positions.add(figure.getCoordinate());
+        for (int i = 0; i < images.size(); i++) {
+            T figure = images.get(i);
+            positions.add(figure.getPosition());
         }
         return positions;
     }
@@ -796,7 +842,7 @@ public class Scene extends Image<Model> {
 
         Rectangle r3 = new Rectangle(p3, 100, 100);
         surface.drawRectangle(r3, surface);
-        Log.v("r3", "center x: " + r3.getCoordinate().getX() + ", y: " + r3.getCoordinate().getY());
+        Log.v("r3", "center x: " + r3.getPosition().getX() + ", y: " + r3.getPosition().getY());
         Log.v("r3", "topLeft x: " + r3.getTopLeft().getX() + ", y: " + r3.getTopLeft().getY());
         Log.v("r3", "topRight x: " + r3.getTopRight().getX() + ", y: " + r3.getTopRight().getY());
         Log.v("r3", "bottomRight x: " + r3.getBottomRight().getX() + ", y: " + r3.getBottomRight().getY());
@@ -876,7 +922,7 @@ public class Scene extends Image<Model> {
 
 //    public void onTouchListener(Event action) {
 //
-//        Image targetFigure = getImageByCoordinate(action.getCoordinate());
+//        Image targetFigure = getImageByPosition(action.getPosition());
 //        action.setTargetImage(targetFigure);
 //
 //        action.getTargetImage().processAction(action);
@@ -885,7 +931,7 @@ public class Scene extends Image<Model> {
 //
 //    public void onHoldListener(Event action) {
 //
-//        Image targetFigure = getImageByCoordinate(action.getCoordinate());
+//        Image targetFigure = getImageByPosition(action.getPosition());
 //        action.setTargetImage(targetFigure);
 //
 //        action.getTargetImage().processAction(action);
@@ -896,7 +942,7 @@ public class Scene extends Image<Model> {
 //
 //        Action actionSequence = action.getAction();
 //
-//        Image targetFigure = getImageByCoordinate(action.getCoordinate());
+//        Image targetFigure = getImageByPosition(action.getPosition());
 //        action.setTargetImage(targetFigure);
 //
 //        Camera camera = action.getActor().getCamera();
@@ -914,7 +960,7 @@ public class Scene extends Image<Model> {
 //
 ////                // Host
 ////                action.getTargetImage().processAction(action);
-////                action.getTargetImage().setCoordinate(action.getCoordinate());
+////                action.getTargetImage().setPosition(action.getPosition());
 ////
 ////                // Camera
 ////                camera.focusSelectHost(action);
@@ -925,7 +971,7 @@ public class Scene extends Image<Model> {
 ////                PortImage portFigure = (PortImage) action.getTargetImage();
 ////
 ////                portFigure.setDragging(true);
-////                portFigure.setCoordinate(action.getCoordinate());
+////                portFigure.setPosition(action.getPosition());
 //
 //            } else if (action.getTargetImage() instanceof Scene) {
 //
@@ -958,7 +1004,7 @@ public class Scene extends Image<Model> {
 //            } else if (action.getTargetImage() instanceof ExtensionImage) {
 //
 ////                // Extension
-////                action.getTargetImage().setCoordinate(action.getCoordinate());
+////                action.getTargetImage().setPosition(action.getPosition());
 ////                action.getTargetImage().processAction(action);
 //
 //            } else if (action.getTargetImage() instanceof Scene) {
@@ -966,8 +1012,8 @@ public class Scene extends Image<Model> {
 ////                // Camera
 ////                if (actionSequence.getSize() > 1) {
 ////                    camera.setOffset(
-////                            action.getCoordinate().getX() - actionSequence.getFirstEvent().getCoordinate().getX(),
-////                            action.getCoordinate().getY() - actionSequence.getFirstEvent().getCoordinate().getY()
+////                            action.getPosition().getX() - actionSequence.getFirstEvent().getPosition().getX(),
+////                            action.getPosition().getY() - actionSequence.getFirstEvent().getPosition().getY()
 ////                    );
 ////
 ////                }
@@ -982,7 +1028,7 @@ public class Scene extends Image<Model> {
 
         event.setType(Event.Type.UNSELECT);
 
-        Image targetImage = getImageByCoordinate(event.getCoordinate());
+        Image targetImage = getImageByPosition(event.getPosition());
         event.setTargetImage(targetImage);
 
         Camera camera = event.getActor().getCamera();

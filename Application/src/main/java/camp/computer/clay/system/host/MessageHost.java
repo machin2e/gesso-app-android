@@ -41,7 +41,7 @@ public class MessageHost {
     Handler handler = new Handler() {
         @Override
         public void handleMessage (android.os.Message msg) {
-//            Log.v("Clay_Time", "addPatch called");
+//            Log.v("Clay_Time", "addExtension called");
 
             // Action the incoming message's data.
             Bundle bundle = msg.getData();

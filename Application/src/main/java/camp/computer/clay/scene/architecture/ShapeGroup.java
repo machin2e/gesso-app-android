@@ -45,7 +45,11 @@ public class ShapeGroup {
     }
 
     public Shape get(int index) {
-        return shapes.get(index);
+        if (index < this.shapes.size()) {
+            return shapes.get(index);
+        } else {
+            return null;
+        }
     }
 
     public Shape getFirst() {
@@ -113,6 +117,21 @@ public class ShapeGroup {
         return shapeGroup;
     }
 
+    public <T extends Feature> ShapeGroup filterFeature(List<T> features) {
+
+        ShapeGroup shapeGroup = new ShapeGroup();
+
+        for (int i = 0; i < this.shapes.size(); i++) {
+            for (int j = 0; j < features.size(); j++) {
+                if (this.shapes.get(i).getFeature() != null && this.shapes.get(i).getFeature() == features.get(j)) {
+                    shapeGroup.add(this.shapes.get(i));
+                }
+            }
+        }
+
+        return shapeGroup;
+    }
+
     /**
      * Filters shapes to those that are within the specified distance from the specified point.
      *
@@ -129,10 +148,27 @@ public class ShapeGroup {
 
             double distanceToShape = Geometry.calculateDistance(
                     point,
-                    shape.getCoordinate()
+                    shape.getPosition()
             );
 
             if (distanceToShape < distance) {
+                shapeGroup.add(shape);
+            }
+
+        }
+
+        return shapeGroup;
+
+    }
+
+    public ShapeGroup filterContains(Point point) {
+
+        ShapeGroup shapeGroup = new ShapeGroup();
+
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
+
+            if (shape.contains(point)) {
                 shapeGroup.add(shape);
             }
 
@@ -154,7 +190,7 @@ public class ShapeGroup {
 
         for (int i = 0; i < shapes.size(); i++) {
             Shape otherShape = shapes.get(i);
-            if (shape.contains(otherShape.getCoordinate())) {
+            if (shape.contains(otherShape.getPosition())) {
                 shapeGroup.add(otherShape);
             }
         }
@@ -185,7 +221,7 @@ public class ShapeGroup {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
-            positions.add(new Point(shape.getCoordinate().getX(), shape.getCoordinate().getY()));
+            positions.add(new Point(shape.getPosition().getX(), shape.getPosition().getY()));
         }
         return positions;
     }
@@ -229,7 +265,7 @@ public class ShapeGroup {
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
 
-            double currentDistance = Geometry.calculateDistance(position, shape.getCoordinate());
+            double currentDistance = Geometry.calculateDistance(position, shape.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;
@@ -252,5 +288,9 @@ public class ShapeGroup {
             Shape shape = shapes.get(i);
             shape.setVisibility(visibility);
         }
+    }
+
+    public int size() {
+        return this.shapes.size();
     }
 }

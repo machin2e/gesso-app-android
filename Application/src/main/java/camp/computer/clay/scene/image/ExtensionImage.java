@@ -38,7 +38,7 @@ public class ExtensionImage extends Image<Extension> {
 
     private void setupShapes() {
 
-        // Create shapes for figure
+        // Create Shapes for Image
         boardShape = new Rectangle(200, 200);
         boardShape.setColor("#f7f7f7");
         boardShape.setOutlineThickness(1);
@@ -60,21 +60,21 @@ public class ExtensionImage extends Image<Extension> {
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    Image targetImage = scene.getImageByCoordinate(event.getCoordinate());
+                    Image targetImage = scene.getImageByPosition(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched base
-                        showPathFigures();
-                        showPortFigures();
+                        showPathImages();
+                        showPortImages();
                         setTransparency(1.0);
 
                         // TODO: Speak "choose a channel to getEvent data."
 
                         // Show ports and paths of touched form
-                        for (PortImage portFigure : getPortFigures()) {
-                            List<Path> paths = portFigure.getPort().getAllPaths();
+                        for (PortImage portImage : getPortImages()) {
+                            List<Path> paths = portImage.getPort().getCompletePath();
                             for (Path path : paths) {
 
                                 // Show ports
@@ -89,7 +89,7 @@ public class ExtensionImage extends Image<Extension> {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
-                    Log.v("Event", "Tapped patch. Port figure count: " + getPortFigures().size());
+                    Log.v("Event", "Tapped patch. Port image count: " + getPortImages().size());
                     Port port = new Port();
                     getExtension().addPort(port);
                     scene.addFeature(port);
@@ -99,9 +99,9 @@ public class ExtensionImage extends Image<Extension> {
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
                     // Update Image
-                    PortImage sourcePortFigure = (PortImage) event.getAction().getFirstEvent().getTargetImage();
-                    sourcePortFigure.setCandidatePathVisibility(Visibility.INVISIBLE);
-                    sourcePortFigure.setCandidatePatchVisibility(Visibility.INVISIBLE);
+                    PortImage sourcePortImage = (PortImage) event.getAction().getFirstEvent().getTargetImage();
+                    sourcePortImage.setCandidatePathVisibility(Visibility.INVISIBLE);
+                    sourcePortImage.setCandidatePatchVisibility(Visibility.INVISIBLE);
 
                 }
             }
@@ -113,21 +113,21 @@ public class ExtensionImage extends Image<Extension> {
         return getFeature();
     }
 
-    public List<PortImage> getPortFigures() {
-        List<PortImage> portFigures = new ArrayList<>();
+    public List<PortImage> getPortImages() {
+        List<PortImage> portShapes = new ArrayList<>();
         Extension extension = getExtension();
 
         for (Port port : extension.getPorts()) {
-            PortImage portFigure = (PortImage) scene.getImage(port);
-            portFigures.add(portFigure);
+            PortImage portShape = (PortImage) scene.getImage(port);
+            portShapes.add(portShape);
         }
 
-        return portFigures;
+        return portShapes;
     }
 
     // TODO: Remove this! Store Port index/id
-    public int getPortFigureIndex(PortImage portFigure) {
-        Port port = (Port) scene.getFeature(portFigure);
+    public int getPortImageIndex(PortImage portImage) {
+        Port port = (Port) scene.getFeature(portImage);
         if (getExtension().getPorts().contains(port)) {
             return this.getExtension().getPorts().indexOf(port);
         }
@@ -148,14 +148,14 @@ public class ExtensionImage extends Image<Extension> {
 
             // Color
             for (int i = 0; i < shapes.size(); i++) {
-                Display.drawRectangle((Rectangle) shapes.get(i), display);
+                shapes.get(i).draw(display);
             }
 
             if (Launcher.ENABLE_GEOMETRY_LABELS) {
                 display.getPaint().setColor(Color.GREEN);
                 display.getPaint().setStyle(Paint.Style.STROKE);
-                Display.drawCircle(getCoordinate(), boardShape.getWidth(), 0, display);
-                Display.drawCircle(getCoordinate(), boardShape.getWidth() / 2.0f, 0, display);
+                Display.drawCircle(getPosition(), boardShape.getWidth(), 0, display);
+                Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
             }
         }
     }
@@ -164,35 +164,35 @@ public class ExtensionImage extends Image<Extension> {
         return this.boardShape;
     }
 
-    public void showPortFigures() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setVisibility(Visibility.VISIBLE);
-            portFigure.showDocks();
+    public void showPortImages() {
+        for (PortImage portImage : getPortImages()) {
+            portImage.setVisibility(Visibility.VISIBLE);
+            portImage.showDocks();
         }
     }
 
     public void hidePortImages() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setVisibility(Visibility.INVISIBLE);
+        for (PortImage portImage : getPortImages()) {
+            portImage.setVisibility(Visibility.INVISIBLE);
         }
     }
 
-    public void showPathFigures() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setPathVisibility(Visibility.INVISIBLE);
+    public void showPathImages() {
+        for (PortImage portImage : getPortImages()) {
+            portImage.setPathVisibility(Visibility.INVISIBLE);
         }
     }
 
     public void hidePathImages() {
-        for (PortImage portFigure : getPortFigures()) {
-            portFigure.setPathVisibility(Visibility.INVISIBLE);
-            portFigure.showDocks();
+        for (PortImage portImage : getPortImages()) {
+            portImage.setPathVisibility(Visibility.INVISIBLE);
+            portImage.showDocks();
         }
     }
 
     public boolean contains(Point point) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
+            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
         } else {
             return false;
         }
@@ -200,7 +200,7 @@ public class ExtensionImage extends Image<Extension> {
 
     public boolean contains(Point point, double padding) {
         if (isVisible()) {
-            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
+            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
         } else {
             return false;
         }

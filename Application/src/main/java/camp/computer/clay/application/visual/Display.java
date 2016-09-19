@@ -146,8 +146,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getCoordinate().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(),
-//                (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getCoordinate().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX()
+//                (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(),
+//                (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX()
                 (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getX(),
                 (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getY()
         );
@@ -453,8 +453,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(Color.parseColor(circle.getColor()));
 
         canvas.drawCircle(
-                (float) circle.getCoordinate().getX(),
-                (float) circle.getCoordinate().getY(),
+                (float) circle.getPosition().getX(),
+                (float) circle.getPosition().getY(),
                 (float) circle.getRadius(),
                 paint
         );
@@ -466,8 +466,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             paint.setStrokeWidth((float) circle.getOutlineThickness());
 
             canvas.drawCircle(
-                    (float) circle.getCoordinate().getX(),
-                    (float) circle.getCoordinate().getY(),
+                    (float) circle.getPosition().getX(),
+                    (float) circle.getPosition().getY(),
                     (float) circle.getRadius(),
                     paint
             );
@@ -591,16 +591,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
             // Rotate shape about its center point
             /*
-            Point topLeft = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getRotation(), rectangle.getRelativeTopLeft());
-            Point topRight = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getRotation(), rectangle.getRelativeTopRight());
-            Point bottomRight = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getRotation(), rectangle.getRelativeBottomRight());
-            Point bottomLeft = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getRotation(), rectangle.getRelativeBottomLeft());
+            Point topLeft = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getRotation(), rectangle.getRelativeTopLeft());
+            Point topRight = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getRotation(), rectangle.getRelativeTopRight());
+            Point bottomRight = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getRotation(), rectangle.getRelativeBottomRight());
+            Point bottomLeft = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getRotation(), rectangle.getRelativeBottomLeft());
             */
 
-//            Point topLeft = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getCoordinate().getRelativeRotation(), rectangle.getRelativeTopLeft());
-//            Point topRight = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getCoordinate().getRelativeRotation(), rectangle.getRelativeTopRight());
-//            Point bottomRight = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getCoordinate().getRelativeRotation(), rectangle.getRelativeBottomRight());
-//            Point bottomLeft = Geometry.calculateRotatedPoint(rectangle.getCoordinate(), rectangle.getCoordinate().getRelativeRotation(), rectangle.getRelativeBottomLeft());
+//            Point topLeft = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getPosition().getRelativeRotation(), rectangle.getRelativeTopLeft());
+//            Point topRight = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getPosition().getRelativeRotation(), rectangle.getRelativeTopRight());
+//            Point bottomRight = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getPosition().getRelativeRotation(), rectangle.getRelativeBottomRight());
+//            Point bottomLeft = Geometry.calculateRotatedPoint(rectangle.getPosition(), rectangle.getPosition().getRelativeRotation(), rectangle.getRelativeBottomLeft());
 
 //            Point topLeft = rectangle.getRelativeTopLeft();
 //            Point topRight = rectangle.getRelativeTopRight();
@@ -608,7 +608,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 //            Point bottomLeft = rectangle.getRelativeBottomLeft();
 
             // Rotate shape vertices about the shape's origin (reference) point
-            Point originCoordinate = rectangle.getCoordinate().getOrigin();
+            Point originCoordinate = rectangle.getPosition().getOrigin();
 
             if (originCoordinate == null) {
                 originCoordinate = new Point(0, 0);
@@ -620,7 +620,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             Point rotatedBottomRight = Geometry.calculateRotatedPoint(originCoordinate, originCoordinate.getRotation(), bottomRight);
             Point rotatedBottomLeft = Geometry.calculateRotatedPoint(originCoordinate, originCoordinate.getRotation(), bottomLeft);
             */
-//            Point originCoordinate = rectangle.getCoordinate();
+//            Point originCoordinate = rectangle.getPosition();
 //            Point rotatedTopLeft = Geometry.calculateRotatedPoint(originCoordinate, originCoordinate.getRotation(), topLeft);
 //            Point rotatedTopRight = Geometry.calculateRotatedPoint(originCoordinate, originCoordinate.getRotation(), topRight);
 //            Point rotatedBottomRight = Geometry.calculateRotatedPoint(originCoordinate, originCoordinate.getRotation(), bottomRight);

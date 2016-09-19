@@ -110,7 +110,7 @@ public class Event {
         this.type = type;
     }
 
-    public Point getCoordinate() {
+    public Point getPosition() {
         return this.pointerCoordinates[0];
     }
 

@@ -14,6 +14,7 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.architecture.ImageGroup;
 import camp.computer.clay.scene.architecture.Scene;
+import camp.computer.clay.scene.architecture.ShapeGroup;
 import camp.computer.clay.scene.image.HostImage;
 import camp.computer.clay.scene.image.ExtensionImage;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -84,11 +85,11 @@ public class Camera {
 
     private Point originalPosition = new Point();
 
-    public void setCoordinate(Point targetPosition) {
-        setCoordinate(targetPosition, positionPeriod);
+    public void setPosition(Point targetPosition) {
+        setPosition(targetPosition, positionPeriod);
     }
 
-    public void setCoordinate(Point targetPosition, double duration) {
+    public void setPosition(Point targetPosition, double duration) {
 
         Log.v("Camera", "position x: " + position.getX() + ", y: " + position.getY());
         Log.v("Camera", "originalPosition x: " + originalPosition.getX() + ", y: " + originalPosition.getY());
@@ -230,13 +231,13 @@ public class Camera {
         Event lastEvent = action.getLastEvent();
 
         // Check if a machine sprite was nearby
-        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(lastEvent.getCoordinate());
+        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(lastEvent.getPosition());
         if (nearestFormImage != null) {
 
             // TODO: Vibrate
 
             // Adjust perspective
-            //getCamera().setCoordinate(nearestFormImage.getCoordinate());
+            //getCamera().setPosition(nearestFormImage.getPosition());
             setScale(0.6f, 100); // Zoom out to show overview
 
         } else {
@@ -248,7 +249,7 @@ public class Camera {
             // Adjust perspective
             Point centerPoint = getScene().getImages(Host.class).getCenterPoint();
             double scale = 0.6;
-            setCoordinate(centerPoint);
+            setPosition(centerPoint);
             setScale(scale); // Zoom out to show overview
 
         }
@@ -256,7 +257,7 @@ public class Camera {
 //        PortImage portFigure = (PortImage) event.getTargetImage();
 //
 //        // Show ports of nearby forms
-//        ImageGroup nearbyFigures = getScene().getImages(Host.class, Extension.class).filterArea(event.getCoordinate(), 200 + 60);
+//        ImageGroup nearbyFigures = getScene().getImages(Host.class, Extension.class).filterArea(event.getPosition(), 200 + 60);
 //
 //        List<Image> images = getScene().getImages(Host.class, Extension.class).getList();
 //        for (int i = 0; i < images.size(); i++) {
@@ -271,7 +272,7 @@ public class Camera {
 //                } else if (image instanceof ExtensionImage) {
 //                    ExtensionImage nearbyFigure = (ExtensionImage) image;
 //                    nearbyFigure.setTransparency(1.0f);
-//                    nearbyFigure.showPortFigures();
+//                    nearbyFigure.showPortImages();
 //                }
 //
 //            } else {
@@ -290,13 +291,13 @@ public class Camera {
 //        }
 //
 //        // Check if a machine sprite was nearby
-//        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(event.getCoordinate());
+//        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(event.getPosition());
 //        if (nearestFormImage != null) {
 //
 //            // TODO: Vibrate
 //
 //            // Adjust perspective
-//            //getCamera().setCoordinate(nearestFormImage.getCoordinate());
+//            //getCamera().setPosition(nearestFormImage.getPosition());
 //            setScale(0.6f, 100); // Zoom out to show overview
 //
 //        } else {
@@ -308,14 +309,14 @@ public class Camera {
 //            // Adjust perspective
 //            Point centerPoint = getScene().getImages(Host.class).getCenterPoint();
 //            double scale = 0.6;
-//            setCoordinate(centerPoint);
+//            setPosition(centerPoint);
 //            setScale(scale); // Zoom out to show overview
 //
 //        }
 
         /*
         // Show the ports in the path
-        List<Path> portPaths = getCamera().getScene().getFeature().getAllPaths(port);
+        List<Path> portPaths = getCamera().getScene().getFeature().getCompletePath(port);
         List<Port> portConnections = getCamera().getScene().getFeature().getPorts(portPaths);
         for (Port portConnection: portConnections) {
             PortImage portFigureConnection = (PortImage) getCamera().getScene().getImage(portConnection);
@@ -388,7 +389,7 @@ public class Camera {
                         formPathPorts.add(port);
                     }
 
-                    List<Path> portPaths = port.getAllPaths();
+                    List<Path> portPaths = port.getCompletePath();
                     for (Path path : portPaths) {
                         if (!formPathPorts.contains(path.getSource())) {
                             formPathPorts.add(path.getSource());
@@ -400,12 +401,12 @@ public class Camera {
                 }
 
                 // Camera
-                List<Image> formPathPortImages = getScene().getImages(formPathPorts);
-                List<Point> formPortPositions = Scene.getCoordinates(formPathPortImages);
-                Rectangle boundingBox = Geometry.calculateBoundingBox(formPortPositions);
+                //List<Image> hostPathPortShapes = getScene().getImages(formPathPorts);
+                ShapeGroup hostPathPortShapes = getScene().getShapes().filterFeature(formPathPorts);
+                Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getCoordinates());
 
                 adjustScale(boundingBox);
-                setCoordinate(boundingBox.getCoordinate());
+                setPosition(boundingBox.getPosition());
 
             } else {
 
@@ -423,10 +424,10 @@ public class Camera {
 //                }
 
                 // TODO: (on second press, also hide external ports, send peripherals) getCamera().setScale(1.2f);
-                // TODO: (cont'd) getCamera().setCoordinate(baseImage.getCoordinate());
+                // TODO: (cont'd) getCamera().setPosition(baseImage.getPosition());
 
                 setScale(1.2f);
-                setCoordinate(hostImage.getCoordinate());
+                setPosition(hostImage.getPosition());
             }
             // </UPDATE_PERSPECTIVE>
         }
@@ -444,7 +445,7 @@ public class Camera {
             hostImage.hidePathImages();
         }
 
-        List<Path> paths = port.getAllPaths();
+        List<Path> paths = port.getCompletePath();
         for (Path connectedPath : paths) {
 
             // Show ports
@@ -471,7 +472,7 @@ public class Camera {
         adjustScale(boundingBox);
 
         // Camera Position
-        setCoordinate(Geometry.calculateCenterCoordinate(pathPortPositions));
+        setPosition(Geometry.calculateCenterCoordinate(pathPortPositions));
     }
 
     public void focusSelectScene() { // Previously called "focusReset"
@@ -485,12 +486,12 @@ public class Camera {
             hostImage.setTransparency(1.0);
         }
 
-        ImageGroup patchFigures = getScene().getImages(Extension.class);
-        for (int i = 0; i < patchFigures.getList().size(); i++) {
-            ExtensionImage patchFigure = (ExtensionImage) patchFigures.get(i);
-            patchFigure.hidePortImages();
-            patchFigure.hidePathImages();
-            patchFigure.setTransparency(1.0);
+        ImageGroup extensionImages = getScene().getImages(Extension.class);
+        for (int i = 0; i < extensionImages.getList().size(); i++) {
+            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+            ////extensionImage.hidePortImages();
+            ////extensionImage.hidePathImages();
+            extensionImage.setTransparency(1.0);
         }
 
         // Adjust scale and position
@@ -501,7 +502,7 @@ public class Camera {
     public void adjustPosition() {
         List<Point> figurePositions = getScene().getImages().filterType(Host.class, Extension.class).getCoordinates();
         Point centerPosition = Geometry.calculateCenterCoordinate(figurePositions);
-        setCoordinate(centerPosition);
+        setPosition(centerPosition);
     }
 
     public void adjustScale() {

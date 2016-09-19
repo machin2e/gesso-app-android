@@ -38,11 +38,11 @@ public abstract class Shape<T extends Feature> {
         return this.feature;
     }
 
-    public Point getCoordinate() {
+    public Point getPosition() {
         return position;
     }
 
-    public void setCoordinate(double x, double y) {
+    public void setPosition(double x, double y) {
         this.position.set(x, y);
     }
 
@@ -82,7 +82,7 @@ public abstract class Shape<T extends Feature> {
 
 //    public boolean contains(Point point) {
 //        if (isVisible()) {
-//            return Geometry.calculateDistance((int) this.getCoordinate().getX(), (int) this.getCoordinate().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("Board")).getHeight() / 2.0f);
+//            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("Board")).getHeight() / 2.0f);
 //        } else {
 //            return false;
 //        }

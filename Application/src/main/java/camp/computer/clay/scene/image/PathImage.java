@@ -82,7 +82,6 @@ public class PathImage extends Image<Path> {
     // TODO: Refactor. Put in Geometry/Shape.
     public void drawTrianglePath(Display display) {
 
-        Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
 
         Path path = getPath();
@@ -92,7 +91,7 @@ public class PathImage extends Image<Path> {
 
         // Show target port
         targetPortShape.setVisibility(Visibility.VISIBLE);
-        // TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
+        //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
@@ -100,20 +99,20 @@ public class PathImage extends Image<Path> {
         //paint.setColor(sourcePortShape.getUniqueColor());
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortShape.getCoordinate(),
-                targetPortShape.getCoordinate()
+                sourcePortShape.getPosition(),
+                targetPortShape.getPosition()
         );
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
         Point pathStartCoordinate = Geometry.calculatePoint(
-                sourcePortShape.getCoordinate(),
+                sourcePortShape.getPosition(),
                 pathRotationAngle,
                 2 * triangleSpacing
         );
 
         Point pathStopCoordinate = Geometry.calculatePoint(
-                targetPortShape.getCoordinate(),
+                targetPortShape.getPosition(),
                 pathRotationAngle + 180,
                 2 * triangleSpacing
         );
@@ -152,26 +151,25 @@ public class PathImage extends Image<Path> {
 
     private void drawLinePath(Display display) {
 
-        Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
 
         Path path = getPath();
 
-        PortImage sourcePortImage = (PortImage) getScene().getImage(path.getSource());
-        PortImage targetPortImage = (PortImage) getScene().getImage(path.getTarget());
+        Shape sourcePortShape = getScene().getShape(path.getSource());
+        Shape targetPortShape = getScene().getShape(path.getTarget());
 
         // Show target port
-        targetPortImage.setVisibility(Visibility.VISIBLE);
-        targetPortImage.setPathVisibility(Visibility.VISIBLE);
+        targetPortShape.setVisibility(Visibility.VISIBLE);
+        //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
-        paint.setColor(sourcePortImage.getUniqueColor());
+        //// TODO: paint.setColor(sourcePortShape.getUniqueColor());
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortImage.getCoordinate(),
-                targetPortImage.getCoordinate()
+                sourcePortShape.getPosition(),
+                targetPortShape.getPosition()
         );
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
@@ -179,13 +177,13 @@ public class PathImage extends Image<Path> {
 //        if (showDocks) {
 //
 //            Point pathStartPosition = Geometry.calculatePoint(
-//                    sourcePortImage.getCoordinate(),
+//                    sourcePortImage.getPosition(),
 //                    pathRotationAngle,
 //                    1.4 * triangleSpacing
 //            );
 //
 //            Point pathStopPosition = Geometry.calculatePoint(
-//                    targetPortImage.getCoordinate(),
+//                    targetPortImage.getPosition(),
 //                    pathRotationAngle + 180,
 //                    1.4 * triangleSpacing
 //            );
@@ -225,13 +223,13 @@ public class PathImage extends Image<Path> {
 //        } else {
 
             Point pathStartCoordinate = Geometry.calculatePoint(
-                    sourcePortImage.getCoordinate(),
+                    sourcePortShape.getPosition(),
                     pathRotationAngle,
                     0
             );
 
             Point pathStopCoordinate = Geometry.calculatePoint(
-                    targetPortImage.getCoordinate(),
+                    targetPortShape.getPosition(),
                     pathRotationAngle + 180,
                     0
             );

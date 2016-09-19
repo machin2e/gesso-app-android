@@ -413,12 +413,12 @@ public class Clay {
 //
 //        // Discover getFirstEvent device
 //        UUID unitUuidA = UUID.fromString("403d4bd4-71b0-4c6b-acab-bd30c6548c71");
-//        getClay().addPatch(unitUuidA, "10.1.10.29");
+//        getClay().addExtension(unitUuidA, "10.1.10.29");
 //        Extension foundUnit = getDeviceByUuid(unitUuidA);
 //
 //        // Discover second device
 //        UUID unitUuidB = UUID.fromString("903d4bd4-71b0-4c6b-acab-bd30c6548c78");
-//        getClay().addPatch(unitUuidB, "192.168.1.123");
+//        getClay().addExtension(unitUuidB, "192.168.1.123");
 //
 //        if (addBehaviorToTimeline) {
 //            for (int i = 0; i < behaviorCount; i++) {

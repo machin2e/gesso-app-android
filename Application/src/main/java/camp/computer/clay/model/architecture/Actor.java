@@ -100,11 +100,11 @@ public class Actor { // Controller
                 }
 
                 // Set the target image
-                Image targetImage = getCamera().getScene().getImageByCoordinate(event.getCoordinate());
+                Image targetImage = getCamera().getScene().getImageByPosition(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShapeByCoordinate(event.getCoordinate());
+                Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 // Action the event
@@ -127,11 +127,11 @@ public class Actor { // Controller
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
-                    Image targetImage = getCamera().getScene().getImageByCoordinate(event.getCoordinate());
+                    Image targetImage = getCamera().getScene().getImageByPosition(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     // Set the target shape
-                    Shape targetShape = targetImage.getShapeByCoordinate(event.getCoordinate());
+                    Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
                     event.setTargetShape(targetShape);
 
 //                    // <HACK>
@@ -170,11 +170,11 @@ public class Actor { // Controller
 //                }
 
                 // Set the target image
-                Image targetImage = getCamera().getScene().getImageByCoordinate(event.getCoordinate());
+                Image targetImage = getCamera().getScene().getImageByPosition(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShapeByCoordinate(event.getCoordinate());
+                Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 //event.getTargetImage().processAction(action);

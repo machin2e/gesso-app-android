@@ -55,6 +55,10 @@ public class Port extends Feature {
         }
     }
 
+    public Host getHost() {
+        return (Host) getParent();
+    }
+
     private List<Path> paths = new ArrayList<>();
 
     public void addPath(Path path) {
@@ -135,7 +139,7 @@ public class Port extends Feature {
      *
      * @return List of paths in the graph containing the port.
      */
-    public List<Path> getAllPaths() {
+    public List<Path> getCompletePath() {
         List<Path> connectedPaths = new ArrayList<>();
         connectedPaths.addAll(getAncestorPaths());
         connectedPaths.addAll(getDescendantPaths());
