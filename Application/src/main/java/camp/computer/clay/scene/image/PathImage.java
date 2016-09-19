@@ -1,13 +1,12 @@
 package camp.computer.clay.scene.image;
 
-import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.model.interaction.EventListener;
+import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -33,7 +32,7 @@ public class PathImage extends Image<Path> {
     }
 
     private void setupActions() {
-        setOnActionListener(new EventListener() {
+        setOnActionListener(new ActionListener() {
             @Override
             public void onAction(Action action) {
 
@@ -74,7 +73,6 @@ public class PathImage extends Image<Path> {
         }
     }
 
-    // TODO: Delete
     public Path getPath() {
         return getFeature();
     }
@@ -172,74 +170,23 @@ public class PathImage extends Image<Path> {
                 targetPortShape.getPosition()
         );
 
-        double triangleRotationAngle = pathRotationAngle + 90.0f;
+        Point pathStartCoordinate = Geometry.calculatePoint(
+                sourcePortShape.getPosition(),
+                pathRotationAngle,
+                0
+        );
 
-//        if (showDocks) {
-//
-//            Point pathStartPosition = Geometry.calculatePoint(
-//                    sourcePortImage.getPosition(),
-//                    pathRotationAngle,
-//                    1.4 * triangleSpacing
-//            );
-//
-//            Point pathStopPosition = Geometry.calculatePoint(
-//                    targetPortImage.getPosition(),
-//                    pathRotationAngle + 180,
-//                    1.4 * triangleSpacing
-//            );
-//
-//            paint.setStyle(Paint.Style.FILL);
-////            Surface.drawTriangle(
-////                    pathStartPosition,
-////                    triangleRotationAngle,
-////                    triangleWidth,
-////                    triangleHeight,
-////                    surface
-////            );
-//            Surface.drawRectangle(
-//                    pathStartPosition,
-//                    triangleRotationAngle,
-//                    triangleWidth,
-//                    triangleWidth,
-//                    surface
-//            );
-//
-//            paint.setStyle(Paint.Style.FILL);
-////            Surface.drawTriangle(
-////                    pathStopPosition,
-////                    triangleRotationAngle,
-////                    triangleWidth,
-////                    triangleHeight,
-////                    surface
-////            );
-//            Surface.drawRectangle(
-//                    pathStopPosition,
-//                    triangleRotationAngle,
-//                    triangleWidth,
-//                    triangleWidth,
-//                    surface
-//            );
-//
-//        } else {
+        Point pathStopCoordinate = Geometry.calculatePoint(
+                targetPortShape.getPosition(),
+                pathRotationAngle + 180,
+                0
+        );
 
-            Point pathStartCoordinate = Geometry.calculatePoint(
-                    sourcePortShape.getPosition(),
-                    pathRotationAngle,
-                    0
-            );
-
-            Point pathStopCoordinate = Geometry.calculatePoint(
-                    targetPortShape.getPosition(),
-                    pathRotationAngle + 180,
-                    0
-            );
-
-            Display.drawLine(
-                    pathStartCoordinate,
-                    pathStopCoordinate,
-                    display
-            );
-//        }
+        Display.drawLine(
+                pathStartCoordinate,
+                pathStopCoordinate,
+                display
+        );
 
     }
 }

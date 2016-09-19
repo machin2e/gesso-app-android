@@ -76,7 +76,7 @@ public class Model extends Feature {
         extension.setParent(this);
     }
 
-    public Extension getPatch(int index) {
+    public Extension getExtension(int index) {
         return this.extensions.get(index);
     }
 

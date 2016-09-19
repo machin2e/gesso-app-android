@@ -239,6 +239,7 @@ public class ShapeGroup {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
+
     public Point getCentroidPosition() {
         return Geometry.calculateCentroidCoordinate(getPositions());
     }

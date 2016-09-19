@@ -2,6 +2,7 @@ package camp.computer.clay.model.architecture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Host extends Feature {
 
@@ -26,8 +27,9 @@ public class Host extends Feature {
 
     public List<Path> getPaths() {
         List<Path> paths = new ArrayList<>();
-        for (Port port: getPorts()) {
-            paths.addAll (port.getPaths());
+        for (int i = 0; i < ports.size(); i++) {
+            Port port = ports.get(i);
+            paths.addAll(port.getPaths());
         }
         return paths;
     }

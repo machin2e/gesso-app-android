@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Feature;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.EventListener;
+import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.scene.util.Color;
 import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
@@ -35,7 +35,7 @@ public abstract class Image<T extends Feature> {
     protected Scene scene = null;
 
     // TODO: Make this an interface? Move interface out of class.
-    protected EventListener eventListener;
+    protected ActionListener actionListener;
 
     public Image(T feature) {
         this.feature = feature;
@@ -190,10 +190,6 @@ public abstract class Image<T extends Feature> {
 
     public abstract void draw(Display display);
 
-//    public abstract boolean contains(Point point);
-
-//    public abstract boolean contains(Point point, double padding);
-
     public boolean contains(Point point) {
         if (isVisible()) {
             for (int i = 0; i < shapes.size(); i++) {
@@ -205,13 +201,13 @@ public abstract class Image<T extends Feature> {
         return false;
     }
 
-    public void setOnActionListener(EventListener eventListener) {
-        this.eventListener = eventListener;
+    public void setOnActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 
     public void processAction(Action action) {
-        if (eventListener != null) {
-            eventListener.onAction(action);
+        if (actionListener != null) {
+            actionListener.onAction(action);
         }
     }
 
@@ -239,7 +235,8 @@ public abstract class Image<T extends Feature> {
 
     public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
-        for (Shape shape : shapes) {
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
             positions.addAll(shape.getVertices());
         }
         return positions;
@@ -248,9 +245,11 @@ public abstract class Image<T extends Feature> {
     // Delete? The above getVertices() should be enough now that Point is refactored! Maybe add getRelativeVertices() if needed.
     public List<Point> getAbsoluteVertices() {
         List<Point> positions = new LinkedList<>();
-        for (Shape shape : shapes) {
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
             List<Point> vertices = shape.getVertices();
-            for (Point shapeVertex : vertices) {
+            for (int j = 0; j < vertices.size(); j++) {
+                Point shapeVertex = vertices.get(j);
 
                 // Rotate shape about its center point
                 Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getPosition(), shape.getRotation(), shapeVertex);

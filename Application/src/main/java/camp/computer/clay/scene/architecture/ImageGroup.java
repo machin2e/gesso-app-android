@@ -72,8 +72,6 @@ public class ImageGroup {
         for (int i = 0; i < this.images.size(); i++) {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
-                //for (Class<?> type : types) {
-                //if (this.images.getEvent(i).getClass() == type) {
                 if (this.images.get(i).getFeature().getClass() == type) {
                     imageGroup.add(this.images.get(i));
                 }

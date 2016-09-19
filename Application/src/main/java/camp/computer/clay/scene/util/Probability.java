@@ -14,11 +14,10 @@ public abstract class Probability {
     }
 
     public static int generateRandomInteger(int minimum, int maximum) {
-
         return (minimum + Probability.randomGenerator.nextInt(maximum - minimum));
     }
 
-    public static int chooseRandomInteger(int... integers) {
+    public static int getRandomInteger(int... integers) {
         return integers[randomGenerator.nextInt(integers.length)];
     }
 }

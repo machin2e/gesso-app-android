@@ -268,11 +268,11 @@ public class Camera {
 //                if (image instanceof HostImage) {
 //                    HostImage nearbyFigure = (HostImage) image;
 //                    nearbyFigure.setTransparency(1.0f);
-//                    nearbyFigure.showPortShapes();
+//                    nearbyFigure.setPortVisibility();
 //                } else if (image instanceof ExtensionImage) {
 //                    ExtensionImage nearbyFigure = (ExtensionImage) image;
 //                    nearbyFigure.setTransparency(1.0f);
-//                    nearbyFigure.showPortShapes();
+//                    nearbyFigure.setPortVisibility();
 //                }
 //
 //            } else {
@@ -321,7 +321,7 @@ public class Camera {
         for (Port portConnection: portConnections) {
             PortImage portFigureConnection = (PortImage) getCamera().getScene().getImage(portConnection);
             portFigureConnection.setVisibility(true);
-            portFigureConnection.showPathImages();
+            portFigureConnection.setPathVisibility();
         }
         */
 
@@ -446,8 +446,8 @@ public class Camera {
         for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.setTransparency(0.05f);
-            hostImage.hidePortShapes();
-            hostImage.hidePathImages();
+            hostImage.setPortVisibility(Visibility.INVISIBLE);
+            hostImage.setPathVisibility(Visibility.INVISIBLE);
         }
 
         List<Path> paths = port.getCompletePath();
@@ -483,8 +483,8 @@ public class Camera {
         ImageGroup hostImages = getScene().getImages(Host.class);
         for (int i = 0; i < hostImages.getList().size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
-            hostImage.hidePortShapes();
-            hostImage.hidePathImages();
+            hostImage.setPortVisibility(Visibility.INVISIBLE);
+            hostImage.setPathVisibility(Visibility.INVISIBLE);
             hostImage.setTransparency(1.0);
         }
 

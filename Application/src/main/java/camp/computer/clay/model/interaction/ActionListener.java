@@ -1,5 +1,5 @@
 package camp.computer.clay.model.interaction;
 
-public interface EventListener {
+public interface ActionListener {
     void onAction(Action action);
 }

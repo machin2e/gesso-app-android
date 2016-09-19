@@ -16,7 +16,7 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.model.interaction.EventListener;
+import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
 import camp.computer.clay.scene.util.geometry.Geometry;
@@ -28,6 +28,14 @@ public class ExtensionImage extends Image<Extension> {
 
     // Shapes
     private Rectangle boardShape = null;
+
+    private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
+    private Point candidateExtensionSourcePosition = new Point();
+    private Point candidateExtensionPosition = new Point();
+
+    private Visibility candidatePathVisibility = Visibility.INVISIBLE;
+    private Point candidatePathSourceCoordinate = new Point(40, 80);
+    private Point candidatePathDestinationCoordinate = new Point(40, 80);
 
     public ExtensionImage(Extension extension) {
         super(extension);
@@ -51,7 +59,7 @@ public class ExtensionImage extends Image<Extension> {
 
     private void setupActions() {
 
-        setOnActionListener(new EventListener() {
+        setOnActionListener(new ActionListener() {
             @Override
             public void onAction(Action action) {
 
@@ -73,8 +81,6 @@ public class ExtensionImage extends Image<Extension> {
                         showPortShapes();
                         setTransparency(1.0);
 
-                        // TODO: Speak "choose a channel to getEvent data."
-
                         // Show ports and paths of touched form
                         List<Shape> portShapes = getPortShapes();
                         for (int i = 0; i < portShapes.size(); i++) {
@@ -82,7 +88,8 @@ public class ExtensionImage extends Image<Extension> {
                             Port port = (Port) portShape.getFeature();
 
                             List<Path> paths = port.getCompletePath();
-                            for (Path path : paths) {
+                            for (int j = 0; j < paths.size(); j++) {
+                                Path path = paths.get(j);
 
                                 // Show ports
                                 scene.getImage(path.getSource()).setVisibility(Visibility.VISIBLE);
@@ -105,8 +112,7 @@ public class ExtensionImage extends Image<Extension> {
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    // Update Image
-                    Shape sourcePortImage = event.getAction().getFirstEvent().getTargetShape();
+                    // Update style
                     setCandidatePathVisibility(Visibility.INVISIBLE);
                     setCandidateExtensionVisibility(Visibility.INVISIBLE);
 
@@ -115,35 +121,6 @@ public class ExtensionImage extends Image<Extension> {
         });
     }
 
-    private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
-    private Point candidateExtensionSourcePosition = new Point();
-    private Point candidateExtensionPosition = new Point();
-
-    private Visibility candidatePathVisibility = Visibility.INVISIBLE;
-    private Point candidatePathSourceCoordinate = new Point(40, 80);
-    private Point candidatePathDestinationCoordinate = new Point(40, 80);
-
-    public void setCandidatePathVisibility(Visibility visibility) {
-        candidatePathVisibility = visibility;
-    }
-
-    public Visibility getCandidatePathVisibility() {
-        return candidatePathVisibility;
-    }
-
-    public void setCandidatePathDestinationCoordinate(Point position) {
-        this.candidatePathDestinationCoordinate.set(position);
-    }
-
-    public void setCandidateExtensionVisibility(Visibility visibility) {
-        candidateExtensionVisibility = visibility;
-    }
-
-    public Visibility getCandidateExtensionVisibility() {
-        return candidateExtensionVisibility;
-    }
-
-    // TODO: Delete
     public Extension getExtension() {
         return getFeature();
     }
@@ -162,12 +139,6 @@ public class ExtensionImage extends Image<Extension> {
     }
 
     public void update() {
-
-//        // Transparency
-//        String transparencyString = String.format("%02x", (int) transparency * 255);
-//        color = Color.parseColor("#" + transparencyString + colorString);
-//        outlineColor = Color.parseColor("#" + transparencyString + outlineColorString);
-
     }
 
     public void draw(Display display) {
@@ -198,32 +169,6 @@ public class ExtensionImage extends Image<Extension> {
     public void hidePortShapes() {
         getShapes("^Port (1[0-2]|[1-9])$").setVisibility(Visibility.INVISIBLE);
     }
-
-//    public void showPortShapes() {
-//        for (PortImage portImage : getPortImages()) {
-//            portImage.setVisibility(Visibility.VISIBLE);
-//            portImage.showDocks();
-//        }
-//    }
-//
-//    public void hidePortShapes() {
-//        for (PortImage portImage : getPortImages()) {
-//            portImage.setVisibility(Visibility.INVISIBLE);
-//        }
-//    }
-
-//    public void showPathImages() {
-//        for (PortImage portImage : getPortImages()) {
-//            portImage.setPathVisibility(Visibility.INVISIBLE);
-//        }
-//    }
-//
-//    public void hidePathImages() {
-//        for (PortImage portImage : getPortImages()) {
-//            portImage.setPathVisibility(Visibility.INVISIBLE);
-//            portImage.showDocks();
-//        }
-//    }
 
     public void showPathImages() {
         List<Port> ports = getFeature().getPorts();
@@ -319,6 +264,26 @@ public class ExtensionImage extends Image<Extension> {
         } else {
             return false;
         }
+    }
+
+    public void setCandidatePathVisibility(Visibility visibility) {
+        candidatePathVisibility = visibility;
+    }
+
+    public Visibility getCandidatePathVisibility() {
+        return candidatePathVisibility;
+    }
+
+    public void setCandidatePathDestinationCoordinate(Point position) {
+        this.candidatePathDestinationCoordinate.set(position);
+    }
+
+    public void setCandidateExtensionVisibility(Visibility visibility) {
+        candidateExtensionVisibility = visibility;
+    }
+
+    public Visibility getCandidateExtensionVisibility() {
+        return candidateExtensionVisibility;
     }
 }
 
