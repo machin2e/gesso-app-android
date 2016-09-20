@@ -84,13 +84,6 @@ public abstract class Shape<T extends Entity> {
         return Geometry.containsPoint(getVertices(), point);
     }
 
-//    public boolean contains(Point point) {
-//        if (isVisible()) {
-//            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (((Rectangle) getShape("Board")).getHeight() / 2.0f);
-//        } else {
-//            return false;
-//        }
-//    }
 
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility;

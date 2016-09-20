@@ -10,6 +10,7 @@ import java.util.List;
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
@@ -28,38 +29,6 @@ import camp.computer.clay.space.util.geometry.Rectangle;
 import camp.computer.clay.space.architecture.Shape;
 
 public class HostImage extends Image<Host> {
-
-    // <HACK>
-    // Color palette generated with i want hue.
-    // Reference: http://tools.medialab.sciences-po.fr/iwanthue/index.php
-    public static String PORT_COLOR_OFF = "#ffefefef";
-    public static String PORT_COLOR_SWITCH = "#ffd35238";
-    public static String PORT_COLOR_PULSE = "#ff75b441";
-    public static String PORT_COLOR_WAVE = "#ff6573c8";
-    public static String PORT_COLOR_REFERENCE = "#ffd1a33c";
-    public static String PORT_COLOR_CMOS = "#ffd35238";
-    public static String PORT_COLOR_TTL = "#ffc65d6b";
-
-    public static String getPortColor(Port.Type portType) {
-        if (portType == Port.Type.NONE) {
-            return PORT_COLOR_OFF;
-        } else if (portType == Port.Type.SWITCH) {
-            return PORT_COLOR_SWITCH;
-        } else if (portType == Port.Type.PULSE) {
-            return PORT_COLOR_PULSE;
-        } else if (portType == Port.Type.WAVE) {
-            return PORT_COLOR_WAVE;
-        } else if (portType == Port.Type.POWER_REFERENCE) {
-            return PORT_COLOR_REFERENCE;
-        } else if (portType == Port.Type.POWER_CMOS) {
-            return PORT_COLOR_CMOS;
-        } else if (portType == Port.Type.POWER_TTL) {
-            return PORT_COLOR_TTL;
-        } else {
-            return PORT_COLOR_OFF;
-        }
-    }
-    // </HACK>
 
     public HostImage(Host host) {
         super(host);
@@ -560,7 +529,7 @@ public class HostImage extends Image<Host> {
                                                         // <HACK>
                                                         // TODO: Put this code in Camera
                                                         // Camera
-                                                        List<Port> pathPorts = port.getPorts(paths);
+                                                        Group<Port> pathPorts = port.getPorts(paths);
                                                         ShapeGroup pathPortShapes = getSpace().getShapes().filterEntity(pathPorts);
                                                         camera.adjustScale(pathPortShapes.getBoundingBox());
                                                         camera.setPosition(pathPortShapes.getCenterPosition());
@@ -655,7 +624,7 @@ public class HostImage extends Image<Host> {
                                                                 space.addEntity(path);
 
                                                                 // Get the just-created Extension Image
-                                                                // Image pathImage = getSpace().getImage(path);
+                                                                // PathImage pathImage = (PathImage) getSpace().getImage(path);
                                                             }
 
                                                             // Camera
@@ -878,7 +847,7 @@ public class HostImage extends Image<Host> {
             Shape portShape = getShape(port);
 
             // Update color of Port shape based on type
-            portShape.setColor(getPortColor(port.getType()));
+            portShape.setColor(camp.computer.clay.space.util.Color.getColor(port.getType()));
 
             // Update color of LED based on corresponding Port's type
             lightShapeGroup.get(i).setColor(portShape.getColor());
@@ -959,7 +928,7 @@ public class HostImage extends Image<Host> {
 
     // TODO: Move into PathImage
     public void setPathVisibility(Visibility visibility) {
-        List<Port> ports = getHost().getPorts();
+        Group<Port> ports = getHost().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
 
@@ -1001,7 +970,7 @@ public class HostImage extends Image<Host> {
 
     // TODO: Move into PathImage
     public void setDockVisibility(Visibility visibility) {
-        List<Port> ports = getHost().getPorts();
+        Group<Port> ports = getHost().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
 

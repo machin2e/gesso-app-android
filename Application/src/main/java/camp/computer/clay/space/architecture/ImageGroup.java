@@ -18,43 +18,10 @@ public class ImageGroup extends Group<Image> {
     public ImageGroup() {
     }
 
-    public void add(Image image) {
-        this.elements.add(image);
-    }
-
-    public void add(List<Image> images) {
-        this.elements.addAll(images);
-    }
-
-    public boolean contains(Image image) {
-        return elements.contains(image);
-    }
-
+    // TODO: Move this into the Group base class
     public ImageGroup remove(Image image) {
         elements.remove(image);
         return this;
-    }
-
-    public Image get(int index) {
-        return elements.get(index);
-    }
-
-    public Image getFirst() {
-        if (elements.size() > 0) {
-            return elements.get(0);
-        }
-        return null;
-    }
-
-    public Image getLast() {
-        if (elements.size() > 0) {
-            return elements.get(elements.size() - 1);
-        }
-        return null;
-    }
-
-    public int size() {
-        return this.elements.size();
     }
 
     /**

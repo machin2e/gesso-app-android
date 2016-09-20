@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.model.architecture.Port;
 
 public abstract class Color {
 
@@ -60,4 +61,36 @@ public abstract class Color {
     public static String getHexColorString(int color) {
         return String.format("#%08X", (0xFFFFFFFF & color));
     }
+
+    // <HACK>
+    // Color palette generated with i want hue.
+    // Reference: http://tools.medialab.sciences-po.fr/iwanthue/index.php
+    public static String PORT_COLOR_OFF = "#ffefefef";
+    public static String PORT_COLOR_SWITCH = "#ffd35238";
+    public static String PORT_COLOR_PULSE = "#ff75b441";
+    public static String PORT_COLOR_WAVE = "#ff6573c8";
+    public static String PORT_COLOR_REFERENCE = "#ffd1a33c";
+    public static String PORT_COLOR_CMOS = "#ffd35238";
+    public static String PORT_COLOR_TTL = "#ffc65d6b";
+
+    public static String getColor(Port.Type portType) {
+        if (portType == Port.Type.NONE) {
+            return PORT_COLOR_OFF;
+        } else if (portType == Port.Type.SWITCH) {
+            return PORT_COLOR_SWITCH;
+        } else if (portType == Port.Type.PULSE) {
+            return PORT_COLOR_PULSE;
+        } else if (portType == Port.Type.WAVE) {
+            return PORT_COLOR_WAVE;
+        } else if (portType == Port.Type.POWER_REFERENCE) {
+            return PORT_COLOR_REFERENCE;
+        } else if (portType == Port.Type.POWER_CMOS) {
+            return PORT_COLOR_CMOS;
+        } else if (portType == Port.Type.POWER_TTL) {
+            return PORT_COLOR_TTL;
+        } else {
+            return PORT_COLOR_OFF;
+        }
+    }
+    // </HACK>
 }

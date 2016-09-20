@@ -232,8 +232,8 @@ public class Port extends Entity {
      * @param paths List of paths for which a list contained ports will be returned.
      * @return List of ports contained in the specified list of paths {@code paths}.
      */
-    public List<Port> getPorts(List<Path> paths) {
-        List<Port> ports = new ArrayList<>();
+    public Group<Port> getPorts(List<Path> paths) {
+        Group<Port> ports = new Group<>();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
             if (!ports.contains(path.getSource())) {

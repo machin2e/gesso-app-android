@@ -20,48 +20,9 @@ public class ShapeGroup extends Group<Shape> {
     public ShapeGroup() {
     }
 
-    public void add(Shape shape) {
-        this.elements.add(shape);
-    }
-
-    public void add(List<Shape> shapes) {
-        this.elements.addAll(shapes);
-    }
-
-    public void add(ShapeGroup shapeGroup) {
-        List<Shape> shapeList = shapeGroup.getList();
-        this.elements.addAll(shapeList);
-    }
-
-    public boolean contains(Shape shape) {
-        return elements.contains(shape);
-    }
-
     public ShapeGroup remove(Shape shape) {
         elements.remove(shape);
         return this;
-    }
-
-    public Shape get(int index) {
-        if (index < this.elements.size()) {
-            return elements.get(index);
-        } else {
-            return null;
-        }
-    }
-
-    public Shape getFirst() {
-        if (elements.size() > 0) {
-            return elements.get(0);
-        }
-        return null;
-    }
-
-    public Shape getLast() {
-        if (elements.size() > 0) {
-            return elements.get(elements.size() - 1);
-        }
-        return null;
     }
 
     /**
@@ -115,7 +76,7 @@ public class ShapeGroup extends Group<Shape> {
         return shapeGroup;
     }
 
-    public <T extends Entity> ShapeGroup filterEntity(List<T> entities) {
+    public <T extends Entity> ShapeGroup filterEntity(Group<T> entities) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -287,9 +248,5 @@ public class ShapeGroup extends Group<Shape> {
             Shape shape = elements.get(i);
             shape.setVisibility(visibility);
         }
-    }
-
-    public int size() {
-        return this.elements.size();
     }
 }

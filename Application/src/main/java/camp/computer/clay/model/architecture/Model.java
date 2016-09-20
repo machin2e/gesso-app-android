@@ -50,11 +50,11 @@ public class Model extends Entity {
         return this.hosts;
     }
 
-    public List<Port> getPorts() {
-        List<Port> ports = new ArrayList<>();
+    public Group<Port> getPorts() {
+        Group<Port> ports = new Group<>();
         for (int i = 0; i < this.hosts.size(); i++) {
             Host host = this.hosts.get(i);
-            ports.addAll(host.getPorts());
+            ports.add(host.getPorts());
         }
         return ports;
     }

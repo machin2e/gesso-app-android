@@ -1,5 +1,6 @@
 package camp.computer.clay.space.image;
 
+import android.graphics.Color;
 import android.graphics.Paint;
 
 import camp.computer.clay.application.visual.Display;
@@ -101,7 +102,7 @@ public class PathImage extends Image<Path> {
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
-        //paint.setColor(sourcePortShape.getUniqueColor());
+        paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
                 sourcePortShape.getPosition(),
@@ -170,7 +171,7 @@ public class PathImage extends Image<Path> {
         // Color
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(15.0f);
-        //// TODO: paint.setColor(sourcePortShape.getUniqueColor());
+        paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
         double pathRotationAngle = Geometry.calculateRotationAngle(
                 sourcePortShape.getPosition(),

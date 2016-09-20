@@ -8,6 +8,7 @@ import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
@@ -15,6 +16,7 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
@@ -135,6 +137,17 @@ public class ExtensionImage extends Image<Extension> {
     }
 
     public void update() {
+
+        // Update Port style
+        for (int i = 0; i < getExtension().getPorts().size(); i++) {
+            Port port = getExtension().getPorts().get(i);
+            Shape portShape = getShape(port);
+
+            // Update color of Port shape based on type
+            if (portShape != null) {
+                portShape.setColor(Color.getColor(port.getType()));
+            }
+        }
     }
 
     public void draw(Display display) {
@@ -158,7 +171,7 @@ public class ExtensionImage extends Image<Extension> {
     }
 
     public void setPathVisibility(Visibility visibility) {
-        List<Port> ports = getEntity().getPorts();
+        Group<Port> ports = getEntity().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
 

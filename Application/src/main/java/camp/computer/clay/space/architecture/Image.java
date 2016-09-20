@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.space.util.Color;
@@ -19,9 +20,9 @@ public abstract class Image<T extends Entity> {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-    protected Point position = new Point(0, 0); // Image position
+    protected Point position = new Point(0, 0);
 
-    protected double scale = 1.0; // Image scale factor
+    protected double scale = 1.0;
 
     protected Visibility visibility = Visibility.VISIBLE;
 
@@ -88,15 +89,12 @@ public abstract class Image<T extends Entity> {
         return visibility;
     }
 
-    public void show() {
-        setVisibility(Visibility.VISIBLE);
-    }
+//    public void addShape(Shape shape) {
+//        shape.getPosition().setOrigin(getPosition());
+//        shapes.add(shape);
+//    }
 
-    public void hide() {
-        setVisibility(Visibility.INVISIBLE);
-    }
-
-    public void addShape(Shape shape) {
+    public <T extends Shape> void addShape(T shape) {
         shape.getPosition().setOrigin(getPosition());
         shapes.add(shape);
     }
@@ -153,7 +151,7 @@ public abstract class Image<T extends Entity> {
         return getShapes().filterType(entityTypes);
     }
 
-    public <T extends Entity> ShapeGroup getShapes(List<T> entities) {
+    public <T extends Entity> ShapeGroup getShapes(Group<T> entities) {
         return getShapes().filterEntity(entities);
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.architecture.Extension;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
@@ -381,10 +382,10 @@ public class Camera {
 //                }
 
                 // Get ports along every path connected to the ports on the touched form
-                List<Port> formPathPorts = new ArrayList<>();
-                List<Port> ports = hostImage.getHost().getPorts();
-                for (int i = 0; i < ports.size(); i++) {
-                    Port port = ports.get(i);
+                Group<Port> formPathPorts = new Group<>();
+                Group<Port> hostPorts = hostImage.getHost().getPorts();
+                for (int i = 0; i < hostPorts.size(); i++) {
+                    Port port = hostPorts.get(i);
 
                     // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
 
@@ -465,7 +466,7 @@ public class Camera {
         }
 
         // Camera
-        List<Port> pathPorts = port.getPorts(paths);
+        Group<Port> pathPorts = port.getPorts(paths);
         ImageGroup pathPortImages = getSpace().getImages(pathPorts);
         List<Point> pathPortPositions = pathPortImages.getPositions();
         Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
@@ -480,7 +481,7 @@ public class Camera {
     public void focusSelectSpace() { // Previously called "focusReset"
 
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
-        ImageGroup hostImages = getSpace().getImages(Host.class);
+        ImageGroup hostImages = space.getImages(Host.class);
         for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);

@@ -13,6 +13,7 @@ import java.util.List;
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Extension;
@@ -204,22 +205,24 @@ public class Space extends Image<Model> {
     }
 
     // TODO: Remove Image parameter. Create that and return it.
-    private void addImage(Image image, String layerTag) {
+    private <T extends Image> void addImage(T image, String layerTag) {
 
         // Add layer (if it doesn't exist)
         if (!hasLayer(layerTag)) {
             addLayer(layerTag);
         }
 
-        // Add image
+        // Add Image
         getLayer(layerTag).addImage(image);
 
-        // Coordinate image
+        // Position the Image
+        // <HACK>
         if (image instanceof HostImage) {
             adjustLayout(image);
         }
+        // </HACK>
 
-        // Update perspective
+        // Update Camera
         getEntity().getActor(0).getCamera().focusSelectSpace();
     }
 
@@ -335,7 +338,7 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public <T> ImageGroup getImages(List<T> entities) {
+    public <T> ImageGroup getImages(Group<T> entities) {
         ImageGroup imageGroup = new ImageGroup();
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);

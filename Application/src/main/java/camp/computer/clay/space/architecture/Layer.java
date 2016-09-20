@@ -18,7 +18,7 @@ public class Layer {
 
     private String tag = "default";
 
-    private List<Image> images = new LinkedList<>();
+    private ImageGroup images = new ImageGroup();
 
     public Layer(Space space) {
         this.space = space;
@@ -59,7 +59,7 @@ public class Layer {
         return null;
     }
 
-    public List<Image> getImages() {
+    public ImageGroup getImages() {
         return this.images;
     }
 
