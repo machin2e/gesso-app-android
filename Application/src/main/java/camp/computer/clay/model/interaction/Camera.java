@@ -92,10 +92,10 @@ public class Camera {
 
     public void setPosition(Point targetPosition, double duration) {
 
-        Log.v("Camera", "position x: " + position.getX() + ", y: " + position.getY());
-        Log.v("Camera", "originalPosition x: " + originalPosition.getX() + ", y: " + originalPosition.getY());
-        Log.v("Camera", "targetPosition x: " + targetPosition.getX() + ", y: " + targetPosition.getY());
-        Log.v("Camera", "-");
+//        Log.v("Camera", "position x: " + position.getX() + ", y: " + position.getY());
+//        Log.v("Camera", "originalPosition x: " + originalPosition.getX() + ", y: " + originalPosition.getY());
+//        Log.v("Camera", "targetPosition x: " + targetPosition.getX() + ", y: " + targetPosition.getY());
+//        Log.v("Camera", "-");
 
         if (targetPosition.getX() == position.getX() && targetPosition.getY() == position.getY()) {
 
@@ -227,6 +227,7 @@ public class Camera {
         return this.space;
     }
 
+    // <REFACTOR>
     public void focusCreatePath(Action action) {
 
         Event lastEvent = action.getLastEvent();
@@ -502,6 +503,7 @@ public class Camera {
         adjustScale();
         adjustPosition();
     }
+    // </REFACTOR>
 
     public void adjustPosition() {
         List<Point> figurePositions = getSpace().getImages().filterType(Host.class, Extension.class).getPositions();

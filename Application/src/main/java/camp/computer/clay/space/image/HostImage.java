@@ -28,7 +28,7 @@ import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Rectangle;
 import camp.computer.clay.space.architecture.Shape;
 
-public class HostImage extends Image<Host> {
+public class HostImage extends PortableImage {
 
     public HostImage(Host host) {
         super(host);
@@ -46,7 +46,7 @@ public class HostImage extends Image<Host> {
         Circle circle;
 
         // Create shapes for figure
-        rectangle = new Rectangle<Host>(getEntity());
+        rectangle = new Rectangle<Host>(getHost());
         rectangle.setWidth(250);
         rectangle.setHeight(250);
         rectangle.setLabel("Board");
@@ -328,7 +328,6 @@ public class HostImage extends Image<Host> {
                                                 space.setPrototypeExtensionPosition(event.getPosition());
 
                                                 getPortShapes().setVisibility(Visibility.INVISIBLE);
-//                                                setPortVisibility(Visibility.INVISIBLE);
                                                 setPathVisibility(Visibility.INVISIBLE);
                                                 setDockVisibility(Visibility.VISIBLE);
 
@@ -347,7 +346,7 @@ public class HostImage extends Image<Host> {
 
                                                 // Candidate Extension Visibility
                                                 boolean isCreateExtensionAction = true;
-                                                ImageGroup imageGroup = getSpace().getImages(Host.class, Extension.class);
+                                                ImageGroup imageGroup = space.getImages(Host.class, Extension.class);
                                                 for (int i = 0; i < imageGroup.size(); i++) {
                                                     Image otherImage = imageGroup.get(i);
 
@@ -401,29 +400,29 @@ public class HostImage extends Image<Host> {
 
                                                     if (image.getEntity() == sourcePort.getParent() || nearbyImages.contains(image)) {
 
-                                                        // <HACK>
-                                                        if (image instanceof HostImage) {
-                                                            HostImage nearbyFigure = (HostImage) image;
-                                                            nearbyFigure.setTransparency(1.0f);
-                                                            nearbyFigure.getPortShapes().setVisibility(Visibility.VISIBLE);
-                                                        } else if (image instanceof ExtensionImage) {
-                                                            // ExtensionImage nearbyFigure = (ExtensionImage) image;
-
-                                                        }
+//                                                        // <HACK>
+//                                                        if (image instanceof HostImage) {
+                                                        PortableImage nearbyFigure = (PortableImage) image;
+                                                        nearbyFigure.setTransparency(1.0f);
+                                                        nearbyFigure.getPortShapes().setVisibility(Visibility.VISIBLE);
+//                                                        } else if (image instanceof ExtensionImage) {
+//                                                            // ExtensionImage nearbyFigure = (ExtensionImage) image;
+//
+//                                                        }
                                                         // </HACK>
 
                                                     } else {
 
                                                         // <HACK>
-                                                        if (image instanceof HostImage) {
-                                                            HostImage nearbyFigure = (HostImage) image;
-                                                            nearbyFigure.setTransparency(0.1f);
-                                                            nearbyFigure.getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                                        } else if (image instanceof ExtensionImage) {
-                                                            ExtensionImage nearbyFigure = (ExtensionImage) image;
-                                                            nearbyFigure.setTransparency(0.1f);
-                                                            //// TODO: nearbyFigure.hidePortShapes();
-                                                        }
+//                                                        if (image instanceof HostImage) {
+                                                        PortableImage nearbyFigure = (PortableImage) image;
+                                                        nearbyFigure.setTransparency(0.1f);
+                                                        nearbyFigure.getPortShapes().setVisibility(Visibility.INVISIBLE);
+//                                                        } else if (image instanceof ExtensionImage) {
+//                                                            ExtensionImage nearbyFigure = (ExtensionImage) image;
+//                                                            nearbyFigure.setTransparency(0.1f);
+//                                                            //// TODO: nearbyFigure.hidePortShapes();
+//                                                        }
                                                         // </HACK>
 
                                                     }
@@ -487,7 +486,7 @@ public class HostImage extends Image<Host> {
                                                         Log.v("TouchPort", "C");
 
                                                         // Remove focus from other Hosts and their Ports
-                                                        ImageGroup hostImages = getSpace().getImages(Host.class);
+                                                        ImageGroup hostImages = space.getImages(Host.class);
                                                         for (int i = 0; i < hostImages.size(); i++) {
                                                             HostImage hostImage = (HostImage) hostImages.get(i);
                                                             hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
@@ -499,12 +498,12 @@ public class HostImage extends Image<Host> {
                                                             shapes.setTransparency(0.1);
                                                         }
 
-                                                        ImageGroup extensionImages = getSpace().getImages().filterType(Extension.class);
+                                                        ImageGroup extensionImages = space.getImages().filterType(Extension.class);
                                                         for (int i = 0; i < extensionImages.size(); i++) {
                                                             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 //                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
                                                             extensionImage.setTransparency(0.1);
-                                                            extensionImage.setPortVisibility(Visibility.INVISIBLE);
+                                                            getPortShapes().setVisibility(Visibility.INVISIBLE);
                                                             extensionImage.setPathVisibility(Visibility.INVISIBLE);
 //                                                            }
                                                         }
@@ -519,18 +518,18 @@ public class HostImage extends Image<Host> {
                                                             Path path = paths.get(i);
 
                                                             // Show Ports
-                                                            getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                            getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                                            space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                                            space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                             // Show Path
-                                                            getSpace().getImage(path).setVisibility(Visibility.VISIBLE);
+                                                            space.getImage(path).setVisibility(Visibility.VISIBLE);
                                                         }
 
                                                         // <HACK>
                                                         // TODO: Put this code in Camera
                                                         // Camera
                                                         Group<Port> pathPorts = port.getPorts(paths);
-                                                        ShapeGroup pathPortShapes = getSpace().getShapes().filterEntity(pathPorts);
+                                                        ShapeGroup pathPortShapes = space.getShapes().filterEntity(pathPorts);
                                                         camera.adjustScale(pathPortShapes.getBoundingBox());
                                                         camera.setPosition(pathPortShapes.getCenterPosition());
                                                         // </HACK>
@@ -566,7 +565,7 @@ public class HostImage extends Image<Host> {
                                                         Port sourcePort = (Port) sourcePortShape.getEntity();
                                                         Port targetPort = null;
 
-                                                        Shape targetPortShape = getSpace().getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
+                                                        Shape targetPortShape = space.getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
                                                         targetPort = (Port) targetPortShape.getEntity();
 
                                                         if (targetPort == null) {
@@ -624,7 +623,7 @@ public class HostImage extends Image<Host> {
                                                                 space.addEntity(path);
 
                                                                 // Get the just-created Extension Image
-                                                                // PathImage pathImage = (PathImage) getSpace().getImage(path);
+                                                                // PathImage pathImage = (PathImage) space.getImage(path);
                                                             }
 
                                                             // Camera
@@ -639,7 +638,7 @@ public class HostImage extends Image<Host> {
 
                                             } else if (action.getLastEvent().getTargetShape() == null
                                                     // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
-                                                    && action.getLastEvent().getTargetImage() == getSpace()) {
+                                                    && action.getLastEvent().getTargetImage() == space) {
 
                                                 // (Host.Port, ..., Space) Action Pattern
 
@@ -663,13 +662,13 @@ public class HostImage extends Image<Host> {
                                                     }
 
                                                     // Add Extension to Model
-                                                    getSpace().getModel().addExtension(extension);
+                                                    space.getModel().addExtension(extension);
 
                                                     // Add Extension to Space
-                                                    getSpace().addEntity(extension);
+                                                    space.addEntity(extension);
 
                                                     // Get the just-created Extension Image
-                                                    Image extensionImage = getSpace().getImage(extension);
+                                                    Image extensionImage = space.getImage(extension);
 
                                                     // Update the Extension Image position and rotation
                                                     extensionImage.setPosition(event.getPosition());
@@ -770,11 +769,11 @@ public class HostImage extends Image<Host> {
 
                                                         // Show source and target ports in path
                                                         //getPortShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                        getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                        getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                                        space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                                        space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                         // Show path connection
-                                                        getSpace().getImage(path).setVisibility(Visibility.VISIBLE);
+                                                        space.getImage(path).setVisibility(Visibility.VISIBLE);
                                                     }
                                                 }
 
@@ -829,11 +828,7 @@ public class HostImage extends Image<Host> {
     }
 
     public Host getHost() {
-        return getEntity();
-    }
-
-    public ShapeGroup getPortShapes() {
-        return getShapes(getHost().getPorts());
+        return (Host) getEntity();
     }
 
     public void update() {
@@ -873,136 +868,5 @@ public class HostImage extends Image<Host> {
             }
         }
     }
-
-    // <REFACTOR>
-
-    // TODO: Move into Port? something (inner class? custom PortShape?)
-    public List<PathImage> getPathImages(int portIndex) {
-        List<PathImage> pathImages = new ArrayList<>();
-        List<Path> paths = getHost().getPort(portIndex).getPaths();
-        // TODO: ImageGroup images = space.getImages(paths);
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(path);
-            pathImages.add(pathImage);
-        }
-
-        return pathImages;
-    }
-
-    // TODO: Move into Port? something (inner class? custom PortShape?)
-    public boolean hasVisiblePaths(int portIndex) {
-        List<PathImage> pathImages = getPathImages(portIndex);
-        for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = pathImages.get(i);
-            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // TODO: Move into Port? something (inner class? custom PortShape?)
-    public boolean hasVisibleAncestorPaths(int portIndex) {
-        List<Path> ancestorPaths = getHost().getPort(portIndex).getAncestorPaths();
-        for (int i = 0; i < ancestorPaths.size(); i++) {
-            Path ancestorPath = ancestorPaths.get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(ancestorPath);
-            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // TODO: Move into Port? something (inner class? custom PortShape?)
-    public ImageGroup getPathImages(Port port) {
-        ImageGroup pathImages = new ImageGroup();
-        for (int i = 0; i < port.getPaths().size(); i++) {
-            Path path = port.getPaths().get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(path);
-            pathImages.add(pathImage);
-        }
-        return pathImages;
-    }
-
-    // TODO: Move into PathImage
-    public void setPathVisibility(Visibility visibility) {
-        Group<Port> ports = getHost().getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
-
-            setPathVisibility(port, visibility);
-        }
-    }
-
-    // TODO: Move into PathImage
-    // TODO: Replace with ImageGroup.filter().setVisibility()
-    public void setPathVisibility(Port port, Visibility visibility) {
-        ImageGroup pathImages = getPathImages(port);
-        for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
-
-            // Update visibility
-            if (visibility == Visibility.VISIBLE) {
-                pathImage.setVisibility(Visibility.VISIBLE);
-                // pathImage.setDockVisibility(Visibility.INVISIBLE);
-            } else if (visibility == Visibility.INVISIBLE) {
-                pathImage.setVisibility(Visibility.INVISIBLE);
-                //pathImage.setDockVisibility(Visibility.VISIBLE);
-            }
-
-            // Recursively traverse Ports in descendant Paths and set their Path image visibility
-            Port targetPort = pathImage.getPath().getTarget();
-            // <HACK>
-            if (targetPort.getParent() instanceof Host) {
-                Host targetHost = (Host) targetPort.getParent();
-                HostImage targetHostImage = (HostImage) getSpace().getImage(targetHost);
-                targetHostImage.setPathVisibility(targetPort, visibility);
-            } else if (targetPort.getParent() instanceof Extension) {
-                Extension targetHost = (Extension) targetPort.getParent();
-                ExtensionImage targetHostImage = (ExtensionImage) getSpace().getImage(targetHost);
-                //targetHostImage.setPathVisibility(targetPort, visibility);
-            }
-            // </HACK>
-        }
-    }
-
-    // TODO: Move into PathImage
-    public void setDockVisibility(Visibility visibility) {
-        Group<Port> ports = getHost().getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
-
-            setDockVisibility(port, visibility);
-        }
-    }
-
-    // TODO: Move into PathImage
-    public void setDockVisibility(Port port, Visibility visibility) {
-        ImageGroup pathImages = getPathImages(port);
-        for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
-
-            // Update visibility
-            pathImage.setDockVisibility(visibility);
-
-            // Deep
-            Port targetPort = pathImage.getPath().getTarget();
-            // <HACK>
-            if (targetPort.getParent() instanceof Host) {
-                Host targetHost = (Host) targetPort.getParent();
-                HostImage targetHostImage = (HostImage) getSpace().getImage(targetHost);
-                targetHostImage.setDockVisibility(targetPort, visibility);
-            } else if (targetPort.getParent() instanceof Extension) {
-                Extension targetHost = (Extension) targetPort.getParent();
-                ExtensionImage targetHostImage = (ExtensionImage) getSpace().getImage(targetHost);
-                //targetHostImage.setDockVisibility(targetPort);
-            }
-            // </HACK>
-        }
-    }
-
-    // </REFACTOR>
 }
 

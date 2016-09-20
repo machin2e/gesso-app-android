@@ -2,35 +2,23 @@ package camp.computer.clay.space.image;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
-import camp.computer.clay.model.architecture.Group;
-import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
-import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 import camp.computer.clay.space.architecture.Shape;
 
-public class ExtensionImage extends Image<Extension> {
-
-    private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
-    private Point candidateExtensionSourcePosition = new Point();
-    private Point candidateExtensionPosition = new Point();
-
-    private Visibility candidatePathVisibility = Visibility.INVISIBLE;
-    private Point candidatePathSourceCoordinate = new Point(40, 80);
-    private Point candidatePathDestinationCoordinate = new Point(40, 80);
+public class ExtensionImage extends PortableImage { // Image<Extension> {
 
     public ExtensionImage(Extension extension) {
         super(extension);
@@ -76,11 +64,11 @@ public class ExtensionImage extends Image<Extension> {
 
                         // Focus on touched base
                         setPathVisibility(Visibility.VISIBLE);
-                        setPortVisibility(Visibility.VISIBLE);
+                        getPortShapes().setVisibility(Visibility.VISIBLE);
                         setTransparency(1.0);
 
                         // Show ports and paths of touched form
-                        List<Shape> portShapes = getPortShapes();
+                        ShapeGroup portShapes = getPortShapes();
                         for (int i = 0; i < portShapes.size(); i++) {
                             Shape portShape = portShapes.get(i);
                             Port port = (Port) portShape.getEntity();
@@ -111,8 +99,8 @@ public class ExtensionImage extends Image<Extension> {
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
                     // Update style
-                    setCandidatePathVisibility(Visibility.INVISIBLE);
-                    setCandidateExtensionVisibility(Visibility.INVISIBLE);
+                    space.setPrototypePathVisibility(Visibility.INVISIBLE);
+                    space.setPrototypeExtensionVisibility(Visibility.INVISIBLE);
 
                 }
             }
@@ -120,23 +108,13 @@ public class ExtensionImage extends Image<Extension> {
     }
 
     public Extension getExtension() {
-        return getEntity();
-    }
-
-    public List<Shape> getPortShapes() {
-        List<Shape> portShapes = new LinkedList<>();
-
-        for (int i = 0; i < this.shapes.size(); i++) {
-            Shape shape = this.shapes.get(i);
-            if (shape.getLabel().startsWith("Port ")) {
-                portShapes.add(shape);
-            }
-        }
-
-        return portShapes;
+        return (Extension) getEntity();
     }
 
     public void update() {
+
+        // TODO: Update Port positions based on the number of ports
+        int portCount = getPortable().getPorts().size();
 
         // Update Port style
         for (int i = 0; i < getExtension().getPorts().size(); i++) {
@@ -164,104 +142,6 @@ public class ExtensionImage extends Image<Extension> {
 //                Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
 //            }
         }
-    }
-
-    public void setPortVisibility(Visibility visibility) {
-        getShapes("^Port (1[0-2]|[1-9])$").setVisibility(visibility);
-    }
-
-    public void setPathVisibility(Visibility visibility) {
-        Group<Port> ports = getEntity().getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
-
-            if (visibility == Visibility.INVISIBLE) {
-                showDocks(port);
-            }
-
-            setPathVisibility(port, visibility);
-        }
-    }
-
-    public void showDocks(Port port) {
-        List<PathImage> pathImages = getPathImages(port);
-        for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = pathImages.get(i);
-
-            pathImage.setDockVisibility(Visibility.VISIBLE);
-
-            // Deep
-//            PortImage targetPortImage = (PortImage) getSpace().getImage(pathImage.getPath().getTarget());
-//            targetPortImage.setDockVisibility();
-            Port targetPort = pathImage.getPath().getTarget();
-            // <HACK>
-            if (targetPort.getParent() instanceof Host) {
-                Host targetHost = (Host) targetPort.getParent();
-                HostImage targetHostImage = (HostImage) getSpace().getImage(targetHost);
-                //// TODO: targetHostImage.setDockVisibility(targetPort, Visibility.VISIBLE);
-            } else if (targetPort.getParent() instanceof Extension) {
-                Extension targetHost = (Extension) targetPort.getParent();
-                ExtensionImage targetHostImage = (ExtensionImage) getSpace().getImage(targetHost);
-                //targetHostImage.setDockVisibility(targetPort);
-            }
-            // </HACK>
-        }
-    }
-
-    // TODO: Replace with ImageGroup.filter().setVisibility()
-    public void setPathVisibility(Port port, Visibility visibility) {
-        List<PathImage> pathImages = getPathImages(port);
-        for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = pathImages.get(i);
-
-            pathImage.setVisibility(visibility);
-
-            // Deep
-            Port targetPort = pathImage.getPath().getTarget();
-            // <HACK>
-            if (targetPort.getParent() instanceof Host) {
-                Host targetHost = (Host) targetPort.getParent();
-                HostImage targetHostImage = (HostImage) getSpace().getImage(targetHost);
-                //// TODO: targetHostImage.setPathVisibility(targetPort, visibility);
-            } else if (targetPort.getParent() instanceof Extension) {
-                Extension targetHost = (Extension) targetPort.getParent();
-                ExtensionImage targetHostImage = (ExtensionImage) getSpace().getImage(targetHost);
-                //targetHostImage.setPathVisibility(targetPort, visibility);
-            }
-            // </HACK>
-        }
-    }
-
-    public List<PathImage> getPathImages(Port port) {
-        List<PathImage> pathImages = new ArrayList<>();
-        List<Path> paths = port.getPaths();
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(path);
-            pathImages.add(pathImage);
-        }
-
-        return pathImages;
-    }
-
-    public void setCandidatePathVisibility(Visibility visibility) {
-        candidatePathVisibility = visibility;
-    }
-
-    public Visibility getCandidatePathVisibility() {
-        return candidatePathVisibility;
-    }
-
-    public void setCandidatePathDestinationCoordinate(Point position) {
-        this.candidatePathDestinationCoordinate.set(position);
-    }
-
-    public void setCandidateExtensionVisibility(Visibility visibility) {
-        candidateExtensionVisibility = visibility;
-    }
-
-    public Visibility getCandidateExtensionVisibility() {
-        return candidateExtensionVisibility;
     }
 }
 

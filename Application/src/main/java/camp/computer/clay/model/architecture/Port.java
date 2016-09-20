@@ -55,8 +55,8 @@ public class Port extends Entity {
         }
     }
 
-    public Host getHost() {
-        return (Host) getParent();
+    public Portable getPortable() {
+        return (Portable) getParent();
     }
 
     private List<Path> paths = new ArrayList<>();
