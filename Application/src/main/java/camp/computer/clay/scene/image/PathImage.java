@@ -15,12 +15,11 @@ import camp.computer.clay.scene.util.geometry.Shape;
 
 public class PathImage extends Image<Path> {
 
-    // </STYLE>
-    public boolean showDocks = true;
+    private Visibility dockVisibility = Visibility.VISIBLE;
+
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
-    // </STYLE>
 
     public PathImage(Path path) {
         super(path);
@@ -56,8 +55,16 @@ public class PathImage extends Image<Path> {
     public void update() {
     }
 
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
+    public void setDockVisibility(Visibility visibility) {
+        this.dockVisibility = visibility;
+    }
+
+    public Visibility getDockVisibility() {
+        return this.dockVisibility;
+    }
+
+    public boolean isDockVisible() {
+        return this.dockVisibility == Visibility.VISIBLE;
     }
 
     public void draw(Display display) {
@@ -115,7 +122,7 @@ public class PathImage extends Image<Path> {
                 2 * triangleSpacing
         );
 
-        if (showDocks) {
+        if (dockVisibility == Visibility.VISIBLE) {
 
             paint.setStyle(Paint.Style.FILL);
             Display.drawTriangle(

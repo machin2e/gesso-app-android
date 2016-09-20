@@ -1,5 +1,6 @@
 package camp.computer.clay.scene.architecture;
 
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -383,7 +384,7 @@ public class Scene extends Image<Model> {
     }
 
     // TODO: Refactor to be cleaner and leverage other classes...
-    public <T extends Feature> ShapeGroup getShapes(Class<?>... types) {
+    public <T extends Feature> ShapeGroup getShapes(Class<? extends Feature>... types) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
         List<Image> imageList = getImages().getList();
@@ -392,24 +393,8 @@ public class Scene extends Image<Model> {
             shapeGroup.add(imageList.get(i).getShapes(types));
         }
 
-
         return shapeGroup.filterType(types);
     }
-
-//    public <T> List<Image> getShapes(List<T> features)
-//        List<Image> images = new ArrayList<>();
-//        for (int i = 0; i < layers.size(); i++) {
-//            Layer layer = layers.get(i);
-//            for (int j = 0; j < features.size(); j++) {
-//                T model = features.get(j);
-//                Image image = layer.getImage((Feature) model);
-//                if (image != null) {
-//                    images.add(image);
-//                }
-//            }
-//        }
-//        return images;
-//    }
 
     public Shape getShape(Feature feature) {
         List<Image> imageList = getImages().getList();
@@ -494,6 +479,10 @@ public class Scene extends Image<Model> {
 
         // Draw Layers
         drawLayers(display);
+
+        // Draw candidate Paths and Extensions (if any)
+        drawCandidatePathImages(display);
+        drawCandidateExtensionImage(display);
 
         // <DEBUG_LABEL>
         if (Launcher.ENABLE_GEOMETRY_LABELS) {
@@ -760,5 +749,118 @@ public class Scene extends Image<Model> {
 
     public List<Layer> getLayers() {
         return layers;
+    }
+
+
+
+
+
+    private Visibility candidateExtensionVisibility = Visibility.INVISIBLE;
+    private Point candidateExtensionPosition = new Point();
+
+    private Visibility candidatePathVisibility = Visibility.INVISIBLE;
+    private Point candidatePathSourcePosition = new Point(40, 80);
+    private Point candidatePathDestinationCoordinate = new Point(40, 80);
+    double shapeRadius = 40.0;
+
+    private void drawCandidateExtensionImage(Display display) {
+
+        if (candidateExtensionVisibility == Visibility.VISIBLE) {
+
+            Paint paint = display.getPaint();
+
+            double pathRotationAngle = Geometry.calculateRotationAngle(
+                    candidatePathSourcePosition,
+                    candidateExtensionPosition
+            );
+
+            paint.setStyle(Paint.Style.FILL);
+            //paint.setColor(Color.CYAN); // paint.setColor(getUniqueColor());
+            paint.setColor(Color.parseColor("#fff7f7f7"));
+            Display.drawRectangle(candidateExtensionPosition, pathRotationAngle + 180, 250, 250, display);
+
+        }
+
+    }
+
+    // TODO: Make this into a shape and put this on a separate layer!
+    public void drawCandidatePathImages(Display display) {
+        if (candidatePathVisibility == Visibility.VISIBLE) {
+
+//            if (getPort().getType() != Port.Type.NONE) {
+
+            Canvas canvas = display.getCanvas();
+            Paint paint = display.getPaint();
+
+            double triangleWidth = 20;
+            double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
+            double triangleSpacing = 35;
+
+            // Color
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(15.0f);
+//                paint.setColor(this.getUniqueColor());
+
+            double pathRotationAngle = Geometry.calculateRotationAngle(
+                    //getPosition(),
+                    candidatePathSourcePosition,
+                    candidatePathDestinationCoordinate
+            );
+
+            Point pathStartCoordinate = Geometry.calculatePoint(
+                    // getPosition(),
+                    candidatePathSourcePosition,
+                    pathRotationAngle,
+                    2 * triangleSpacing
+            );
+
+            Point pathStopCoordinate = Geometry.calculatePoint(
+                    candidatePathDestinationCoordinate,
+                    pathRotationAngle + 180,
+                    2 * triangleSpacing
+            );
+
+            Display.drawTrianglePath(
+                    pathStartCoordinate,
+                    pathStopCoordinate,
+                    triangleWidth,
+                    triangleHeight,
+                    display
+            );
+
+            // Color
+            paint.setStyle(Paint.Style.FILL);
+//                paint.setColor(getUniqueColor());
+            Display.drawCircle(candidatePathDestinationCoordinate, shapeRadius, 0.0f, display);
+//            }
+        }
+    }
+
+    public void setCandidatePathVisibility(Visibility visibility) {
+        candidatePathVisibility = visibility;
+    }
+
+    public Visibility getCandidatePathVisibility() {
+        return candidatePathVisibility;
+    }
+
+    public void setCandidatePathSourcePosition(Point position) {
+        this.candidatePathSourcePosition.set(position);
+    }
+
+    public void setCandidatePathDestinationPosition(Point position) {
+        this.candidatePathDestinationCoordinate.set(position);
+    }
+
+    public void setCandidateExtensionPosition(Point position) {
+        this.candidateExtensionPosition.set(position);
+    }
+
+    public void setCandidateExtensionVisibility(Visibility visibility) {
+        candidateExtensionVisibility = visibility;
+    }
+
+    public Visibility getCandidateExtensionVisibility() {
+        return candidateExtensionVisibility;
     }
 }

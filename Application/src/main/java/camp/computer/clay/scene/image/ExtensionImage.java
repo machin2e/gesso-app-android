@@ -1,14 +1,11 @@
 package camp.computer.clay.scene.image;
 
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Host;
@@ -19,7 +16,6 @@ import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.scene.architecture.Image;
 import camp.computer.clay.scene.util.Visibility;
-import camp.computer.clay.scene.util.geometry.Geometry;
 import camp.computer.clay.scene.util.geometry.Point;
 import camp.computer.clay.scene.util.geometry.Rectangle;
 import camp.computer.clay.scene.util.geometry.Shape;
@@ -77,8 +73,8 @@ public class ExtensionImage extends Image<Extension> {
                     if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched base
-                        showPathImages();
-                        showPortShapes();
+                        setPathVisibility(Visibility.VISIBLE);
+                        setPortVisibility(Visibility.VISIBLE);
                         setTransparency(1.0);
 
                         // Show ports and paths of touched form
@@ -157,30 +153,20 @@ public class ExtensionImage extends Image<Extension> {
         }
     }
 
-    public void showPortShapes() {
-        getShapes("^Port (1[0-2]|[1-9])$").setVisibility(Visibility.VISIBLE);
+    public void setPortVisibility(Visibility visibility) {
+        getShapes("^Port (1[0-2]|[1-9])$").setVisibility(visibility);
     }
 
-    public void hidePortShapes() {
-        getShapes("^Port (1[0-2]|[1-9])$").setVisibility(Visibility.INVISIBLE);
-    }
-
-    public void showPathImages() {
+    public void setPathVisibility(Visibility visibility) {
         List<Port> ports = getFeature().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
 
-            setPathVisibility(port, Visibility.VISIBLE);
-        }
-    }
+            if (visibility == Visibility.INVISIBLE) {
+                showDocks(port);
+            }
 
-    public void hidePathImages() {
-        List<Port> ports = getFeature().getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
-
-            setPathVisibility(port, Visibility.INVISIBLE);
-            showDocks(port);
+            setPathVisibility(port, visibility);
         }
     }
 
@@ -189,21 +175,21 @@ public class ExtensionImage extends Image<Extension> {
         for (int i = 0; i < pathImages.size(); i++) {
             PathImage pathImage = pathImages.get(i);
 
-            pathImage.showDocks = true;
+            pathImage.setDockVisibility(Visibility.VISIBLE);
 
             // Deep
 //            PortImage targetPortImage = (PortImage) getScene().getImage(pathImage.getPath().getTarget());
-//            targetPortImage.showDocks();
+//            targetPortImage.setDockVisibility();
             Port targetPort = pathImage.getPath().getTarget();
             // <HACK>
             if (targetPort.getParent() instanceof Host) {
                 Host targetHost = (Host) targetPort.getParent();
                 HostImage targetHostImage = (HostImage) getScene().getImage(targetHost);
-                targetHostImage.showDocks(targetPort);
+                //// TODO: targetHostImage.setDockVisibility(targetPort, Visibility.VISIBLE);
             } else if (targetPort.getParent() instanceof Extension) {
                 Extension targetHost = (Extension) targetPort.getParent();
                 ExtensionImage targetHostImage = (ExtensionImage) getScene().getImage(targetHost);
-                //targetHostImage.showDocks(targetPort);
+                //targetHostImage.setDockVisibility(targetPort);
             }
             // </HACK>
         }
@@ -223,7 +209,7 @@ public class ExtensionImage extends Image<Extension> {
             if (targetPort.getParent() instanceof Host) {
                 Host targetHost = (Host) targetPort.getParent();
                 HostImage targetHostImage = (HostImage) getScene().getImage(targetHost);
-                targetHostImage.setPathVisibility(targetPort, visibility);
+                //// TODO: targetHostImage.setPathVisibility(targetPort, visibility);
             } else if (targetPort.getParent() instanceof Extension) {
                 Extension targetHost = (Extension) targetPort.getParent();
                 ExtensionImage targetHostImage = (ExtensionImage) getScene().getImage(targetHost);
@@ -244,22 +230,6 @@ public class ExtensionImage extends Image<Extension> {
 
         return pathImages;
     }
-
-//    public boolean contains(Point point) {
-//        if (isVisible()) {
-//            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f);
-//        } else {
-//            return false;
-//        }
-//    }
-//
-//    public boolean contains(Point point, double padding) {
-//        if (isVisible()) {
-//            return Geometry.calculateDistance((int) this.getPosition().getX(), (int) this.getPosition().getY(), point.getX(), point.getY()) < (this.boardShape.getHeight() / 2.0f + padding);
-//        } else {
-//            return false;
-//        }
-//    }
 
     public void setCandidatePathVisibility(Visibility visibility) {
         candidatePathVisibility = visibility;

@@ -446,8 +446,9 @@ public class Camera {
         for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.setTransparency(0.05f);
-            hostImage.setPortVisibility(Visibility.INVISIBLE);
+            hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             hostImage.setPathVisibility(Visibility.INVISIBLE);
+            hostImage.setDockVisibility(Visibility.VISIBLE);
         }
 
         List<Path> paths = port.getCompletePath();
@@ -483,8 +484,9 @@ public class Camera {
         ImageGroup hostImages = getScene().getImages(Host.class);
         for (int i = 0; i < hostImages.getList().size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
-            hostImage.setPortVisibility(Visibility.INVISIBLE);
+            hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             hostImage.setPathVisibility(Visibility.INVISIBLE);
+            hostImage.setDockVisibility(Visibility.VISIBLE);
             hostImage.setTransparency(1.0);
         }
 

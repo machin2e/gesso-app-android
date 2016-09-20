@@ -149,25 +149,30 @@ public abstract class Image<T extends Feature> {
         return shapeGroup;
     }
 
-    public <T extends Feature> ShapeGroup getShapes(Class<?>... types) {
-        return getShapes().filterType(types);
+    //    public <T extends Feature> ShapeGroup getShapes(Class<?>... featureTypes) {
+    public <T extends Feature> ShapeGroup getShapes(Class<? extends Feature>... featureTypes) {
+        return getShapes().filterType(featureTypes);
+    }
+
+    public <T extends Feature> ShapeGroup getShapes(List<T> features) {
+        return getShapes().filterFeature(features);
     }
 
     /**
      * Removes elements <em>that do not match</em> the regular expressions defined in
      * {@code labels}.
      *
-     * @param labels The list of {@code Shape} objects matching the regular expressions list.
+     * @param labelPatterns The list of {@code Shape} objects matching the regular expressions list.
      * @return A list of {@code Shape} objects.
      */
-    public ShapeGroup getShapes(String... labels) {
+    public ShapeGroup getShapes(String... labelPatterns) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.shapes.size(); i++) {
-            for (int j = 0; j < labels.length; j++) {
+            for (int j = 0; j < labelPatterns.length; j++) {
 
-                Pattern pattern = Pattern.compile(labels[j]);
+                Pattern pattern = Pattern.compile(labelPatterns[j]);
                 Matcher matcher = pattern.matcher(this.shapes.get(i).getLabel());
 
                 boolean isMatch = matcher.matches();

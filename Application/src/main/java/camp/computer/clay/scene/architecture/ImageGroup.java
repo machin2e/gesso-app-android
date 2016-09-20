@@ -168,6 +168,16 @@ public class ImageGroup {
         return positions;
     }
 
+    public ShapeGroup getShapes() {
+        ShapeGroup shapeGroup = new ShapeGroup();
+
+        for (int i = 0; i < this.images.size(); i++) {
+            shapeGroup.add(this.images.get(i).getShapes());
+        }
+
+        return shapeGroup;
+    }
+
     public Point getCenterPoint() {
         return Geometry.calculateCenterPosition(getCoordinates());
     }
