@@ -18,10 +18,10 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import camp.computer.clay.application.Application;
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.old_model.Action;
-import camp.computer.clay.system.old_model.Device;
+import camp.computer.clay.system.old_model.Host;
 import camp.computer.clay.system.old_model.Event;
 import camp.computer.clay.system.old_model.Script;
 import camp.computer.clay.system.old_model.State;
@@ -60,7 +60,7 @@ public class SQLiteStoreHost {
             uuid = UUID.fromString("99ff8f6d-a0e7-4b6e-8033-ee3e0dc9a78e");
             if (!getClay().getCache().hasScript(uuid)) {
                 Log.v("Clay_Behavior_Repo", "\"message\" behavior not found in the repository. Adding it.");
-                generateBehaviorScript(uuid, "message", "regex", "Patch Other \"hello\"");
+                generateBehaviorScript(uuid, "message", "regex", "Extension Other \"hello\"");
             }
 
             // tone
@@ -128,10 +128,10 @@ public class SQLiteStoreHost {
 
     /* Tables */
 
-    private static final String DEVICE_TABLE_NAME          = "Patch";
+    private static final String DEVICE_TABLE_NAME          = "Extension";
     private static final String TIMELINE_TABLE_NAME        = "Timeline";
     private static final String EVENT_TABLE_NAME           = "Event";
-    private static final String ACTION_TABLE_NAME          = "Action";
+    private static final String ACTION_TABLE_NAME          = "Event";
     private static final String SCRIPT_TABLE_NAME          = "Script";
     private static final String STATE_TABLE_NAME           = "State";
 
@@ -197,7 +197,7 @@ public class SQLiteStoreHost {
         public static final String COLUMN_NAME_UUID          = "uuid";
         public static final String COLUMN_NAME_TAG           = "tag"; // Used by interpretter on devices
         public static final String COLUMN_NAME_STATE_PATTERN = "statePattern"; // Regular expression to validate state encoding
-        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize State for a (Event, Action) pair
+        public static final String COLUMN_NAME_DEFAULT_STATE = "defaultState"; // Used to initialize State for a (Event, Event) pair
 
         public static final String COLUMN_NAME_TIME_CREATED  = "timeCreated";
         public static final String COLUMN_NAME_HIDDEN        = "hidden";
@@ -384,10 +384,10 @@ public class SQLiteStoreHost {
 
             String DB_PATH;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                DB_PATH = Application.getContext().getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
+                DB_PATH = Launcher.getContext().getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
             }
             else {
-                DB_PATH = Application.getContext().getFilesDir().getPath() + Application.getContext().getPackageName() + "/databases/";
+                DB_PATH = Launcher.getContext().getFilesDir().getPath() + Launcher.getContext().getPackageName() + "/databases/";
             }
 
             Log.v("Content_Manager", "Trying to write...");
@@ -477,7 +477,7 @@ public class SQLiteStoreHost {
         // * Query for behavior state associated with the event.
 
         // - Get root behavior UUIDs, unique only (from table of tree edges)
-        // - For each root, get actions with parent with root UUID, addPatch to parent's list of
+        // - For each root, getEvent actions with parent with root UUID, addExtension to parent's list of
         //   children, to reconstruct the graph. Do this recursively until the query for
         //   children returns no results (leaf nodes).
         // - For children, query for the associated behavior script.
@@ -513,7 +513,7 @@ public class SQLiteStoreHost {
             // if any, in the correct order.
             String sortOrder = ActionEntry.COLUMN_NAME_SIBLING_INDEX + " ASC";
 
-            // Only get the actions with no parent (the root actions).
+            // Only getEvent the actions with no parent (the root actions).
             String selection = null;
             String[] selectionArgs = null; // { timeline.getUuid().toString() };
             if (parentAction == null) {
@@ -567,7 +567,7 @@ public class SQLiteStoreHost {
                 // Recursive call to reconstruct the action's children
                 Log.v("flem", "action.getUuid(): " + action.getUuid());
                 if (isParentAction(action.getUuid())) {
-                    // Recursive query to get the children of the action just created.
+                    // Recursive query to getEvent the children of the action just created.
                     queryActions(action);
                 } else {
                     // Basic action, so set script.
@@ -579,7 +579,7 @@ public class SQLiteStoreHost {
                 // TODO: action.setScript
 
                 // Add the action to Clay
-                // TODO: Only add root actions to Clay? Maybe only those should be available for selection.
+                // TODO: Only addEvent root actions to Clay? Maybe only those should be available for selection.
                 getClay().getCache().cache(action);
                 Log.v("Content_Manager", "> added beahvior: " + action.getUuid());
 
@@ -588,9 +588,9 @@ public class SQLiteStoreHost {
             }
         }
 
-        // TODO: queryScripts () // Get all actions, for use to create the first actions in the database.
+        // TODO: queryScripts () // Get all actions, for use to create the getFirstEvent actions in the database.
 
-        /** Action Script */
+        /** Event Script */
 
         public void saveScript(Script script) {
 
@@ -733,7 +733,7 @@ public class SQLiteStoreHost {
 //            return null;
 //        }
 
-        /** Action States */
+        /** Event States */
 
         public void saveState(Event event, State state) {
 
@@ -807,16 +807,16 @@ public class SQLiteStoreHost {
 
             // Get the behavior and behavior script from the cache. Here, these are assumed to
             // be available in the cache, since it is assumed they are loaded and cached when
-            // Clay is first opened.
+            // Clay is getFirstEvent opened.
             Script behaviorScript = getClay ().getCache ().getScript(UUID.fromString(behaviorScriptUuidString));
-            Action behavior = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
+            Event behavior = getClay().getCache().getEvent(UUID.fromString(behaviorUuidString));
             behavior.setScript(behaviorScript);
 
             // Reconstruct behavior state object
 //            Log.v ("Query_Behavior_State", "state: " + state);
 //            Log.v("Query_Behavior_State", "uuid: " + UUID.fromString(uuidString));
             State behaviorState = new State(UUID.fromString (uuidString), state);
-            event.setBehaviorState(behaviorState); // event.getAction ().setState (behaviorState);
+            event.setBehaviorState(behaviorState); // event.getEvent ().setState (behaviorState);
 //            Log.v("Query_Behavior_State", "behavior.state: " + behavior.getState().getState());
 //            Log.v("Query_Behavior_State", "behavior.state.uuid: " + behavior.getState().getUuid());
 //            Log.v("Query_Behavior_State", "---");
@@ -830,7 +830,7 @@ public class SQLiteStoreHost {
 
         public void queryState(Event event) {
 
-//            Action behavior = event.getAction();
+//            Event behavior = event.getEvent();
 
             Log.v("Content_Manager", "queryState");
             SQLiteDatabase db = SQLiteStoreHost.this.db.getReadableDatabase();
@@ -877,7 +877,7 @@ public class SQLiteStoreHost {
 
                 // Get the behavior and behavior script from the cache. Here, these are assumed to
                 // be available in the cache, since it is assumed they are loaded and cached when
-                // Clay is first opened.
+                // Clay is getFirstEvent opened.
 //            Script behaviorScript = getClay().getCache().getScript(UUID.fromString(behaviorScriptUuidString));
 //            Log.v ("Content_Manager", "> behavior: " + behavior.getUuid());
 //            behavior.setScript(behaviorScript);
@@ -892,24 +892,24 @@ public class SQLiteStoreHost {
 
         /** Units */
 
-        public void insertDevice(Device device) {
+        public void insertDevice(Host host) {
 
             // Gets the data repository in write mode
             SQLiteDatabase db = SQLiteStoreHost.this.db.getWritableDatabase();
 
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(DeviceEntry.COLUMN_NAME_UUID, device.getUuid().toString());
-            values.put(DeviceEntry.COLUMN_NAME_TIMELINE_UUID, device.getTimeline().getUuid().toString());
+            values.put(DeviceEntry.COLUMN_NAME_UUID, host.getUuid().toString());
+            values.put(DeviceEntry.COLUMN_NAME_TIMELINE_UUID, host.getTimeline().getUuid().toString());
 
             // Insert the new row, returning the primary key value of the new row
             long entryId = db.insert(DeviceEntry.TABLE_NAME, null, values);
 
-            Log.v("Content_Manager", "Inserted device into database (_id: " + entryId + ")");
+            Log.v("Content_Manager", "Inserted host into database (_id: " + entryId + ")");
 
         }
 
-        public Device queryUnit (UUID uuid) {
+        public Host queryUnit (UUID uuid) {
             Log.v("Content_Manager", "queryUnit");
             SQLiteDatabase db = SQLiteStoreHost.this.db.getReadableDatabase();
 
@@ -947,13 +947,13 @@ public class SQLiteStoreHost {
                 String timelineUuidString = cursor.getString(cursor.getColumnIndexOrThrow(DeviceEntry.COLUMN_NAME_TIMELINE_UUID));
 
                 // Create the behavior
-                Device device = new Device(getClay(), UUID.fromString(uuidString));
-                device.getTimeline().setUuid(UUID.fromString(timelineUuidString));
+                Host host = new Host(getClay(), UUID.fromString(uuidString));
+                host.getTimeline().setUuid(UUID.fromString(timelineUuidString));
 
-                // Reconstruct the device's timeline
-                queryTimeline (device, UUID.fromString(timelineUuidString));
+                // Reconstruct the host's timeline
+                queryTimeline (host, UUID.fromString(timelineUuidString));
 
-                return device;
+                return host;
             }
 
             return null;
@@ -988,7 +988,7 @@ public class SQLiteStoreHost {
 
         }
 
-        public Timeline queryTimeline (Device device, UUID timelineUuid) {
+        public Timeline queryTimeline (Host host, UUID timelineUuid) {
 
             Log.v("Content_Manager", "queryTimeline");
             SQLiteDatabase db = SQLiteStoreHost.this.db.getReadableDatabase();
@@ -1030,10 +1030,10 @@ public class SQLiteStoreHost {
             Timeline timeline = new Timeline (UUID.fromString(uuidString));
 
             // Populate the timeline with its events
-            queryEvents (device, timeline);
+            queryEvents (host, timeline);
 
-            // Assign the timeline to the device
-            device.setTimeline(timeline);
+            // Assign the timeline to the host
+            host.setTimeline(timeline);
 
             return timeline;
         }
@@ -1112,7 +1112,7 @@ public class SQLiteStoreHost {
 
             Action scriptAction = null;
 
-            Log.v("Content_Manager", "getAction");
+            Log.v("Content_Manager", "getEvent");
 
             // Get connection to database
             SQLiteDatabase db = SQLiteStoreHost.this.db.getReadableDatabase();
@@ -1132,7 +1132,7 @@ public class SQLiteStoreHost {
             // Specify how to sort the retrieved data
             String sortOrder = null;
 
-            // TODO: if parentUuid is null, then compare the tag, and get the UUID if exists, for reuse
+            // TODO: if parentUuid is null, then compare the tag, and getEvent the UUID if exists, for reuse
 
             String selection = null;
             String[] selectionArgs = null;
@@ -1214,14 +1214,14 @@ public class SQLiteStoreHost {
 //                String sortOrder = ActionEntry.COLUMN_NAME_PARENT_UUID + " ASC, "
 //                        + ActionEntry.COLUMN_NAME_SIBLING_INDEX + " ASC";
 
-                // TODO: if parentUuid is null, then compare the tag, and get the UUID if exists, for reuse
+                // TODO: if parentUuid is null, then compare the tag, and getEvent the UUID if exists, for reuse
 
                 String selection = null;
                 String[] selectionArgs = null;
 //                if (parentUuid == null) {
-//                    Log.v("New_Behavior", "adding new behavior with tag " + behavior.getTag());
+//                    Log.v("New_Behavior", "adding new behavior with tag " + behavior.getLabel());
 //                    selection = ActionEntry.COLUMN_NAME_TAG + " = ?";
-//                    selectionArgs = new String[]{behavior.getTag()};
+//                    selectionArgs = new String[]{behavior.getLabel()};
 //                } else {
                     selection = ActionEntry.COLUMN_NAME_UUID + " LIKE ? AND "
                             + ActionEntry.COLUMN_NAME_SIBLING_INDEX + " = ?";
@@ -1275,12 +1275,12 @@ public class SQLiteStoreHost {
                 for (Action childAction : children) {
                     parentAction.addAction(childAction);
                 }
-//                parentAction.addAction(foundUnit.getTimeline().getEvents().get(0).getAction());
-//                parentAction.addAction(foundUnit.getTimeline().getEvents().get(1).getAction());
+//                parentAction.addAction(foundUnit.getTimeline().getEvents().getEvent(0).getEvent());
+//                parentAction.addAction(foundUnit.getTimeline().getEvents().getEvent(1).getEvent());
 
 //                storeAction(parentAction);
 //
-//                getClay().getCache().getActions().add(parentAction);
+//                getClay().getCache().getActions().addEvent(parentAction);
             }
 
             return parentAction;
@@ -1313,15 +1313,15 @@ public class SQLiteStoreHost {
             // Specify how to sort the retrieved data
             String sortOrder = null;
 
-            // TODO: if parentUuid is null, then compare the tag, and get the UUID if exists, for reuse
+            // TODO: if parentUuid is null, then compare the tag, and getEvent the UUID if exists, for reuse
 
             String selection = null;
             String[] selectionArgs = null;
             // TODO!!!!!!!!!!!! Check if action exists (by structure, varies for leaf/basic, intermediate, root)
 //            if (parentUuid == null) {
-//                Log.v ("New_Behavior", "adding new action with tag " + action.getTag());
+//                Log.v ("New_Behavior", "adding new action with tag " + action.getLabel());
 //                selection = ActionEntry.COLUMN_NAME_TAG + " = ?";
-//                selectionArgs = new String[] { action.getTag() };
+//                selectionArgs = new String[] { action.getLabel() };
 //            } else {
                 selection = ActionEntry.COLUMN_NAME_UUID + " LIKE ? AND "
                         + ActionEntry.COLUMN_NAME_PARENT_UUID + " LIKE ?";
@@ -1441,10 +1441,10 @@ public class SQLiteStoreHost {
         /**
          * Called by queryTimeline after it reconstructs a timeline.
          *
-         * @param device
+         * @param host
          * @param timeline
          */
-        public void queryEvents (Device device, Timeline timeline) {
+        public void queryEvents (Host host, Timeline timeline) {
 
             Log.v("Content_Manager", "queryEvents");
             SQLiteDatabase db = SQLiteStoreHost.this.db.getReadableDatabase();
@@ -1490,10 +1490,10 @@ public class SQLiteStoreHost {
                 // Reconstruct the event object
                 Event event = new Event (UUID.fromString (uuidString), timeline);
 
-                // Get the Action and Script objects. These are assumed to be
+                // Get the Event and Script objects. These are assumed to be
                 // available in the cache at this point, since they should be loaded when Clay
-                // is first oepned.
-                //Action action = getClay ().getAction (UUID.fromString (behaviorUuidString));
+                // is getFirstEvent oepned.
+                //Event action = getClay ().getEvent (UUID.fromString (behaviorUuidString));
 
                 // Reconstruct the associated action
                 Action action = getClay().getCache().getAction(UUID.fromString(actionUuidString));
@@ -1510,7 +1510,7 @@ public class SQLiteStoreHost {
                     // associated with these. Note that at this point, the action is assumed to
                     // be present in the cache. This should be the case since all actions are
                     // cached when the app starts.
-                    Action action = getClay().getCache().getAction(UUID.fromString(behaviorUuidString));
+                    Event action = getClay().getCache().getEvent(UUID.fromString(behaviorUuidString));
                     event.setAction (action);
                 } else {
                     // Reconstruct leaf node.
@@ -1661,16 +1661,16 @@ public class SQLiteStoreHost {
     public SQLiteStoreHost(Clay clay, String type) {
         this.clay = clay;
         this.type = type;
-        this.db = new SQLiteDatabaseHelper(Application.getContext());
+        this.db = new SQLiteDatabaseHelper(Launcher.getContext());
     }
 
     public Clay getClay () {
-        return Application.getDisplay().getClay();
+        return Launcher.getLauncherView().getClay();
     }
 
     /**
      * Store the action. Recursively stores the action tree graph by performing a breadth
-     * first traversal.
+     * getFirstEvent traversal.
      * @param action The action to store.
      */
     public void storeAction(Action action) {
@@ -1700,7 +1700,7 @@ public class SQLiteStoreHost {
 
         Log.v ("Content_Manager", "storeActionTree");
 
-        // Breadth first storage, to ensure that a relation to a action's children can be
+        // Breadth getFirstEvent storage, to ensure that a relation to a action's children can be
         // created. The parent must be in the database before children can store a relation to
         // their parent.
 
@@ -1712,7 +1712,7 @@ public class SQLiteStoreHost {
         // TODO: ...before saving a action tree, not just the action node UUID.
         if (!db.queryActionExists(action, parentAction)) {
 
-            // TODO: Update the basic action that has a script, addPatch a parent! Yes, the action can have both a parent and a script! (leaf node!)
+            // TODO: Update the basic action that has a script, addExtension a parent! Yes, the action can have both a parent and a script! (leaf node!)
 
             db.saveAction(action, parentAction);
         } else {
@@ -1739,7 +1739,7 @@ public class SQLiteStoreHost {
 
     public void restoreAction(UUID uuid) {
         Log.v("Content_Manager", "restoreAction");
-//        Action behavior = db.queryBehavior(uuid);
+//        Event behavior = db.queryBehavior(uuid);
 //        if (behavior == null) {
 //            callback.onFailure();
 //        } else {
@@ -1752,8 +1752,8 @@ public class SQLiteStoreHost {
         db.saveTimeline(timeline);
     }
 
-    public Timeline restoreTimeline (Device device, UUID uuid) {
-        Timeline timeline = db.queryTimeline(device, uuid);
+    public Timeline restoreTimeline (Host host, UUID uuid) {
+        Timeline timeline = db.queryTimeline(host, uuid);
         return timeline;
     }
 
@@ -1803,13 +1803,13 @@ public class SQLiteStoreHost {
         db.queryState(event);
     }
 
-    public void storeDevice(Device device) {
-        db.insertDevice(device);
+    public void storeDevice(Host host) {
+        db.insertDevice(host);
     }
 
-    public Device restoreDevice(UUID uuid) {
-        Device device = db.queryUnit(uuid);
-        return device;
+    public Host restoreDevice(UUID uuid) {
+        Host host = db.queryUnit(uuid);
+        return host;
     }
 
     public Action getActionComposition(ArrayList<Action> children) {

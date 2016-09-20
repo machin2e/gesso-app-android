@@ -4,15 +4,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.interaction.*;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.scene.architecture.Scene;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.architecture.Shape;
 
+/**
+ * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
+ * based on the actions recognized on one of the {@code Host} objects associated with the
+ * {@code Actor}.
+ */
 public class Actor { // Controller
 
     private Camera camera = null;
 
-    // PatternSet (Smart querying interface)
-    public List<ActionSequence> actionSequences = new LinkedList<>();
+    // Action (Smart querying interface)
+    public List<Action> actions = new LinkedList<>();
 
     public Actor() {
         setup();
@@ -24,11 +32,16 @@ public class Actor { // Controller
         setCamera(camera);
     }
 
+    /**
+     * Sets the {@code Camera} that defines the {@code Actor}'s viewing area onto the {@code Space}.
+     *
+     * @param camera The {@code Camera} to use to define the viewing area onto the {@code Space}.
+     */
     public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
-    public boolean hasView() {
+    public boolean hasCamera() {
         return camera != null;
     }
 
@@ -37,13 +50,13 @@ public class Actor { // Controller
     }
 
     /**
-     * Conveninece function.
+     * Convenience method.
      *
      * @return
      */
-    public Scene getScene() {
+    public Space getSpace() {
         if (camera != null) {
-            return camera.getScene();
+            return camera.getSpace();
         }
         return null;
     }
@@ -53,82 +66,121 @@ public class Actor { // Controller
      *
      * @return The most recent interaction.
      */
-    private ActionSequence getPattern() {
-        if (actionSequences.size() > 0) {
-            return actionSequences.get(actionSequences.size() - 1);
+    private Action getProcess() {
+        if (actions.size() > 0) {
+            return actions.get(actions.size() - 1);
         } else {
             return null;
         }
     }
 
-    public void onAction(Action action) {
+    public void processAction(Event event) { // TODO: Rename to processAction()
 
-        action.setActor(this);
+        event.setActor(this);
 
-        switch (action.getType()) {
+        switch (event.getType()) {
 
-            case TOUCH: {
+            case SELECT: {
 
                 // Having an idea is just accumulating intention. It's a suggestion from your existential
                 // controller.
 
-                // Start a new actionSequence
-                ActionSequence actionSequence = new ActionSequence();
-                actionSequences.add(actionSequence);
+                // Start a new action
+                Action action = new Action();
+                actions.add(action);
 
-                // Add action to actionSequence
-                actionSequence.add(action);
+                // Add event to action
+                action.addEvent(event);
 
-                // Record actionSequences on timeline
-                // TODO: Cache and store the processAction actionSequences before deleting them completely! Do it in
+                // Record actions on timeline
+                // TODO: Cache and store the processAction actions before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
-                if (actionSequences.size() > 3) {
-                    actionSequences.remove(0);
+                if (actions.size() > 3) {
+                    actions.remove(0);
                 }
 
-                // Process the action
-                getCamera().getScene().onTouchListener(action);
+                // Set the target image
+                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                event.setTargetImage(targetImage);
+
+                // Set the target shape
+                Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
+                event.setTargetShape(targetShape);
+
+                // Action the event
+                event.getTargetImage().processAction(action);
+
+                //getCamera().getSpace().onTouchListener(event);
 
                 break;
             }
 
             case MOVE: {
 
-                ActionSequence actionSequence = getPattern();
-                actionSequence.add(action);
+                Action action = getProcess();
+                action.addEvent(event);
 
                 // Current
-                action.isPointing[action.pointerIndex] = true;
+                event.isPointing[event.pointerIndex] = true;
 
                 // Classify/Callback
-                if (actionSequence.getDragDistance() > Action.MINIMUM_DRAG_DISTANCE) {
-                    action.setType(Action.Type.MOVE);
-                    getCamera().getScene().onMoveListener(action);
+                if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
+
+                    // Set the target image
+                    Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                    event.setTargetImage(targetImage);
+
+                    // Set the target shape
+                    Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
+                    event.setTargetShape(targetShape);
+
+//                    // <HACK>
+//                    // TODO: Update handlers and Delete!
+//                    //Action action = event.getAction();
+//                    if (action.size() > 1) {
+//                        event.setTargetImage(action.getFirstEvent().getTargetImage());
+//                        event.setTargetShape(action.getFirstEvent().getTargetShape());
+//                    }
+//                    // </HACK>
+
+                    //event.getTargetImage().processAction(action);
+                    action.getFirstEvent().getTargetImage().processAction(action);
                 }
 
                 break;
             }
 
-            case RELEASE: {
+            case UNSELECT: {
 
-                ActionSequence actionSequence = getPattern();
-                actionSequence.add(action);
+                Action action = getProcess();
+                action.addEvent(event);
 
                 // Current
-                action.isPointing[action.pointerIndex] = false;
+                event.isPointing[event.pointerIndex] = false;
 
-                // Stop listening for a hold action
-                actionSequence.timerHandler.removeCallbacks(actionSequence.timerRunnable);
+                // Stop listening for a hold event
+                action.timerHandler.removeCallbacks(action.timerRunnable);
 
-//                if (actionSequence.getDuration() < Action.MAXIMUM_TAP_DURATION) {
-//                    action.setType(Action.Type.TOUCH);
-//                    getCamera().getScene().onTapListener(action);
+//                if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
+//                    event.setType(Event.Type.SELECT);
+//                    getCamera().getSpace().onTapListener(event);
 //                } else {
-//                    action.setType(Action.Type.RELEASE);
-//                    getCamera().getScene().onReleaseListener(action);
+//                    event.setType(Event.Type.UNSELECT);
+//                    getCamera().getSpace().onReleaseListener(event);
 //                }
 
-                getCamera().getScene().onReleaseListener(action);
+                // Set the target image
+                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                event.setTargetImage(targetImage);
+
+                // Set the target shape
+                Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
+                event.setTargetShape(targetShape);
+
+                //event.getTargetImage().processAction(action);
+                action.getFirstEvent().getTargetImage().processAction(action);
+
+//                getCamera().getSpace().onReleaseListener(event);
 
                 break;
             }

@@ -1,140 +1,238 @@
 package camp.computer.clay.model.interaction;
 
-import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.scene.architecture.Figure;
-import camp.computer.clay.scene.util.Time;
-import camp.computer.clay.scene.util.geometry.Point;
+import android.os.Handler;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
+
+/**
+ * An Action is a sequence of one or more events.
+ */
 public class Action {
 
-    // TODO: Rename "Type" to "Stage" or "Phase". Type should be "Touch", "Sound", "Motion", etc.
-    // TODO: Increase MAXIMUM_POINT_COUNT to 10
-    // TODO: Associate with broader context (e.g., sensor data, including 3D rotation, brightness.
+    // TODO: Entity this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
+    // TODO: Entity voice thisAction in the same way. Generify to Action<T> or subclass.
+    // TODO: (?) Entity data transmissions as events in the same way?
 
-    public enum Type {
+    private List<Event> events = new LinkedList<>();
 
-        NONE,
-        TOUCH, // Consider renaming to CONNECT or ATTACH or ENGAGE
-        HOLD,
-        MOVE,
-        RELEASE; // Consider renaming to DISCONNECT or DETACH or DISENGAGE
+    // TODO: Classify these! Every time an Event is added!
+    // TODO: (cont'd) Note can have multiple sequences per finger in an thisAction,
+    // TODO: (cont'd) so consider remodeling as per-finger thisAction and treat each finger
+    // TODO: (cont'd) as an individual actor.
+    private boolean[] isHolding = new boolean[Event.MAXIMUM_POINT_COUNT];
+    private boolean[] isDragging = new boolean[Event.MAXIMUM_POINT_COUNT];
+    private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
+    // TODO: private double[] touchPressure = new double[Event.MAXIMUM_POINT_COUNT]; // Reference: http://stackoverflow.com/questions/17540058/android-detect-touch-pressure-on-capacitive-touch-screen
 
-        Type() {
+    public double offsetX = 0;
+    public double offsetY = 0;
+
+    public Handler timerHandler = new Handler();
+
+    Action thisAction = this;
+
+    public Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+            int pointerIndex = 0;
+
+            if (getFirstEvent().isPointing[pointerIndex]) {
+                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
+
+                    // <HACK>
+                    // TODO: Make this less ugly! It's so ugly.
+                    thisAction.getFirstEvent().setType(Event.Type.HOLD);
+//                    getFirstEvent().getActor().getCamera().getSpace().onHoldListener(thisAction.getFirstEvent());
+
+                    Event event = thisAction.getFirstEvent();
+                    Image targetImage = getFirstEvent().getActor().getSpace().getImageByPosition(event.getPosition());
+                    event.setTargetImage(targetImage);
+
+                    event.getTargetImage().processAction(thisAction);
+                    // </HACK>
+
+                    thisAction.isHolding[pointerIndex] = true;
+
+                }
+            }
         }
-
-    }
-
-    public static int MAXIMUM_POINT_COUNT = 1;
-
-    public static int MAXIMUM_TAP_DURATION = 200;
-
-    public static int MINIMUM_HOLD_DURATION = 600;
-
-    public static int MINIMUM_DRAG_DISTANCE = 35;
-
-    final public static long DEFAULT_TIMESTAMP = 0L;
-
-    private ActionSequence parentActionSequence = null;
-
-    /**
-     * The points at which actions were performed (e.g., the touch points on a touchscreen).
-     */
-    public Point[] points = new Point[MAXIMUM_POINT_COUNT];
-
-    public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
-
-    private Figure[] targetFigure = new Figure[MAXIMUM_POINT_COUNT];
-
-    private Type type = null;
-
-    private Actor actor = null;
-
-    private long timestamp = DEFAULT_TIMESTAMP;
-
-    public int pointerIndex = -1;
+    };
 
     public Action() {
-        this.timestamp = Time.getCurrentTime();
         setup();
     }
 
     private void setup() {
-        for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
-            points[i] = new Point(0, 0);
-            targetFigure[i] = null;
-            isPointing[i] = false;
+        for (int i = 0; i < Event.MAXIMUM_POINT_COUNT; i++) {
+            isHolding[i] = false;
+            isDragging[i] = false;
+            dragDistance[i] = 0;
         }
     }
 
-    public boolean hasPoints() { // was hasTouches
-        for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
-            if (isPointing[i]) {
-                return true;
+    public void addEvent(Event event) {
+
+        event.setAction(this);
+
+        events.add(event);
+
+        offsetX += event.getPosition().getX();
+        offsetY += event.getPosition().getY();
+
+        if (events.size() == 1) {
+
+            // Start timer to check for hold
+            timerHandler.removeCallbacks(timerRunnable);
+            timerHandler.postDelayed(timerRunnable, Event.MINIMUM_HOLD_DURATION);
+
+        } else if (events.size() > 1) {
+
+            // Calculate drag distance
+            this.dragDistance[event.pointerIndex] = Geometry.calculateDistance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
+
+            if (getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
+                isDragging[event.pointerIndex] = true;
+            }
+
+        }
+    }
+
+    public Event getEvent(int index) {
+        return this.events.get(index);
+    }
+
+    public Event getFirstEvent() {
+        if (events.size() > 0) {
+            return events.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public Event getLastEvent() {
+        if (events.size() > 0) {
+            return events.get(events.size() - 1);
+        } else {
+            return null;
+        }
+    }
+
+    // TODO: Remove this? Or make it complement the updated getTargetImage() which returns the Entity that the process targeted.
+    public Entity getSourceEntity() {
+        if (events.size() > 0) {
+            if (getEvent(0).getTargetShape() != null && getEvent(0).getTargetShape().getEntity() != null) {
+                return getEvent(0).getTargetShape().getEntity();
+            } else {
+                return getEvent(0).getTargetImage().getEntity();
             }
         }
-        return false;
+        return null;
     }
 
-    public boolean hasPattern() {
-        return parentActionSequence != null;
-    }
-
-    public void setPattern(ActionSequence actionSequence) {
-        this.parentActionSequence = actionSequence;
-    }
-
-    public ActionSequence getActionSequence() {
-        return this.parentActionSequence;
-    }
-
-    public void setActor(Actor actor) {
-        this.actor = actor;
-    }
-
-    public Actor getActor() {
-        return this.actor;
-    }
-
-    public Type getType() {
-        return this.type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Point getPosition() {
-        return this.points[0];
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
-    }
-
-    public boolean isPointing(int fingerIndex) { // was isTouching
-        return this.targetFigure[fingerIndex] != null;
-    }
-
-    public void setTarget(int fingerIndex, Figure figure) {
-        this.targetFigure[fingerIndex] = figure;
-    }
-
-    public Figure getTarget(int fingerIndex) {
-        return this.targetFigure[fingerIndex];
-    }
-
-    public boolean isPointing() { // was isTouching
-        return isPointing(0);
-    }
-
-    public void setTarget(Figure figure) {
-        setTarget(0, figure);
-        if (figure != null) {
-            isPointing[0] = true;
+    public Entity getTargetEntity() { // getTargetEntity
+//        Event event = getLastEvent();
+//        if (event != null) {
+//            return event.getTargetImage().getEntity();
+//        }
+//        return null;
+        if (events.size() > 0) {
+            Event lastEvent = getLastEvent();
+            if (lastEvent.getTargetShape() != null && lastEvent.getTargetShape().getEntity() != null) {
+                return lastEvent.getTargetShape().getEntity();
+            } else {
+                return lastEvent.getTargetImage().getEntity();
+            }
         }
+        return null;
     }
 
-    public Figure getTarget() {
-        return getTarget(0);
+    public long getStartTime() {
+        return getFirstEvent().getTimestamp();
     }
+
+    public long getStopTime() {
+        return getLastEvent().getTimestamp();
+    }
+
+    public int getSize() {
+        return this.events.size();
+    }
+
+    public long getDuration() {
+        return getLastEvent().getTimestamp() - getFirstEvent().getTimestamp();
+    }
+
+    public ArrayList<Point> getTouchPath() {
+        ArrayList<Point> touchCoordinates = new ArrayList<>();
+        for (int i = 0; i < events.size(); i++) {
+            touchCoordinates.add(events.get(i).getPosition());
+        }
+        return touchCoordinates;
+    }
+
+    public boolean isHolding() {
+        return isHolding[0];
+    }
+
+    public boolean isDragging() {
+        return isDragging[getLastEvent().pointerIndex];
+    }
+
+    public boolean isTap() {
+        return getDuration() < Event.MAXIMUM_TAP_DURATION;
+    }
+
+    public double getDragDistance() {
+        return dragDistance[getLastEvent().pointerIndex];
+    }
+
+    /**
+     * Returns point-to-point distance between getFirstEvent and getLastEvent action positions.
+     *
+     * @return Point-to-point distance between the getFirstEvent and getLastEvent events' positions.
+     */
+    public double getDistance() {
+        Event firstEvent = getFirstEvent();
+        Event lastEvent = getLastEvent();
+        double distance = Geometry.calculateDistance(
+                firstEvent.getPosition(),
+                lastEvent.getPosition()
+        );
+        return distance;
+    }
+
+    // <CLASSIFIER>
+    // TODO: Implement classifiers (inc. $1).
+    // </CLASSIFIER>
+
+    public boolean startsWith(Event event) {
+        return (getFirstEvent() == event);
+    }
+
+    public boolean stopsWith(Event event) {
+        return (getLastEvent() == event);
+    }
+
+//    // in handlers (e.g., in Images), use this to check for match, if match, then use/get/set on the action's events to get inputs for the routine operation
+//    public boolean matches(Event... events) {
+//        for (int i = 0, j = 0; i < this.events.size(); i++) {
+//
+//            Event event = this.events.get(i);
+//            Event otherEvent = events[i];
+//
+//            if (event != otherEvent && otherEvent !=) {
+//
+//            }
+//        }
+//    }
+
+    // TODO: public boolean matches(Action action) { return false; }
 }

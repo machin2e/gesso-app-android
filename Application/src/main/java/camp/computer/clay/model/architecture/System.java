@@ -1,4 +1,4 @@
 package camp.computer.clay.model.architecture;
 
-public class System extends Construct {
+public class System extends Entity {
 }

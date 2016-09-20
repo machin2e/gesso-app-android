@@ -260,11 +260,11 @@ public class Descriptor {
     public Descriptor get (String key) {
         for (Descriptor descriptor : this.children) {
             if (descriptor.getLabel().equals(key)) {
-                Log.v ("Descriptor", "get '" + key + "'");
+                Log.v ("Descriptor", "getEvent '" + key + "'");
                 return descriptor;
             }
         }
-        Log.v ("Descriptor", "failed to get '" + key + "'");
+        Log.v ("Descriptor", "failed to getEvent '" + key + "'");
         return null;
     }
 

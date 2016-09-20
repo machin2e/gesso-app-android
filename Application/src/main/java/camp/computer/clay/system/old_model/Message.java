@@ -59,12 +59,12 @@ public class Message {
         return this.type;
     }
 
-    // TODO: getSource().getAddress()
+    // TODO: getSourceEntity().getAddress()
     public String getSourceAddress() {
         return this.source;
     }
 
-    // TODO: getFigureByPosition().getAddress()
+    // TODO: getImageByPosition().getAddress()
     public String getTargetAddress() {
         return this.target;
     }

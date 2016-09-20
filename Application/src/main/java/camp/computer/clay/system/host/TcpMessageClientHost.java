@@ -13,7 +13,7 @@ import java.util.Date;
 import camp.computer.clay.system.old_model.Message;
 import camp.computer.clay.system.host.util.CRC16;
 
-public class TcpMessageClientHost {
+public class TCPMessageClientHost {
 
     public static int MESSAGE_SEND_FREQUENCY = 100;
 
@@ -25,9 +25,9 @@ public class TcpMessageClientHost {
 
     private TcpConnectTask tcpConnectTask = null;
 
-    private TcpClientHost mTcpClientHost = null;
+    private TCPClientHost mTCPClientHost = null;
 
-    public TcpMessageClientHost() {
+    public TCPMessageClientHost() {
 
     }
 
@@ -80,10 +80,10 @@ public class TcpMessageClientHost {
     */
 
     public void disconnect () {
-        if (mTcpClientHost != null) {
+        if (mTCPClientHost != null) {
             Log.v ("TCP_Client", "disconnect");
-            mTcpClientHost.stop();
-            mTcpClientHost = null;
+            mTCPClientHost.stop();
+            mTCPClientHost = null;
         }
     }
 
@@ -101,13 +101,13 @@ public class TcpMessageClientHost {
 
             while (runTask) {
 
-                // Update time since last message was sent
+                // Update time since getLastEvent message was sent
                 currentTime = Calendar.getInstance();
                 long timeSinceSend = currentTime.getTime().getTime() - previousSendTime.getTime();
 
                 if (outgoingMessages.size() > 0) {
 //                    Log.v("TCP_Client", "Outgoing message count: " + outgoingMessages.size());
-                    if (mTcpClientHost == null || !mTcpClientHost.isRunning()) {
+                    if (mTCPClientHost == null || !mTCPClientHost.isRunning()) {
 //                        Log.v("TCP_Client", "No client to " + inetAddress + ". Creating.");
                         if (inetAddress != null) {
                             if (tcpConnectTask == null) {
@@ -115,12 +115,12 @@ public class TcpMessageClientHost {
                                 executeAsyncTask(tcpConnectTask, inetAddress);
                             }
                         }
-                    } else if (mTcpClientHost != null && mTcpClientHost.isRunning()) { // Only send messages if the client is connected
+                    } else if (mTCPClientHost != null && mTCPClientHost.isRunning()) { // Only send messages if the client is connected
 //                    if (outgoingMessages.size() > 0) {
                         if (timeSinceSend > MESSAGE_SEND_FREQUENCY) {
                             Message outgoingMessage = outgoingMessages.get(0);
                             Log.v("TCP_Client_Send", "Sending message: " + outgoingMessage.getContent());
-                            if (mTcpClientHost != null) {
+                            if (mTCPClientHost != null) {
 
 
 
@@ -140,7 +140,7 @@ public class TcpMessageClientHost {
 
 
 
-                                boolean result = mTcpClientHost.expose(outmsg);
+                                boolean result = mTCPClientHost.expose(outmsg);
                                 if (result) {
                                     outgoingMessages.remove(0);
                                 }
@@ -161,10 +161,10 @@ public class TcpMessageClientHost {
         }
     }
 
-    private class TcpConnectTask extends AsyncTask<InetAddress, String, TcpClientHost> {
+    private class TcpConnectTask extends AsyncTask<InetAddress, String, TCPClientHost> {
 
         @Override
-        protected TcpClientHost doInBackground(InetAddress... params) {
+        protected TCPClientHost doInBackground(InetAddress... params) {
 
             Log.v("TCP_Client", "Started AsyncTask: TcpConnectTask");
 
@@ -179,11 +179,11 @@ public class TcpMessageClientHost {
             //we create a TCPClient object and
 //                InetAddress remoteServerAddress = remoteServerAddress = InetAddress.getByName(inetAddress);
             int remoteServerPort = 3000;
-            mTcpClientHost = new TcpClientHost(remoteServerAddress, remoteServerPort);
+            mTCPClientHost = new TCPClientHost(remoteServerAddress, remoteServerPort);
 
             // <HACK>
-            // TODO: Put this in an intermediate "DeviceTcpConnection" class, that contains "TcpClientHost" and has methods for registering callbacks?
-            mTcpClientHost.setOnMessageReceived(new TcpClientHost.OnMessageReceived() {
+            // TODO: Put this in an intermediate "DeviceTcpConnection" class, that contains "TCPClientHost" and has methods for registering callbacks?
+            mTCPClientHost.setOnMessageReceived(new TCPClientHost.OnMessageReceived() {
                 @Override
                 //here the messageReceived method is implemented
                 public void messageReceived(String messageString) {
@@ -199,7 +199,7 @@ public class TcpMessageClientHost {
                     message.setDeliveryGuaranteed(true);
 
                     // Enqueue message
-                    incomingMessages.add (message);
+                    incomingMessages.addEvent (message);
                     */
                 }
             });
@@ -208,11 +208,11 @@ public class TcpMessageClientHost {
             // if Disconnects, try reconnecting!
 //                boolean dorun = true;
 //                while (dorun) {
-            mTcpClientHost.run();
+            mTCPClientHost.run();
 //                }
 
             //            Log.v("TCP_Client", "WELL IT STOPPED!");
-            mTcpClientHost = null; // Remove the client connection
+            mTCPClientHost = null; // Remove the client connection
             tcpConnectTask = null;
 
             return null;

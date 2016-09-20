@@ -118,14 +118,14 @@ public class CacheHost {
         if (getClay().hasStore()) {
             Log.v("Content_Manager", "populateCache");
 
-            // Restore behavior scripts and addPatch them to the cache
+            // Restore behavior scripts and addExtension them to the cache
             getClay().getStore().restoreScripts();
             Log.v("Content_Manager", "Restored behavior scripts:");
             for (Script script : getClay().getCache().getScripts()) {
                 Log.v("Content_Manager", "\t" + script.getUuid());
             }
 
-            // Restore actions and addPatch them to the cache
+            // Restore actions and addExtension them to the cache
             getClay().getStore().restoreActions();
             Log.v("Content_Manager", "Restored actions:");
             for (Action action : getClay().getCache().getActions()) {
@@ -140,7 +140,7 @@ public class CacheHost {
         for (int i = 0; i < tabCount; i++) {
             tabString += "\t";
         }
-        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
+        Log.v ("Content_Manager", tabString + "Event (UUID: " + action.getUuid() + ")");
         if (!action.hasScript()) {
             for (Action childAction : action.getActions()) {
                 printBehavior(childAction, tabCount + 1);
@@ -156,7 +156,7 @@ public class CacheHost {
         for (int i = 0; i < tabCount; i++) {
             tabString += "\t";
         }
-        Log.v ("Content_Manager", tabString + "Action (UUID: " + action.getUuid() + ")");
+        Log.v ("Content_Manager", tabString + "Event (UUID: " + action.getUuid() + ")");
         if (!action.hasScript()) {
             for (Action childAction : action.getActions()) {
                 printBehavior(childAction, tabCount + 1);

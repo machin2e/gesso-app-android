@@ -61,7 +61,7 @@ public class Event {
         this.initializeContent();
 //        if (action.getActions().size() == 0) {
 //            String defaultState = action.getScript().getDefaultState();
-//            this.state.add(new State(defaultState));
+//            this.state.addEvent(new State(defaultState));
 //        } else {
 //            this.initializeState(action);
 //        }
@@ -120,7 +120,7 @@ public class Event {
             for (Descriptor child : channelContentDescriptor.getChildren()) {
                 child.put("valid").from("true", "false").set("false");
                 child.put("type");
-                child.put("device").set(this.getTimeline().getDevice().getUuid().toString());
+                child.put("device").set(this.getTimeline().getHost().getUuid().toString());
                     child.put("sourceMachine");
                 child.put("provider");
                 child.put("value");
@@ -141,7 +141,7 @@ public class Event {
         this.initializeContent();
     }
 
-//    public Event (Timeline timeline, Action action, State state) {
+//    public Event (Timeline timeline, Event action, State state) {
 //
 //        this.uuid = UUID.randomUUID();
 //
@@ -157,7 +157,7 @@ public class Event {
     }
 
     public Clay getClay() {
-        return getTimeline().getDevice().getClay();
+        return getTimeline().getHost().getClay();
     }
 
     public Timeline getTimeline() {
