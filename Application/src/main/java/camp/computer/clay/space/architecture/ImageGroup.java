@@ -1,14 +1,14 @@
-package camp.computer.clay.scene.architecture;
+package camp.computer.clay.space.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Feature;
-import camp.computer.clay.scene.util.Visibility;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Rectangle;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.space.util.geometry.Shape;
 
 /**
  * ImageGroup is an interface for managing and manipulating sets of images.
@@ -65,14 +65,29 @@ public class ImageGroup {
      * @param types
      * @return
      */
-    public <T extends Feature> ImageGroup filterType(Class<?>... types) {
+    public <T extends Entity> ImageGroup filterType(Class<?>... types) {
 
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < this.images.size(); i++) {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
-                if (this.images.get(i).getFeature().getClass() == type) {
+                if (this.images.get(i).getEntity().getClass() == type) {
+                    imageGroup.add(this.images.get(i));
+                }
+            }
+        }
+
+        return imageGroup;
+    }
+
+    public <T extends Entity> ImageGroup filterEntity(List<T> entities) {
+
+        ImageGroup imageGroup = new ImageGroup();
+
+        for (int i = 0; i < this.images.size(); i++) {
+            for (int j = 0; j < entities.size(); j++) {
+                if (this.images.get(i).getEntity() != null && this.images.get(i).getEntity() == entities.get(j)) {
                     imageGroup.add(this.images.get(i));
                 }
             }
@@ -150,7 +165,7 @@ public class ImageGroup {
         return images;
     }
 
-    public List<Point> getCoordinates() {
+    public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
@@ -179,11 +194,11 @@ public class ImageGroup {
     }
 
     public Point getCenterPoint() {
-        return Geometry.calculateCenterPosition(getCoordinates());
+        return Geometry.calculateCenterPosition(getPositions());
     }
 
     public Point getCentroidPoint() {
-        return Geometry.calculateCentroidCoordinate(getCoordinates());
+        return Geometry.calculateCentroidCoordinate(getPositions());
     }
 
     public Rectangle getBoundingBox() {
@@ -191,7 +206,7 @@ public class ImageGroup {
     }
 
     public List<Point> getBoundingShape() {
-        return Geometry.computeConvexHull(getCoordinates());
+        return Geometry.computeConvexHull(getPositions());
     }
 
     /**

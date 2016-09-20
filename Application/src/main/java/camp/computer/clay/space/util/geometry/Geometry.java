@@ -1,10 +1,10 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.architecture.Scene;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.Space;
 
 public abstract class Geometry {
 
@@ -420,7 +420,7 @@ public abstract class Geometry {
 
         // Sort pointerCoordinates based on distance from center
         List<T> sortedImages = sortByDistanceToPoint(positions, packingCenter);
-        List<Point> sortedPositions = Scene.getCoordinates(sortedImages);
+        List<Point> sortedPositions = Space.getPositions(sortedImages);
 
         double minSeparationSq = distance * distance;
 

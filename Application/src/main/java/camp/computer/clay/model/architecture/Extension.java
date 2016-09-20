@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * {@code Extension} represents a <em>host extension</em>.
  */
-public class Extension extends Feature {
+public class Extension extends Entity {
 
     // Servo: GND, 3.3V, PWM
     // DC Motor: GND, 5V

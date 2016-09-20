@@ -1,10 +1,10 @@
 package camp.computer.clay.model.interaction;
 
 import camp.computer.clay.model.architecture.Actor;
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.util.Time;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.util.Time;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Shape;
 
 public class Event {
 

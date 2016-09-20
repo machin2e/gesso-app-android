@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import android.graphics.Color;
 
@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.model.architecture.Entity;
 
-public class Rectangle<T extends Feature> extends Shape<T> {
+public class Rectangle<T extends Entity> extends Shape<T> {
 
     private double width = 1.0;
 
     private double height = 1.0;
 
-    public Rectangle(T feature) {
-        this.feature = feature;
+    public Rectangle(T entity) {
+        this.entity = entity;
     }
 
     public Rectangle(double width, double height) {

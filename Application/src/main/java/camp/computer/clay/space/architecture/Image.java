@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.architecture;
+package camp.computer.clay.space.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,17 +6,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.scene.util.Color;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Rectangle;
-import camp.computer.clay.scene.util.geometry.Shape;
-import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.space.util.Color;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.space.util.geometry.Shape;
+import camp.computer.clay.space.util.Visibility;
 
-public abstract class Image<T extends Feature> {
+public abstract class Image<T extends Entity> {
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -30,27 +30,27 @@ public abstract class Image<T extends Feature> {
 
     protected double transparency = targetTransparency;
 
-    protected T feature = null;
+    protected T entity = null;
 
-    protected Scene scene = null;
+    protected Space space = null;
 
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Image(T feature) {
-        this.feature = feature;
+    public Image(T entity) {
+        this.entity = entity;
     }
 
-    public T getFeature() {
-        return this.feature;
+    public T getEntity() {
+        return this.entity;
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public void setSpace(Space space) {
+        this.space = space;
     }
 
-    public Scene getScene() {
-        return this.scene;
+    public Space getSpace() {
+        return this.space;
     }
 
     public Point getPosition() {
@@ -122,10 +122,10 @@ public abstract class Image<T extends Feature> {
         return null;
     }
 
-    public Shape getShape(Feature feature) {
+    public Shape getShape(Entity entity) {
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
-            if (shape.getFeature() == feature) {
+            if (shape.getEntity() == entity) {
                 return shape;
             }
         }
@@ -149,13 +149,13 @@ public abstract class Image<T extends Feature> {
         return shapeGroup;
     }
 
-    //    public <T extends Feature> ShapeGroup getShapes(Class<?>... featureTypes) {
-    public <T extends Feature> ShapeGroup getShapes(Class<? extends Feature>... featureTypes) {
-        return getShapes().filterType(featureTypes);
+    //    public <T extends Entity> ShapeGroup getShapes(Class<?>... entityTypes) {
+    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
+        return getShapes().filterType(entityTypes);
     }
 
-    public <T extends Feature> ShapeGroup getShapes(List<T> features) {
-        return getShapes().filterFeature(features);
+    public <T extends Entity> ShapeGroup getShapes(List<T> entities) {
+        return getShapes().filterEntity(entities);
     }
 
     /**
@@ -247,7 +247,7 @@ public abstract class Image<T extends Feature> {
         return positions;
     }
 
-    // Delete? The above getVertices() should be enough now that Point is refactored! Maybe add getRelativeVertices() if needed.
+    // Delete? The above getVertices() should be enough now that Point is refactored! Maybe addImage getRelativeVertices() if needed.
     public List<Point> getAbsoluteVertices() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {

@@ -1,19 +1,14 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
 
-public class Line<T extends Feature> extends Shape<T> {
+public class Text extends Shape {
     private Point source = new Point(0, 0);
     private Point target = new Point(0, 0);
 
-    public Line () {}
-
-    public Line(T feature) {
-        this.feature = feature;
-    }
+    public Text() {}
 
     @Override
     public List<Point> getVertices() {
@@ -27,12 +22,10 @@ public class Line<T extends Feature> extends Shape<T> {
 
     @Override
     public void draw(Display display) {
-        if (isVisible()) {
-            Display.drawLine(this, display);
-        }
+
     }
 
-    public Line (Point source, Point target) {
+    public Text(Point source, Point target) {
         this.source = source;
         this.target = target;
     }

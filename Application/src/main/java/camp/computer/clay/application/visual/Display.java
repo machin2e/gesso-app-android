@@ -18,19 +18,19 @@ import java.util.List;
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.scene.architecture.Scene;
-import camp.computer.clay.scene.util.Visibility;
-import camp.computer.clay.scene.util.geometry.Circle;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Line;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Polygon;
-import camp.computer.clay.scene.util.geometry.Rectangle;
-import camp.computer.clay.scene.util.geometry.Triangle;
+import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Circle;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Line;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Polygon;
+import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.space.util.geometry.Triangle;
 
 public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
-    // Scene Rendering Context
+    // Space Rendering Context
     private Bitmap canvasBitmap = null;
     private Canvas canvas = null;
     private int canvasWidth;
@@ -38,15 +38,15 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Matrix identityMatrix;
 
-    // Scene DisplayOutput
+    // Space DisplayOutput
     private SurfaceHolder surfaceHolder;
     private DisplayOutput displayOutput;
 
     // Coordinate System (Grid)
     private Point originPosition = new Point();
 
-    // Scene
-    private Scene scene;
+    // Space
+    private Space space;
 
     public Display(Context context) {
         super(context);
@@ -72,7 +72,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         identityMatrix = new Matrix();
 
-        // Center the scene coordinate system
+        // Center the space coordinate system
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
@@ -138,7 +138,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     protected void doDraw(Canvas canvas) {
         setCanvas(canvas);
 
-        if (this.scene == null || this.canvas == null) {
+        if (this.space == null || this.canvas == null) {
             return;
         }
 
@@ -146,33 +146,33 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // Adjust the perspective
         canvas.save();
         canvas.translate(
-//                (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(),
-//                (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX()
-                (float) originPosition.getX() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getX(),
-                (float) originPosition.getY() + (float) scene.getFeature().getActor(0).getCamera().getPosition().getY()
+//                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(),
+//                (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX()
+                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX(),
+                (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY()
         );
         // this.canvas.rotate((float) ApplicationView.getLauncherView().getOrientationInput().getRotationZ());
         canvas.scale(
-                (float) scene.getFeature().getActor(0).getCamera().getScale(),
-                (float) scene.getFeature().getActor(0).getCamera().getScale()
+                (float) space.getEntity().getActor(0).getCamera().getScale(),
+                (float) space.getEntity().getActor(0).getCamera().getScale()
         );
         // </PERSPECTIVE>
 
         // TODO: Get Model
-        // TODO: Get Model's selected Scene
+        // TODO: Get Model's selected Space
 
         // Draw the background
         canvas.drawColor(Color.WHITE);
 
-        // Scene
+        // Space
         canvas.save();
-        getScene().draw(this);
+        getSpace().draw(this);
         canvas.restore();
 
         canvas.restore();
 
         // Annotation
-        if (scene.goalVisibility == Visibility.VISIBLE) {
+        if (space.goalVisibility == Visibility.VISIBLE) {
 
             canvas.save();
 
@@ -243,7 +243,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
      */
     public void update() {
 
-        if (scene == null) {
+        if (space == null) {
             return;
         }
 
@@ -256,7 +256,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 synchronized (getHolder()) {
 
                     // Update
-                    scene.update();
+                    space.update();
 
                     // Draw
                     doDraw(canvas);
@@ -285,8 +285,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return this.paint;
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public void setSpace(Space space) {
+        this.space = space;
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
@@ -294,16 +294,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-        scene.getFeature().getActor(0).getCamera().setWidth(screenWidth);
-        scene.getFeature().getActor(0).getCamera().setHeight(screenHeight);
+        space.getEntity().getActor(0).getCamera().setWidth(screenWidth);
+        space.getEntity().getActor(0).getCamera().setHeight(screenHeight);
     }
 
-    public Scene getScene() {
-        return this.scene;
+    public Space getSpace() {
+        return this.space;
     }
 
     //----------------------------------------------------------------------------------------------
-    // Event Feature
+    // Event Entity
     //----------------------------------------------------------------------------------------------
 
     @Override
@@ -325,14 +325,14 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
         int pointerCount = motionEvent.getPointerCount();
 
-        if (this.scene == null) {
+        if (this.space == null) {
             return false;
         }
 
         // Log.v("InteractionHistory", "Started pointerCoordinates composition.");
 
         // Get active actor
-        Actor actor = scene.getFeature().getActor(0);
+        Actor actor = space.getEntity().getActor(0);
 
         // Create pointerCoordinates event
         Event event = new Event();

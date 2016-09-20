@@ -1,17 +1,17 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.model.architecture.Entity;
 
-public class Polygon<T extends Feature> extends Shape<T> {
+public class Polygon<T extends Entity> extends Shape<T> {
 
     private List<Point> vertices = new ArrayList<>();
 
-    public Polygon(T feature) {
-        this.feature = feature;
+    public Polygon(T entity) {
+        this.entity = entity;
     }
 
     public Polygon(Point position, List<Point> vertices) {

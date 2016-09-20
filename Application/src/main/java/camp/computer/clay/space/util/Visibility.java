@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.util;
+package camp.computer.clay.space.util;
 
 public enum Visibility {
 

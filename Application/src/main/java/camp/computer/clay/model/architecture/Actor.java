@@ -6,9 +6,9 @@ import java.util.List;
 import camp.computer.clay.model.interaction.*;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.architecture.Scene;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.util.geometry.Shape;
 
 /**
  * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
@@ -33,9 +33,9 @@ public class Actor { // Controller
     }
 
     /**
-     * Sets the {@code Camera} that defines the {@code Actor}'s viewing area onto the {@code Scene}.
+     * Sets the {@code Camera} that defines the {@code Actor}'s viewing area onto the {@code Space}.
      *
-     * @param camera The {@code Camera} to use to define the viewing area onto the {@code Scene}.
+     * @param camera The {@code Camera} to use to define the viewing area onto the {@code Space}.
      */
     public void setCamera(Camera camera) {
         this.camera = camera;
@@ -54,9 +54,9 @@ public class Actor { // Controller
      *
      * @return
      */
-    public Scene getScene() {
+    public Space getSpace() {
         if (camera != null) {
-            return camera.getScene();
+            return camera.getSpace();
         }
         return null;
     }
@@ -100,7 +100,7 @@ public class Actor { // Controller
                 }
 
                 // Set the target image
-                Image targetImage = getCamera().getScene().getImageByPosition(event.getPosition());
+                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -110,7 +110,7 @@ public class Actor { // Controller
                 // Action the event
                 event.getTargetImage().processAction(action);
 
-                //getCamera().getScene().onTouchListener(event);
+                //getCamera().getSpace().onTouchListener(event);
 
                 break;
             }
@@ -127,7 +127,7 @@ public class Actor { // Controller
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
-                    Image targetImage = getCamera().getScene().getImageByPosition(event.getPosition());
+                    Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     // Set the target shape
@@ -137,7 +137,7 @@ public class Actor { // Controller
 //                    // <HACK>
 //                    // TODO: Update handlers and Delete!
 //                    //Action action = event.getAction();
-//                    if (action.getSize() > 1) {
+//                    if (action.size() > 1) {
 //                        event.setTargetImage(action.getFirstEvent().getTargetImage());
 //                        event.setTargetShape(action.getFirstEvent().getTargetShape());
 //                    }
@@ -163,14 +163,14 @@ public class Actor { // Controller
 
 //                if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
 //                    event.setType(Event.Type.SELECT);
-//                    getCamera().getScene().onTapListener(event);
+//                    getCamera().getSpace().onTapListener(event);
 //                } else {
 //                    event.setType(Event.Type.UNSELECT);
-//                    getCamera().getScene().onReleaseListener(event);
+//                    getCamera().getSpace().onReleaseListener(event);
 //                }
 
                 // Set the target image
-                Image targetImage = getCamera().getScene().getImageByPosition(event.getPosition());
+                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -180,7 +180,7 @@ public class Actor { // Controller
                 //event.getTargetImage().processAction(action);
                 action.getFirstEvent().getTargetImage().processAction(action);
 
-//                getCamera().getScene().onReleaseListener(event);
+//                getCamera().getSpace().onReleaseListener(event);
 
                 break;
             }

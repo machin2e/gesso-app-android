@@ -2,9 +2,8 @@ package camp.computer.clay.model.architecture;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class Host extends Feature {
+public class Host extends Entity {
 
     // has Script (i.e., Host runs a Script)
 

@@ -1,9 +1,9 @@
-package camp.computer.clay.scene.util;
+package camp.computer.clay.space.util;
 
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.model.architecture.Entity;
 
 public abstract class Color {
 
@@ -21,17 +21,17 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<Feature, Integer> colorMap = new HashMap<Feature, Integer>();
+    private static HashMap<Entity, Integer> colorMap = new HashMap<Entity, Integer>();
 
-    public static int getUniqueColor(Feature feature) {
+    public static int getUniqueColor(Entity entity) {
 
-        if (colorMap.containsKey(feature)) {
-            return colorMap.get(feature);
+        if (colorMap.containsKey(entity)) {
+            return colorMap.get(entity);
         }
 
         for (int i = 0; i < PATH_COLOR_PALETTE.length; i++) {
             if (!colorMap.containsValue(PATH_COLOR_PALETTE[i])) {
-                colorMap.put(feature, PATH_COLOR_PALETTE[i]);
+                colorMap.put(entity, PATH_COLOR_PALETTE[i]);
                 return PATH_COLOR_PALETTE[i];
             }
         }
@@ -43,7 +43,7 @@ public abstract class Color {
             int blue = 30 + random.nextInt(225);
             int randomColor = android.graphics.Color.rgb(red, green, blue);
             if (!colorMap.containsValue(randomColor)) {
-                colorMap.put(feature, randomColor);
+                colorMap.put(entity, randomColor);
                 return randomColor;
             }
         }

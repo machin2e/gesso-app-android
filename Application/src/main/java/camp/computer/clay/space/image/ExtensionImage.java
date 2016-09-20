@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.image;
+package camp.computer.clay.space.image;
 
 import android.util.Log;
 
@@ -14,11 +14,11 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.util.Visibility;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Rectangle;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.space.util.geometry.Shape;
 
 public class ExtensionImage extends Image<Extension> {
 
@@ -67,7 +67,7 @@ public class ExtensionImage extends Image<Extension> {
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    Image targetImage = scene.getImageByPosition(event.getPosition());
+                    Image targetImage = space.getImageByPosition(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
@@ -81,18 +81,18 @@ public class ExtensionImage extends Image<Extension> {
                         List<Shape> portShapes = getPortShapes();
                         for (int i = 0; i < portShapes.size(); i++) {
                             Shape portShape = portShapes.get(i);
-                            Port port = (Port) portShape.getFeature();
+                            Port port = (Port) portShape.getEntity();
 
                             List<Path> paths = port.getCompletePath();
                             for (int j = 0; j < paths.size(); j++) {
                                 Path path = paths.get(j);
 
                                 // Show ports
-                                getScene().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                getScene().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                 // Show path
-                                getScene().getImage(path).setVisibility(Visibility.VISIBLE);
+                                getSpace().getImage(path).setVisibility(Visibility.VISIBLE);
                             }
                         }
                     }
@@ -102,7 +102,7 @@ public class ExtensionImage extends Image<Extension> {
                     Log.v("Event", "Tapped patch. Port image count: " + getPortShapes().size());
                     Port port = new Port();
                     getExtension().addPort(port);
-                    scene.addFeature(port);
+                    space.addEntity(port);
 
                 } else if (event.getType() == Event.Type.MOVE) {
 
@@ -118,7 +118,7 @@ public class ExtensionImage extends Image<Extension> {
     }
 
     public Extension getExtension() {
-        return getFeature();
+        return getEntity();
     }
 
     public List<Shape> getPortShapes() {
@@ -158,7 +158,7 @@ public class ExtensionImage extends Image<Extension> {
     }
 
     public void setPathVisibility(Visibility visibility) {
-        List<Port> ports = getFeature().getPorts();
+        List<Port> ports = getEntity().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
 
@@ -178,17 +178,17 @@ public class ExtensionImage extends Image<Extension> {
             pathImage.setDockVisibility(Visibility.VISIBLE);
 
             // Deep
-//            PortImage targetPortImage = (PortImage) getScene().getImage(pathImage.getPath().getTarget());
+//            PortImage targetPortImage = (PortImage) getSpace().getImage(pathImage.getPath().getTarget());
 //            targetPortImage.setDockVisibility();
             Port targetPort = pathImage.getPath().getTarget();
             // <HACK>
             if (targetPort.getParent() instanceof Host) {
                 Host targetHost = (Host) targetPort.getParent();
-                HostImage targetHostImage = (HostImage) getScene().getImage(targetHost);
+                HostImage targetHostImage = (HostImage) getSpace().getImage(targetHost);
                 //// TODO: targetHostImage.setDockVisibility(targetPort, Visibility.VISIBLE);
             } else if (targetPort.getParent() instanceof Extension) {
                 Extension targetHost = (Extension) targetPort.getParent();
-                ExtensionImage targetHostImage = (ExtensionImage) getScene().getImage(targetHost);
+                ExtensionImage targetHostImage = (ExtensionImage) getSpace().getImage(targetHost);
                 //targetHostImage.setDockVisibility(targetPort);
             }
             // </HACK>
@@ -208,11 +208,11 @@ public class ExtensionImage extends Image<Extension> {
             // <HACK>
             if (targetPort.getParent() instanceof Host) {
                 Host targetHost = (Host) targetPort.getParent();
-                HostImage targetHostImage = (HostImage) getScene().getImage(targetHost);
+                HostImage targetHostImage = (HostImage) getSpace().getImage(targetHost);
                 //// TODO: targetHostImage.setPathVisibility(targetPort, visibility);
             } else if (targetPort.getParent() instanceof Extension) {
                 Extension targetHost = (Extension) targetPort.getParent();
-                ExtensionImage targetHostImage = (ExtensionImage) getScene().getImage(targetHost);
+                ExtensionImage targetHostImage = (ExtensionImage) getSpace().getImage(targetHost);
                 //targetHostImage.setPathVisibility(targetPort, visibility);
             }
             // </HACK>
@@ -224,7 +224,7 @@ public class ExtensionImage extends Image<Extension> {
         List<Path> paths = port.getPaths();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
-            PathImage pathImage = (PathImage) getScene().getImage(path);
+            PathImage pathImage = (PathImage) getSpace().getImage(path);
             pathImages.add(pathImage);
         }
 

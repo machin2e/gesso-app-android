@@ -1,13 +1,13 @@
-package camp.computer.clay.scene.image;
+package camp.computer.clay.space.image;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
-import camp.computer.clay.scene.architecture.Image;
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.architecture.Image;
 
 public class PortableImage extends Image {
 
-    public PortableImage(Feature feature) {
-        super(feature);
+    public PortableImage(Entity entity) {
+        super(entity);
     }
 
     @Override

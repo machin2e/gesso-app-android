@@ -6,19 +6,19 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Feature;
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Point;
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
 
 /**
  * An Action is a sequence of one or more events.
  */
 public class Action {
 
-    // TODO: Feature this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
-    // TODO: Feature voice thisAction in the same way. Generify to Action<T> or subclass.
-    // TODO: (?) Feature data transmissions as events in the same way?
+    // TODO: Entity this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
+    // TODO: Entity voice thisAction in the same way. Generify to Action<T> or subclass.
+    // TODO: (?) Entity data transmissions as events in the same way?
 
     private List<Event> events = new LinkedList<>();
 
@@ -50,10 +50,10 @@ public class Action {
                     // <HACK>
                     // TODO: Make this less ugly! It's so ugly.
                     thisAction.getFirstEvent().setType(Event.Type.HOLD);
-//                    getFirstEvent().getActor().getCamera().getScene().onHoldListener(thisAction.getFirstEvent());
+//                    getFirstEvent().getActor().getCamera().getSpace().onHoldListener(thisAction.getFirstEvent());
 
                     Event event = thisAction.getFirstEvent();
-                    Image targetImage = getFirstEvent().getActor().getScene().getImageByPosition(event.getPosition());
+                    Image targetImage = getFirstEvent().getActor().getSpace().getImageByPosition(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     event.getTargetImage().processAction(thisAction);
@@ -125,30 +125,30 @@ public class Action {
         }
     }
 
-    // TODO: Remove this? Or make it complement the updated getTargetImage() which returns the Feature that the process targeted.
-    public Feature getSourceFeature() { // getOrigin
+    // TODO: Remove this? Or make it complement the updated getTargetImage() which returns the Entity that the process targeted.
+    public Entity getSourceEntity() {
         if (events.size() > 0) {
-            if (getEvent(0).getTargetShape() != null && getEvent(0).getTargetShape().getFeature() != null) {
-                return getEvent(0).getTargetShape().getFeature();
+            if (getEvent(0).getTargetShape() != null && getEvent(0).getTargetShape().getEntity() != null) {
+                return getEvent(0).getTargetShape().getEntity();
             } else {
-                return getEvent(0).getTargetImage().getFeature();
+                return getEvent(0).getTargetImage().getEntity();
             }
         }
         return null;
     }
 
-    public Feature getTargetFeature() { // getTargetFeature
+    public Entity getTargetEntity() { // getTargetEntity
 //        Event event = getLastEvent();
 //        if (event != null) {
-//            return event.getTargetImage().getFeature();
+//            return event.getTargetImage().getEntity();
 //        }
 //        return null;
         if (events.size() > 0) {
             Event lastEvent = getLastEvent();
-            if (lastEvent.getTargetShape() != null && lastEvent.getTargetShape().getFeature() != null) {
-                return lastEvent.getTargetShape().getFeature();
+            if (lastEvent.getTargetShape() != null && lastEvent.getTargetShape().getEntity() != null) {
+                return lastEvent.getTargetShape().getEntity();
             } else {
-                return lastEvent.getTargetImage().getFeature();
+                return lastEvent.getTargetImage().getEntity();
             }
         }
         return null;

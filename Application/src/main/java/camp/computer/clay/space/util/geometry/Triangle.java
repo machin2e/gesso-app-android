@@ -1,18 +1,18 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.model.architecture.Entity;
 
-public class Triangle<T extends Feature> extends Shape<T> {
+public class Triangle<T extends Entity> extends Shape<T> {
 
     private Point a = new Point(0, 0);
     private Point b = new Point(0, 0);
     private Point c = new Point(0, 0);
 
-    public Triangle(T feature) {
-        this.feature = feature;
+    public Triangle(T entity) {
+        this.entity = entity;
     }
 
     public Triangle(Point position) {

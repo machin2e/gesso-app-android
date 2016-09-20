@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code Model} represents the build state of available and online Clay hosts and features of the
+ * {@code Model} represents the build state of available and online Clay Hosts and Entities of the
  * discovered physical environment sensed or computed based on data collected from Clay hosts.
  */
-public class Model extends Feature {
+public class Model extends Entity {
 
     private System system = new System();
 

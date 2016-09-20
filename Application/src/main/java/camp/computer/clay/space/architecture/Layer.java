@@ -1,16 +1,17 @@
-package camp.computer.clay.scene.architecture;
+package camp.computer.clay.space.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.architecture.Feature;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.util.geometry.Shape;
 
 public class Layer {
 
     private static int LAYER_ID_COUNT = 0;
 
-    private Scene scene;
+    private Space space;
 
     // TODO: Replace this with UUID
     // TODO: Add tags (can search by tags)
@@ -20,8 +21,8 @@ public class Layer {
 
     private List<Image> images = new LinkedList<>();
 
-    public Layer(Scene scene) {
-        this.scene = scene;
+    public Layer(Space space) {
+        this.space = space;
 
         // Set the layer ID
         this.id = LAYER_ID_COUNT;
@@ -40,52 +41,58 @@ public class Layer {
         this.tag = tag;
     }
 
-    public Scene getScene() {
-        return this.scene;
+    public Space getSpace() {
+        return this.space;
     }
 
-    public void add(Image image) {
+    public void addImage(Image image) {
         this.images.add(image);
-        image.setScene(scene);
+        image.setSpace(space);
     }
 
-    public Image getImage(Feature feature) {
+    public Image getImage(Entity entity) {
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            if (image.getFeature() == feature) {
+            if (image.getEntity() == entity) {
                 return image;
             }
         }
         return null;
     }
 
-    public Feature getFeature(Image image) {
+    public List<Image> getImages() {
+        return this.images;
+    }
+
+    public int size() {
+        return this.images.size();
+    }
+
+    public Entity getEntity(Image image) {
         for (int i = 0; i < images.size(); i++) {
             if (images.get(i) == image) {
-                return images.get(i).getFeature();
+                return images.get(i).getEntity();
             }
         }
         return null;
     }
 
-    // TODO: (?) Call into Image.getFeature(Shape)
-    public Feature getFeature(Shape shape) {
+    // TODO: (?) Call into Image.getEntity(Shape)
+    public Entity getEntity(Shape shape) {
         for (int i = 0; i < images.size(); i++) {
             List<Shape> shapeList = images.get(i).getShapes().getList();
             for (int j = 0; j < shapeList.size(); j++) {
                 if (shapeList.get(i) == shape) {
-                    return images.get(i).getFeature();
+                    return images.get(i).getEntity();
                 }
             }
         }
         return null;
     }
 
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public int getSize() {
-        return this.images.size();
+    public void draw(Display display) {
+        for (int i = 0; i < getImages().size(); i++) {
+            getImages().get(i).draw(display);
+        }
     }
 }

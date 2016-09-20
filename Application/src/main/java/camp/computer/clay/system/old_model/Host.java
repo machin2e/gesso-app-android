@@ -11,7 +11,7 @@ import java.util.UUID;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.host.TCPMessageClientHost;
 
-// TODO: Integrate with Host in new feature. Also separate the feature (descriptive information that
+// TODO: Integrate with Host in new entity. Also separate the entity (descriptive information that
 // TODO: (cont'd) provides a lookup table of sorts, and the simulation (includes virtual
 // TODO: (cont'd) communications interfaces such as TCP).
 
@@ -29,7 +29,7 @@ public class Host {
 
     private Date timeOfLastContact = null;
 
-    // TODO: Cache/feature the unit's state and behavior
+    // TODO: Cache/entity the unit's state and behavior
 
     private TCPMessageClientHost TCPMessageClientHost;
 

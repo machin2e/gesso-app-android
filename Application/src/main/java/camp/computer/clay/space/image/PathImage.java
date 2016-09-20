@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.image;
+package camp.computer.clay.space.image;
 
 import android.graphics.Paint;
 
@@ -7,11 +7,11 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.util.Visibility;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Shape;
 
 public class PathImage extends Image<Path> {
 
@@ -52,6 +52,10 @@ public class PathImage extends Image<Path> {
         });
     }
 
+    public Path getPath() {
+        return getEntity();
+    }
+
     public void update() {
     }
 
@@ -80,10 +84,6 @@ public class PathImage extends Image<Path> {
         }
     }
 
-    public Path getPath() {
-        return getFeature();
-    }
-
     // TODO: Refactor. Put in Geometry/Shape.
     public void drawTrianglePath(Display display) {
 
@@ -91,8 +91,8 @@ public class PathImage extends Image<Path> {
 
         Path path = getPath();
 
-        Shape sourcePortShape = getScene().getShape(path.getSource());
-        Shape targetPortShape = getScene().getShape(path.getTarget());
+        Shape sourcePortShape = getSpace().getShape(path.getSource());
+        Shape targetPortShape = getSpace().getShape(path.getTarget());
 
         // Show target port
         targetPortShape.setVisibility(Visibility.VISIBLE);
@@ -160,8 +160,8 @@ public class PathImage extends Image<Path> {
 
         Path path = getPath();
 
-        Shape sourcePortShape = getScene().getShape(path.getSource());
-        Shape targetPortShape = getScene().getShape(path.getTarget());
+        Shape sourcePortShape = getSpace().getShape(path.getSource());
+        Shape targetPortShape = getSpace().getShape(path.getTarget());
 
         // Show target port
         targetPortShape.setVisibility(Visibility.VISIBLE);

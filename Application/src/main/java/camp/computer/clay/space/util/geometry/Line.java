@@ -1,14 +1,19 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.model.architecture.Entity;
 
-public class Text extends Shape {
+public class Line<T extends Entity> extends Shape<T> {
     private Point source = new Point(0, 0);
     private Point target = new Point(0, 0);
 
-    public Text() {}
+    public Line () {}
+
+    public Line(T entity) {
+        this.entity = entity;
+    }
 
     @Override
     public List<Point> getVertices() {
@@ -22,10 +27,12 @@ public class Text extends Shape {
 
     @Override
     public void draw(Display display) {
-
+        if (isVisible()) {
+            Display.drawLine(this, display);
+        }
     }
 
-    public Text(Point source, Point target) {
+    public Line (Point source, Point target) {
         this.source = source;
         this.target = target;
     }

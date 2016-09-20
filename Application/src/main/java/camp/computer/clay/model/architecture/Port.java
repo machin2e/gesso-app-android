@@ -5,7 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Port extends Feature {
+public class Port extends Entity {
 
     public enum Direction {
 
@@ -170,7 +170,7 @@ public class Port extends Feature {
                 Path path = paths.get(i);
                 if (path.getTarget() == dequeuedPort) {
                     ancestorPaths.add(path); // Store the path
-                    // TODO: ancestorPaths.addEvent(path.getSourceFeature().getDescendantPaths()) will allow to
+                    // TODO: ancestorPaths.addEvent(path.getSourceEntity().getDescendantPaths()) will allow to
                     // TODO: (cont'd) getEvent complete ancestor graph.
                     searchablePorts.add(path.getSource()); // Queue the source port in the search
                 }

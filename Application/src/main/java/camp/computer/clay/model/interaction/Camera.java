@@ -11,17 +11,17 @@ import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.scene.architecture.Image;
-import camp.computer.clay.scene.architecture.ImageGroup;
-import camp.computer.clay.scene.architecture.Scene;
-import camp.computer.clay.scene.architecture.ShapeGroup;
-import camp.computer.clay.scene.image.HostImage;
-import camp.computer.clay.scene.image.ExtensionImage;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Rectangle;
-import camp.computer.clay.scene.util.Time;
-import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.ImageGroup;
+import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.architecture.ShapeGroup;
+import camp.computer.clay.space.image.HostImage;
+import camp.computer.clay.space.image.ExtensionImage;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.space.util.Time;
+import camp.computer.clay.space.util.Visibility;
 
 public class Camera {
 
@@ -49,8 +49,8 @@ public class Camera {
         return this.height;
     }
 
-    // The scene displayed from this perspective
-    private Scene scene = null;
+    // The space displayed from this perspective
+    private Space space = null;
 
     // Focus in Camera
     private Image focusImage = null;
@@ -58,8 +58,8 @@ public class Camera {
     public Camera() {
     }
 
-    public Camera(Scene scene) {
-        this.scene = scene;
+    public Camera(Space space) {
+        this.space = space;
     }
 
     public Point getPosition() {
@@ -218,12 +218,12 @@ public class Camera {
 
     }
 
-    public void setScene(Scene scene) {
-        this.scene = scene;
+    public void setSpace(Space space) {
+        this.space = space;
     }
 
-    public Scene getScene() {
-        return this.scene;
+    public Space getSpace() {
+        return this.space;
     }
 
     public void focusCreatePath(Action action) {
@@ -231,7 +231,7 @@ public class Camera {
         Event lastEvent = action.getLastEvent();
 
         // Check if a machine sprite was nearby
-        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(lastEvent.getPosition());
+        Image nearestFormImage = getSpace().getImages().filterType(Host.class).getNearest(lastEvent.getPosition());
         if (nearestFormImage != null) {
 
             // TODO: Vibrate
@@ -247,7 +247,7 @@ public class Camera {
 //            boardImage.showPaths();
 
             // Adjust perspective
-            Point centerPoint = getScene().getImages(Host.class).getCenterPoint();
+            Point centerPoint = getSpace().getImages(Host.class).getCenterPoint();
             double scale = 0.6;
             setPosition(centerPoint);
             setScale(scale); // Zoom out to show overview
@@ -257,9 +257,9 @@ public class Camera {
 //        PortImage portFigure = (PortImage) event.getTargetImage();
 //
 //        // Show ports of nearby forms
-//        ImageGroup nearbyFigures = getScene().getImages(Host.class, Extension.class).filterArea(event.getPosition(), 200 + 60);
+//        ImageGroup nearbyFigures = getSpace().getImages(Host.class, Extension.class).filterArea(event.getPosition(), 200 + 60);
 //
-//        List<Image> images = getScene().getImages(Host.class, Extension.class).getList();
+//        List<Image> images = getSpace().getImages(Host.class, Extension.class).getList();
 //        for (int i = 0; i < images.size(); i++) {
 //            Image image = images.get(i);
 //
@@ -291,7 +291,7 @@ public class Camera {
 //        }
 //
 //        // Check if a machine sprite was nearby
-//        Image nearestFormImage = getScene().getImages().filterType(Host.class).getNearest(event.getPosition());
+//        Image nearestFormImage = getSpace().getImages().filterType(Host.class).getNearest(event.getPosition());
 //        if (nearestFormImage != null) {
 //
 //            // TODO: Vibrate
@@ -307,7 +307,7 @@ public class Camera {
 //            portFigure.showPaths();
 //
 //            // Adjust perspective
-//            Point centerPoint = getScene().getImages(Host.class).getCenterPosition();
+//            Point centerPoint = getSpace().getImages(Host.class).getCenterPosition();
 //            double scale = 0.6;
 //            setPosition(centerPoint);
 //            setScale(scale); // Zoom out to show overview
@@ -316,10 +316,10 @@ public class Camera {
 
         /*
         // Show the ports in the path
-        List<Path> portPaths = getCamera().getScene().getFeature().getCompletePath(port);
-        List<Port> portConnections = getCamera().getScene().getFeature().getPorts(portPaths);
+        List<Path> portPaths = getCamera().getSpace().getEntity().getCompletePath(port);
+        List<Port> portConnections = getCamera().getSpace().getEntity().getPorts(portPaths);
         for (Port portConnection: portConnections) {
-            PortImage portFigureConnection = (PortImage) getCamera().getScene().getImage(portConnection);
+            PortImage portFigureConnection = (PortImage) getCamera().getSpace().getImage(portConnection);
             portFigureConnection.setVisibility(true);
             portFigureConnection.setPathVisibility();
         }
@@ -351,14 +351,13 @@ public class Camera {
 
             // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
-            ImageGroup otherHostImages = getScene().getImages().filterType(Host.class, Extension.class).remove(hostImage);
-            List<Image> list = otherHostImages.getList();
-            for (int i = 0; i < list.size(); i++) {
-                Image otherHostImage = list.get(i);
+            ImageGroup otherHostImages = getSpace().getImages().filterType(Host.class, Extension.class).remove(hostImage);
+            for (int i = 0; i < otherHostImages.size(); i++) {
+                Image otherHostImage = otherHostImages.get(i);
 //                image.hidePortShapes();
 //                image.hidePathImages();
                 otherHostImage.setTransparency(0.1f);
-//                TODO: Set <Rectangle> for Host; remove <Feature> from Image
+//                TODO: Set <Rectangle> for Host; remove <Entity> from Image
             }
 
             Action previousAction = null;
@@ -387,7 +386,7 @@ public class Camera {
                 for (int i = 0; i < ports.size(); i++) {
                     Port port = ports.get(i);
 
-                    // TODO: ((PortImage) getCamera().getScene().getImage(port)).getVisiblePaths()
+                    // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
 
                     if (!formPathPorts.contains(port)) {
                         formPathPorts.add(port);
@@ -406,8 +405,8 @@ public class Camera {
                 }
 
                 // Camera
-                //List<Image> hostPathPortShapes = getScene().getImages(formPathPorts);
-                ShapeGroup hostPathPortShapes = getScene().getShapes().filterFeature(formPathPorts);
+                //List<Image> hostPathPortShapes = getSpace().getImages(formPathPorts);
+                ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(formPathPorts);
                 Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
 
                 adjustScale(boundingBox);
@@ -442,7 +441,7 @@ public class Camera {
     public void focusSelectPath(Port port) {
 
         // Remove focus from other forms and their ports
-        List<Image> hostImages = getScene().getImages(Host.class).getList();
+        ImageGroup hostImages = getSpace().getImages(Host.class);
         for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.setTransparency(0.05f);
@@ -456,33 +455,33 @@ public class Camera {
             Path connectedPath = paths.get(i);
 
             // Show ports
-            getScene().getShape(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
-            //TODO:((PortImage) getScene().getImage(connectedPath.getSource())).showPaths();
-            getScene().getShape(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
-            //TODO:((PortImage) getScene().getImage(connectedPath.getTarget())).showPaths();
+            getSpace().getShape(connectedPath.getSource()).setVisibility(Visibility.VISIBLE);
+            //TODO:((PortImage) getSpace().getImage(connectedPath.getSource())).showPaths();
+            getSpace().getShape(connectedPath.getTarget()).setVisibility(Visibility.VISIBLE);
+            //TODO:((PortImage) getSpace().getImage(connectedPath.getTarget())).showPaths();
 
             // Show path
-            getScene().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
+            getSpace().getImage(connectedPath).setVisibility(Visibility.VISIBLE);
         }
 
         // Camera
         List<Port> pathPorts = port.getPorts(paths);
-        List<Image> pathPortImages = getScene().getImages(pathPorts);
-        List<Point> pathPortPositions = Scene.getCoordinates(pathPortImages);
+        ImageGroup pathPortImages = getSpace().getImages(pathPorts);
+        List<Point> pathPortPositions = pathPortImages.getPositions();
         Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
 
-        // Camera Scale
+        // Update Scale
         adjustScale(boundingBox);
 
-        // Camera Position
+        // Update Position
         setPosition(Geometry.calculateCenterPosition(pathPortPositions));
     }
 
-    public void focusSelectScene() { // Previously called "focusReset"
+    public void focusSelectSpace() { // Previously called "focusReset"
 
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
-        ImageGroup hostImages = getScene().getImages(Host.class);
-        for (int i = 0; i < hostImages.getList().size(); i++) {
+        ImageGroup hostImages = getSpace().getImages(Host.class);
+        for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             hostImage.setPathVisibility(Visibility.INVISIBLE);
@@ -490,8 +489,8 @@ public class Camera {
             hostImage.setTransparency(1.0);
         }
 
-        ImageGroup extensionImages = getScene().getImages(Extension.class);
-        for (int i = 0; i < extensionImages.getList().size(); i++) {
+        ImageGroup extensionImages = getSpace().getImages(Extension.class);
+        for (int i = 0; i < extensionImages.size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
             //// TODO: extensionImage.hidePortShapes();
             //// TODO: extensionImage.hidePathImages();
@@ -504,7 +503,7 @@ public class Camera {
     }
 
     public void adjustPosition() {
-        List<Point> figurePositions = getScene().getImages().filterType(Host.class, Extension.class).getCoordinates();
+        List<Point> figurePositions = getSpace().getImages().filterType(Host.class, Extension.class).getPositions();
         Point centerPosition = Geometry.calculateCenterPosition(figurePositions);
         setPosition(centerPosition);
     }
@@ -514,9 +513,9 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-        List<Point> figureVertices = getScene().getImages().filterType(Host.class, Extension.class).getVertices();
+        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getVertices();
         if (figureVertices.size() > 0) {
-            Rectangle boundingBox = getScene().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+            Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }
     }

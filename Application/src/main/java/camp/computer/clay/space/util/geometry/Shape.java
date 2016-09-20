@@ -1,13 +1,13 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
-import camp.computer.clay.scene.util.Color;
-import camp.computer.clay.scene.util.Visibility;
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.util.Color;
+import camp.computer.clay.space.util.Visibility;
 
-public abstract class Shape<T extends Feature> {
+public abstract class Shape<T extends Entity> {
 
     protected String label = "";
 
@@ -21,21 +21,21 @@ public abstract class Shape<T extends Feature> {
     protected String outlineColor = "#ff000000";
     protected double outlineThickness = 1.0;
 
-    protected T feature = null;
+    protected T entity = null;
 
     public Shape() {
     }
 
-    public Shape(T feature) {
-        this.feature = feature;
+    public Shape(T entity) {
+        this.entity = entity;
     }
 
     public Shape(Point position) {
         this.position.set(position);
     }
 
-    public T getFeature() {
-        return this.feature;
+    public T getEntity() {
+        return this.entity;
     }
 
     public Point getPosition() {

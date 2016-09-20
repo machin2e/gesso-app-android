@@ -1,16 +1,16 @@
-package camp.computer.clay.scene.architecture;
+package camp.computer.clay.space.architecture;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import camp.computer.clay.model.architecture.Feature;
-import camp.computer.clay.scene.util.Visibility;
-import camp.computer.clay.scene.util.geometry.Geometry;
-import camp.computer.clay.scene.util.geometry.Point;
-import camp.computer.clay.scene.util.geometry.Rectangle;
-import camp.computer.clay.scene.util.geometry.Shape;
+import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.space.util.geometry.Shape;
 
 /**
  * ShapeGroup is an interface for managing and manipulating sets of shapes.
@@ -101,14 +101,14 @@ public class ShapeGroup {
      * @param types
      * @return
      */
-    public <T extends Feature> ShapeGroup filterType(Class<?>... types) {
+    public <T extends Entity> ShapeGroup filterType(Class<?>... types) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.shapes.size(); i++) {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
-                if (this.shapes.get(i).getFeature() != null && this.shapes.get(i).getFeature().getClass() == type) {
+                if (this.shapes.get(i).getEntity() != null && this.shapes.get(i).getEntity().getClass() == type) {
                     shapeGroup.add(this.shapes.get(i));
                 }
             }
@@ -117,13 +117,13 @@ public class ShapeGroup {
         return shapeGroup;
     }
 
-    public <T extends Feature> ShapeGroup filterFeature(List<T> features) {
+    public <T extends Entity> ShapeGroup filterEntity(List<T> entities) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.shapes.size(); i++) {
-            for (int j = 0; j < features.size(); j++) {
-                if (this.shapes.get(i).getFeature() != null && this.shapes.get(i).getFeature() == features.get(j)) {
+            for (int j = 0; j < entities.size(); j++) {
+                if (this.shapes.get(i).getEntity() != null && this.shapes.get(i).getEntity() == entities.get(j)) {
                     shapeGroup.add(this.shapes.get(i));
                 }
             }

@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 import android.graphics.Color;
 
@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Feature;
+import camp.computer.clay.model.architecture.Entity;
 
 /**
  * Circle. By default, objects are unit circles.
  */
-public class Circle<T extends Feature> extends Shape<T> {
+public class Circle<T extends Entity> extends Shape<T> {
 
     /**
      * The number of vertices to use to approximate the circle. By default, this is set to 12,
@@ -26,8 +26,8 @@ public class Circle<T extends Feature> extends Shape<T> {
         this.radius = radius;
     }
 
-    public Circle(T feature) {
-        this.feature = feature;
+    public Circle(T entity) {
+        this.entity = entity;
     }
 
     public Circle(Point position, double radius) {

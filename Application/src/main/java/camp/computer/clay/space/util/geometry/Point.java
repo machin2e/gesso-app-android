@@ -1,4 +1,4 @@
-package camp.computer.clay.scene.util.geometry;
+package camp.computer.clay.space.util.geometry;
 
 public class Point {
     //

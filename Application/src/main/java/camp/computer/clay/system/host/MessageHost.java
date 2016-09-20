@@ -57,7 +57,7 @@ public class MessageHost {
             // Create the message
             Message message = new Message ("udp", senderAddress, null, tokens[1]);
 
-            // Update the unit feature associated with the message
+            // Update the unit entity associated with the message
             if (getClay ().hasDeviceByAddress(tokens[0])) {
 
                 // Get the host associated with the received message

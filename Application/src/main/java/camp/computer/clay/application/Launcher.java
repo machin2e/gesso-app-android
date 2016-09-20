@@ -142,7 +142,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         setContentView(R.layout.activity_main);
 
-        // Scene Surface
+        // Space Surface
         display = (Display) findViewById (R.id.app_surface_view);
         display.onResume();
 
@@ -455,8 +455,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageKeyboardLayout.invalidate();
     }
 
-    public camp.computer.clay.scene.util.geometry.Point convertToVisiblePosition(Point point) {
-        camp.computer.clay.scene.util.geometry.Point visiblePosition = new camp.computer.clay.scene.util.geometry.Point();
+    public camp.computer.clay.space.util.geometry.Point convertToVisiblePosition(Point point) {
+        camp.computer.clay.space.util.geometry.Point visiblePosition = new camp.computer.clay.space.util.geometry.Point();
         return visiblePosition;
     }
 
@@ -755,7 +755,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
     @Override
     public void refreshListViewFromData(Host host) {
-        // TODO: Update the view to reflect the latest state of the object feature
+        // TODO: Update the view to reflect the latest state of the object entity
     }
 
     // TODO: Rename to something else and make a getLauncherView() function specific to the
