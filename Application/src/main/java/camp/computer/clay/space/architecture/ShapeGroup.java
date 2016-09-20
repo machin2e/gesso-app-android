@@ -10,7 +10,6 @@ import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.util.geometry.Shape;
 
 /**
  * ShapeGroup is an interface for managing and manipulating sets of shapes.

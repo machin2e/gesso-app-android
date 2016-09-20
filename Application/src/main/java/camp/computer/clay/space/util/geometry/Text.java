@@ -3,6 +3,7 @@ package camp.computer.clay.space.util.geometry;
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
+import camp.computer.clay.space.architecture.Shape;
 
 public class Text extends Shape {
     private Point source = new Point(0, 0);

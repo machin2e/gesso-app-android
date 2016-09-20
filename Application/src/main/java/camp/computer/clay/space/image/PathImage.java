@@ -11,7 +11,7 @@ import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
-import camp.computer.clay.space.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Shape;
 
 public class PathImage extends Image<Path> {
 

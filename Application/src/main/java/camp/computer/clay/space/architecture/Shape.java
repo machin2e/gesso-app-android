@@ -1,4 +1,4 @@
-package camp.computer.clay.space.util.geometry;
+package camp.computer.clay.space.architecture;
 
 import java.util.List;
 
@@ -6,6 +6,10 @@ import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Geometry;
+import camp.computer.clay.space.util.geometry.Line;
+import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.space.util.geometry.Rectangle;
 
 public abstract class Shape<T extends Entity> {
 
@@ -150,6 +154,9 @@ public abstract class Shape<T extends Entity> {
 
     public String getLabel() {
         return this.label;
+    }
+
+    public void update() {
     }
 
     public abstract void draw(Display display);

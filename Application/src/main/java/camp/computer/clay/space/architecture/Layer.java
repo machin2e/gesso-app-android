@@ -5,7 +5,6 @@ import java.util.List;
 
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
-import camp.computer.clay.space.util.geometry.Shape;
 
 public class Layer {
 

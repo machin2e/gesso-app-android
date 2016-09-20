@@ -4,7 +4,7 @@ import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.util.Time;
 import camp.computer.clay.space.util.geometry.Point;
-import camp.computer.clay.space.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Shape;
 
 public class Event {
 

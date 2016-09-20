@@ -30,7 +30,6 @@ import camp.computer.clay.space.util.Probability;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.util.geometry.Shape;
 
 public class Space extends Image<Model> {
 

@@ -25,7 +25,7 @@ import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.util.geometry.Shape;
+import camp.computer.clay.space.architecture.Shape;
 
 public class HostImage extends Image<Host> {
 
@@ -640,7 +640,7 @@ public class HostImage extends Image<Host> {
 
                                                                 Log.v("Events", "D.1");
 
-                                                                // Create and configure new path
+                                                                // Create and configure new Path
                                                                 Path path = new Path(sourcePort, targetPort);
 
                                                                 if (sourcePort.getParent() instanceof Extension || targetPort.getParent() instanceof Extension) {
@@ -655,9 +655,7 @@ public class HostImage extends Image<Host> {
                                                                 space.addEntity(path);
 
                                                                 // Get the just-created Extension Image
-                                                                Image pathImage = getSpace().getImage(path);
-
-
+                                                                // Image pathImage = getSpace().getImage(path);
                                                             }
 
                                                             // Camera

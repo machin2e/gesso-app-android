@@ -8,7 +8,6 @@ import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.util.geometry.Shape;
 
 /**
  * ImageGroup is an interface for managing and manipulating sets of images.

@@ -13,7 +13,6 @@ import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.util.geometry.Shape;
 import camp.computer.clay.space.util.Visibility;
 
 public abstract class Image<T extends Entity> {
@@ -191,7 +190,11 @@ public abstract class Image<T extends Entity> {
         return shapes.remove(index);
     }
 
-    public abstract void update();
+    public void update() {
+        for (int i = 0; i < this.shapes.size(); i++) {
+            this.shapes.get(i).update();
+        }
+    }
 
     public abstract void draw(Display display);
 
