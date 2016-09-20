@@ -16,7 +16,7 @@ import camp.computer.clay.space.architecture.ImageGroup;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Visibility;
 
-public class PortableImage extends Image<Portable> {
+public abstract class PortableImage extends Image<Portable> {
 
     public PortableImage(Portable portable) {
         super(portable);

@@ -651,12 +651,14 @@ public class HostImage extends PortableImage {
                                                     Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
                                                     // Create the Extension
+                                                    // TODO: Extension extension = new Extension(ExtensionProfile);
                                                     Extension extension = new Extension();
 
                                                     // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
 
                                                     // Create Ports and add them to the Extension
-                                                    for (int j = 0; j < 1; j++) {
+                                                    int extensionProfile_portCount = 1;
+                                                    for (int j = 0; j < extensionProfile_portCount; j++) {
                                                         Port port = new Port();
                                                         extension.addPort(port);
                                                     }
@@ -687,7 +689,7 @@ public class HostImage extends PortableImage {
                                                         // Ports
                                                         Circle<Port> circle = new Circle<>(port);
                                                         circle.setRadius(40);
-                                                        circle.setLabel("Port 1");
+                                                        circle.setLabel("Port " + i + 1);
                                                         circle.setPosition(-90, 200);
                                                         // circle.setRelativeRotation(0);
 

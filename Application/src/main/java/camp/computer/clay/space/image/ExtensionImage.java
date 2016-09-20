@@ -36,11 +36,10 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
 
         // Create Shapes for Image
         rectangle = new Rectangle(200, 200);
+        addShape(rectangle);
         rectangle.setLabel("Board");
         rectangle.setColor("#f7f7f7");
         rectangle.setOutlineThickness(1);
-        addShape(rectangle);
-
     }
 
     private void setupActions() {
@@ -115,6 +114,17 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
 
         // TODO: Update Port positions based on the number of ports
         int portCount = getPortable().getPorts().size();
+        for (int i = 0; i < getPortable().getPorts().size(); i++) {
+            Port port = getPortable().getPorts().get(i);
+            Shape portShape = getShape(port);
+
+            if (portShape != null) {
+                double portSpacing = 100;
+                double x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
+                portShape.getPosition().setRelativeX(x);
+                // TODO: Also update y coordinate
+            }
+        }
 
         // Update Port style
         for (int i = 0; i < getExtension().getPorts().size(); i++) {
