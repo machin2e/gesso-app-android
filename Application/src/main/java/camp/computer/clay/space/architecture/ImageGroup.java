@@ -4,58 +4,57 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
 /**
- * ImageGroup is an interface for managing and manipulating sets of images.
+ * ImageGroup is an interface for managing and manipulating sets of elements.
  */
-public class ImageGroup {
-
-    private List<Image> images = new LinkedList<>();
+public class ImageGroup extends Group<Image> {
 
     public ImageGroup() {
     }
 
     public void add(Image image) {
-        this.images.add(image);
+        this.elements.add(image);
     }
 
     public void add(List<Image> images) {
-        this.images.addAll(images);
+        this.elements.addAll(images);
     }
 
     public boolean contains(Image image) {
-        return images.contains(image);
+        return elements.contains(image);
     }
 
     public ImageGroup remove(Image image) {
-        images.remove(image);
+        elements.remove(image);
         return this;
     }
 
     public Image get(int index) {
-        return images.get(index);
+        return elements.get(index);
     }
 
     public Image getFirst() {
-        if (images.size() > 0) {
-            return images.get(0);
+        if (elements.size() > 0) {
+            return elements.get(0);
         }
         return null;
     }
 
     public Image getLast() {
-        if (images.size() > 0) {
-            return images.get(images.size() - 1);
+        if (elements.size() > 0) {
+            return elements.get(elements.size() - 1);
         }
         return null;
     }
 
     public int size() {
-        return this.images.size();
+        return this.elements.size();
     }
 
     /**
@@ -68,11 +67,11 @@ public class ImageGroup {
 
         ImageGroup imageGroup = new ImageGroup();
 
-        for (int i = 0; i < this.images.size(); i++) {
+        for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
-                if (this.images.get(i).getEntity().getClass() == type) {
-                    imageGroup.add(this.images.get(i));
+                if (this.elements.get(i).getEntity().getClass() == type) {
+                    imageGroup.add(this.elements.get(i));
                 }
             }
         }
@@ -84,10 +83,10 @@ public class ImageGroup {
 
         ImageGroup imageGroup = new ImageGroup();
 
-        for (int i = 0; i < this.images.size(); i++) {
+        for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < entities.size(); j++) {
-                if (this.images.get(i).getEntity() != null && this.images.get(i).getEntity() == entities.get(j)) {
-                    imageGroup.add(this.images.get(i));
+                if (this.elements.get(i).getEntity() != null && this.elements.get(i).getEntity() == entities.get(j)) {
+                    imageGroup.add(this.elements.get(i));
                 }
             }
         }
@@ -96,7 +95,7 @@ public class ImageGroup {
     }
 
     /**
-     * Filters images to those that are within the specified distance from the specified point.
+     * Filters elements to those that are within the specified distance from the specified point.
      *
      * @param point
      * @param distance
@@ -106,9 +105,9 @@ public class ImageGroup {
 
         ImageGroup imageGroup = new ImageGroup();
 
-        for (int i = 0; i < images.size(); i++) {
+        for (int i = 0; i < elements.size(); i++) {
 
-            Image image = images.get(i);
+            Image image = elements.get(i);
 
             double distanceToImage = Geometry.calculateDistance(
                     point,
@@ -126,7 +125,7 @@ public class ImageGroup {
     }
 
     /**
-     * Filters images that fall within the area defined by {@code shape}.
+     * Filters elements that fall within the area defined by {@code shape}.
      *
      * @param shape The {@code Shape} covering the area to filter.
      * @return The {@code ImageGroup} containing the area covered by {@code shape}.
@@ -135,8 +134,8 @@ public class ImageGroup {
 
         ImageGroup imageGroup = new ImageGroup();
 
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
             if (shape.contains(image.getPosition())) {
                 imageGroup.add(image);
             }
@@ -149,8 +148,8 @@ public class ImageGroup {
 
         ImageGroup imageGroup = new ImageGroup();
 
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
             if (image.getVisibility() == visibility) {
                 imageGroup.add(image);
             }
@@ -161,13 +160,13 @@ public class ImageGroup {
     }
 
     public List<Image> getList() {
-        return images;
+        return elements;
     }
 
     public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
             positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
         }
         return positions;
@@ -175,8 +174,8 @@ public class ImageGroup {
 
     public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
             positions.addAll(image.getAbsoluteVertices());
         }
         return positions;
@@ -185,8 +184,8 @@ public class ImageGroup {
     public ShapeGroup getShapes() {
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < this.images.size(); i++) {
-            shapeGroup.add(this.images.get(i).getShapes());
+        for (int i = 0; i < this.elements.size(); i++) {
+            shapeGroup.add(this.elements.get(i).getShapes());
         }
 
         return shapeGroup;
@@ -219,8 +218,8 @@ public class ImageGroup {
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
 
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
 
             double currentDistance = Geometry.calculateDistance(position, image.getPosition());
 
@@ -234,15 +233,15 @@ public class ImageGroup {
     }
 
     public void setTransparency(double transparency) {
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
             image.setTransparency(transparency);
         }
     }
 
     public void setVisibility(Visibility visibility) {
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
             image.setVisibility(visibility);
         }
     }

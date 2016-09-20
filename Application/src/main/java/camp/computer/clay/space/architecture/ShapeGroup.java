@@ -6,61 +6,60 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
 /**
- * ShapeGroup is an interface for managing and manipulating sets of shapes.
+ * ShapeGroup is an interface for managing and manipulating sets of elements.
  */
-public class ShapeGroup {
-
-    private List<Shape> shapes = new LinkedList<>();
+public class ShapeGroup extends Group<Shape> {
 
     public ShapeGroup() {
     }
 
     public void add(Shape shape) {
-        this.shapes.add(shape);
+        this.elements.add(shape);
     }
 
     public void add(List<Shape> shapes) {
-        this.shapes.addAll(shapes);
+        this.elements.addAll(shapes);
     }
 
     public void add(ShapeGroup shapeGroup) {
         List<Shape> shapeList = shapeGroup.getList();
-        this.shapes.addAll(shapeList);
+        this.elements.addAll(shapeList);
     }
 
     public boolean contains(Shape shape) {
-        return shapes.contains(shape);
+        return elements.contains(shape);
     }
 
     public ShapeGroup remove(Shape shape) {
-        shapes.remove(shape);
+        elements.remove(shape);
         return this;
     }
 
     public Shape get(int index) {
-        if (index < this.shapes.size()) {
-            return shapes.get(index);
+        if (index < this.elements.size()) {
+            return elements.get(index);
         } else {
             return null;
         }
     }
 
     public Shape getFirst() {
-        if (shapes.size() > 0) {
-            return shapes.get(0);
+        if (elements.size() > 0) {
+            return elements.get(0);
         }
         return null;
     }
 
     public Shape getLast() {
-        if (shapes.size() > 0) {
-            return shapes.get(shapes.size() - 1);
+        if (elements.size() > 0) {
+            return elements.get(elements.size() - 1);
         }
         return null;
     }
@@ -76,17 +75,17 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < this.shapes.size(); i++) {
+        for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < labels.length; j++) {
 
                 Pattern pattern = Pattern.compile(labels[j]);
-                Matcher matcher = pattern.matcher(this.shapes.get(i).getLabel());
+                Matcher matcher = pattern.matcher(this.elements.get(i).getLabel());
 
                 boolean isMatch = matcher.matches();
 
-//                if (this.shapes.get(i).getLabel().equals(labels[j])) {
+//                if (this.elements.get(i).getLabel().equals(labels[j])) {
                 if (isMatch) {
-                    shapeGroup.add(this.shapes.get(i));
+                    shapeGroup.add(this.elements.get(i));
                 }
             }
         }
@@ -104,11 +103,11 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < this.shapes.size(); i++) {
+        for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < types.length; j++) {
                 Class<?> type = types[j];
-                if (this.shapes.get(i).getEntity() != null && this.shapes.get(i).getEntity().getClass() == type) {
-                    shapeGroup.add(this.shapes.get(i));
+                if (this.elements.get(i).getEntity() != null && this.elements.get(i).getEntity().getClass() == type) {
+                    shapeGroup.add(this.elements.get(i));
                 }
             }
         }
@@ -120,10 +119,10 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < this.shapes.size(); i++) {
+        for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < entities.size(); j++) {
-                if (this.shapes.get(i).getEntity() != null && this.shapes.get(i).getEntity() == entities.get(j)) {
-                    shapeGroup.add(this.shapes.get(i));
+                if (this.elements.get(i).getEntity() != null && this.elements.get(i).getEntity() == entities.get(j)) {
+                    shapeGroup.add(this.elements.get(i));
                 }
             }
         }
@@ -132,7 +131,7 @@ public class ShapeGroup {
     }
 
     /**
-     * Filters shapes to those that are within the specified distance from the specified point.
+     * Filters elements to those that are within the specified distance from the specified point.
      *
      * @param point
      * @param distance
@@ -142,8 +141,8 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
 
             double distanceToShape = Geometry.calculateDistance(
                     point,
@@ -164,8 +163,8 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
 
             if (shape.contains(point)) {
                 shapeGroup.add(shape);
@@ -178,7 +177,7 @@ public class ShapeGroup {
     }
 
     /**
-     * Filters shapes that fall within the area defined by {@code shape}.
+     * Filters elements that fall within the area defined by {@code shape}.
      *
      * @param shape The {@code Shape} covering the area to filter.
      * @return The {@code ShapeGroup} containing the area covered by {@code shape}.
@@ -187,8 +186,8 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape otherShape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape otherShape = elements.get(i);
             if (shape.contains(otherShape.getPosition())) {
                 shapeGroup.add(otherShape);
             }
@@ -201,8 +200,8 @@ public class ShapeGroup {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
             if (shape.getVisibility() == visibility) {
                 shapeGroup.add(shape);
             }
@@ -213,13 +212,13 @@ public class ShapeGroup {
     }
 
     public List<Shape> getList() {
-        return shapes;
+        return elements;
     }
 
     public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
             positions.add(new Point(shape.getPosition().getX(), shape.getPosition().getY()));
         }
         return positions;
@@ -227,8 +226,8 @@ public class ShapeGroup {
 
     public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
             positions.addAll(shape.getVertices());
         }
         return positions;
@@ -262,8 +261,8 @@ public class ShapeGroup {
         double shortestDistance = Float.MAX_VALUE;
         Shape nearestShape = null;
 
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
 
             double currentDistance = Geometry.calculateDistance(position, shape.getPosition());
 
@@ -277,20 +276,20 @@ public class ShapeGroup {
     }
 
     public void setTransparency(double transparency) {
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
             shape.setTransparency(transparency);
         }
     }
 
     public void setVisibility(Visibility visibility) {
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = elements.get(i);
             shape.setVisibility(visibility);
         }
     }
 
     public int size() {
-        return this.shapes.size();
+        return this.elements.size();
     }
 }
