@@ -3,6 +3,7 @@ package camp.computer.clay.model.architecture;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.interaction.*;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.Action;
@@ -75,6 +76,10 @@ public class Actor { // Controller
     }
 
     public void processAction(Event event) { // TODO: Rename to processAction()
+
+        // <HACK>
+        Launcher.getLauncherView().publish(event.getType().toString());
+        // </HACK>
 
         event.setActor(this);
 

@@ -366,8 +366,8 @@ public class Space extends Image<Model> {
         return imageGroup;
     }
 
-    public <T extends Entity> ImageGroup getImages(Class<?>... types) {
-        return getImages().filterType(types);
+    public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes) {
+        return getImages().filterType(entityTypes);
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)

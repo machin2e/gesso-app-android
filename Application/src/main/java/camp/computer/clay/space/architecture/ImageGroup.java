@@ -27,16 +27,16 @@ public class ImageGroup extends Group<Image> {
     /**
      * Removes all elements except those with the specified type.
      *
-     * @param types
+     * @param entityTypes
      * @return
      */
-    public <T extends Entity> ImageGroup filterType(Class<?>... types) {
+    public <T extends Entity> ImageGroup filterType(Class<?>... entityTypes) {
 
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
-            for (int j = 0; j < types.length; j++) {
-                Class<?> type = types[j];
+            for (int j = 0; j < entityTypes.length; j++) {
+                Class<?> type = entityTypes[j];
                 if (this.elements.get(i).getEntity().getClass() == type) {
                     imageGroup.add(this.elements.get(i));
                 }

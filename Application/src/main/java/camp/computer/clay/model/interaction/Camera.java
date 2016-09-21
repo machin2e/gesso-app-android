@@ -12,12 +12,14 @@ import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
+import camp.computer.clay.model.architecture.Portable;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.ImageGroup;
 import camp.computer.clay.space.architecture.Space;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.ExtensionImage;
+import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
@@ -482,21 +484,13 @@ public class Camera {
     public void focusSelectSpace() { // Previously called "focusReset"
 
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
-        ImageGroup hostImages = space.getImages(Host.class);
-        for (int i = 0; i < hostImages.size(); i++) {
-            HostImage hostImage = (HostImage) hostImages.get(i);
-            hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            hostImage.setPathVisibility(Visibility.INVISIBLE);
-            hostImage.setDockVisibility(Visibility.VISIBLE);
-            hostImage.setTransparency(1.0);
-        }
-
-        ImageGroup extensionImages = getSpace().getImages(Extension.class);
-        for (int i = 0; i < extensionImages.size(); i++) {
-            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-            //// TODO: extensionImage.hidePortShapes();
-            //// TODO: extensionImage.hidePathImages();
-            extensionImage.setTransparency(1.0);
+        ImageGroup portableImages = space.getImages(Host.class, Extension.class);
+        for (int i = 0; i < portableImages.size(); i++) {
+            PortableImage portableImage = (PortableImage) portableImages.get(i);
+            portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableImage.setPathVisibility(Visibility.INVISIBLE);
+            portableImage.setDockVisibility(Visibility.VISIBLE);
+            portableImage.setTransparency(1.0);
         }
 
         // Adjust scale and position

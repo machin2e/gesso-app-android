@@ -409,6 +409,25 @@ public class HostImage extends PortableImage {
 //                                                            // ExtensionImage nearbyFigure = (ExtensionImage) image;
 //
 //                                                        }
+
+                                                        // TODO: Add additional port!
+                                                        if (image instanceof ExtensionImage) {
+                                                            Extension extension = ((ExtensionImage) image).getExtension();
+
+                                                            boolean addPort = true;
+                                                            for (int j = 0; j < extension.getPorts().size(); j++) {
+                                                                Port existingPort = extension.getPorts().get(j);
+                                                                if (existingPort.getType() == Port.Type.NONE) {
+                                                                    addPort = false;
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            if (addPort) {
+                                                                extension.addPort(new Port());
+                                                            }
+                                                        }
+
                                                         // </HACK>
 
                                                     } else {
@@ -681,26 +700,29 @@ public class HostImage extends PortableImage {
                                                     );
                                                     extensionImage.setRotation(extensionImageRotation + 90);
 //
-                                                    // <HACK>
-                                                    // Create Port shapes for each of Extension's Ports
-                                                    for (int i = 0; i < extension.getPorts().size(); i++) {
-                                                        Port port = extension.getPorts().get(i);
-
-                                                        // Ports
-                                                        Circle<Port> circle = new Circle<>(port);
-                                                        circle.setRadius(40);
-                                                        circle.setLabel("Port " + i + 1);
-                                                        circle.setPosition(-90, 200);
-                                                        // circle.setRelativeRotation(0);
-
-                                                        circle.setColor("#efefef");
-                                                        circle.setOutlineThickness(0);
-
-                                                        circle.setVisibility(Visibility.INVISIBLE);
-
-                                                        extensionImage.addShape(circle);
-                                                    }
-                                                    // </HACK>
+//                                                    // <HACK>
+//                                                    // Create Port shapes for each of Extension's Ports
+//                                                    for (int i = 0; i < extension.getPorts().size(); i++) {
+//                                                        Port port = extension.getPorts().get(i);
+//
+//                                                        if (getShape(port) == null) {
+//
+//                                                            // Ports
+//                                                            Circle<Port> circle = new Circle<>(port);
+//                                                            circle.setRadius(40);
+//                                                            circle.setLabel("Port " + i + 1);
+//                                                            circle.setPosition(-90, 200);
+//                                                            // circle.setRelativeRotation(0);
+//
+//                                                            circle.setColor("#efefef");
+//                                                            circle.setOutlineThickness(0);
+//
+//                                                            circle.setVisibility(Visibility.INVISIBLE);
+//
+//                                                            extensionImage.addShape(circle);
+//                                                        }
+//                                                    }
+//                                                    // </HACK>
 
                                                     // Configure Host's Port (i.e., the Path's source Port)
                                                     Port hostPort = (Port) sourcePortShape.getEntity();

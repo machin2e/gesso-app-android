@@ -15,6 +15,7 @@ import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Rectangle;
 import camp.computer.clay.space.architecture.Shape;
 
@@ -35,11 +36,22 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
         Rectangle rectangle;
 
         // Create Shapes for Image
-        rectangle = new Rectangle(200, 200);
-        addShape(rectangle);
+        rectangle = new Rectangle(getExtension());
+        rectangle.setWidth(200);
+        rectangle.setHeight(200);
         rectangle.setLabel("Board");
         rectangle.setColor("#f7f7f7");
         rectangle.setOutlineThickness(1);
+        addShape(rectangle);
+
+        // Headers
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header");
+        rectangle.setPosition(0, 107);
+        rectangle.setRotation(0);
+        rectangle.setColor("#3b3b3b");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
     }
 
     private void setupActions() {
@@ -112,6 +124,33 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
 
     public void update() {
 
+        // Create any additional images or shapes to match the Entity
+        // <HACK>
+        // Create Port shapes for each of Extension's Ports
+        for (int i = 0; i < getExtension().getPorts().size(); i++) {
+            Port port = getExtension().getPorts().get(i);
+
+            if (getShape(port) == null) {
+
+                // Ports
+                Circle<Port> circle = new Circle<>(port);
+                circle.setRadius(40);
+                circle.setLabel("Port " + (getExtension().getPorts().size() + 1));
+                circle.setPosition(-90, 200);
+                // circle.setRelativeRotation(0);
+
+                circle.setColor("#efefef");
+                circle.setOutlineThickness(0);
+
+                circle.setVisibility(Visibility.INVISIBLE);
+
+                addShape(circle);
+            }
+        }
+
+        // TODO: Clean up/delete images/shapes for any removed ports...
+        // </HACK>
+
         // TODO: Update Port positions based on the number of ports
         int portCount = getPortable().getPorts().size();
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
@@ -136,6 +175,9 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                 portShape.setColor(Color.getColor(port.getType()));
             }
         }
+
+        // Update Header (size, etc.)
+        ((Rectangle) getShape("Header")).setWidth(15 * getExtension().getPorts().size());
     }
 
     public void draw(Display display) {

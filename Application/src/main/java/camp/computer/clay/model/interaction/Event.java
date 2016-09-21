@@ -1,5 +1,6 @@
 package camp.computer.clay.model.interaction;
 
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.util.Time;

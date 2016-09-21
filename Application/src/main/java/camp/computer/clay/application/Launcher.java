@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.application.communication.RedisSub.RedisSubThread;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
@@ -47,14 +49,15 @@ import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
 import camp.computer.clay.system.old_model.Host;
 import camp.computer.clay.system.host.DisplayHostInterface;
+import redis.clients.jedis.Jedis;
 
 public class Launcher extends FragmentActivity implements DisplayHostInterface { // was Launcher
     // rename Launcher to Setup? to provide analog to "setup" functions in classes?
 
     // <Settings>
-    private static final boolean ENABLE_TONE_GENERATOR = false;
-    private static final boolean ENABLE_SPEECH_GENERATOR = false;
-    private static final boolean ENABLE_MOTION_SENSOR = true;
+    private static final boolean ENABLE_TONE_OUTPUT = false;
+    private static final boolean ENABLE_SPEECH_OUTPUT = false;
+    private static final boolean ENABLE_MOTION_INPUT = true;
 
     private static final long MESSAGE_SEND_FREQUENCY = 500;
     // </Settings>
@@ -114,7 +117,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         Launcher.context = getApplicationContext();
 
         // Sensor Interface
-        if (ENABLE_MOTION_SENSOR) {
+        if (ENABLE_MOTION_INPUT) {
             orientationInput = new OrientationInput(getApplicationContext());
         }
 
@@ -399,16 +402,105 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         handler.post(runnableCode);
 
         // Check availability of speech synthesis engine on Android host device.
-        if (ENABLE_SPEECH_GENERATOR) {
+        if (ENABLE_SPEECH_OUTPUT) {
             SpeechOutput.checkAvailability(this);
         }
 
-        if (ENABLE_TONE_GENERATOR) {
+        if (ENABLE_TONE_OUTPUT) {
             toneOutput = new ToneOutput();
         }
 
         hideChat();
+
+        // <REDIS>
+//        new JedisConnectToDatabaseTask().execute("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com:14268");
+
+//        while (this.jedis == null) {
+//            // Waiting for connection...
+//        }
+
+//        new Thread(
+//                new RedisSubThread(this.jedis)
+//        ).start();
+        // </REDIS>
     }
+
+    // <REDIS>
+    private Jedis jedis;
+
+    public class JedisConnectToDatabaseTask extends AsyncTask<String, Void, Void> {
+
+        private Exception exception;
+
+        protected Void doInBackground(String... args) {
+            try {
+                String uri = args[0].split(":")[0];
+                int port = Integer.parseInt(args[0].split(":")[1]);
+                Log.v("Redis", "Jedis Task");
+                //jedis = new Jedis("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com", 14268);
+                jedis = new Jedis(uri, port);
+                jedis.auth("testdb");
+                jedis.set("foo", "bar");
+                String value = jedis.get("foo");
+                Log.v("Redis", "foo: " + value);
+
+//                jedis.publish("events", args[0]);
+//                Log.v("Redis", "called publish");
+
+                new Thread(
+                        new RedisSubThread(jedis)
+                ).start();
+
+                //return theRSSHandler.getFeed();
+                return null;
+            } catch (Exception e) {
+                this.exception = e;
+
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Void feed) {
+            // TODO: check this.exception
+            // TODO: do something with the feed
+        }
+    }
+
+    public void publish(String message) {
+        new JedisPublishTask().execute(message);
+    }
+
+    class JedisPublishTask extends AsyncTask<String, Void, Void> {
+
+        private Exception exception;
+
+        protected Void doInBackground(String... urls) {
+            try {
+//                Log.v("Jedis", "Jedis Task");
+//                Jedis jedis = new Jedis("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com", 14268);
+//                jedis.auth("testdb");
+//                jedis.set("foo", "bar");
+//                String value = jedis.get("foo");
+//                Log.v("Jedis", "foo: " + value);
+
+                jedis.publish("events", urls[0]);
+                Log.v("Redis", "called publish");
+
+                //return theRSSHandler.getFeed();
+                return null;
+            } catch (Exception e) {
+                this.exception = e;
+
+                return null;
+            }
+        }
+
+        protected void onPostExecute(Void feed) {
+            // TODO: check this.exception
+            // TODO: do something with the feed
+        }
+    }
+    // </REDIS>
 
     public void hideChat() {
         // <CHAT_AND_CONTEXT_SCOPE>

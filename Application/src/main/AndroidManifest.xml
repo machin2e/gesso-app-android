@@ -15,7 +15,7 @@
     <application
         android:label="@string/application_name"
         android:icon="@drawable/ic_launcher">
-        <activity android:name="camp.computer.clay.application.Launcher"
+        <activity android:name=".Launcher"
             android:theme="@style/SplashTheme"
             android:icon="@drawable/ic_launcher"
             android:label="@string/application_name">
@@ -25,4 +25,4 @@
             </intent-filter>
         </activity>
     </application>
-</manifest> 
+</manifest>

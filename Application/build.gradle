@@ -21,4 +21,6 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:23.0.+'
+    // https://mvnrepository.com/artifact/redis.clients/jedis
+    compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
 }
