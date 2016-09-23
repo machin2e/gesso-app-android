@@ -70,7 +70,8 @@ public class Line<T extends Entity> extends Shape<T> {
 
     public void setTarget(Point target)
     {
-        this.target = target;
+        //this.target = target;
+        this.target.set(target);
     }
 
     public double getLength()

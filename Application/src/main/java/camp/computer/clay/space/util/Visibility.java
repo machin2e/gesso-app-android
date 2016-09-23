@@ -1,5 +1,6 @@
 package camp.computer.clay.space.util;
 
+// TODO: http://stackoverflow.com/questions/32354107/how-are-enums-internally-represented-in-java
 public class Visibility {
 
     private Visibility reference = null;

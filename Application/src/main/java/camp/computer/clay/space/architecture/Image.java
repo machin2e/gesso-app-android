@@ -1,5 +1,7 @@
 package camp.computer.clay.space.architecture;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -102,15 +104,10 @@ public abstract class Image<T extends Entity> {
         return visibility;
     }
 
-//    public void addShape(Shape shape) {
-//        shape.getPosition().setOrigin(getPosition());
-//        shapes.add(shape);
-//    }
-
     public <T extends Shape> void addShape(T shape)
     {
         shape.getPosition().setOrigin(getPosition());
-        shapes.add(shape);
+        this.shapes.add(shape);
     }
 
     public <T extends Shape> void addShape(T shape, String label)
@@ -149,7 +146,7 @@ public abstract class Image<T extends Entity> {
 
     public Shape getShapeByPosition(Point point)
     {
-        List<Shape> shapes = getShapes().getList();
+//        List<Shape> shapes = getShapes().getList();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.contains(point)) {
@@ -214,7 +211,9 @@ public abstract class Image<T extends Entity> {
 
     public void update()
     {
+        Log.v("OnUpdate", "Image.update " + shapes.size());
         for (int i = 0; i < this.shapes.size(); i++) {
+            Log.v("OnUpdate", "Image.update " + shapes.get(i));
             this.shapes.get(i).update();
         }
     }

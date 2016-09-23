@@ -155,10 +155,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // <PERSPECTIVE>
         // Adjust the perspective
         canvas.save();
-        canvas.translate(
-//                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(),
-//                (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX()
-                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY());
+        canvas.translate((float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX());
+//                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY());
         // this.canvas.rotate((float) ApplicationView.getLauncherView().getOrientationInput().getRotationZ());
         canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
         // </PERSPECTIVE>
@@ -391,7 +389,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public static void drawLine(Line line, Display display)
     {
-
         Log.v("Line", "Display.drawLine from " + line.getSource().getX() + ", " + line.getSource().getY() + " to " + line.getTarget().getX() + ", " + line.getTarget().getY());
 
         Canvas canvas = display.getCanvas();
@@ -400,11 +397,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.parseColor(line.getOutlineColor()));
         paint.setStrokeWidth((float) line.getOutlineThickness());
-        paint.setStrokeWidth(5.0f);
 
         // Color
         canvas.drawLine((float) line.getSource().getX(), (float) line.getSource().getY(), (float) line.getTarget().getX(), (float) line.getTarget().getY(), paint);
-
     }
 
     public static void drawLine(Point source, Point target, Display display)

@@ -25,6 +25,7 @@ import camp.computer.clay.space.architecture.ImageGroup;
 import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.util.Probability;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Geometry;
@@ -48,7 +49,6 @@ public class HostImage extends PortableImage {
 
     private void setupShapes()
     {
-
         Rectangle rectangle;
         Circle circle;
 
@@ -206,6 +206,7 @@ public class HostImage extends PortableImage {
             }
 
             // Line (Port Data Plot)
+            /*
             Line line = new Line();
             addShape(line);
             line.setOrigin(circle.getPosition()); // Remove this? Weird to have a line with a center...
@@ -214,6 +215,46 @@ public class HostImage extends PortableImage {
             line.setRotation(90);
             line.setOutlineColor("#ff000000");
             line.getVisibility().setReference(circle.getVisibility());
+            */
+
+            // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto y axis points with most recent data
+            Line previousLine = null;
+            int segmentCount = 10;
+            for (int j = 0; j < segmentCount; j++) {
+                Line line = new Line();
+                addShape(line);
+                line.setOrigin(circle.getPosition()); // Remove this? Weird to have a line with a center...
+
+                if (previousLine == null) {
+                    line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
+                } else {
+                    line.setSource(new Point(previousLine.getTarget().getRelativeX(), previousLine.getTarget().getRelativeY(), line.getPosition()));
+                }
+                if (j < (segmentCount - 1)) {
+                    double segmentLength = (circle.getRadius() * 2) / segmentCount;
+                    line.setTarget(new Point(line.getSource().getRelativeX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
+
+//                    Log.v("OnUpdate", "ADDING onUpdateListener");
+//                    final Circle finalCircle = circle;
+//                    line.setOnUpdateListener(new OnUpdateListener<Line>() {
+//                        @Override
+//                        public void onUpdate(Line line)
+//                        {
+//                            line.getTarget().setRelativeY(Probability.generateRandomInteger(-(int) finalCircle.getRadius(), (int) finalCircle.getRadius()));
+//                        }
+//                    });
+
+                } else {
+                    line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
+                }
+
+                line.setRotation(90);
+                line.setOutlineColor("#ff000000");
+                line.setOutlineThickness(3.0);
+                line.getVisibility().setReference(circle.getVisibility());
+
+                previousLine = line;
+            }
         }
     }
 
@@ -834,7 +875,6 @@ public class HostImage extends PortableImage {
 
     public void update()
     {
-
         // Get LED shapes
         ShapeGroup lightShapeGroup = getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
 
@@ -850,6 +890,14 @@ public class HostImage extends PortableImage {
             lightShapeGroup.get(i).setColor(portShape.getColor());
         }
 
+
+        // <HACK>
+        // TODO: Move into Shape base class
+        for (int i = 0; i < shapes.size(); i++) {
+            //Log.v("OnUpdate", "Image.update " + shapes.size());
+            shapes.get(i).update();
+        }
+        // </HACK>
     }
 
     public void draw(Display display)
