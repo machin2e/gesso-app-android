@@ -43,6 +43,7 @@ import camp.computer.clay.application.communication.RedisSub.RedisSubThread;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
+import camp.computer.clay.application.ui.Dialog;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.profile.ExtensionProfile;
@@ -63,9 +64,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     private static final boolean ENABLE_MOTION_INPUT = true;
 
     private static final long MESSAGE_SEND_FREQUENCY = 500;
-    // </Settings>
 
-    // <Style>
     public static boolean ENABLE_GEOMETRY_LABELS = false;
 
     /**
@@ -73,7 +72,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
      * during debugging.
      */
     private static final boolean ENABLE_FULLSCREEN = true;
-    // </Style>
+    // </Settings>
 
     public Display display;
 
@@ -92,6 +91,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     private UDPHost UDPHost;
 
     private NetworkResource networkResource;
+
+    Dialog ui;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -112,6 +113,10 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     }
 
+    public Dialog getUi() {
+        return this.ui;
+    }
+
     /**
      * Called when the activity is getFirstEvent created.
      */
@@ -119,6 +124,10 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // "Return the context of the single, global Application object of the current process.
+        // This generally should only be used if you need a Context whose lifecycle is separate
+        // from the current context, that is tied to the lifetime of the process rather than the
+        // current component." (Android Documentation)
         Launcher.context = getApplicationContext();
 
         // Sensor Interface
@@ -132,6 +141,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         // Display Interface
         Launcher.launcherView = this;
+
+        ui = new Dialog(this);
 
 //        for (int i = 0; i < 100; i++) {
 //            String outgoingMessage = "announce device " + UUID.randomUUID();
@@ -880,311 +891,4 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     public OrientationInput getOrientationInput() {
         return this.orientationInput;
     }
-
-    // <UI>
-    public interface OnCompleteCallback<T> {
-        void onComplete(T result);
-    }
-
-    public void displayInputDialog(final OnCompleteCallback onCompleteCallback) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Create Extension");
-
-        // Set up the input
-        final EditText input = new EditText(this);
-
-        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-
-        // Add input to view
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onCompleteCallback.onComplete(input.getText().toString());
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // TODO: Callback with "Cancel" action
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
-    // TODO: public <T> void displaySelectionDialog(List<T> options, OnCompleteCallback onCompleteCallback) {
-    public <T> void displaySelectionDialog(final List<ExtensionProfile> options, final OnCompleteCallback onCompleteCallback) {
-
-        // Items
-//        List<String> options = new ArrayList<>();
-//        options.add("Servo");
-//        options.add("Servo with Analog Feedback");
-//        options.add("IR Rangefinder");
-//        options.add("Ultrasonic Rangefinder");
-//        options.add("Stepper Motor");
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        // dialogBuilder.setIcon(R.drawable.ic_launcher);
-        dialogBuilder.setTitle("Select a patch to connect:");
-
-        // Add data adapter
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_item
-        );
-
-//        // Add data to adapter. These are the options.
-//        for (int i = 0; i < options.size(); i++) {
-//            arrayAdapter.add(options.get(i));
-//        }
-
-        // Add Profiles
-        for (int i = 0; i < options.size(); i++) {
-//            ExtensionProfile extensionProfile = getClay().getExtensionProfiles().get(i);
-//            options.add(extensionProfile.getLabel());
-            arrayAdapter.add(options.get(i).getLabel());
-        }
-
-        // Apply the adapter to the dialog
-        dialogBuilder.setAdapter(arrayAdapter, null);
-
-        /*
-        builderSingle.setNegativeButton(
-                "Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        */
-
-        final AlertDialog dialog = dialogBuilder.create();
-
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String selectionLabel = arrayAdapter.getItem(position);
-                ExtensionProfile selection = options.get(position);
-
-                // Configure based on Profile
-                // Add Ports based on Profile
-                onCompleteCallback.onComplete(selection);
-//                while (selection.getPortCount() < position + 1) {
-//                    selection.addPort(new Port());
-//                }
-
-                // Response
-                /*
-                AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
-                builderInner.setMessage(selectionLabel);
-                builderInner.setTitle("Connecting patch");
-                builderInner.setPositiveButton(
-                        "Ok",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(
-                                    DialogInterface dialog,
-                                    int which) {
-                                dialog.dismiss();
-                            }
-                        });
-
-                dialog.dismiss();
-                builderInner.show();
-                */
-
-                dialog.dismiss();
-
-                displayTasksDialog();
-            }
-        });
-
-        dialog.show();
-    }
-
-    // Break multi-step tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
-    // displayFloatingTaskDialog(<task list>, <task step to display>)
-
-    public void displayTasksDialog() {
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        // builderSingle.setIcon(R.drawable.ic_launcher);
-        dialogBuilder.setTitle("Complete these steps to assemble");
-
-        // TODO: Difficulty
-        // TODO: Average Time
-
-        // Create data adapter
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_multichoice
-        );
-
-        // Add data to adapter
-        arrayAdapter.add("Task 1");
-        arrayAdapter.add("Task 2");
-        arrayAdapter.add("Task 3");
-        arrayAdapter.add("Task 4");
-        arrayAdapter.add("Task 5");
-
-        final Context appContext = this;
-
-        /*
-        builderSingle.setNegativeButton(
-                "Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        */
-
-        // Positive button
-        dialogBuilder.setPositiveButton(
-                "Start",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-//                        String strName = arrayAdapter.getItem(which);
-
-                        // Response
-                        /*
-                        AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
-                        builderInner.setMessage(strName);
-                        builderInner.setTitle("Connecting patch");
-                        builderInner.setPositiveButton(
-                                "Ok",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(
-                                            DialogInterface dialog,
-                                            int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-
-                        dialog.dismiss();
-                        builderInner.show();
-                        */
-
-//                        displayTasksDialog();
-
-
-                        displayTaskDialog();
-                    }
-                });
-
-        // Set data adapter
-        dialogBuilder.setAdapter(
-                arrayAdapter,
-                null
-        );
-
-
-        AlertDialog dialog = dialogBuilder.create();
-
-        dialog.getListView().setItemsCanFocus(false);
-        dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Manage selected items here
-                System.out.println("clicked" + position);
-                CheckedTextView textView = (CheckedTextView) view;
-                if (textView.isChecked()) {
-
-                } else {
-
-                }
-            }
-        });
-
-        dialog.show();
-    }
-
-    public void displayTaskDialog() {
-
-        final Context appContext = this;
-
-        // Items
-        List<String> options = new ArrayList<>();
-        options.add("Task 1");
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        // dialogBuilder.setIcon(R.drawable.ic_launcher);
-        dialogBuilder.setTitle("Do this task");
-
-        // Add data adapter
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.select_dialog_singlechoice
-        );
-
-        // Add data to adapter. These are the options.
-        for (int i = 0; i < options.size(); i++) {
-            arrayAdapter.add(options.get(i));
-        }
-
-        // Apply the adapter to the dialog
-        dialogBuilder.setAdapter(arrayAdapter, null);
-
-        /*
-        // "Back" Button
-        builderSingle.setNegativeButton(
-                "Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-        */
-
-        final AlertDialog dialog = dialogBuilder.create();
-
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                String itemLabel = arrayAdapter.getItem(position);
-
-                // Response
-                /*
-                AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
-                builderInner.setMessage(strName);
-                builderInner.setTitle("Connecting patch");
-                builderInner.setPositiveButton(
-                        "Ok",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(
-                                    DialogInterface dialog,
-                                    int which) {
-                                dialog.dismiss();
-                            }
-                        });
-
-                dialog.dismiss();
-                builderInner.show();
-                */
-
-                dialog.dismiss();
-
-                displayTaskDialog();
-            }
-        });
-
-        dialog.show();
-    }
-    // </UI>
 }

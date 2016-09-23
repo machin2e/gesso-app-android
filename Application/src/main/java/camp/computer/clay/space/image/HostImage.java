@@ -7,6 +7,7 @@ import android.util.Log;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.ui.Dialog;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Group;
@@ -819,7 +820,7 @@ public class HostImage extends PortableImage {
                                                 } else if (extensionProfiles.size() > 0) {
 
                                                     // Show Extension store and get selection from user
-                                                    Launcher.getLauncherView().displaySelectionDialog(extensionProfiles, new Launcher.OnCompleteCallback<ExtensionProfile>() {
+                                                    Launcher.getLauncherView().getUi().displaySelectionDialog(extensionProfiles, new Dialog.OnCompleteCallback<ExtensionProfile>() {
                                                         @Override
                                                         public void onComplete(ExtensionProfile extensionProfile) {
 

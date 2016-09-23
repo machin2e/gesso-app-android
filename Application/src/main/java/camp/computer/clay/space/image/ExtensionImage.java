@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.ui.Dialog;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Path;
@@ -71,7 +72,7 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                 } else if (event.getType() == Event.Type.HOLD) {
 
                     // TODO: Only call displayInputDialog if the extension is a draft (i.e., does not have an associated ExtensionProfile)
-                    Launcher.getLauncherView().displayInputDialog(new Launcher.OnCompleteCallback<String>() {
+                    Launcher.getLauncherView().getUi().displayInputDialog(new Dialog.OnCompleteCallback<String>() {
                         @Override
                         public void onComplete(String result) {
 
