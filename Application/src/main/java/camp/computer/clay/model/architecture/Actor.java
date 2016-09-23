@@ -16,7 +16,7 @@ import camp.computer.clay.space.architecture.Shape;
  * based on the actions recognized on one of the {@code Host} objects associated with the
  * {@code Actor}.
  */
-public class Actor { // Controller
+public class Actor {
 
     private Camera camera = null;
 
@@ -67,7 +67,7 @@ public class Actor { // Controller
      *
      * @return The most recent interaction.
      */
-    private Action getProcess() {
+    private Action getAction() {
         if (actions.size() > 0) {
             return actions.get(actions.size() - 1);
         } else {
@@ -115,14 +115,35 @@ public class Actor { // Controller
                 // Action the event
                 event.getTargetImage().processAction(action);
 
-                //getCamera().getSpace().onTouchListener(event);
+                break;
+            }
+
+            case HOLD: {
+
+                // Start a new action
+                Action action = getAction();
+                actions.add(action);
+
+                // Add event to action
+                action.addEvent(event);
+
+                // Set the target image
+                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                event.setTargetImage(targetImage);
+
+                // Set the target shape
+                Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
+                event.setTargetShape(targetShape);
+
+                // Action the event
+                event.getTargetImage().processAction(action);
 
                 break;
             }
 
             case MOVE: {
 
-                Action action = getProcess();
+                Action action = getAction();
                 action.addEvent(event);
 
                 // Current
@@ -139,16 +160,6 @@ public class Actor { // Controller
                     Shape targetShape = targetImage.getShapeByPosition(event.getPosition());
                     event.setTargetShape(targetShape);
 
-//                    // <HACK>
-//                    // TODO: Update handlers and Delete!
-//                    //Action action = event.getAction();
-//                    if (action.size() > 1) {
-//                        event.setTargetImage(action.getFirstEvent().getTargetImage());
-//                        event.setTargetShape(action.getFirstEvent().getTargetShape());
-//                    }
-//                    // </HACK>
-
-                    //event.getTargetImage().processAction(action);
                     action.getFirstEvent().getTargetImage().processAction(action);
                 }
 
@@ -157,7 +168,7 @@ public class Actor { // Controller
 
             case UNSELECT: {
 
-                Action action = getProcess();
+                Action action = getAction();
                 action.addEvent(event);
 
                 // Current
@@ -165,14 +176,6 @@ public class Actor { // Controller
 
                 // Stop listening for a hold event
                 action.timerHandler.removeCallbacks(action.timerRunnable);
-
-//                if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
-//                    event.setType(Event.Type.SELECT);
-//                    getCamera().getSpace().onTapListener(event);
-//                } else {
-//                    event.setType(Event.Type.UNSELECT);
-//                    getCamera().getSpace().onReleaseListener(event);
-//                }
 
                 // Set the target image
                 Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());

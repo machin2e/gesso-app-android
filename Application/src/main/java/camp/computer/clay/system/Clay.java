@@ -6,6 +6,7 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Port;
+import camp.computer.clay.model.profile.ExtensionProfile;
 import camp.computer.clay.space.architecture.Space;
 import camp.computer.clay.system.host.CacheHost;
 import camp.computer.clay.system.host.DisplayHostInterface;
@@ -46,6 +48,12 @@ public class Clay {
 
     // Group of discovered hosts
     private List<Host> hosts = new ArrayList<>();
+
+    private List<ExtensionProfile> extensionProfiles = new ArrayList<>();
+
+    public List<ExtensionProfile> getExtensionProfiles() {
+        return this.extensionProfiles;
+    }
 
     public Clay() {
 

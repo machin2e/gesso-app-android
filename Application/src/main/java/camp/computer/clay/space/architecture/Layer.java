@@ -6,7 +6,7 @@ import java.util.List;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
 
-public class Layer {
+public class Layer { // TODO: Replace Layer with Group (probably ImageGroup)
 
     private static int LAYER_ID_COUNT = 0;
 

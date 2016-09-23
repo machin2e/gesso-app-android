@@ -1,6 +1,7 @@
 package camp.computer.clay.model.interaction;
 
 import android.os.Handler;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -36,8 +37,6 @@ public class Action {
 
     public Handler timerHandler = new Handler();
 
-    Action thisAction = this;
-
     public Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
@@ -47,19 +46,13 @@ public class Action {
             if (getFirstEvent().isPointing[pointerIndex]) {
                 if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
 
-                    // <HACK>
-                    // TODO: Make this less ugly! It's so ugly.
-                    thisAction.getFirstEvent().setType(Event.Type.HOLD);
-//                    getFirstEvent().getActor().getCamera().getSpace().onHoldListener(thisAction.getFirstEvent());
+                    Event event = new Event();
+                    event.setType(Event.Type.HOLD);
+                    event.pointerIndex = getFirstEvent().pointerIndex;
+                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just copy the previous event's since this is a synthetic event?)
+                    getFirstEvent().getActor().processAction(event);
 
-                    Event event = thisAction.getFirstEvent();
-                    Image targetImage = getFirstEvent().getActor().getSpace().getImageByPosition(event.getPosition());
-                    event.setTargetImage(targetImage);
-
-                    event.getTargetImage().processAction(thisAction);
-                    // </HACK>
-
-                    thisAction.isHolding[pointerIndex] = true;
+                    isHolding[pointerIndex] = true;
 
                 }
             }

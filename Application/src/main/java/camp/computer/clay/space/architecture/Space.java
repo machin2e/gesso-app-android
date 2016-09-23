@@ -79,7 +79,7 @@ public class Space extends Image<Model> {
                 } else if (lastEvent.getType() == Event.Type.HOLD) {
 
                     // Select patch to connect
-                    Launcher.getLauncherView().displayChooseDialog();
+//                    Launcher.getLauncherView().displaySelectionDialog();
 
                 } else if (lastEvent.getType() == Event.Type.MOVE) {
 
@@ -755,9 +755,8 @@ public class Space extends Image<Model> {
             );
 
             paint.setStyle(Paint.Style.FILL);
-            //paint.setColor(Color.CYAN); // paint.setColor(getUniqueColor());
             paint.setColor(Color.parseColor("#fff7f7f7"));
-            Display.drawRectangle(prototypeExtensionPosition, pathRotationAngle + 180, 250, 250, display);
+            Display.drawRectangle(prototypeExtensionPosition, pathRotationAngle + 180, 200, 200, display);
 
         }
 

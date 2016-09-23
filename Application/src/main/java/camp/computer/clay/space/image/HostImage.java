@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
@@ -18,6 +17,7 @@ import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Camera;
+import camp.computer.clay.model.profile.ExtensionProfile;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.ImageGroup;
 import camp.computer.clay.space.architecture.Space;
@@ -289,7 +289,7 @@ public class HostImage extends PortableImage {
                                 @Override
                                 public void onAction(Action action) {
 
-                                    Event event = action.getLastEvent();
+                                    final Event event = action.getLastEvent();
 
                                     Camera camera = event.getActor().getCamera();
 
@@ -401,29 +401,24 @@ public class HostImage extends PortableImage {
                                                     if (image.getEntity() == sourcePort.getParent() || nearbyImages.contains(image)) {
 
 //                                                        // <HACK>
-//                                                        if (image instanceof HostImage) {
-                                                        PortableImage nearbyFigure = (PortableImage) image;
-                                                        nearbyFigure.setTransparency(1.0f);
-                                                        nearbyFigure.getPortShapes().setVisibility(Visibility.VISIBLE);
-//                                                        } else if (image instanceof ExtensionImage) {
-//                                                            // ExtensionImage nearbyFigure = (ExtensionImage) image;
-//
-//                                                        }
+                                                        PortableImage nearbyImage = (PortableImage) image;
+                                                        nearbyImage.setTransparency(1.0f);
+                                                        nearbyImage.getPortShapes().setVisibility(Visibility.VISIBLE);
 
                                                         // TODO: Add additional port!
                                                         if (image instanceof ExtensionImage) {
                                                             Extension extension = ((ExtensionImage) image).getExtension();
 
-                                                            boolean addPort = true;
+                                                            boolean addPrototypePort = true;
                                                             for (int j = 0; j < extension.getPorts().size(); j++) {
                                                                 Port existingPort = extension.getPorts().get(j);
                                                                 if (existingPort.getType() == Port.Type.NONE) {
-                                                                    addPort = false;
+                                                                    addPrototypePort = false;
                                                                     break;
                                                                 }
                                                             }
 
-                                                            if (addPort) {
+                                                            if (addPrototypePort) {
                                                                 extension.addPort(new Port());
                                                             }
                                                         }
@@ -663,7 +658,7 @@ public class HostImage extends PortableImage {
 
                                                 Log.v("Extension", "Creating Extension from Port");
 
-                                                Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
+                                                Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
 
                                                 if (space.getPrototypeExtensionVisibility() == Visibility.VISIBLE) {
 
@@ -695,37 +690,13 @@ public class HostImage extends PortableImage {
                                                     extensionImage.setPosition(event.getPosition());
 
                                                     double extensionImageRotation = Geometry.calculateRotationAngle(
-                                                            sourcePortShape.getPosition(),
+                                                            hostPortShape.getPosition(),
                                                             extensionImage.getPosition()
                                                     );
                                                     extensionImage.setRotation(extensionImageRotation + 90);
-//
-//                                                    // <HACK>
-//                                                    // Create Port shapes for each of Extension's Ports
-//                                                    for (int i = 0; i < extension.getPorts().size(); i++) {
-//                                                        Port port = extension.getPorts().get(i);
-//
-//                                                        if (getShape(port) == null) {
-//
-//                                                            // Ports
-//                                                            Circle<Port> circle = new Circle<>(port);
-//                                                            circle.setRadius(40);
-//                                                            circle.setLabel("Port " + i + 1);
-//                                                            circle.setPosition(-90, 200);
-//                                                            // circle.setRelativeRotation(0);
-//
-//                                                            circle.setColor("#efefef");
-//                                                            circle.setOutlineThickness(0);
-//
-//                                                            circle.setVisibility(Visibility.INVISIBLE);
-//
-//                                                            extensionImage.addShape(circle);
-//                                                        }
-//                                                    }
-//                                                    // </HACK>
 
                                                     // Configure Host's Port (i.e., the Path's source Port)
-                                                    Port hostPort = (Port) sourcePortShape.getEntity();
+                                                    Port hostPort = (Port) hostPortShape.getEntity();
 
                                                     if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
                                                         hostPort.setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
@@ -792,7 +763,6 @@ public class HostImage extends PortableImage {
                                                         Path path = paths.get(j);
 
                                                         // Show source and target ports in path
-                                                        //getPortShape(path.getSource()).setVisibility(Visibility.VISIBLE);
                                                         space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
                                                         space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
@@ -836,11 +806,87 @@ public class HostImage extends PortableImage {
                                             // Check if connecting to a extension
                                             if (space.getPrototypeExtensionVisibility() == Visibility.VISIBLE) {
 
-                                                // Show extension store
-                                                Launcher.getLauncherView().displayChooseDialog();
-//                        Launcher.getLauncherView().displayTasksDialog();
-
                                                 space.setPrototypeExtensionVisibility(Visibility.INVISIBLE);
+
+                                                // Get cached extension profiles (and retrieve additional from Internet store)
+                                                List<ExtensionProfile> extensionProfiles = Launcher.getLauncherView().getClay().getExtensionProfiles();
+
+
+                                                if (extensionProfiles.size() == 0) {
+
+                                                    // Show "default" DIY extension builder (or info about there being no extensions)
+
+                                                } else if (extensionProfiles.size() > 0) {
+
+                                                    // Show Extension store and get selection from user
+                                                    Launcher.getLauncherView().displaySelectionDialog(extensionProfiles, new Launcher.OnCompleteCallback<ExtensionProfile>() {
+                                                        @Override
+                                                        public void onComplete(ExtensionProfile extensionProfile) {
+
+                                                            Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+
+                                                            // Create the Extension
+                                                            final Extension extension = new Extension(extensionProfile);
+
+                                                            // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
+
+                                                            /*
+                                                            // Create Ports and add them to the Extension
+                                                            int extensionProfile_portCount = 1;
+                                                            for (int j = 0; j < extensionProfile_portCount; j++) {
+                                                                Port port = new Port();
+                                                                extension.addPort(port);
+                                                            }
+                                                            */
+
+                                                            // Add Extension to Model
+                                                            space.getModel().addExtension(extension);
+
+                                                            // Add Extension to Space
+                                                            space.addEntity(extension);
+
+                                                            // Get the just-created Extension Image
+                                                            Image extensionImage = space.getImage(extension);
+
+                                                            // Update the Extension Image position and rotation
+                                                            extensionImage.setPosition(event.getPosition());
+
+                                                            double extensionImageRotation = Geometry.calculateRotationAngle(
+                                                                    getPosition(),
+                                                                    extensionImage.getPosition()
+                                                            );
+                                                            extensionImage.setRotation(extensionImageRotation + 90);
+
+                                                        /*
+                                                        // Configure Host's Port (i.e., the Path's source Port)
+                                                        Port hostPort = (Port) hostPortShape.getEntity();
+
+                                                        if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
+                                                            hostPort.setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
+                                                            hostPort.setDirection(Port.Direction.BOTH);
+                                                        }
+
+                                                        // Configure Extension's Ports (i.e., the Path's target Port)
+                                                        Port extensionPort = extension.getPorts().get(0);
+                                                        extensionPort.setDirection(Port.Direction.INPUT);
+                                                        extensionPort.setType(hostPort.getType());
+
+                                                        // Create Path from Host to Extension
+                                                        Path path = new Path(hostPort, extensionPort);
+                                                        path.setType(Path.Type.ELECTRONIC);
+                                                        hostPort.addPath(path);
+
+                                                        // Add Path to Space
+                                                        space.addEntity(path);
+
+                                                        // Update Camera
+                                                        camera.focusSelectPath(hostPort);
+                                                        */
+
+                                                        }
+                                                    });
+                                                    // Launcher.getLauncherView().displayTasksDialog();
+                                                }
                                             }
                                         }
 

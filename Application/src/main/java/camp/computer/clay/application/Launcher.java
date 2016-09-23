@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -23,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -43,6 +45,7 @@ import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.interaction.Event;
+import camp.computer.clay.model.profile.ExtensionProfile;
 import camp.computer.clay.system.host.NetworkResource;
 import camp.computer.clay.system.host.UDPHost;
 import camp.computer.clay.system.host.SQLiteStoreHost;
@@ -98,8 +101,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == SpeechOutput.CHECK_CODE) {
-            if(resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+        if (requestCode == SpeechOutput.CHECK_CODE) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 speechOutput = new SpeechOutput(this);
             } else {
                 Intent install = new Intent();
@@ -109,7 +112,9 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     }
 
-    /** Called when the activity is getFirstEvent created. */
+    /**
+     * Called when the activity is getFirstEvent created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,7 +151,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         setContentView(R.layout.activity_main);
 
         // Space Surface
-        display = (Display) findViewById (R.id.app_surface_view);
+        display = (Display) findViewById(R.id.app_surface_view);
         display.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
@@ -162,7 +167,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
             }
         });
 
-        final Button pathEditorAddActionButton = (Button) findViewById (R.id.path_editor_add_action);
+        final Button pathEditorAddActionButton = (Button) findViewById(R.id.path_editor_add_action);
         pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent motionEvent) {
@@ -237,7 +242,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         if (UDPHost == null) {
             UDPHost = new UDPHost("udp");
             clay.addHost(this.UDPHost);
-            UDPHost.startServer ();
+            UDPHost.startServer();
         }
 
         // Internet Network Interface
@@ -268,7 +273,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
@@ -298,11 +303,11 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
             @Override
             public boolean onTouch(View v, MotionEvent motionEvent) {
 
-                int pointerIndex = ((motionEvent.getAction () & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                int pointerId = motionEvent.getPointerId (pointerIndex);
+                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                int pointerId = motionEvent.getPointerId(pointerIndex);
                 //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
-                int touchActionType = (motionEvent.getAction () & MotionEvent.ACTION_MASK);
-                int pointCount = motionEvent.getPointerCount ();
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                int pointCount = motionEvent.getPointerCount();
 
                 // Update the state of the touched object based on the current pointerCoordinates interaction state.
                 if (touchActionType == MotionEvent.ACTION_DOWN) {
@@ -511,7 +516,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         messageContentLayout.setVisibility(View.GONE);
@@ -524,7 +529,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
 
@@ -584,7 +589,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         // <CHAT>
 
@@ -622,7 +627,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         contextScope.setText("✓");
     }
@@ -634,7 +639,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById (R.id.context_button);
+        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
@@ -697,7 +702,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
         actionConstruct.setBackgroundColor(Color.parseColor("#44000000"));
 
-        final LinearLayout pathPatchActionList = (LinearLayout) findViewById (R.id.path_editor_action_list);
+        final LinearLayout pathPatchActionList = (LinearLayout) findViewById(R.id.path_editor_action_list);
 
         actionConstruct.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -852,13 +857,15 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
     // TODO: Rename to something else and make a getLauncherView() function specific to the
     // TODO: (cont'd) display interface.
-    public static Launcher getLauncherView() { return Launcher.launcherView; }
+    public static Launcher getLauncherView() {
+        return Launcher.launcherView;
+    }
 
     public Display getDisplay() {
         return this.display;
     }
 
-    public double getFramesPerSecond () {
+    public double getFramesPerSecond() {
         return getDisplay().getDisplayOutput().getFramesPerSecond();
     }
 
@@ -874,17 +881,53 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         return this.orientationInput;
     }
 
-    public void displayChooseDialog() {
+    // <UI>
+    public interface OnCompleteCallback<T> {
+        void onComplete(T result);
+    }
 
-        final Context appContext = this;
+    public void displayInputDialog(final OnCompleteCallback onCompleteCallback) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Create Extension");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        // Add input to view
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                onCompleteCallback.onComplete(input.getText().toString());
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO: Callback with "Cancel" action
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    // TODO: public <T> void displaySelectionDialog(List<T> options, OnCompleteCallback onCompleteCallback) {
+    public <T> void displaySelectionDialog(final List<ExtensionProfile> options, final OnCompleteCallback onCompleteCallback) {
 
         // Items
-        List<String> options = new ArrayList<>();
-        options.add("Servo");
-        options.add("Servo with Analog Feedback");
-        options.add("IR Rangefinder");
-        options.add("Ultrasonic Rangefinder");
-        options.add("Stepper Motor");
+//        List<String> options = new ArrayList<>();
+//        options.add("Servo");
+//        options.add("Servo with Analog Feedback");
+//        options.add("IR Rangefinder");
+//        options.add("Ultrasonic Rangefinder");
+//        options.add("Stepper Motor");
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
@@ -896,9 +939,16 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
                 android.R.layout.select_dialog_item
         );
 
-        // Add data to adapter. These are the options.
+//        // Add data to adapter. These are the options.
+//        for (int i = 0; i < options.size(); i++) {
+//            arrayAdapter.add(options.get(i));
+//        }
+
+        // Add Profiles
         for (int i = 0; i < options.size(); i++) {
-            arrayAdapter.add(options.get(i));
+//            ExtensionProfile extensionProfile = getClay().getExtensionProfiles().get(i);
+//            options.add(extensionProfile.getLabel());
+            arrayAdapter.add(options.get(i).getLabel());
         }
 
         // Apply the adapter to the dialog
@@ -921,12 +971,20 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                String strName = arrayAdapter.getItem(position);
+                String selectionLabel = arrayAdapter.getItem(position);
+                ExtensionProfile selection = options.get(position);
+
+                // Configure based on Profile
+                // Add Ports based on Profile
+                onCompleteCallback.onComplete(selection);
+//                while (selection.getPortCount() < position + 1) {
+//                    selection.addPort(new Port());
+//                }
 
                 // Response
                 /*
                 AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
-                builderInner.setMessage(strName);
+                builderInner.setMessage(selectionLabel);
                 builderInner.setTitle("Connecting patch");
                 builderInner.setPositiveButton(
                         "Ok",
@@ -1043,7 +1101,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
                 // Manage selected items here
                 System.out.println("clicked" + position);
                 CheckedTextView textView = (CheckedTextView) view;
-                if(textView.isChecked()) {
+                if (textView.isChecked()) {
 
                 } else {
 
@@ -1128,4 +1186,5 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         dialog.show();
     }
+    // </UI>
 }

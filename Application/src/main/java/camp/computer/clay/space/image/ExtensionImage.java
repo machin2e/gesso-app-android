@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import camp.computer.clay.application.Launcher;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Path;
@@ -11,6 +12,7 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.profile.ExtensionProfile;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Color;
@@ -66,6 +68,28 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
 
                 } else if (event.getType() == Event.Type.SELECT) {
 
+                } else if (event.getType() == Event.Type.HOLD) {
+
+                    // TODO: Only call displayInputDialog if the extension is a draft (i.e., does not have an associated ExtensionProfile)
+                    Launcher.getLauncherView().displayInputDialog(new Launcher.OnCompleteCallback<String>() {
+                        @Override
+                        public void onComplete(String result) {
+
+                            // Create Extension Profile
+                            ExtensionProfile extensionProfile = new ExtensionProfile();
+                            extensionProfile.setLabel(result);
+                            extensionProfile.setPortCount(getPortable().getPorts().size());
+                            Log.v("HoldAction", "Creating new profile \"" + extensionProfile.getLabel() + "\" with " + extensionProfile.getPortCount() + " ports. Only added if no duplicate (i.e., doesn't already exist)");
+
+                            // Cache the new Extension Profile
+                            Launcher.getLauncherView().getClay().getExtensionProfiles().add(extensionProfile);
+
+                            // TODO: Persist the profile in the user's private store (either local or online)
+
+                            // TODO: Persist the profile in the global store online
+                        }
+                    });
+
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
                     Image targetImage = space.getImageByPosition(event.getPosition());
@@ -97,13 +121,6 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                             }
                         }
                     }
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                    Log.v("Event", "Tapped patch. Port image count: " + getPortShapes().size());
-                    Port port = new Port();
-                    getExtension().addPort(port);
-                    space.addEntity(port);
 
                 } else if (event.getType() == Event.Type.MOVE) {
 
