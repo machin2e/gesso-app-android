@@ -191,7 +191,7 @@ public class Descriptor {
 
     public Descriptor set (String content, boolean notifyContentTree) {
         if ((this.descriptionRange == null) || (this.descriptionRange != null && this.descriptionRange.contains(content))) {
-            Log.v("Descriptor", "set '" + this.label + "' to '" + content + "'");
+            Log.v("Descriptor", "setValue '" + this.label + "' to '" + content + "'");
             if (this.isList) {
                 Log.v("Content_Decision_List", "LIST");
 
@@ -297,9 +297,9 @@ public class Descriptor {
 
     public Descriptor put (String key, String content) {
         if (content == null) {
-            Log.v("Descriptor", "set '" + key);
+            Log.v("Descriptor", "setValue '" + key);
         } else {
-            Log.v("Descriptor", "set '" + key + "' to '" + content + "'");
+            Log.v("Descriptor", "setValue '" + key + "' to '" + content + "'");
         }
 
         Descriptor descriptorEntry = this.get(key);

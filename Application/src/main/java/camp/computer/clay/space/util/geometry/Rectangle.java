@@ -1,7 +1,5 @@
 package camp.computer.clay.space.util.geometry;
 
-import android.graphics.Color;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,50 +13,35 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     private double height = 1.0;
 
-    public Rectangle(T entity) {
+    public Rectangle(T entity)
+    {
         this.entity = entity;
     }
 
-    public Rectangle(double width, double height) {
+    public Rectangle(double width, double height)
+    {
         super();
         this.width = width;
         this.height = height;
     }
 
-    public Rectangle(Point position, double width, double height) {
+    public Rectangle(Point position, double width, double height)
+    {
         super(position);
         this.width = width;
         this.height = height;
     }
 
-    public Rectangle(double left, double top, double right, double bottom) {
+    public Rectangle(double left, double top, double right, double bottom)
+    {
         super(new Point((right + left) / 2.0, (top + bottom) / 2.0));
         this.width = (right - left);
         this.height = (bottom - top);
     }
 
-    // TODO: Delete?
-    public List<Point> getRelativeVertices() {
-        ArrayList<Point> vertices = new ArrayList<>();
-        vertices.add(getRelativeTopLeft());
-        vertices.add(getRelativeTopRight());
-        vertices.add(getRelativeBottomRight());
-        vertices.add(getRelativeBottomLeft());
-        return vertices;
-    }
-
-    // TODO: Delete?
-    public List<Line> getRelativeSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        segments.add(new Line(getRelativeTopLeft(), getRelativeTopRight()));
-        segments.add(new Line(getRelativeTopRight(), getRelativeBottomRight()));
-        segments.add(new Line(getRelativeBottomRight(), getRelativeBottomLeft()));
-        segments.add(new Line(getRelativeBottomLeft(), getRelativeTopLeft()));
-        return segments;
-    }
-
-    public List<Point> getVertices() {
-        ArrayList<Point> vertices = new ArrayList<>();
+    public List<Point> getVertices()
+    {
+        List<Point> vertices = new ArrayList<>();
         vertices.add(getTopLeft());
         vertices.add(getTopRight());
         vertices.add(getBottomRight());
@@ -66,7 +49,8 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         return vertices;
     }
 
-    public List<Line> getSegments() {
+    public List<Line> getSegments()
+    {
         ArrayList<Line> segments = new ArrayList<>();
         segments.add(new Line(getTopLeft(), getTopRight()));
         segments.add(new Line(getTopRight(), getBottomRight()));
@@ -76,90 +60,111 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public void draw(Display display) {
+    public void draw(Display display)
+    {
         if (isVisible()) {
             Display.drawRectangle(this, display);
-
-            display.getPaint().setColor(Color.GREEN);
-//            Surface.drawRectangle(position, getRotation(), width, height, surface);
         }
     }
 
-    public double getWidth() {
+    public double getWidth()
+    {
         return this.width;
     }
 
-    public void setWidth(double width) {
+    public void setWidth(double width)
+    {
         this.width = width;
     }
 
-    public double getHeight() {
+    public double getHeight()
+    {
         return this.height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(double height)
+    {
         this.height = height;
     }
 
-    public double getRelativeLeft() {
+    // TODO: Return a Number that updates when the Point coordinates update
+    public double getRelativeLeft()
+    {
         return 0 - (width / 2.0f);
     }
 
-    public double getRelativeTop() {
+    // TODO: Return a Number that updates when the Point coordinates update
+    public double getRelativeTop()
+    {
         return 0 - (height / 2.0f);
     }
 
-    public double getRelativeRight() {
+    public double getRelativeRight()
+    {
+        // TODO: Return a Number that updates when the Point coordinates update
 //        return this.position.getRelativeX() + (width / 2.0f);
         return 0 + (width / 2.0f);
     }
 
-    public double getRelativeBottom() {
+    public double getRelativeBottom()
+    {
+        // TODO: Return a Number that updates when the Point coordinates update
 //        return this.position.getRelativeY() + (height / 2.0f);
         return 0 + (height / 2.0f);
     }
 
-    public Point getRelativeTopLeft() {
+    public Point getRelativeTopLeft()
+    {
         return new Point(getRelativeLeft(), getRelativeTop());
     }
 
-    public Point getRelativeTopRight() {
+    public Point getRelativeTopRight()
+    {
         return new Point(getRelativeRight(), getRelativeTop());
     }
 
-    public Point getRelativeBottomRight() {
+    public Point getRelativeBottomRight()
+    {
         return new Point(getRelativeRight(), getRelativeBottom());
     }
 
-    public Point getRelativeBottomLeft() {
+    public Point getRelativeBottomLeft()
+    {
         return new Point(getRelativeLeft(), getRelativeBottom());
     }
 
-    public Point getTopLeft() {
+    public Point getTopLeft()
+    {
         return new Point(getRelativeLeft(), getRelativeTop(), position);
     }
 
-    public Point getTopRight() {
+    public Point getTopRight()
+    {
         return new Point(getRelativeRight(), getRelativeTop(), position);
     }
 
-    public Point getBottomRight() {
+    public Point getBottomRight()
+    {
         return new Point(getRelativeRight(), getRelativeBottom(), position);
     }
 
-    public Point getBottomLeft() {
+    public Point getBottomLeft()
+    {
         return new Point(getRelativeLeft(), getRelativeBottom(), position);
     }
 
-    public double getArea() {
+    public double getArea()
+    {
         return this.width * this.height;
     }
 
-    public double getPerimeter() {
+    public double getPerimeter()
+    {
         return 2 * (this.width + this.height);
     }
 
-    public double getDiagonalLength() {
+    public double getDiagonalLength()
+    {
         return (double) Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
     }
 }

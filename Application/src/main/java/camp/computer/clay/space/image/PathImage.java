@@ -6,35 +6,39 @@ import android.graphics.Paint;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
-import camp.computer.clay.space.architecture.Shape;
 
 public class PathImage extends Image<Path> {
 
-    private Visibility dockVisibility = Visibility.VISIBLE;
+    private Visibility dockVisibility = new Visibility(Visibility.Value.VISIBLE);
 
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
 
-    public PathImage(Path path) {
+    public PathImage(Path path)
+    {
         super(path);
         setup();
     }
 
-    private void setup() {
+    private void setup()
+    {
         setupActions();
     }
 
-    private void setupActions() {
+    private void setupActions()
+    {
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Action action)
+            {
 
                 Event event = action.getLastEvent();
 
@@ -53,26 +57,32 @@ public class PathImage extends Image<Path> {
         });
     }
 
-    public Path getPath() {
+    public Path getPath()
+    {
         return getEntity();
     }
 
-    public void update() {
+    public void update()
+    {
     }
 
-    public void setDockVisibility(Visibility visibility) {
-        this.dockVisibility = visibility;
+    public void setDockVisibility(Visibility.Value visibility)
+    {
+        this.dockVisibility.setValue(visibility);
     }
 
-    public Visibility getDockVisibility() {
+    public Visibility getDockVisibility()
+    {
         return this.dockVisibility;
     }
 
-    public boolean isDockVisible() {
-        return this.dockVisibility == Visibility.VISIBLE;
+    public boolean isDockVisible()
+    {
+        return this.dockVisibility.getValue() == Visibility.Value.VISIBLE;
     }
 
-    public void draw(Display display) {
+    public void draw(Display display)
+    {
 
         if (isVisible()) {
             // Draw path between ports with style dependant on path type
@@ -86,7 +96,8 @@ public class PathImage extends Image<Path> {
     }
 
     // TODO: Refactor. Put in Geometry/Shape.
-    public void drawTrianglePath(Display display) {
+    public void drawTrianglePath(Display display)
+    {
 
         Paint paint = display.getPaint();
 
@@ -96,7 +107,7 @@ public class PathImage extends Image<Path> {
         Shape targetPortShape = getSpace().getShape(path.getTarget());
 
         // Show target port
-        targetPortShape.setVisibility(Visibility.VISIBLE);
+        targetPortShape.setVisibility(Visibility.Value.VISIBLE);
         //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
@@ -104,58 +115,30 @@ public class PathImage extends Image<Path> {
         paint.setStrokeWidth(15.0f);
         paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-        double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortShape.getPosition(),
-                targetPortShape.getPosition()
-        );
+        double pathRotationAngle = Geometry.calculateRotationAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
-        Point pathStartCoordinate = Geometry.calculatePoint(
-                sourcePortShape.getPosition(),
-                pathRotationAngle,
-                2 * triangleSpacing
-        );
+        Point pathStartCoordinate = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotationAngle, 2 * triangleSpacing);
 
-        Point pathStopCoordinate = Geometry.calculatePoint(
-                targetPortShape.getPosition(),
-                pathRotationAngle + 180,
-                2 * triangleSpacing
-        );
+        Point pathStopCoordinate = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 2 * triangleSpacing);
 
-        if (dockVisibility == Visibility.VISIBLE) {
+        if (dockVisibility.getValue() == Visibility.Value.VISIBLE) {
 
             paint.setStyle(Paint.Style.FILL);
-            Display.drawTriangle(
-                    pathStartCoordinate,
-                    triangleRotationAngle,
-                    triangleWidth,
-                    triangleHeight,
-                    display
-            );
+            Display.drawTriangle(pathStartCoordinate, triangleRotationAngle, triangleWidth, triangleHeight, display);
 
             paint.setStyle(Paint.Style.FILL);
-            Display.drawTriangle(
-                    pathStopCoordinate,
-                    triangleRotationAngle,
-                    triangleWidth,
-                    triangleHeight,
-                    display
-            );
+            Display.drawTriangle(pathStopCoordinate, triangleRotationAngle, triangleWidth, triangleHeight, display);
 
         } else {
 
-            Display.drawTrianglePath(
-                    pathStartCoordinate,
-                    pathStopCoordinate,
-                    triangleWidth,
-                    triangleHeight,
-                    display
-            );
+            Display.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight, display);
         }
     }
 
-    private void drawLinePath(Display display) {
+    private void drawLinePath(Display display)
+    {
 
         Paint paint = display.getPaint();
 
@@ -165,7 +148,7 @@ public class PathImage extends Image<Path> {
         Shape targetPortShape = getSpace().getShape(path.getTarget());
 
         // Show target port
-        targetPortShape.setVisibility(Visibility.VISIBLE);
+        targetPortShape.setVisibility(Visibility.Value.VISIBLE);
         //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
@@ -173,28 +156,13 @@ public class PathImage extends Image<Path> {
         paint.setStrokeWidth(15.0f);
         paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-        double pathRotationAngle = Geometry.calculateRotationAngle(
-                sourcePortShape.getPosition(),
-                targetPortShape.getPosition()
-        );
+        double pathRotationAngle = Geometry.calculateRotationAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
 
-        Point pathStartCoordinate = Geometry.calculatePoint(
-                sourcePortShape.getPosition(),
-                pathRotationAngle,
-                0
-        );
+        Point pathStartCoordinate = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
 
-        Point pathStopCoordinate = Geometry.calculatePoint(
-                targetPortShape.getPosition(),
-                pathRotationAngle + 180,
-                0
-        );
+        Point pathStopCoordinate = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
-        Display.drawLine(
-                pathStartCoordinate,
-                pathStopCoordinate,
-                display
-        );
+        Display.drawLine(pathStartCoordinate, pathStopCoordinate, display);
 
     }
 }

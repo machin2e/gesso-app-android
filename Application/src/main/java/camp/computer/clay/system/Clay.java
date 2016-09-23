@@ -6,7 +6,6 @@ import android.text.format.Formatter;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,8 +23,8 @@ import camp.computer.clay.system.host.NetworkHost;
 import camp.computer.clay.system.host.NetworkResourceInterface;
 import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.old_model.Descriptor;
-import camp.computer.clay.system.old_model.Host;
 import camp.computer.clay.system.old_model.Event;
+import camp.computer.clay.system.old_model.Host;
 
 public class Clay {
 
@@ -51,11 +50,13 @@ public class Clay {
 
     private List<ExtensionProfile> extensionProfiles = new ArrayList<>();
 
-    public List<ExtensionProfile> getExtensionProfiles() {
+    public List<ExtensionProfile> getExtensionProfiles()
+    {
         return this.extensionProfiles;
     }
 
-    public Clay() {
+    public Clay()
+    {
 
         this.cache = new CacheHost(this); // Set up cache
 
@@ -76,7 +77,7 @@ public class Clay {
 
 //        setupSimulation();
 
-        // Create actor and set perspective
+        // Create actor and setValue perspective
         Actor actor = new Actor();
         actor.getCamera().setSpace(space);
 
@@ -85,19 +86,23 @@ public class Clay {
 
         Launcher.getLauncherView().getDisplay().setSpace(space);
 
+        // <TEST>
         simulateHost();
         simulateHost();
         simulateHost();
         simulateHost();
         simulateHost();
+        // </TEST>
 
     }
 
-    public Model getModel() {
+    public Model getModel()
+    {
         return this.model;
     }
 
-    public Space getSpace() {
+    public Space getSpace()
+    {
         return this.space;
     }
 
@@ -127,7 +132,8 @@ public class Clay {
 //        }
 //    }
 
-    private void simulateHost() {
+    private void simulateHost()
+    {
 
         // <FORM_CONFIGURATION>
         // TODO: Read this from the device (or look up from host UUID). It will be encoded on
@@ -147,7 +153,8 @@ public class Clay {
         space.addEntity(host);
     }
 
-    public Descriptor getDescriptor() {
+    public Descriptor getDescriptor()
+    {
         return this.descriptor;
     }
 
@@ -155,11 +162,13 @@ public class Clay {
      * Clay's essential operating system functions.
      */
 
-    public void addHost(MessageHostInterface messageManager) {
+    public void addHost(MessageHostInterface messageManager)
+    {
         this.messageHost.addHost(messageManager);
     }
 
-    public void addResource (NetworkResourceInterface networkResource) {
+    public void addResource(NetworkResourceInterface networkResource)
+    {
         this.networkHost.addHost(networkResource);
     }
 
@@ -167,7 +176,8 @@ public class Clay {
      * Adds a descriptor manager for use by Clay. Retrieves the basic actions provided by the
      * descriptor manager and makes them available in Clay.
      */
-    public void setStore(SQLiteStoreHost contentManager) {
+    public void setStore(SQLiteStoreHost contentManager)
+    {
         this.storeHost = contentManager;
     }
 
@@ -177,71 +187,84 @@ public class Clay {
 
     /**
      * Adds a view to Clay. This makes the view available for use in systems built with Clay.
+     *
      * @param view The view to make available to Clay.
      */
-    public void addDisplay(DisplayHostInterface view) {
-        this.displays.add (view);
+    public void addDisplay(DisplayHostInterface view)
+    {
+        this.displays.add(view);
     }
 
     /**
      * Returns the view manager the specified index.
+     *
      * @param i The index of the view to return.
      * @return The view at the specified index.
      */
-    public DisplayHostInterface getView (int i) {
-        return this.displays.get (i);
+    public DisplayHostInterface getView(int i)
+    {
+        return this.displays.get(i);
     }
 
-    public CacheHost getCache() {
+    public CacheHost getCache()
+    {
         return this.cache;
     }
 
-    public SQLiteStoreHost getStore() {
+    public SQLiteStoreHost getStore()
+    {
         return this.storeHost;
     }
 
-    public List<Host> getHosts() {
+    public List<Host> getHosts()
+    {
         return this.hosts;
     }
 
-    public boolean hasNetworkHost() {
+    public boolean hasNetworkHost()
+    {
         return this.networkHost != null;
     }
 
     // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
-    public String getInternetAddress () {
+    public String getInternetAddress()
+    {
         Context context = Launcher.getContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        Log.v ("Clay", "Internet address: " + ip);
+        Log.v("Clay", "Internet address: " + ip);
         return ip;
     }
 
-    public String getInternetBroadcastAddress () {
+    public String getInternetBroadcastAddress()
+    {
         String broadcastAddressString = getInternetAddress();
-        Log.v ("Clay", "Broadcast: " + broadcastAddressString);
+        Log.v("Clay", "Broadcast: " + broadcastAddressString);
         broadcastAddressString = broadcastAddressString.substring(0, broadcastAddressString.lastIndexOf("."));
         broadcastAddressString += ".255";
         return broadcastAddressString;
     }
 
-    public Host getDeviceByAddress(String address) {
+    public Host getDeviceByAddress(String address)
+    {
         for (Host host : getHosts()) {
-            if (host.getInternetAddress ().compareTo (address) == 0) {
+            if (host.getInternetAddress().compareTo(address) == 0) {
                 return host;
             }
         }
         return null;
     }
 
-    private Clay getClay () {
+    private Clay getClay()
+    {
         return this;
     }
 
     /**
      * Adds the specified unit to Clay's operating model.
      */
-    public Host addDevice(final UUID deviceUuid, final String internetAddress) {
+    public Host addDevice(final UUID deviceUuid, final String internetAddress)
+    {
 
 //        Log.v("UDP", "found host");
 
@@ -255,7 +278,7 @@ public class Clay {
 
         // If unable to restore the host's profile, then create a profile for the host.
         if (host == null) {
-            host = new Host(getClay (), deviceUuid);
+            host = new Host(getClay(), deviceUuid);
         }
 
         simulateHost();
@@ -327,19 +350,19 @@ public class Clay {
             // Update restored host with information from host
             host.setInternetAddress(internetAddress);
 
-            Log.v ("TCP", "host.internetAddress: " + internetAddress);
+            Log.v("TCP", "host.internetAddress: " + internetAddress);
 
             // Store the updated host profile.
-            getStore ().storeDevice (host);
+            getStore().storeDevice(host);
             getStore().storeTimeline(host.getTimeline());
 
             Log.v("TCP", "host.internetAddress (2): " + internetAddress);
 
             // Add host to ClayaddMessage
-            if (!this.hosts.contains (host)) {
+            if (!this.hosts.contains(host)) {
 
                 // Add host to present (i.e., local cache).
-                this.hosts.add (host);
+                this.hosts.add(host);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
 //                ApplicationView.getLauncherView().mapView.getEntity().simulateHost(new Host());
@@ -378,8 +401,8 @@ public class Clay {
             for (Event event : host.getTimeline().getEvents()) {
                 // <HACK>
                 host.enqueueMessage("start event " + event.getUuid());
-                host.enqueueMessage("set event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                host.enqueueMessage("set event " + event.getUuid() + " descriptor \"" + event.getState().get(0).getState().toString() + "\"");
+                host.enqueueMessage("setValue event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+                host.enqueueMessage("setValue event " + event.getUuid() + " descriptor \"" + event.getState().get(0).getState().toString() + "\"");
                 // </HACK>
             }
         }
@@ -387,7 +410,8 @@ public class Clay {
         return host;
     }
 
-    public boolean hasDeviceByUuid(UUID uuid) {
+    public boolean hasDeviceByUuid(UUID uuid)
+    {
         for (Host host : getHosts()) {
             if (host.getUuid().compareTo(uuid) == 0) {
                 return true;
@@ -396,7 +420,8 @@ public class Clay {
         return false;
     }
 
-    public Host getDeviceByUuid(UUID uuid) {
+    public Host getDeviceByUuid(UUID uuid)
+    {
         for (Host host : getHosts()) {
             if (host.getUuid().compareTo(uuid) == 0) {
                 return host;
@@ -405,7 +430,8 @@ public class Clay {
         return null;
     }
 
-    public boolean hasDeviceByAddress(String address) {
+    public boolean hasDeviceByAddress(String address)
+    {
         /*
         for (Extension device : getExtensions()) {
             if (device.getInternetAddress().equals(address)) {
@@ -529,20 +555,24 @@ public class Clay {
 
     /**
      * Returns true if Clay has a descriptor manager.
+     *
      * @return True if Clay has a descriptor manager. False otherwise.
      */
-    public boolean hasStore() {
+    public boolean hasStore()
+    {
         return this.storeHost != null;
     }
 
-    private boolean hasCache() {
+    private boolean hasCache()
+    {
         return this.cache != null;
     }
 
     /**
      * Cycle through routine operations.
      */
-    public void step () {
+    public void step()
+    {
         messageHost.processMessage();
     }
 }

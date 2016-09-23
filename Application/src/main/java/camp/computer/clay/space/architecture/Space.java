@@ -13,21 +13,21 @@ import java.util.List;
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
+import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Model;
-import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Camera;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
-import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.Probability;
+import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
@@ -36,31 +36,35 @@ public class Space extends Image<Model> {
 
     private List<Layer> layers = new ArrayList<>();
 
-    private Visibility prototypeExtensionVisibility = Visibility.INVISIBLE;
+    private Visibility prototypeExtensionVisibility = new Visibility(Visibility.Value.INVISIBLE);
     private Point prototypeExtensionPosition = new Point();
 
-    private Visibility prototypePathVisibility = Visibility.INVISIBLE;
+    private Visibility prototypePathVisibility = new Visibility(Visibility.Value.INVISIBLE);
     private Point prototypePathSourcePosition = new Point(40, 80);
     private Point prototypePathDestinationCoordinate = new Point(40, 80);
     double shapeRadius = 40.0;
 
-    public Space(Model model) {
+    public Space(Model model)
+    {
         super(model);
         setup();
     }
 
-    private void setup() {
+    private void setup()
+    {
         setupActions();
     }
 
-    public Visibility goalVisibility = Visibility.INVISIBLE;
+    public Visibility goalVisibility = new Visibility(Visibility.Value.INVISIBLE);
 
-    private void setupActions() {
+    private void setupActions()
+    {
 
         // Setup interactivity
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Action action)
+            {
 
                 Event lastEvent = action.getLastEvent();
 
@@ -79,7 +83,7 @@ public class Space extends Image<Model> {
                 } else if (lastEvent.getType() == Event.Type.HOLD) {
 
                     // Select patch to connect
-//                    Launcher.getLauncherView().displaySelectionDialog();
+//                    Launcher.getLauncherView().promptSelection();
 
                 } else if (lastEvent.getType() == Event.Type.MOVE) {
 
@@ -92,10 +96,7 @@ public class Space extends Image<Model> {
 
                         // Camera
                         if (action.getSize() > 1) {
-                            camera.setOffset(
-                                    lastEvent.getPosition().getX() - action.getFirstEvent().getPosition().getX(),
-                                    lastEvent.getPosition().getY() - action.getFirstEvent().getPosition().getY()
-                            );
+                            camera.setOffset(lastEvent.getPosition().getX() - action.getFirstEvent().getPosition().getX(), lastEvent.getPosition().getY() - action.getFirstEvent().getPosition().getY());
 
                         }
 
@@ -108,11 +109,13 @@ public class Space extends Image<Model> {
         });
     }
 
-    public Model getModel() {
+    public Model getModel()
+    {
         return getEntity();
     }
 
-    private boolean hasLayer(String tag) {
+    private boolean hasLayer(String tag)
+    {
         for (int i = 0; i < layers.size(); i++) {
             if (layers.get(i).getTag().equals(tag)) {
                 return true;
@@ -121,7 +124,8 @@ public class Space extends Image<Model> {
         return false;
     }
 
-    private void addLayer(String tag) {
+    private void addLayer(String tag)
+    {
         if (!hasLayer(tag)) {
             Layer layer = new Layer(this);
             layer.setTag(tag);
@@ -129,7 +133,8 @@ public class Space extends Image<Model> {
         }
     }
 
-    public Layer getLayer(String tag) {
+    public Layer getLayer(String tag)
+    {
         for (int i = 0; i < layers.size(); i++) {
             if (layers.get(i).getTag().equals(tag)) {
                 return layers.get(i);
@@ -138,7 +143,8 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public Layer getLayer(int id) {
+    public Layer getLayer(int id)
+    {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             if (layer.getIndex() == id) {
@@ -148,7 +154,8 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public <T extends Entity> void addEntity(T entity) {
+    public <T extends Entity> void addEntity(T entity)
+    {
 
         if (entity instanceof Host) {
 
@@ -205,7 +212,8 @@ public class Space extends Image<Model> {
     }
 
     // TODO: Remove Image parameter. Create that and return it.
-    private <T extends Image> void addImage(T image, String layerTag) {
+    private <T extends Image> void addImage(T image, String layerTag)
+    {
 
         // Add layer (if it doesn't exist)
         if (!hasLayer(layerTag)) {
@@ -231,7 +239,8 @@ public class Space extends Image<Model> {
      *
      * @param image The {@code Image} for which the position will be adjusted.
      */
-    private void adjustLayout(Image image) {
+    private void adjustLayout(Image image)
+    {
 
         int adjustmentMethod = 1;
 
@@ -253,11 +262,7 @@ public class Space extends Image<Model> {
 
             } else if (imageCoordinates.size() == 1) {
 
-                position = Geometry.calculatePoint(
-                        imageCoordinates.get(0),
-                        Probability.generateRandomInteger(0, 360),
-                        imageSeparationDistance
-                );
+                position = Geometry.calculatePoint(imageCoordinates.get(0), Probability.generateRandomInteger(0, 360), imageSeparationDistance);
 
             } else {
 
@@ -267,11 +272,7 @@ public class Space extends Image<Model> {
                 int targetIndex = sourceIndex + 1;
 
                 Point midpoint = Geometry.calculateMidpoint(hullPoints.get(sourceIndex), hullPoints.get(targetIndex));
-                position = Geometry.calculatePoint(
-                        midpoint,
-                        Geometry.calculateRotationAngle(hullPoints.get(sourceIndex), hullPoints.get(targetIndex)) + 90,
-                        imageSeparationDistance
-                );
+                position = Geometry.calculatePoint(midpoint, Geometry.calculateRotationAngle(hullPoints.get(sourceIndex), hullPoints.get(targetIndex)) + 90, imageSeparationDistance);
             }
 
             // Assign the found position to the image
@@ -312,11 +313,12 @@ public class Space extends Image<Model> {
      * specified {@code Entity}.
      *
      * @param entity The {@code Entity} for which the corresponding {@code Image} will be
-     *                returned, if any.
+     *               returned, if any.
      * @return The {@code Image} corresponding to the specified {@code Entity}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
-    public boolean contains(Entity entity) {
+    public boolean contains(Entity entity)
+    {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Image image = layer.getImage(entity);
@@ -327,7 +329,8 @@ public class Space extends Image<Model> {
         return false;
     }
 
-    public Image getImage(Entity entity) {
+    public Image getImage(Entity entity)
+    {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Image image = layer.getImage(entity);
@@ -338,7 +341,8 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public <T> ImageGroup getImages(Group<T> entities) {
+    public <T> ImageGroup getImages(Group<T> entities)
+    {
         ImageGroup imageGroup = new ImageGroup();
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
@@ -353,7 +357,8 @@ public class Space extends Image<Model> {
         return imageGroup;
     }
 
-    public ImageGroup getImages() {
+    public ImageGroup getImages()
+    {
         ImageGroup imageGroup = new ImageGroup();
         List<Integer> indices = getLayerIndices();
         for (int i = 0; i < indices.size(); i++) {
@@ -366,13 +371,15 @@ public class Space extends Image<Model> {
         return imageGroup;
     }
 
-    public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes) {
+    public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes)
+    {
         return getImages().filterType(entityTypes);
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
-    public Image getImageByPosition(Point point) {
-        ImageGroup images = getImages().filterVisibility(Visibility.VISIBLE);
+    public Image getImageByPosition(Point point)
+    {
+        ImageGroup images = getImages().filterVisibility(Visibility.Value.VISIBLE);
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
             if (image.contains(point)) {
@@ -382,7 +389,8 @@ public class Space extends Image<Model> {
         return this;
     }
 
-    public ShapeGroup getShapes() {
+    public ShapeGroup getShapes()
+    {
         ShapeGroup shapeGroup = new ShapeGroup();
         ImageGroup imageList = getImages();
 
@@ -394,7 +402,8 @@ public class Space extends Image<Model> {
     }
 
     // TODO: Refactor to be cleaner and leverage other classes...
-    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
+    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
         ImageGroup imageList = getImages();
@@ -406,7 +415,8 @@ public class Space extends Image<Model> {
         return shapeGroup.filterType(entityTypes);
     }
 
-    public Shape getShape(Entity entity) {
+    public Shape getShape(Entity entity)
+    {
         ImageGroup images = getImages();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
@@ -418,11 +428,13 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public Model getEntity() {
+    public Model getEntity()
+    {
         return this.entity;
     }
 
-    public Entity getEntity(Image image) {
+    public Entity getEntity(Image image)
+    {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Entity entity = layer.getEntity(image);
@@ -433,7 +445,8 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public Entity getEntity(Shape shape) {
+    public Entity getEntity(Shape shape)
+    {
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Entity entity = layer.getEntity(shape);
@@ -444,7 +457,8 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public static <T extends Image> List<Point> getPositions(List<T> images) {
+    public static <T extends Image> List<Point> getPositions(List<T> images)
+    {
         List<Point> positions = new ArrayList<>();
         for (int i = 0; i < images.size(); i++) {
             T figure = images.get(i);
@@ -453,7 +467,8 @@ public class Space extends Image<Model> {
         return positions;
     }
 
-    public void update() {
+    public void update()
+    {
 
         // Update perspective
         getEntity().getActor(0).getCamera().update();
@@ -472,7 +487,8 @@ public class Space extends Image<Model> {
     }
 
     @Override
-    public void draw(Display display) {
+    public void draw(Display display)
+    {
 
         // <DEBUG_LABEL>
         if (Launcher.ENABLE_GEOMETRY_LABELS) {
@@ -714,7 +730,8 @@ public class Space extends Image<Model> {
         */
     }
 
-    private void drawLayers(Display display) {
+    private void drawLayers(Display display)
+    {
 
         if (getLayer("paths") != null) {
             getLayer("paths").draw(display);
@@ -729,7 +746,8 @@ public class Space extends Image<Model> {
         }
     }
 
-    public List<Integer> getLayerIndices() {
+    public List<Integer> getLayerIndices()
+    {
         List<Integer> layerIndices = new ArrayList<>();
         for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
@@ -739,20 +757,19 @@ public class Space extends Image<Model> {
         return layerIndices;
     }
 
-    public List<Layer> getLayers() {
+    public List<Layer> getLayers()
+    {
         return layers;
     }
 
-    private void drawPrototypeExtensionImage(Display display) {
+    private void drawPrototypeExtensionImage(Display display)
+    {
 
-        if (prototypeExtensionVisibility == Visibility.VISIBLE) {
+        if (prototypeExtensionVisibility.getValue() == Visibility.Value.VISIBLE) {
 
             Paint paint = display.getPaint();
 
-            double pathRotationAngle = Geometry.calculateRotationAngle(
-                    prototypePathSourcePosition,
-                    prototypeExtensionPosition
-            );
+            double pathRotationAngle = Geometry.calculateRotationAngle(prototypePathSourcePosition, prototypeExtensionPosition);
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#fff7f7f7"));
@@ -763,8 +780,9 @@ public class Space extends Image<Model> {
     }
 
     // TODO: Make this into a shape and put this on a separate layer!
-    public void drawPrototypePathImages(Display display) {
-        if (prototypePathVisibility == Visibility.VISIBLE) {
+    public void drawPrototypePathImages(Display display)
+    {
+        if (prototypePathVisibility.getValue() == Visibility.Value.VISIBLE) {
 
 //            if (getPort().getType() != Port.Type.NONE) {
 
@@ -782,30 +800,15 @@ public class Space extends Image<Model> {
 
             double pathRotationAngle = Geometry.calculateRotationAngle(
                     //getPosition(),
-                    prototypePathSourcePosition,
-                    prototypePathDestinationCoordinate
-            );
+                    prototypePathSourcePosition, prototypePathDestinationCoordinate);
 
             Point pathStartCoordinate = Geometry.calculatePoint(
                     // getPosition(),
-                    prototypePathSourcePosition,
-                    pathRotationAngle,
-                    2 * triangleSpacing
-            );
+                    prototypePathSourcePosition, pathRotationAngle, 2 * triangleSpacing);
 
-            Point pathStopCoordinate = Geometry.calculatePoint(
-                    prototypePathDestinationCoordinate,
-                    pathRotationAngle + 180,
-                    2 * triangleSpacing
-            );
+            Point pathStopCoordinate = Geometry.calculatePoint(prototypePathDestinationCoordinate, pathRotationAngle + 180, 2 * triangleSpacing);
 
-            Display.drawTrianglePath(
-                    pathStartCoordinate,
-                    pathStopCoordinate,
-                    triangleWidth,
-                    triangleHeight,
-                    display
-            );
+            Display.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight, display);
 
             // Color
             paint.setStyle(Paint.Style.FILL);
@@ -815,31 +818,38 @@ public class Space extends Image<Model> {
         }
     }
 
-    public void setPrototypePathVisibility(Visibility visibility) {
-        prototypePathVisibility = visibility;
+    public void setPrototypePathVisibility(Visibility.Value visibility)
+    {
+        prototypePathVisibility.setValue(visibility);
     }
 
-    public Visibility getPrototypePathVisibility() {
+    public Visibility getPrototypePathVisibility()
+    {
         return prototypePathVisibility;
     }
 
-    public void setPrototypePathSourcePosition(Point position) {
+    public void setPrototypePathSourcePosition(Point position)
+    {
         this.prototypePathSourcePosition.set(position);
     }
 
-    public void setPrototypePathDestinationPosition(Point position) {
+    public void setPrototypePathDestinationPosition(Point position)
+    {
         this.prototypePathDestinationCoordinate.set(position);
     }
 
-    public void setPrototypeExtensionPosition(Point position) {
+    public void setPrototypeExtensionPosition(Point position)
+    {
         this.prototypeExtensionPosition.set(position);
     }
 
-    public void setPrototypeExtensionVisibility(Visibility visibility) {
-        prototypeExtensionVisibility = visibility;
+    public void setPrototypeExtensionVisibility(Visibility.Value visibility)
+    {
+        prototypeExtensionVisibility.setValue(visibility);
     }
 
-    public Visibility getPrototypeExtensionVisibility() {
+    public Visibility getPrototypeExtensionVisibility()
+    {
         return prototypeExtensionVisibility;
     }
 }

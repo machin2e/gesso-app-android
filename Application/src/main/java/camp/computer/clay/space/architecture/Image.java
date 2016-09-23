@@ -11,10 +11,10 @@ import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.space.util.Color;
+import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.util.Visibility;
 
 public abstract class Image<T extends Entity> {
 
@@ -24,7 +24,7 @@ public abstract class Image<T extends Entity> {
 
     protected double scale = 1.0;
 
-    protected Visibility visibility = Visibility.VISIBLE;
+    protected Visibility visibility = new Visibility(Visibility.Value.VISIBLE);
 
     protected double targetTransparency = 1.0;
 
@@ -37,55 +37,68 @@ public abstract class Image<T extends Entity> {
     // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
-    public Image(T entity) {
+    public Image(T entity)
+    {
         this.entity = entity;
     }
 
-    public T getEntity() {
+    public T getEntity()
+    {
         return this.entity;
     }
 
-    public void setSpace(Space space) {
+    public void setSpace(Space space)
+    {
         this.space = space;
     }
 
-    public Space getSpace() {
+    public Space getSpace()
+    {
         return this.space;
     }
 
-    public Point getPosition() {
+    public Point getPosition()
+    {
         return this.position;
     }
 
-    public double getRotation() {
+    public double getRotation()
+    {
         return this.position.getRotation();
     }
 
-    public double getScale() {
+    public double getScale()
+    {
         return this.scale;
     }
 
-    public void setPosition(Point position) {
+    public void setPosition(Point position)
+    {
         this.position.set(position.getX(), position.getY());
     }
 
-    public void setRotation(double angle) {
+    public void setRotation(double angle)
+    {
         this.position.setRelativeRotation(angle);
     }
 
-    public void setScale(double scale) {
+    public void setScale(double scale)
+    {
         this.scale = scale;
     }
 
-    public boolean isVisible() {
-        return visibility == Visibility.VISIBLE;
+    public boolean isVisible()
+    {
+        return visibility.getValue() == Visibility.Value.VISIBLE;
     }
 
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
+    public void setVisibility(Visibility.Value visibility)
+    {
+        this.visibility.setValue(visibility);
     }
 
-    public Visibility getVisibility() {
+    public Visibility getVisibility()
+    {
         return visibility;
     }
 
@@ -94,22 +107,26 @@ public abstract class Image<T extends Entity> {
 //        shapes.add(shape);
 //    }
 
-    public <T extends Shape> void addShape(T shape) {
+    public <T extends Shape> void addShape(T shape)
+    {
         shape.getPosition().setOrigin(getPosition());
         shapes.add(shape);
     }
 
-    public <T extends Shape> void addShape(T shape, String label) {
+    public <T extends Shape> void addShape(T shape, String label)
+    {
         shape.setLabel(label);
         shape.getPosition().setOrigin(getPosition());
         shapes.add(shape);
     }
 
-    public Shape getShape(int index) {
+    public Shape getShape(int index)
+    {
         return shapes.get(index);
     }
 
-    public Shape getShape(String label) {
+    public Shape getShape(String label)
+    {
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.getLabel().equals(label)) {
@@ -119,7 +136,8 @@ public abstract class Image<T extends Entity> {
         return null;
     }
 
-    public Shape getShape(Entity entity) {
+    public Shape getShape(Entity entity)
+    {
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.getEntity() == entity) {
@@ -129,7 +147,8 @@ public abstract class Image<T extends Entity> {
         return null;
     }
 
-    public Shape getShapeByPosition(Point point) {
+    public Shape getShapeByPosition(Point point)
+    {
         List<Shape> shapes = getShapes().getList();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
@@ -140,18 +159,21 @@ public abstract class Image<T extends Entity> {
         return null;
     }
 
-    public ShapeGroup getShapes() {
+    public ShapeGroup getShapes()
+    {
         ShapeGroup shapeGroup = new ShapeGroup();
         shapeGroup.add(this.shapes);
         return shapeGroup;
     }
 
     //    public <T extends Entity> ShapeGroup getShapes(Class<?>... entityTypes) {
-    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
+    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes)
+    {
         return getShapes().filterType(entityTypes);
     }
 
-    public <T extends Entity> ShapeGroup getShapes(Group<T> entities) {
+    public <T extends Entity> ShapeGroup getShapes(Group<T> entities)
+    {
         return getShapes().filterEntity(entities);
     }
 
@@ -162,7 +184,8 @@ public abstract class Image<T extends Entity> {
      * @param labelPatterns The list of {@code Shape} objects matching the regular expressions list.
      * @return A list of {@code Shape} objects.
      */
-    public ShapeGroup getShapes(String... labelPatterns) {
+    public ShapeGroup getShapes(String... labelPatterns)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -184,11 +207,13 @@ public abstract class Image<T extends Entity> {
         return shapeGroup;
     }
 
-    public Shape removeShape(int index) {
+    public Shape removeShape(int index)
+    {
         return shapes.remove(index);
     }
 
-    public void update() {
+    public void update()
+    {
         for (int i = 0; i < this.shapes.size(); i++) {
             this.shapes.get(i).update();
         }
@@ -196,7 +221,8 @@ public abstract class Image<T extends Entity> {
 
     public abstract void draw(Display display);
 
-    public boolean contains(Point point) {
+    public boolean contains(Point point)
+    {
         if (isVisible()) {
             for (int i = 0; i < shapes.size(); i++) {
                 if (shapes.get(i).contains(point)) {
@@ -207,18 +233,21 @@ public abstract class Image<T extends Entity> {
         return false;
     }
 
-    public void setOnActionListener(ActionListener actionListener) {
+    public void setOnActionListener(ActionListener actionListener)
+    {
         this.actionListener = actionListener;
     }
 
-    public void processAction(Action action) {
+    public void processAction(Action action)
+    {
         if (actionListener != null) {
             actionListener.onAction(action);
         }
     }
 
     // TODO: Delete?
-    public void setTransparency(final double transparency) {
+    public void setTransparency(final double transparency)
+    {
         this.targetTransparency = transparency;
 
         for (int i = 0; i < shapes.size(); i++) {
@@ -239,7 +268,8 @@ public abstract class Image<T extends Entity> {
         this.transparency = this.targetTransparency;
     }
 
-    public List<Point> getVertices() {
+    public List<Point> getVertices()
+    {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
@@ -248,28 +278,29 @@ public abstract class Image<T extends Entity> {
         return positions;
     }
 
-    // Delete? The above getVertices() should be enough now that Point is refactored! Maybe addImage getRelativeVertices() if needed.
-    public List<Point> getAbsoluteVertices() {
-        List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            List<Point> vertices = shape.getVertices();
-            for (int j = 0; j < vertices.size(); j++) {
-                Point shapeVertex = vertices.get(j);
+//    // Delete? The above getVertices() should be enough now that Point is refactored! Maybe addImage getRelativeVertices() if needed.
+//    public List<Point> getAbsoluteVertices() {
+//        List<Point> positions = new LinkedList<>();
+//        for (int i = 0; i < shapes.size(); i++) {
+//            Shape shape = shapes.get(i);
+//            List<Point> vertices = shape.getVertices();
+//            for (int j = 0; j < vertices.size(); j++) {
+//                Point shapeVertex = vertices.get(j);
+//
+//                // Rotate shape about its center point
+//                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getPosition(), shape.getRotation(), shapeVertex);
+//
+//                // Rotate shape vertices about the shape's reference point
+//                Point referencePoint = position;
+//                absoluteVertex = Geometry.calculateRotatedPoint(referencePoint, getRotation(), absoluteVertex);
+//                positions.add(absoluteVertex);
+//            }
+//        }
+//        return positions;
+//    }
 
-                // Rotate shape about its center point
-                Point absoluteVertex = Geometry.calculateRotatedPoint(shape.getPosition(), shape.getRotation(), shapeVertex);
-
-                // Rotate shape vertices about the shape's reference point
-                Point referencePoint = position;
-                absoluteVertex = Geometry.calculateRotatedPoint(referencePoint, getRotation(), absoluteVertex);
-                positions.add(absoluteVertex);
-            }
-        }
-        return positions;
-    }
-
-    public Rectangle getBoundingBox() {
+    public Rectangle getBoundingBox()
+    {
 
         List<Point> boundingBoxVertices = new LinkedList<>();
 

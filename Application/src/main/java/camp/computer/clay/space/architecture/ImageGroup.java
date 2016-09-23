@@ -15,11 +15,13 @@ import camp.computer.clay.space.util.geometry.Rectangle;
  */
 public class ImageGroup extends Group<Image> {
 
-    public ImageGroup() {
+    public ImageGroup()
+    {
     }
 
     // TODO: Move this into the Group base class
-    public ImageGroup remove(Image image) {
+    public ImageGroup remove(Image image)
+    {
         elements.remove(image);
         return this;
     }
@@ -30,7 +32,8 @@ public class ImageGroup extends Group<Image> {
      * @param entityTypes
      * @return
      */
-    public <T extends Entity> ImageGroup filterType(Class<?>... entityTypes) {
+    public <T extends Entity> ImageGroup filterType(Class<?>... entityTypes)
+    {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -46,7 +49,8 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public <T extends Entity> ImageGroup filterEntity(List<T> entities) {
+    public <T extends Entity> ImageGroup filterEntity(List<T> entities)
+    {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -68,7 +72,8 @@ public class ImageGroup extends Group<Image> {
      * @param distance
      * @return
      */
-    public ImageGroup filterArea(Point point, double distance) {
+    public ImageGroup filterArea(Point point, double distance)
+    {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -76,10 +81,7 @@ public class ImageGroup extends Group<Image> {
 
             Image image = elements.get(i);
 
-            double distanceToImage = Geometry.calculateDistance(
-                    point,
-                    image.getPosition()
-            );
+            double distanceToImage = Geometry.calculateDistance(point, image.getPosition());
 
             if (distanceToImage < distance) {
                 imageGroup.add(image);
@@ -97,7 +99,8 @@ public class ImageGroup extends Group<Image> {
      * @param shape The {@code Shape} covering the area to filter.
      * @return The {@code ImageGroup} containing the area covered by {@code shape}.
      */
-    public ImageGroup filterArea(Shape shape) {
+    public ImageGroup filterArea(Shape shape)
+    {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -111,13 +114,14 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public ImageGroup filterVisibility(Visibility visibility) {
+    public ImageGroup filterVisibility(Visibility.Value visibility)
+    {
 
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
-            if (image.getVisibility() == visibility) {
+            if (image.getVisibility().getValue() == visibility) {
                 imageGroup.add(image);
             }
 
@@ -126,11 +130,13 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public List<Image> getList() {
+    public List<Image> getList()
+    {
         return elements;
     }
 
-    public List<Point> getPositions() {
+    public List<Point> getPositions()
+    {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
@@ -139,16 +145,19 @@ public class ImageGroup extends Group<Image> {
         return positions;
     }
 
-    public List<Point> getVertices() {
+    public List<Point> getVertices()
+    {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
-            positions.addAll(image.getAbsoluteVertices());
+            //positions.addAll(image.getAbsoluteVertices());
+            positions.addAll(image.getVertices());
         }
         return positions;
     }
 
-    public ShapeGroup getShapes() {
+    public ShapeGroup getShapes()
+    {
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
@@ -158,19 +167,23 @@ public class ImageGroup extends Group<Image> {
         return shapeGroup;
     }
 
-    public Point getCenterPoint() {
+    public Point getCenterPoint()
+    {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
-    public Point getCentroidPoint() {
+    public Point getCentroidPoint()
+    {
         return Geometry.calculateCentroidCoordinate(getPositions());
     }
 
-    public Rectangle getBoundingBox() {
+    public Rectangle getBoundingBox()
+    {
         return Geometry.calculateBoundingBox(getVertices());
     }
 
-    public List<Point> getBoundingShape() {
+    public List<Point> getBoundingShape()
+    {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -180,7 +193,8 @@ public class ImageGroup extends Group<Image> {
      * @param position
      * @return
      */
-    public Image getNearest(Point position) {
+    public Image getNearest(Point position)
+    {
 
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
@@ -199,14 +213,16 @@ public class ImageGroup extends Group<Image> {
         return nearestImage;
     }
 
-    public void setTransparency(double transparency) {
+    public void setTransparency(double transparency)
+    {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
             image.setTransparency(transparency);
         }
     }
 
-    public void setVisibility(Visibility visibility) {
+    public void setVisibility(Visibility.Value visibility)
+    {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
             image.setVisibility(visibility);

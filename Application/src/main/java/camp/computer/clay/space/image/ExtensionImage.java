@@ -11,30 +11,33 @@ import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.profile.ExtensionProfile;
 import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Rectangle;
-import camp.computer.clay.space.architecture.Shape;
 
 public class ExtensionImage extends PortableImage { // Image<Extension> {
 
-    public ExtensionImage(Extension extension) {
+    public ExtensionImage(Extension extension)
+    {
         super(extension);
         setup();
     }
 
-    private void setup() {
+    private void setup()
+    {
         setupShapes();
         setupActions();
     }
 
-    private void setupShapes() {
+    private void setupShapes()
+    {
 
         Rectangle rectangle;
 
@@ -57,11 +60,13 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
         addShape(rectangle);
     }
 
-    private void setupActions() {
+    private void setupActions()
+    {
 
         setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action) {
+            public void onAction(Action action)
+            {
 
                 Event event = action.getLastEvent();
 
@@ -71,10 +76,11 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
-                    // TODO: Only call displayInputDialog if the extension is a draft (i.e., does not have an associated ExtensionProfile)
-                    Launcher.getLauncherView().getUi().displayInputDialog(new Dialog.OnCompleteCallback<String>() {
+                    // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated ExtensionProfile)
+                    Launcher.getLauncherView().getUi().promptInputText(new Dialog.OnCompleteCallback<String>() {
                         @Override
-                        public void onComplete(String result) {
+                        public void onComplete(String result)
+                        {
 
                             // Create Extension Profile
                             ExtensionProfile extensionProfile = new ExtensionProfile();
@@ -99,8 +105,8 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                     if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
 
                         // Focus on touched base
-                        setPathVisibility(Visibility.VISIBLE);
-                        getPortShapes().setVisibility(Visibility.VISIBLE);
+                        setPathVisibility(Visibility.Value.VISIBLE);
+                        getPortShapes().setVisibility(Visibility.Value.VISIBLE);
                         setTransparency(1.0);
 
                         // Show ports and paths of touched form
@@ -114,11 +120,11 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                                 Path path = paths.get(j);
 
                                 // Show ports
-                                getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                getSpace().getShape(path.getSource()).setVisibility(Visibility.Value.VISIBLE);
+                                getSpace().getShape(path.getTarget()).setVisibility(Visibility.Value.VISIBLE);
 
                                 // Show path
-                                getSpace().getImage(path).setVisibility(Visibility.VISIBLE);
+                                getSpace().getImage(path).setVisibility(Visibility.Value.VISIBLE);
                             }
                         }
                     }
@@ -128,19 +134,21 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
                     // Update style
-                    space.setPrototypePathVisibility(Visibility.INVISIBLE);
-                    space.setPrototypeExtensionVisibility(Visibility.INVISIBLE);
+                    space.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
+                    space.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
 
                 }
             }
         });
     }
 
-    public Extension getExtension() {
+    public Extension getExtension()
+    {
         return (Extension) getEntity();
     }
 
-    public void update() {
+    public void update()
+    {
 
         // Create any additional images or shapes to match the Entity
         // <HACK>
@@ -160,7 +168,7 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
                 circle.setColor("#efefef");
                 circle.setOutlineThickness(0);
 
-                circle.setVisibility(Visibility.INVISIBLE);
+                circle.setVisibility(Visibility.Value.INVISIBLE);
 
                 addShape(circle);
             }
@@ -198,7 +206,8 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
         ((Rectangle) getShape("Header")).setWidth(15 * getExtension().getPorts().size());
     }
 
-    public void draw(Display display) {
+    public void draw(Display display)
+    {
         if (isVisible()) {
 
             for (int i = 0; i < shapes.size(); i++) {

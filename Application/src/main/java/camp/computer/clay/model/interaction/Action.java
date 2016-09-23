@@ -214,7 +214,7 @@ public class Action {
         return (getLastEvent() == event);
     }
 
-//    // in handlers (e.g., in Images), use this to check for match, if match, then use/get/set on the action's events to get inputs for the routine operation
+//    // in handlers (e.g., in Images), use this to check for match, if match, then use/get/setValue on the action's events to get inputs for the routine operation
 //    public boolean matches(Event... events) {
 //        for (int i = 0, j = 0; i < this.events.size(); i++) {
 //

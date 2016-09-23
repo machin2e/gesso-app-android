@@ -15,7 +15,7 @@ import camp.computer.clay.space.architecture.Shape;
 public class Circle<T extends Entity> extends Shape<T> {
 
     /**
-     * The number of vertices to use to approximate the circle. By default, this is set to 12,
+     * The number of vertices to use to approximate the circle. By default, this is setValue to 12,
      * corresponding to a vertex every 30 degrees.
      */
     private int vertexCount = 12;

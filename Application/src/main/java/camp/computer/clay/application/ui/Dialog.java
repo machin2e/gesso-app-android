@@ -25,12 +25,12 @@ public class Dialog {
         this.launcher = launcher;
     }
 
-    // <UI>
+    // TODO: Replace OnCompleteCallback with Action?
     public interface OnCompleteCallback<T> {
         void onComplete(T result);
     }
 
-    public void displayInputDialog(final OnCompleteCallback onCompleteCallback) {
+    public void promptInputText(final OnCompleteCallback onCompleteCallback) {
         AlertDialog.Builder builder = new AlertDialog.Builder(launcher.getLauncherView());
         builder.setTitle("Create Extension");
 
@@ -62,8 +62,8 @@ public class Dialog {
         builder.show();
     }
 
-    // TODO: public <T> void displaySelectionDialog(List<T> options, OnCompleteCallback onCompleteCallback) {
-    public <T> void displaySelectionDialog(final List<ExtensionProfile> options, final OnCompleteCallback onCompleteCallback) {
+    // TODO: public <T> void promptSelection(List<T> options, OnCompleteCallback onCompleteCallback) {
+    public <T> void promptSelection(final List<ExtensionProfile> options, final OnCompleteCallback onCompleteCallback) {
 
         // Items
 //        List<String> options = new ArrayList<>();
@@ -147,7 +147,7 @@ public class Dialog {
 
                 dialog.dismiss();
 
-                displayTasksDialog();
+                promptTasks();
             }
         });
 
@@ -157,7 +157,7 @@ public class Dialog {
     // Break multi-step tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
     // displayFloatingTaskDialog(<task list>, <task step to display>)
 
-    public void displayTasksDialog() {
+    public void promptTasks() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getLauncherView());
         // builderSingle.setIcon(R.drawable.ic_launcher);
@@ -221,10 +221,10 @@ public class Dialog {
                         builderInner.show();
                         */
 
-//                        displayTasksDialog();
+//                        promptTasks();
 
 
-                        displayTaskDialog();
+                        promptTask();
                     }
                 });
 
@@ -256,7 +256,7 @@ public class Dialog {
         dialog.show();
     }
 
-    public void displayTaskDialog() {
+    public void promptTask() {
 
         // Items
         List<String> options = new ArrayList<>();
@@ -322,11 +322,10 @@ public class Dialog {
 
                 dialog.dismiss();
 
-                displayTaskDialog();
+                promptTask();
             }
         });
 
         dialog.show();
     }
-    // </UI>
 }

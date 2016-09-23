@@ -15,7 +15,7 @@ public abstract class Shape<T extends Entity> {
 
     protected String label = "";
 
-    protected Visibility visibility = Visibility.VISIBLE;
+    protected Visibility visibility = new Visibility(Visibility.Value.VISIBLE);
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
@@ -27,85 +27,108 @@ public abstract class Shape<T extends Entity> {
 
     protected T entity = null;
 
-    public Shape() {
+    public Shape()
+    {
     }
 
-    public Shape(T entity) {
+    public Shape(T entity)
+    {
         this.entity = entity;
     }
 
-    public Shape(Point position) {
+    public Shape(Point position)
+    {
         this.position.set(position);
     }
 
-    public T getEntity() {
+    public T getEntity()
+    {
         return this.entity;
     }
 
-    public Point getPosition() {
+    public Point getPosition()
+    {
         return position;
     }
 
-    public void setPosition(double x, double y) {
+    public void setPosition(double x, double y)
+    {
         this.position.set(x, y);
     }
 
-    public void setRotation(double angle) {
+    public void setPosition(Point point)
+    {
+        this.position.set(point.getX(), point.getY());
+    }
+
+    public void setRotation(double angle)
+    {
         this.position.setRelativeRotation(angle);
     }
 
-    public double getRotation() {
+    public double getRotation()
+    {
         return this.position.getRotation();
     }
 
-    public void setOrigin(Point point) {
+    public void setOrigin(Point point)
+    {
         this.position.setOrigin(point);
     }
 
-    public Point getOrigin() {
+    public Point getOrigin()
+    {
         return this.position.getOrigin();
     }
 
     abstract public List<Point> getVertices();
 
     /**
-     * Returns the axis-aligned minimum bounding box for the set of vertices that define the shape.
+     * Returns the axis-aligned minimum bounding box for the setValue of vertices that define the shape.
      *
      * @return A {@code Rectangle} representing the minimum bounding box.
      * @see <a href="https://en.wikipedia.org/wiki/Minimum_bounding_box">Minimum bounding box</a>
      */
-    public Rectangle getBoundingBox() {
+    public Rectangle getBoundingBox()
+    {
         return Geometry.calculateBoundingBox(getVertices());
     }
 
     abstract public List<Line> getSegments();
 
-    public boolean contains(Point point) {
+    public boolean contains(Point point)
+    {
         return Geometry.containsPoint(getVertices(), point);
     }
 
 
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
+    public void setVisibility(Visibility.Value visibility)
+    {
+        this.visibility.setValue(visibility);
     }
 
-    public Visibility getVisibility() {
+    public Visibility getVisibility()
+    {
         return this.visibility;
     }
 
-    public boolean isVisible() {
-        return visibility == Visibility.VISIBLE;
+    public boolean isVisible()
+    {
+        return visibility.getValue() == Visibility.Value.VISIBLE;
     }
 
-    public void setColor(String color) {
+    public void setColor(String color)
+    {
         this.color = color;
     }
 
-    public String getColor() {
+    public String getColor()
+    {
         return color;
     }
 
-    public void setTransparency(final double transparency) {
+    public void setTransparency(final double transparency)
+    {
         this.targetTransparency = transparency;
 
         // Color
@@ -121,35 +144,43 @@ public abstract class Shape<T extends Entity> {
         this.transparency = this.targetTransparency;
     }
 
-    public void setOutlineColor(String color) {
+    public void setOutlineColor(String color)
+    {
         this.outlineColor = color;
     }
 
-    public String getOutlineColor() {
+    public String getOutlineColor()
+    {
         return outlineColor;
     }
 
-    public void setOutlineThickness(double thickness) {
+    public void setOutlineThickness(double thickness)
+    {
         this.outlineThickness = thickness;
     }
 
-    public double getOutlineThickness() {
+    public double getOutlineThickness()
+    {
         return outlineThickness;
     }
 
-    public void setLabel(String label) {
+    public void setLabel(String label)
+    {
         this.label = label;
     }
 
-    public boolean hasLabel() {
+    public boolean hasLabel()
+    {
         return this.label != null && this.label.length() > 0;
     }
 
-    public String getLabel() {
+    public String getLabel()
+    {
         return this.label;
     }
 
-    public void update() {
+    public void update()
+    {
     }
 
     public abstract void draw(Display display);

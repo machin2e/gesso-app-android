@@ -91,7 +91,7 @@ public class Port extends Entity {
 
         Log.v("TouchPort", "path count: " + paths.size());
 
-        // Recursively set physically connected ports to the same type
+        // Recursively setValue physically connected ports to the same type
         for (int i = 0; i < this.paths.size(); i++) {
             Path path = this.paths.get(i);
             if (path.getType() == Path.Type.ELECTRONIC) {

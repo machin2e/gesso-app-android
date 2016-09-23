@@ -17,10 +17,12 @@ import camp.computer.clay.space.util.geometry.Rectangle;
  */
 public class ShapeGroup extends Group<Shape> {
 
-    public ShapeGroup() {
+    public ShapeGroup()
+    {
     }
 
-    public ShapeGroup remove(Shape shape) {
+    public ShapeGroup remove(Shape shape)
+    {
         elements.remove(shape);
         return this;
     }
@@ -32,7 +34,8 @@ public class ShapeGroup extends Group<Shape> {
      * @param labels The list of {@code Shape} objects matching the regular expressions list.
      * @return A list of {@code Shape} objects.
      */
-    public ShapeGroup filterLabel(String... labels) {
+    public ShapeGroup filterLabel(String... labels)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -60,7 +63,8 @@ public class ShapeGroup extends Group<Shape> {
      * @param types
      * @return
      */
-    public <T extends Entity> ShapeGroup filterType(Class<?>... types) {
+    public <T extends Entity> ShapeGroup filterType(Class<?>... types)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -76,7 +80,8 @@ public class ShapeGroup extends Group<Shape> {
         return shapeGroup;
     }
 
-    public <T extends Entity> ShapeGroup filterEntity(Group<T> entities) {
+    public <T extends Entity> ShapeGroup filterEntity(Group<T> entities)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -98,17 +103,15 @@ public class ShapeGroup extends Group<Shape> {
      * @param distance
      * @return
      */
-    public ShapeGroup filterArea(Point point, double distance) {
+    public ShapeGroup filterArea(Point point, double distance)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
 
-            double distanceToShape = Geometry.calculateDistance(
-                    point,
-                    shape.getPosition()
-            );
+            double distanceToShape = Geometry.calculateDistance(point, shape.getPosition());
 
             if (distanceToShape < distance) {
                 shapeGroup.add(shape);
@@ -120,7 +123,8 @@ public class ShapeGroup extends Group<Shape> {
 
     }
 
-    public ShapeGroup filterContains(Point point) {
+    public ShapeGroup filterContains(Point point)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -143,7 +147,8 @@ public class ShapeGroup extends Group<Shape> {
      * @param shape The {@code Shape} covering the area to filter.
      * @return The {@code ShapeGroup} containing the area covered by {@code shape}.
      */
-    public ShapeGroup filterArea(Shape shape) {
+    public ShapeGroup filterArea(Shape shape)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -157,7 +162,8 @@ public class ShapeGroup extends Group<Shape> {
         return shapeGroup;
     }
 
-    public ShapeGroup filterVisibility(Visibility visibility) {
+    public ShapeGroup filterVisibility(Visibility visibility)
+    {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -172,11 +178,13 @@ public class ShapeGroup extends Group<Shape> {
         return shapeGroup;
     }
 
-    public List<Shape> getList() {
+    public List<Shape> getList()
+    {
         return elements;
     }
 
-    public List<Point> getPositions() {
+    public List<Point> getPositions()
+    {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
@@ -185,7 +193,8 @@ public class ShapeGroup extends Group<Shape> {
         return positions;
     }
 
-    public List<Point> getVertices() {
+    public List<Point> getVertices()
+    {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
@@ -194,20 +203,24 @@ public class ShapeGroup extends Group<Shape> {
         return positions;
     }
 
-    public Point getCenterPosition() {
+    public Point getCenterPosition()
+    {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
 
-    public Point getCentroidPosition() {
+    public Point getCentroidPosition()
+    {
         return Geometry.calculateCentroidCoordinate(getPositions());
     }
 
-    public Rectangle getBoundingBox() {
+    public Rectangle getBoundingBox()
+    {
         return Geometry.calculateBoundingBox(getVertices());
     }
 
-    public List<Point> getBoundingShape() {
+    public List<Point> getBoundingShape()
+    {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -217,7 +230,8 @@ public class ShapeGroup extends Group<Shape> {
      * @param position
      * @return
      */
-    public Shape getNearest(Point position) {
+    public Shape getNearest(Point position)
+    {
 
         double shortestDistance = Float.MAX_VALUE;
         Shape nearestShape = null;
@@ -236,14 +250,16 @@ public class ShapeGroup extends Group<Shape> {
         return nearestShape;
     }
 
-    public void setTransparency(double transparency) {
+    public void setTransparency(double transparency)
+    {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             shape.setTransparency(transparency);
         }
     }
 
-    public void setVisibility(Visibility visibility) {
+    public void setVisibility(Visibility.Value visibility)
+    {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             shape.setVisibility(visibility);

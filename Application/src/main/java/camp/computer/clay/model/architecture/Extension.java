@@ -1,8 +1,5 @@
 package camp.computer.clay.model.architecture;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import camp.computer.clay.model.profile.ExtensionProfile;
 
 /**

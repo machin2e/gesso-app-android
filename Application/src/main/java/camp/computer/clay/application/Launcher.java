@@ -1,8 +1,6 @@
 package camp.computer.clay.application;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -12,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
-import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -20,14 +17,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,8 +28,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import camp.computer.clay.application.communication.RedisSub.RedisSubThread;
 import camp.computer.clay.application.sound.SpeechOutput;
@@ -46,13 +36,12 @@ import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.application.ui.Dialog;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.model.profile.ExtensionProfile;
-import camp.computer.clay.system.host.NetworkResource;
-import camp.computer.clay.system.host.UDPHost;
-import camp.computer.clay.system.host.SQLiteStoreHost;
 import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.old_model.Host;
 import camp.computer.clay.system.host.DisplayHostInterface;
+import camp.computer.clay.system.host.NetworkResource;
+import camp.computer.clay.system.host.SQLiteStoreHost;
+import camp.computer.clay.system.host.UDPHost;
+import camp.computer.clay.system.old_model.Host;
 import redis.clients.jedis.Jedis;
 
 public class Launcher extends FragmentActivity implements DisplayHostInterface { // was Launcher
@@ -95,12 +84,14 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     Dialog ui;
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
         super.onPostCreate(savedInstanceState);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SpeechOutput.CHECK_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
@@ -113,7 +104,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     }
 
-    public Dialog getUi() {
+    public Dialog getUi()
+    {
         return this.ui;
     }
 
@@ -121,7 +113,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
      * Called when the activity is getFirstEvent created.
      */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         // "Return the context of the single, global Application object of the current process.
@@ -172,7 +165,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
         pathEditor.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
                 pathEditor.setVisibility(View.GONE);
                 return true;
             }
@@ -181,7 +175,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final Button pathEditorAddActionButton = (Button) findViewById(R.id.path_editor_add_action);
         pathEditorAddActionButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
+            public boolean onTouch(View v, MotionEvent motionEvent)
+            {
 
                 int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
                 int pointerId = motionEvent.getPointerId(pointerIndex);
@@ -292,7 +287,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageContentHint.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
                 messageContentHint.setVisibility(View.GONE);
                 showMessageKeyboard();
                 return false;
@@ -312,7 +308,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         // Set up interactivity
         messageContentLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
+            public boolean onTouch(View v, MotionEvent motionEvent)
+            {
 
                 int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
                 int pointerId = motionEvent.getPointerId(pointerIndex);
@@ -352,7 +349,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         messageContentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
 
 
             }
@@ -362,7 +360,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         // </CONTEXT_SCOPE>
         contextScope.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
+            public boolean onTouch(View v, MotionEvent event)
+            {
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
@@ -448,7 +447,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         private Exception exception;
 
-        protected Void doInBackground(String... args) {
+        protected Void doInBackground(String... args)
+        {
             try {
                 String uri = args[0].split(":")[0];
                 int port = Integer.parseInt(args[0].split(":")[1]);
@@ -463,9 +463,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 //                jedis.publish("events", args[0]);
 //                Log.v("Redis", "called publish");
 
-                new Thread(
-                        new RedisSubThread(jedis)
-                ).start();
+                new Thread(new RedisSubThread(jedis)).start();
 
                 //return theRSSHandler.getFeed();
                 return null;
@@ -476,13 +474,15 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
             }
         }
 
-        protected void onPostExecute(Void feed) {
+        protected void onPostExecute(Void feed)
+        {
             // TODO: check this.exception
             // TODO: do something with the feed
         }
     }
 
-    public void publish(String message) {
+    public void publish(String message)
+    {
         new JedisPublishTask().execute(message);
     }
 
@@ -490,12 +490,13 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         private Exception exception;
 
-        protected Void doInBackground(String... urls) {
+        protected Void doInBackground(String... urls)
+        {
             try {
 //                Log.v("Jedis", "Jedis Task");
 //                Jedis jedis = new Jedis("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com", 14268);
 //                jedis.auth("testdb");
-//                jedis.set("foo", "bar");
+//                jedis.setValue("foo", "bar");
 //                String value = jedis.get("foo");
 //                Log.v("Jedis", "foo: " + value);
 
@@ -511,14 +512,16 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
             }
         }
 
-        protected void onPostExecute(Void feed) {
+        protected void onPostExecute(Void feed)
+        {
             // TODO: check this.exception
             // TODO: do something with the feed
         }
     }
     // </REDIS>
 
-    public void hideChat() {
+    public void hideChat()
+    {
         // <CHAT_AND_CONTEXT_SCOPE>
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
@@ -533,7 +536,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageContentLayout.setVisibility(View.GONE);
     }
 
-    private void showMessageKeyboard() {
+    private void showMessageKeyboard()
+    {
 
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
@@ -563,22 +567,26 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageKeyboardLayout.invalidate();
     }
 
-    public camp.computer.clay.space.util.geometry.Point convertToVisiblePosition(Point point) {
+    public camp.computer.clay.space.util.geometry.Point convertToVisiblePosition(Point point)
+    {
         camp.computer.clay.space.util.geometry.Point visiblePosition = new camp.computer.clay.space.util.geometry.Point();
         return visiblePosition;
     }
 
-    public float convertDipToPx(float dip) {
+    public float convertDipToPx(float dip)
+    {
         Resources r = getResources();
         float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, r.getDisplayMetrics());
         return px;
     }
 
-    private void generateKeyboard() {
+    private void generateKeyboard()
+    {
         generateKeys();
     }
 
-    private void generateKeys() {
+    private void generateKeys()
+    {
 
         //final EditText messageContent = (EditText) findViewById(R.id.message_content);
 
@@ -593,7 +601,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         generateKey("chat");
     }
 
-    private void generateKey(String settings) {
+    private void generateKey(String settings)
+    {
 
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
@@ -608,9 +617,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final Button messageKey = new Button(getContext());
         messageKey.setText(settings);
         messageKey.setTextSize(12.0f);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(5, 0, 5, 0);
         messageKey.setPadding(0, 0, 0, 0);
         messageKey.setLayoutParams(layoutParams);
@@ -619,7 +626,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         messageKey.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
 
                 // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
                 appendToChatMessage(messageKey.getText().toString());
@@ -631,7 +639,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageKeyboard.addView(messageKey);
     }
 
-    private void validateChatMessage() {
+    private void validateChatMessage()
+    {
 
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
@@ -643,7 +652,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         contextScope.setText("✓");
     }
 
-    private void appendToChatMessage(String text) {
+    private void appendToChatMessage(String text)
+    {
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
         final HorizontalScrollView messageContentLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_content_layout_perspective);
         final LinearLayout messageContent = (LinearLayout) findViewById(R.id.message_content);
@@ -659,9 +669,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         final Button messageWord = new Button(getContext());
         messageWord.setText(text);
         messageWord.setTextSize(12.0f);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(10, 0, 10, 0);
         messageWord.setPadding(0, 0, 0, 0);
         messageWord.setLayoutParams(layoutParams);
@@ -670,7 +678,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         messageWord.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
 
                 messageContent.removeView(messageWord);
 
@@ -698,13 +707,15 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageContent.addView(messageWord);
 
         messageContentLayoutPerspective.postDelayed(new Runnable() {
-            public void run() {
+            public void run()
+            {
                 messageContentLayoutPerspective.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
             }
         }, 100L);
     }
 
-    private void addPathPatchAction() {
+    private void addPathPatchAction()
+    {
 
         final TextView actionConstruct = new TextView(getContext());
         actionConstruct.setText("Event (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
@@ -717,7 +728,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         actionConstruct.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
+            public boolean onTouch(View v, MotionEvent motionEvent)
+            {
 
                 int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
 
@@ -754,7 +766,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     private Handler fullscreenServiceHandler = new Handler();
     private Runnable fullscreenServiceRunnable = new Runnable() {
         @Override
-        public void run() {
+        public void run()
+        {
             // Do what you need to do.
             // e.g., foobar();
             hideSystemUI();
@@ -766,12 +779,14 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     };
 
-    private void startFullscreenService() {
+    private void startFullscreenService()
+    {
         enableFullscreenService = true;
         fullscreenServiceHandler.postDelayed(fullscreenServiceRunnable, Event.MINIMUM_HOLD_DURATION);
     }
 
-    public void stopFullscreenService() {
+    public void stopFullscreenService()
+    {
         enableFullscreenService = false;
     }
 
@@ -779,21 +794,16 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
      * References:
      * - http://stackoverflow.com/questions/9926767/is-there-a-way-to-hide-the-system-navigation-bar-in-android-ics
      */
-    private void hideSystemUI() {
+    private void hideSystemUI()
+    {
         View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LOW_PROFILE
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_IMMERSIVE);
     }
     // </FULLSCREEN_SERVICE>
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
 
         // <VISUALIZATION>
@@ -802,7 +812,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         if (UDPHost == null) {
@@ -823,7 +834,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     // Define the code block to be executed
     private Runnable runnableCode = new Runnable() {
         @Override
-        public void run() {
+        public void run()
+        {
             // Action the outgoing messages
             clay.step();
 
@@ -833,7 +845,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     };
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
 
         // Stop speech generator
@@ -842,53 +855,64 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     }
 
-    public static Context getContext() {
+    public static Context getContext()
+    {
         return Launcher.context;
     }
 
     @Override
-    public void setClay(Clay clay) {
+    public void setClay(Clay clay)
+    {
         this.clay = clay;
     }
 
     @Override
-    public Clay getClay() {
+    public Clay getClay()
+    {
         return this.clay;
     }
 
     @Override
-    public void addDeviceView(Host host) {
+    public void addDeviceView(Host host)
+    {
 
     }
 
     @Override
-    public void refreshListViewFromData(Host host) {
+    public void refreshListViewFromData(Host host)
+    {
         // TODO: Update the view to reflect the latest state of the object entity
     }
 
     // TODO: Rename to something else and make a getLauncherView() function specific to the
     // TODO: (cont'd) display interface.
-    public static Launcher getLauncherView() {
+    public static Launcher getLauncherView()
+    {
         return Launcher.launcherView;
     }
 
-    public Display getDisplay() {
+    public Display getDisplay()
+    {
         return this.display;
     }
 
-    public double getFramesPerSecond() {
+    public double getFramesPerSecond()
+    {
         return getDisplay().getDisplayOutput().getFramesPerSecond();
     }
 
-    public SpeechOutput getSpeechOutput() {
+    public SpeechOutput getSpeechOutput()
+    {
         return this.speechOutput;
     }
 
-    public ToneOutput getToneOutput() {
+    public ToneOutput getToneOutput()
+    {
         return this.toneOutput;
     }
 
-    public OrientationInput getOrientationInput() {
+    public OrientationInput getOrientationInput()
+    {
         return this.orientationInput;
     }
 }

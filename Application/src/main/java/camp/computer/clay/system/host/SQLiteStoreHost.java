@@ -570,7 +570,7 @@ public class SQLiteStoreHost {
                     // Recursive query to getEvent the children of the action just created.
                     queryActions(action);
                 } else {
-                    // Basic action, so set script.
+                    // Basic action, so setValue script.
                     Script script = getClay().getCache().getScript(UUID.fromString(scriptUuidString));
                     action.setScript(script);
                 }
