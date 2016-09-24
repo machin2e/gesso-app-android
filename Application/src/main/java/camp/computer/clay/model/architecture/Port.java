@@ -5,10 +5,10 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Port extends Entity {
-
-    public enum Direction {
-
+public class Port extends Entity
+{
+    public enum Direction
+    {
         NONE("none"),
         OUTPUT("output"),
         INPUT("input"),
@@ -17,18 +17,20 @@ public class Port extends Entity {
         // TODO: Change the index to a UUID?
         String label;
 
-        Direction(String label) {
+        Direction(String label)
+        {
             this.label = label;
         }
 
-        public String getLabel() {
+        public String getLabel()
+        {
             return this.label;
         }
     }
 
     // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
-    public enum Type {
-
+    public enum Type
+    {
         NONE("none"),
         SWITCH("switch"),
         PULSE("pulse"),
@@ -40,53 +42,78 @@ public class Port extends Entity {
         // TODO: Change the index to a UUID?
         String label;
 
-        Type(String label) {
+        Type(String label)
+        {
             this.label = label;
         }
 
-        public String getLabel() {
+        public String getLabel()
+        {
             return this.label;
         }
 
-        public static Type next(Type currentType) {
+        public static Type next(Type currentType)
+        {
             Type[] values = Type.values();
             int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
             return values[(currentIndex + 1) % values.length];
         }
     }
 
-    public Portable getPortable() {
+    private List<Path> paths = new ArrayList<>();
+
+    private Type type = Type.NONE;
+
+    private Direction direction = Direction.NONE;
+
+    public Portable getPortable()
+    {
         return (Portable) getParent();
     }
 
-    private List<Path> paths = new ArrayList<>();
-
-    public void addPath(Path path) {
+    public void addPath(Path path)
+    {
         if (!hasPath(path)) {
             this.paths.add(path);
             path.setParent(this);
         }
     }
 
-    public void removePath(Path path) {
+    public void removePath(Path path)
+    {
         if (hasPath(path)) {
             this.paths.remove(path);
         }
     }
 
-    public List<Path> getPaths() {
+    public List<Path> getPaths()
+    {
         return this.paths;
     }
 
-    private Type type = Type.NONE;
+    public Extension getExtension()
+    {
+        List<Path> paths = this.getCompletePath();
+        for (int i = 0; i < paths.size(); i++) {
+            Path path = paths.get(i);
+            if (path.getSource() == this || path.getTarget() == this) {
+                if (path.getSource().getParent() instanceof Extension) {
+                    return (Extension) path.getSource().getParent();
+                } else if (path.getTarget().getParent() instanceof Extension) {
+                    return (Extension) path.getTarget().getParent();
+                }
+            }
+        }
+        return null;
+    }
 
-    private Direction direction = Direction.NONE;
-
-    public Type getType() {
+    public Type getType()
+    {
         return this.type;
     }
 
-    public void setType(Type type) {
+    public void setType(Type type)
+    {
         this.type = type;
 
         Log.v("TouchPort", "path count: " + paths.size());
@@ -113,15 +140,18 @@ public class Port extends Entity {
         }
     }
 
-    public Direction getDirection() {
+    public Direction getDirection()
+    {
         return this.direction;
     }
 
-    public void setDirection(Direction direction) {
+    public void setDirection(Direction direction)
+    {
         this.direction = direction;
     }
 
-    public boolean hasPath() {
+    public boolean hasPath()
+    {
         if (this.paths.size() > 0) {
             return true;
         } else {
@@ -129,7 +159,8 @@ public class Port extends Entity {
         }
     }
 
-    public boolean hasPath(Path path) {
+    public boolean hasPath(Path path)
+    {
         return this.paths.contains(path);
     }
 
@@ -139,7 +170,8 @@ public class Port extends Entity {
      *
      * @return List of paths in the graph containing the port.
      */
-    public List<Path> getCompletePath() {
+    public List<Path> getCompletePath()
+    {
 
         // TODO: Replace List<Path> with PathGroup with filters
 
@@ -149,7 +181,8 @@ public class Port extends Entity {
         return connectedPaths;
     }
 
-    public List<Path> getAncestorPaths() {
+    public List<Path> getAncestorPaths()
+    {
 
         Model model = (Model) getParent().getParent();
         List<Path> paths = model.getPaths();
@@ -182,7 +215,8 @@ public class Port extends Entity {
         return ancestorPaths;
     }
 
-    public List<Path> getDescendantPaths() {
+    public List<Path> getDescendantPaths()
+    {
 
         List<Path> descendantPaths = new ArrayList<>();
         List<Port> searchablePorts = new ArrayList<>();
@@ -204,7 +238,8 @@ public class Port extends Entity {
         return descendantPaths;
     }
 
-    public boolean hasAncestor(Port port) {
+    public boolean hasAncestor(Port port)
+    {
         List<Path> ancestorPaths = getAncestorPaths();
         for (int i = 0; i < ancestorPaths.size(); i++) {
             Path ancestorPath = ancestorPaths.get(i);
@@ -215,7 +250,8 @@ public class Port extends Entity {
         return false;
     }
 
-    public boolean hasDescendant(Port port) {
+    public boolean hasDescendant(Port port)
+    {
         List<Path> descendantPaths = getDescendantPaths();
         for (int i = 0; i < descendantPaths.size(); i++) {
             Path descendantPath = descendantPaths.get(i);
@@ -230,9 +266,11 @@ public class Port extends Entity {
      * Returns a list of the ports contained in the list of paths {@code paths}.
      *
      * @param paths List of paths for which a list contained ports will be returned.
+     *
      * @return List of ports contained in the specified list of paths {@code paths}.
      */
-    public Group<Port> getPorts(List<Path> paths) {
+    public Group<Port> getPorts(List<Path> paths)
+    {
         Group<Port> ports = new Group<>();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);

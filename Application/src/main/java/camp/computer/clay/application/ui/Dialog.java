@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
-import camp.computer.clay.model.profile.ExtensionProfile;
+import camp.computer.clay.model.profile.PortableProfile;
 
 public class Dialog {
 
@@ -31,11 +31,11 @@ public class Dialog {
     }
 
     public void promptInputText(final OnCompleteCallback onCompleteCallback) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(launcher.getLauncherView());
+        AlertDialog.Builder builder = new AlertDialog.Builder(launcher.getView());
         builder.setTitle("Create Extension");
 
         // Set up the input
-        final EditText input = new EditText(launcher.getLauncherView());
+        final EditText input = new EditText(launcher.getView());
 
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -63,7 +63,7 @@ public class Dialog {
     }
 
     // TODO: public <T> void promptSelection(List<T> options, OnCompleteCallback onCompleteCallback) {
-    public <T> void promptSelection(final List<ExtensionProfile> options, final OnCompleteCallback onCompleteCallback) {
+    public <T> void promptSelection(final List<PortableProfile> options, final OnCompleteCallback onCompleteCallback) {
 
         // Items
 //        List<String> options = new ArrayList<>();
@@ -73,13 +73,13 @@ public class Dialog {
 //        options.add("Ultrasonic Rangefinder");
 //        options.add("Stepper Motor");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getLauncherView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Select a patch to connect:");
 
         // Add data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                launcher.getLauncherView(),
+                launcher.getView(),
                 android.R.layout.select_dialog_item
         );
 
@@ -90,7 +90,7 @@ public class Dialog {
 
         // Add Profiles
         for (int i = 0; i < options.size(); i++) {
-//            ExtensionProfile extensionProfile = getClay().getExtensionProfiles().get(i);
+//            PortableProfile extensionProfile = getClay().getPortableProfiles().get(i);
 //            options.add(extensionProfile.getLabel());
             arrayAdapter.add(options.get(i).getLabel());
         }
@@ -116,7 +116,7 @@ public class Dialog {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String selectionLabel = arrayAdapter.getItem(position);
-                ExtensionProfile selection = options.get(position);
+                PortableProfile selection = options.get(position);
 
                 // Configure based on Profile
                 // Add Ports based on Profile
@@ -159,7 +159,7 @@ public class Dialog {
 
     public void promptTasks() {
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getLauncherView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
         // builderSingle.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Complete these steps to assemble");
 
@@ -168,7 +168,7 @@ public class Dialog {
 
         // Create data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                launcher.getLauncherView(),
+                launcher.getView(),
                 android.R.layout.select_dialog_multichoice
         );
 
@@ -179,7 +179,7 @@ public class Dialog {
         arrayAdapter.add("Task 4");
         arrayAdapter.add("Task 5");
 
-        final Context appContext = launcher.getLauncherView();
+        final Context appContext = launcher.getView();
 
         /*
         builderSingle.setNegativeButton(
@@ -262,13 +262,13 @@ public class Dialog {
         List<String> options = new ArrayList<>();
         options.add("Task 1");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getLauncherView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Do this task");
 
         // Add data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                launcher.getLauncherView(),
+                launcher.getView(),
                 android.R.layout.select_dialog_singlechoice
         );
 

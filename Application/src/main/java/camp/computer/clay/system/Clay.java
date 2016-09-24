@@ -13,7 +13,7 @@ import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.architecture.Actor;
 import camp.computer.clay.model.architecture.Model;
 import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.profile.ExtensionProfile;
+import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.space.architecture.Space;
 import camp.computer.clay.system.host.CacheHost;
 import camp.computer.clay.system.host.DisplayHostInterface;
@@ -26,7 +26,8 @@ import camp.computer.clay.system.old_model.Descriptor;
 import camp.computer.clay.system.old_model.Event;
 import camp.computer.clay.system.old_model.Host;
 
-public class Clay {
+public class Clay
+{
 
     private Descriptor descriptor = null;
 
@@ -48,11 +49,11 @@ public class Clay {
     // Group of discovered hosts
     private List<Host> hosts = new ArrayList<>();
 
-    private List<ExtensionProfile> extensionProfiles = new ArrayList<>();
+    private List<PortableProfile> portableProfiles = new ArrayList<>();
 
-    public List<ExtensionProfile> getExtensionProfiles()
+    public List<PortableProfile> getPortableProfiles()
     {
-        return this.extensionProfiles;
+        return this.portableProfiles;
     }
 
     public Clay()
@@ -84,7 +85,7 @@ public class Clay {
         // Add actor to model
         model.addActor(actor);
 
-        Launcher.getLauncherView().getDisplay().setSpace(space);
+        Launcher.getView().getDisplay().setSpace(space);
 
         // <TEST>
         simulateHost();
@@ -199,6 +200,7 @@ public class Clay {
      * Returns the view manager the specified index.
      *
      * @param i The index of the view to return.
+     *
      * @return The view at the specified index.
      */
     public DisplayHostInterface getView(int i)
@@ -296,16 +298,16 @@ public class Clay {
         String deviceTag = "";
         if (host.getUuid().toString().equals("001affff-ffff-ffff-4e45-3158200a0027")) {
             deviceTag = "bender";
-            Launcher.getLauncherView().getSpeechOutput().speakPhrase("bender");
+            Launcher.getView().getSpeechOutput().speakPhrase("bender");
         } else if (host.getUuid().toString().equals("002effff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "kitt";
-            Launcher.getLauncherView().getSpeechOutput().speakPhrase("kitt");
+            Launcher.getView().getSpeechOutput().speakPhrase("kitt");
         } else if (host.getUuid().toString().equals("002fffff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "gerty";
-            Launcher.getLauncherView().getSpeechOutput().speakPhrase("gerty");
+            Launcher.getView().getSpeechOutput().speakPhrase("gerty");
         } else if (host.getUuid().toString().equals("0027ffff-ffff-ffff-4e45-36932003000a")) {
             deviceTag = "hal";
-            Launcher.getLauncherView().getSpeechOutput().speakPhrase("hal");
+            Launcher.getView().getSpeechOutput().speakPhrase("hal");
         }
 
         host.setTag(deviceTag);
@@ -365,7 +367,7 @@ public class Clay {
                 this.hosts.add(host);
                 Log.v("Content_Manager", "Successfully added timeline.");
 
-//                ApplicationView.getLauncherView().mapView.getEntity().simulateHost(new Host());
+//                ApplicationView.getView().mapView.getEntity().simulateHost(new Host());
 
                 // Add timelines to attached displays
                 for (DisplayHostInterface view : this.displays) {
@@ -394,7 +396,7 @@ public class Clay {
             */
 
 //            // Show the action button
-//            ApplicationView.getLauncherView().getCursorView().show(true);
+//            ApplicationView.getView().getCursorView().show(true);
 
             // Populate the host's timeline
             // TODO: Populate from scratch only if no timeline has been programmed for the host

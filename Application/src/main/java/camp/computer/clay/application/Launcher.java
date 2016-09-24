@@ -372,7 +372,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
                     // Get screen width and height of the device
                     DisplayMetrics metrics = new DisplayMetrics();
-                    Launcher.getLauncherView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    Launcher.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                     int screenWidth = metrics.widthPixels;
                     int screenHeight = metrics.heightPixels;
 
@@ -884,9 +884,9 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         // TODO: Update the view to reflect the latest state of the object entity
     }
 
-    // TODO: Rename to something else and make a getLauncherView() function specific to the
+    // TODO: Rename to something else and make a getView() function specific to the
     // TODO: (cont'd) display interface.
-    public static Launcher getLauncherView()
+    public static Launcher getView()
     {
         return Launcher.launcherView;
     }

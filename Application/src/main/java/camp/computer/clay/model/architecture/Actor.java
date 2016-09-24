@@ -78,7 +78,7 @@ public class Actor {
     public void processAction(Event event) { // TODO: Rename to processAction()
 
         // <HACK>
-        Launcher.getLauncherView().publish(event.getType().toString());
+        Launcher.getView().publish(event.getType().toString());
         // </HACK>
 
         event.setActor(this);

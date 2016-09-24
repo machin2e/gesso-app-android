@@ -1,9 +1,18 @@
 package camp.computer.clay.model.architecture;
 
-import java.util.ArrayList;
-import java.util.List;
+import camp.computer.clay.model.profile.PortableProfile;
 
-public class Host extends Portable {
+public class Host extends Portable
+{
+    public Host()
+    {
+        super();
+    }
 
-    // has Script (i.e., Host runs a Script)
+    public Host(PortableProfile profile)
+    {
+        super(profile);
+    }
+
+    // has Script/is Scriptable (i.e., Host runs a Script)
 }

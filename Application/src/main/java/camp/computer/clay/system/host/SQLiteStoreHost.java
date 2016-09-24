@@ -1665,7 +1665,7 @@ public class SQLiteStoreHost {
     }
 
     public Clay getClay () {
-        return Launcher.getLauncherView().getClay();
+        return Launcher.getView().getClay();
     }
 
     /**

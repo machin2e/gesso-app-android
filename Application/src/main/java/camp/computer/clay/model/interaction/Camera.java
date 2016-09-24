@@ -23,7 +23,8 @@ import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
-public class Camera {
+public class Camera
+{
 
     // TODO: Caption generation for each Perspective/Camera
 
@@ -131,7 +132,7 @@ public class Camera {
             // <PLAN_ANIMATION>
             originalPosition.set(position);
 
-            positionFrameLimit = (int) (Launcher.getLauncherView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
+            positionFrameLimit = (int) (Launcher.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             positionFrameIndex = 0;
             // </PLAN_ANIMATION>
@@ -158,7 +159,7 @@ public class Camera {
         if (duration == 0) {
             this.scale = scale;
         } else {
-            double frameCount = Launcher.getLauncherView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
+            double frameCount = Launcher.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             scaleDelta = Math.abs(scale - this.scale) / frameCount;
         }
@@ -338,7 +339,6 @@ public class Camera {
 
     public void focusMoveCamera(Event event)
     {
-
         // Move perspective
         Action action = event.getAction();
         setOffset(action.offsetX, action.offsetY);
@@ -346,7 +346,6 @@ public class Camera {
 
     public void focusSelectHost(Event event)
     {
-
         Actor actor = event.getActor();
         Action action = event.getAction();
 
@@ -360,7 +359,6 @@ public class Camera {
 
             HostImage hostImage = (HostImage) event.getTargetImage();
 
-            // <UPDATE_PERSPECTIVE>
             // Remove focus from other form
             ImageGroup otherHostImages = getSpace().getImages().filterType(Host.class, Extension.class).remove(hostImage);
             for (int i = 0; i < otherHostImages.size(); i++) {
@@ -379,7 +377,8 @@ public class Camera {
             }
 
             // Camera
-            if (hostImage.getHost().getPaths().size() > 0 && (previousAction != null && previousAction.getFirstEvent().getTargetImage() != event.getTargetImage())) {
+            if (hostImage.getHost().getPaths().size() > 0
+                    && (previousAction != null && previousAction.getFirstEvent().getTargetImage() != event.getTargetImage())) {
 
                 Log.v("Touch_", "A");
 
@@ -415,7 +414,6 @@ public class Camera {
                 }
 
                 // Camera
-                //List<Image> hostPathPortShapes = getSpace().getImages(formPathPorts);
                 ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(formPathPorts);
                 Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
 
@@ -443,7 +441,6 @@ public class Camera {
                 setScale(1.2f);
                 setPosition(hostImage.getPosition());
             }
-            // </UPDATE_PERSPECTIVE>
         }
 
     }

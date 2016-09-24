@@ -33,15 +33,15 @@ import camp.computer.clay.space.util.geometry.Rectangle;
 
 public class Space extends Image<Model>
 {
-
     private List<Layer> layers = new ArrayList<>();
 
     private Visibility prototypeExtensionVisibility = new Visibility(Visibility.Value.INVISIBLE);
     private Point prototypeExtensionPosition = new Point();
 
     private Visibility prototypePathVisibility = new Visibility(Visibility.Value.INVISIBLE);
-    private Point prototypePathSourcePosition = new Point(40, 80);
-    private Point prototypePathDestinationCoordinate = new Point(40, 80);
+    private Point prototypePathSourcePosition = new Point(0, 0);
+    private Point prototypePathDestinationCoordinate = new Point(0, 0);
+
     double shapeRadius = 40.0;
 
     public Space(Model model)
@@ -59,7 +59,6 @@ public class Space extends Image<Model>
 
     private void setupActions()
     {
-
         // Setup interactivity
         setOnActionListener(new ActionListener()
         {
@@ -71,49 +70,28 @@ public class Space extends Image<Model>
 
                 Camera camera = lastEvent.getActor().getCamera();
 
-                if (lastEvent.getType() == Event.Type.NONE)
-                {
-
-                } else if (lastEvent.getType() == Event.Type.SELECT)
-                {
-
-                    if (action.isTap())
-                    {
+                if (lastEvent.getType() == Event.Type.NONE) {
+                } else if (lastEvent.getType() == Event.Type.SELECT) {
+                    if (action.isTap()) {
 
                         // Camera
                         camera.focusSelectSpace();
                     }
-
-                } else if (lastEvent.getType() == Event.Type.HOLD)
-                {
-
+                } else if (lastEvent.getType() == Event.Type.HOLD) {
                     // Select patch to connect
-//                    Launcher.getLauncherView().promptSelection();
+//                    Launcher.getView().promptSelection();
 
-                } else if (lastEvent.getType() == Event.Type.MOVE)
-                {
-
-                    if (action.isHolding())
-                    {
-
+                } else if (lastEvent.getType() == Event.Type.MOVE) {
+                    if (action.isHolding()) {
                         // Space
                         lastEvent.getTargetImage().processAction(action);
-
-                    } else
-                    {
-
+                    } else {
                         // Camera
-                        if (action.getSize() > 1)
-                        {
+                        if (action.getSize() > 1) {
                             camera.setOffset(lastEvent.getPosition().getX() - action.getFirstEvent().getPosition().getX(), lastEvent.getPosition().getY() - action.getFirstEvent().getPosition().getY());
-
                         }
-
                     }
-
-                } else if (lastEvent.getType() == Event.Type.UNSELECT)
-                {
-
+                } else if (lastEvent.getType() == Event.Type.UNSELECT) {
                 }
             }
         });
@@ -126,10 +104,8 @@ public class Space extends Image<Model>
 
     private boolean hasLayer(String tag)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
-            if (layers.get(i).getTag().equals(tag))
-            {
+        for (int i = 0; i < layers.size(); i++) {
+            if (layers.get(i).getTag().equals(tag)) {
                 return true;
             }
         }
@@ -138,8 +114,7 @@ public class Space extends Image<Model>
 
     private void addLayer(String tag)
     {
-        if (!hasLayer(tag))
-        {
+        if (!hasLayer(tag)) {
             Layer layer = new Layer(this);
             layer.setTag(tag);
             layers.add(layer);
@@ -148,10 +123,8 @@ public class Space extends Image<Model>
 
     public Layer getLayer(String tag)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
-            if (layers.get(i).getTag().equals(tag))
-            {
+        for (int i = 0; i < layers.size(); i++) {
+            if (layers.get(i).getTag().equals(tag)) {
                 return layers.get(i);
             }
         }
@@ -160,11 +133,9 @@ public class Space extends Image<Model>
 
     public Layer getLayer(int id)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            if (layer.getIndex() == id)
-            {
+            if (layer.getIndex() == id) {
                 return layer;
             }
         }
@@ -173,9 +144,7 @@ public class Space extends Image<Model>
 
     public <T extends Entity> void addEntity(T entity)
     {
-
-        if (entity instanceof Host)
-        {
+        if (entity instanceof Host) {
 
             Host host = (Host) entity;
 
@@ -183,17 +152,14 @@ public class Space extends Image<Model>
             HostImage hostImage = new HostImage(host);
 
             // Create Port Shapes for each of the Host's Ports
-            for (int i = 0; i < host.getPorts().size(); i++)
-            {
+            for (int i = 0; i < host.getPorts().size(); i++) {
                 Port port = host.getPorts().get(i);
                 addEntity(port);
             }
 
             // Add Host Image to Space
             addImage(hostImage, "hosts");
-
-        } else if (entity instanceof Extension)
-        {
+        } else if (entity instanceof Extension) {
 
             Extension extension = (Extension) entity;
 
@@ -201,17 +167,14 @@ public class Space extends Image<Model>
             ExtensionImage extensionImage = new ExtensionImage(extension);
 
             // Create Port Shapes for each of the Extension's Ports
-            for (int i = 0; i < extension.getPorts().size(); i++)
-            {
+            for (int i = 0; i < extension.getPorts().size(); i++) {
                 Port port = extension.getPorts().get(i);
                 addEntity(port);
             }
 
             // Add Extension Image to Space
             addImage(extensionImage, "extensions");
-
-        } else if (entity instanceof Port)
-        {
+        } else if (entity instanceof Port) {
 
             Port port = (Port) entity;
 
@@ -220,8 +183,7 @@ public class Space extends Image<Model>
 
             // TODO:
 
-        } else if (entity instanceof Path)
-        {
+        } else if (entity instanceof Path) {
 
             Path path = (Path) entity;
 
@@ -230,7 +192,6 @@ public class Space extends Image<Model>
 
             // Add Path Image to Space
             addImage(pathImage, "paths");
-
         }
     }
 
@@ -238,8 +199,7 @@ public class Space extends Image<Model>
     private <T extends Image> void addImage(T image, String layerTag)
     {
         // Add layer (if it doesn't exist)
-        if (!hasLayer(layerTag))
-        {
+        if (!hasLayer(layerTag)) {
             addLayer(layerTag);
         }
 
@@ -248,8 +208,7 @@ public class Space extends Image<Model>
 
         // Position the Image
         // <HACK>
-        if (image instanceof HostImage)
-        {
+        if (image instanceof HostImage) {
             adjustLayout(image);
         }
         // </HACK>
@@ -267,11 +226,9 @@ public class Space extends Image<Model>
      */
     private void adjustLayout(Image image)
     {
-
         int adjustmentMethod = 1;
 
-        if (adjustmentMethod == 0)
-        {
+        if (adjustmentMethod == 0) {
 
             // Calculate random positions separated by minimum distance
             final float imageSeparationDistance = 550; // 500;
@@ -283,19 +240,11 @@ public class Space extends Image<Model>
 
             Log.v("Coordinate", "imageCoordinates.size = " + imageCoordinates.size());
 
-            if (imageCoordinates.size() == 0)
-            {
-
+            if (imageCoordinates.size() == 0) {
                 position = new Point(0, 0);
-
-            } else if (imageCoordinates.size() == 1)
-            {
-
+            } else if (imageCoordinates.size() == 1) {
                 position = Geometry.calculatePoint(imageCoordinates.get(0), Probability.generateRandomInteger(0, 360), imageSeparationDistance);
-
-            } else
-            {
-
+            } else {
                 List<Point> hullPoints = Geometry.computeConvexHull(imageCoordinates);
 
                 int sourceIndex = Probability.generateRandomInteger(0, hullPoints.size() - 1);
@@ -310,21 +259,17 @@ public class Space extends Image<Model>
             image.setRotation(Probability.getRandomGenerator().nextInt(360));
         }
 
-        if (adjustmentMethod == 1)
-        {
+        if (adjustmentMethod == 1) {
 
             ImageGroup imageCoordinates = getImages().filterType(Host.class);
 
             // Set position
-            if (imageCoordinates.size() == 1)
-            {
+            if (imageCoordinates.size() == 1) {
                 imageCoordinates.get(0).setPosition(new Point(0, 0));
-            } else if (imageCoordinates.size() == 2)
-            {
+            } else if (imageCoordinates.size() == 2) {
                 imageCoordinates.get(0).setPosition(new Point(-300, 0));
                 imageCoordinates.get(1).setPosition(new Point(300, 0));
-            } else if (imageCoordinates.size() == 5)
-            {
+            } else if (imageCoordinates.size() == 5) {
                 imageCoordinates.get(0).setPosition(new Point(-300, -600));
                 imageCoordinates.get(0).setRotation(0);
                 imageCoordinates.get(1).setPosition(new Point(300, -600));
@@ -348,17 +293,16 @@ public class Space extends Image<Model>
      *
      * @param entity The {@code Entity} for which the corresponding {@code Image} will be
      *               returned, if any.
+     *
      * @return The {@code Image} corresponding to the specified {@code Entity}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
     public boolean contains(Entity entity)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Image image = layer.getImage(entity);
-            if (image != null)
-            {
+            if (image != null) {
                 return true;
             }
         }
@@ -367,12 +311,10 @@ public class Space extends Image<Model>
 
     public Image getImage(Entity entity)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Image image = layer.getImage(entity);
-            if (image != null)
-            {
+            if (image != null) {
                 return image;
             }
         }
@@ -382,15 +324,12 @@ public class Space extends Image<Model>
     public <T> ImageGroup getImages(Group<T> entities)
     {
         ImageGroup imageGroup = new ImageGroup();
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            for (int j = 0; j < entities.size(); j++)
-            {
+            for (int j = 0; j < entities.size(); j++) {
                 T model = entities.get(j);
                 Image image = layer.getImage((Entity) model);
-                if (image != null)
-                {
+                if (image != null) {
                     imageGroup.add(image);
                 }
             }
@@ -402,12 +341,10 @@ public class Space extends Image<Model>
     {
         ImageGroup imageGroup = new ImageGroup();
         List<Integer> indices = getLayerIndices();
-        for (int i = 0; i < indices.size(); i++)
-        {
+        for (int i = 0; i < indices.size(); i++) {
             Integer index = indices.get(i);
             Layer layer = getLayer(index);
-            if (layer != null)
-            {
+            if (layer != null) {
                 imageGroup.add(layer.getImages());
             }
         }
@@ -423,11 +360,9 @@ public class Space extends Image<Model>
     public Image getImageByPosition(Point point)
     {
         ImageGroup images = getImages().filterVisibility(Visibility.Value.VISIBLE);
-        for (int i = 0; i < images.size(); i++)
-        {
+        for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-            if (image.contains(point))
-            {
+            if (image.contains(point)) {
                 return image;
             }
         }
@@ -439,8 +374,7 @@ public class Space extends Image<Model>
         ShapeGroup shapeGroup = new ShapeGroup();
         ImageGroup imageList = getImages();
 
-        for (int i = 0; i < imageList.size(); i++)
-        {
+        for (int i = 0; i < imageList.size(); i++) {
             shapeGroup.add(imageList.get(i).getShapes());
         }
 
@@ -450,12 +384,10 @@ public class Space extends Image<Model>
     // TODO: Refactor to be cleaner and leverage other classes...
     public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes)
     {
-
         ShapeGroup shapeGroup = new ShapeGroup();
         ImageGroup imageList = getImages();
 
-        for (int i = 0; i < imageList.size(); i++)
-        {
+        for (int i = 0; i < imageList.size(); i++) {
             shapeGroup.add(imageList.get(i).getShapes(entityTypes));
         }
 
@@ -465,12 +397,10 @@ public class Space extends Image<Model>
     public Shape getShape(Entity entity)
     {
         ImageGroup images = getImages();
-        for (int i = 0; i < images.size(); i++)
-        {
+        for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
             Shape shape = image.getShape(entity);
-            if (shape != null)
-            {
+            if (shape != null) {
                 return shape;
             }
         }
@@ -484,12 +414,10 @@ public class Space extends Image<Model>
 
     public Entity getEntity(Image image)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Entity entity = layer.getEntity(image);
-            if (entity != null)
-            {
+            if (entity != null) {
                 return entity;
             }
         }
@@ -498,12 +426,10 @@ public class Space extends Image<Model>
 
     public Entity getEntity(Shape shape)
     {
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             Entity entity = layer.getEntity(shape);
-            if (entity != null)
-            {
+            if (entity != null) {
                 return entity;
             }
         }
@@ -513,8 +439,7 @@ public class Space extends Image<Model>
     public static <T extends Image> List<Point> getPositions(List<T> images)
     {
         List<Point> positions = new ArrayList<>();
-        for (int i = 0; i < images.size(); i++)
-        {
+        for (int i = 0; i < images.size(); i++) {
             T figure = images.get(i);
             positions.add(figure.getPosition());
         }
@@ -524,17 +449,15 @@ public class Space extends Image<Model>
     @Override
     public void update()
     {
-        super.update();
+//        super.update();
 
         // Update perspective
         getEntity().getActor(0).getCamera().update();
 
         // Update figures
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
-            for (int j = 0; j < layer.getImages().size(); j++)
-            {
+            for (int j = 0; j < layer.getImages().size(); j++) {
                 Image image = layer.getImages().get(j);
                 image.update();
             }
@@ -547,18 +470,14 @@ public class Space extends Image<Model>
     @Override
     public void draw(Display display)
     {
-
         // <DEBUG_LABEL>
-        if (Launcher.ENABLE_GEOMETRY_LABELS)
-        {
-
+        if (Launcher.ENABLE_GEOMETRY_LABELS) {
             // <AXES_LABEL>
             display.getPaint().setColor(Color.CYAN);
             display.getPaint().setStrokeWidth(1.0f);
             display.getCanvas().drawLine(-5000, 0, 5000, 0, display.getPaint());
             display.getCanvas().drawLine(0, -5000, 0, 5000, display.getPaint());
             // </AXES_LABEL>
-
         }
         // </DEBUG_LABEL>
 
@@ -570,8 +489,7 @@ public class Space extends Image<Model>
         drawPrototypeExtensionImage(display);
 
         // <DEBUG_LABEL>
-        if (Launcher.ENABLE_GEOMETRY_LABELS)
-        {
+        if (Launcher.ENABLE_GEOMETRY_LABELS) {
 
             // <FPS_LABEL>
             Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();
@@ -624,9 +542,7 @@ public class Space extends Image<Model>
             List<Point> baseVertices = getImages().filterType(Host.class, Extension.class).getVertices();
 
             // Hull vertices
-            for (int i = 0; i < baseVertices.size() - 1; i++)
-            {
-
+            for (int i = 0; i < baseVertices.size() - 1; i++) {
                 display.getPaint().setStrokeWidth(1.0f);
                 display.getPaint().setColor(Color.parseColor("#FF2828"));
                 display.getPaint().setStyle(Paint.Style.FILL);
@@ -645,9 +561,7 @@ public class Space extends Image<Model>
             Display.drawPolygon(convexHullVertices, display);
 
             // Hull vertices
-            for (int i = 0; i < convexHullVertices.size() - 1; i++)
-            {
-
+            for (int i = 0; i < convexHullVertices.size() - 1; i++) {
                 display.getPaint().setStrokeWidth(1.0f);
                 display.getPaint().setColor(Color.parseColor("#FF2828"));
                 display.getPaint().setStyle(Paint.Style.STROKE);
@@ -665,7 +579,6 @@ public class Space extends Image<Model>
             Rectangle boundingBox = getImages().filterType(Host.class).getBoundingBox();
             Display.drawPolygon(boundingBox.getVertices(), display);
             // </BOUNDING_BOX_LABEL>
-
         }
         // </DEBUG_LABEL>
 
@@ -794,19 +707,15 @@ public class Space extends Image<Model>
 
     private void drawLayers(Display display)
     {
-
-        if (getLayer("paths") != null)
-        {
+        if (getLayer("paths") != null) {
             getLayer("paths").draw(display);
         }
 
-        if (getLayer("hosts") != null)
-        {
+        if (getLayer("hosts") != null) {
             getLayer("hosts").draw(display);
         }
 
-        if (getLayer("extensions") != null)
-        {
+        if (getLayer("extensions") != null) {
             getLayer("extensions").draw(display);
         }
     }
@@ -814,8 +723,7 @@ public class Space extends Image<Model>
     public List<Integer> getLayerIndices()
     {
         List<Integer> layerIndices = new ArrayList<>();
-        for (int i = 0; i < layers.size(); i++)
-        {
+        for (int i = 0; i < layers.size(); i++) {
             Layer layer = layers.get(i);
             layerIndices.add(layer.getIndex());
         }
@@ -830,9 +738,7 @@ public class Space extends Image<Model>
 
     private void drawPrototypeExtensionImage(Display display)
     {
-
-        if (prototypeExtensionVisibility.getValue() == Visibility.Value.VISIBLE)
-        {
+        if (prototypeExtensionVisibility.getValue() == Visibility.Value.VISIBLE) {
 
             Paint paint = display.getPaint();
 
@@ -841,16 +747,13 @@ public class Space extends Image<Model>
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#fff7f7f7"));
             Display.drawRectangle(prototypeExtensionPosition, pathRotationAngle + 180, 200, 200, display);
-
         }
-
     }
 
     // TODO: Make this into a shape and put this on a separate layer!
     public void drawPrototypePathImages(Display display)
     {
-        if (prototypePathVisibility.getValue() == Visibility.Value.VISIBLE)
-        {
+        if (prototypePathVisibility.getValue() == Visibility.Value.VISIBLE) {
 //            if (getPort().getType() != Port.Type.NONE) {
 
             Paint paint = display.getPaint();

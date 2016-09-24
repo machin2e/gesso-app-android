@@ -13,7 +13,8 @@ import camp.computer.clay.space.architecture.ImageGroup;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Visibility;
 
-public abstract class PortableImage extends Image<Portable> {
+public abstract class PortableImage extends Image<Portable>
+{
 
     public PortableImage(Portable portable)
     {
@@ -120,7 +121,7 @@ public abstract class PortableImage extends Image<Portable> {
             // Update visibility
             if (visibility == Visibility.Value.VISIBLE) {
                 pathImage.setVisibility(Visibility.Value.VISIBLE);
-                // pathImage.setDockVisibility(Visibility.INVISIBLE);
+//                 pathImage.setDockVisibility(Visibility.INVISIBLE);
             } else if (visibility == Visibility.Value.INVISIBLE) {
                 pathImage.setVisibility(Visibility.Value.INVISIBLE);
                 //pathImage.setDockVisibility(Visibility.VISIBLE);

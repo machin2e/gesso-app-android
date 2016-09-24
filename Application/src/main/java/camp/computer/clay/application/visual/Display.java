@@ -155,9 +155,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // <PERSPECTIVE>
         // Adjust the perspective
         canvas.save();
-        canvas.translate((float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getLauncherView().getOrientationInput().getRotationY(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getLauncherView().getOrientationInput().getRotationX());
+        canvas.translate((float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getView().getOrientationInput().getRotationY(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getView().getOrientationInput().getRotationX());
 //                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY());
-        // this.canvas.rotate((float) ApplicationView.getLauncherView().getOrientationInput().getRotationZ());
+        // this.canvas.rotate((float) ApplicationView.getView().getOrientationInput().getRotationZ());
         canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
         // </PERSPECTIVE>
 
@@ -279,7 +279,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
-        Launcher.getLauncherView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Launcher.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 

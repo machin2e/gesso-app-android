@@ -13,7 +13,7 @@ import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.model.profile.ExtensionProfile;
+import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.architecture.ShapeGroup;
@@ -22,7 +22,8 @@ import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
-public class ExtensionImage extends PortableImage { // Image<Extension> {
+public class ExtensionImage extends PortableImage
+{ // Image<Extension> {
 
     public ExtensionImage(Extension extension)
     {
@@ -63,7 +64,8 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
     private void setupActions()
     {
 
-        setOnActionListener(new ActionListener() {
+        setOnActionListener(new ActionListener()
+        {
             @Override
             public void onAction(Action action)
             {
@@ -76,20 +78,23 @@ public class ExtensionImage extends PortableImage { // Image<Extension> {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
-                    // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated ExtensionProfile)
-                    Launcher.getLauncherView().getUi().promptInputText(new Dialog.OnCompleteCallback<String>() {
+                    // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
+                    Launcher.getView().getUi().promptInputText(new Dialog.OnCompleteCallback<String>()
+                    {
                         @Override
                         public void onComplete(String result)
                         {
-
                             // Create Extension Profile
-                            ExtensionProfile extensionProfile = new ExtensionProfile();
-                            extensionProfile.setLabel(result);
-                            extensionProfile.setPortCount(getPortable().getPorts().size());
-                            Log.v("HoldAction", "Creating new profile \"" + extensionProfile.getLabel() + "\" with " + extensionProfile.getPortCount() + " ports. Only added if no duplicate (i.e., doesn't already exist)");
+                            PortableProfile portableProfile = new PortableProfile(getExtension());
+                            portableProfile.setLabel(result);
+//                            portableProfile.setPortCount(getPortable().getPorts().size());
+                            Log.v("HoldAction", "Creating new profile \"" + portableProfile.getLabel() + "\" with " + portableProfile.getPorts().size() + " ports. Only added if no duplicate (i.e., doesn't already exist)");
+
+                            // Assign the Profile to the Extension
+                            getExtension().setProfile(portableProfile);
 
                             // Cache the new Extension Profile
-                            Launcher.getLauncherView().getClay().getExtensionProfiles().add(extensionProfile);
+                            Launcher.getView().getClay().getPortableProfiles().add(portableProfile);
 
                             // TODO: Persist the profile in the user's private store (either local or online)
 
