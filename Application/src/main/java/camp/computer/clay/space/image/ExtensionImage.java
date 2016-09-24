@@ -79,7 +79,7 @@ public class ExtensionImage extends PortableImage
                 } else if (event.getType() == Event.Type.HOLD) {
 
                     // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
-                    Launcher.getView().getUi().promptInputText(new Dialog.OnCompleteCallback<String>()
+                    Launcher.getView().getPrompts().promptInputText(new Dialog.OnCompleteCallback<String>()
                     {
                         @Override
                         public void onComplete(String result)
@@ -208,7 +208,10 @@ public class ExtensionImage extends PortableImage
         }
 
         // Update Header (size, etc.)
-        ((Rectangle) getShape("Header")).setWidth(15 * getExtension().getPorts().size());
+        // Reference: http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
+        double pixelsPerMillimeter = 6;
+        double headerWidth = pixelsPerMillimeter * (2.54 * getPortable().getPorts().size() + 0.6); // +-0.6
+        ((Rectangle) getShape("Header")).setWidth(headerWidth);
     }
 
     public void draw(Display display)

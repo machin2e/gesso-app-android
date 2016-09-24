@@ -7,7 +7,8 @@ import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.space.architecture.Shape;
 
-public class Line<T extends Entity> extends Shape<T> {
+public class Line<T extends Entity> extends Shape<T>
+{
 
     protected Point source = new Point(0, 0);
     protected Point target = new Point(0, 0);
@@ -77,5 +78,11 @@ public class Line<T extends Entity> extends Shape<T> {
     public double getLength()
     {
         return Geometry.calculateDistance(source, target);
+    }
+
+    public Point getMidpoint()
+    {
+        Point midpoint = Geometry.calculateMidpoint2(getSource(), getTarget());
+        return midpoint;
     }
 }

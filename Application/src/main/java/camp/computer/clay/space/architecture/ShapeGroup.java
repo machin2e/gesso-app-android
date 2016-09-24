@@ -15,7 +15,8 @@ import camp.computer.clay.space.util.geometry.Rectangle;
 /**
  * ShapeGroup is an interface for managing and manipulating sets of elements.
  */
-public class ShapeGroup extends Group<Shape> {
+public class ShapeGroup extends Group<Shape>
+{
 
     public ShapeGroup()
     {
@@ -32,6 +33,7 @@ public class ShapeGroup extends Group<Shape> {
      * {@code labels}.
      *
      * @param labels The list of {@code Shape} objects matching the regular expressions list.
+     *
      * @return A list of {@code Shape} objects.
      */
     public ShapeGroup filterLabel(String... labels)
@@ -60,17 +62,18 @@ public class ShapeGroup extends Group<Shape> {
     /**
      * Removes all elements except those with the specified type.
      *
-     * @param types
+     * @param entityTypes
+     *
      * @return
      */
-    public <T extends Entity> ShapeGroup filterType(Class<?>... types)
+    public <T extends Entity> ShapeGroup filterType(Class<?>... entityTypes)
     {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
-            for (int j = 0; j < types.length; j++) {
-                Class<?> type = types[j];
+            for (int j = 0; j < entityTypes.length; j++) {
+                Class<?> type = entityTypes[j];
                 if (this.elements.get(i).getEntity() != null && this.elements.get(i).getEntity().getClass() == type) {
                     shapeGroup.add(this.elements.get(i));
                 }
@@ -82,7 +85,6 @@ public class ShapeGroup extends Group<Shape> {
 
     public <T extends Entity> ShapeGroup filterEntity(Group<T> entities)
     {
-
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
@@ -96,11 +98,27 @@ public class ShapeGroup extends Group<Shape> {
         return shapeGroup;
     }
 
+    public <T extends Entity> ShapeGroup filterEntity(T... entities)
+    {
+        ShapeGroup shapeGroup = new ShapeGroup();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+            for (int j = 0; j < entities.length; j++) {
+                if (this.elements.get(i).getEntity() != null && this.elements.get(i).getEntity() == entities[j]) {
+                    shapeGroup.add(this.elements.get(i));
+                }
+            }
+        }
+
+        return shapeGroup;
+    }
+
     /**
      * Filters elements to those that are within the specified distance from the specified point.
      *
      * @param point
      * @param distance
+     *
      * @return
      */
     public ShapeGroup filterArea(Point point, double distance)
@@ -145,6 +163,7 @@ public class ShapeGroup extends Group<Shape> {
      * Filters elements that fall within the area defined by {@code shape}.
      *
      * @param shape The {@code Shape} covering the area to filter.
+     *
      * @return The {@code ShapeGroup} containing the area covered by {@code shape}.
      */
     public ShapeGroup filterArea(Shape shape)
@@ -228,6 +247,7 @@ public class ShapeGroup extends Group<Shape> {
      * Finds and returns the nearest <em>visible</em> <code>Shape</code>.
      *
      * @param position
+     *
      * @return
      */
     public Shape getNearest(Point position)

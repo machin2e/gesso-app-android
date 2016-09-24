@@ -7,7 +7,8 @@ import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.space.architecture.Shape;
 
-public class Rectangle<T extends Entity> extends Shape<T> {
+public class Rectangle<T extends Entity> extends Shape<T>
+{
 
     private double width = 1.0;
 
@@ -57,6 +58,28 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         segments.add(new Line(getBottomRight(), getBottomLeft()));
         segments.add(new Line(getBottomLeft(), getTopLeft()));
         return segments;
+    }
+
+    public Line getNearestSegment(Point point)
+    {
+        double nearestDistance = Double.MAX_VALUE;
+        Line nearestSegment = null;
+
+        List<Line> segments = getSegments();
+        for (int i = 0; i < segments.size(); i++) {
+            double distanceToSegment = 0;
+            if (i < (segments.size() - 1)) {
+                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(i + 1).getTarget());
+            } else {
+                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(0).getTarget());
+            }
+            if (distanceToSegment < nearestDistance) {
+                nearestDistance = distanceToSegment;
+                nearestSegment = segments.get(i);
+            }
+        }
+
+        return nearestSegment;
     }
 
     @Override

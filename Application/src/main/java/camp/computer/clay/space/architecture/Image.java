@@ -18,7 +18,8 @@ import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
-public abstract class Image<T extends Entity> {
+public abstract class Image<T extends Entity>
+{
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -179,6 +180,7 @@ public abstract class Image<T extends Entity> {
      * {@code labels}.
      *
      * @param labelPatterns The list of {@code Shape} objects matching the regular expressions list.
+     *
      * @return A list of {@code Shape} objects.
      */
     public ShapeGroup getShapes(String... labelPatterns)

@@ -104,7 +104,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     }
 
-    public Dialog getUi()
+    public Dialog getPrompts()
     {
         return this.ui;
     }

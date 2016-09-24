@@ -1,6 +1,7 @@
 package camp.computer.clay.space.util.geometry;
 
-public class Point {
+public class Point
+{
     //
     // TODO: Update to use numbers that can be composed and given dependencies (used in
     // TODO: (cont'd) expressions) and dynamically update expressions. Do animations by giving them

@@ -6,17 +6,21 @@ import java.util.List;
 import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.Space;
 
-public abstract class Geometry {
+public abstract class Geometry
+{
 
     /**
      * Returns the sum of the degrees of in a shape (or polygon) with the number of segments
      * {@code segmentCount}.
      *
      * @param segmentCount The number of segments in a shape (or polygon).
+     *
      * @return The degrees in a shape with the number of segments {@code segmentCount}.
+     *
      * @see <a href="http://www.mathsisfun.com/geometry/interior-angles-polygons.html">Interior Angles of Polygons</a>
      */
-    public static int calculateDegreesInShape(int segmentCount) {
+    public static int calculateDegreesInShape(int segmentCount)
+    {
         if (segmentCount > 2) {
             return (segmentCount - 2) * 180;
         } else {
@@ -24,11 +28,13 @@ public abstract class Geometry {
         }
     }
 
-    public static double calculateDistance(Point source, Point target) {
+    public static double calculateDistance(Point source, Point target)
+    {
         return calculateDistance(source.getX(), source.getY(), target.getX(), target.getY());
     }
 
-    public static double calculateDistance(double x1, double y1, double x2, double y2) {
+    public static double calculateDistance(double x1, double y1, double x2, double y2)
+    {
         double distanceSquare = Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
         double distance = Math.sqrt(distanceSquare);
         return distance;
@@ -46,9 +52,11 @@ public abstract class Geometry {
      *
      * @param source Point we are rotating around.
      * @param target Point to which we want to calculate the rotation, relative to the center point.
+     *
      * @return rotation in degrees.  This is the rotation from centerPt to targetPt.
      */
-    public static double calculateRotationAngle(Point source, Point target) {
+    public static double calculateRotationAngle(Point source, Point target)
+    {
 
         // calculate the rotation theta from the deltaY and deltaX values
         // (atan2 returns radians values from [-PI,PI])
@@ -78,7 +86,8 @@ public abstract class Geometry {
         return angle;
     }
 
-    public static double calculateRotationAngle(double x1, double y1, double x2, double y2) {
+    public static double calculateRotationAngle(double x1, double y1, double x2, double y2)
+    {
 
         // calculate the rotation theta from the deltaY and deltaX values
         // (atan2 returns radians values from [-PI,PI])
@@ -117,37 +126,54 @@ public abstract class Geometry {
      *
      * @return
      */
-    public static Point calculateRotatedPoint(Point originPoint, double angle, Point point) {
+    public static Point calculateRotatedPoint(Point originPoint, double angle, Point point)
+    {
         return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), Geometry.calculateDistance(originPoint, point));
     }
 
-    public static Point calculateRotatedPoint(double x1, double y1, double angle, double x2, double y2) {
+    public static Point calculateRotatedPoint(double x1, double y1, double angle, double x2, double y2)
+    {
         return Geometry.calculatePoint(x1, y1, angle + Geometry.calculateRotationAngle(x1, y1, x2, y2), Geometry.calculateDistance(x1, y1, x2, y2));
     }
 
-    public static Point calculatePoint(Point originPoint, double rotation, double distance) {
+    public static Point calculatePoint(Point originPoint, double rotation, double distance)
+    {
         Point point = new Point();
         point.setX(originPoint.getX() + distance * Math.cos(Math.toRadians(rotation)));
         point.setY(originPoint.getY() + distance * Math.sin(Math.toRadians(rotation)));
         return point;
     }
 
-    public static Point calculatePoint(double x, double y, double rotation, double distance) {
+    public static Point calculatePoint(double x, double y, double rotation, double distance)
+    {
         Point point = new Point();
         point.setX(x + distance * Math.cos(Math.toRadians(rotation)));
         point.setY(y + distance * Math.sin(Math.toRadians(rotation)));
         return point;
     }
 
-    public static Point calculateMidpoint(Point source, Point target) {
+    // TODO: Update references to use the new method and remove this one... Only need one calculateMidpoint()
+    public static Point calculateMidpoint(Point source, Point target)
+    {
         Point midpoint = new Point();
         midpoint.setX((source.getX() + target.getX()) / 2.0f);
         midpoint.setY((source.getY() + target.getY()) / 2.0f);
         return midpoint;
     }
 
+    public static Point calculateMidpoint2(Point source, Point target)
+    {
+        Point midpoint = new Point(
+                (source.getRelativeX() + target.getRelativeX()) / 2.0f,
+                (source.getRelativeY() + target.getRelativeY()) / 2.0f,
+                source.getOrigin()
+        );
+        return midpoint;
+    }
+
     //Compute the dot product AB . AC
-    public static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC) {
+    public static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC)
+    {
         Point AB = new Point();
         Point BC = new Point();
         AB.setX(linePointB.getX() - linePointA.getX());
@@ -159,7 +185,8 @@ public abstract class Geometry {
     }
 
     //Compute the cross product AB x AC
-    public static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
+    public static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC)
+    {
         Point AB = new Point();
         Point AC = new Point();
         AB.setX(linePointB.getX() - linePointA.getX());
@@ -174,7 +201,8 @@ public abstract class Geometry {
     //if isSegment is true, AB is a segment, not a line.
     // References:
     // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
-    public static double calculateLineToPointDistance(Point linePointA, Point linePointB, Point pointC, boolean isSegment) {
+    public static double calculateLineToPointDistance(Point linePointA, Point linePointB, Point pointC, boolean isSegment)
+    {
         double distance = calculateCrossProduct(linePointA, linePointB, pointC) / Geometry.calculateDistance(linePointA, linePointB);
         if (isSegment) {
             double dot1 = calculateDotProduct(linePointA, linePointB, pointC);
@@ -190,7 +218,8 @@ public abstract class Geometry {
         return Math.abs(distance);
     }
 
-    public static Point calculateCentroidCoordinate(List<Point> points) {
+    public static Point calculateCentroidCoordinate(List<Point> points)
+    {
 
         Point centroidPosition = new Point(0, 0);
 
@@ -212,7 +241,8 @@ public abstract class Geometry {
         return centroidPosition;
     }
 
-    public static Rectangle calculateBoundingBox(List<Point> points) {
+    public static Rectangle calculateBoundingBox(List<Point> points)
+    {
 
         double minX = Float.MAX_VALUE;
         double maxX = -Float.MAX_VALUE;
@@ -237,11 +267,13 @@ public abstract class Geometry {
         return new Rectangle(minX, minY, maxX, maxY);
     }
 
-    public static Point calculateCenterPosition(List<Point> points) {
+    public static Point calculateCenterPosition(List<Point> points)
+    {
         return calculateBoundingBox(points).getPosition();
     }
 
-    public static Point calculateNearestPoint(Point sourcePoint, List<Point> points) {
+    public static Point calculateNearestPoint(Point sourcePoint, List<Point> points)
+    {
 
         // Initialize point
         Point nearestPoint = points.get(0);
@@ -268,9 +300,11 @@ public abstract class Geometry {
      * - Another implementation is <em>GrahamScan</em> (http://algs4.cs.princeton.edu/99hull/GrahamScan.java.html).
      *
      * @param points
+     *
      * @return
      */
-    public static List<Point> computeConvexHull(List<Point> points) {
+    public static List<Point> computeConvexHull(List<Point> points)
+    {
 
         List<Point> convexHull = new ArrayList<>();
 
@@ -328,7 +362,8 @@ public abstract class Geometry {
         return convexHull;
     }
 
-    public static void hullSet(Point A, Point B, List<Point> set, List<Point> hull) {
+    public static void hullSet(Point A, Point B, List<Point> set, List<Point> hull)
+    {
         int insertPosition = hull.indexOf(B);
 
         if (set.size() == 0) {
@@ -381,7 +416,8 @@ public abstract class Geometry {
 
     }
 
-    public static double distance(Point A, Point B, Point C) {
+    public static double distance(Point A, Point B, Point C)
+    {
         double ABx = B.getX() - A.getX();
         double ABy = B.getY() - A.getY();
         double num = ABx * (A.getY() - C.getY()) - ABy * (A.getX() - C.getX());
@@ -391,7 +427,8 @@ public abstract class Geometry {
         return num;
     }
 
-    public static int pointLocation(Point A, Point B, Point P) {
+    public static int pointLocation(Point A, Point B, Point P)
+    {
         double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
         if (cp1 > 0) {
             return 1;
@@ -414,9 +451,11 @@ public abstract class Geometry {
      * - http://stackoverflow.com/questions/3265986/an-algorithm-to-space-out-overlapping-rectangles
      *
      * @param positions
+     *
      * @return
      */
-    public static <T extends Image> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter) {
+    public static <T extends Image> List<T> computeCirclePacking(List<T> positions, double distance, Point packingCenter)
+    {
 
         // Sort pointerCoordinates based on distance from center
         List<T> sortedImages = sortByDistanceToPoint(positions, packingCenter);
@@ -506,7 +545,8 @@ public abstract class Geometry {
 
     }
 
-    public static <T extends Image> List<T> sortByDistanceToPoint(List<T> positions, Point point) {
+    public static <T extends Image> List<T> sortByDistanceToPoint(List<T> positions, Point point)
+    {
 
         // Initialize with unsorted list of pointerCoordinates
         List<T> sortedList = new ArrayList(positions);
@@ -651,11 +691,14 @@ public abstract class Geometry {
      * defined by the boundary pointerCoordinates.
      *
      * @param vertices The vertices defining the boundary polygon
-     * @param point The point to check
+     * @param point    The point to check
+     *
      * @return true If the point is inside the boundary, false otherwise
+     *
      * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Point Inclusion in Polygon Test (W. Randolph Franklin)</a>
      */
-    public static boolean containsPoint(List<Point> vertices, Point point) {
+    public static boolean containsPoint(List<Point> vertices, Point point)
+    {
 
         // Setup
         double minX = vertices.get(0).getX();
@@ -687,7 +730,8 @@ public abstract class Geometry {
         return isContained;
     }
 
-    public static List<Point> getRegularPolygon(Point position, double radius, int segmentCount) {
+    public static List<Point> getRegularPolygon(Point position, double radius, int segmentCount)
+    {
 
         List<Point> vertices = new ArrayList<>();
 
