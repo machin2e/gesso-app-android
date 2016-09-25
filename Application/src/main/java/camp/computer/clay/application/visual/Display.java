@@ -49,25 +49,21 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     // Space
     private Space space;
 
-    public Display(Context context)
-    {
+    public Display(Context context) {
         super(context);
         setFocusable(true);
     }
 
-    public Display(Context context, AttributeSet attrs)
-    {
+    public Display(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public Display(Context context, AttributeSet attrs, int defStyle)
-    {
+    public Display(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder)
-    {
+    public void surfaceCreated(SurfaceHolder holder) {
 
         canvasWidth = getWidth();
         canvasHeight = getHeight();
@@ -82,14 +78,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
-    {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder)
-    {
+    public void surfaceDestroyed(SurfaceHolder holder) {
 //        // Kill the background Thread
 //        boolean retry = true;
 //        // displayOutput.setRunning (false);
@@ -103,8 +97,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 //        }
     }
 
-    public void onResume()
-    {
+    public void onResume() {
         // Log.v("MapView", "onResume");
 
         surfaceHolder = getHolder();
@@ -123,8 +116,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public void onPause()
-    {
+    public void onPause() {
         // Log.v("MapView", "onPause");
 
         // Pause the communications
@@ -144,8 +136,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    protected void doDraw(Canvas canvas)
-    {
+    protected void doDraw(Canvas canvas) {
         setCanvas(canvas);
 
         if (this.space == null || this.canvas == null) {
@@ -224,8 +215,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     /**
      * The function run in background thread, not UI thread.
      */
-    public void update()
-    {
+    public void update() {
 
         if (space == null) {
             return;
@@ -253,28 +243,23 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public DisplayOutput getDisplayOutput()
-    {
+    public DisplayOutput getDisplayOutput() {
         return this.displayOutput;
     }
 
-    private void setCanvas(Canvas canvas)
-    {
+    private void setCanvas(Canvas canvas) {
         this.canvas = canvas;
     }
 
-    public Canvas getCanvas()
-    {
+    public Canvas getCanvas() {
         return this.canvas;
     }
 
-    public Paint getPaint()
-    {
+    public Paint getPaint() {
         return this.paint;
     }
 
-    public void setSpace(Space space)
-    {
+    public void setSpace(Space space) {
         this.space = space;
 
         // Get screen width and height of the device
@@ -287,8 +272,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         space.getEntity().getActor(0).getCamera().setHeight(screenHeight);
     }
 
-    public Space getSpace()
-    {
+    public Space getSpace() {
         return this.space;
     }
 
@@ -297,8 +281,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     //----------------------------------------------------------------------------------------------
 
     @Override
-    public boolean onTouchEvent(MotionEvent motionEvent)
-    {
+    public boolean onTouchEvent(MotionEvent motionEvent) {
 
         // - Motion events contain information about all of the pointers that are currently active
         //   even if some of them have not moved since the getLastEvent event was delivered.
@@ -387,8 +370,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public static void drawLine(Line line, Display display)
-    {
+    public static void drawLine(Line line, Display display) {
         Log.v("Line", "Display.drawLine from " + line.getSource().getX() + ", " + line.getSource().getY() + " to " + line.getTarget().getX() + ", " + line.getTarget().getY());
 
         Canvas canvas = display.getCanvas();
@@ -402,8 +384,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawLine((float) line.getSource().getX(), (float) line.getSource().getY(), (float) line.getTarget().getX(), (float) line.getTarget().getY(), paint);
     }
 
-    public static void drawLine(Point source, Point target, Display display)
-    {
+    public static void drawLine(Point source, Point target, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -413,8 +394,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawCircle(Point position, double radius, double angle, Display display)
-    {
+    public static void drawCircle(Point position, double radius, double angle, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -424,8 +404,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawCircle(Circle circle, Display display)
-    {
+    public static void drawCircle(Circle circle, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -447,8 +426,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-    public static void drawText(Point position, String text, double size, Display display)
-    {
+    public static void drawText(Point position, String text, double size, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -467,8 +445,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     //public static void drawRectangle(Point position, double angle, double width, double height, Surface surface) {
-    public static void drawRectangle(Point position, double angle, double width, double height, Display display)
-    {
+    public static void drawRectangle(Point position, double angle, double width, double height, Display display) {
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
 
@@ -496,8 +473,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawRectangle(Rectangle rectangle, Display display)
-    {
+    public static void drawRectangle(Rectangle rectangle, Display display) {
         if (rectangle.isVisible()) {
 
             Canvas canvas = display.getCanvas();
@@ -507,24 +483,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor(rectangle.getColor()));
 
-            // Draw shape by drawing lines that connect its vertices
-            android.graphics.Path path = new android.graphics.Path();
-            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-            path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
-            path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
-            path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
-            path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
-            path.close();
-
-            canvas.drawPath(path, paint);
-
-            // Draw pointerCoordinates in shape
-            if (rectangle.getOutlineThickness() > 0) {
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
-                paint.setStrokeWidth((float) rectangle.getOutlineThickness());
-
-                path = new android.graphics.Path();
+            if (rectangle.getCornerRadius() == 0) {
+                // Draw shape by drawing lines that connect its vertices
+                android.graphics.Path path = new android.graphics.Path();
                 path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
                 path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
                 path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
@@ -533,13 +494,192 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 path.close();
 
                 canvas.drawPath(path, paint);
-            }
 
+                // Draw pointerCoordinates in shape
+                if (rectangle.getOutlineThickness() > 0) {
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
+                    paint.setStrokeWidth((float) rectangle.getOutlineThickness());
+
+                    path = new android.graphics.Path();
+                    path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+                    path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
+                    path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
+                    path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
+                    path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
+                    path.close();
+
+                    canvas.drawPath(path, paint);
+                }
+
+            } else {
+
+                Point topLeft = rectangle.getTopLeft();
+                Point topRight = rectangle.getTopRight();
+                Point bottomRight = rectangle.getBottomRight();
+                Point bottomLeft = rectangle.getBottomLeft();
+
+                Point innerTopLeft = new Point(
+                        topLeft.getRelativeX() + rectangle.getCornerRadius(),
+                        topLeft.getRelativeY() + rectangle.getCornerRadius(),
+                        topLeft.getOrigin()
+                );
+
+                Point innerTopRight = new Point(
+                        topRight.getRelativeX() - rectangle.getCornerRadius(),
+                        topRight.getRelativeY() + rectangle.getCornerRadius(),
+                        topRight.getOrigin()
+                );
+
+                Point innerBottomRight = new Point(
+                        bottomRight.getRelativeX() - rectangle.getCornerRadius(),
+                        bottomRight.getRelativeY() - rectangle.getCornerRadius(),
+                        bottomRight.getOrigin()
+                );
+
+                Point innerBottomLeft = new Point(
+                        bottomLeft.getRelativeX() + rectangle.getCornerRadius(),
+                        bottomLeft.getRelativeY() - rectangle.getCornerRadius(),
+                        bottomLeft.getOrigin()
+                );
+
+                // Top segment
+                Point topSegmentSource = new Point(
+                        topLeft.getRelativeX() + rectangle.getCornerRadius(),
+                        topLeft.getRelativeY(),
+                        rectangle.getPosition()
+                );
+
+                Point topSegmentTarget = new Point(
+                        topRight.getRelativeX() - rectangle.getCornerRadius(),
+                        topRight.getRelativeY(),
+                        rectangle.getPosition()
+                );
+
+                List<Point> topRightArc = Geometry.getArc(innerTopRight, rectangle.getCornerRadius(), 270.0, 360.0, 10);
+
+                // Right segment
+                Point rightSegmentSource = new Point(
+                        topRight.getRelativeX(),
+                        topRight.getRelativeY() + rectangle.getCornerRadius(),
+                        rectangle.getPosition()
+                );
+
+                Point rightSegmentTarget = new Point(
+                        bottomRight.getRelativeX(),
+                        bottomRight.getRelativeY() - rectangle.getCornerRadius(),
+                        rectangle.getPosition()
+                );
+
+                List<Point> bottomRightArc = Geometry.getArc(innerBottomRight, rectangle.getCornerRadius(), 0.0, 90.0, 10);
+
+                // Bottom segment
+                Point bottomSegmentSource = new Point(
+                        bottomRight.getRelativeX() - rectangle.getCornerRadius(),
+                        bottomRight.getRelativeY(),
+                        rectangle.getPosition()
+                );
+
+                Point bottomSegmentTarget = new Point(
+                        bottomLeft.getRelativeX() + rectangle.getCornerRadius(),
+                        bottomLeft.getRelativeY(),
+                        rectangle.getPosition()
+                );
+
+                List<Point> bottomLeftArc = Geometry.getArc(innerBottomLeft, rectangle.getCornerRadius(), 90.0, 180.0, 10);
+
+                // Left segment
+                Point leftSegmentSource = new Point(
+                        bottomLeft.getRelativeX(),
+                        bottomLeft.getRelativeY() - rectangle.getCornerRadius(),
+                        rectangle.getPosition()
+                );
+
+                Point leftSegmentTarget = new Point(
+                        topLeft.getRelativeX(),
+                        topLeft.getRelativeY() + rectangle.getCornerRadius(),
+                        rectangle.getPosition()
+                );
+
+                List<Point> topLeftArc = Geometry.getArc(innerTopLeft, rectangle.getCornerRadius(), 180.0, 270.0, 10);
+
+                // Draw shape by drawing lines that connect its vertices
+                android.graphics.Path path = new android.graphics.Path();
+                path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+                path.moveTo((float) topSegmentSource.getX(), (float) topSegmentSource.getY());
+                path.lineTo((float) topSegmentTarget.getX(), (float) topSegmentTarget.getY());
+                for (int i = 0; i < topRightArc.size(); i++) {
+                    path.lineTo((float) topRightArc.get(i).getX(), (float) topRightArc.get(i).getY());
+                }
+                path.lineTo((float) rightSegmentSource.getX(), (float) rightSegmentSource.getY());
+                path.lineTo((float) rightSegmentTarget.getX(), (float) rightSegmentTarget.getY());
+                for (int i = 0; i < bottomRightArc.size(); i++) {
+                    path.lineTo((float) bottomRightArc.get(i).getX(), (float) bottomRightArc.get(i).getY());
+                }
+                path.lineTo((float) bottomSegmentSource.getX(), (float) bottomSegmentSource.getY());
+                path.lineTo((float) bottomSegmentTarget.getX(), (float) bottomSegmentTarget.getY());
+                for (int i = 0; i < bottomLeftArc.size(); i++) {
+                    path.lineTo((float) bottomLeftArc.get(i).getX(), (float) bottomLeftArc.get(i).getY());
+                }
+                path.lineTo((float) leftSegmentSource.getX(), (float) leftSegmentSource.getY());
+                path.lineTo((float) leftSegmentTarget.getX(), (float) leftSegmentTarget.getY());
+                for (int i = 0; i < topLeftArc.size(); i++) {
+                    path.lineTo((float) topLeftArc.get(i).getX(), (float) topLeftArc.get(i).getY());
+                }
+                path.close();
+
+                canvas.drawPath(path, paint);
+
+                // Draw pointerCoordinates in shape
+                if (rectangle.getOutlineThickness() > 0) {
+                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
+                    paint.setStrokeWidth((float) rectangle.getOutlineThickness());
+
+                    path = new android.graphics.Path();
+                    path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+                    path.moveTo((float) topSegmentSource.getX(), (float) topSegmentSource.getY());
+                    path.lineTo((float) topSegmentTarget.getX(), (float) topSegmentTarget.getY());
+                    for (int i = 0; i < topRightArc.size(); i++) {
+                        path.lineTo((float) topRightArc.get(i).getX(), (float) topRightArc.get(i).getY());
+                    }
+                    path.lineTo((float) rightSegmentSource.getX(), (float) rightSegmentSource.getY());
+                    path.lineTo((float) rightSegmentTarget.getX(), (float) rightSegmentTarget.getY());
+                    for (int i = 0; i < bottomRightArc.size(); i++) {
+                        path.lineTo((float) bottomRightArc.get(i).getX(), (float) bottomRightArc.get(i).getY());
+                    }
+                    path.lineTo((float) bottomSegmentSource.getX(), (float) bottomSegmentSource.getY());
+                    path.lineTo((float) bottomSegmentTarget.getX(), (float) bottomSegmentTarget.getY());
+                    for (int i = 0; i < bottomLeftArc.size(); i++) {
+                        path.lineTo((float) bottomLeftArc.get(i).getX(), (float) bottomLeftArc.get(i).getY());
+                    }
+                    path.lineTo((float) leftSegmentSource.getX(), (float) leftSegmentSource.getY());
+                    path.lineTo((float) leftSegmentTarget.getX(), (float) leftSegmentTarget.getY());
+                    for (int i = 0; i < topLeftArc.size(); i++) {
+                        path.lineTo((float) topLeftArc.get(i).getX(), (float) topLeftArc.get(i).getY());
+                    }
+                    path.close();
+
+                    canvas.drawPath(path, paint);
+                }
+
+//                canvas.save();
+//                canvas.rotate((float) rectangle.getRotation());
+//                canvas.drawRoundRect(
+//                        (float) rectangle.getLeft(),
+//                        (float) rectangle.getTop(),
+//                        (float) rectangle.getRight(),
+//                        (float) rectangle.getBottom(),
+//                        (float) rectangle.getCornerRadius(),
+//                        (float) rectangle.getCornerRadius(),
+//                        paint
+//                );
+//                canvas.restore();
+            }
         }
     }
 
-    public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Display display)
-    {
+    public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Display display) {
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
 
@@ -573,8 +713,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
      * @param sideCount
      * @param display
      */
-    public static void drawRegularPolygon(Point position, int radius, int sideCount, Display display)
-    {
+    public static void drawRegularPolygon(Point position, int radius, int sideCount, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -599,13 +738,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawPolygon(Polygon polygon, Display display)
-    {
+    public static void drawPolygon(Polygon polygon, Display display) {
         drawPolygon(polygon.getVertices(), display);
     }
 
-    public static void drawPolygon(List<Point> vertices, Display display)
-    {
+    public static void drawPolygon(List<Point> vertices, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -627,13 +764,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawPath(path, paint);
     }
 
-    public static void drawTriangle(Triangle triangle, Display display)
-    {
+    public static void drawTriangle(Triangle triangle, Display display) {
         // TODO:
     }
 
-    public static void drawTriangle(Point position, double angle, double width, double height, Display display)
-    {
+    public static void drawTriangle(Point position, double angle, double width, double height, Display display) {
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();

@@ -33,7 +33,7 @@ import camp.computer.clay.application.communication.RedisSub.RedisSubThread;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
-import camp.computer.clay.application.ui.Dialog;
+import camp.computer.clay.application.ui.Prompt;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.system.Clay;
@@ -81,7 +81,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
     private NetworkResource networkResource;
 
-    Dialog ui;
+    Prompt ui;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
@@ -104,7 +104,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
     }
 
-    public Dialog getPrompts()
+    public Prompt getActionPrompts()
     {
         return this.ui;
     }
@@ -135,7 +135,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         // Display Interface
         Launcher.launcherView = this;
 
-        ui = new Dialog(this);
+        ui = new Prompt(this);
 
 //        for (int i = 0; i < 100; i++) {
 //            String outgoingMessage = "announce device " + UUID.randomUUID();
@@ -213,7 +213,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         // Read default form profiles
         String jsonString = null;
         try {
-            InputStream inputStream = getContext().getAssets().open("forms.json");
+            InputStream inputStream = getContext().getAssets().open("Hosts.json");
             int fileSize = inputStream.available();
             byte[] fileBuffer = new byte[fileSize];
             inputStream.read(fileBuffer);

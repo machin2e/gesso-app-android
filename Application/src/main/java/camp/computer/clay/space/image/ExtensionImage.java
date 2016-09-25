@@ -1,11 +1,9 @@
 package camp.computer.clay.space.image;
 
-import android.util.Log;
-
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
-import camp.computer.clay.application.ui.Dialog;
+import camp.computer.clay.application.ui.Prompt;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Path;
@@ -14,7 +12,6 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.profile.PortableProfile;
-import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.util.Color;
@@ -78,36 +75,13 @@ public class ExtensionImage extends PortableImage
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
-                    // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
-                    Launcher.getView().getPrompts().promptInputText(new Dialog.OnCompleteCallback<String>()
-                    {
-                        @Override
-                        public void onComplete(String result)
-                        {
-                            // Create Extension Profile
-                            PortableProfile portableProfile = new PortableProfile(getExtension());
-                            portableProfile.setLabel(result);
-//                            portableProfile.setPortCount(getPortable().getPorts().size());
-                            Log.v("HoldAction", "Creating new profile \"" + portableProfile.getLabel() + "\" with " + portableProfile.getPorts().size() + " ports. Only added if no duplicate (i.e., doesn't already exist)");
+                    createProfile();
 
-                            // Assign the Profile to the Extension
-                            getExtension().setProfile(portableProfile);
-
-                            // Cache the new Extension Profile
-                            Launcher.getView().getClay().getPortableProfiles().add(portableProfile);
-
-                            // TODO: Persist the profile in the user's private store (either local or online)
-
-                            // TODO: Persist the profile in the global store online
-                        }
-                    });
+                } else if (event.getType() == Event.Type.MOVE) {
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    Image targetImage = space.getImageByPosition(event.getPosition());
-                    event.setTargetImage(targetImage);
-
-                    if (action.getDuration() < Event.MAXIMUM_TAP_DURATION) {
+                    if (action.isTap()) {
 
                         // Focus on touched base
                         setPathVisibility(Visibility.Value.VISIBLE);
@@ -134,17 +108,47 @@ public class ExtensionImage extends PortableImage
                         }
                     }
 
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                    // Update style
-                    space.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
-                    space.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
-
                 }
             }
         });
+    }
+
+    // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
+    private void createProfile()
+    {
+        if (!getExtension().hasProfile()) {
+
+            // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
+            Launcher.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>()
+            {
+                @Override
+                public void onComplete(String text)
+                {
+                    // Create Extension Profile
+                    PortableProfile portableProfile = new PortableProfile(getExtension());
+                    portableProfile.setLabel(text);
+
+                    // Assign the Profile to the Extension
+                    getExtension().setProfile(portableProfile);
+
+                    // Cache the new Extension Profile
+                    Launcher.getView().getClay().getPortableProfiles().add(portableProfile);
+
+                    // TODO: Persist the profile in the user's private store (either local or online)
+
+                    // TODO: Persist the profile in the global store online
+                }
+            });
+        } else {
+            Launcher.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener()
+            {
+                @Override
+                public void onComplete(Object result)
+                {
+                    
+                }
+            });
+        }
     }
 
     public Extension getExtension()
@@ -154,7 +158,6 @@ public class ExtensionImage extends PortableImage
 
     public void update()
     {
-
         // Create any additional images or shapes to match the Entity
         // <HACK>
         // Create Port shapes for each of Extension's Ports
@@ -182,8 +185,13 @@ public class ExtensionImage extends PortableImage
         // TODO: Clean up/delete images/shapes for any removed ports...
         // </HACK>
 
+        // Update Header (size, etc.)
+        // Reference: http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
+        double pixelsPerMillimeter = 6;
+        double headerWidth = pixelsPerMillimeter * (2.54 * getPortable().getPorts().size() + 0.6); // +-0.6
+        ((Rectangle) getShape("Header")).setWidth(headerWidth);
+
         // TODO: Update Port positions based on the number of ports
-        int portCount = getPortable().getPorts().size();
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
             Port port = getPortable().getPorts().get(i);
             Shape portShape = getShape(port);
@@ -206,12 +214,6 @@ public class ExtensionImage extends PortableImage
                 portShape.setColor(Color.getColor(port.getType()));
             }
         }
-
-        // Update Header (size, etc.)
-        // Reference: http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
-        double pixelsPerMillimeter = 6;
-        double headerWidth = pixelsPerMillimeter * (2.54 * getPortable().getPorts().size() + 0.6); // +-0.6
-        ((Rectangle) getShape("Header")).setWidth(headerWidth);
     }
 
     public void draw(Display display)

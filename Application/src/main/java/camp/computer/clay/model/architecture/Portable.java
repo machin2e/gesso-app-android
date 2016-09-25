@@ -65,6 +65,11 @@ public class Portable extends Entity
         return this.profile;
     }
 
+    public boolean hasProfile()
+    {
+        return this.profile != null;
+    }
+
     public void setProfile(PortableProfile profile)
     {
         this.profile = profile;

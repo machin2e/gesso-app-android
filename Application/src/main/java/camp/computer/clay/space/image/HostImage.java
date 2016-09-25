@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
-import camp.computer.clay.application.ui.Dialog;
+import camp.computer.clay.application.ui.Prompt;
 import camp.computer.clay.application.visual.Display;
 import camp.computer.clay.model.architecture.Extension;
 import camp.computer.clay.model.architecture.Group;
@@ -33,30 +33,27 @@ import camp.computer.clay.space.util.geometry.Line;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
-public class HostImage extends PortableImage
-{
+public class HostImage extends PortableImage {
 
-    public HostImage(Host host)
-    {
+    public HostImage(Host host) {
         super(host);
         setup();
     }
 
-    private void setup()
-    {
+    private void setup() {
         setupShapes();
         setupActions();
     }
 
-    private void setupShapes()
-    {
+    private void setupShapes() {
         Rectangle rectangle;
         Circle circle;
 
         // Create shapes for figure
-        rectangle = new Rectangle<Host>(getHost());
+        rectangle = new Rectangle<>(getHost());
         rectangle.setWidth(250);
         rectangle.setHeight(250);
+        rectangle.setCornerRadius(13.0);
         rectangle.setLabel("Board");
         rectangle.setColor("#f7f7f7");
         rectangle.setOutlineThickness(1);
@@ -97,72 +94,84 @@ public class HostImage extends PortableImage
 
         // Lights
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 1");
         rectangle.setPosition(-20, 105);
         rectangle.setRotation(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 2");
         rectangle.setPosition(0, 105);
         rectangle.setRotation(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 3");
         rectangle.setPosition(20, 105);
         rectangle.setRotation(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 4");
         rectangle.setPosition(105, 20);
         rectangle.setRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 5");
         rectangle.setPosition(105, 0);
         rectangle.setRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 6");
         rectangle.setPosition(105, -20);
         rectangle.setRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 7");
         rectangle.setPosition(20, -105);
         rectangle.setRotation(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 8");
         rectangle.setPosition(0, -105);
         rectangle.setRotation(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 9");
         rectangle.setPosition(-20, -105);
         rectangle.setRotation(0);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 10");
         rectangle.setPosition(-105, -20);
         rectangle.setRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 11");
         rectangle.setPosition(-105, 0);
         rectangle.setRotation(90);
         addShape(rectangle);
 
         rectangle = new Rectangle(12, 20);
+        rectangle.setCornerRadius(3.0);
         rectangle.setLabel("LED 12");
         rectangle.setPosition(-105, 20);
         rectangle.setRotation(90);
@@ -261,13 +270,10 @@ public class HostImage extends PortableImage
         }
     }
 
-    private void setupActions()
-    {
-        setOnActionListener(new ActionListener()
-                            {
+    private void setupActions() {
+        setOnActionListener(new ActionListener() {
                                 @Override
-                                public void onAction(Action action)
-                                {
+                                public void onAction(Action action) {
 
                                     final Event event = action.getLastEvent();
 
@@ -884,11 +890,9 @@ public class HostImage extends PortableImage
 
                                                     // Prompt User to select an Extension from the Store
                                                     // i.e., Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
-                                                    Launcher.getView().getPrompts().promptSelection(portableProfiles, new Dialog.OnCompleteCallback<PortableProfile>()
-                                                    {
+                                                    Launcher.getView().getActionPrompts().promptSelection(portableProfiles, new Prompt.OnActionListener<PortableProfile>() {
                                                         @Override
-                                                        public void onComplete(PortableProfile portableProfile)
-                                                        {
+                                                        public void onComplete(PortableProfile portableProfile) {
                                                             Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
                                                             // Create the Extension
@@ -1047,13 +1051,11 @@ public class HostImage extends PortableImage
         );
     }
 
-    public Host getHost()
-    {
+    public Host getHost() {
         return (Host) getEntity();
     }
 
-    public void update()
-    {
+    public void update() {
         // Get LED shapes
         ShapeGroup lightShapeGroup = getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
 
@@ -1079,8 +1081,7 @@ public class HostImage extends PortableImage
         // </HACK>
     }
 
-    public void draw(Display display)
-    {
+    public void draw(Display display) {
         if (isVisible()) {
 
             // Color

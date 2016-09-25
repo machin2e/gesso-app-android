@@ -17,20 +17,48 @@ import java.util.List;
 import camp.computer.clay.application.Launcher;
 import camp.computer.clay.model.profile.PortableProfile;
 
-public class Dialog {
+public class Prompt
+{
 
     private Launcher launcher = null;
 
-    public Dialog(Launcher launcher) {
+    public Prompt(Launcher launcher)
+    {
         this.launcher = launcher;
     }
 
-    // TODO: Replace OnCompleteCallback with Action?
-    public interface OnCompleteCallback<T> {
+    // TODO: Replace OnActionListener with Action?
+    public interface OnActionListener<T>
+    {
         void onComplete(T result);
     }
 
-    public void promptInputText(final OnCompleteCallback onCompleteCallback) {
+    public void promptAcknowledgment(final OnActionListener onActionListener)
+    {
+        new AlertDialog.Builder(launcher.getView())
+                .setTitle("Notice")
+                .setMessage("The extension already has a profile.")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        // continue with delete
+                        onActionListener.onComplete(null);
+                    }
+                })
+//                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener()
+//                {
+//                    public void onClick(DialogInterface dialog, int which)
+//                    {
+//                        // do nothing
+//                    }
+//                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    public void promptInputText(final OnActionListener onActionListener)
+    {
         AlertDialog.Builder builder = new AlertDialog.Builder(launcher.getView());
         builder.setTitle("Create Extension");
 
@@ -44,16 +72,20 @@ public class Dialog {
         builder.setView(input);
 
         // Set up the buttons
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onCompleteCallback.onComplete(input.getText().toString());
+            public void onClick(DialogInterface dialog, int which)
+            {
+                onActionListener.onComplete(input.getText().toString());
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 // TODO: Callback with "Cancel" action
                 dialog.cancel();
             }
@@ -62,8 +94,9 @@ public class Dialog {
         builder.show();
     }
 
-    // TODO: public <T> void promptSelection(List<T> options, OnCompleteCallback onCompleteCallback) {
-    public <T> void promptSelection(final List<PortableProfile> options, final OnCompleteCallback onCompleteCallback) {
+    // TODO: public <T> void promptSelection(List<T> options, OnActionListener onActionListener) {
+    public <T> void promptSelection(final List<PortableProfile> options, final OnActionListener onActionListener)
+    {
 
         // Items
 //        List<String> options = new ArrayList<>();
@@ -111,16 +144,18 @@ public class Dialog {
 
         final AlertDialog dialog = dialogBuilder.create();
 
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
 
                 String selectionLabel = arrayAdapter.getItem(position);
                 PortableProfile selection = options.get(position);
 
                 // Configure based on Profile
                 // Add Ports based on Profile
-                onCompleteCallback.onComplete(selection);
+                onActionListener.onComplete(selection);
 //                while (selection.getPortCount() < position + 1) {
 //                    selection.addPort(new Port());
 //                }
@@ -157,7 +192,8 @@ public class Dialog {
     // Break multi-step tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
     // displayFloatingTaskDialog(<task list>, <task step to display>)
 
-    public void promptTasks() {
+    public void promptTasks()
+    {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
         // builderSingle.setIcon(R.drawable.ic_launcher);
@@ -195,9 +231,11 @@ public class Dialog {
         // Positive button
         dialogBuilder.setPositiveButton(
                 "Start",
-                new DialogInterface.OnClickListener() {
+                new DialogInterface.OnClickListener()
+                {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
 
 //                        String strName = arrayAdapter.getItem(which);
 
@@ -226,7 +264,8 @@ public class Dialog {
 
                         promptTask();
                     }
-                });
+                }
+        );
 
         // Set data adapter
         dialogBuilder.setAdapter(
@@ -239,9 +278,11 @@ public class Dialog {
 
         dialog.getListView().setItemsCanFocus(false);
         dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 // Manage selected items here
                 System.out.println("clicked" + position);
                 CheckedTextView textView = (CheckedTextView) view;
@@ -256,7 +297,8 @@ public class Dialog {
         dialog.show();
     }
 
-    public void promptTask() {
+    public void promptTask()
+    {
 
         // Items
         List<String> options = new ArrayList<>();
@@ -294,9 +336,11 @@ public class Dialog {
 
         final AlertDialog dialog = dialogBuilder.create();
 
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
 
                 String itemLabel = arrayAdapter.getItem(position);
 

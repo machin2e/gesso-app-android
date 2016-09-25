@@ -23,10 +23,7 @@ public class PortableProfile
     {
         for (int i = 0; i < portable.getPorts().size(); i++) {
             Port port = portable.getPorts().get(i);
-            PortProfile portProfile = new PortProfile();
-            portProfile.setType(port.getType());
-            portProfile.setDirection(port.getDirection());
-            // portProfile.setLabel
+            PortProfile portProfile = new PortProfile(port);
             addPort(portProfile);
         }
     }
