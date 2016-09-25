@@ -53,9 +53,9 @@ public class HostImage extends PortableImage {
         rectangle = new Rectangle<>(getHost());
         rectangle.setWidth(250);
         rectangle.setHeight(250);
-        rectangle.setCornerRadius(13.0);
+        rectangle.setCornerRadius(20.0);
         rectangle.setLabel("Board");
-        rectangle.setColor("#f7f7f7");
+        rectangle.setColor("#1f1f1e"); // #f7f7f7
         rectangle.setOutlineThickness(1);
         addShape(rectangle);
 
@@ -64,7 +64,7 @@ public class HostImage extends PortableImage {
         rectangle.setLabel("Header 1");
         rectangle.setPosition(0, 132);
         rectangle.setRotation(0);
-        rectangle.setColor("#3b3b3b");
+        rectangle.setColor("#404040"); // #3b3b3b
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
@@ -72,7 +72,7 @@ public class HostImage extends PortableImage {
         rectangle.setLabel("Header 2");
         rectangle.setPosition(132, 0);
         rectangle.setRotation(90);
-        rectangle.setColor("#3b3b3b");
+        rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
@@ -80,7 +80,7 @@ public class HostImage extends PortableImage {
         rectangle.setLabel("Header 3");
         rectangle.setPosition(0, -132);
         rectangle.setRotation(0);
-        rectangle.setColor("#3b3b3b");
+        rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
@@ -88,94 +88,64 @@ public class HostImage extends PortableImage {
         rectangle.setLabel("Header 4");
         rectangle.setPosition(-132, 0);
         rectangle.setRotation(90);
-        rectangle.setColor("#3b3b3b");
+        rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
         // Lights
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 1");
-        rectangle.setPosition(-20, 105);
-        rectangle.setRotation(0);
-        addShape(rectangle);
+        List<Point> lightPositions = new ArrayList<>();
+        lightPositions.add(new Point(-20, 105));
+        lightPositions.add(new Point(0, 105));
+        lightPositions.add(new Point(20, 105));
+        lightPositions.add(new Point(105, 20));
+        lightPositions.add(new Point(105, 0));
+        lightPositions.add(new Point(105, -20));
+        lightPositions.add(new Point(20, -105));
+        lightPositions.add(new Point(0, -105));
+        lightPositions.add(new Point(-20, -105));
+        lightPositions.add(new Point(-105, -20));
+        lightPositions.add(new Point(-105, 0));
+        lightPositions.add(new Point(-105, 20));
 
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 2");
-        rectangle.setPosition(0, 105);
-        rectangle.setRotation(0);
-        addShape(rectangle);
+        List<Double> lightRotations = new ArrayList<>();
+        lightRotations.add(0.0);
+        lightRotations.add(0.0);
+        lightRotations.add(0.0);
+        lightRotations.add(90.0);
+        lightRotations.add(90.0);
+        lightRotations.add(90.0);
+        lightRotations.add(180.0);
+        lightRotations.add(180.0);
+        lightRotations.add(180.0);
+        lightRotations.add(270.0);
+        lightRotations.add(270.0);
+        lightRotations.add(270.0);
 
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 3");
-        rectangle.setPosition(20, 105);
-        rectangle.setRotation(0);
-        addShape(rectangle);
+        for (int i = 0; i < lightPositions.size(); i++) {
+            rectangle = new Rectangle(12, 20);
+            rectangle.setPosition(lightPositions.get(i));
+            rectangle.setRotation(lightRotations.get(i));
+            rectangle.setCornerRadius(3.0);
+            rectangle.setLabel("LED " + (i + 1));
+            addShape(rectangle);
+        }
 
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 4");
-        rectangle.setPosition(105, 20);
-        rectangle.setRotation(90);
-        addShape(rectangle);
+        // Mounting Holes
+        List<Point> mountingHolePositions = new ArrayList<>();
+        mountingHolePositions.add(new Point(-105, -105));
+        mountingHolePositions.add(new Point(105, -105));
+        mountingHolePositions.add(new Point(105, 105));
+        mountingHolePositions.add(new Point(-105, 105));
 
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 5");
-        rectangle.setPosition(105, 0);
-        rectangle.setRotation(90);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 6");
-        rectangle.setPosition(105, -20);
-        rectangle.setRotation(90);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 7");
-        rectangle.setPosition(20, -105);
-        rectangle.setRotation(0);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 8");
-        rectangle.setPosition(0, -105);
-        rectangle.setRotation(0);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 9");
-        rectangle.setPosition(-20, -105);
-        rectangle.setRotation(0);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 10");
-        rectangle.setPosition(-105, -20);
-        rectangle.setRotation(90);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 11");
-        rectangle.setPosition(-105, 0);
-        rectangle.setRotation(90);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(12, 20);
-        rectangle.setCornerRadius(3.0);
-        rectangle.setLabel("LED 12");
-        rectangle.setPosition(-105, 20);
-        rectangle.setRotation(90);
-        addShape(rectangle);
+        for (int i = 0; i < mountingHolePositions.size(); i++) {
+            circle = new Circle<>(10.0);
+            circle.setPosition(mountingHolePositions.get(i));
+            circle.setLabel("Mount " + (i + 1));
+            circle.setColor("#ffffff");
+            circle.setOutlineThickness(0);
+            circle.getVisibility().setReference(getShape("Board").getVisibility());
+            addShape(circle);
+        }
 
         // Setup Ports
         List<Point> portCirclePositions = new ArrayList<>();
@@ -196,9 +166,9 @@ public class HostImage extends PortableImage {
 
             // Circle
             circle = new Circle<>(getHost().getPort(i));
-            circle.setRadius(40);
             circle.setLabel("Port " + (i + 1));
             circle.setPosition(portCirclePositions.get(i));
+            circle.setRadius(40);
             // circle.setRelativeRotation(0);
             circle.setColor("#efefef");
             circle.setOutlineThickness(0);
@@ -645,6 +615,30 @@ public class HostImage extends PortableImage {
                                                                 // PathImage pathImage = (PathImage) space.getImage(path);
                                                             }
 
+                                                            // Remove focus from other forms and their ports
+                                                            ImageGroup hostImages = getSpace().getImages(Host.class);
+                                                            for (int i = 0; i < hostImages.size(); i++) {
+                                                                HostImage hostImage = (HostImage) hostImages.get(i);
+                                                                hostImage.setTransparency(0.05f);
+                                                                hostImage.getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
+                                                                hostImage.setPathVisibility(Visibility.Value.INVISIBLE);
+                                                                hostImage.setDockVisibility(Visibility.Value.VISIBLE);
+                                                            }
+
+                                                            List<Path> paths = sourcePort.getCompletePath();
+                                                            for (int i = 0; i < paths.size(); i++) {
+                                                                Path connectedPath = paths.get(i);
+
+                                                                // Show ports
+                                                                getSpace().getShape(connectedPath.getSource()).setVisibility(Visibility.Value.VISIBLE);
+                                                                //TODO:((PortImage) getSpace().getImage(connectedPath.getSource())).showPaths();
+                                                                getSpace().getShape(connectedPath.getTarget()).setVisibility(Visibility.Value.VISIBLE);
+                                                                //TODO:((PortImage) getSpace().getImage(connectedPath.getTarget())).showPaths();
+
+                                                                // Show path
+                                                                getSpace().getImage(connectedPath).setVisibility(Visibility.Value.VISIBLE);
+                                                            }
+
                                                             // Camera
                                                             event.getActor().getCamera().focusSelectPath(sourcePort);
                                                         }
@@ -776,6 +770,31 @@ public class HostImage extends PortableImage {
 
                                                     // Add Path to Space
                                                     space.addEntity(path);
+
+
+                                                    // Remove focus from other forms and their ports
+                                                    ImageGroup hostImages = getSpace().getImages(Host.class);
+                                                    for (int i = 0; i < hostImages.size(); i++) {
+                                                        HostImage hostImage = (HostImage) hostImages.get(i);
+                                                        hostImage.setTransparency(0.05f);
+                                                        hostImage.getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
+                                                        hostImage.setPathVisibility(Visibility.Value.INVISIBLE);
+                                                        hostImage.setDockVisibility(Visibility.Value.VISIBLE);
+                                                    }
+
+                                                    List<Path> paths = hostPort.getCompletePath();
+                                                    for (int i = 0; i < paths.size(); i++) {
+                                                        Path connectedPath = paths.get(i);
+
+                                                        // Show ports
+                                                        getSpace().getShape(connectedPath.getSource()).setVisibility(Visibility.Value.VISIBLE);
+                                                        //TODO:((PortImage) getSpace().getImage(connectedPath.getSource())).showPaths();
+                                                        getSpace().getShape(connectedPath.getTarget()).setVisibility(Visibility.Value.VISIBLE);
+                                                        //TODO:((PortImage) getSpace().getImage(connectedPath.getTarget())).showPaths();
+
+                                                        // Show path
+                                                        getSpace().getImage(connectedPath).setVisibility(Visibility.Value.VISIBLE);
+                                                    }
 
                                                     // Update Camera
                                                     camera.focusSelectPath(hostPort);

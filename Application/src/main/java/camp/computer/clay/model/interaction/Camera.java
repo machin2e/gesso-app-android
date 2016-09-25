@@ -23,8 +23,7 @@ import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
-public class Camera
-{
+public class Camera {
 
     // TODO: Caption generation for each Perspective/Camera
 
@@ -34,23 +33,19 @@ public class Camera
 
     private double height; // Height of perspective
 
-    public void setWidth(double width)
-    {
+    public void setWidth(double width) {
         this.width = width;
     }
 
-    public double getWidth()
-    {
+    public double getWidth() {
         return this.width;
     }
 
-    public void setHeight(double height)
-    {
+    public void setHeight(double height) {
         this.height = height;
     }
 
-    public double getHeight()
-    {
+    public double getHeight() {
         return this.height;
     }
 
@@ -60,17 +55,14 @@ public class Camera
     // Focus in Camera
     private Image focusImage = null;
 
-    public Camera()
-    {
+    public Camera() {
     }
 
-    public Camera(Space space)
-    {
+    public Camera(Space space) {
         this.space = space;
     }
 
-    public Point getPosition()
-    {
+    public Point getPosition() {
         return this.position;
     }
 
@@ -93,13 +85,11 @@ public class Camera
 
     private Point originalPosition = new Point();
 
-    public void setPosition(Point targetPosition)
-    {
+    public void setPosition(Point targetPosition) {
         setPosition(targetPosition, positionPeriod);
     }
 
-    public void setPosition(Point targetPosition, double duration)
-    {
+    public void setPosition(Point targetPosition, double duration) {
 
 //        Log.v("Camera", "position x: " + position.getX() + ", y: " + position.getY());
 //        Log.v("Camera", "originalPosition x: " + originalPosition.getX() + ", y: " + originalPosition.getY());
@@ -139,20 +129,17 @@ public class Camera
         }
     }
 
-    public void setOffset(double xOffset, double yOffset)
-    {
+    public void setOffset(double xOffset, double yOffset) {
         this.targetPosition.offset(xOffset, yOffset);
         this.originalPosition.offset(xOffset, yOffset);
         this.position.offset(xOffset, yOffset);
     }
 
-    public void setScale(double scale)
-    {
+    public void setScale(double scale) {
         setScale(scale, scalePeriod);
     }
 
-    public void setScale(double scale, double duration)
-    {
+    public void setScale(double scale, double duration) {
 
         this.targetScale = scale;
 
@@ -165,13 +152,11 @@ public class Camera
         }
     }
 
-    public double getScale()
-    {
+    public double getScale() {
         return this.scale;
     }
 
-    public void update()
-    {
+    public void update() {
 
         /*
         // Solution 1: This works without per-frame adjustment. It's a starting point for that.
@@ -224,19 +209,16 @@ public class Camera
 
     }
 
-    public void setSpace(Space space)
-    {
+    public void setSpace(Space space) {
         this.space = space;
     }
 
-    public Space getSpace()
-    {
+    public Space getSpace() {
         return this.space;
     }
 
     // <REFACTOR>
-    public void focusCreatePath(Action action)
-    {
+    public void focusCreatePath(Action action) {
 
         Event lastEvent = action.getLastEvent();
 
@@ -337,15 +319,13 @@ public class Camera
 
     }
 
-    public void focusMoveCamera(Event event)
-    {
+    public void focusMoveCamera(Event event) {
         // Move perspective
         Action action = event.getAction();
         setOffset(action.offsetX, action.offsetY);
     }
 
-    public void focusSelectHost(Event event)
-    {
+    public void focusSelectHost(Event event) {
         Actor actor = event.getActor();
         Action action = event.getAction();
 
@@ -445,34 +425,9 @@ public class Camera
 
     }
 
-    public void focusSelectPath(Port port)
-    {
-
-        // Remove focus from other forms and their ports
-        ImageGroup hostImages = getSpace().getImages(Host.class);
-        for (int i = 0; i < hostImages.size(); i++) {
-            HostImage hostImage = (HostImage) hostImages.get(i);
-            hostImage.setTransparency(0.05f);
-            hostImage.getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
-            hostImage.setPathVisibility(Visibility.Value.INVISIBLE);
-            hostImage.setDockVisibility(Visibility.Value.VISIBLE);
-        }
-
-        List<Path> paths = port.getCompletePath();
-        for (int i = 0; i < paths.size(); i++) {
-            Path connectedPath = paths.get(i);
-
-            // Show ports
-            getSpace().getShape(connectedPath.getSource()).setVisibility(Visibility.Value.VISIBLE);
-            //TODO:((PortImage) getSpace().getImage(connectedPath.getSource())).showPaths();
-            getSpace().getShape(connectedPath.getTarget()).setVisibility(Visibility.Value.VISIBLE);
-            //TODO:((PortImage) getSpace().getImage(connectedPath.getTarget())).showPaths();
-
-            // Show path
-            getSpace().getImage(connectedPath).setVisibility(Visibility.Value.VISIBLE);
-        }
-
+    public void focusSelectPath(Port port) {
         // Camera
+        List<Path> paths = port.getCompletePath();
         Group<Port> pathPorts = port.getPorts(paths);
         ImageGroup pathPortImages = getSpace().getImages(pathPorts);
         List<Point> pathPortPositions = pathPortImages.getPositions();
@@ -485,8 +440,7 @@ public class Camera
         setPosition(Geometry.calculateCenterPosition(pathPortPositions));
     }
 
-    public void focusSelectSpace()
-    { // Previously called "focusReset"
+    public void focusSelectSpace() { // Previously called "focusReset"
 
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
         ImageGroup portableImages = space.getImages(Host.class, Extension.class);
@@ -504,20 +458,17 @@ public class Camera
     }
     // </REFACTOR>
 
-    public void adjustPosition()
-    {
+    public void adjustPosition() {
         List<Point> figurePositions = getSpace().getImages().filterType(Host.class, Extension.class).getPositions();
         Point centerPosition = Geometry.calculateCenterPosition(figurePositions);
         setPosition(centerPosition);
     }
 
-    public void adjustScale()
-    {
+    public void adjustScale() {
         adjustScale(Camera.DEFAULT_SCALE_PERIOD);
     }
 
-    public void adjustScale(double duration)
-    {
+    public void adjustScale(double duration) {
         List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getVertices();
         if (figureVertices.size() > 0) {
             Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
@@ -525,13 +476,11 @@ public class Camera
         }
     }
 
-    public void adjustScale(Rectangle boundingBox)
-    {
+    public void adjustScale(Rectangle boundingBox) {
         adjustScale(boundingBox, Camera.DEFAULT_SCALE_PERIOD);
     }
 
-    public void adjustScale(Rectangle boundingBox, double duration)
-    {
+    public void adjustScale(Rectangle boundingBox, double duration) {
 
         // <PADDING_MULTIPLIER>
         double paddingMultiplier = 1.10;
