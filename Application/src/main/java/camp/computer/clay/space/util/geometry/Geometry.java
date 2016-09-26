@@ -139,15 +139,11 @@ public abstract class Geometry {
         return point;
     }
 
-    // TODO: Update references to use the new method and remove this one... Only need one calculateMidpoint()
-    public static Point calculateMidpoint(Point source, Point target) {
-        Point midpoint = new Point();
-        midpoint.setX((source.getX() + target.getX()) / 2.0f);
-        midpoint.setY((source.getY() + target.getY()) / 2.0f);
-        return midpoint;
+    public static Point calculateMidpoint(Line line) {
+        return calculateMidpoint(line.getSource(), line.getTarget());
     }
 
-    public static Point calculateMidpoint2(Point source, Point target) {
+    public static Point calculateMidpoint(Point source, Point target) {
         Point midpoint = new Point(
                 (source.getRelativeX() + target.getRelativeX()) / 2.0f,
                 (source.getRelativeY() + target.getRelativeY()) / 2.0f,
@@ -338,7 +334,7 @@ public abstract class Geometry {
         return convexHull;
     }
 
-    public static void hullSet(Point A, Point B, List<Point> set, List<Point> hull) {
+    private static void hullSet(Point A, Point B, List<Point> set, List<Point> hull) {
         int insertPosition = hull.indexOf(B);
 
         if (set.size() == 0) {
@@ -391,7 +387,7 @@ public abstract class Geometry {
 
     }
 
-    public static double distance(Point A, Point B, Point C) {
+    private static double distance(Point A, Point B, Point C) {
         double ABx = B.getX() - A.getX();
         double ABy = B.getY() - A.getY();
         double num = ABx * (A.getY() - C.getY()) - ABy * (A.getX() - C.getX());
@@ -401,7 +397,7 @@ public abstract class Geometry {
         return num;
     }
 
-    public static int pointLocation(Point A, Point B, Point P) {
+    private static int pointLocation(Point A, Point B, Point P) {
         double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
         if (cp1 > 0) {
             return 1;
@@ -707,8 +703,8 @@ public abstract class Geometry {
             Point vertexPosition = new Point(
 //                    (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)),
 //                    (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)),
-                    (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeAngle())),
-                    (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeAngle())),
+                    (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeRotation())),
+                    (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeRotation())),
                     position
             );
 

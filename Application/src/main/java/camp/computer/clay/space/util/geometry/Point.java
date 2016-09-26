@@ -75,20 +75,12 @@ public class Point {
         return relativeY;
     }
 
-    public double getRelativeAngle() {
-        return rotation;
-    }
-
     public void setRelativeX(double x) {
         this.relativeX = x;
     }
 
     public void setRelativeY(double y) {
         this.relativeY = y;
-    }
-
-    public void setRelativeAngle(double angle) {
-        this.rotation = angle;
     }
 
     /**

@@ -405,10 +405,6 @@ public class HostImage extends PortableImage {
 
                                     } else if (event.getType() == Event.Type.UNSELECT) {
 
-//                                        Log.v("Ixn", "firstTargetShape: " + action.getFirstEvent().getTargetShape().getLabel());
-//                                        Log.v("Ixn", "lastTargetShape: " + action.getLastEvent().getTargetShape());
-//                                        Log.v("Ixn", "lastTargetShape: " + action.getLastEvent().getTargetShape().getLabel());
-
                                         // <HACK>
                                         // TODO: Refactor so this doesn't have to be here! It's messy this way... standardize the way "null shapes" are handled
                                         if (action.getFirstEvent().getTargetShape() == null) {
@@ -541,37 +537,21 @@ public class HostImage extends PortableImage {
                                                             }
 
                                                             if (segmentIndex == 0) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                0,
-                                                                                -500,
-                                                                                getPosition()
-                                                                        )
-                                                                );
+                                                                extensionImage.getPosition().setReferencePoint(getPosition());
+                                                                extensionImage.getPosition().setRelativeX(0);
+                                                                extensionImage.getPosition().setRelativeY(-500);
                                                             } else if (segmentIndex == 1) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                500,
-                                                                                0,
-                                                                                getPosition()
-                                                                        )
-                                                                );
+                                                                extensionImage.getPosition().setReferencePoint(getPosition());
+                                                                extensionImage.getPosition().setRelativeX(500);
+                                                                extensionImage.getPosition().setRelativeY(0);
                                                             } else if (segmentIndex == 2) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                0,
-                                                                                500,
-                                                                                getPosition()
-                                                                        )
-                                                                );
+                                                                extensionImage.getPosition().setReferencePoint(getPosition());
+                                                                extensionImage.getPosition().setRelativeX(0);
+                                                                extensionImage.getPosition().setRelativeY(500);
                                                             } else if (segmentIndex == 3) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                -500,
-                                                                                0,
-                                                                                getPosition()
-                                                                        )
-                                                                );
+                                                                extensionImage.getPosition().setReferencePoint(getPosition());
+                                                                extensionImage.getPosition().setRelativeX(-500);
+                                                                extensionImage.getPosition().setRelativeY(0);
                                                             }
 
                                                             //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
@@ -944,37 +924,21 @@ public class HostImage extends PortableImage {
                                                     }
 
                                                     if (segmentIndex == 0) {
-                                                        extensionImage.getPosition().set(
-                                                                new Point(
-                                                                        0,
-                                                                        -500,
-                                                                        getPosition()
-                                                                )
-                                                        );
+                                                        extensionImage.getPosition().setReferencePoint(getPosition());
+                                                        extensionImage.getPosition().setRelativeX(0);
+                                                        extensionImage.getPosition().setRelativeY(-500);
                                                     } else if (segmentIndex == 1) {
-                                                        extensionImage.getPosition().set(
-                                                                new Point(
-                                                                        500,
-                                                                        0,
-                                                                        getPosition()
-                                                                )
-                                                        );
+                                                        extensionImage.getPosition().setReferencePoint(getPosition());
+                                                        extensionImage.getPosition().setRelativeX(500);
+                                                        extensionImage.getPosition().setRelativeY(0);
                                                     } else if (segmentIndex == 2) {
-                                                        extensionImage.getPosition().set(
-                                                                new Point(
-                                                                        0,
-                                                                        500,
-                                                                        getPosition()
-                                                                )
-                                                        );
+                                                        extensionImage.getPosition().setReferencePoint(getPosition());
+                                                        extensionImage.getPosition().setRelativeX(0);
+                                                        extensionImage.getPosition().setRelativeY(500);
                                                     } else if (segmentIndex == 3) {
-                                                        extensionImage.getPosition().set(
-                                                                new Point(
-                                                                        -500,
-                                                                        0,
-                                                                        getPosition()
-                                                                )
-                                                        );
+                                                        extensionImage.getPosition().setReferencePoint(getPosition());
+                                                        extensionImage.getPosition().setRelativeX(-500);
+                                                        extensionImage.getPosition().setRelativeY(0);
                                                     }
 
                                                     //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());

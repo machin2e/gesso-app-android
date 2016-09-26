@@ -82,7 +82,7 @@ public class Line<T extends Entity> extends Shape<T>
 
     public Point getMidpoint()
     {
-        Point midpoint = Geometry.calculateMidpoint2(getSource(), getTarget());
+        Point midpoint = Geometry.calculateMidpoint(getSource(), getTarget());
         return midpoint;
     }
 }
