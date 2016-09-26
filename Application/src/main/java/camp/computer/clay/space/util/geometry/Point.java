@@ -1,7 +1,6 @@
 package camp.computer.clay.space.util.geometry;
 
-public class Point
-{
+public class Point {
     //
     // TODO: Update to use numbers that can be composed and given dependencies (used in
     // TODO: (cont'd) expressions) and dynamically update expressions. Do animations by giving them
@@ -29,8 +28,7 @@ public class Point
      * Rotation rotation in degrees
      */
     // TODO: Refactor so 0 degrees faces upward, not right.
-    public Point()
-    {
+    public Point() {
         this(0, 0);
     }
 
@@ -40,14 +38,12 @@ public class Point
      *
      * @param otherPoint The {@code Point} to copy.
      */
-    public Point(Point otherPoint)
-    {
+    public Point(Point otherPoint) {
         this.x = otherPoint.x;
         this.y = otherPoint.y;
     }
 
-    public Point(double x, double y)
-    {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -59,56 +55,46 @@ public class Point
      * @param y              The y coordinate of this {@code Point} relative to {@code referencePoint}.
      * @param referencePoint
      */
-    public Point(double x, double y, Point referencePoint)
-    {
-        setOrigin(referencePoint);
+    public Point(double x, double y, Point referencePoint) {
+        setReferencePoint(referencePoint);
         setRelativeX(x);
         setRelativeY(y);
     }
 
-    public Point getOrigin()
-    {
+    public Point getReferencePoint() {
         return referencePoint;
     }
 
-    public void setOrigin(Point referenceCoordinate)
-    {
+    public void setReferencePoint(Point referenceCoordinate) {
         this.referencePoint = referenceCoordinate;
     }
 
-    public double getRelativeX()
-    {
+    public double getRelativeX() {
         return x;
     }
 
-    public double getRelativeY()
-    {
+    public double getRelativeY() {
         return y;
     }
 
-    public double getRelativeAngle()
-    {
+    public double getRelativeAngle() {
         return rotation;
     }
 
-    public void setRelative(Point point)
-    {
+    public void setRelative(Point point) {
         this.x = point.x;
         this.y = point.y;
     }
 
-    public void setRelativeX(double x)
-    {
+    public void setRelativeX(double x) {
         this.x = x;
     }
 
-    public void setRelativeY(double y)
-    {
+    public void setRelativeY(double y) {
         this.y = y;
     }
 
-    public void setRelativeAngle(double angle)
-    {
+    public void setRelativeAngle(double angle) {
         this.rotation = angle;
     }
 
@@ -116,8 +102,7 @@ public class Point
      * @param dx Absolute offset along x axis from current x position.
      * @param dy Absolute offset along y axis from current y position.
      */
-    public void offset(double dx, double dy)
-    {
+    public void offset(double dx, double dy) {
         this.x = this.x + dx;
         this.y = this.y + dy;
     }
@@ -125,8 +110,7 @@ public class Point
     /**
      * @return Absolute x coordinate.
      */
-    public double getX()
-    {
+    public double getX() {
 
         if (referencePoint != null) {
             double globalX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
@@ -139,8 +123,7 @@ public class Point
     /**
      * @return Absolute y coordinate.
      */
-    public double getY()
-    {
+    public double getY() {
         if (referencePoint != null) {
             double globalY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
             return referencePoint.getY() + globalY;
@@ -149,8 +132,7 @@ public class Point
         }
     }
 
-    public double getRotation()
-    {
+    public double getRotation() {
         if (referencePoint != null) {
             return referencePoint.getRotation() + this.rotation;
         } else {
@@ -158,8 +140,7 @@ public class Point
         }
     }
 
-    public double getRelativeRotation()
-    {
+    public double getRelativeRotation() {
         return this.rotation;
     }
 
@@ -167,8 +148,7 @@ public class Point
      * @param x Absolute x coordinate. Converted to relative coordinate internally.
      * @param y Absolute y coordinate. Converted to relative coordinate internally.
      */
-    public void set(double x, double y)
-    {
+    public void set(double x, double y) {
         setX(x);
         setY(y);
     }
@@ -176,14 +156,13 @@ public class Point
     /**
      * @param point Absolute position. Converted to relative position internally.
      */
-    public void set(Point point)
-    {
+    public void set(Point point) {
         setRelativeX(point.getRelativeX());
         setRelativeY(point.getRelativeY());
 
         // <HACK?>
         // TODO: Set these?
-        setOrigin(point.getOrigin());
+        setReferencePoint(point.getReferencePoint());
         setRelativeRotation(point.getRelativeRotation());
         // </HACK?>
     }
@@ -191,8 +170,7 @@ public class Point
     /**
      * @param x Absolute x coordinate. Converted to a relative x position internally.
      */
-    public void setX(double x)
-    {
+    public void setX(double x) {
         if (referencePoint != null) {
             this.x = x - referencePoint.getX();
         } else {
@@ -203,8 +181,7 @@ public class Point
     /**
      * @param y Absolute y coordinate. Converted to a relative y position internally.
      */
-    public void setY(double y)
-    {
+    public void setY(double y) {
         if (referencePoint != null) {
             this.y = y - referencePoint.getY();
         } else {
@@ -212,8 +189,7 @@ public class Point
         }
     }
 
-    public void setRelativeRotation(double rotation)
-    {
+    public void setRelativeRotation(double rotation) {
         this.rotation = rotation;
     }
 }

@@ -63,11 +63,11 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void setOrigin(Point point) {
-        this.position.setOrigin(point);
+        this.position.setReferencePoint(point);
     }
 
     public Point getOrigin() {
-        return this.position.getOrigin();
+        return this.position.getReferencePoint();
     }
 
     abstract public List<Point> getVertices();

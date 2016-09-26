@@ -19,23 +19,19 @@ import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
-public class ExtensionImage extends PortableImage
-{ // Image<Extension> {
+public class ExtensionImage extends PortableImage {
 
-    public ExtensionImage(Extension extension)
-    {
+    public ExtensionImage(Extension extension) {
         super(extension);
         setup();
     }
 
-    private void setup()
-    {
+    private void setup() {
         setupShapes();
         setupActions();
     }
 
-    private void setupShapes()
-    {
+    private void setupShapes() {
 
         Rectangle rectangle;
 
@@ -58,14 +54,11 @@ public class ExtensionImage extends PortableImage
         addShape(rectangle);
     }
 
-    private void setupActions()
-    {
+    private void setupActions() {
 
-        setOnActionListener(new ActionListener()
-        {
+        setOnActionListener(new ActionListener() {
             @Override
-            public void onAction(Action action)
-            {
+            public void onAction(Action action) {
 
                 Event event = action.getLastEvent();
 
@@ -114,16 +107,13 @@ public class ExtensionImage extends PortableImage
     }
 
     // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    private void createProfile()
-    {
+    private void createProfile() {
         if (!getExtension().hasProfile()) {
 
             // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
-            Launcher.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>()
-            {
+            Launcher.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
                 @Override
-                public void onComplete(String text)
-                {
+                public void onComplete(String text) {
                     // Create Extension Profile
                     PortableProfile portableProfile = new PortableProfile(getExtension());
                     portableProfile.setLabel(text);
@@ -140,24 +130,21 @@ public class ExtensionImage extends PortableImage
                 }
             });
         } else {
-            Launcher.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener()
-            {
+            Launcher.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener() {
                 @Override
-                public void onComplete(Object result)
-                {
-                    
+                public void onComplete(Object result) {
+
                 }
             });
         }
     }
 
-    public Extension getExtension()
-    {
+    public Extension getExtension() {
         return (Extension) getEntity();
     }
 
-    public void update()
-    {
+    public void update() {
+
         // Create any additional images or shapes to match the Entity
         // <HACK>
         // Create Port shapes for each of Extension's Ports
@@ -216,8 +203,7 @@ public class ExtensionImage extends PortableImage
         }
     }
 
-    public void draw(Display display)
-    {
+    public void draw(Display display) {
         if (isVisible()) {
 
             for (int i = 0; i < shapes.size(); i++) {

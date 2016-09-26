@@ -426,18 +426,27 @@ public class Camera {
     }
 
     public void focusSelectPath(Port port) {
+
         // Camera
         List<Path> paths = port.getCompletePath();
-        Group<Port> pathPorts = port.getPorts(paths);
-        ImageGroup pathPortImages = getSpace().getImages(pathPorts);
-        List<Point> pathPortPositions = pathPortImages.getPositions();
-        Rectangle boundingBox = Geometry.calculateBoundingBox(pathPortPositions);
+        Group<Port> ports = port.getPorts(paths);
+        ShapeGroup shapes = getSpace().getShapes(ports);
+
+//        for (int i = 0; i < ports.size(); i++) {
+//            Extension extension = ports.get(i).getExtension();
+//            if (extension != null) {
+//                shapes.add(getSpace().getShape(extension));
+//            }
+//        }
+
+        List<Point> positions = shapes.getPositions();
+        Rectangle boundingBox = Geometry.calculateBoundingBox(positions);
 
         // Update Scale
         adjustScale(boundingBox);
 
         // Update Position
-        setPosition(Geometry.calculateCenterPosition(pathPortPositions));
+        setPosition(Geometry.calculateCenterPosition(positions));
     }
 
     public void focusSelectSpace() { // Previously called "focusReset"

@@ -1,14 +1,12 @@
 package camp.computer.clay.model.interaction;
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.architecture.Entity;
-import camp.computer.clay.space.architecture.Image;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
 

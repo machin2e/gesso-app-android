@@ -522,25 +522,25 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 Point innerTopLeft = new Point(
                         topLeft.getRelativeX() + rectangle.getCornerRadius(),
                         topLeft.getRelativeY() + rectangle.getCornerRadius(),
-                        topLeft.getOrigin()
+                        topLeft.getReferencePoint()
                 );
 
                 Point innerTopRight = new Point(
                         topRight.getRelativeX() - rectangle.getCornerRadius(),
                         topRight.getRelativeY() + rectangle.getCornerRadius(),
-                        topRight.getOrigin()
+                        topRight.getReferencePoint()
                 );
 
                 Point innerBottomRight = new Point(
                         bottomRight.getRelativeX() - rectangle.getCornerRadius(),
                         bottomRight.getRelativeY() - rectangle.getCornerRadius(),
-                        bottomRight.getOrigin()
+                        bottomRight.getReferencePoint()
                 );
 
                 Point innerBottomLeft = new Point(
                         bottomLeft.getRelativeX() + rectangle.getCornerRadius(),
                         bottomLeft.getRelativeY() - rectangle.getCornerRadius(),
-                        bottomLeft.getOrigin()
+                        bottomLeft.getReferencePoint()
                 );
 
                 // Top segment

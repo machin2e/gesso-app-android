@@ -1,6 +1,5 @@
 package camp.computer.clay.space.architecture;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.visual.Display;

@@ -189,12 +189,12 @@ public class HostImage extends PortableImage {
             /*
             Line line = new Line();
             addShape(line);
-            line.setOrigin(circle.getPosition()); // Remove this? Weird to have a line with a center...
+            line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
             line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
             line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
             line.setRotation(90);
             line.setOutlineColor("#ff000000");
-            line.getVisibility().setReference(circle.getVisibility());
+            line.getVisibility().setReferencePoint(circle.getVisibility());
             */
 
             /*
@@ -204,7 +204,7 @@ public class HostImage extends PortableImage {
             for (int j = 0; j < segmentCount; j++) {
                 Line line = new Line();
                 addShape(line);
-                line.setOrigin(circle.getPosition()); // Remove this? Weird to have a line with a center...
+                line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
 
                 if (previousLine == null) {
                     line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
@@ -232,7 +232,7 @@ public class HostImage extends PortableImage {
                 line.setRotation(90);
                 line.setOutlineColor("#ff000000");
                 line.setOutlineThickness(3.0);
-                line.getVisibility().setReference(circle.getVisibility());
+                line.getVisibility().setReferencePoint(circle.getVisibility());
 
                 previousLine = line;
             }
@@ -416,7 +416,245 @@ public class HostImage extends PortableImage {
                                         }
                                         // </HACK>
 
-                                        if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
+                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
+
+                                            if (action.isTap()) {
+
+                                                // Focus on touched form
+                                                setPathVisibility(Visibility.Value.VISIBLE);
+                                                getPortShapes().setVisibility(Visibility.Value.VISIBLE);
+                                                //setDockVisibility(Visibility.Value.INVISIBLE);
+
+                                                setTransparency(1.0);
+
+                                                // Show ports and paths of touched form
+                                                for (int i = 0; i < getHost().getPorts().size(); i++) {
+                                                    List<Path> paths = getHost().getPort(i).getCompletePath();
+
+                                                    for (int j = 0; j < paths.size(); j++) {
+                                                        Path path = paths.get(j);
+
+                                                        // Show source and target ports in path
+                                                        space.getShape(path.getSource()).setVisibility(Visibility.Value.VISIBLE);
+                                                        space.getShape(path.getTarget()).setVisibility(Visibility.Value.VISIBLE);
+
+                                                        // Show path connection
+                                                        space.getImage(path).setVisibility(Visibility.Value.VISIBLE);
+
+//                                                        // Show Extensions connected to Port
+//                                                        if (path.getSource().getExtension() != null) {
+//                                                            Extension extension = path.getSource().getExtension();
+//                                                            space.getImage(extension).setVisibility(Visibility.Value.VISIBLE);
+//                                                        }
+//
+//                                                        if (path.getTarget().getExtension() != null) {
+//                                                            Extension extension = path.getSource().getExtension();
+//                                                            space.getImage(extension).setVisibility(Visibility.Value.VISIBLE);
+//                                                        }
+                                                    }
+                                                }
+
+                                                // Camera
+                                                camera.focusSelectHost(event);
+
+                                            } else {
+
+                                                // TODO: Release longer than tap!
+
+                                                if (event.getTargetImage() instanceof HostImage) {
+
+                                                    // If getFirstEvent processAction was on the same form, then respond
+                                                    if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
+
+                                                        // Host
+//                                                        event.getTargetImage().processAction(action);
+
+                                                        // Camera
+//                                                        camera.focusSelectSpace();
+                                                    }
+
+                                                } else if (event.getTargetImage() instanceof Space) {
+
+                                                    // Host
+//                                                        action.getFirstEvent().getTargetImage().processAction(action);
+
+                                                }
+
+                                            }
+
+                                            // Check if connecting to a extension
+                                            if (space.getPrototypeExtensionVisibility().getValue() == Visibility.Value.VISIBLE) {
+
+                                                space.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
+
+                                                // Get cached extension profiles (and retrieve additional from Internet store)
+                                                List<PortableProfile> portableProfiles = Launcher.getView().getClay().getPortableProfiles();
+
+
+                                                if (portableProfiles.size() == 0) {
+
+                                                    // Show "default" DIY extension builder (or info about there being no extensions)
+
+                                                } else if (portableProfiles.size() > 0) {
+
+                                                    // Prompt User to select an Extension from the Store
+                                                    // i.e., Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
+                                                    Launcher.getView().getActionPrompts().promptSelection(portableProfiles, new Prompt.OnActionListener<PortableProfile>() {
+                                                        @Override
+                                                        public void onComplete(PortableProfile portableProfile) {
+                                                            Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+
+                                                            // Create the Extension
+                                                            final Extension extension = new Extension(portableProfile);
+
+                                                            // Add Extension to Model
+                                                            space.getModel().addExtension(extension);
+
+                                                            // Add Extension to Space
+                                                            space.addEntity(extension);
+
+                                                            // Get the just-created Extension Image
+                                                            ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+
+                                                            // Update the Extension Image position and rotation
+                                                            extensionImage.setPosition(event.getPosition());
+
+                                                            // <REFACTOR>
+
+                                                            // Update the Extension Image position and rotation
+                                                            //extensionImage.setPosition(event.getPosition());
+                                                            Shape hostShape = getShape("Board");
+
+                                                            Line nearestSegment = null;
+                                                            int segmentIndex = -1;
+                                                            List<Line> boardShapeSegments = hostShape.getSegments();
+                                                            double distanceToSegmentMidpoint = Double.MAX_VALUE;
+                                                            for (int i = 0; i < boardShapeSegments.size(); i++) {
+                                                                Line segment = boardShapeSegments.get(i);
+                                                                Point midpoint = segment.getMidpoint();
+                                                                double distance = Geometry.calculateDistance(event.getPosition(), midpoint);
+                                                                if (distance < distanceToSegmentMidpoint) {
+                                                                    distanceToSegmentMidpoint = distance;
+                                                                    nearestSegment = segment;
+                                                                    segmentIndex = i;
+                                                                }
+                                                            }
+
+                                                            if (segmentIndex == 0) {
+                                                                extensionImage.getPosition().set(
+                                                                        new Point(
+                                                                                0,
+                                                                                -500,
+                                                                                getPosition()
+                                                                        )
+                                                                );
+                                                            } else if (segmentIndex == 1) {
+                                                                extensionImage.getPosition().set(
+                                                                        new Point(
+                                                                                500,
+                                                                                0,
+                                                                                getPosition()
+                                                                        )
+                                                                );
+                                                            } else if (segmentIndex == 2) {
+                                                                extensionImage.getPosition().set(
+                                                                        new Point(
+                                                                                0,
+                                                                                500,
+                                                                                getPosition()
+                                                                        )
+                                                                );
+                                                            } else if (segmentIndex == 3) {
+                                                                extensionImage.getPosition().set(
+                                                                        new Point(
+                                                                                -500,
+                                                                                0,
+                                                                                getPosition()
+                                                                        )
+                                                                );
+                                                            }
+
+                                                            //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
+                                                            if (segmentIndex == 0) {
+                                                                extensionImage.setRotation(0);
+                                                            } else if (segmentIndex == 1) {
+                                                                extensionImage.setRotation(90);
+                                                            } else if (segmentIndex == 2) {
+                                                                extensionImage.setRotation(180);
+                                                            } else if (segmentIndex == 3) {
+                                                                extensionImage.setRotation(270);
+                                                            }
+                                                            // </REFACTOR>
+
+                                                            // Automatically select, connect paths to, and configure the Host's Ports
+                                                            for (int i = 0; i < portableProfile.getPorts().size(); i++) {
+
+                                                                // Select an available Host Port
+                                                                Port selectedHostPort = null;
+                                                                double distanceToSelectedPort = Double.MAX_VALUE;
+                                                                for (int j = 0; j < getHost().getPorts().size(); j++) {
+                                                                    if (getHost().getPorts().get(j).getType() == Port.Type.NONE) {
+
+                                                                        double distanceToPort = Geometry.calculateDistance(
+                                                                                getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
+                                                                                extensionImage.getPosition()
+                                                                        );
+
+                                                                        // Check if the port is the nearest
+                                                                        if (distanceToPort < distanceToSelectedPort) {
+                                                                            selectedHostPort = getHost().getPorts().get(j);
+                                                                            distanceToSelectedPort = distanceToPort;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                // TODO: selectedHostPort = (Port) getPortShapes().getNearest(extensionImage.getPosition()).getEntity();
+
+                                                                // Configure Host's Port
+                                                                selectedHostPort.setType(portableProfile.getPorts().get(i).getType());
+                                                                selectedHostPort.setDirection(portableProfile.getPorts().get(i).getDirection());
+
+                                                                // Create Path from Extension Port to Host Port
+                                                                Path path = new Path(selectedHostPort, extension.getPorts().get(i));
+                                                                path.setType(Path.Type.ELECTRONIC);
+
+                                                                selectedHostPort.addPath(path);
+
+                                                                space.addEntity(path);
+                                                            }
+
+                                                        /*
+                                                        // Configure Host's Port (i.e., the Path's source Port)
+                                                        Port hostPort = (Port) hostPortShape.getEntity();
+
+                                                        if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
+                                                            hostPort.setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
+                                                            hostPort.setDirection(Port.Direction.BOTH);
+                                                        }
+
+                                                        // Configure Extension's Ports (i.e., the Path's target Port)
+                                                        Port extensionPort = extension.getPorts().get(0);
+                                                        extensionPort.setDirection(Port.Direction.INPUT);
+                                                        extensionPort.setType(hostPort.getType());
+
+                                                        // Create Path from Host to Extension
+                                                        Path path = new Path(hostPort, extensionPort);
+                                                        path.setType(Path.Type.ELECTRONIC);
+                                                        hostPort.addPath(path);
+
+                                                        // Add Path to Space
+                                                        space.addEntity(path);
+
+                                                        // Update Camera
+                                                        camera.focusSelectPath(hostPort);
+                                                        */
+
+                                                        }
+                                                    });
+                                                    // Launcher.getView().promptTasks();
+                                                }
+                                            }
+
+                                        } else if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
 
                                             if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
 
@@ -664,16 +902,15 @@ public class HostImage extends PortableImage {
                                                     Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
                                                     // Create the Extension
-                                                    // TODO: Extension extension = new Extension(PortableProfile);
+                                                    // TODO: Extension extension = new Extension(PortableProfile); with PortableProfile without UUID?
                                                     Extension extension = new Extension();
 
                                                     // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
 
                                                     // Create Ports and add them to the Extension
-                                                    int extensionProfile_portCount = 1;
-                                                    for (int j = 0; j < extensionProfile_portCount; j++) {
-                                                        Port port = new Port();
-                                                        extension.addPort(port);
+                                                    int portCount = 1;
+                                                    for (int j = 0; j < portCount; j++) {
+                                                        extension.addPort(new Port());
                                                     }
 
                                                     // Add Extension to Model
@@ -683,7 +920,9 @@ public class HostImage extends PortableImage {
                                                     space.addEntity(extension);
 
                                                     // Get the just-created Extension Image
-                                                    Image extensionImage = space.getImage(extension);
+                                                    ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+
+                                                    extensionImage.setPosition(event.getPosition());
 
                                                     // <REFACTOR>
                                                     // Update the Extension Image position and rotation
@@ -708,14 +947,14 @@ public class HostImage extends PortableImage {
                                                         extensionImage.getPosition().set(
                                                                 new Point(
                                                                         0,
-                                                                        -350,
+                                                                        -500,
                                                                         getPosition()
                                                                 )
                                                         );
                                                     } else if (segmentIndex == 1) {
                                                         extensionImage.getPosition().set(
                                                                 new Point(
-                                                                        350,
+                                                                        500,
                                                                         0,
                                                                         getPosition()
                                                                 )
@@ -724,14 +963,14 @@ public class HostImage extends PortableImage {
                                                         extensionImage.getPosition().set(
                                                                 new Point(
                                                                         0,
-                                                                        350,
+                                                                        500,
                                                                         getPosition()
                                                                 )
                                                         );
                                                     } else if (segmentIndex == 3) {
                                                         extensionImage.getPosition().set(
                                                                 new Point(
-                                                                        -350,
+                                                                        -500,
                                                                         0,
                                                                         getPosition()
                                                                 )
@@ -770,7 +1009,6 @@ public class HostImage extends PortableImage {
 
                                                     // Add Path to Space
                                                     space.addEntity(path);
-
 
                                                     // Remove focus from other forms and their ports
                                                     ImageGroup hostImages = getSpace().getImages(Host.class);
@@ -824,245 +1062,7 @@ public class HostImage extends PortableImage {
                                                 space.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
                                             }
 
-                                        } else if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
-
-                                            Log.v("Ixn", "got to board");
-
-                                            if (action.isTap()) {
-
-                                                // Focus on touched form
-                                                setPathVisibility(Visibility.Value.VISIBLE);
-                                                getPortShapes().setVisibility(Visibility.Value.VISIBLE);
-                                                //setDockVisibility(Visibility.Value.INVISIBLE);
-
-                                                setTransparency(1.0);
-
-                                                // Show ports and paths of touched form
-                                                for (int i = 0; i < getHost().getPorts().size(); i++) {
-                                                    List<Path> paths = getHost().getPort(i).getCompletePath();
-
-                                                    for (int j = 0; j < paths.size(); j++) {
-                                                        Path path = paths.get(j);
-
-                                                        // Show source and target ports in path
-                                                        space.getShape(path.getSource()).setVisibility(Visibility.Value.VISIBLE);
-                                                        space.getShape(path.getTarget()).setVisibility(Visibility.Value.VISIBLE);
-
-                                                        // Show path connection
-                                                        space.getImage(path).setVisibility(Visibility.Value.VISIBLE);
-
-//                                                        // Show Extensions connected to Port
-//                                                        if (path.getSource().getExtension() != null) {
-//                                                            Extension extension = path.getSource().getExtension();
-//                                                            space.getImage(extension).setVisibility(Visibility.Value.VISIBLE);
-//                                                        }
-//
-//                                                        if (path.getTarget().getExtension() != null) {
-//                                                            Extension extension = path.getSource().getExtension();
-//                                                            space.getImage(extension).setVisibility(Visibility.Value.VISIBLE);
-//                                                        }
-                                                    }
-                                                }
-
-                                                // Camera
-                                                camera.focusSelectHost(event);
-
-                                            } else {
-
-                                                // TODO: Release longer than tap!
-
-                                                if (event.getTargetImage() instanceof HostImage) {
-
-                                                    // If getFirstEvent processAction was on the same form, then respond
-                                                    if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
-
-                                                        // Host
-//                                                        event.getTargetImage().processAction(action);
-
-                                                        // Camera
-//                                                        camera.focusSelectSpace();
-                                                    }
-
-                                                } else if (event.getTargetImage() instanceof Space) {
-
-                                                    // Host
-//                                                        action.getFirstEvent().getTargetImage().processAction(action);
-
-                                                }
-
-                                            }
-
-                                            // Check if connecting to a extension
-                                            if (space.getPrototypeExtensionVisibility().getValue() == Visibility.Value.VISIBLE) {
-
-                                                space.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
-
-                                                // Get cached extension profiles (and retrieve additional from Internet store)
-                                                List<PortableProfile> portableProfiles = Launcher.getView().getClay().getPortableProfiles();
-
-
-                                                if (portableProfiles.size() == 0) {
-
-                                                    // Show "default" DIY extension builder (or info about there being no extensions)
-
-                                                } else if (portableProfiles.size() > 0) {
-
-                                                    // Prompt User to select an Extension from the Store
-                                                    // i.e., Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
-                                                    Launcher.getView().getActionPrompts().promptSelection(portableProfiles, new Prompt.OnActionListener<PortableProfile>() {
-                                                        @Override
-                                                        public void onComplete(PortableProfile portableProfile) {
-                                                            Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
-
-                                                            // Create the Extension
-                                                            final Extension extension = new Extension(portableProfile);
-
-                                                            // Add Extension to Model
-                                                            space.getModel().addExtension(extension);
-
-                                                            // Add Extension to Space
-                                                            space.addEntity(extension);
-
-                                                            // Get the just-created Extension Image
-                                                            Image extensionImage = space.getImage(extension);
-
-                                                            // Update the Extension Image position and rotation
-//                                                            extensionImage.setPosition(event.getPosition());
-
-                                                            // <REFACTOR>
-                                                            // Update the Extension Image position and rotation
-                                                            //extensionImage.setPosition(event.getPosition());
-                                                            Shape boardShape = getShape("Board");
-                                                            Line nearestSegment = null;
-                                                            int segmentIndex = -1;
-                                                            List<Line> boardShapeSegments = boardShape.getSegments();
-                                                            double distanceToSegmentMidpoint = Double.MAX_VALUE;
-                                                            for (int i = 0; i < boardShapeSegments.size(); i++) {
-                                                                Line segment = boardShapeSegments.get(i);
-                                                                Point midpoint = segment.getMidpoint();
-                                                                double distance = Geometry.calculateDistance(event.getPosition(), midpoint);
-                                                                if (distance < distanceToSegmentMidpoint) {
-                                                                    distanceToSegmentMidpoint = distance;
-                                                                    nearestSegment = segment;
-                                                                    segmentIndex = i;
-                                                                }
-                                                            }
-
-                                                            if (segmentIndex == 0) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                0,
-                                                                                -350,
-                                                                                getPosition()
-                                                                        )
-                                                                );
-                                                            } else if (segmentIndex == 1) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                350,
-                                                                                0,
-                                                                                getPosition()
-                                                                        )
-                                                                );
-                                                            } else if (segmentIndex == 2) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                0,
-                                                                                350,
-                                                                                getPosition()
-                                                                        )
-                                                                );
-                                                            } else if (segmentIndex == 3) {
-                                                                extensionImage.getPosition().set(
-                                                                        new Point(
-                                                                                -350,
-                                                                                0,
-                                                                                getPosition()
-                                                                        )
-                                                                );
-                                                            }
-
-                                                            //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
-                                                            if (segmentIndex == 0) {
-                                                                extensionImage.setRotation(0);
-                                                            } else if (segmentIndex == 1) {
-                                                                extensionImage.setRotation(90);
-                                                            } else if (segmentIndex == 2) {
-                                                                extensionImage.setRotation(180);
-                                                            } else if (segmentIndex == 3) {
-                                                                extensionImage.setRotation(270);
-                                                            }
-                                                            // </REFACTOR>
-
-                                                            // Automatically select, connect paths to, and configure the Host's Ports
-                                                            for (int i = 0; i < portableProfile.getPorts().size(); i++) {
-
-                                                                // Select an available Host Port
-                                                                Port selectedHostPort = null;
-                                                                double distanceToSelectedPort = Double.MAX_VALUE;
-                                                                for (int j = 0; j < getHost().getPorts().size(); j++) {
-                                                                    if (getHost().getPorts().get(j).getType() == Port.Type.NONE) {
-
-                                                                        double distanceToPort = Geometry.calculateDistance(
-                                                                                getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                                                                                extensionImage.getPosition()
-                                                                        );
-
-                                                                        // Check if the port is the nearest
-                                                                        if (distanceToPort < distanceToSelectedPort) {
-                                                                            selectedHostPort = getHost().getPorts().get(j);
-                                                                            distanceToSelectedPort = distanceToPort;
-                                                                        }
-                                                                    }
-                                                                }
-                                                                // TODO: selectedHostPort = (Port) getPortShapes().getNearest(extensionImage.getPosition()).getEntity();
-
-                                                                // Configure Host's Port
-                                                                selectedHostPort.setType(portableProfile.getPorts().get(i).getType());
-                                                                selectedHostPort.setDirection(portableProfile.getPorts().get(i).getDirection());
-
-                                                                // Create Path from Extension Port to Host Port
-                                                                Path path = new Path(selectedHostPort, extension.getPorts().get(i));
-                                                                path.setType(Path.Type.ELECTRONIC);
-
-                                                                selectedHostPort.addPath(path);
-
-                                                                space.addEntity(path);
-                                                            }
-
-                                                        /*
-                                                        // Configure Host's Port (i.e., the Path's source Port)
-                                                        Port hostPort = (Port) hostPortShape.getEntity();
-
-                                                        if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
-                                                            hostPort.setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
-                                                            hostPort.setDirection(Port.Direction.BOTH);
-                                                        }
-
-                                                        // Configure Extension's Ports (i.e., the Path's target Port)
-                                                        Port extensionPort = extension.getPorts().get(0);
-                                                        extensionPort.setDirection(Port.Direction.INPUT);
-                                                        extensionPort.setType(hostPort.getType());
-
-                                                        // Create Path from Host to Extension
-                                                        Path path = new Path(hostPort, extensionPort);
-                                                        path.setType(Path.Type.ELECTRONIC);
-                                                        hostPort.addPath(path);
-
-                                                        // Add Path to Space
-                                                        space.addEntity(path);
-
-                                                        // Update Camera
-                                                        camera.focusSelectPath(hostPort);
-                                                        */
-
-                                                        }
-                                                    });
-                                                    // Launcher.getView().promptTasks();
-                                                }
-                                            }
                                         }
-
                                     }
                                 }
                             }

@@ -151,7 +151,7 @@ public abstract class Geometry {
         Point midpoint = new Point(
                 (source.getRelativeX() + target.getRelativeX()) / 2.0f,
                 (source.getRelativeY() + target.getRelativeY()) / 2.0f,
-                source.getOrigin()
+                source.getReferencePoint()
         );
         return midpoint;
     }
