@@ -187,7 +187,7 @@ public class ExtensionImage extends PortableImage {
                 double portSpacing = 100;
                 double x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
                 portShape.getPosition().setRelativeX(x);
-                // TODO: Also update y coordinate
+                // TODO: Also update relativeY coordinate
             }
         }
 

@@ -732,7 +732,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             path.lineTo((float) vertexPosition.getX(), (float) vertexPosition.getY());
         }
 
-//        path.lineTo(position.x, position.y);
+//        path.lineTo(position.relativeX, position.relativeY);
         path.close();
 
         canvas.drawPath(path, paint);

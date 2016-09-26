@@ -8,15 +8,13 @@ public class Point {
     //
     // TODO: Refactor to support N dimensions, including rotation angles accordingly.
 
-    // private static Point origin = new Point(0, 0);
-
     /**
      * The {@code Point} relative to which this point will be positioned.
      */
     protected Point referencePoint = null;
 
-    private double x = 0;
-    private double y = 0;
+    protected double relativeX = 0;
+    protected double relativeY = 0;
 
     /**
      * Relative rotation of the the coordinate with which points referencing this one will be
@@ -39,20 +37,20 @@ public class Point {
      * @param otherPoint The {@code Point} to copy.
      */
     public Point(Point otherPoint) {
-        this.x = otherPoint.x;
-        this.y = otherPoint.y;
+        this.relativeX = otherPoint.relativeX;
+        this.relativeY = otherPoint.relativeY;
     }
 
     public Point(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.relativeX = x;
+        this.relativeY = y;
     }
 
     /**
      * Creates a new {@code Point} positioned relative to {@code referencePoint}.
      *
-     * @param x              The x coordinate of this {@code Point} relative to {@code referencePoint}.
-     * @param y              The y coordinate of this {@code Point} relative to {@code referencePoint}.
+     * @param x              The relativeX coordinate of this {@code Point} relative to {@code referencePoint}.
+     * @param y              The relativeY coordinate of this {@code Point} relative to {@code referencePoint}.
      * @param referencePoint
      */
     public Point(double x, double y, Point referencePoint) {
@@ -70,28 +68,23 @@ public class Point {
     }
 
     public double getRelativeX() {
-        return x;
+        return relativeX;
     }
 
     public double getRelativeY() {
-        return y;
+        return relativeY;
     }
 
     public double getRelativeAngle() {
         return rotation;
     }
 
-    public void setRelative(Point point) {
-        this.x = point.x;
-        this.y = point.y;
-    }
-
     public void setRelativeX(double x) {
-        this.x = x;
+        this.relativeX = x;
     }
 
     public void setRelativeY(double y) {
-        this.y = y;
+        this.relativeY = y;
     }
 
     public void setRelativeAngle(double angle) {
@@ -99,36 +92,36 @@ public class Point {
     }
 
     /**
-     * @param dx Absolute offset along x axis from current x position.
-     * @param dy Absolute offset along y axis from current y position.
+     * @param dx Absolute offset along relativeX axis from current relativeX position.
+     * @param dy Absolute offset along relativeY axis from current relativeY position.
      */
     public void offset(double dx, double dy) {
-        this.x = this.x + dx;
-        this.y = this.y + dy;
+        this.relativeX = this.relativeX + dx;
+        this.relativeY = this.relativeY + dy;
     }
 
     /**
-     * @return Absolute x coordinate.
+     * @return Absolute relativeX coordinate.
      */
     public double getX() {
 
         if (referencePoint != null) {
-            double globalX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            double globalX = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
             return referencePoint.getX() + globalX;
         } else {
-            return this.x;
+            return this.relativeX;
         }
     }
 
     /**
-     * @return Absolute y coordinate.
+     * @return Absolute relativeY coordinate.
      */
     public double getY() {
         if (referencePoint != null) {
-            double globalY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            double globalY = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.sin(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
             return referencePoint.getY() + globalY;
         } else {
-            return this.y;
+            return this.relativeY;
         }
     }
 
@@ -145,8 +138,8 @@ public class Point {
     }
 
     /**
-     * @param x Absolute x coordinate. Converted to relative coordinate internally.
-     * @param y Absolute y coordinate. Converted to relative coordinate internally.
+     * @param x Absolute relativeX coordinate. Converted to relative coordinate internally.
+     * @param y Absolute relativeY coordinate. Converted to relative coordinate internally.
      */
     public void set(double x, double y) {
         setX(x);
@@ -168,24 +161,24 @@ public class Point {
     }
 
     /**
-     * @param x Absolute x coordinate. Converted to a relative x position internally.
+     * @param x Absolute relativeX coordinate. Converted to a relative relativeX position internally.
      */
     public void setX(double x) {
         if (referencePoint != null) {
-            this.x = x - referencePoint.getX();
+            this.relativeX = x - referencePoint.getX();
         } else {
-            this.x = x;
+            this.relativeX = x;
         }
     }
 
     /**
-     * @param y Absolute y coordinate. Converted to a relative y position internally.
+     * @param y Absolute relativeY coordinate. Converted to a relative relativeY position internally.
      */
     public void setY(double y) {
         if (referencePoint != null) {
-            this.y = y - referencePoint.getY();
+            this.relativeY = y - referencePoint.getY();
         } else {
-            this.y = y;
+            this.relativeY = y;
         }
     }
 

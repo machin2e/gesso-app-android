@@ -198,7 +198,7 @@ public class HostImage extends PortableImage {
             */
 
             /*
-            // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto y axis points with most recent data
+            // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto relativeY axis points with most recent data
             Line previousLine = null;
             int segmentCount = 10;
             for (int j = 0; j < segmentCount; j++) {

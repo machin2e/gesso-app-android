@@ -168,7 +168,7 @@ public abstract class Geometry {
         return dot;
     }
 
-    //Compute the cross product AB x AC
+    //Compute the cross product AB relativeX AC
     public static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point AC = new Point();

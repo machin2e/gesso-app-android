@@ -654,11 +654,11 @@ public class Space extends Image<Model> {
 
         Rectangle r3 = new Rectangle(p3, 100, 100);
         surface.drawRectangle(r3, surface);
-        Log.v("r3", "center x: " + r3.getPosition().getX() + ", y: " + r3.getPosition().getY());
-        Log.v("r3", "topLeft x: " + r3.getTopLeft().getX() + ", y: " + r3.getTopLeft().getY());
-        Log.v("r3", "topRight x: " + r3.getTopRight().getX() + ", y: " + r3.getTopRight().getY());
-        Log.v("r3", "bottomRight x: " + r3.getBottomRight().getX() + ", y: " + r3.getBottomRight().getY());
-        Log.v("r3", "bottomLeft x: " + r3.getBottomLeft().getX() + ", y: " + r3.getBottomLeft().getY());
+        Log.v("r3", "center relativeX: " + r3.getPosition().getX() + ", relativeY: " + r3.getPosition().getY());
+        Log.v("r3", "topLeft relativeX: " + r3.getTopLeft().getX() + ", relativeY: " + r3.getTopLeft().getY());
+        Log.v("r3", "topRight relativeX: " + r3.getTopRight().getX() + ", relativeY: " + r3.getTopRight().getY());
+        Log.v("r3", "bottomRight relativeX: " + r3.getBottomRight().getX() + ", relativeY: " + r3.getBottomRight().getY());
+        Log.v("r3", "bottomLeft relativeX: " + r3.getBottomLeft().getX() + ", relativeY: " + r3.getBottomLeft().getY());
 
         points = r3.getVertices();
         for (int i = 0; i < points.size(); i++) {

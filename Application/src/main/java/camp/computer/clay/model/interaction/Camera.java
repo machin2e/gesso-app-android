@@ -91,9 +91,9 @@ public class Camera {
 
     public void setPosition(Point targetPosition, double duration) {
 
-//        Log.v("Camera", "position x: " + position.getX() + ", y: " + position.getY());
-//        Log.v("Camera", "originalPosition x: " + originalPosition.getX() + ", y: " + originalPosition.getY());
-//        Log.v("Camera", "targetPosition x: " + targetPosition.getX() + ", y: " + targetPosition.getY());
+//        Log.v("Camera", "position relativeX: " + position.getX() + ", relativeY: " + position.getY());
+//        Log.v("Camera", "originalPosition relativeX: " + originalPosition.getX() + ", relativeY: " + originalPosition.getY());
+//        Log.v("Camera", "targetPosition relativeX: " + targetPosition.getX() + ", relativeY: " + targetPosition.getY());
 //        Log.v("Camera", "-");
 
         if (targetPosition.getX() == position.getX() && targetPosition.getY() == position.getY()) {
