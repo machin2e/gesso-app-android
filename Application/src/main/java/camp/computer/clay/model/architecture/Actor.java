@@ -105,7 +105,7 @@ public class Actor {
                 }
 
                 // Set the target image
-                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -128,7 +128,7 @@ public class Actor {
                 action.addEvent(event);
 
                 // Set the target image
-                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -153,7 +153,7 @@ public class Actor {
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
-                    Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                    Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     // Set the target shape
@@ -178,7 +178,7 @@ public class Actor {
                 action.timerHandler.removeCallbacks(action.timerRunnable);
 
                 // Set the target image
-                Image targetImage = getCamera().getSpace().getImageByPosition(event.getPosition());
+                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
