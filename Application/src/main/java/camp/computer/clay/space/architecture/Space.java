@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
@@ -22,6 +21,8 @@ import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.model.interaction.Event;
+import camp.computer.clay.space.architecture.util.ImageGroup;
+import camp.computer.clay.space.architecture.util.ShapeGroup;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
@@ -32,7 +33,9 @@ import camp.computer.clay.space.util.geometry.Point;
 import camp.computer.clay.space.util.geometry.Rectangle;
 
 public class Space extends Image<Model> {
-    private List<Layer> layers = new ArrayList<>();
+//    private List<Layer> layers = new ArrayList<>();
+
+    protected ImageGroup images = new ImageGroup();
 
     private Visibility prototypeExtensionVisibility = new Visibility(Visibility.Value.INVISIBLE);
     private Point prototypeExtensionPosition = new Point();
@@ -95,41 +98,41 @@ public class Space extends Image<Model> {
         return getEntity();
     }
 
-    private boolean hasLayer(String tag) {
-        for (int i = 0; i < layers.size(); i++) {
-            if (layers.get(i).getTag().equals(tag)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void addLayer(String tag) {
-        if (!hasLayer(tag)) {
-            Layer layer = new Layer(this);
-            layer.setTag(tag);
-            layers.add(layer);
-        }
-    }
-
-    public Layer getLayer(String tag) {
-        for (int i = 0; i < layers.size(); i++) {
-            if (layers.get(i).getTag().equals(tag)) {
-                return layers.get(i);
-            }
-        }
-        return null;
-    }
-
-    public Layer getLayer(int id) {
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            if (layer.getIndex() == id) {
-                return layer;
-            }
-        }
-        return null;
-    }
+//    private boolean hasLayer(String tag) {
+//        for (int i = 0; i < layers.size(); i++) {
+//            if (layers.get(i).getTag().equals(tag)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private void addLayer(String tag) {
+//        if (!hasLayer(tag)) {
+//            Layer layer = new Layer(this);
+//            layer.setTag(tag);
+//            layers.add(layer);
+//        }
+//    }
+//
+//    public Layer getLayer(String tag) {
+//        for (int i = 0; i < layers.size(); i++) {
+//            if (layers.get(i).getTag().equals(tag)) {
+//                return layers.get(i);
+//            }
+//        }
+//        return null;
+//    }
+//
+//    public Layer getLayer(int id) {
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            if (layer.getIndex() == id) {
+//                return layer;
+//            }
+//        }
+//        return null;
+//    }
 
     public <T extends Entity> void addEntity(T entity) {
         if (entity instanceof Host) {
@@ -186,12 +189,14 @@ public class Space extends Image<Model> {
     // TODO: Remove Image parameter. Create that and return it.
     private <T extends Image> void addImage(T image, String layerTag) {
         // Add layer (if it doesn't exist)
-        if (!hasLayer(layerTag)) {
-            addLayer(layerTag);
-        }
+//        if (!hasLayer(layerTag)) {
+//            addLayer(layerTag);
+//        }
 
         // Add Image
-        getLayer(layerTag).addImage(image);
+//        getLayer(layerTag).addImage(image);
+        image.setSpace(this);
+        images.add(image);
 
         // Position the Image
         // <HACK>
@@ -283,69 +288,81 @@ public class Space extends Image<Model> {
      * present. If one is not present, this method returns {@code null}.
      */
     public boolean contains(Entity entity) {
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            Image image = layer.getImage(entity);
-            if (image != null) {
-                return true;
-            }
-        }
-        return false;
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            Image image = layer.getImage(entity);
+//            if (image != null) {
+//                return true;
+//            }
+//        }
+//        return false;
+        return images.filterEntity(entity).size() > 0;
     }
 
     public Image getImage(Entity entity) {
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            Image image = layer.getImage(entity);
-            if (image != null) {
-                return image;
-            }
-        }
-        return null;
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            Image image = layer.getImage(entity);
+//            if (image != null) {
+//                return image;
+//            }
+//        }
+//        return null;
+        return images.filterEntity(entity).get(0);
     }
 
-    public <T> ImageGroup getImages(Group<T> entities) {
-        ImageGroup imageGroup = new ImageGroup();
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            for (int j = 0; j < entities.size(); j++) {
-                T entity = entities.get(j);
-                Image image = layer.getImage((Entity) entity);
-                if (image != null) {
-                    imageGroup.add(image);
-                }
-            }
-        }
-        return imageGroup;
+    public <T extends Entity> ImageGroup getImages(Group<T> entities) {
+//        ImageGroup imageGroup = new ImageGroup();
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            for (int j = 0; j < entities.size(); j++) {
+//                T entity = entities.get(j);
+//                Image image = layer.getImage((Entity) entity);
+//                if (image != null) {
+//                    imageGroup.add(image);
+//                }
+//            }
+//        }
+//        return imageGroup;
+        return images.filterEntity(entities);
     }
 
     public ImageGroup getImages() {
-        ImageGroup imageGroup = new ImageGroup();
-        List<Integer> indices = getLayerIndices();
-        for (int i = 0; i < indices.size(); i++) {
-            Integer index = indices.get(i);
-            Layer layer = getLayer(index);
-            if (layer != null) {
-                imageGroup.add(layer.getImages());
-            }
-        }
-        return imageGroup;
+//        ImageGroup imageGroup = new ImageGroup();
+//        List<Integer> indices = getLayerIndices();
+//        for (int i = 0; i < indices.size(); i++) {
+//            Integer index = indices.get(i);
+//            Layer layer = getLayer(index);
+//            if (layer != null) {
+//                imageGroup.add(layer.getImages());
+//            }
+//        }
+//        return imageGroup;
+        return images;
     }
 
     public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes) {
-        return getImages().filterType(entityTypes);
+//        return getImages().filterType(entityTypes);
+        return images.filterType(entityTypes);
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
     public Image getImageByPosition(Point point) {
-        ImageGroup images = getImages().filterVisibility(Visibility.Value.VISIBLE);
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
-            if (image.contains(point)) {
-                return image;
-            }
+//        ImageGroup images = getImages().filterVisibility(Visibility.Value.VISIBLE);
+//        for (int i = 0; i < images.size(); i++) {
+//            Image image = images.get(i);
+//            if (image.contains(point)) {
+//                return image;
+//            }
+//        }
+//        return this;
+
+        ImageGroup image = images.filterVisibility(Visibility.Value.VISIBLE).filterContains(point);
+        if (image.size() > 0) {
+            return image.get(0);
+        } else {
+            return this;
         }
-        return this;
     }
 
     public ShapeGroup getShapes() {
@@ -387,28 +404,29 @@ public class Space extends Image<Model> {
         return this.entity;
     }
 
-    public Entity getEntity(Image image) {
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            Entity entity = layer.getEntity(image);
-            if (entity != null) {
-                return entity;
-            }
-        }
-        return null;
-    }
+//    public Entity getEntity(Image image) {
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            Entity entity = layer.getEntity(image);
+//            if (entity != null) {
+//                return entity;
+//            }
+//        }
+//        return null;
+//    }
 
-    public Entity getEntity(Shape shape) {
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            Entity entity = layer.getEntity(shape);
-            if (entity != null) {
-                return entity;
-            }
-        }
-        return null;
-    }
+//    public Entity getEntity(Shape shape) {
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            Entity entity = layer.getEntity(shape);
+//            if (entity != null) {
+//                return entity;
+//            }
+//        }
+//        return null;
+//    }
 
+    // TODO: Delete this! It is redundant...
     public static <T extends Image> List<Point> getPositions(List<T> images) {
         List<Point> positions = new ArrayList<>();
         for (int i = 0; i < images.size(); i++) {
@@ -425,13 +443,17 @@ public class Space extends Image<Model> {
         // Update perspective
         getEntity().getActor(0).getCamera().update();
 
-        // Update figures
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            for (int j = 0; j < layer.getImages().size(); j++) {
-                Image image = layer.getImages().get(j);
-                image.update();
-            }
+//        // Update figures
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            for (int j = 0; j < layer.getImages().size(); j++) {
+//                Image image = layer.getImages().get(j);
+//                image.update();
+//            }
+//        }
+
+        for (int i = 0; i < images.size(); i++) {
+            images.get(i).update();
         }
 
         // Update figure layout
@@ -676,32 +698,36 @@ public class Space extends Image<Model> {
     }
 
     private void drawLayers(Display display) {
-        if (getLayer("paths") != null) {
-            getLayer("paths").draw(display);
-        }
+//        if (getLayer("paths") != null) {
+//            getLayer("paths").draw(display);
+//        }
+//
+//        if (getLayer("hosts") != null) {
+//            getLayer("hosts").draw(display);
+//        }
+//
+//        if (getLayer("extensions") != null) {
+//            getLayer("extensions").draw(display);
+//        }
 
-        if (getLayer("hosts") != null) {
-            getLayer("hosts").draw(display);
-        }
-
-        if (getLayer("extensions") != null) {
-            getLayer("extensions").draw(display);
+        for (int i = 0; i < images.size(); i++) {
+            images.get(i).draw(display);
         }
     }
 
-    public List<Integer> getLayerIndices() {
-        List<Integer> layerIndices = new ArrayList<>();
-        for (int i = 0; i < layers.size(); i++) {
-            Layer layer = layers.get(i);
-            layerIndices.add(layer.getIndex());
-        }
-        Collections.sort(layerIndices);
-        return layerIndices;
-    }
-
-    public List<Layer> getLayers() {
-        return layers;
-    }
+//    public List<Integer> getLayerIndices() {
+//        List<Integer> layerIndices = new ArrayList<>();
+//        for (int i = 0; i < layers.size(); i++) {
+//            Layer layer = layers.get(i);
+//            layerIndices.add(layer.getIndex());
+//        }
+//        Collections.sort(layerIndices);
+//        return layerIndices;
+//    }
+//
+//    public List<Layer> getLayers() {
+//        return layers;
+//    }
 
     private void drawPrototypeExtensionImage(Display display) {
         if (prototypeExtensionVisibility.getValue() == Visibility.Value.VISIBLE) {

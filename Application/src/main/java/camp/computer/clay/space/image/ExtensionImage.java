@@ -13,7 +13,7 @@ import camp.computer.clay.model.interaction.ActionListener;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.space.architecture.Shape;
-import camp.computer.clay.space.architecture.ShapeGroup;
+import camp.computer.clay.space.architecture.util.ShapeGroup;
 import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
@@ -87,7 +87,7 @@ public class ExtensionImage extends PortableImage {
                             Shape portShape = portShapes.get(i);
                             Port port = (Port) portShape.getEntity();
 
-                            List<Path> paths = port.getCompletePath();
+                            List<Path> paths = port.getCompletePaths();
                             for (int j = 0; j < paths.size(); j++) {
                                 Path path = paths.get(j);
 
@@ -210,13 +210,41 @@ public class ExtensionImage extends PortableImage {
                 shapes.get(i).draw(display);
             }
 
-//            if (Launcher.ENABLE_GEOMETRY_LABELS) {
-//                display.getPaint().setColor(Color.GREEN);
-//                display.getPaint().setStyle(Paint.Style.STROKE);
-//                Display.drawCircle(getPosition(), boardShape.getWidth(), 0, display);
-//                Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
-//            }
+            drawConnections(display);
         }
+    }
+
+    private void drawConnections(Display display) {
+
+        // <REFACTOR>
+        // TODO: Move into the Shape.draw() for Port shape
+        // Draw connections to Host
+        ShapeGroup portShapes = getPortShapes();
+        for (int i = 0; i < portShapes.size(); i++) {
+
+            Shape portShape = portShapes.get(i);
+            Port port = (Port) portShape.getEntity();
+
+            // Search for connected Host's Port
+            Port hostPort = null;
+            List<Path> paths = port.getCompletePaths(1);
+            for (int j = 0; j < paths.size(); j++) {
+                hostPort = paths.get(j).getHostPort();
+            }
+
+            // Draw the connection to the Host's Port
+            if (hostPort != null) {
+
+                // Get connect Host's Port shape
+                Shape hostPortShape = space.getShape(hostPort);
+
+                // Draw connection between Ports
+                display.getPaint().setColor(android.graphics.Color.parseColor(Color.getColor(port.getType())));
+                display.getPaint().setStrokeWidth(15.0f);
+                Display.drawLine(portShape.getPosition(), hostPortShape.getPosition(), display);
+            }
+        }
+        // </REFACTOR>
     }
 }
 

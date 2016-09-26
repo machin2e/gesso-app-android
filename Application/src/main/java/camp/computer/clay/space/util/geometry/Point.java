@@ -1,6 +1,9 @@
 package camp.computer.clay.space.util.geometry;
 
 public class Point {
+
+    public static int count = 0;
+
     //
     // TODO: Update to use numbers that can be composed and given dependencies (used in
     // TODO: (cont'd) expressions) and dynamically update expressions. Do animations by giving them
@@ -28,6 +31,9 @@ public class Point {
     // TODO: Refactor so 0 degrees faces upward, not right.
     public Point() {
         this(0, 0);
+
+//        count++;
+//        Log.v("Point", "count: " + count);
     }
 
     /**
@@ -39,11 +45,17 @@ public class Point {
     public Point(Point otherPoint) {
         this.relativeX = otherPoint.relativeX;
         this.relativeY = otherPoint.relativeY;
+
+//        count++;
+//        Log.v("Point", "count: " + count);
     }
 
     public Point(double x, double y) {
         this.relativeX = x;
         this.relativeY = y;
+
+//        count++;
+//        Log.v("Point", "count: " + count);
     }
 
     /**
@@ -57,7 +69,14 @@ public class Point {
         setReferencePoint(referencePoint);
         setRelativeX(x);
         setRelativeY(y);
+
+//        count++;
+//        Log.v("Point", "count: " + count);
     }
+
+//    protected void finalize() throws Throwable {
+//        count--;
+//    }
 
     public Point getReferencePoint() {
         return referencePoint;

@@ -1,4 +1,4 @@
-package camp.computer.clay.space.architecture;
+package camp.computer.clay.space.architecture.util;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.model.architecture.Group;
+import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
@@ -15,15 +16,12 @@ import camp.computer.clay.space.util.geometry.Rectangle;
 /**
  * ShapeGroup is an interface for managing and manipulating sets of elements.
  */
-public class ShapeGroup extends Group<Shape>
-{
+public class ShapeGroup extends Group<Shape> {
 
-    public ShapeGroup()
-    {
+    public ShapeGroup() {
     }
 
-    public ShapeGroup remove(Shape shape)
-    {
+    public ShapeGroup remove(Shape shape) {
         elements.remove(shape);
         return this;
     }
@@ -33,11 +31,9 @@ public class ShapeGroup extends Group<Shape>
      * {@code labels}.
      *
      * @param labels The list of {@code Shape} objects matching the regular expressions list.
-     *
      * @return A list of {@code Shape} objects.
      */
-    public ShapeGroup filterLabel(String... labels)
-    {
+    public ShapeGroup filterLabel(String... labels) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -63,11 +59,9 @@ public class ShapeGroup extends Group<Shape>
      * Removes all elements except those with the specified type.
      *
      * @param entityTypes
-     *
      * @return
      */
-    public <T extends Entity> ShapeGroup filterType(Class<?>... entityTypes)
-    {
+    public <T extends Entity> ShapeGroup filterType(Class<?>... entityTypes) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -83,8 +77,7 @@ public class ShapeGroup extends Group<Shape>
         return shapeGroup;
     }
 
-    public <T extends Entity> ShapeGroup filterEntity(Group<T> entities)
-    {
+    public <T extends Entity> ShapeGroup filterEntity(Group<T> entities) {
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
@@ -98,8 +91,7 @@ public class ShapeGroup extends Group<Shape>
         return shapeGroup;
     }
 
-    public <T extends Entity> ShapeGroup filterEntity(T... entities)
-    {
+    public <T extends Entity> ShapeGroup filterEntity(T... entities) {
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
@@ -118,11 +110,9 @@ public class ShapeGroup extends Group<Shape>
      *
      * @param point
      * @param distance
-     *
      * @return
      */
-    public ShapeGroup filterArea(Point point, double distance)
-    {
+    public ShapeGroup filterArea(Point point, double distance) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -141,8 +131,7 @@ public class ShapeGroup extends Group<Shape>
 
     }
 
-    public ShapeGroup filterContains(Point point)
-    {
+    public ShapeGroup filterContains(Point point) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -156,18 +145,15 @@ public class ShapeGroup extends Group<Shape>
         }
 
         return shapeGroup;
-
     }
 
     /**
      * Filters elements that fall within the area defined by {@code shape}.
      *
      * @param shape The {@code Shape} covering the area to filter.
-     *
      * @return The {@code ShapeGroup} containing the area covered by {@code shape}.
      */
-    public ShapeGroup filterArea(Shape shape)
-    {
+    public ShapeGroup filterArea(Shape shape) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -181,8 +167,7 @@ public class ShapeGroup extends Group<Shape>
         return shapeGroup;
     }
 
-    public ShapeGroup filterVisibility(Visibility visibility)
-    {
+    public ShapeGroup filterVisibility(Visibility visibility) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -197,13 +182,11 @@ public class ShapeGroup extends Group<Shape>
         return shapeGroup;
     }
 
-    public List<Shape> getList()
-    {
+    public List<Shape> getList() {
         return elements;
     }
 
-    public List<Point> getPositions()
-    {
+    public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
@@ -212,8 +195,7 @@ public class ShapeGroup extends Group<Shape>
         return positions;
     }
 
-    public List<Point> getVertices()
-    {
+    public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
@@ -222,24 +204,20 @@ public class ShapeGroup extends Group<Shape>
         return positions;
     }
 
-    public Point getCenterPosition()
-    {
+    public Point getCenterPosition() {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
 
-    public Point getCentroidPosition()
-    {
+    public Point getCentroidPosition() {
         return Geometry.calculateCentroidCoordinate(getPositions());
     }
 
-    public Rectangle getBoundingBox()
-    {
+    public Rectangle getBoundingBox() {
         return Geometry.calculateBoundingBox(getVertices());
     }
 
-    public List<Point> getBoundingShape()
-    {
+    public List<Point> getBoundingShape() {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -247,11 +225,9 @@ public class ShapeGroup extends Group<Shape>
      * Finds and returns the nearest <em>visible</em> <code>Shape</code>.
      *
      * @param position
-     *
      * @return
      */
-    public Shape getNearest(Point position)
-    {
+    public Shape getNearest(Point position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Shape nearestShape = null;
@@ -270,16 +246,14 @@ public class ShapeGroup extends Group<Shape>
         return nearestShape;
     }
 
-    public void setTransparency(double transparency)
-    {
+    public void setTransparency(double transparency) {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             shape.setTransparency(transparency);
         }
     }
 
-    public void setVisibility(Visibility.Value visibility)
-    {
+    public void setVisibility(Visibility.Value visibility) {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             shape.setVisibility(visibility);

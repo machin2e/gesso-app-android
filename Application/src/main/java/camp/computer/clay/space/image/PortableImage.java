@@ -9,8 +9,8 @@ import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.model.architecture.Portable;
 import camp.computer.clay.space.architecture.Image;
-import camp.computer.clay.space.architecture.ImageGroup;
-import camp.computer.clay.space.architecture.ShapeGroup;
+import camp.computer.clay.space.architecture.util.ImageGroup;
+import camp.computer.clay.space.architecture.util.ShapeGroup;
 import camp.computer.clay.space.util.Visibility;
 
 public abstract class PortableImage extends Image<Portable>

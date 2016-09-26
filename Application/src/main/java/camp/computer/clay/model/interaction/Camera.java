@@ -1,7 +1,5 @@
 package camp.computer.clay.model.interaction;
 
-import android.util.Log;
-
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
@@ -12,9 +10,9 @@ import camp.computer.clay.model.architecture.Host;
 import camp.computer.clay.model.architecture.Path;
 import camp.computer.clay.model.architecture.Port;
 import camp.computer.clay.space.architecture.Image;
-import camp.computer.clay.space.architecture.ImageGroup;
-import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.architecture.util.ImageGroup;
+import camp.computer.clay.space.architecture.util.ShapeGroup;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.space.util.Time;
@@ -85,8 +83,8 @@ public class Camera {
 
     private Point originalPosition = new Point();
 
-    public void setPosition(Point targetPosition) {
-        setPosition(targetPosition, positionPeriod);
+    public void setPosition(Point position) {
+        setPosition(position, positionPeriod);
     }
 
     public void setPosition(Point targetPosition, double duration) {
@@ -308,7 +306,7 @@ public class Camera {
 
         /*
         // Show the ports in the path
-        List<Path> portPaths = getCamera().getSpace().getEntity().getCompletePath(port);
+        List<Path> portPaths = getCamera().getSpace().getEntity().getCompletePaths(port);
         List<Port> portConnections = getCamera().getSpace().getEntity().getPorts(portPaths);
         for (Port portConnection: portConnections) {
             PortImage portFigureConnection = (PortImage) getCamera().getSpace().getImage(portConnection);
@@ -339,28 +337,23 @@ public class Camera {
 
             HostImage hostImage = (HostImage) event.getTargetImage();
 
-            // Remove focus from other form
-            ImageGroup otherHostImages = getSpace().getImages().filterType(Host.class, Extension.class).remove(hostImage);
-            for (int i = 0; i < otherHostImages.size(); i++) {
-                Image otherHostImage = otherHostImages.get(i);
-//                image.hidePortShapes();
-//                image.hidePathImages();
-                otherHostImage.setTransparency(0.1f);
-//                TODO: Set <Rectangle> for Host; remove <Entity> from Image
-            }
+            // Reduce transparency of other all Portables (not electrically connected to the Host)
+            ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class).remove(hostImage);
+            otherPortableImages.setTransparency(0.1);
 
+            // Get the previous Action
             Action previousAction = null;
             if (actor.actions.size() > 1) {
                 previousAction = actor.actions.get(actor.actions.size() - 2);
-                Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
-                Log.v("PreviousTouch", "Current: " + event.getTargetImage());
+//                Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
+//                Log.v("PreviousTouch", "Current: " + event.getTargetImage());
             }
 
             // Camera
             if (hostImage.getHost().getPaths().size() > 0
                     && (previousAction != null && previousAction.getFirstEvent().getTargetImage() != event.getTargetImage())) {
 
-                Log.v("Touch_", "A");
+//                Log.v("Touch_", "A");
 
 //                for (PortImage portImage : baseImage.getPortShapes()) {
 //                    List<PathImage> pathImages = portImage.getPathImages();
@@ -369,32 +362,32 @@ public class Camera {
 //                    }
 //                }
 
-                // Get ports along every path connected to the ports on the touched form
-                Group<Port> formPathPorts = new Group<>();
+                // Get ports along every Path connected to the Ports on the touched Host
+                Group<Port> basePathPorts = new Group<>();
                 Group<Port> hostPorts = hostImage.getHost().getPorts();
                 for (int i = 0; i < hostPorts.size(); i++) {
                     Port port = hostPorts.get(i);
 
                     // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
 
-                    if (!formPathPorts.contains(port)) {
-                        formPathPorts.add(port);
+                    if (!basePathPorts.contains(port)) {
+                        basePathPorts.add(port);
                     }
 
-                    List<Path> portPaths = port.getCompletePath();
+                    List<Path> portPaths = port.getCompletePaths();
                     for (int i1 = 0; i1 < portPaths.size(); i1++) {
                         Path path = portPaths.get(i1);
-                        if (!formPathPorts.contains(path.getSource())) {
-                            formPathPorts.add(path.getSource());
+                        if (!basePathPorts.contains(path.getSource())) {
+                            basePathPorts.add(path.getSource());
                         }
-                        if (!formPathPorts.contains(path.getTarget())) {
-                            formPathPorts.add(path.getTarget());
+                        if (!basePathPorts.contains(path.getTarget())) {
+                            basePathPorts.add(path.getTarget());
                         }
                     }
                 }
 
                 // Camera
-                ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(formPathPorts);
+                ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
                 Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
 
                 adjustScale(boundingBox);
@@ -402,7 +395,7 @@ public class Camera {
 
             } else {
 
-                Log.v("Touch_", "B");
+//                Log.v("Touch_", "B");
 
                 // Do this on second press, or when none of the machine's ports have paths.
                 // This provides lookahead, so you can be triggered to processAction again to recover
@@ -428,7 +421,7 @@ public class Camera {
     public void focusSelectPath(Port port) {
 
         // Camera
-        List<Path> paths = port.getCompletePath();
+        List<Path> paths = port.getCompletePaths();
         Group<Port> ports = port.getPorts(paths);
         ShapeGroup shapes = getSpace().getShapes(ports);
 

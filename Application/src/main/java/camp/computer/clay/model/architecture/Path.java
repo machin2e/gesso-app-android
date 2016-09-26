@@ -91,6 +91,33 @@ public class Path extends Entity {
         return this.target;
     }
 
+    public Host getHost() {
+        if (getSource().getPortable().getClass() == Extension.class) {
+            return (Host) getTarget().getPortable();
+        } else if (getTarget().getPortable().getClass() == Extension.class) {
+            return (Host) getSource().getPortable();
+        }
+        return null;
+    }
+
+    public Extension getExtension() {
+        if (getSource().getPortable().getClass() == Host.class) {
+            return (Extension) getTarget().getPortable();
+        } else if (getTarget().getPortable().getClass() == Host.class) {
+            return (Extension) getSource().getPortable();
+        }
+        return null;
+    }
+
+    public Port getHostPort() {
+        if (getSource().getPortable().getClass() == Host.class) {
+            return getSource();
+        } else if (getTarget().getPortable().getClass() == Host.class) {
+            return getTarget();
+        }
+        return null;
+    }
+
     public boolean contains(Port port) {
         if (this.source == port || this.target == port) {
             return true;

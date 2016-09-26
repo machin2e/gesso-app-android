@@ -4,12 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
-import camp.computer.clay.model.interaction.*;
-import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.interaction.Action;
+import camp.computer.clay.model.interaction.Camera;
+import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.space.architecture.Image;
-import camp.computer.clay.space.architecture.Space;
 import camp.computer.clay.space.architecture.Shape;
+import camp.computer.clay.space.architecture.Space;
 
 /**
  * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,

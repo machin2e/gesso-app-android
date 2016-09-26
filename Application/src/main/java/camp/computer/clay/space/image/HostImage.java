@@ -22,10 +22,10 @@ import camp.computer.clay.model.interaction.Camera;
 import camp.computer.clay.model.interaction.Event;
 import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.space.architecture.Image;
-import camp.computer.clay.space.architecture.ImageGroup;
 import camp.computer.clay.space.architecture.Shape;
-import camp.computer.clay.space.architecture.ShapeGroup;
 import camp.computer.clay.space.architecture.Space;
+import camp.computer.clay.space.architecture.util.ImageGroup;
+import camp.computer.clay.space.architecture.util.ShapeGroup;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Circle;
 import camp.computer.clay.space.util.geometry.Geometry;
@@ -425,7 +425,7 @@ public class HostImage extends PortableImage {
 
                                                 // Show ports and paths of touched form
                                                 for (int i = 0; i < getHost().getPorts().size(); i++) {
-                                                    List<Path> paths = getHost().getPort(i).getCompletePath();
+                                                    List<Path> paths = getHost().getPort(i).getCompletePaths();
 
                                                     for (int j = 0; j < paths.size(); j++) {
                                                         Path path = paths.get(j);
@@ -452,6 +452,10 @@ public class HostImage extends PortableImage {
 
                                                 // Camera
                                                 camera.focusSelectHost(event);
+
+                                                if (getHost().getExtensions().size() > 0) {
+                                                    space.getImages(getHost().getExtensions()).setTransparency(1.0);
+                                                }
 
                                             } else {
 
@@ -700,7 +704,7 @@ public class HostImage extends PortableImage {
                                                             setPathVisibility(port, Visibility.Value.VISIBLE);
                                                             setDockVisibility(port, Visibility.Value.INVISIBLE);
 
-                                                            List<Path> paths = port.getCompletePath();
+                                                            List<Path> paths = port.getCompletePaths();
                                                             for (int i = 0; i < paths.size(); i++) {
                                                                 Path path = paths.get(i);
 
@@ -843,7 +847,7 @@ public class HostImage extends PortableImage {
                                                                 hostImage.setDockVisibility(Visibility.Value.VISIBLE);
                                                             }
 
-                                                            List<Path> paths = sourcePort.getCompletePath();
+                                                            List<Path> paths = sourcePort.getCompletePaths();
                                                             for (int i = 0; i < paths.size(); i++) {
                                                                 Path connectedPath = paths.get(i);
 
@@ -888,8 +892,8 @@ public class HostImage extends PortableImage {
                                                     // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
 
                                                     // Create Ports and add them to the Extension
-                                                    int portCount = 1;
-                                                    for (int j = 0; j < portCount; j++) {
+                                                    int defaultPortCount = 1;
+                                                    for (int j = 0; j < defaultPortCount; j++) {
                                                         extension.addPort(new Port());
                                                     }
 
@@ -984,7 +988,7 @@ public class HostImage extends PortableImage {
                                                         hostImage.setDockVisibility(Visibility.Value.VISIBLE);
                                                     }
 
-                                                    List<Path> paths = hostPort.getCompletePath();
+                                                    List<Path> paths = hostPort.getCompletePaths();
                                                     for (int i = 0; i < paths.size(); i++) {
                                                         Path connectedPath = paths.get(i);
 

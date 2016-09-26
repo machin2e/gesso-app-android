@@ -69,6 +69,14 @@ public class Action {
         }
     }
 
+//    // TODO: getPreviousAction()
+//    Action previousAction = null;
+//    if (.actions.size() > 1) {
+//        previousAction = actor.actions.get(actor.actions.size() - 2);
+//        Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
+//        Log.v("PreviousTouch", "Current: " + event.getTargetImage());
+//    }
+
     public void addEvent(Event event) {
 
         event.setAction(this);

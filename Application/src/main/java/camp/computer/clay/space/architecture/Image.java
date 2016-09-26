@@ -12,6 +12,7 @@ import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.model.architecture.Group;
 import camp.computer.clay.model.interaction.Action;
 import camp.computer.clay.model.interaction.ActionListener;
+import camp.computer.clay.space.architecture.util.ShapeGroup;
 import camp.computer.clay.space.util.Color;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;

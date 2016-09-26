@@ -1,10 +1,12 @@
-package camp.computer.clay.space.architecture;
+package camp.computer.clay.space.architecture.util;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.model.architecture.Entity;
 import camp.computer.clay.model.architecture.Group;
+import camp.computer.clay.space.architecture.Image;
+import camp.computer.clay.space.architecture.Shape;
 import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.space.util.geometry.Geometry;
 import camp.computer.clay.space.util.geometry.Point;
@@ -15,13 +17,11 @@ import camp.computer.clay.space.util.geometry.Rectangle;
  */
 public class ImageGroup extends Group<Image> {
 
-    public ImageGroup()
-    {
+    public ImageGroup() {
     }
 
     // TODO: Move this into the Group base class
-    public ImageGroup remove(Image image)
-    {
+    public ImageGroup remove(Image image) {
         elements.remove(image);
         return this;
     }
@@ -32,8 +32,7 @@ public class ImageGroup extends Group<Image> {
      * @param entityTypes
      * @return
      */
-    public <T extends Entity> ImageGroup filterType(Class<?>... entityTypes)
-    {
+    public <T extends Entity> ImageGroup filterType(Class<?>... entityTypes) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -49,8 +48,7 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public <T extends Entity> ImageGroup filterEntity(List<T> entities)
-    {
+    public <T extends Entity> ImageGroup filterEntity(Group<T> entities) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -65,6 +63,37 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
+    public <T extends Entity> ImageGroup filterEntity(T... entities) {
+
+        ImageGroup imageGroup = new ImageGroup();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+            for (int j = 0; j < entities.length; j++) {
+                if (this.elements.get(i).getEntity() != null && this.elements.get(i).getEntity() == entities[j]) {
+                    imageGroup.add(this.elements.get(i));
+                }
+            }
+        }
+
+        return imageGroup;
+    }
+
+    public ImageGroup filterContains(Point point) {
+
+        ImageGroup imageGroup = new ImageGroup();
+
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
+
+            if (image.contains(point)) {
+                imageGroup.add(image);
+            }
+
+        }
+
+        return imageGroup;
+    }
+
     /**
      * Filters elements to those that are within the specified distance from the specified point.
      *
@@ -72,8 +101,7 @@ public class ImageGroup extends Group<Image> {
      * @param distance
      * @return
      */
-    public ImageGroup filterArea(Point point, double distance)
-    {
+    public ImageGroup filterArea(Point point, double distance) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -99,8 +127,7 @@ public class ImageGroup extends Group<Image> {
      * @param shape The {@code Shape} covering the area to filter.
      * @return The {@code ImageGroup} containing the area covered by {@code shape}.
      */
-    public ImageGroup filterArea(Shape shape)
-    {
+    public ImageGroup filterArea(Shape shape) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -114,8 +141,7 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public ImageGroup filterVisibility(Visibility.Value visibility)
-    {
+    public ImageGroup filterVisibility(Visibility.Value visibility) {
 
         ImageGroup imageGroup = new ImageGroup();
 
@@ -130,13 +156,11 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public List<Image> getList()
-    {
+    public List<Image> getList() {
         return elements;
     }
 
-    public List<Point> getPositions()
-    {
+    public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
@@ -145,8 +169,7 @@ public class ImageGroup extends Group<Image> {
         return positions;
     }
 
-    public List<Point> getVertices()
-    {
+    public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
@@ -156,8 +179,7 @@ public class ImageGroup extends Group<Image> {
         return positions;
     }
 
-    public ShapeGroup getShapes()
-    {
+    public ShapeGroup getShapes() {
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
@@ -167,23 +189,19 @@ public class ImageGroup extends Group<Image> {
         return shapeGroup;
     }
 
-    public Point getCenterPoint()
-    {
+    public Point getCenterPoint() {
         return Geometry.calculateCenterPosition(getPositions());
     }
 
-    public Point getCentroidPoint()
-    {
+    public Point getCentroidPoint() {
         return Geometry.calculateCentroidCoordinate(getPositions());
     }
 
-    public Rectangle getBoundingBox()
-    {
+    public Rectangle getBoundingBox() {
         return Geometry.calculateBoundingBox(getVertices());
     }
 
-    public List<Point> getBoundingShape()
-    {
+    public List<Point> getBoundingShape() {
         return Geometry.computeConvexHull(getPositions());
     }
 
@@ -193,8 +211,7 @@ public class ImageGroup extends Group<Image> {
      * @param position
      * @return
      */
-    public Image getNearest(Point position)
-    {
+    public Image getNearest(Point position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;
@@ -213,16 +230,14 @@ public class ImageGroup extends Group<Image> {
         return nearestImage;
     }
 
-    public void setTransparency(double transparency)
-    {
+    public void setTransparency(double transparency) {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
             image.setTransparency(transparency);
         }
     }
 
-    public void setVisibility(Visibility.Value visibility)
-    {
+    public void setVisibility(Visibility.Value visibility) {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
             image.setVisibility(visibility);
