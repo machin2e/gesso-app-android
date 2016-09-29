@@ -29,19 +29,19 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 
-import camp.computer.clay.application.communication.RedisSub.RedisSubThread;
+import camp.computer.clay.Clay;
+import camp.computer.clay.application.communication.UDPHost;
+import camp.computer.clay.application.communication.redis.RedisSubThread;
+import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
-import camp.computer.clay.application.ui.Prompt;
-import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.system.Clay;
-import camp.computer.clay.system.host.DisplayHostInterface;
-import camp.computer.clay.system.host.NetworkResource;
-import camp.computer.clay.system.host.SQLiteStoreHost;
-import camp.computer.clay.system.host.UDPHost;
-import camp.computer.clay.system.old_model.Host;
+import camp.computer.clay.application.storage.SQLiteStoreHost;
+import camp.computer.clay.model.action.Event;
+import camp.computer.clay.old_model.PhoneHost;
+import camp.computer.clay.host.DisplayHostInterface;
+import camp.computer.clay.host.NetworkResource;
 import redis.clients.jedis.Jedis;
 
 public class Launcher extends FragmentActivity implements DisplayHostInterface { // was Launcher
@@ -77,7 +77,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
     private Clay clay;
 
-    private UDPHost UDPHost;
+    private camp.computer.clay.application.communication.UDPHost UDPHost;
 
     private NetworkResource networkResource;
 
@@ -567,9 +567,9 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         messageKeyboardLayout.invalidate();
     }
 
-    public camp.computer.clay.space.util.geometry.Point convertToVisiblePosition(Point point)
+    public camp.computer.clay.util.geometry.Point convertToVisiblePosition(Point point)
     {
-        camp.computer.clay.space.util.geometry.Point visiblePosition = new camp.computer.clay.space.util.geometry.Point();
+        camp.computer.clay.util.geometry.Point visiblePosition = new camp.computer.clay.util.geometry.Point();
         return visiblePosition;
     }
 
@@ -873,13 +873,13 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     }
 
     @Override
-    public void addDeviceView(Host host)
+    public void addDeviceView(PhoneHost phoneHost)
     {
 
     }
 
     @Override
-    public void refreshListViewFromData(Host host)
+    public void refreshListViewFromData(PhoneHost phoneHost)
     {
         // TODO: Update the view to reflect the latest state of the object entity
     }

@@ -3,16 +3,16 @@ package camp.computer.clay.space.image;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Path;
-import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Event;
-import camp.computer.clay.space.architecture.Image;
-import camp.computer.clay.space.architecture.Shape;
+import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.model.Path;
+import camp.computer.clay.model.action.Action;
+import camp.computer.clay.model.action.ActionListener;
+import camp.computer.clay.model.action.Event;
+import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.space.util.Visibility;
-import camp.computer.clay.space.util.geometry.Geometry;
-import camp.computer.clay.space.util.geometry.Point;
+import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Point;
 
 public class PathImage extends Image<Path> {
 

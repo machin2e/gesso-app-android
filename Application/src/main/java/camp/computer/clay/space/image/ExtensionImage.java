@@ -3,21 +3,22 @@ package camp.computer.clay.space.image;
 import java.util.List;
 
 import camp.computer.clay.application.Launcher;
-import camp.computer.clay.application.ui.Prompt;
-import camp.computer.clay.application.visual.Display;
-import camp.computer.clay.model.architecture.Extension;
-import camp.computer.clay.model.architecture.Path;
-import camp.computer.clay.model.architecture.Port;
-import camp.computer.clay.model.interaction.Action;
-import camp.computer.clay.model.interaction.ActionListener;
-import camp.computer.clay.model.interaction.Event;
+import camp.computer.clay.application.graphics.controls.Prompt;
+import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.model.Extension;
+import camp.computer.clay.model.Path;
+import camp.computer.clay.model.Port;
+import camp.computer.clay.model.action.Action;
+import camp.computer.clay.model.action.ActionListener;
+import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.PortableProfile;
-import camp.computer.clay.space.architecture.Shape;
-import camp.computer.clay.space.architecture.util.ShapeGroup;
-import camp.computer.clay.space.util.Color;
+import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.space.util.Visibility;
-import camp.computer.clay.space.util.geometry.Circle;
-import camp.computer.clay.space.util.geometry.Rectangle;
+import camp.computer.clay.util.Color;
+import camp.computer.clay.util.geometry.Circle;
+import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.geometry.Rectangle;
 
 public class ExtensionImage extends PortableImage {
 
@@ -87,7 +88,7 @@ public class ExtensionImage extends PortableImage {
                             Shape portShape = portShapes.get(i);
                             Port port = (Port) portShape.getEntity();
 
-                            List<Path> paths = port.getCompletePaths();
+                            List<Path> paths = port.getPaths();
                             for (int j = 0; j < paths.size(); j++) {
                                 Path path = paths.get(j);
 
@@ -176,9 +177,12 @@ public class ExtensionImage extends PortableImage {
         // Reference: http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
         double pixelsPerMillimeter = 6;
         double headerWidth = pixelsPerMillimeter * (2.54 * getPortable().getPorts().size() + 0.6); // +-0.6
-        ((Rectangle) getShape("Header")).setWidth(headerWidth);
+
+        Rectangle header = ((Rectangle) getShape("Header"));
+        header.setWidth(headerWidth);
 
         // TODO: Update Port positions based on the number of ports
+
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
             Port port = getPortable().getPorts().get(i);
             Shape portShape = getShape(port);
@@ -189,6 +193,17 @@ public class ExtensionImage extends PortableImage {
                 portShape.getPosition().setRelativeX(x);
                 // TODO: Also update relativeY coordinate
             }
+
+            // Calculate Port connector positions
+            if (portInterfacePositions.size() > i) {
+//                portInterfacePositions.add(new Point(-20, 132, position));
+                double connectionX = pixelsPerMillimeter * (2.54 * i + 0.6);
+                portInterfacePositions.get(i).setRelativeX(connectionX);
+            } else {
+                double connectionX = pixelsPerMillimeter * (2.54 * i + 0.6);
+                portInterfacePositions.add(new Point(connectionX, 107, position));
+            }
+
         }
 
         // Update Port style
@@ -218,30 +233,43 @@ public class ExtensionImage extends PortableImage {
 
         // <REFACTOR>
         // TODO: Move into the Shape.draw() for Port shape
-        // Draw connections to Host
+        // Draw connections to PhoneHost
         ShapeGroup portShapes = getPortShapes();
         for (int i = 0; i < portShapes.size(); i++) {
 
             Shape portShape = portShapes.get(i);
             Port port = (Port) portShape.getEntity();
 
-            // Search for connected Host's Port
+            // Search for connected PhoneHost's Port
             Port hostPort = null;
-            List<Path> paths = port.getCompletePaths(1);
+            List<Path> paths = port.getPaths(1);
+            int hostPortIndex = -1;
             for (int j = 0; j < paths.size(); j++) {
                 hostPort = paths.get(j).getHostPort();
             }
 
-            // Draw the connection to the Host's Port
+            // Draw the connection to the PhoneHost's Port
             if (hostPort != null) {
 
-                // Get connect Host's Port shape
+                // <HACK>
+                hostPortIndex = hostPort.getPortable().getPorts().indexOf(hostPort);
+                int extensionPortIndex = getPortable().getPorts().indexOf(port);
+                // </HACK>
+
+                // Get connect PhoneHost's Port shape
                 Shape hostPortShape = space.getShape(hostPort);
+
+                HostImage hostImage = (HostImage) space.getImage(hostPort.getPortable());
+
+                Point extensionPortConnectorPosition = portInterfacePositions.get(extensionPortIndex);
+                Point hostPortConnectorPosition = hostImage.portInterfacePositions.get(hostPortIndex);
 
                 // Draw connection between Ports
                 display.getPaint().setColor(android.graphics.Color.parseColor(Color.getColor(port.getType())));
                 display.getPaint().setStrokeWidth(15.0f);
-                Display.drawLine(portShape.getPosition(), hostPortShape.getPosition(), display);
+                //Display.drawLine(portShape.getPosition(), hostPortShape.getPosition(), display);
+//                Display.drawLine(portShape.getPosition(), hostPortConnectorPosition, display);
+                Display.drawLine(extensionPortConnectorPosition, hostPortConnectorPosition, display);
             }
         }
         // </REFACTOR>
