@@ -3,24 +3,24 @@ package camp.computer.clay.old_model;
 import java.util.ArrayList;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.host.NetworkResourceInterface;
+import camp.computer.clay.host.InternetInterface;
 
-public class NetworkHost {
+public class Internet {
 
     private Clay clay;
 
-    private ArrayList<NetworkResourceInterface> networkResources;
+    private ArrayList<InternetInterface> networkResources;
 
     // TODO: Combine incoming and outgoing message queues into a single queue.
-    private ArrayList<Message> incomingMessages = new ArrayList<Message>(); // Create incoming message queue.
-    private ArrayList<Message> outgoingMessages = new ArrayList<Message>(); // Create outgoing message queue.
+    private ArrayList<Message> incomingMessages = new ArrayList<>(); // Create incoming message queue.
+    private ArrayList<Message> outgoingMessages = new ArrayList<>(); // Create outgoing message queue.
 
-    public NetworkHost(Clay clay) {
-        this.networkResources = new ArrayList<NetworkResourceInterface>();
+    public Internet(Clay clay) {
+        this.networkResources = new ArrayList<>();
         this.clay = clay;
     }
 
-    public void addHost(NetworkResourceInterface resource) {
+    public void addHost(InternetInterface resource) {
         if (!this.networkResources.contains(resource)) {
             this.networkResources.add(resource);
             resource.addHost(this);

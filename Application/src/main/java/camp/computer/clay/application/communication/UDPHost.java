@@ -10,13 +10,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import camp.computer.clay.application.Launcher;
-import camp.computer.clay.old_model.MessageHost;
-import camp.computer.clay.host.MessageHostInterface;
+import camp.computer.clay.application.Application;
+import camp.computer.clay.host.MessengerInterface;
 import camp.computer.clay.host.util.CRC16;
 import camp.computer.clay.old_model.Message;
+import camp.computer.clay.old_model.Messenger;
 
-public class UDPHost extends Thread implements MessageHostInterface {
+public class UDPHost extends Thread implements MessengerInterface {
 
     private static final int MAX_UDP_DATAGRAM_LEN = 1500;
 
@@ -31,7 +31,7 @@ public class UDPHost extends Thread implements MessageHostInterface {
 
     private boolean isRunning = true;
 
-    private MessageHost messageHost;
+    private Messenger messenger;
 
     private String type;
 
@@ -39,17 +39,17 @@ public class UDPHost extends Thread implements MessageHostInterface {
         this.type = type;
     }
 
-    public void engage(MessageHost messageHost) {
-        this.messageHost = messageHost;
+    public void addMessenger(Messenger messenger) {
+        this.messenger = messenger;
     }
 
-    public MessageHost getMessageHost() {
-        return this.messageHost;
+    public Messenger getMessenger() {
+        return this.messenger;
     }
 
-    public void disengage(MessageHost messageHost) {
-        if (this.messageHost == messageHost) {
-            this.messageHost = null;
+    public void removeMessenger(Messenger messenger) {
+        if (this.messenger == messenger) {
+            this.messenger = null;
         }
     }
 
@@ -62,7 +62,7 @@ public class UDPHost extends Thread implements MessageHostInterface {
     }
 
     public void process(Message message) {
-        if (messageHost != null) {
+        if (messenger != null) {
             if (message.getType().equals(this.getType())) {
                 processMessage(message);
             }
@@ -122,8 +122,8 @@ public class UDPHost extends Thread implements MessageHostInterface {
                         Message incomingMessage = new Message("udp", source, null, incomingMessageContent);
 
                         // ...then pass the message to the message manager running in the main thread.
-                        if (messageHost != null) {
-                            messageHost.send(incomingMessage);
+                        if (messenger != null) {
+                            messenger.send(incomingMessage);
                         }
                     }
                 }
@@ -155,7 +155,7 @@ public class UDPHost extends Thread implements MessageHostInterface {
 
         // Acquire a multicast lock to enable receiving broadcast packets
         if (multicastLock == null) {
-            WifiManager wm = (WifiManager) Launcher.getContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wm = (WifiManager) Application.getContext().getSystemService(Context.WIFI_SERVICE);
             multicastLock = wm.createMulticastLock("mydebuginfo");
             multicastLock.acquire();
         }

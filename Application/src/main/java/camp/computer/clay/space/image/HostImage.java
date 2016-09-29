@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.model.Extension;
@@ -479,7 +479,7 @@ public class HostImage extends PortableImage {
                                                 space.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
 
                                                 // Get cached extension profiles (and retrieve additional from Internet store)
-                                                List<PortableProfile> portableProfiles = Launcher.getView().getClay().getPortableProfiles();
+                                                List<PortableProfile> portableProfiles = Application.getView().getClay().getPortableProfiles();
 
 
                                                 if (portableProfiles.size() == 0) {
@@ -490,7 +490,7 @@ public class HostImage extends PortableImage {
 
                                                     // Prompt User to select an Extension from the Store
                                                     // i.e., Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
-                                                    Launcher.getView().getActionPrompts().promptSelection(portableProfiles, new Prompt.OnActionListener<PortableProfile>() {
+                                                    Application.getView().getActionPrompts().promptSelection(portableProfiles, new Prompt.OnActionListener<PortableProfile>() {
                                                         @Override
                                                         public void onComplete(PortableProfile portableProfile) {
                                                             Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
@@ -625,7 +625,7 @@ public class HostImage extends PortableImage {
 
                                                         }
                                                     });
-                                                    // Launcher.getView().promptTasks();
+                                                    // Application.getView().promptTasks();
                                                 }
                                             }
 
@@ -1068,7 +1068,7 @@ public class HostImage extends PortableImage {
             }
 
             // Labels
-            if (Launcher.ENABLE_GEOMETRY_LABELS) {
+            if (Application.ENABLE_GEOMETRY_LABELS) {
                 display.getPaint().setColor(Color.GREEN);
                 display.getPaint().setStyle(Paint.Style.STROKE);
                 Rectangle boardShape = (Rectangle) getShape("Board");

@@ -8,7 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Extension;
@@ -69,7 +69,7 @@ public class Space extends Image<Model> {
 
                 } else if (lastEvent.getType() == Event.Type.HOLD) {
                     // Select patch to connect
-//                    Launcher.getView().promptSelection();
+//                    Application.getView().promptSelection();
 
                 } else if (lastEvent.getType() == Event.Type.MOVE) {
 //                    if (action.isHolding()) {
@@ -342,7 +342,7 @@ public class Space extends Image<Model> {
     @Override
     public void draw(Display display) {
         // <DEBUG_LABEL>
-        if (Launcher.ENABLE_GEOMETRY_LABELS) {
+        if (Application.ENABLE_GEOMETRY_LABELS) {
             // <AXES_LABEL>
             display.getPaint().setColor(Color.CYAN);
             display.getPaint().setStrokeWidth(1.0f);
@@ -362,7 +362,7 @@ public class Space extends Image<Model> {
         drawPrototypeExtension(display);
 
         // <DEBUG_LABEL>
-        if (Launcher.ENABLE_GEOMETRY_LABELS) {
+        if (Application.ENABLE_GEOMETRY_LABELS) {
 
             // <FPS_LABEL>
             Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();

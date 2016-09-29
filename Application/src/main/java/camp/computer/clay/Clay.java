@@ -9,25 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.application.Launcher;
-import camp.computer.clay.host.Cache;
+import camp.computer.clay.application.Application;
+import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.host.DisplayHostInterface;
-import camp.computer.clay.host.MessageHostInterface;
-import camp.computer.clay.host.NetworkResourceInterface;
+import camp.computer.clay.host.MessengerInterface;
+import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.profile.PortableProfile;
-import camp.computer.clay.old_model.MessageHost;
-import camp.computer.clay.old_model.NetworkHost;
+import camp.computer.clay.old_model.Messenger;
+import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.util.image.Space;
 
 public class Clay {
 
-    private MessageHost messageHost = null;
+    private Messenger messenger = null;
 
-    private NetworkHost networkHost = null;
+    private Internet internet = null;
 
     private Cache cache = null;
 
@@ -51,9 +51,9 @@ public class Clay {
 
         this.cache = new Cache(this); // Set up cache
 
-        this.messageHost = new MessageHost(this); // Start the messaging systems
+        this.messenger = new Messenger(this); // Start the messaging systems
 
-        this.networkHost = new NetworkHost(this); // Start the networking systems
+        this.internet = new Internet(this); // Start the networking systems
 
         // Model
         this.model = new Model();
@@ -70,7 +70,7 @@ public class Clay {
         // Add actor to model
         model.addActor(actor);
 
-        Launcher.getView().getDisplay().setSpace(space);
+        Application.getView().getDisplay().setSpace(space);
 
         // <TEST>
         simulateHost();
@@ -140,12 +140,12 @@ public class Clay {
      * Clay's essential operating system functions.
      */
 
-    public void addHost(MessageHostInterface messageManager) {
-        this.messageHost.addHost(messageManager);
+    public void addHost(MessengerInterface messageManager) {
+        this.messenger.addHost(messageManager);
     }
 
-    public void addResource(NetworkResourceInterface networkResource) {
-        this.networkHost.addHost(networkResource);
+    public void addResource(InternetInterface networkResource) {
+        this.internet.addHost(networkResource);
     }
 
     /**
@@ -194,12 +194,12 @@ public class Clay {
     }
 
     public boolean hasNetworkHost() {
-        return this.networkHost != null;
+        return this.internet != null;
     }
 
     // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
     public String getInternetAddress() {
-        Context context = Launcher.getContext();
+        Context context = Application.getContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
         Log.v("Clay", "Internet address: " + ip);
@@ -262,16 +262,16 @@ public class Clay {
         String deviceTag = "";
         if (phoneHost.getUuid().toString().equals("001affff-ffff-ffff-4e45-3158200a0027")) {
             deviceTag = "bender";
-            Launcher.getView().getSpeechOutput().speakPhrase("bender");
+            Application.getView().getSpeechOutput().speakPhrase("bender");
         } else if (phoneHost.getUuid().toString().equals("002effff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "kitt";
-            Launcher.getView().getSpeechOutput().speakPhrase("kitt");
+            Application.getView().getSpeechOutput().speakPhrase("kitt");
         } else if (phoneHost.getUuid().toString().equals("002fffff-ffff-ffff-4e45-3158200a0015")) {
             deviceTag = "gerty";
-            Launcher.getView().getSpeechOutput().speakPhrase("gerty");
+            Application.getView().getSpeechOutput().speakPhrase("gerty");
         } else if (phoneHost.getUuid().toString().equals("0027ffff-ffff-ffff-4e45-36932003000a")) {
             deviceTag = "hal";
-            Launcher.getView().getSpeechOutput().speakPhrase("hal");
+            Application.getView().getSpeechOutput().speakPhrase("hal");
         }
 
         phoneHost.setTag(deviceTag);
@@ -532,6 +532,6 @@ public class Clay {
      * Cycle through routine operations.
      */
     public void step() {
-        messageHost.processMessage();
+        messenger.processMessage();
     }
 }

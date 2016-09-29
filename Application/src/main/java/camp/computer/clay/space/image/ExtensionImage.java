@@ -2,7 +2,7 @@ package camp.computer.clay.space.image;
 
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Extension;
@@ -112,7 +112,7 @@ public class ExtensionImage extends PortableImage {
         if (!getExtension().hasProfile()) {
 
             // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
-            Launcher.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
+            Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
                     // Create Extension Profile
@@ -123,7 +123,7 @@ public class ExtensionImage extends PortableImage {
                     getExtension().setProfile(portableProfile);
 
                     // Cache the new Extension Profile
-                    Launcher.getView().getClay().getPortableProfiles().add(portableProfile);
+                    Application.getView().getClay().getPortableProfiles().add(portableProfile);
 
                     // TODO: Persist the profile in the user's private store (either local or online)
 
@@ -131,7 +131,7 @@ public class ExtensionImage extends PortableImage {
                 }
             });
         } else {
-            Launcher.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener() {
+            Application.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener() {
                 @Override
                 public void onComplete(Object result) {
 

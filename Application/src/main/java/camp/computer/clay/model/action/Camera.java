@@ -2,7 +2,7 @@ package camp.computer.clay.model.action;
 
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Extension;
 import camp.computer.clay.model.Group;
@@ -120,7 +120,7 @@ public class Camera {
             // <PLAN_ANIMATION>
             originalPosition.set(position);
 
-            positionFrameLimit = (int) (Launcher.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
+            positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             positionFrameIndex = 0;
             // </PLAN_ANIMATION>
@@ -144,7 +144,7 @@ public class Camera {
         if (duration == 0) {
             this.scale = scale;
         } else {
-            double frameCount = Launcher.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
+            double frameCount = Application.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             scaleDelta = Math.abs(scale - this.scale) / frameCount;
         }

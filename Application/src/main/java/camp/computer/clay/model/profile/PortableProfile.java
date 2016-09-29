@@ -14,6 +14,8 @@ public class PortableProfile {
 
     private List<PortProfile> portProfiles = new ArrayList<>();
 
+    // TODO: Add geometry points or UUID to Image
+
     public PortableProfile() {
     }
 

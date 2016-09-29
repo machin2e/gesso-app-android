@@ -6,8 +6,8 @@ do
   do
   echo "Installatroning $APKLIST on $SERIAL"
   # adb -s $SERIAL -d install -r $APKLIST
-  # adb shell am start -n computer.camp.clay.designer/camp.computer.clay.application.Launcher
-  adb -s $SERIAL shell am start -n computer.camp.clay.designer/camp.computer.clay.application.Launcher
+  # adb shell am start -n computer.camp.clay.designer/camp.computer.clay.application.Application
+  adb -s $SERIAL shell am start -n computer.camp.clay.designer/camp.computer.clay.application.Application
   done
 
   # for MP4LIST in $(ls *.mp4);

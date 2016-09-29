@@ -14,17 +14,17 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.model.profile.PortableProfile;
 
 public class Prompt
 {
 
-    private Launcher launcher = null;
+    private Application application = null;
 
-    public Prompt(Launcher launcher)
+    public Prompt(Application application)
     {
-        this.launcher = launcher;
+        this.application = application;
     }
 
     // TODO: Replace OnActionListener with Action?
@@ -35,7 +35,7 @@ public class Prompt
 
     public void promptAcknowledgment(final OnActionListener onActionListener)
     {
-        new AlertDialog.Builder(launcher.getView())
+        new AlertDialog.Builder(application.getView())
                 .setTitle("Notice")
                 .setMessage("The extension already has a profile.")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
@@ -59,11 +59,11 @@ public class Prompt
 
     public void promptInputText(final OnActionListener onActionListener)
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(launcher.getView());
+        AlertDialog.Builder builder = new AlertDialog.Builder(application.getView());
         builder.setTitle("Create Extension");
 
         // Set up the input
-        final EditText input = new EditText(launcher.getView());
+        final EditText input = new EditText(application.getView());
 
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -106,13 +106,13 @@ public class Prompt
 //        options.add("Ultrasonic Rangefinder");
 //        options.add("Stepper Motor");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Select a patch to connect:");
 
         // Add data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                launcher.getView(),
+                application.getView(),
                 android.R.layout.select_dialog_item
         );
 
@@ -195,7 +195,7 @@ public class Prompt
     public void promptTasks()
     {
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
         // builderSingle.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Complete these steps to assemble");
 
@@ -204,7 +204,7 @@ public class Prompt
 
         // Create data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                launcher.getView(),
+                application.getView(),
                 android.R.layout.select_dialog_multichoice
         );
 
@@ -215,7 +215,7 @@ public class Prompt
         arrayAdapter.add("Task 4");
         arrayAdapter.add("Task 5");
 
-        final Context appContext = launcher.getView();
+        final Context appContext = application.getView();
 
         /*
         builderSingle.setNegativeButton(
@@ -304,13 +304,13 @@ public class Prompt
         List<String> options = new ArrayList<>();
         options.add("Task 1");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(launcher.getView());
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("Do this task");
 
         // Add data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                launcher.getView(),
+                application.getView(),
                 android.R.layout.select_dialog_singlechoice
         );
 

@@ -10,27 +10,27 @@ import java.util.Date;
 import java.util.UUID;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.host.MessageHostInterface;
+import camp.computer.clay.host.MessengerInterface;
 
-public class MessageHost {
+public class Messenger {
 
     private Clay clay;
 
-    private ArrayList<MessageHostInterface> messageManagers;
+    private ArrayList<MessengerInterface> messageManagers;
 
     // TODO: Combine incoming and outgoing message queues into a single queue.
     private ArrayList<Message> incomingMessages = new ArrayList<Message>(); // Create incoming message queue.
     private ArrayList<Message> outgoingMessages = new ArrayList<Message>(); // Create outgoing message queue.
 
-    public MessageHost(Clay clay) {
-        this.messageManagers = new ArrayList<MessageHostInterface>();
+    public Messenger(Clay clay) {
+        this.messageManagers = new ArrayList<MessengerInterface>();
         this.clay = clay;
     }
 
-    public void addHost(MessageHostInterface messageManager) {
+    public void addHost(MessengerInterface messageManager) {
         if (!this.messageManagers.contains(messageManager)) {
             this.messageManagers.add(messageManager);
-            messageManager.engage(this);
+            messageManager.addMessenger(this);
         }
     }
 
@@ -328,7 +328,7 @@ public class MessageHost {
 
     private void processOutgoingMessage(Message message) {
 
-        for (MessageHostInterface messageManager : messageManagers) {
+        for (MessengerInterface messageManager : messageManagers) {
             if (messageManager.getType().equals(message.getType())) {
 
                 // Dequeue the message if its delivery is not guaranteed

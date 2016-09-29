@@ -38,13 +38,13 @@ import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.host.DisplayHostInterface;
-import camp.computer.clay.host.NetworkResource;
+import camp.computer.clay.host.Internet;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 import redis.clients.jedis.Jedis;
 
-public class Launcher extends FragmentActivity implements DisplayHostInterface { // was Launcher
-    // rename Launcher to Setup? to provide analog to "setup" functions in classes?
+public class Application extends FragmentActivity implements DisplayHostInterface { // was Application
+    // rename Application to Setup? to provide analog to "setup" functions in classes?
 
     // <Settings>
     private static final boolean ENABLE_TONE_OUTPUT = false;
@@ -72,13 +72,13 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
     private static Context context;
 
-    private static Launcher launcherView;
+    private static Application applicationView;
 
     private Clay clay;
 
     private camp.computer.clay.application.communication.UDPHost UDPHost;
 
-    private NetworkResource networkResource;
+    private Internet networkResource;
 
     Prompt ui;
 
@@ -116,7 +116,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         // This generally should only be used if you need a Context whose lifecycle is separate
         // from the current context, that is tied to the lifetime of the process rather than the
         // current component." (Android Documentation)
-        Launcher.context = getApplicationContext();
+        Application.context = getApplicationContext();
 
         // Sensor Interface
         if (ENABLE_MOTION_INPUT) {
@@ -128,7 +128,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
         }
 
         // Display Interface
-        Launcher.launcherView = this;
+        Application.applicationView = this;
 
         ui = new Prompt(this);
 
@@ -246,7 +246,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
         // Internet Network Interface
         if (networkResource == null) {
-            networkResource = new NetworkResource();
+            networkResource = new Internet();
             clay.addResource(this.networkResource);
         }
 
@@ -363,7 +363,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
                     // Get screen width and height of the device
                     DisplayMetrics metrics = new DisplayMetrics();
-                    Launcher.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                     int screenWidth = metrics.widthPixels;
                     int screenHeight = metrics.heightPixels;
 
@@ -820,7 +820,7 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
     }
 
     public static Context getContext() {
-        return Launcher.context;
+        return Application.context;
     }
 
     @Override
@@ -845,8 +845,8 @@ public class Launcher extends FragmentActivity implements DisplayHostInterface {
 
     // TODO: Rename to something else and make a getView() function specific to the
     // TODO: (cont'd) display interface.
-    public static Launcher getView() {
-        return Launcher.launcherView;
+    public static Application getView() {
+        return Application.applicationView;
     }
 
     public Display getDisplay() {

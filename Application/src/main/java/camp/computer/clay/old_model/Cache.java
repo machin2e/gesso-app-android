@@ -1,4 +1,4 @@
-package camp.computer.clay.host;
+package camp.computer.clay.old_model;
 
 import camp.computer.clay.Clay;
 

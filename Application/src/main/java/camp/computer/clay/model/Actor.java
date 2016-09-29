@@ -78,7 +78,7 @@ public class Actor {
 
         // <HACK>
         // Redis
-        //Launcher.getView().publish(event.getType().toString());
+        //Application.getView().publish(event.getType().toString());
         // </HACK>
 
         event.setActor(this);

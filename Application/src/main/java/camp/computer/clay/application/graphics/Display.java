@@ -16,7 +16,7 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
-import camp.computer.clay.application.Launcher;
+import camp.computer.clay.application.Application;
 import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.Space;
@@ -146,7 +146,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // <PERSPECTIVE>
         // Adjust the perspective
         canvas.save();
-        canvas.translate((float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Launcher.getView().getOrientationInput().getRotationY(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Launcher.getView().getOrientationInput().getRotationX());
+        canvas.translate((float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Application.getView().getOrientationInput().getRotationY(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Application.getView().getOrientationInput().getRotationX());
 //                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY());
         // this.canvas.rotate((float) ApplicationView.getView().getOrientationInput().getRotationZ());
         canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
@@ -264,7 +264,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
-        Launcher.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
