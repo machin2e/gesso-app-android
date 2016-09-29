@@ -32,8 +32,8 @@ public class Message {
 //    public static final String HTTP_PROTOCOL = "HTTP";
     private String type;
 
-    public Message (String type, String source, String target, String content) {
-    //Message (InetAddress from, InetAddress to, String content) {
+    public Message(String type, String source, String target, String content) {
+        //Message (InetAddress from, InetAddress to, String content) {
 
         this.uuid = UUID.randomUUID();
 
@@ -47,15 +47,15 @@ public class Message {
         retryCount = 0;
 
         // TODO: Only do this when "verify" is true.
-        if (content.startsWith (Message.VERIFY_PREFIX)) {
+        if (content.startsWith(Message.VERIFY_PREFIX)) {
             this.checksum = Message.generateChecksum(this.content);
         } else {
-            this.checksum = Message.generateChecksum (Message.VERIFY_PREFIX + this.content);
+            this.checksum = Message.generateChecksum(Message.VERIFY_PREFIX + this.content);
         }
 
     }
 
-    public String getType () {
+    public String getType() {
         return this.type;
     }
 
@@ -69,31 +69,31 @@ public class Message {
         return this.target;
     }
 
-    public String getContent () {
+    public String getContent() {
         return this.content;
     }
 
-    public boolean isDeliveryGuaranteed () {
+    public boolean isDeliveryGuaranteed() {
         return verify;
     }
 
-    public void setDeliveryGuaranteed (boolean isGuaranteed) {
+    public void setDeliveryGuaranteed(boolean isGuaranteed) {
         verify = isGuaranteed;
     }
 
-    public boolean isDelivered () {
+    public boolean isDelivered() {
         return isVerified;
     }
 
-    public void setDelivered (boolean delivered) {
+    public void setDelivered(boolean delivered) {
         isVerified = delivered;
     }
 
-    public int getRetryCount () {
+    public int getRetryCount() {
         return retryCount;
     }
 
-    public void setRetryCount (int count) {
+    public void setRetryCount(int count) {
         retryCount = count;
     }
 
@@ -109,43 +109,42 @@ public class Message {
         this.retryCount++;
     }
 
-    public static String generateChecksum (String message) {
-        return generateSha1Hash (message);
+    public static String generateChecksum(String message) {
+        return generateSha1Hash(message);
     }
 
-    public static String generateSha1Hash (String string) {
+    public static String generateSha1Hash(String string) {
         String hash = null;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
-            byte[] bytes = string.getBytes ("UTF-8");
-            digest.update (bytes, 0, bytes.length);
-            bytes = digest.digest ();
+            byte[] bytes = string.getBytes("UTF-8");
+            digest.update(bytes, 0, bytes.length);
+            bytes = digest.digest();
 
             // This is ~55x faster than looping and String.formating()
-            hash = bytesToHex (bytes);
+            hash = bytesToHex(bytes);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace ();
+            e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace ();
+            e.printStackTrace();
         }
         return hash;
     }
 
     // http://stackoverflow.com/questions/9655181/convert-from-byte-array-to-hex-string-in-java
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    public static String bytesToHex( byte[] bytes )
-    {
-        char[] hexChars = new char[ bytes.length * 2 ];
-        for( int j = 0; j < bytes.length; j++ )
-        {
-            int v = bytes[ j ] & 0xFF;
-            hexChars[ j * 2 ] = hexArray[ v >>> 4 ];
-            hexChars[ j * 2 + 1 ] = hexArray[ v & 0x0F ];
+
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
-        return new String( hexChars );
+        return new String(hexChars);
     }
 
-    public String getChecksum () {
+    public String getChecksum() {
         return this.checksum;
     }
 }

@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.application.Launcher;
-import camp.computer.clay.old_model.MessageHost;
-import camp.computer.clay.old_model.NetworkHost;
-import camp.computer.clay.application.storage.SQLiteStoreHost;
 import camp.computer.clay.host.Cache;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.MessageHostInterface;
@@ -21,22 +18,18 @@ import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.profile.PortableProfile;
-import camp.computer.clay.old_model.Descriptor;
-import camp.computer.clay.old_model.Event;
+import camp.computer.clay.old_model.MessageHost;
+import camp.computer.clay.old_model.NetworkHost;
 import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.util.image.Space;
 
 public class Clay {
-
-    private Descriptor descriptor = null;
 
     private MessageHost messageHost = null;
 
     private NetworkHost networkHost = null;
 
     private Cache cache = null;
-
-    private SQLiteStoreHost storeHost = null;
 
     private Model model;
 
@@ -61,11 +54,6 @@ public class Clay {
         this.messageHost = new MessageHost(this); // Start the messaging systems
 
         this.networkHost = new NetworkHost(this); // Start the networking systems
-
-        // Descriptor
-        // TODO: Stream this in from the Internet and phoneHosts.
-        descriptor = new Descriptor("clay", "");
-        descriptor.list("phoneHosts");
 
         // Model
         this.model = new Model();
@@ -148,10 +136,6 @@ public class Clay {
         space.addEntity(host);
     }
 
-    public Descriptor getDescriptor() {
-        return this.descriptor;
-    }
-
     /*
      * Clay's essential operating system functions.
      */
@@ -168,9 +152,9 @@ public class Clay {
      * Adds a descriptor manager for use by Clay. Retrieves the basic actions provided by the
      * descriptor manager and makes them available in Clay.
      */
-    public void setStore(SQLiteStoreHost contentManager) {
-        this.storeHost = contentManager;
-    }
+//    public void setStore(SQLiteStoreHost contentManager) {
+//        this.storeHost = contentManager;
+//    }
 
     /*
      * Clay's infrastructure management functions.
@@ -199,9 +183,11 @@ public class Clay {
         return this.cache;
     }
 
-    public SQLiteStoreHost getStore() {
-        return this.storeHost;
-    }
+//    public SQLiteStoreHost getStore() {
+//        return this.storeHost;
+//    }public SQLiteStoreHost getStore() {
+//        return this.storeHost;
+//    }
 
     public List<PhoneHost> getPhoneHosts() {
         return this.phoneHosts;
@@ -254,12 +240,12 @@ public class Clay {
         }
 
         // Try to restore the phoneHost profile from the storeHost.
-        PhoneHost phoneHost = getStore().restoreDevice(deviceUuid);
+//        PhoneHost phoneHost = getStore().restoreDevice(deviceUuid);
 
         // If unable to restore the phoneHost's profile, then create a profile for the phoneHost.
-        if (phoneHost == null) {
-            phoneHost = new PhoneHost(getClay(), deviceUuid);
-        }
+//        if (phoneHost == null) {
+//            phoneHost = new PhoneHost(getClay(), deviceUuid);
+//        }
 
         simulateHost();
 
@@ -292,102 +278,102 @@ public class Clay {
         */
         // </HACK>
 
-        // Update the phoneHost's profile based on information received from phoneHost itself.
-        if (phoneHost != null) {
+//        // Update the phoneHost's profile based on information received from phoneHost itself.
+//        if (phoneHost != null) {
+//
+//            // Data.
+//            Descriptor deviceDescriptor = getClay().getDescriptor().get("phoneHosts").put(deviceUuid.toString());
+//
+//            // <HACK>
+//            // TODO: Update this from a list of the observables received from the boards.
+//            Descriptor channelsDescriptor = deviceDescriptor.list("channels");
+//            for (int i = 0; i < 12; i++) {
+//
+//                // phoneHost/<uuid>/channels/<number>
+//                Descriptor channelDescriptor = channelsDescriptor.put(String.valueOf(i + 1));
+//
+//                // phoneHost/<uuid>/channels/<number>/number
+//                channelDescriptor.put("number", String.valueOf(i + 1));
+//
+//                // phoneHost/<uuid>/channels/<number>/direction
+//                channelDescriptor.put("direction").from("input", "output").set("input");
+//
+//                // phoneHost/<uuid>/channels/<number>/type
+//                channelDescriptor.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
+//
+//                // phoneHost/<uuid>/channels/<number>/descriptor
+//                Descriptor channelContentDescriptor = channelDescriptor.put("descriptor");
+//
+//                // phoneHost/<uuid>/channels/<number>/descriptor/<observable>
+//                // TODO: Retreive the "from" values and the "default" value from the exposed observables on the actual hardware (or the hardware profile)
+//                channelContentDescriptor.put("toggle_value").from("on", "off").set("off");
+//                channelContentDescriptor.put("waveform_sample_value", "none");
+//                channelContentDescriptor.put("pulse_period_seconds", "0");
+//                channelContentDescriptor.put("pulse_duty_cycle", "0");
+//            }
+//            // </HACK>
+//
+//            // Update restored phoneHost with information from phoneHost
+//            phoneHost.setInternetAddress(internetAddress);
+//
+//            Log.v("TCP", "phoneHost.internetAddress: " + internetAddress);
+//
+//            // Store the updated phoneHost profile.
+//            getStore().storeDevice(phoneHost);
+//            getStore().storeTimeline(phoneHost.getTimeline());
+//
+//            Log.v("TCP", "phoneHost.internetAddress (2): " + internetAddress);
+//
+//            // Add phoneHost to ClayaddMessage
+//            if (!this.phoneHosts.contains(phoneHost)) {
+//
+//                // Add phoneHost to present (i.e., local cache).
+//                this.phoneHosts.add(phoneHost);
+//                Log.v("Content_Manager", "Successfully added timeline.");
+//
+////                ApplicationView.getView().mapView.getEntity().simulateHost(new PhoneHost());
+//
+//                // Add timelines to attached displays
+//                for (DisplayHostInterface view : this.displays) {
+//                    view.addDeviceView(phoneHost);
+//                }
+//            }
+//
+//            Log.v("TCP", "phoneHost.internetAddress (3): " + internetAddress);
+//
+//            // Establish TCP connection
+//            phoneHost.connectTcp();
+//
+//            Log.v("TCP", "phoneHost.internetAddress (4): " + internetAddress);
+//
+//            /*
+//            // Reset the phoneHost
+//            if (isNew) {
+//
+//                // <HACK>
+//                phoneHost.enqueueMessage("request reset");
+//                // getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage(propagatorMessage);
+//                // </HACK>
+//
+//                isNew = false;
+//            }
+//            */
+//
+////            // Show the action button
+////            ApplicationView.getView().getCursorView().show(true);
+//
+//            // Populate the phoneHost's timeline
+//            // TODO: Populate from scratch only if no timeline has been programmed for the phoneHost
+//            for (Event event : phoneHost.getTimeline().getEvents()) {
+//                // <HACK>
+//                phoneHost.enqueueMessage("start event " + event.getUuid());
+//                phoneHost.enqueueMessage("setValue event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
+//                phoneHost.enqueueMessage("setValue event " + event.getUuid() + " descriptor \"" + event.getState().get(0).getState().toString() + "\"");
+//                // </HACK>
+//            }
+//        }
 
-            // Data.
-            Descriptor deviceDescriptor = getClay().getDescriptor().get("phoneHosts").put(deviceUuid.toString());
-
-            // <HACK>
-            // TODO: Update this from a list of the observables received from the boards.
-            Descriptor channelsDescriptor = deviceDescriptor.list("channels");
-            for (int i = 0; i < 12; i++) {
-
-                // phoneHost/<uuid>/channels/<number>
-                Descriptor channelDescriptor = channelsDescriptor.put(String.valueOf(i + 1));
-
-                // phoneHost/<uuid>/channels/<number>/number
-                channelDescriptor.put("number", String.valueOf(i + 1));
-
-                // phoneHost/<uuid>/channels/<number>/direction
-                channelDescriptor.put("direction").from("input", "output").set("input");
-
-                // phoneHost/<uuid>/channels/<number>/type
-                channelDescriptor.put("type").from("toggle", "waveform", "pulse").set("toggle"); // TODO: switch
-
-                // phoneHost/<uuid>/channels/<number>/descriptor
-                Descriptor channelContentDescriptor = channelDescriptor.put("descriptor");
-
-                // phoneHost/<uuid>/channels/<number>/descriptor/<observable>
-                // TODO: Retreive the "from" values and the "default" value from the exposed observables on the actual hardware (or the hardware profile)
-                channelContentDescriptor.put("toggle_value").from("on", "off").set("off");
-                channelContentDescriptor.put("waveform_sample_value", "none");
-                channelContentDescriptor.put("pulse_period_seconds", "0");
-                channelContentDescriptor.put("pulse_duty_cycle", "0");
-            }
-            // </HACK>
-
-            // Update restored phoneHost with information from phoneHost
-            phoneHost.setInternetAddress(internetAddress);
-
-            Log.v("TCP", "phoneHost.internetAddress: " + internetAddress);
-
-            // Store the updated phoneHost profile.
-            getStore().storeDevice(phoneHost);
-            getStore().storeTimeline(phoneHost.getTimeline());
-
-            Log.v("TCP", "phoneHost.internetAddress (2): " + internetAddress);
-
-            // Add phoneHost to ClayaddMessage
-            if (!this.phoneHosts.contains(phoneHost)) {
-
-                // Add phoneHost to present (i.e., local cache).
-                this.phoneHosts.add(phoneHost);
-                Log.v("Content_Manager", "Successfully added timeline.");
-
-//                ApplicationView.getView().mapView.getEntity().simulateHost(new PhoneHost());
-
-                // Add timelines to attached displays
-                for (DisplayHostInterface view : this.displays) {
-                    view.addDeviceView(phoneHost);
-                }
-            }
-
-            Log.v("TCP", "phoneHost.internetAddress (3): " + internetAddress);
-
-            // Establish TCP connection
-            phoneHost.connectTcp();
-
-            Log.v("TCP", "phoneHost.internetAddress (4): " + internetAddress);
-
-            /*
-            // Reset the phoneHost
-            if (isNew) {
-
-                // <HACK>
-                phoneHost.enqueueMessage("request reset");
-                // getClay().getDeviceByUuid(UUID.fromString(sourceDeviceUuid)).enqueueMessage(propagatorMessage);
-                // </HACK>
-
-                isNew = false;
-            }
-            */
-
-//            // Show the action button
-//            ApplicationView.getView().getCursorView().show(true);
-
-            // Populate the phoneHost's timeline
-            // TODO: Populate from scratch only if no timeline has been programmed for the phoneHost
-            for (Event event : phoneHost.getTimeline().getEvents()) {
-                // <HACK>
-                phoneHost.enqueueMessage("start event " + event.getUuid());
-                phoneHost.enqueueMessage("setValue event " + event.getUuid() + " action " + event.getAction().getScript().getUuid()); // <HACK />
-                phoneHost.enqueueMessage("setValue event " + event.getUuid() + " descriptor \"" + event.getState().get(0).getState().toString() + "\"");
-                // </HACK>
-            }
-        }
-
-        return phoneHost;
+        return null;
     }
 
     public boolean hasDeviceByUuid(UUID uuid) {
@@ -535,10 +521,9 @@ public class Clay {
      *
      * @return True if Clay has a descriptor manager. False otherwise.
      */
-    public boolean hasStore() {
-        return this.storeHost != null;
-    }
-
+//    public boolean hasStore() {
+//        return this.storeHost != null;
+//    }
     private boolean hasCache() {
         return this.cache != null;
     }

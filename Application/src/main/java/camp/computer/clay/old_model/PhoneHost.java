@@ -25,7 +25,7 @@ public class PhoneHost {
 
     private String meshAddress = null; // The unit's IP address
 
-    private Timeline timeline = null;
+//    private Timeline timeline = null;
 
     private Date timeOfLastContact = null;
 
@@ -43,7 +43,7 @@ public class PhoneHost {
 
         this.uuid = uuid;
 
-        this.timeline = new Timeline(this);
+//        this.timeline = new Timeline(this);
 
         tags = new ArrayList<String>();
     }
@@ -117,14 +117,14 @@ public class PhoneHost {
         return this.meshAddress;
     }
 
-    public Timeline getTimeline() {
-        return this.timeline;
-    }
-
-    public void setTimeline(Timeline timeline) {
-        this.timeline = timeline;
-        this.timeline.setPhoneHost(this);
-    }
+//    public Timeline getTimeline() {
+//        return this.timeline;
+//    }
+//
+//    public void setTimeline(Timeline timeline) {
+//        this.timeline = timeline;
+//        this.timeline.setPhoneHost(this);
+//    }
 
     public void connectTcp() {
 
