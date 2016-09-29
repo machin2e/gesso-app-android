@@ -21,7 +21,6 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.PortableProfile;
-import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
@@ -29,6 +28,7 @@ import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 

@@ -5,7 +5,6 @@ import java.util.List;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;

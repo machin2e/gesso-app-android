@@ -189,8 +189,8 @@ public class Prompt
         dialog.show();
     }
 
-    // Break multi-step tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
-    // displayFloatingTaskDialog(<task list>, <task step to display>)
+    // Break multi-update tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
+    // displayFloatingTaskDialog(<task list>, <task update to display>)
 
     public void promptTasks()
     {

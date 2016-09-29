@@ -24,7 +24,6 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
-import camp.computer.clay.space.util.Visibility;
 import camp.computer.clay.util.Probability;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;

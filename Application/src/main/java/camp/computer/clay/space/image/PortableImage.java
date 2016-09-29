@@ -11,7 +11,7 @@ import camp.computer.clay.model.Portable;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
-import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.geometry.Point;
 
 public abstract class PortableImage extends Image<Portable> {

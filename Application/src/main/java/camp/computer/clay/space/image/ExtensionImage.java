@@ -14,7 +14,7 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.util.ShapeGroup;
-import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Point;

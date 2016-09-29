@@ -10,7 +10,7 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 

@@ -115,7 +115,7 @@ public class Messenger {
         return incomingMessages.remove(0);
     }
 
-    // TODO: Unify queues and rename to "processAction()" or "step()"
+    // TODO: Unify queues and rename to "processAction()" or "update()"
     public void processIncomingMessages() {
 //        Log.v ("UDP_Processing", "<<< processIncomingQueue");
         // Dequeue and processAction the next message on the incoming message queue.
@@ -342,7 +342,7 @@ public class Messenger {
         }
 
 //        if (this.datagramServer != null) {
-//            datagramServer.processMessage (outgoingMessage);
+//            datagramServer.update (outgoingMessage);
 //        }
 
     }
@@ -361,7 +361,7 @@ public class Messenger {
         queueOutgoingMessage(message);
     }
 
-    public void processMessage() {
+    public void update() { // was "processMessage()"
 
         // Action incoming messages
         processIncomingMessages();

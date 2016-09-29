@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Group;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.space.util.Visibility;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;

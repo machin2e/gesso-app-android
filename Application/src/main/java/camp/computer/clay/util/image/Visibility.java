@@ -1,4 +1,4 @@
-package camp.computer.clay.space.util;
+package camp.computer.clay.util.image;
 
 // TODO: http://stackoverflow.com/questions/32354107/how-are-enums-internally-represented-in-java
 public class Visibility {
@@ -12,27 +12,22 @@ public class Visibility {
         INVISIBLE,
         VISIBLE;
 
-        Value()
-        {
+        Value() {
         }
     }
 
-    public Visibility()
-    {
+    public Visibility() {
     }
 
-    public Visibility(Visibility.Value value)
-    {
+    public Visibility(Visibility.Value value) {
         this.value = value;
     }
 
-    public void setValue(Visibility.Value value)
-    {
+    public void setValue(Visibility.Value value) {
         this.value = value;
     }
 
-    public Visibility.Value getValue()
-    {
+    public Visibility.Value getValue() {
         if (reference != null) {
             return reference.getValue();
         } else {
@@ -40,18 +35,15 @@ public class Visibility {
         }
     }
 
-    public void setReference(Visibility visibility)
-    {
+    public void setReference(Visibility visibility) {
         this.reference = visibility;
     }
 
-    public Visibility getReference()
-    {
+    public Visibility getReference() {
         return this.reference;
     }
 
-    public boolean isVisible()
-    {
+    public boolean isVisible() {
         return this.value == Visibility.Value.VISIBLE;
     }
 }

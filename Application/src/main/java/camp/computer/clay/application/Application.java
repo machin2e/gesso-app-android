@@ -802,7 +802,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         @Override
         public void run() {
             // Action the outgoing messages
-            clay.step();
+            clay.update();
 
             // Repeat this the same runnable code block again another 2 seconds
             handler.postDelayed(runnableCode, MESSAGE_SEND_FREQUENCY);
