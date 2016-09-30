@@ -299,8 +299,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
         final int pointerCount = motionEvent.getPointerCount();
 
-        final int historySize = motionEvent.getHistorySize();
-
         if (this.space == null) {
             return false;
         }
@@ -310,8 +308,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // Get active actor
         Actor actor = space.getEntity().getActor(0);
 
-        boolean processHistory = true;
+        boolean processHistory = false;
         if (processHistory) {
+
+            final int historySize = motionEvent.getHistorySize();
 
             for (int historyIndex = 0; historyIndex < historySize; historyIndex++) {
 

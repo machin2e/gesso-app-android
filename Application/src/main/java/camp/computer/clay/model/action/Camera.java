@@ -11,6 +11,7 @@ import camp.computer.clay.model.Port;
 import camp.computer.clay.model.Portable;
 import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.model.util.PortGroup;
+import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
@@ -249,6 +250,47 @@ public class Camera {
         Group<Port> hostPorts = hostImage.getHost().getPorts();
         for (int i = 0; i < hostPorts.size(); i++) {
             Port port = hostPorts.get(i);
+
+            // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
+
+            if (!basePathPorts.contains(port)) {
+                basePathPorts.add(port);
+            }
+
+            PathGroup portPaths = port.getPaths();
+            for (int i1 = 0; i1 < portPaths.size(); i1++) {
+                Path path = portPaths.get(i1);
+                if (!basePathPorts.contains(path.getSource())) {
+                    basePathPorts.add(path.getSource());
+                }
+                if (!basePathPorts.contains(path.getTarget())) {
+                    basePathPorts.add(path.getTarget());
+                }
+            }
+        }
+
+        // Camera
+        ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
+        Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
+
+        adjustScale(boundingBox);
+        setPosition(boundingBox.getPosition());
+    }
+
+    public void setFocus(Extension extension) {
+
+        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+
+        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
+        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
+        otherPortableImages.remove(extensionImage);
+        otherPortableImages.setTransparency(0.1);
+
+        // Get ports along every Path connected to the Ports on the touched PhoneHost
+        Group<Port> basePathPorts = new Group<>();
+        Group<Port> extensionPorts = extensionImage.getExtension().getPorts();
+        for (int i = 0; i < extensionPorts.size(); i++) {
+            Port port = extensionPorts.get(i);
 
             // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
 

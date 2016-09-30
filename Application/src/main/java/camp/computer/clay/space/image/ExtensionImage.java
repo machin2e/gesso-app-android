@@ -99,6 +99,8 @@ public class ExtensionImage extends PortableImage {
                                 getSpace().getImage(path).setVisibility(Visibility.Value.VISIBLE);
                             }
                         }
+
+                        event.getActor().getCamera().setFocus(getExtension());
                     }
 
                 }
