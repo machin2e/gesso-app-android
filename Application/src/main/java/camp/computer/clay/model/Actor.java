@@ -17,13 +17,14 @@ import camp.computer.clay.util.image.Space;
  */
 public class Actor {
 
-    private Camera camera = null;
+    private Camera camera = new Camera();
 
     // Action (Smart querying interface)
     public List<Action> actions = new LinkedList<>();
 
-    public Actor() {
+    public Actor(Space space) {
         setup();
+        camera.setSpace(space);
     }
 
     private void setup() {

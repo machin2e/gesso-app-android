@@ -61,11 +61,8 @@ public class Clay {
         // Space
         this.space = new Space(model);
 
-//        setupSimulation();
-
-        // Create actor and setValue perspective
-        Actor actor = new Actor();
-        actor.getCamera().setSpace(space);
+        // Create actor and set perspective
+        Actor actor = new Actor(this.space);
 
         // Add actor to model
         model.addActor(actor);
