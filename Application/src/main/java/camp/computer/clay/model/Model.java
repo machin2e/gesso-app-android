@@ -3,6 +3,8 @@ package camp.computer.clay.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.model.util.PathGroup;
+
 /**
  * {@code Model} represents the build state of available and online Clay Hosts and Entities of the
  * discovered physical environment sensed or computed based on data collected from Clay hosts.
@@ -59,13 +61,13 @@ public class Model extends Entity {
         return ports;
     }
 
-    public List<Path> getPaths() {
-        List<Path> paths = new ArrayList<>();
+    public PathGroup getPaths() {
+        PathGroup paths = new PathGroup();
         for (int i = 0; i < this.hosts.size(); i++) {
             Host host = this.hosts.get(i);
             for (int j = 0; j < host.getPorts().size(); j++) {
                 Port port = host.getPorts().get(j);
-                paths.addAll(port.getForwardPaths());
+                paths.add(port.getForwardPaths());
             }
         }
         return paths;

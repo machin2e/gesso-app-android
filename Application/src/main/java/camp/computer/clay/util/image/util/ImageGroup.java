@@ -5,12 +5,12 @@ import java.util.List;
 
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Group;
-import camp.computer.clay.util.image.Image;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Visibility;
 
 /**
  * ImageGroup is an interface for managing and manipulating sets of elements.
@@ -190,11 +190,11 @@ public class ImageGroup extends Group<Image> {
     }
 
     public Point getCenterPoint() {
-        return Geometry.calculateCenterPosition(getPositions());
+        return Geometry.calculateCenter(getPositions());
     }
 
     public Point getCentroidPoint() {
-        return Geometry.calculateCentroidCoordinate(getPositions());
+        return Geometry.calculateCentroid(getPositions());
     }
 
     public Rectangle getBoundingBox() {
@@ -211,7 +211,7 @@ public class ImageGroup extends Group<Image> {
      * @param position
      * @return
      */
-    public Image getNearest(Point position) {
+    public Image getNearestImage(Point position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Image nearestImage = null;

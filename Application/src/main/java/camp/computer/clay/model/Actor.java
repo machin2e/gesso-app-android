@@ -74,12 +74,7 @@ public class Actor {
         }
     }
 
-    public void processAction(Event event) { // TODO: Rename to processAction()
-
-        // <HACK>
-        // Redis
-        //Application.getView().publish(event.getType().toString());
-        // </HACK>
+    public void processAction(Event event) {
 
         event.setActor(this);
 
@@ -87,14 +82,11 @@ public class Actor {
 
             case SELECT: {
 
-                // Having an idea is just accumulating intention. It's a suggestion from your existential
-                // controller.
-
-                // Start a new action
+                // Create a new Action
                 Action action = new Action();
                 actions.add(action);
 
-                // Add event to action
+                // Add Event to Action
                 action.addEvent(event);
 
                 // Record actions on timeline

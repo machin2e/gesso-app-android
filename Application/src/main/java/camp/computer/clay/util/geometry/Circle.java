@@ -1,7 +1,5 @@
 package camp.computer.clay.util.geometry;
 
-import android.graphics.Color;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,11 +67,6 @@ public class Circle<T extends Entity> extends Shape<T> {
     public void draw(Display display) {
         if (isVisible()) {
             Display.drawCircle(this, display);
-
-            display.getPaint().setColor(Color.GREEN);
-            //Surface.drawCircle(position, this.radius / 2, getRotation(), surface);
-
-            //Surface.drawPolygon(getVertices(), surface);
         }
     }
 }

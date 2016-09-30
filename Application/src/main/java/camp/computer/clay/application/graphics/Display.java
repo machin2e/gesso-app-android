@@ -19,8 +19,6 @@ import java.util.List;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Line;
@@ -28,6 +26,8 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Triangle;
+import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.Visibility;
 
 public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -680,6 +680,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Display display) {
+
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
 

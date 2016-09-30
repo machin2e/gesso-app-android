@@ -21,6 +21,7 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.PortableProfile;
+import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
@@ -48,35 +49,19 @@ public class HostImage extends PortableImage {
         Rectangle rectangle;
         Circle circle;
 
-        // Create shapes for figure
+        // Board
         rectangle = new Rectangle<>(getHost());
         rectangle.setWidth(250);
         rectangle.setHeight(250);
         rectangle.setCornerRadius(20.0);
-        rectangle.setLabel("Board");
+        rectangle.setLabel("Substrate");
         rectangle.setColor("#1f1f1e"); // #f7f7f7
         rectangle.setOutlineThickness(1);
         addShape(rectangle);
 
         // Headers
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 1");
-        rectangle.setPosition(0, 132);
-        rectangle.setRotation(0);
-        rectangle.setColor("#404040"); // #3b3b3b
-        rectangle.setOutlineThickness(0);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 2");
-        rectangle.setPosition(132, 0);
-        rectangle.setRotation(90);
-        rectangle.setColor("#404040");
-        rectangle.setOutlineThickness(0);
-        addShape(rectangle);
-
-        rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 3");
+        rectangle.setLabel("Header 1"); // or number 1 (top)
         rectangle.setPosition(0, -132);
         rectangle.setRotation(0);
         rectangle.setColor("#404040");
@@ -84,12 +69,44 @@ public class HostImage extends PortableImage {
         addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 4");
+        rectangle.setLabel("Header 2"); // or number 2 (right)
+        rectangle.setPosition(132, 0);
+        rectangle.setRotation(90);
+        rectangle.setColor("#404040");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
+
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header 3"); // or number 3 (bottom)
+        rectangle.setPosition(0, 132);
+        rectangle.setRotation(0);
+        rectangle.setColor("#404040"); // #3b3b3b
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
+
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header 4"); // or number 4 (left)
         rectangle.setPosition(-132, 0);
         rectangle.setRotation(90);
         rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
+
+        portConnectorPositions.add(new Point(-20, 132, position));
+        portConnectorPositions.add(new Point(0, 132, position));
+        portConnectorPositions.add(new Point(20, 132, position));
+
+        portConnectorPositions.add(new Point(132, 20, position));
+        portConnectorPositions.add(new Point(132, 0, position));
+        portConnectorPositions.add(new Point(132, -20, position));
+
+        portConnectorPositions.add(new Point(20, -132, position));
+        portConnectorPositions.add(new Point(0, -132, position));
+        portConnectorPositions.add(new Point(-20, -132, position));
+
+        portConnectorPositions.add(new Point(-132, -20, position));
+        portConnectorPositions.add(new Point(-132, 0, position));
+        portConnectorPositions.add(new Point(-132, 20, position));
 
         // Lights
         List<Point> lightPositions = new ArrayList<>();
@@ -105,19 +122,6 @@ public class HostImage extends PortableImage {
         lightPositions.add(new Point(-105, -20));
         lightPositions.add(new Point(-105, 0));
         lightPositions.add(new Point(-105, 20));
-
-        portInterfacePositions.add(new Point(-20, 132, position));
-        portInterfacePositions.add(new Point(0, 132, position));
-        portInterfacePositions.add(new Point(20, 132, position));
-        portInterfacePositions.add(new Point(132, 20, position));
-        portInterfacePositions.add(new Point(132, 0, position));
-        portInterfacePositions.add(new Point(132, -20, position));
-        portInterfacePositions.add(new Point(20, -132, position));
-        portInterfacePositions.add(new Point(0, -132, position));
-        portInterfacePositions.add(new Point(-20, -132, position));
-        portInterfacePositions.add(new Point(-132, -20, position));
-        portInterfacePositions.add(new Point(-132, 0, position));
-        portInterfacePositions.add(new Point(-132, 20, position));
 
         List<Double> lightRotations = new ArrayList<>();
         lightRotations.add(0.0);
@@ -155,7 +159,7 @@ public class HostImage extends PortableImage {
             circle.setLabel("Mount " + (i + 1));
             circle.setColor("#ffffff");
             circle.setOutlineThickness(0);
-            circle.getVisibility().setReference(getShape("Board").getVisibility());
+            circle.getVisibility().setReference(getShape("Substrate").getVisibility());
             addShape(circle);
         }
 
@@ -273,16 +277,16 @@ public class HostImage extends PortableImage {
                                             return;
                                         }
 
-                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
+                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Substrate")) {
 
                                             // Holding
                                             if (action.isHolding()) {
 
-                                                // Update position of PhoneHost image
+                                                // Update position of Host image
                                                 setPosition(event.getPosition());
 
                                                 // Camera
-                                                camera.focusSelectHost(event);
+                                                camera.setFocus(getHost());
 
                                             } else {
 
@@ -367,7 +371,9 @@ public class HostImage extends PortableImage {
                                                                 }
 
                                                                 if (addPrototypePort) {
-                                                                    extensionPortable.addPort(new Port());
+                                                                    Port port = new Port();
+                                                                    port.setNumber(1);
+                                                                    extensionPortable.addPort(port);
                                                                 }
                                                             }
                                                         }
@@ -390,7 +396,8 @@ public class HostImage extends PortableImage {
                                             }
 
                                             // Camera
-                                            camera.focusCreatePath(action);
+                                            Port sourcePort = (Port) action.getFirstEvent().getTargetShape().getEntity();
+                                            camera.setFocus(sourcePort, event.getPosition());
 
                                         }
 
@@ -403,7 +410,7 @@ public class HostImage extends PortableImage {
                                         }
                                         // </HACK>
 
-                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
+                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Substrate")) {
 
                                             if (action.isTap()) {
 
@@ -416,7 +423,7 @@ public class HostImage extends PortableImage {
 
                                                 // Show ports and paths of touched form
                                                 for (int i = 0; i < getHost().getPorts().size(); i++) {
-                                                    List<Path> paths = getHost().getPort(i).getPaths();
+                                                    PathGroup paths = getHost().getPort(i).getPaths();
 
                                                     for (int j = 0; j < paths.size(); j++) {
                                                         Path path = paths.get(j);
@@ -442,7 +449,7 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 // Camera
-                                                camera.focusSelectHost(event);
+                                                camera.setFocus(getHost());
 
                                                 if (getHost().getExtensions().size() > 0) {
                                                     space.getImages(getHost().getExtensions()).setTransparency(1.0);
@@ -457,16 +464,16 @@ public class HostImage extends PortableImage {
                                                     // If getFirstEvent processAction was on the same form, then respond
                                                     if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
 
-                                                        // PhoneHost
+                                                        // Host
 //                                                        event.getTargetImage().processAction(action);
 
                                                         // Camera
-//                                                        camera.focusSelectSpace();
+//                                                        camera.setFocus();
                                                     }
 
                                                 } else if (event.getTargetImage() instanceof Space) {
 
-                                                    // PhoneHost
+                                                    // Host
 //                                                        action.getFirstEvent().getTargetImage().processAction(action);
 
                                                 }
@@ -514,7 +521,7 @@ public class HostImage extends PortableImage {
 
                                                             // Update the Extension Image position and rotation
                                                             //extensionImage.setPosition(event.getPosition());
-                                                            Shape hostShape = getShape("Board");
+                                                            Shape hostShape = getShape("Substrate");
 
                                                             Line nearestSegment = null;
                                                             int segmentIndex = -1;
@@ -561,10 +568,10 @@ public class HostImage extends PortableImage {
                                                             }
                                                             // </REFACTOR>
 
-                                                            // Automatically select, connect paths to, and configure the PhoneHost's Ports
+                                                            // Automatically select, connect paths to, and configure the Host's Ports
                                                             for (int i = 0; i < portableProfile.getPorts().size(); i++) {
 
-                                                                // Select an available PhoneHost Port
+                                                                // Select an available Host Port
                                                                 Port selectedHostPort = null;
                                                                 double distanceToSelectedPort = Double.MAX_VALUE;
                                                                 for (int j = 0; j < getHost().getPorts().size(); j++) {
@@ -582,13 +589,13 @@ public class HostImage extends PortableImage {
                                                                         }
                                                                     }
                                                                 }
-                                                                // TODO: selectedHostPort = (Port) getPortShapes().getNearest(extensionImage.getPosition()).getEntity();
+                                                                // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
 
-                                                                // Configure PhoneHost's Port
+                                                                // Configure Host's Port
                                                                 selectedHostPort.setType(portableProfile.getPorts().get(i).getType());
                                                                 selectedHostPort.setDirection(portableProfile.getPorts().get(i).getDirection());
 
-                                                                // Create Path from Extension Port to PhoneHost Port
+                                                                // Create Path from Extension Port to Host Port
                                                                 Path path = new Path(selectedHostPort, extension.getPorts().get(i));
                                                                 path.setType(Path.Type.ELECTRONIC);
 
@@ -598,7 +605,7 @@ public class HostImage extends PortableImage {
                                                             }
 
                                                         /*
-                                                        // Configure PhoneHost's Port (i.e., the Path's source Port)
+                                                        // Configure Host's Port (i.e., the Path's source Port)
                                                         Port hostPort = (Port) hostPortShape.getEntity();
 
                                                         if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
@@ -611,7 +618,7 @@ public class HostImage extends PortableImage {
                                                         extensionPort.setDirection(Port.Direction.INPUT);
                                                         extensionPort.setType(hostPort.getType());
 
-                                                        // Create Path from PhoneHost to Extension
+                                                        // Create Path from Host to Extension
                                                         Path path = new Path(hostPort, extensionPort);
                                                         path.setType(Path.Type.ELECTRONIC);
                                                         hostPort.addForwardPath(path);
@@ -620,7 +627,7 @@ public class HostImage extends PortableImage {
                                                         space.addEntity(path);
 
                                                         // Update Camera
-                                                        camera.focusSelectPath(hostPort);
+                                                        camera.setFocus(hostPort);
                                                         */
 
                                                         }
@@ -633,11 +640,11 @@ public class HostImage extends PortableImage {
 
                                             if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
 
-                                                // (PhoneHost.Port, ..., PhoneHost.Port) Action Pattern
+                                                // (Host.Port, ..., Host.Port) Action Pattern
 
                                                 if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape()) { // if (action.isTap()) {
 
-                                                    // (PhoneHost.Port A, ..., PhoneHost.Port A) Action Pattern
+                                                    // (Host.Port A, ..., Host.Port A) Action Pattern
                                                     // i.e., The action's first and last events address the same port. Therefore, it must be either a tap or a hold.
 
                                                     // Get port associated with the touched port shape
@@ -667,7 +674,7 @@ public class HostImage extends PortableImage {
 
                                                             Log.v("TouchPort", "C");
 
-                                                            // Remove focus from other Hosts and their Ports
+                                                            // Hide Ports on the non-selected Hosts
                                                             ImageGroup hostImages = space.getImages(Host.class);
                                                             for (int i = 0; i < hostImages.size(); i++) {
                                                                 HostImage hostImage = (HostImage) hostImages.get(i);
@@ -675,27 +682,32 @@ public class HostImage extends PortableImage {
                                                                 hostImage.setPathVisibility(Visibility.Value.INVISIBLE);
                                                                 hostImage.setDockVisibility(Visibility.Value.VISIBLE);
 
-                                                                // Get shapes in image matching labels "Board", "Header <number>", and "LED <number>"
-                                                                ShapeGroup shapes = hostImage.getShapes().filterLabel("^Board$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
+                                                                // Make non-selected Hosts transparent
+                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <number>", and "LED <number>"
+                                                                ShapeGroup shapes = hostImage.getShapes().filterLabel("^Substrate$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
                                                                 shapes.setTransparency(0.1);
+//                                                                hostImage.setTransparency(0.1);
                                                             }
 
+                                                            // Hide Ports on the non-selected Extensions (like above, but for Extensions)
                                                             ImageGroup extensionImages = space.getImages().filterType(Extension.class);
                                                             for (int i = 0; i < extensionImages.size(); i++) {
                                                                 ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 //                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
+
                                                                 extensionImage.setTransparency(0.1);
-                                                                getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
+
+                                                                extensionImage.getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
                                                                 extensionImage.setPathVisibility(Visibility.Value.INVISIBLE);
 //                                                            }
                                                             }
 
-                                                            // Update the Port's style. Show the Port's Paths.
+                                                            // Show the Port's Paths
                                                             setVisibility(Visibility.Value.VISIBLE);
                                                             setPathVisibility(port, Visibility.Value.VISIBLE);
                                                             setDockVisibility(port, Visibility.Value.INVISIBLE);
 
-                                                            List<Path> paths = port.getPaths();
+                                                            PathGroup paths = port.getPaths();
                                                             for (int i = 0; i < paths.size(); i++) {
                                                                 Path path = paths.get(i);
 
@@ -707,10 +719,31 @@ public class HostImage extends PortableImage {
                                                                 space.getImage(path).setVisibility(Visibility.Value.VISIBLE);
                                                             }
 
+                                                            // Show all Paths also connected to the Extension to which the touched Port is connected
+                                                            if (port.getExtension() != null) {
+                                                                Group<Port> siblingPorts = port.getExtension().getPorts();
+                                                                for (int i = 0; i < siblingPorts.size(); i++) {
+                                                                    Port siblingPort = siblingPorts.get(i);
+                                                                    if (siblingPort != port) {
+                                                                        PathGroup siblingPaths = siblingPort.getPaths();
+                                                                        for (int j = 0; j < siblingPaths.size(); j++) {
+                                                                            Path siblingPath = siblingPaths.get(j);
+
+                                                                            // Show Ports
+                                                                            space.getShape(siblingPath.getSource()).setVisibility(Visibility.Value.VISIBLE);
+                                                                            space.getShape(siblingPath.getTarget()).setVisibility(Visibility.Value.VISIBLE);
+
+                                                                            // Show Path
+                                                                            space.getImage(siblingPath).setVisibility(Visibility.Value.VISIBLE);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+
                                                             // <HACK>
                                                             // TODO: Put this code in Camera
                                                             // Camera
-                                                            Group<Port> pathPorts = port.getPorts(paths);
+                                                            Group<Port> pathPorts = paths.getPorts();
                                                             ShapeGroup pathPortShapes = space.getShapes().filterEntity(pathPorts);
                                                             camera.adjustScale(pathPortShapes.getBoundingBox());
                                                             camera.setPosition(pathPortShapes.getCenterPosition());
@@ -736,7 +769,7 @@ public class HostImage extends PortableImage {
 
                                                 } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
 
-                                                    // (PhoneHost.Port A, ..., PhoneHost.Port B) Action Pattern
+                                                    // (Host.Port A, ..., Host.Port B) Action Pattern
                                                     // i.e., The Action's first and last Events address different Ports.
 
                                                     Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
@@ -838,7 +871,7 @@ public class HostImage extends PortableImage {
                                                                 hostImage.setDockVisibility(Visibility.Value.VISIBLE);
                                                             }
 
-                                                            List<Path> paths = sourcePort.getPaths();
+                                                            PathGroup paths = sourcePort.getPaths();
                                                             for (int i = 0; i < paths.size(); i++) {
                                                                 Path connectedPath = paths.get(i);
 
@@ -853,7 +886,7 @@ public class HostImage extends PortableImage {
                                                             }
 
                                                             // Camera
-                                                            event.getActor().getCamera().focusSelectPath(sourcePort);
+                                                            event.getActor().getCamera().setFocus(paths);
                                                         }
 
                                                         space.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
@@ -866,7 +899,7 @@ public class HostImage extends PortableImage {
                                                     // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
                                                     && action.getLastEvent().getTargetImage() == space) {
 
-                                                // (PhoneHost.Port, ..., Space) Action Pattern
+                                                // (Host.Port, ..., Space) Action Pattern
 
                                                 Log.v("Extension", "Creating Extension from Port");
 
@@ -885,7 +918,9 @@ public class HostImage extends PortableImage {
                                                     // Create Ports and add them to the Extension
                                                     int defaultPortCount = 1;
                                                     for (int j = 0; j < defaultPortCount; j++) {
-                                                        extension.addPort(new Port());
+                                                        Port port = new Port();
+                                                        port.setNumber(j + 1);
+                                                        extension.addPort(port);
                                                     }
 
                                                     // Add Extension to Model
@@ -902,7 +937,7 @@ public class HostImage extends PortableImage {
                                                     // <REFACTOR>
                                                     // Update the Extension Image position and rotation
                                                     //extensionImage.setPosition(event.getPosition());
-                                                    Shape boardShape = getShape("Board");
+                                                    Shape boardShape = getShape("Substrate");
                                                     Line nearestSegment = null;
                                                     int segmentIndex = -1;
                                                     List<Line> boardShapeSegments = boardShape.getSegments();
@@ -948,7 +983,7 @@ public class HostImage extends PortableImage {
                                                     }
                                                     // </REFACTOR>
 
-                                                    // Configure PhoneHost's Port (i.e., the Path's source Port)
+                                                    // Configure Host's Port (i.e., the Path's source Port)
                                                     Port hostPort = (Port) hostPortShape.getEntity();
 
                                                     if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
@@ -961,7 +996,7 @@ public class HostImage extends PortableImage {
                                                     extensionPort.setDirection(Port.Direction.INPUT);
                                                     extensionPort.setType(hostPort.getType());
 
-                                                    // Create Path from PhoneHost to Extension
+                                                    // Create Path from Host to Extension
                                                     Path path = new Path(hostPort, extensionPort);
                                                     path.setType(Path.Type.ELECTRONIC);
                                                     hostPort.addForwardPath(path);
@@ -979,7 +1014,7 @@ public class HostImage extends PortableImage {
                                                         hostImage.setDockVisibility(Visibility.Value.VISIBLE);
                                                     }
 
-                                                    List<Path> paths = hostPort.getPaths();
+                                                    PathGroup paths = hostPort.getPaths();
                                                     for (int i = 0; i < paths.size(); i++) {
                                                         Path connectedPath = paths.get(i);
 
@@ -994,7 +1029,7 @@ public class HostImage extends PortableImage {
                                                     }
 
                                                     // Update Camera
-                                                    camera.focusSelectPath(hostPort);
+                                                    camera.setFocus(paths);
 
                                                 }
 
@@ -1071,7 +1106,7 @@ public class HostImage extends PortableImage {
             if (Application.ENABLE_GEOMETRY_LABELS) {
                 display.getPaint().setColor(Color.GREEN);
                 display.getPaint().setStyle(Paint.Style.STROKE);
-                Rectangle boardShape = (Rectangle) getShape("Board");
+                Rectangle boardShape = (Rectangle) getShape("Substrate");
                 Display.drawCircle(getPosition(), boardShape.getWidth(), 0, display);
                 Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
             }

@@ -128,7 +128,6 @@ public abstract class Image<T extends Entity> {
 
     public Shape getShape(Point point) {
 
-//        List<Shape> shapes = getShapes().getList();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.contains(point)) {

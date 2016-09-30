@@ -102,6 +102,7 @@ public class Clay {
 
         for (int j = 0; j < PORT_COUNT; j++) {
             Port port = new Port();
+            port.setNumber(j + 1);
             host.addPort(port);
         }
 

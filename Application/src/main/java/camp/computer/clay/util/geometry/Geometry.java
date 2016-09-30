@@ -8,66 +8,26 @@ import camp.computer.clay.util.image.Space;
 
 public abstract class Geometry {
 
-    /**
-     * Returns the sum of the degrees of in a shape (or polygon) with the number of segments
-     * {@code segmentCount}.
-     *
-     * @param segmentCount The number of segments in a shape (or polygon).
-     * @return The degrees in a shape with the number of segments {@code segmentCount}.
-     * @see <a href="http://www.mathsisfun.com/geometry/interior-angles-polygons.html">Interior Angles of Polygons</a>
-     */
-    public static int calculateDegreesInShape(int segmentCount) {
-        if (segmentCount > 2) {
-            return (segmentCount - 2) * 180;
-        } else {
-            return 0;
-        }
+    public static double calculateRotationAngle(Point source, Point target) {
+        return Geometry.calculateRotationAngle(source.getX(), source.getY(), target.getX(), target.getY());
     }
 
     /**
-     * Calculates the rotation from source to target in degrees.
-     * The return should range from [0,360), rotating CLOCKWISE,
-     * 0 and 360 degrees represents NORTH,
-     * 90 degrees represents EAST, etc...
+     * Calculates the rotation angle in degrees from {@code source} to {@code target}.
+     * <p>
+     * Returns angle in degrees in the range [0,360), rotating CLOCKWISE, 0 and 360 degrees
+     * represents NORTH, 90 degrees represents EAST, etc...
      * <p>
      * Assumes all pointerCoordinates are in the same coordinate space.  If they are not,
      * you will need to call SwingUtilities.convertPointToScreen or equivalent
      * on all arguments before passing them  to this function.
      *
-     * @param source Point we are rotating around.
-     * @param target Point to which we want to calculate the rotation, relative to the center point.
+     * @param x1 Point we are rotating around.
+     * @param y1
+     * @param x2 Point to which we want to calculate the rotation, relative to the center point.
+     * @param y2
      * @return rotation in degrees.  This is the rotation from centerPt to targetPt.
      */
-    public static double calculateRotationAngle(Point source, Point target) {
-
-        // calculate the rotation theta from the deltaY and deltaX values
-        // (atan2 returns radians values from [-PI,PI])
-        // 0 currently pointerCoordinates EAST.
-        // NOTE: By preserving Y and X param order to atan2,  we are expecting
-        // a CLOCKWISE rotation direction.
-        double theta = Math.atan2(target.getY() - source.getY(), target.getX() - source.getX());
-
-        // rotate the theta rotation clockwise by 90 degrees
-        // (this makes 0 point NORTH)
-        // NOTE: adding to an rotation rotates it clockwise.
-        // subtracting would rotate it counter-clockwise
-//        theta += Math.PI / 2.0;
-
-        // convert from radians to degrees
-        // this will give you an rotation from [0->270],[-180,0]
-        double angle = Math.toDegrees(theta);
-
-        // convert to positive range [0-360)
-        // since we want to prevent negative angles, adjust them now.
-        // we can assume that atan2 will not return a negative value
-        // greater than one partial rotation
-//        if (rotation < 0) {
-//            rotation += 360;
-//        }
-
-        return angle;
-    }
-
     public static double calculateRotationAngle(double x1, double y1, double x2, double y2) {
 
         // calculate the rotation theta from the deltaY and deltaX values
@@ -99,16 +59,15 @@ public abstract class Geometry {
     }
 
     /**
-     * Calculates coordinates of a point rotated about about another origin point by a given number
-     * of degrees.
+     * Calculates coordinates of a point rotated about about another point by {@code angle} degrees.
      * <p>
      * References:
      * - http://www.gamefromscratch.com/post/2012/11/24/GameDev-math-recipes-Rotating-one-point-around-another-point.aspx
      *
      * @return
      */
-    public static Point calculateRotatedPoint(Point originPoint, double angle, Point point) {
-        return Geometry.calculatePoint(originPoint, angle + Geometry.calculateRotationAngle(originPoint, point), Point.calculateDistance(originPoint, point));
+    public static Point calculateRotatedPoint(Point center, double angle, Point point) {
+        return Geometry.calculatePoint(center, angle + Geometry.calculateRotationAngle(center, point), Point.calculateDistance(center, point));
     }
 
     public static Point calculateRotatedPoint(double x1, double y1, double angle, double x2, double y2) {
@@ -143,7 +102,7 @@ public abstract class Geometry {
     }
 
     //Compute the dot product AB . AC
-    public static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC) {
+    private static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point BC = new Point();
         AB.setX(linePointB.getX() - linePointA.getX());
@@ -155,7 +114,7 @@ public abstract class Geometry {
     }
 
     //Compute the cross product AB relativeX AC
-    public static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
+    private static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point AC = new Point();
         AB.setX(linePointB.getX() - linePointA.getX());
@@ -166,27 +125,37 @@ public abstract class Geometry {
         return cross;
     }
 
-    //Compute the distance from AB to C
+    /**
+     * Calculates the distance between the point {@code point} and the line or segment through
+     * {@code linePointA} and {@code linePointB}.
+     *
+     * @param linePointA
+     * @param linePointB
+     * @param point
+     * @param isSegment
+     * @return
+     */
+    //
     //if isSegment is true, AB is a segment, not a line.
     // References:
     // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
-    public static double calculateLineToPointDistance(Point linePointA, Point linePointB, Point pointC, boolean isSegment) {
-        double distance = calculateCrossProduct(linePointA, linePointB, pointC) / Point.calculateDistance(linePointA, linePointB);
+    public static double calculateLineToPointDistance(Point linePointA, Point linePointB, Point point, boolean isSegment) {
+        double distance = calculateCrossProduct(linePointA, linePointB, point) / Point.calculateDistance(linePointA, linePointB);
         if (isSegment) {
-            double dot1 = calculateDotProduct(linePointA, linePointB, pointC);
+            double dot1 = calculateDotProduct(linePointA, linePointB, point);
             if (dot1 > 0) {
-                return Point.calculateDistance(linePointB, pointC);
+                return Point.calculateDistance(linePointB, point);
             }
 
-            double dot2 = calculateDotProduct(linePointB, linePointA, pointC);
+            double dot2 = calculateDotProduct(linePointB, linePointA, point);
             if (dot2 > 0) {
-                return Point.calculateDistance(linePointA, pointC);
+                return Point.calculateDistance(linePointA, point);
             }
         }
         return Math.abs(distance);
     }
 
-    public static Point calculateCentroidCoordinate(List<Point> points) {
+    public static Point calculateCentroid(List<Point> points) {
 
         Point centroidPosition = new Point(0, 0);
 
@@ -233,22 +202,32 @@ public abstract class Geometry {
         return new Rectangle(minX, minY, maxX, maxY);
     }
 
-    public static Point calculateCenterPosition(List<Point> points) {
+    /**
+     * Calculates and returns the center {@code Point} of the {@code Point}s in {@code points}.
+     *
+     * @param points
+     * @return
+     */
+    public static Point calculateCenter(List<Point> points) {
         return calculateBoundingBox(points).getPosition();
     }
 
-    public static Point calculateNearestPoint(Point sourcePoint, List<Point> points) {
+    /**
+     * Returns the {@code Point} in {@code points} nearest to {@code point}.
+     *
+     * @param point
+     * @param points
+     * @return
+     */
+    public static Point calculateNearestPoint(Point point, List<Point> points) {
 
         // Initialize point
         Point nearestPoint = points.get(0);
-        double nearestDistance = Point.calculateDistance(sourcePoint, nearestPoint);
+        double nearestDistance = Point.calculateDistance(point, nearestPoint);
 
         // Search for the nearest point
         for (int i = 0; i < points.size(); i++) {
-
-            Point point = points.get(i);
-            double distance = Point.calculateDistance(sourcePoint, point);
-
+            double distance = Point.calculateDistance(points.get(i), point);
             if (distance < nearestDistance) {
                 nearestPoint.set(point);
             }
@@ -521,126 +500,9 @@ public abstract class Geometry {
             }
         }
 
-//        String sortedListResult = "";
-//        for (Image p: sortedList) {
-//            sortedListResult += calculateDistance(p.getPosition(), point) + ", ";
-//        }
-//        Log.v("Sort", sortedListResult);
-
         return sortedList;
 
     }
-
-//    /**
-//     * Compute list of pointerCoordinates that are separated by a minimal distance. Based on circle packing
-//     * algorithm.
-//     * @param positions
-//     * @return
-//     */
-//    public static ArrayList<Point> computeCirclePacking(ArrayList<Point> positions, double distance, Point packingCenter) {
-//
-//        // Sort pointerCoordinates based on distance from center
-//        ArrayList<Point> sortedPoints = sortByDistanceToPoint(positions, packingCenter);
-//
-//        double minSeparationSq = distance * distance;
-//
-//        for (int i = 0; i < sortedPoints.size() - 1; i++) {
-//            for (int j = i + 1; j < sortedPoints.size(); j++) {
-//
-//                if (i == j) {
-//                    continue;
-//                }
-//
-//                Point vectorAB = new Point();
-//                vectorAB.getX() = sortedPoints.getEvent(j).getX() - sortedPoints.getEvent(i).getX();
-//                vectorAB.getY() = sortedPoints.getEvent(j).getY() - sortedPoints.getEvent(i).getX();
-//
-//                double radiusSum = distance + distance;
-//
-//                // Length squared = (dx * dx) + (dy * dy);
-//                double d = (double) (Geometry.calculateDistance(vectorAB, packingCenter) * Geometry.calculateDistance(vectorAB, packingCenter)) - minSeparationSq;
-//                double minSepSq = Math.min(d, minSeparationSq);
-//                d -= minSepSq;
-//
-//                if (d < (radiusSum * radiusSum) - 0.01 )
-//                {
-//                    // Normalize (transform into unit vector)
-//                    // TODO: AB.Normalize();
-//                    double magnitude = (double) Geometry.calculateDistance(packingCenter, vectorAB);
-//                    Point unitVectorAB = new Point(0, 0);
-//                    unitVectorAB.getX() = vectorAB.getX() / magnitude;
-//                    unitVectorAB.getY() = vectorAB.getY() / magnitude;
-//
-//                    // TODO: AB *= (double)((r - Math.Sqrt(d)) * 0.5f);
-//                    unitVectorAB.getX() *= (double)((radiusSum - Math.sqrt(d)) * 0.5f);
-//                    unitVectorAB.getY() *= (double)((radiusSum - Math.sqrt(d)) * 0.5f);
-//
-////                    if (positions.getEvent(j) != mDraggingCircle)
-//                        // TODO: positions.getEvent(j).mCenter += AB;
-//                    sortedPoints.getEvent(j).getX() += unitVectorAB.getX();
-//                    sortedPoints.getEvent(j).getY() += unitVectorAB.getY();
-////                    if (positions.getEvent(i) != mDraggingCircle)
-//                        // TODO: positions.getEvent(i).mCenter -= AB;
-//                    sortedPoints.getEvent(i).getX() -= unitVectorAB.getX();
-//                    sortedPoints.getEvent(i).getY() -= unitVectorAB.getY();
-//                }
-//
-//            }
-//        }
-//
-//        double iterationCounter = 5;
-//        double damping = 0.1f / (double)(iterationCounter);
-//        for (int i = 0; i < sortedPoints.size(); i++)
-//        {
-////            if (mCircles[i] != mDraggingCircle)
-////            {
-//                // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
-//                Point v = new Point(0, 0);
-//                v.getX() = sortedPoints.getEvent(i).getX() - packingCenter.getX();
-//                v.getY() = sortedPoints.getEvent(i).getY() - packingCenter.getY();
-//
-//                // TODO: v *= damping;
-//                v.getX() *= damping;
-//                v.getY() *= damping;
-//
-//                // TODO: mCircles[i].mCenter -= v;
-//                sortedPoints.getEvent(i).getX() -= v.getX();
-//                sortedPoints.getEvent(i).getY() -= v.getY();
-////            }
-//        }
-//
-//        return sortedPoints;
-//
-//    }
-//
-//    public static ArrayList<Point> sortByDistanceToPoint(ArrayList<Point> positions, Point point) {
-//
-//        // Initialize with unsorted list of pointerCoordinates
-//        ArrayList<Point> sortedList = new ArrayList(positions);
-//
-//        for (int i = 0; i < sortedList.size(); i++) {
-//            for (int j = i + 1; j < sortedList.size(); j++) {
-//
-//                Point p1 = positions.getEvent(i);
-//                Point p2 = positions.getEvent(j);
-//
-//                if (Geometry.calculateDistance(p1, point) > Geometry.calculateDistance(p2, point)) {
-//                    positions.remove(i);
-//                    positions.addEvent(i + 1, p1);
-//                }
-//
-//            }
-//        }
-//
-//        String sortedListResult = "";
-//        for (Point p: sortedList) {
-//            sortedListResult += calculateDistance(p, point) + ", ";
-//        }
-//        Log.v("Sort", sortedListResult);
-//
-//        return sortedList;
-//
-//    }
 
     /**
      * General-purpose function that returns true if the given point is contained inside the shape
@@ -691,17 +553,11 @@ public abstract class Geometry {
 
             // Calculate point prior to rotation
             Point vertexPosition = new Point(
-//                    (position.getX() + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)),
-//                    (position.getY() + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)),
                     (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeRotation())),
                     (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRelativeRotation())),
                     position
             );
 
-            // Calculate rotated point
-            //Point rotatedPoint = Geometry.calculateRotatedPoint(position, position.getRotation(), vertexPosition);
-
-            //vertices.addEvent(vertexPosition);
             vertices.add(vertexPosition);
         }
 
@@ -727,19 +583,4 @@ public abstract class Geometry {
 
         return vertices;
     }
-
-    // TODO: Detect if a point falls within a shape defined by list of pointerCoordinates.
-    // TODO: (cont'd) - http://alienryderflex.com/polygon/
-    // TODO: (cont'd) - http://stackoverflow.com/questions/8721406/how-to-determine-if-a-point-is-inside-a-2d-convex-polygon
-    // TODO: (cont'd) - http://math.stackexchange.com/questions/193606/detect-when-a-point-belongs-to-a-bounding-box-with-distances?lq=1
-    // TODO: (cont'd) - http://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
-
-    // TODO: Detect minimum bounding box rotating to fit list of pointerCoordinates
-    // TODO: (cont'd) - http://gis.stackexchange.com/questions/22895/how-to-find-the-minimum-area-rectangle-for-given-points
-
-    // TODO: Classify shape given a list of pointerCoordinates (2D point cloud). (Use this rather than instanceof?)
-    // TODO: (cont'd) - http://stat.fsu.edu/~anuj/pdf/papers/Y2012/Su_CSDA_2012_Paper.pdf
-    // TODO: (cont'd) - http://homepages.inf.ed.ac.uk/svijayak/publications/mcneill-IJCAI2005.pdf
-    // TODO: (cont'd) - http://www.cs.umd.edu/~djacobs/pubs_files/ID-pami-8.pdf
-    // TODO: (cont'd) - https://en.wikipedia.org/wiki/Shape_analysis_(digital_geometry)
 }

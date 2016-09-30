@@ -1,8 +1,6 @@
 package camp.computer.clay.model;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import camp.computer.clay.model.util.PathGroup;
 
 public class Port extends Entity {
 
@@ -52,11 +50,13 @@ public class Port extends Entity {
         }
     }
 
-    private List<Path> paths = new ArrayList<>();
+    protected int number = 0;
 
-    private Type type = Type.NONE;
+    protected Type type = Type.NONE;
 
-    private Direction direction = Direction.NONE;
+    protected Direction direction = Direction.NONE;
+
+    protected PathGroup paths = new PathGroup();
 
     public Portable getPortable() {
         return (Portable) getParent();
@@ -77,12 +77,12 @@ public class Port extends Entity {
     }
 
     // TODO: Rename to getRemotePorts() // returns "virtual ports" exposed to remove devices (other Clay)
-    public List<Path> getForwardPaths() { // formerly getPaths()
+    public PathGroup getForwardPaths() { // formerly getPaths()
         return this.getDescendantPaths(1);
     }
 
     public Extension getExtension() {
-        List<Path> paths = this.getPaths(1);
+        PathGroup paths = this.getPaths(1);
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
             if (path.getSource() == this || path.getTarget() == this) {
@@ -94,6 +94,14 @@ public class Port extends Entity {
             }
         }
         return null;
+    }
+
+    public int getNumber() {
+        return this.number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public Type getType() {
@@ -143,10 +151,10 @@ public class Port extends Entity {
         return this.paths.contains(path);
     }
 
-    public List<Path> getPaths(int depth) {
-        List<Path> connectedPaths = new ArrayList<>();
-        connectedPaths.addAll(getAncestorPaths(depth));
-        connectedPaths.addAll(getDescendantPaths(depth));
+    public PathGroup getPaths(int depth) {
+        PathGroup connectedPaths = new PathGroup();
+        connectedPaths.add(getAncestorPaths(depth));
+        connectedPaths.add(getDescendantPaths(depth));
         return connectedPaths;
     }
 
@@ -156,23 +164,20 @@ public class Port extends Entity {
      *
      * @return List of paths in the graph containing the port.
      */
-    public List<Path> getPaths() {
-
-        // TODO: Replace List<Path> with PathGroup with filters
-
-        List<Path> connectedPaths = new ArrayList<>();
-        connectedPaths.addAll(getAncestorPaths());
-        connectedPaths.addAll(getDescendantPaths());
-        return connectedPaths;
+    public PathGroup getPaths() {
+        PathGroup paths = new PathGroup();
+        paths.add(getAncestorPaths());
+        paths.add(getDescendantPaths());
+        return paths;
     }
 
-    public List<Path> getAncestorPaths(int depth) {
+    public PathGroup getAncestorPaths(int depth) {
 
-        List<Path> ancestorPaths = new ArrayList<>();
+        PathGroup ancestorPaths = new PathGroup();
 
         Model model = (Model) getParent().getParent();
 
-        List<Path> paths = model.getPaths();
+        PathGroup paths = model.getPaths();
 
         // Search for direct ancestor paths from port
         for (int i = 0; i < paths.size(); i++) {
@@ -182,7 +187,7 @@ public class Port extends Entity {
 
                 // Recursive call to the Path's source Port
                 if (depth > 1) {
-                    ancestorPaths.addAll(path.getSource().getAncestorPaths(depth - 1));
+                    ancestorPaths.add(path.getSource().getAncestorPaths(depth - 1));
                 }
             }
         }
@@ -191,12 +196,12 @@ public class Port extends Entity {
         return ancestorPaths;
     }
 
-    public List<Path> getAncestorPaths() {
+    public PathGroup getAncestorPaths() {
 
         Model model = (Model) getParent().getParent();
-        List<Path> paths = model.getPaths();
+        PathGroup paths = model.getPaths();
 
-        List<Path> ancestorPaths = new ArrayList<>();
+        PathGroup ancestorPaths = new PathGroup();
 
         // Search for direct ancestor paths from port
         for (int i = 0; i < paths.size(); i++) {
@@ -205,16 +210,16 @@ public class Port extends Entity {
                 ancestorPaths.add(path); // Store the path
 
                 // Recursive call to the Path's source Port
-                ancestorPaths.addAll(path.getSource().getAncestorPaths());
+                ancestorPaths.add(path.getSource().getAncestorPaths());
             }
         }
 
         return ancestorPaths;
     }
 
-    public List<Path> getDescendantPaths(int depth) {
+    public PathGroup getDescendantPaths(int depth) {
 
-        List<Path> descendantPaths = new LinkedList<>();
+        PathGroup descendantPaths = new PathGroup();
 
         for (int i = 0; i < this.paths.size(); i++) {
             Path path = this.paths.get(i);
@@ -222,28 +227,28 @@ public class Port extends Entity {
 
             // Recursive call to the Path's target Port
             if (depth > 1) {
-                descendantPaths.addAll(path.getTarget().getDescendantPaths(depth - 1));
+                descendantPaths.add(path.getTarget().getDescendantPaths(depth - 1));
             }
         }
 
         return descendantPaths;
     }
 
-    public List<Path> getDescendantPaths() {
+    public PathGroup getDescendantPaths() {
 
-        List<Path> descendantPaths = new LinkedList<>();
+        PathGroup descendantPaths = new PathGroup();
 
         for (int i = 0; i < this.paths.size(); i++) {
             Path path = this.paths.get(i);
             descendantPaths.add(path); // Store the path
-            descendantPaths.addAll(path.getTarget().getDescendantPaths());
+            descendantPaths.add(path.getTarget().getDescendantPaths());
         }
 
         return descendantPaths;
     }
 
     public boolean hasAncestor(Port port) {
-        List<Path> ancestorPaths = getAncestorPaths();
+        PathGroup ancestorPaths = getAncestorPaths();
         for (int i = 0; i < ancestorPaths.size(); i++) {
             Path ancestorPath = ancestorPaths.get(i);
             if (ancestorPath.getSource() == port || ancestorPath.getTarget() == port) {
@@ -254,7 +259,7 @@ public class Port extends Entity {
     }
 
     public boolean hasDescendant(Port port) {
-        List<Path> descendantPaths = getDescendantPaths();
+        PathGroup descendantPaths = getDescendantPaths();
         for (int i = 0; i < descendantPaths.size(); i++) {
             Path descendantPath = descendantPaths.get(i);
             if (descendantPath.getSource() == port || descendantPath.getTarget() == port) {
@@ -270,17 +275,17 @@ public class Port extends Entity {
      * @param paths List of paths for which a list contained ports will be returned.
      * @return List of ports contained in the specified list of paths {@code paths}.
      */
-    public Group<Port> getPorts(List<Path> paths) {
-        Group<Port> ports = new Group<>();
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            if (!ports.contains(path.getSource())) {
-                ports.add(path.getSource());
-            }
-            if (!ports.contains(path.getTarget())) {
-                ports.add(path.getTarget());
-            }
-        }
-        return ports;
-    }
+//    public Group<Port> getPorts(List<Path> paths) {
+//        Group<Port> ports = new Group<>();
+//        for (int i = 0; i < paths.size(); i++) {
+//            Path path = paths.get(i);
+//            if (!ports.contains(path.getSource())) {
+//                ports.add(path.getSource());
+//            }
+//            if (!ports.contains(path.getTarget())) {
+//                ports.add(path.getTarget());
+//            }
+//        }
+//        return ports;
+//    }
 }

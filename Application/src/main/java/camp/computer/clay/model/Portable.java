@@ -1,9 +1,7 @@
 package camp.computer.clay.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import camp.computer.clay.model.profile.PortableProfile;
+import camp.computer.clay.model.util.PathGroup;
 
 public class Portable extends Entity {
     private PortableProfile profile = null;
@@ -21,6 +19,7 @@ public class Portable extends Entity {
         // Create Ports to match the Profile
         for (int i = 0; i < profile.getPorts().size(); i++) {
             Port port = new Port();
+            port.setNumber(i + 1);
             port.setType(profile.getPorts().get(i).getType());
             port.setDirection(profile.getPorts().get(i).getDirection());
             addPort(port);
@@ -44,11 +43,11 @@ public class Portable extends Entity {
         return this.ports;
     }
 
-    public List<Path> getPaths() {
-        List<Path> paths = new ArrayList<>();
+    public PathGroup getPaths() {
+        PathGroup paths = new PathGroup();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
-            paths.addAll(port.getForwardPaths());
+            paths.add(port.getForwardPaths());
         }
         return paths;
     }

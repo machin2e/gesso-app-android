@@ -7,11 +7,11 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Group;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Visibility;
 
 /**
  * ShapeGroup is an interface for managing and manipulating sets of elements.
@@ -205,12 +205,12 @@ public class ShapeGroup extends Group<Shape> {
     }
 
     public Point getCenterPosition() {
-        return Geometry.calculateCenterPosition(getPositions());
+        return Geometry.calculateCenter(getPositions());
     }
 
 
     public Point getCentroidPosition() {
-        return Geometry.calculateCentroidCoordinate(getPositions());
+        return Geometry.calculateCentroid(getPositions());
     }
 
     public Rectangle getBoundingBox() {

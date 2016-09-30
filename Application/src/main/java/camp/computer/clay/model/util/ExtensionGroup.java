@@ -1,4 +1,4 @@
-package camp.computer.clay.model.architecture.util;
+package camp.computer.clay.model.util;
 
 import camp.computer.clay.model.Extension;
 

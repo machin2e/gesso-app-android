@@ -38,6 +38,7 @@ public class Space extends Image<Model> {
     protected Visibility prototypeExtensionVisibility = new Visibility(Visibility.Value.INVISIBLE);
     protected Point prototypeExtensionPosition = new Point();
 
+    protected PathImage prototypePathImage = new PathImage(null);
     protected Visibility prototypePathVisibility = new Visibility(Visibility.Value.INVISIBLE);
     protected Point prototypePathSourcePosition = new Point(0, 0);
     protected Point prototypePathDestinationCoordinate = new Point(0, 0);
@@ -84,7 +85,7 @@ public class Space extends Image<Model> {
                     if (action.isTap()) {
 
                         // Camera
-                        camera.focusSelectSpace();
+                        camera.setFocus(getSpace());
                     }
                 }
             }
@@ -130,12 +131,7 @@ public class Space extends Image<Model> {
 
         } else if (entity instanceof Port) {
 
-            Port port = (Port) entity;
-
-//            PortImage portImage = new PortImage(port);
-//            addImage(portImage, "ports");
-
-            // TODO:
+//            Port port = (Port) entity;
 
         } else if (entity instanceof Path) {
 
@@ -166,7 +162,7 @@ public class Space extends Image<Model> {
         // </HACK>
 
         // Update Camera
-        getEntity().getActor(0).getCamera().focusSelectSpace();
+        getEntity().getActor(0).getCamera().setFocus(getSpace());
     }
 
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
@@ -396,7 +392,7 @@ public class Space extends Image<Model> {
 
             // <CENTER_LABEL>
             List<Point> figureCoordinates = getImages().filterType(Host.class, Extension.class).getPositions();
-            Point baseImagesCenterCoordinate = Geometry.calculateCenterPosition(figureCoordinates);
+            Point baseImagesCenterCoordinate = Geometry.calculateCenter(figureCoordinates);
             display.getPaint().setColor(Color.RED);
             display.getPaint().setStyle(Paint.Style.FILL);
             display.getCanvas().drawCircle((float) baseImagesCenterCoordinate.getX(), (float) baseImagesCenterCoordinate.getY(), 10, display.getPaint());
@@ -500,11 +496,12 @@ public class Space extends Image<Model> {
                     2 * triangleSpacing
             );
 
+            paint.setColor(Color.parseColor("#efefef"));
             Display.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight, display);
 
             // Color
             paint.setStyle(Paint.Style.FILL);
-//            paint.setColor(getUniqueColor());
+//            paint.setColor(Color.parseColor("#efefef"));
             double shapeRadius = 40.0;
             Display.drawCircle(prototypePathDestinationCoordinate, shapeRadius, 0.0f, display);
         }

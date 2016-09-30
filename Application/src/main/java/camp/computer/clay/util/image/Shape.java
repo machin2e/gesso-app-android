@@ -61,11 +61,11 @@ public abstract class Shape<T extends Entity> {
         return this.position.getRotation();
     }
 
-    public void setOrigin(Point point) {
+    public void setReferencePoint(Point point) {
         this.position.setReferencePoint(point);
     }
 
-    public Point getOrigin() {
+    public Point getReferencePoint() {
         return this.position.getReferencePoint();
     }
 
@@ -86,7 +86,6 @@ public abstract class Shape<T extends Entity> {
     public boolean contains(Point point) {
         return Geometry.containsPoint(getVertices(), point);
     }
-
 
     public void setVisibility(Visibility.Value visibility) {
         this.visibility.setValue(visibility);

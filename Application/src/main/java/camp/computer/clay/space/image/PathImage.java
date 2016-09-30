@@ -5,14 +5,15 @@ import android.graphics.Paint;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Path;
+import camp.computer.clay.model.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
+import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
 
 public class PathImage extends Image<Path> {
 
@@ -75,17 +76,21 @@ public class PathImage extends Image<Path> {
     public void draw(Display display) {
 
         if (isVisible()) {
-            // Draw path between ports with style dependant on path type
             Path path = getPath();
             if (path.getType() == Path.Type.MESH) {
+                // Draw Path between Ports
                 drawTrianglePath(display);
             } else if (path.getType() == Path.Type.ELECTRONIC) {
                 drawLinePath(display);
             }
+        } else {
+            Path path = getPath();
+            if (path.getType() == Path.Type.ELECTRONIC) {
+                drawPhysicalPath(display);
+            }
         }
     }
 
-    // TODO: Refactor. Put in Geometry/Shape.
     public void drawTrianglePath(Display display) {
 
         Paint paint = display.getPaint();
@@ -131,20 +136,45 @@ public class PathImage extends Image<Path> {
         Shape sourcePortShape = getSpace().getShape(path.getSource());
         Shape targetPortShape = getSpace().getShape(path.getTarget());
 
-        // Show target port
-        targetPortShape.setVisibility(Visibility.Value.VISIBLE);
-        //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
+        if (sourcePortShape != null && targetPortShape != null) {
 
-        // Color
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(15.0f);
-        paint.setColor(Color.parseColor(sourcePortShape.getColor()));
+            // Show target port
+            targetPortShape.setVisibility(Visibility.Value.VISIBLE);
+            //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
-        double pathRotationAngle = Geometry.calculateRotationAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-        Point pathStartCoordinate = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
-        Point pathStopCoordinate = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+            // Color
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(15.0f);
+            paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-        Display.drawLine(pathStartCoordinate, pathStopCoordinate, display);
+            double pathRotationAngle = Geometry.calculateRotationAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
+            Point pathStartCoordinate = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
+            Point pathStopCoordinate = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
+            Display.drawLine(pathStartCoordinate, pathStopCoordinate, display);
+        }
+
+    }
+
+    private void drawPhysicalPath(Display display) {
+
+        Path path = getPath();
+
+        // Get Host and Extension Ports
+        Port hostPort = path.getSource();
+        Port extensionPort = path.getTarget();
+
+        // Draw the connection to the Host's Port
+
+        PortableImage hostImage = (PortableImage) space.getImage(hostPort.getPortable());
+        PortableImage extensionImage = (PortableImage) space.getImage(extensionPort.getPortable());
+
+        Point hostConnectorPosition = hostImage.portConnectorPositions.get(hostPort.getNumber() - 1);
+        Point extensionConnectorPosition = extensionImage.portConnectorPositions.get(extensionPort.getNumber() - 1);
+
+        // Draw connection between Ports
+        display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
+        display.getPaint().setStrokeWidth(15.0f);
+        Display.drawLine(hostConnectorPosition, extensionConnectorPosition, display);
     }
 }

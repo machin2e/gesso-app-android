@@ -19,6 +19,11 @@ public class Group<T> {
         this.elements.addAll(elements);
     }
 
+    public Group<T> remove(T element) {
+        this.elements.remove(element);
+        return this;
+    }
+
     public boolean contains(T element) {
         return elements.contains(element);
     }

@@ -1,5 +1,7 @@
 package camp.computer.clay.model;
 
+import camp.computer.clay.model.util.PortGroup;
+
 public class Path extends Entity {
 
     // TODO: Physical dimensions (distance between boards)
@@ -89,6 +91,13 @@ public class Path extends Entity {
 
     public Port getTarget() {
         return this.target;
+    }
+
+    public PortGroup getPorts() {
+        PortGroup ports = new PortGroup();
+        ports.add(source);
+        ports.add(target);
+        return ports;
     }
 
     public Host getHost() {
