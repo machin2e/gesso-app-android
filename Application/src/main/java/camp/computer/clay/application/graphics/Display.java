@@ -297,7 +297,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
         int pointerId = motionEvent.getPointerId(pointerIndex);
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-        int pointerCount = motionEvent.getPointerCount();
+        final int pointerCount = motionEvent.getPointerCount();
+
+        final int historySize = motionEvent.getHistorySize();
 
         if (this.space == null) {
             return false;
@@ -307,6 +309,73 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Get active actor
         Actor actor = space.getEntity().getActor(0);
+
+        boolean processHistory = true;
+        if (processHistory) {
+
+            for (int historyIndex = 0; historyIndex < historySize; historyIndex++) {
+
+                // Create pointerCoordinates event
+                Event event = new Event();
+
+                if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
+                    if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
+
+                        // Current
+                        // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
+                        for (int i = 0; i < pointerCount; i++) {
+                            int id = motionEvent.getPointerId(i);
+                            Point perspectivePosition = actor.getCamera().getPosition();
+                            double perspectiveScale = actor.getCamera().getScale();
+                            event.pointerCoordinates[id].setX((motionEvent.getHistoricalX(i, historyIndex) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
+                            event.pointerCoordinates[id].setY((motionEvent.getHistoricalY(i, historyIndex) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                        }
+
+                        // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
+                        // starts the gesture. The pointer data for this pointer is always at index 0 in
+                        // the MotionEvent.
+                        //
+                        // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
+                        // the getFirstEvent. The pointer data for this pointer is at the index returned by
+                        // getActionIndex().
+                        //
+                        // ACTION_MOVE is sent when a change has happened during a press gesture for any
+                        // pointer.
+                        //
+                        // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
+                        //
+                        // ACTION_UP is sent when the getLastEvent pointer leaves the screen.
+                        //
+                        // REFERENCES:
+                        // - https://developer.android.com/training/gestures/multi.html
+
+                        // Update the state of the touched object based on the current pointerCoordinates event state.
+                        if (touchInteractionType == MotionEvent.ACTION_DOWN) {
+                            event.setType(Event.Type.SELECT);
+                            event.pointerIndex = pointerId;
+                            actor.processAction(event);
+                        } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
+                            // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
+                        } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
+                            event.setType(Event.Type.MOVE);
+                            event.pointerIndex = pointerId;
+                            actor.processAction(event);
+                        } else if (touchInteractionType == MotionEvent.ACTION_UP) {
+                            event.setType(Event.Type.UNSELECT);
+                            event.pointerIndex = pointerId;
+                            actor.processAction(event);
+                        } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
+                            // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
+                        } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
+                            // TODO:
+                        } else {
+                            // TODO:
+                        }
+                    }
+                }
+            }
+
+        }
 
         // Create pointerCoordinates event
         Event event = new Event();

@@ -38,7 +38,6 @@ public class Space extends Image<Model> {
     protected Visibility prototypeExtensionVisibility = new Visibility(Visibility.Value.INVISIBLE);
     protected Point prototypeExtensionPosition = new Point();
 
-    protected PathImage prototypePathImage = new PathImage(null);
     protected Visibility prototypePathVisibility = new Visibility(Visibility.Value.INVISIBLE);
     protected Point prototypePathSourcePosition = new Point(0, 0);
     protected Point prototypePathDestinationCoordinate = new Point(0, 0);
@@ -60,28 +59,27 @@ public class Space extends Image<Model> {
             @Override
             public void onAction(Action action) {
 
-                Event lastEvent = action.getLastEvent();
+                Event event = action.getLastEvent();
+                Camera camera = event.getActor().getCamera();
 
-                Camera camera = lastEvent.getActor().getCamera();
+                if (event.getType() == Event.Type.NONE) {
+                } else if (event.getType() == Event.Type.SELECT) {
 
-                if (lastEvent.getType() == Event.Type.NONE) {
-                } else if (lastEvent.getType() == Event.Type.SELECT) {
+                } else if (event.getType() == Event.Type.HOLD) {
 
-                } else if (lastEvent.getType() == Event.Type.HOLD) {
-                    // Select patch to connect
-//                    Application.getView().promptSelection();
-
-                } else if (lastEvent.getType() == Event.Type.MOVE) {
+                } else if (event.getType() == Event.Type.MOVE) {
 //                    if (action.isHolding()) {
 //                        // Space
 //                        //lastEvent.getTargetImage().processAction(action);
 //                    } else if (action.isDragging()) {
                     // Camera
-                    if (action.getSize() > 1) {
-                        camera.setOffset(lastEvent.getPosition().getX() - action.getFirstEvent().getPosition().getX(), lastEvent.getPosition().getY() - action.getFirstEvent().getPosition().getY());
-                    }
+//                    if (action.getSize() > 1) {
+//                        camera.setOffset(event.getPosition().getX() - action.getFirstEvent().getPosition().getX(), event.getPosition().getY() - action.getFirstEvent().getPosition().getY());
 //                    }
-                } else if (lastEvent.getType() == Event.Type.UNSELECT) {
+
+                    camera.setOffset(action.getOffset().getX(), action.getOffset().getY());
+//                    }
+                } else if (event.getType() == Event.Type.UNSELECT) {
                     if (action.isTap()) {
 
                         // Camera

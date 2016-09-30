@@ -24,7 +24,11 @@ public class Model extends Entity {
     }
 
     public Actor getActor(int index) {
-        return this.actors.get(index);
+        if (index < this.actors.size()) {
+            return this.actors.get(index);
+        } else {
+            return null;
+        }
     }
 
     public List<Actor> getActors() {

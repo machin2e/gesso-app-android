@@ -29,9 +29,6 @@ public class Action {
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
     // TODO: private double[] touchPressure = new double[Event.MAXIMUM_POINT_COUNT]; // Reference: http://stackoverflow.com/questions/17540058/android-detect-touch-pressure-on-capacitive-touch-screen
 
-    public double offsetX = 0;
-    public double offsetY = 0;
-
     public Handler timerHandler = new Handler();
 
     public Runnable timerRunnable = new Runnable() {
@@ -81,9 +78,6 @@ public class Action {
         event.setAction(this);
 
         events.add(event);
-
-        offsetX += event.getPosition().getX();
-        offsetY += event.getPosition().getY();
 
         if (events.size() == 1) {
 
@@ -217,6 +211,13 @@ public class Action {
 
     public boolean stopsWith(Event event) {
         return (getLastEvent() == event);
+    }
+
+    protected Point offset = new Point();
+
+    public Point getOffset() {
+        this.offset.set(getLastEvent().getPosition().getX() - getFirstEvent().getPosition().getX(), getLastEvent().getPosition().getY() - getFirstEvent().getPosition().getY());
+        return offset;
     }
 
 //    // in handlers (e.g., in Images), use this to check for match, if match, then use/get/setValue on the action's events to get inputs for the routine operation
