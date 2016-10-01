@@ -74,35 +74,47 @@ public class ExtensionImage extends PortableImage {
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    if (action.isTap()) {
+                    // Previous Action targeted also this Extension
+                    // TODO: Refactor
+                    if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getExtension()) {
 
-                        // Focus on touched base
-                        setPathVisibility(Visibility.Value.VISIBLE);
-                        getPortShapes().setVisibility(Visibility.Value.VISIBLE);
-                        setTransparency(1.0);
-
-                        // Show ports and paths of touched form
-                        ShapeGroup portShapes = getPortShapes();
-                        for (int i = 0; i < portShapes.size(); i++) {
-                            Shape portShape = portShapes.get(i);
-                            Port port = (Port) portShape.getEntity();
-
-                            PathGroup paths = port.getPaths();
-                            for (int j = 0; j < paths.size(); j++) {
-                                Path path = paths.get(j);
-
-                                // Show ports
-                                getSpace().getShape(path.getSource()).setVisibility(Visibility.Value.VISIBLE);
-                                getSpace().getShape(path.getTarget()).setVisibility(Visibility.Value.VISIBLE);
-
-                                // Show path
-                                getSpace().getImage(path).setVisibility(Visibility.Value.VISIBLE);
-                            }
+                        if (action.isTap()) {
+                            // TODO: Replace with script editor/timeline
+                            Application.getView().openActionEditor(getExtension());
                         }
 
-                        event.getActor().getCamera().setFocus(getExtension());
-                    }
+                    } else {
 
+
+                        if (action.isTap()) {
+
+                            // Focus on touched base
+                            setPathVisibility(Visibility.Value.VISIBLE);
+                            getPortShapes().setVisibility(Visibility.Value.VISIBLE);
+                            setTransparency(1.0);
+
+                            // Show ports and paths of touched form
+                            ShapeGroup portShapes = getPortShapes();
+                            for (int i = 0; i < portShapes.size(); i++) {
+                                Shape portShape = portShapes.get(i);
+                                Port port = (Port) portShape.getEntity();
+
+                                PathGroup paths = port.getPaths();
+                                for (int j = 0; j < paths.size(); j++) {
+                                    Path path = paths.get(j);
+
+                                    // Show ports
+                                    getSpace().getShape(path.getSource()).setVisibility(Visibility.Value.VISIBLE);
+                                    getSpace().getShape(path.getTarget()).setVisibility(Visibility.Value.VISIBLE);
+
+                                    // Show path
+                                    getSpace().getImage(path).setVisibility(Visibility.Value.VISIBLE);
+                                }
+                            }
+
+                            event.getActor().getCamera().setFocus(getExtension());
+                        }
+                    }
                 }
             }
         });

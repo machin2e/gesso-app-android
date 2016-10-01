@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.util.geometry.Point;
 
@@ -17,6 +18,16 @@ public class Action {
     // TODO: Entity this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
     // TODO: Entity voice thisAction in the same way. Generify to Action<T> or subclass.
     // TODO: (?) Entity data transmissions as events in the same way?
+
+    protected Actor actor = null;
+
+    public void setActor(Actor actor) {
+        this.actor = actor;
+    }
+
+    public Actor getActor() {
+        return this.actor;
+    }
 
     private List<Event> events = new LinkedList<>();
 
@@ -72,6 +83,16 @@ public class Action {
 //        Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
 //        Log.v("PreviousTouch", "Current: " + event.getTargetImage());
 //    }
+
+    public Action getPrevious() {
+        if (actor != null) {
+            if (actor.getActions().size() > 1) {
+                int previousActionIndex = actor.getActions().size() - 2;
+                return actor.getActions().get(previousActionIndex);
+            }
+        }
+        return null;
+    }
 
     public void addEvent(Event event) {
 

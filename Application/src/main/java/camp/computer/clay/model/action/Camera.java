@@ -32,7 +32,7 @@ public class Camera {
 
     public static final double DEFAULT_ADJUSTMENT_PERIOD = 200;
 
-    public static double MAXIMUM_SCALE = 1.0;
+    public static double MAXIMUM_SCALE = 1.5;
 
     /**
      * Width of perspective --- actions (e.g., touches) are interpreted relative to this point
@@ -184,10 +184,22 @@ public class Camera {
         }
     }
 
+    /**
+     * Adjusts the {@code Camera} to fit the bounding box {@code boundingBox}. This sets the
+     * duration of the scale adjustment to the default value {@code DEFAULT_SCALE_PERIOD}.
+     *
+     * @param boundingBox The bounding box to fit into the display area.
+     */
     public void adjustScale(Rectangle boundingBox) {
         adjustScale(boundingBox, Camera.DEFAULT_SCALE_PERIOD);
     }
 
+    /**
+     * Adjusts the {@code Camera} to fit the bounding box {@code boundingBox}.
+     *
+     * @param boundingBox The bounding box to fit into the display area.
+     * @param duration    The duration of the scale adjustment.
+     */
     public void adjustScale(Rectangle boundingBox, double duration) {
 
 //        // Multiply the bounding box
@@ -205,7 +217,8 @@ public class Camera {
                 setScale(verticalScale, duration);
             }
         } else {
-            setScale(DEFAULT_SCALE, DEFAULT_SCALE_PERIOD);
+            //setScale(DEFAULT_SCALE, DEFAULT_SCALE_PERIOD);
+            setScale(MAXIMUM_SCALE, DEFAULT_SCALE_PERIOD);
         }
     }
 
@@ -271,7 +284,8 @@ public class Camera {
 
         // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
-        Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
+        //Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
+        Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getVertices());
 
         adjustScale(boundingBox);
         setPosition(boundingBox.getPosition());

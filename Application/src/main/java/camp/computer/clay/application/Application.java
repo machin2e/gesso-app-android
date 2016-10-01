@@ -39,6 +39,7 @@ import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
+import camp.computer.clay.model.Extension;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 import redis.clients.jedis.Jedis;
@@ -103,6 +104,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     public Prompt getActionPrompts() {
         return this.ui;
+    }
+
+    public void openActionEditor(Extension extension) {
+        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
+        pathEditor.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -205,7 +211,9 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         // Read default form profiles
         String jsonString = null;
-        try {
+        try
+
+        {
             InputStream inputStream = getContext().getAssets().open("Hosts.json");
             int fileSize = inputStream.available();
             byte[] fileBuffer = new byte[fileSize];
@@ -213,13 +221,19 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             inputStream.close();
             jsonString = new String(fileBuffer, "UTF-8");
 
-        } catch (IOException e) {
+        } catch (
+                IOException e
+                )
+
+        {
             e.printStackTrace();
         }
 
         // Create JSON object
         JSONObject jsonObject = null;
-        try {
+        try
+
+        {
             jsonObject = new JSONObject(jsonString);
 
             JSONObject formObject = jsonObject.getJSONObject("form");
@@ -228,24 +242,35 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
             Log.v("Configuration", "reading JSON name: " + formName);
 
-        } catch (JSONException e) {
+        } catch (
+                JSONException e
+                )
+
+        {
             e.printStackTrace();
         }
 
 
         // Clay
-        clay = new Clay();
+        clay = new
+
+                Clay();
+
         clay.addDisplay(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
-        if (UDPHost == null) {
+        if (UDPHost == null)
+
+        {
             UDPHost = new UDPHost("udp");
             clay.addHost(this.UDPHost);
             UDPHost.startServer();
         }
 
         // Internet Network Interface
-        if (networkResource == null) {
+        if (networkResource == null)
+
+        {
             networkResource = new Internet();
             clay.addResource(this.networkResource);
         }
@@ -264,7 +289,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         */
 
         // Prevent on-screen keyboard from pushing up content
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        getWindow()
+
+                .
+
+                        setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         // <CHAT_AND_CONTEXT_SCOPE>
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
@@ -279,15 +308,19 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         // <CHAT>
 
-        messageContentHint.setOnTouchListener(new View.OnTouchListener() {
+        messageContentHint.setOnTouchListener(new View.OnTouchListener()
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                messageContentHint.setVisibility(View.GONE);
-                showMessageKeyboard();
-                return false;
-            }
-        });
+                                              {
+
+                                                  @Override
+                                                  public boolean onTouch(View v, MotionEvent event) {
+                                                      messageContentHint.setVisibility(View.GONE);
+                                                      showMessageKeyboard();
+                                                      return false;
+                                                  }
+                                              }
+
+        );
 
         // Hide scrollbars in keyboard
         messageKeyboardLayoutPerspective.setVerticalScrollBarEnabled(false);
@@ -300,35 +333,37 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         generateKeyboard();
 
         // Set up interactivity
-        messageContentLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent motionEvent) {
+        messageContentLayout.setOnTouchListener(new View.OnTouchListener()
 
-                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                int pointerId = motionEvent.getPointerId(pointerIndex);
-                //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
-                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-                int pointCount = motionEvent.getPointerCount();
+                                                {
+                                                    @Override
+                                                    public boolean onTouch(View v, MotionEvent motionEvent) {
 
-                // Update the state of the touched object based on the current pointerCoordinates interaction state.
-                if (touchActionType == MotionEvent.ACTION_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_UP) {
-                    showMessageKeyboard();
-                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO:
-                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
+                                                        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                                                        int pointerId = motionEvent.getPointerId(pointerIndex);
+                                                        //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
+                                                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                                                        int pointCount = motionEvent.getPointerCount();
 
-                return true;
-            }
+                                                        // Update the state of the touched object based on the current pointerCoordinates interaction state.
+                                                        if (touchActionType == MotionEvent.ACTION_DOWN) {
+                                                            // TODO:
+                                                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                                                            // TODO:
+                                                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                                                            // TODO:
+                                                        } else if (touchActionType == MotionEvent.ACTION_UP) {
+                                                            showMessageKeyboard();
+                                                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                                                            // TODO:
+                                                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                                                            // TODO:
+                                                        } else {
+                                                            // TODO:
+                                                        }
+
+                                                        return true;
+                                                    }
 
 //            @Override
 //            public boolean onTouch(Camera v, MotionEvent event) {
@@ -338,81 +373,95 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                timelineButton.setInputType(inType); // restore input type
 //                return true; // consume pointerCoordinates even
 //            }
-        });
+                                                }
 
-        messageContentLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        );
+
+        messageContentLayout.setOnClickListener(new View.OnClickListener()
+
+                                                {
+                                                    @Override
+                                                    public void onClick(View v) {
 
 
-            }
-        });
+                                                    }
+                                                }
+
+        );
         // </CHAT>
 
         // </CONTEXT_SCOPE>
-        contextScope.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+        contextScope.setOnTouchListener(new View.OnTouchListener()
 
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                        {
+                                            @Override
+                                            public boolean onTouch(View v, MotionEvent event) {
 
-                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                                                if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    // Get button holder
-                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
+                                                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 
-                    // Get screen width and height of the device
-                    DisplayMetrics metrics = new DisplayMetrics();
-                    Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                    int screenWidth = metrics.widthPixels;
-                    int screenHeight = metrics.heightPixels;
+                                                    // Get button holder
+                                                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
 
-                    // Get button width and height
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
-                    int buttonWidth = relativeLayout.getWidth();
-                    int buttonHeight = relativeLayout.getHeight();
+                                                    // Get screen width and height of the device
+                                                    DisplayMetrics metrics = new DisplayMetrics();
+                                                    Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                                                    int screenWidth = metrics.widthPixels;
+                                                    int screenHeight = metrics.heightPixels;
 
-                    // Reposition button
-                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
+                                                    // Get button width and height
+                                                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
+                                                    int buttonWidth = relativeLayout.getWidth();
+                                                    int buttonHeight = relativeLayout.getHeight();
 
-                    relativeLayout.requestLayout();
-                    relativeLayout.invalidate();
+                                                    // Reposition button
+                                                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
+                                                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
 
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                                                    relativeLayout.requestLayout();
+                                                    relativeLayout.invalidate();
 
-                    // Get button holder
-                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
+                                                } else if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                    // TODO: Compute relative to dependant sprite position
-                    Point originPoint = new Point(959, 1655);
+                                                    // Get button holder
+                                                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
+
+                                                    // TODO: Compute relative to dependant sprite position
+                                                    Point originPoint = new Point(959, 1655);
 
 //                    Animation animation = new Animation();
 //                    animation.moveToPoint(relativeLayout, originPoint, 300);
 
-                    // Reset the message envelope
-                    messageContent.removeAllViews();
-                    messageKeyboardLayout.setVisibility(View.GONE);
+                                                    // Reset the message envelope
+                                                    messageContent.removeAllViews();
+                                                    messageKeyboardLayout.setVisibility(View.GONE);
 
-                    // Replace the hint
-                    messageContent.addView(messageContentHint);
-                    messageContentHint.setVisibility(View.VISIBLE);
-                }
+                                                    // Replace the hint
+                                                    messageContent.addView(messageContentHint);
+                                                    messageContentHint.setVisibility(View.VISIBLE);
+                                                }
 
-                return false;
-            }
-        });
+                                                return false;
+                                            }
+                                        }
+
+        );
         // </CONTEXT_SCOPE>
 
         // Start the initial worker thread (runnable task) by posting through the handler
         handler.post(runnableCode);
 
         // Check availability of speech synthesis engine on Android host device.
-        if (ENABLE_SPEECH_OUTPUT) {
+        if (ENABLE_SPEECH_OUTPUT)
+
+        {
             SpeechOutput.checkAvailability(this);
         }
 
-        if (ENABLE_TONE_OUTPUT) {
+        if (ENABLE_TONE_OUTPUT)
+
+        {
             toneOutput = new ToneOutput();
         }
 
@@ -503,6 +552,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             // TODO: check this.exception
             // TODO: do something with the feed
         }
+
     }
     // </REDIS>
 

@@ -20,7 +20,7 @@ public class Actor {
     private Camera camera = new Camera();
 
     // Action (Smart querying interface)
-    public List<Action> actions = new LinkedList<>();
+    protected List<Action> actions = new LinkedList<>();
 
     public Actor(Space space) {
         setup();
@@ -75,6 +75,10 @@ public class Actor {
         }
     }
 
+    public List<Action> getActions() {
+        return this.actions;
+    }
+
     public void processAction(Event event) {
 
         event.setActor(this);
@@ -85,6 +89,7 @@ public class Actor {
 
                 // Create a new Action
                 Action action = new Action();
+                action.setActor(this);
                 actions.add(action);
 
                 // Add Event to Action
