@@ -272,7 +272,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     @Override
     public void draw(Display display) {
         if (isVisible()) {
-            Display.drawRectangle(this, display);
+            display.drawRectangle(this);
         }
     }
 

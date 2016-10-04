@@ -101,11 +101,20 @@ public abstract class Shape<T extends Entity> {
 
     public void setColor(String color) {
         this.color = color;
+
+        // <ANDROID>
+        this.colorCode = android.graphics.Color.parseColor(color);
+        // </ANDROID>
     }
 
     public String getColor() {
         return color;
     }
+
+    // <ANDROID>
+    public int colorCode = android.graphics.Color.WHITE;
+    public int outlineColorCode = android.graphics.Color.BLACK;
+    // </ANDROID>
 
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
@@ -125,6 +134,10 @@ public abstract class Shape<T extends Entity> {
 
     public void setOutlineColor(String color) {
         this.outlineColor = color;
+
+        // <ANDROID>
+        this.outlineColorCode = android.graphics.Color.parseColor(color);
+        // </ANDROID>
     }
 
     public String getOutlineColor() {
