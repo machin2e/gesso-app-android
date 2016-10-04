@@ -112,7 +112,12 @@ public class ExtensionImage extends PortableImage {
                                 }
                             }
 
+                            // Camera
                             event.getActor().getCamera().setFocus(getExtension());
+
+                            // Title
+                            space.setTitleText("Extension");
+                            space.setTitleVisibility(Visibility.Value.VISIBLE);
                         }
                     }
                 }

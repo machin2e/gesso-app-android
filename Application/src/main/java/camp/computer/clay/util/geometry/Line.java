@@ -65,7 +65,7 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     public double getLength() {
-        return Point.calculateDistance(source, target);
+        return Geometry.calculateDistance(source, target);
     }
 
     public Point getMidpoint() {

@@ -30,7 +30,7 @@ public class DisplayOutput extends Thread {
         this.display = display;
     }
 
-    public void setRunning (boolean isRunning) {
+    public void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
     }
 
@@ -42,7 +42,7 @@ public class DisplayOutput extends Thread {
     // </STATISTICS>
 
     @Override
-    public void run () {
+    public void run() {
 
         long framePeriod = 1000 / targetFramesPerSecond; // PhoneHost period in milliseconds
         long frameStartTime;
@@ -70,27 +70,27 @@ public class DisplayOutput extends Thread {
             // Sleep the thread until the time remaining in the frame's allocated draw time expires.
             // This reduces energy consumption thereby increasing battery life.
 //            if (ENABLE_THREAD_SLEEP) {
-                frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
+            frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
 //                Log.v("SleepTime", "sleepTime: " + frameSleepTime);
-                try {
-                    if (frameSleepTime > 0) {
-                        Thread.sleep(frameSleepTime);
-                    } else {
-                        Thread.sleep(30);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace ();
+            try {
+                if (frameSleepTime > 0) {
+                    Thread.sleep(frameSleepTime);
+                } else {
+                    Thread.sleep(30);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 //            }
 
         }
     }
 
-    public long getTargetFramesPerSecond () {
+    public long getTargetFramesPerSecond() {
         return targetFramesPerSecond;
     }
 
-    public void setTargetFramesPerSecond (int framesPerSecond) {
+    public void setTargetFramesPerSecond(int framesPerSecond) {
         this.targetFramesPerSecond = framesPerSecond;
     }
 

@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -166,7 +165,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.restore();
 
         // Annotation
-        if (space.goalVisibility.getValue() == Visibility.Value.VISIBLE) {
+        if (space.getTitleVisibility().getValue() == Visibility.Value.VISIBLE) {
 
             canvas.save();
 
@@ -175,11 +174,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             paint.setStyle(Paint.Style.FILL);
             paint.setTextSize(100);
 
-            String projectTitleText = "GOAL";
+            String projectTitleText = space.getTitleText(); // "Goal";
             Rect projectTitleTextBounds = new Rect();
             paint.getTextBounds(projectTitleText, 0, projectTitleText.length(), projectTitleTextBounds);
             canvas.drawText(projectTitleText, (getWidth() / 2.0f) - (projectTitleTextBounds.width() / 2.0f), (250) - (projectTitleTextBounds.height() / 2.0f), paint);
 
+            /*
             // Menu
             paint.setColor(Color.BLACK);
             paint.setStyle(Paint.Style.FILL);
@@ -196,6 +196,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 180f, (getWidth() / 2.0f) + 75f, getHeight() - 180f, paint
 
             );
+            */
 
             canvas.restore();
         }
@@ -440,7 +441,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public static void drawLine(Line line, Display display) {
-        Log.v("Line", "Display.drawLine from " + line.getSource().getX() + ", " + line.getSource().getY() + " to " + line.getTarget().getX() + ", " + line.getTarget().getY());
+//        Log.v("Line", "Display.drawLine from " + line.getSource().getX() + ", " + line.getSource().getY() + " to " + line.getTarget().getX() + ", " + line.getTarget().getY());
 
         Canvas canvas = display.getCanvas();
         Paint paint = display.getPaint();
@@ -757,7 +758,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
-        double pathDistance = Point.calculateDistance(startPosition, stopPosition);
+        double pathDistance = Geometry.calculateDistance(startPosition, stopPosition);
 
         int triangleCount = (int) (pathDistance / (triangleHeight + 15));
         double triangleSpacing2 = pathDistance / triangleCount;
@@ -849,9 +850,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Point p3 = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
 
         // Calculate pointerCoordinates after rotation
-        Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), (double) Point.calculateDistance(position, p1));
-        Point rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), (double) Point.calculateDistance(position, p2));
-        Point rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (double) Point.calculateDistance(position, p3));
+        Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), (double) Geometry.calculateDistance(position, p1));
+        Point rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), (double) Geometry.calculateDistance(position, p2));
+        Point rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (double) Geometry.calculateDistance(position, p3));
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);

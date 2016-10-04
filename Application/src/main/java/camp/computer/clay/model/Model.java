@@ -11,8 +11,6 @@ import camp.computer.clay.model.util.PathGroup;
  */
 public class Model extends Entity {
 
-    private System system = new System();
-
     private List<Actor> actors = new ArrayList<>();
 
     private List<Host> hosts = new ArrayList<>();
@@ -33,14 +31,6 @@ public class Model extends Entity {
 
     public List<Actor> getActors() {
         return this.actors;
-    }
-
-    public void setSystem(System system) {
-        this.system = system;
-    }
-
-    public System getSystem() {
-        return this.system;
     }
 
     public void addHost(Host host) {

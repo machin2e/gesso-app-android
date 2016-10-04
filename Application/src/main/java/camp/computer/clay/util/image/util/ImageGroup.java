@@ -109,7 +109,7 @@ public class ImageGroup extends Group<Image> {
 
             Image image = elements.get(i);
 
-            double distanceToImage = Point.calculateDistance(point, image.getPosition());
+            double distanceToImage = Geometry.calculateDistance(point, image.getPosition());
 
             if (distanceToImage < distance) {
                 imageGroup.add(image);
@@ -219,7 +219,7 @@ public class ImageGroup extends Group<Image> {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
 
-            double currentDistance = Point.calculateDistance(position, image.getPosition());
+            double currentDistance = Geometry.calculateDistance(position, image.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;

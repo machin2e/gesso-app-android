@@ -23,6 +23,7 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.util.geometry.Circle;
+import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -317,7 +318,7 @@ public class HostImage extends PortableImage {
                                                     Image otherImage = imageGroup.get(i);
 
                                                     // Update style of nearby Hosts
-                                                    double distanceToHostImage = Point.calculateDistance(
+                                                    double distanceToHostImage = Geometry.calculateDistance(
                                                             event.getPosition(),
                                                             otherImage.getPosition()
                                                     );
@@ -454,6 +455,10 @@ public class HostImage extends PortableImage {
                                                 if (getHost().getExtensions().size() > 0) {
                                                     space.getImages(getHost().getExtensions()).setTransparency(1.0);
                                                 }
+
+                                                // Title
+                                                space.setTitleText("Host");
+                                                space.setTitleVisibility(Visibility.Value.VISIBLE);
 
                                             } else {
 
@@ -941,7 +946,7 @@ public class HostImage extends PortableImage {
             for (int j = 0; j < getHost().getPorts().size(); j++) {
                 if (getHost().getPorts().get(j).getType() == Port.Type.NONE) {
 
-                    double distanceToPort = Point.calculateDistance(
+                    double distanceToPort = Geometry.calculateDistance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
                             extensionImage.getPosition()
                     );
@@ -980,7 +985,7 @@ public class HostImage extends PortableImage {
         for (int i = 0; i < boardShapeSegments.size(); i++) {
             Line segment = boardShapeSegments.get(i);
             Point midpoint = segment.getMidpoint();
-            double distance = Point.calculateDistance(point, midpoint);
+            double distance = Geometry.calculateDistance(point, midpoint);
             if (distance < distanceToSegmentMidpoint) {
                 distanceToSegmentMidpoint = distance;
                 nearestSegment = segment;

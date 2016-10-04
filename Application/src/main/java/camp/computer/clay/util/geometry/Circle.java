@@ -23,15 +23,21 @@ public class Circle<T extends Entity> extends Shape<T> {
     public Circle(double radius) {
         super(new Point(0, 0));
         this.radius = radius;
+
+        updateGeometryCache();
     }
 
     public Circle(T entity) {
         this.entity = entity;
+
+        updateGeometryCache();
     }
 
     public Circle(Point position, double radius) {
         super(position);
         this.radius = radius;
+
+        updateGeometryCache();
     }
 
     public double getRadius() {
@@ -40,7 +46,15 @@ public class Circle<T extends Entity> extends Shape<T> {
 
     public void setRadius(double radius) {
         this.radius = radius;
+
+        updateGeometryCache();
     }
+
+    protected void updateGeometryCache() {
+        vertices = Geometry.getRegularPolygon(position, this.radius, vertexCount + 1);
+    }
+
+    protected List<Point> vertices = new ArrayList<>();
 
     /**
      * Returns list of pointerCoordinates on the perimeter of the circle that define a regular polygon that
@@ -50,12 +64,12 @@ public class Circle<T extends Entity> extends Shape<T> {
      */
     @Override
     public List<Point> getVertices() {
-        return Geometry.getRegularPolygon(position, this.radius, vertexCount + 1);
+        return vertices;
     }
 
     @Override
     public List<Line> getSegments() {
-        List<Point> vertices = getVertices();
+        //List<Point> vertices = getVertices();
         ArrayList<Line> segments = new ArrayList<>();
         for (int i = 0; i < vertices.size() - 1; i++) {
             segments.add(new Line(vertices.get(i), vertices.get(i + 1)));

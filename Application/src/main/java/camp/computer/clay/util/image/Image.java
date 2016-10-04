@@ -20,6 +20,13 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public abstract class Image<T extends Entity> {
 
+    /**
+     * The parent {@code Space} containing this {@code Image}.
+     */
+    protected Space space = null;
+
+    protected T entity = null;
+
     protected List<Shape> shapes = new LinkedList<>();
 
     protected Point position = new Point(0, 0);
@@ -32,11 +39,6 @@ public abstract class Image<T extends Entity> {
 
     protected double transparency = targetTransparency;
 
-    protected T entity = null;
-
-    protected Space space = null;
-
-    // TODO: Make this an interface? Move interface out of class.
     protected ActionListener actionListener;
 
     public Image(T entity) {

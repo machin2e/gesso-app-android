@@ -238,7 +238,7 @@ public class Camera {
             Portable sourcePortable = sourcePort.getPortable();
             PortableImage sourcePortableImage = (PortableImage) space.getImage(sourcePortable);
 
-            double distanceToPortable = Point.calculateDistance(sourcePortableImage.getPosition(), targetPosition);
+            double distanceToPortable = Geometry.calculateDistance(sourcePortableImage.getPosition(), targetPosition);
 
             if (distanceToPortable > 800) {
                 setScale(0.6f, 100); // Zoom out to show overview
@@ -401,7 +401,7 @@ public class Camera {
         // Position
         if (positionFrameIndex < positionFrameLimit) {
 
-            double totalDistanceToTarget = Point.calculateDistance(originalPosition, targetPosition);
+            double totalDistanceToTarget = Geometry.calculateDistance(originalPosition, targetPosition);
             double totalDistanceToTargetX = targetPosition.getX() - originalPosition.getX();
             double totalDistanceToTargetY = targetPosition.getY() - originalPosition.getY();
 

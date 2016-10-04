@@ -67,11 +67,11 @@ public abstract class Geometry {
      * @return
      */
     public static Point calculateRotatedPoint(Point center, double angle, Point point) {
-        return Geometry.calculatePoint(center, angle + Geometry.calculateRotationAngle(center, point), Point.calculateDistance(center, point));
+        return Geometry.calculatePoint(center, angle + Geometry.calculateRotationAngle(center, point), calculateDistance(center, point));
     }
 
     public static Point calculateRotatedPoint(double x1, double y1, double angle, double x2, double y2) {
-        return Geometry.calculatePoint(x1, y1, angle + Geometry.calculateRotationAngle(x1, y1, x2, y2), Point.calculateDistance(x1, y1, x2, y2));
+        return Geometry.calculatePoint(x1, y1, angle + Geometry.calculateRotationAngle(x1, y1, x2, y2), calculateDistance(x1, y1, x2, y2));
     }
 
     public static Point calculatePoint(Point originPoint, double rotation, double distance) {
@@ -140,16 +140,16 @@ public abstract class Geometry {
     // References:
     // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
     public static double calculateLineToPointDistance(Point linePointA, Point linePointB, Point point, boolean isSegment) {
-        double distance = calculateCrossProduct(linePointA, linePointB, point) / Point.calculateDistance(linePointA, linePointB);
+        double distance = calculateCrossProduct(linePointA, linePointB, point) / calculateDistance(linePointA, linePointB);
         if (isSegment) {
             double dot1 = calculateDotProduct(linePointA, linePointB, point);
             if (dot1 > 0) {
-                return Point.calculateDistance(linePointB, point);
+                return calculateDistance(linePointB, point);
             }
 
             double dot2 = calculateDotProduct(linePointB, linePointA, point);
             if (dot2 > 0) {
-                return Point.calculateDistance(linePointA, point);
+                return calculateDistance(linePointA, point);
             }
         }
         return Math.abs(distance);
@@ -177,14 +177,17 @@ public abstract class Geometry {
         return centroidPosition;
     }
 
+    // TODO: Cache the result on a per-shape basis... remove per-step Rectangle allocation
     public static Rectangle calculateBoundingBox(List<Point> points) {
 
-        double minX = Float.MAX_VALUE;
-        double maxX = -Float.MAX_VALUE;
-        double minY = Float.MAX_VALUE;
-        double maxY = -Float.MAX_VALUE;
+        double minX = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE;
+        double minY = Double.MAX_VALUE;
+        double maxY = -Double.MAX_VALUE;
 
-        for (Point point : points) {
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+
             if (point.getX() < minX) {
                 minX = point.getX();
             }
@@ -223,11 +226,11 @@ public abstract class Geometry {
 
         // Initialize point
         Point nearestPoint = points.get(0);
-        double nearestDistance = Point.calculateDistance(point, nearestPoint);
+        double nearestDistance = calculateDistance(point, nearestPoint);
 
         // Search for the nearest point
         for (int i = 0; i < points.size(); i++) {
-            double distance = Point.calculateDistance(points.get(i), point);
+            double distance = calculateDistance(points.get(i), point);
             if (distance < nearestDistance) {
                 nearestPoint.set(point);
             }
@@ -418,7 +421,7 @@ public abstract class Geometry {
                 double r = (sortedImages.get(i).getBoundingBox().getWidth() / 2.0f) + (sortedImages.get(i).getBoundingBox().getWidth() / 2.0f);
 
                 // Length squared = (dx * dx) + (dy * dy);
-                double vectorABLength = Point.calculateDistance(sortedPositions.get(i), sortedPositions.get(j));
+                double vectorABLength = calculateDistance(sortedPositions.get(i), sortedPositions.get(j));
                 double d = vectorABLength * vectorABLength - minSeparationSq;
                 double minSepSq = Math.min(d, minSeparationSq);
                 d -= minSepSq;
@@ -430,7 +433,7 @@ public abstract class Geometry {
 //                    Log.v("Sort", "--");
                     // Normalize (transform into unit vector)
                     // TODO: AB.Normalize();
-                    double magnitude = (double) Point.calculateDistance(
+                    double magnitude = (double) calculateDistance(
                             sortedPositions.get(i),
                             sortedPositions.get(j)
                     );
@@ -492,7 +495,7 @@ public abstract class Geometry {
                 T p1 = sortedList.get(j - 1);
                 T p2 = sortedList.get(j);
 
-                if (Point.calculateDistance(p1.getPosition(), point) > Point.calculateDistance(p2.getPosition(), point)) {
+                if (calculateDistance(p1.getPosition(), point) > calculateDistance(p2.getPosition(), point)) {
                     sortedList.remove(j - 1);
                     sortedList.add(j, p1);
                 }
@@ -582,5 +585,15 @@ public abstract class Geometry {
         }
 
         return vertices;
+    }
+
+    public static double calculateDistance(Point source, Point target) {
+        return calculateDistance(source.getX(), source.getY(), target.getX(), target.getY());
+    }
+
+    public static double calculateDistance(double x1, double y1, double x2, double y2) {
+        double distanceSquare = Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
+        double distance = Math.sqrt(distanceSquare);
+        return distance;
     }
 }

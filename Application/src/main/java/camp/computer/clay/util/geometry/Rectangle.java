@@ -8,11 +8,15 @@ import camp.computer.clay.model.Entity;
 import camp.computer.clay.util.image.Shape;
 
 public class Rectangle<T extends Entity> extends Shape<T> {
+
     private double width = 1.0;
 
     private double height = 1.0;
 
     private double cornerRadius = 0.0;
+
+    // <CACHED_OBJECTS>
+    // </CACHED_OBJECTS>
 
     public Rectangle(T entity) {
         this.entity = entity;
@@ -36,12 +40,20 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         this.height = (bottom - top);
     }
 
+    List<Point> vertices = new ArrayList<>(4);
+
     public List<Point> getVertices() {
-        List<Point> vertices = new ArrayList<>();
-        vertices.add(getTopLeft());
-        vertices.add(getTopRight());
-        vertices.add(getBottomRight());
-        vertices.add(getBottomLeft());
+        if (vertices.size() < 4) {
+            vertices.add(getTopLeft());
+            vertices.add(getTopRight());
+            vertices.add(getBottomRight());
+            vertices.add(getBottomLeft());
+        } else {
+            vertices.set(0, getTopLeft());
+            vertices.set(1, getTopRight());
+            vertices.set(2, getBottomRight());
+            vertices.set(3, getBottomLeft());
+        }
         return vertices;
     }
 
@@ -62,9 +74,9 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         for (int i = 0; i < segments.size(); i++) {
             double distanceToSegment = 0;
             if (i < (segments.size() - 1)) {
-                distanceToSegment = Point.calculateDistance(point, segments.get(i).getSource()) + Point.calculateDistance(point, segments.get(i + 1).getTarget());
+                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(i + 1).getTarget());
             } else {
-                distanceToSegment = Point.calculateDistance(point, segments.get(i).getSource()) + Point.calculateDistance(point, segments.get(0).getTarget());
+                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(0).getTarget());
             }
             if (distanceToSegment < nearestDistance) {
                 nearestDistance = distanceToSegment;
@@ -144,47 +156,45 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         return 0 + (height / 2.0f);
     }
 
-    public Point getRelativeTopLeft() {
-        return new Point(getRelativeLeft(), getRelativeTop());
-    }
-
-    public Point getRelativeTopRight() {
-        return new Point(getRelativeRight(), getRelativeTop());
-    }
-
-    public Point getRelativeBottomRight() {
-        return new Point(getRelativeRight(), getRelativeBottom());
-    }
-
-    public Point getRelativeBottomLeft() {
-        return new Point(getRelativeLeft(), getRelativeBottom());
-    }
+    // Cached descriptive {@code Point} geometry for the {@code Shape}.
+    protected Point topLeft = new Point(getRelativeLeft(), getRelativeTop(), position);
+    protected Point topRight = new Point(getRelativeRight(), getRelativeTop(), position);
+    protected Point bottomRight = new Point(getRelativeRight(), getRelativeBottom(), position);
+    protected Point bottomLeft = new Point(getRelativeLeft(), getRelativeBottom(), position);
 
     public Point getTopLeft() {
-        return new Point(getRelativeLeft(), getRelativeTop(), position);
+        //return new Point(getRelativeLeft(), getRelativeTop(), position);
+        topLeft.setRelative(
+                0 - (width / 2.0), // getRelativeLeft(),
+                0 - (height / 2.0) // getRelativeTop()
+        );
+        return topLeft;
     }
 
     public Point getTopRight() {
-        return new Point(getRelativeRight(), getRelativeTop(), position);
+        //return new Point(getRelativeRight(), getRelativeTop(), position);
+        topRight.setRelative(
+                0 + (width / 2.0), // getRelativeRight(),
+                0 - (height / 2.0) // getRelativeTop()
+        );
+        return topRight;
     }
 
     public Point getBottomRight() {
-        return new Point(getRelativeRight(), getRelativeBottom(), position);
+        //return new Point(getRelativeRight(), getRelativeBottom(), position);
+        bottomRight.setRelative(
+                0 + (width / 2.0), // getRelativeRight(),
+                0 + (height / 2.0) // getRelativeBottom()
+        );
+        return bottomRight;
     }
 
     public Point getBottomLeft() {
-        return new Point(getRelativeLeft(), getRelativeBottom(), position);
-    }
-
-    public double getArea() {
-        return this.width * this.height;
-    }
-
-    public double getPerimeter() {
-        return 2 * (this.width + this.height);
-    }
-
-    public double getDiagonalLength() {
-        return (double) Math.sqrt(Math.pow(this.width, 2) + Math.pow(this.height, 2));
+        //return new Point(getRelativeLeft(), getRelativeBottom(), position);
+        bottomLeft.setRelative(
+                0 - (width / 2.0), // getRelativeLeft(),
+                0 + (height / 2.0) // getRelativeBottom()
+        );
+        return bottomLeft;
     }
 }

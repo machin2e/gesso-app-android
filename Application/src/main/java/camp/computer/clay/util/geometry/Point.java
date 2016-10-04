@@ -2,38 +2,34 @@ package camp.computer.clay.util.geometry;
 
 public class Point {
 
-    public static int count = 0;
-
-    //
-    // TODO: Update to use numbers that can be composed and given dependencies (used in
-    // TODO: (cont'd) expressions) and dynamically update expressions. Do animations by giving them
-    // TODO: (cont'd) quantity-change rules.
-    //
-    // TODO: Refactor to support N dimensions, including rotation angles accordingly.
-
     /**
      * The {@code Point} relative to which this point will be positioned.
      */
     protected Point referencePoint = null;
 
+    /**
+     * The x coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
+     * {@code null} then this is equivalent to an absolute position.
+     */
     protected double relativeX = 0;
+
+    /**
+     * The y coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
+     * {@code null} then this is equivalent to an absolute position.
+     */
     protected double relativeY = 0;
 
     /**
-     * Relative rotation of the the coordinate with which points referencing this one will be
+     * Relative rotation of the coordinate with which points referencing this one will be
      * rotated.
      */
-    private double rotation = 0;
+    protected double rotation = 0;
 
     /**
      * Rotation rotation in degrees
      */
-    // TODO: Refactor so 0 degrees faces upward, not right.
     public Point() {
         this(0, 0);
-
-//        count++;
-//        Log.v("Point", "count: " + count);
     }
 
     /**
@@ -45,17 +41,11 @@ public class Point {
     public Point(Point otherPoint) {
         this.relativeX = otherPoint.relativeX;
         this.relativeY = otherPoint.relativeY;
-
-//        count++;
-//        Log.v("Point", "count: " + count);
     }
 
     public Point(double x, double y) {
         this.relativeX = x;
         this.relativeY = y;
-
-//        count++;
-//        Log.v("Point", "count: " + count);
     }
 
     /**
@@ -69,31 +59,14 @@ public class Point {
         setReferencePoint(referencePoint);
         setRelativeX(x);
         setRelativeY(y);
-
-//        count++;
-//        Log.v("Point", "count: " + count);
     }
-
-    public static double calculateDistance(Point source, Point target) {
-        return calculateDistance(source.getX(), source.getY(), target.getX(), target.getY());
-    }
-
-    public static double calculateDistance(double x1, double y1, double x2, double y2) {
-        double distanceSquare = Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2);
-        double distance = Math.sqrt(distanceSquare);
-        return distance;
-    }
-
-//    protected void finalize() throws Throwable {
-//        count--;
-//    }
 
     public Point getReferencePoint() {
         return referencePoint;
     }
 
-    public void setReferencePoint(Point referenceCoordinate) {
-        this.referencePoint = referenceCoordinate;
+    public void setReferencePoint(Point referencePoint) {
+        this.referencePoint = referencePoint;
     }
 
     public double getRelativeX() {
@@ -102,6 +75,11 @@ public class Point {
 
     public double getRelativeY() {
         return relativeY;
+    }
+
+    public void setRelative(double x, double y) {
+        this.relativeX = x;
+        this.relativeY = y;
     }
 
     public void setRelativeX(double x) {
@@ -127,7 +105,7 @@ public class Point {
     public double getX() {
 
         if (referencePoint != null) {
-            double globalX = calculateDistance(0, 0, relativeX, relativeY) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
+            double globalX = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
             return referencePoint.getX() + globalX;
         } else {
             return this.relativeX;
@@ -139,7 +117,7 @@ public class Point {
      */
     public double getY() {
         if (referencePoint != null) {
-            double globalY = calculateDistance(0, 0, relativeX, relativeY) * Math.sin(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
+            double globalY = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.sin(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
             return referencePoint.getY() + globalY;
         } else {
             return this.relativeY;

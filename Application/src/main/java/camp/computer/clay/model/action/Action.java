@@ -8,6 +8,7 @@ import java.util.List;
 
 import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Entity;
+import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 
 /**
@@ -109,7 +110,7 @@ public class Action {
         } else if (events.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[event.pointerIndex] = Point.calculateDistance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
+            this.dragDistance[event.pointerIndex] = Geometry.calculateDistance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
 
             if (getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
                 isDragging[event.pointerIndex] = true;
@@ -215,7 +216,7 @@ public class Action {
     public double getDistance() {
         Event firstEvent = getFirstEvent();
         Event lastEvent = getLastEvent();
-        double distance = Point.calculateDistance(
+        double distance = Geometry.calculateDistance(
                 firstEvent.getPosition(),
                 lastEvent.getPosition()
         );

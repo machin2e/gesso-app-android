@@ -119,7 +119,7 @@ public class ShapeGroup extends Group<Shape> {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
 
-            double distanceToShape = Point.calculateDistance(point, shape.getPosition());
+            double distanceToShape = Geometry.calculateDistance(point, shape.getPosition());
 
             if (distanceToShape < distance) {
                 shapeGroup.add(shape);
@@ -235,7 +235,7 @@ public class ShapeGroup extends Group<Shape> {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
 
-            double currentDistance = Point.calculateDistance(position, shape.getPosition());
+            double currentDistance = Geometry.calculateDistance(position, shape.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;
