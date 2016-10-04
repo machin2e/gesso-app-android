@@ -1,7 +1,6 @@
 package camp.computer.clay.space.image;
 
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.Canvas;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -996,6 +995,7 @@ public class HostImage extends PortableImage {
     }
 
     private void adjustExtensionPosition(ExtensionImage extensionImage, int segmentIndex) {
+
         // <REFACTOR>
         // Update the Extension Image position and rotation
         //extensionImage.setPosition(event.getPosition());
@@ -1035,6 +1035,7 @@ public class HostImage extends PortableImage {
     }
 
     public void update() {
+
         // Get LED shapes
         ShapeGroup lightShapeGroup = getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
 
@@ -1063,19 +1064,32 @@ public class HostImage extends PortableImage {
     public void draw(Display display) {
         if (isVisible()) {
 
+            Canvas canvas = display.getCanvas();
+
+            canvas.save();
+
+            canvas.translate(
+                    (float) getPosition().getRelativeX(),
+                    (float) getPosition().getRelativeY()
+            );
+
+            canvas.rotate((float) getPosition().getRelativeRotation());
+
             // Color
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);
             }
 
-            // Labels
-            if (Application.ENABLE_GEOMETRY_LABELS) {
-                display.getPaint().setColor(Color.GREEN);
-                display.getPaint().setStyle(Paint.Style.STROKE);
-                Rectangle boardShape = (Rectangle) getShape("Substrate");
-                display.drawCircle(getPosition(), boardShape.getWidth(), 0);
-                display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0);
-            }
+//            // Labels
+//            if (Application.ENABLE_GEOMETRY_LABELS) {
+//                display.getPaint().setColor(Color.GREEN);
+//                display.getPaint().setStyle(Paint.Style.STROKE);
+//                Rectangle boardShape = (Rectangle) getShape("Substrate");
+//                display.drawCircle(getPosition(), boardShape.getWidth(), 0);
+//                display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0);
+//            }
+
+            canvas.restore();
         }
     }
 }

@@ -1,5 +1,7 @@
 package camp.computer.clay.space.image;
 
+import android.graphics.Canvas;
+
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
@@ -269,9 +271,34 @@ public class ExtensionImage extends PortableImage {
 
     public void draw(Display display) {
         if (isVisible()) {
+
+            Canvas canvas = display.getCanvas();
+
+            canvas.save();
+
+            // <HACK>
+            if (getPosition().getReferencePoint() != null) {
+                canvas.translate(
+                        (float) getPosition().getReferencePoint().getRelativeX(),
+                        (float) getPosition().getReferencePoint().getRelativeY()
+                );
+
+                canvas.rotate((float) getPosition().getReferencePoint().getRelativeRotation());
+            }
+            // </HACK>
+
+            canvas.translate(
+                    (float) getPosition().getRelativeX(),
+                    (float) getPosition().getRelativeY()
+            );
+
+            canvas.rotate((float) getPosition().getRelativeRotation());
+
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);
             }
+
+            canvas.restore();
         }
     }
 }

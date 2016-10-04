@@ -488,11 +488,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.save();
 
         canvas.translate(
-                (float) circle.getPosition().getX(),
-                (float) circle.getPosition().getY()
+                (float) circle.getPosition().getRelativeX(),
+                (float) circle.getPosition().getRelativeY()
         );
 
-        canvas.rotate((float) circle.getRotation());
+        canvas.rotate((float) circle.getPosition().getRelativeRotation());
 
         // Fill
         paint.setStyle(Paint.Style.FILL);
@@ -538,29 +538,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawRectangle(Point position, double angle, double width, double height) {
 
-//        // Calculate coordinates of Rectangle before rotation and translation
-//        Point originalTopLeft = new Point(position.getX() - (width / 2.0f), position.getY() - (height / 2.0f));
-//        Point originalTopRight = new Point(position.getX() + (width / 2.0f), position.getY() - (height / 2.0f));
-//        Point originalBottomRight = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
-//        Point originalBottomLeft = new Point(position.getX() - (width / 2.0f), position.getY() + (height / 2.0f));
-//
-//        // Rotate shape about its center point
-//        Point rotatedTopLeft = Geometry.calculateRotatedPoint(position, angle, originalTopLeft);
-//        Point rotatedTopRight = Geometry.calculateRotatedPoint(position, angle, originalTopRight);
-//        Point rotatedBottomRight = Geometry.calculateRotatedPoint(position, angle, originalBottomRight);
-//        Point rotatedBottomLeft = Geometry.calculateRotatedPoint(position, angle, originalBottomLeft);
-//
-//        // Draw pointerCoordinates in shape
-//        android.graphics.Path path = new android.graphics.Path();
-//        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-//        path.moveTo((float) rotatedTopLeft.getX(), (float) rotatedTopLeft.getY());
-//        path.lineTo((float) rotatedTopRight.getX(), (float) rotatedTopRight.getY());
-//        path.lineTo((float) rotatedBottomRight.getX(), (float) rotatedBottomRight.getY());
-//        path.lineTo((float) rotatedBottomLeft.getX(), (float) rotatedBottomLeft.getY());
-//        path.close();
-//
-//        canvas.drawPath(path, paint);
-
         canvas.save();
 
         canvas.translate(
@@ -589,12 +566,25 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(rectangle.colorCode);
 
+//        // <Image>
+//        canvas.translate(
+//                (float) rectangle.getPosition().getReferencePoint().getRelativeX(),
+//                (float) rectangle.getPosition().getReferencePoint().getRelativeY()
+//        );
+//
+//        // canvas.rotate((float) rectangle.getRotation());
+//        canvas.rotate((float) rectangle.getPosition().getReferencePoint().getRelativeRotation());
+//        // </Image>
+
+        // <Shape>
         canvas.translate(
-                (float) rectangle.getPosition().getX(),
-                (float) rectangle.getPosition().getY()
+                (float) rectangle.getPosition().getRelativeX(),
+                (float) rectangle.getPosition().getRelativeY()
         );
 
-        canvas.rotate((float) rectangle.getRotation());
+        // canvas.rotate((float) rectangle.getRotation());
+        canvas.rotate((float) rectangle.getPosition().getRelativeRotation());
+        // </Shape>
 
         /*
         canvas.drawRect(
@@ -677,7 +667,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
      * @param position
      * @param radius
      * @param sideCount
-     * @param display
      */
     public void drawRegularPolygon(Point position, int radius, int sideCount) {
 
@@ -740,9 +729,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Point p3 = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
 
         // Calculate pointerCoordinates after rotation
-        Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), (double) Geometry.calculateDistance(position, p1));
-        Point rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), (double) Geometry.calculateDistance(position, p2));
-        Point rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), (double) Geometry.calculateDistance(position, p3));
+        Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), Geometry.calculateDistance(position, p1));
+        Point rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), Geometry.calculateDistance(position, p2));
+        Point rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), Geometry.calculateDistance(position, p3));
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);

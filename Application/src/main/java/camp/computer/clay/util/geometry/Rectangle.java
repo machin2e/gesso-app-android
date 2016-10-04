@@ -1,7 +1,5 @@
 package camp.computer.clay.util.geometry;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +16,14 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     private double cornerRadius = 0.0;
 
     // <CACHED_OBJECTS>
+    // TODO: Move caching framework into superclass
+    // Cached descriptive {@code Point} geometry for the {@code Shape}.
+    protected Point topLeft = new Point(getRelativeLeft(), getRelativeTop(), position);
+    protected Point topRight = new Point(getRelativeRight(), getRelativeTop(), position);
+    protected Point bottomRight = new Point(getRelativeRight(), getRelativeBottom(), position);
+    protected Point bottomLeft = new Point(getRelativeLeft(), getRelativeBottom(), position);
+
+    List<Point> vertices = new ArrayList<>();
     // </CACHED_OBJECTS>
 
     public Rectangle(T entity) {
@@ -51,101 +57,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 //        updateCache();
     }
 
-    // Cached descriptive {@code Point} geometry for the {@code Shape}.
-    protected Point topLeft = new Point(getRelativeLeft(), getRelativeTop(), position);
-    protected Point topRight = new Point(getRelativeRight(), getRelativeTop(), position);
-    protected Point bottomRight = new Point(getRelativeRight(), getRelativeBottom(), position);
-    protected Point bottomLeft = new Point(getRelativeLeft(), getRelativeBottom(), position);
-
-    List<Point> vertices = new ArrayList<>(4);
-
-    Point innerTopLeft = new Point(
-            topLeft.getRelativeX() + getCornerRadius(),
-            topLeft.getRelativeY() + getCornerRadius(),
-            topLeft.getReferencePoint()
-    );
-
-    Point innerTopRight = new Point(
-            topRight.getRelativeX() - getCornerRadius(),
-            topRight.getRelativeY() + getCornerRadius(),
-            topRight.getReferencePoint()
-    );
-
-    Point innerBottomRight = new Point(
-            bottomRight.getRelativeX() - getCornerRadius(),
-            bottomRight.getRelativeY() - getCornerRadius(),
-            bottomRight.getReferencePoint()
-    );
-
-    Point innerBottomLeft = new Point(
-            bottomLeft.getRelativeX() + getCornerRadius(),
-            bottomLeft.getRelativeY() - getCornerRadius(),
-            bottomLeft.getReferencePoint()
-    );
-
-    // Top segment
-    public Point topSegmentSource = new Point(
-            topLeft.getRelativeX() + getCornerRadius(),
-            topLeft.getRelativeY(),
-            getPosition()
-    );
-
-    public Point topSegmentTarget = new Point(
-            topRight.getRelativeX() - getCornerRadius(),
-            topRight.getRelativeY(),
-            getPosition()
-    );
-
-    public List<Point> topRightArc = null; // Geometry.getArc(innerTopRight, getCornerRadius(), 270.0, 360.0, 10);
-
-    // Right segment
-    public Point rightSegmentSource = new Point(
-            topRight.getRelativeX(),
-            topRight.getRelativeY() + getCornerRadius(),
-            getPosition()
-    );
-
-    public Point rightSegmentTarget = new Point(
-            bottomRight.getRelativeX(),
-            bottomRight.getRelativeY() - getCornerRadius(),
-            getPosition()
-    );
-
-    public List<Point> bottomRightArc = null; // Geometry.getArc(innerBottomRight, getCornerRadius(), 0.0, 90.0, 10);
-
-    // Bottom segment
-    public Point bottomSegmentSource = new Point(
-            bottomRight.getRelativeX() - getCornerRadius(),
-            bottomRight.getRelativeY(),
-            getPosition()
-    );
-
-    public Point bottomSegmentTarget = new Point(
-            bottomLeft.getRelativeX() + getCornerRadius(),
-            bottomLeft.getRelativeY(),
-            getPosition()
-    );
-
-    public List<Point> bottomLeftArc = null; // Geometry.getArc(innerBottomLeft, getCornerRadius(), 90.0, 180.0, 10);
-
-    // Left segment
-    public Point leftSegmentSource = new Point(
-            bottomLeft.getRelativeX(),
-            bottomLeft.getRelativeY() - getCornerRadius(),
-            getPosition()
-    );
-
-    public Point leftSegmentTarget = new Point(
-            topLeft.getRelativeX(),
-            topLeft.getRelativeY() + getCornerRadius(),
-            getPosition()
-    );
-
-    public List<Point> topLeftArc = null; // Geometry.getArc(innerTopLeft, getCornerRadius(), 180.0, 270.0, 10);
-
     protected void updateCache() {
-
-        Log.v("Geometry", "updateCache");
 
         // Update {@code vertices}
         if (vertices.size() < 4) {
@@ -159,80 +71,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
             vertices.set(2, getBottomRight());
             vertices.set(3, getBottomLeft());
         }
-
-        // Rounded Corner Geometry
-
-        innerTopLeft.setRelative(
-                topLeft.relativeX + this.cornerRadius,
-                topLeft.relativeY + this.cornerRadius
-        );
-
-        innerTopRight.setRelative(
-                topRight.relativeX - this.cornerRadius,
-                topRight.relativeY + this.cornerRadius
-        );
-
-        innerBottomRight.setRelative(
-                bottomRight.relativeX - this.cornerRadius,
-                bottomRight.relativeY - this.cornerRadius
-        );
-
-        innerBottomLeft.setRelative(
-                bottomLeft.relativeX + this.cornerRadius,
-                bottomLeft.relativeY - this.cornerRadius
-        );
-
-        // Top segment
-        topSegmentSource.setRelative(
-                topLeft.relativeX + this.cornerRadius,
-                topLeft.relativeY
-        );
-
-        topSegmentTarget.setRelative(
-                topRight.relativeX - this.cornerRadius,
-                topRight.relativeY
-        );
-
-        topRightArc = Geometry.getArc(innerTopRight, this.cornerRadius, 270.0, 360.0, 10);
-
-        // Right segment
-        rightSegmentSource.setRelative(
-                topRight.relativeX,
-                topRight.relativeY + this.cornerRadius
-        );
-
-        rightSegmentTarget.setRelative(
-                bottomRight.relativeX,
-                bottomRight.relativeY - this.cornerRadius
-        );
-
-        bottomRightArc = Geometry.getArc(innerBottomRight, this.cornerRadius, 0.0, 90.0, 10);
-
-        // Bottom segment
-        bottomSegmentSource.setRelative(
-                bottomRight.relativeX - this.cornerRadius,
-                bottomRight.relativeY
-        );
-
-        bottomSegmentTarget.setRelative(
-                bottomLeft.relativeX + this.cornerRadius,
-                bottomLeft.relativeY
-        );
-
-        bottomLeftArc = Geometry.getArc(innerBottomLeft, this.cornerRadius, 90.0, 180.0, 10);
-
-        // Left segment
-        leftSegmentSource.setRelative(
-                bottomLeft.relativeX,
-                bottomLeft.relativeY - this.cornerRadius
-        );
-
-        leftSegmentTarget.setRelative(
-                topLeft.relativeX,
-                topLeft.relativeY + this.cornerRadius
-        );
-
-        topLeftArc = Geometry.getArc(innerTopLeft, this.cornerRadius, 180.0, 270.0, 10);
     }
 
     public List<Point> getVertices() {
