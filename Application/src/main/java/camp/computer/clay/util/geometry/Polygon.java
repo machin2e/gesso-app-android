@@ -46,7 +46,7 @@ public class Polygon<T extends Entity> extends Shape<T> {
     @Override
     public void draw(Display display) {
         if (isVisible()) {
-            Display.drawPolygon(this, display);
+            display.drawPolygon(this);
         }
     }
 

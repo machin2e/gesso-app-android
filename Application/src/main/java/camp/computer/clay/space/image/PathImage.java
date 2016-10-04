@@ -117,14 +117,14 @@ public class PathImage extends Image<Path> {
         if (dockVisibility.getValue() == Visibility.Value.VISIBLE) {
 
             paint.setStyle(Paint.Style.FILL);
-            Display.drawTriangle(sourcePoint, triangleRotation, triangleWidth, triangleHeight, display);
+            display.drawTriangle(sourcePoint, triangleRotation, triangleWidth, triangleHeight);
 
             paint.setStyle(Paint.Style.FILL);
-            Display.drawTriangle(targetPoint, triangleRotation, triangleWidth, triangleHeight, display);
+            display.drawTriangle(targetPoint, triangleRotation, triangleWidth, triangleHeight);
 
         } else {
 
-            Display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight, display);
+            display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
         }
     }
 
@@ -151,7 +151,7 @@ public class PathImage extends Image<Path> {
             Point pathStartCoordinate = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
             Point pathStopCoordinate = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
-            Display.drawLine(pathStartCoordinate, pathStopCoordinate, display);
+            display.drawLine(pathStartCoordinate, pathStopCoordinate);
         }
 
     }
@@ -175,6 +175,6 @@ public class PathImage extends Image<Path> {
         // Draw connection between Ports
         display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
         display.getPaint().setStrokeWidth(15.0f);
-        Display.drawLine(hostConnectorPosition, extensionConnectorPosition, display);
+        display.drawLine(hostConnectorPosition, extensionConnectorPosition);
     }
 }

@@ -494,7 +494,8 @@ public class Space extends Image<Model> {
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#fff7f7f7"));
-            Display.drawRectangle(prototypeExtensionPosition, pathRotationAngle + 180, 200, 200, display);
+
+            display.drawRectangle(prototypeExtensionPosition, pathRotationAngle + 180, 200, 200);
         }
     }
 
@@ -531,13 +532,13 @@ public class Space extends Image<Model> {
             );
 
             paint.setColor(Color.parseColor("#efefef"));
-            Display.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight, display);
+            display.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight);
 
             // Color
             paint.setStyle(Paint.Style.FILL);
 //            paint.setColor(Color.parseColor("#efefef"));
             double shapeRadius = 40.0;
-            Display.drawCircle(prototypePathDestinationCoordinate, shapeRadius, 0.0f, display);
+            display.drawCircle(prototypePathDestinationCoordinate, shapeRadius, 0.0f);
         }
     }
 

@@ -23,13 +23,13 @@ public class Triangle<T extends Entity> extends Shape<T> {
         super(position);
     }
 
-    public void setPoints (double width, double height) {
+    public void setPoints(double width, double height) {
         a = new Point(position.getX() + -(width / 2.0f), position.getY() + (height / 2.0f));
         b = new Point(position.getX() + 0, position.getY() - (height / 2.0f));
         c = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
     }
 
-    public void setPoints (Point a, Point b, Point c) {
+    public void setPoints(Point a, Point b, Point c) {
         this.a = a;
         this.b = b;
         this.c = c;
@@ -48,7 +48,7 @@ public class Triangle<T extends Entity> extends Shape<T> {
     @Override
     public void draw(Display display) {
         if (isVisible()) {
-            Display.drawTriangle(this, display);
+            display.drawTriangle(this);
         }
     }
 }

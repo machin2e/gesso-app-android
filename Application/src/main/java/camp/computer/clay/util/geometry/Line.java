@@ -37,7 +37,7 @@ public class Line<T extends Entity> extends Shape<T> {
     @Override
     public void draw(Display display) {
         if (isVisible()) {
-            Display.drawLine(this, display);
+            display.drawLine(this);
         }
     }
 

@@ -84,7 +84,7 @@ public class Circle<T extends Entity> extends Shape<T> {
     @Override
     public void draw(Display display) {
         if (isVisible()) {
-            Display.drawCircle(this, display);
+            display.drawCircle(this);
         }
     }
 }

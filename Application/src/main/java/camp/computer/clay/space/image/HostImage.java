@@ -1073,8 +1073,8 @@ public class HostImage extends PortableImage {
                 display.getPaint().setColor(Color.GREEN);
                 display.getPaint().setStyle(Paint.Style.STROKE);
                 Rectangle boardShape = (Rectangle) getShape("Substrate");
-                Display.drawCircle(getPosition(), boardShape.getWidth(), 0, display);
-                Display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0, display);
+                display.drawCircle(getPosition(), boardShape.getWidth(), 0);
+                display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0);
             }
         }
     }
