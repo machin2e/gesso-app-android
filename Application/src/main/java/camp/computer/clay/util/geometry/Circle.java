@@ -24,20 +24,20 @@ public class Circle<T extends Entity> extends Shape<T> {
         super(new Point(0, 0));
         this.radius = radius;
 
-        updateGeometryCache();
+        updateCache();
     }
 
     public Circle(T entity) {
         this.entity = entity;
 
-        updateGeometryCache();
+        updateCache();
     }
 
     public Circle(Point position, double radius) {
         super(position);
         this.radius = radius;
 
-        updateGeometryCache();
+        updateCache();
     }
 
     public double getRadius() {
@@ -47,10 +47,14 @@ public class Circle<T extends Entity> extends Shape<T> {
     public void setRadius(double radius) {
         this.radius = radius;
 
-        updateGeometryCache();
+        updateCache();
     }
 
-    protected void updateGeometryCache() {
+    /**
+     * Updates the descriptive geometry associated with this {@code Shape} (e.g., relative
+     * {@code Point}s).
+     */
+    protected void updateCache() {
         vertices = Geometry.getRegularPolygon(position, this.radius, vertexCount + 1);
     }
 

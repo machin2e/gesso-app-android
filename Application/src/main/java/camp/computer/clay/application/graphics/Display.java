@@ -160,6 +160,25 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // Space
         canvas.save();
         getSpace().draw(this);
+
+
+//        canvas.save();
+//        canvas.translate(0, 500);
+//        canvas.rotate(30);
+//
+//        paint.setColor(Color.GREEN);
+//        canvas.drawRect(-50, -50, 50, 50, paint);
+//        canvas.restore();
+//
+//        canvas.save();
+//        canvas.translate(0, -500);
+//        canvas.rotate(45);
+//
+//        paint.setColor(Color.GREEN);
+//        canvas.drawRect(-50, -50, 50, 50, paint);
+//        canvas.restore();
+
+
         canvas.restore();
 
         canvas.restore();
@@ -544,194 +563,223 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public static void drawRectangle(Rectangle rectangle, Display display) {
-        if (rectangle.isVisible()) {
+//        if (rectangle.isVisible()) {
 
-            Canvas canvas = display.getCanvas();
-            Paint paint = display.getPaint();
+        Canvas canvas = display.getCanvas();
+        Paint paint = display.getPaint();
 
-            // Set style
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.parseColor(rectangle.getColor()));
+        // Set style
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.parseColor(rectangle.getColor()));
 
-            if (rectangle.getCornerRadius() == 0) {
-                // Draw shape by drawing lines that connect its vertices
-                android.graphics.Path path = new android.graphics.Path();
+        if (rectangle.getCornerRadius() == 0) {
+
+//            // Draw shape by drawing lines that connect its vertices
+//            android.graphics.Path path = new android.graphics.Path();
+//            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+//            path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
+//            path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
+//            path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
+//            path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
+//            path.close();
+//
+//            canvas.drawPath(path, paint);
+
+            canvas.save();
+
+            // Scale, Point Translation, Rotation, Object Translation
+
+            canvas.translate(
+                    (float) rectangle.getPosition().getX(),
+                    (float) rectangle.getPosition().getY()
+            );
+
+            canvas.rotate((float) rectangle.getRotation());
+//            canvas.rotate((float) rectangle.getRotation());
+
+            canvas.drawRect(
+                    (float) rectangle.getRelativeLeft(),
+                    (float) rectangle.getRelativeTop(),
+                    (float) rectangle.getRelativeRight(),
+                    (float) rectangle.getRelativeBottom(),
+                    paint
+            );
+
+            canvas.restore();
+
+            // Draw pointerCoordinates in shape
+            if (rectangle.getOutlineThickness() > 0) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
+                paint.setStrokeWidth((float) rectangle.getOutlineThickness());
+
+//                path = new android.graphics.Path();
+//                path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+//                path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
+//                path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
+//                path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
+//                path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
+//                path.close();
+//
+//                canvas.drawPath(path, paint);
+
+                canvas.save();
+
+//                canvas.rotate((float) rectangle.getRotation());
+
+                canvas.translate(
+                        (float) rectangle.getPosition().getX(),
+                        (float) rectangle.getPosition().getY()
+                );
+
+                canvas.rotate((float) rectangle.getRotation());
+
+                canvas.drawRect(
+                        (float) rectangle.getRelativeLeft(),
+                        (float) rectangle.getRelativeTop(),
+                        (float) rectangle.getRelativeRight(),
+                        (float) rectangle.getRelativeBottom(),
+                        paint
+                );
+
+                canvas.restore();
+            }
+
+        } else {
+
+            // Draw shape by drawing lines that connect its vertices
+//            android.graphics.Path path = new android.graphics.Path();
+//            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+//            path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
+//            path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
+//            path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
+//            path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
+//            path.close();
+//
+//            canvas.drawPath(path, paint);
+
+            canvas.save();
+
+            // Scale, Point Translation, Rotation, Object Translation
+
+            canvas.translate(
+                    (float) rectangle.getPosition().getX(),
+                    (float) rectangle.getPosition().getY()
+            );
+
+            canvas.rotate((float) rectangle.getRotation());
+//            canvas.rotate((float) rectangle.getRotation());
+
+            canvas.drawRoundRect(
+                    (float) rectangle.getRelativeLeft(),
+                    (float) rectangle.getRelativeTop(),
+                    (float) rectangle.getRelativeRight(),
+                    (float) rectangle.getRelativeBottom(),
+                    (float) rectangle.getCornerRadius(),
+                    (float) rectangle.getCornerRadius(),
+                    paint
+            );
+
+            // Draw pointerCoordinates in shape
+            if (rectangle.getOutlineThickness() > 0) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
+                paint.setStrokeWidth((float) rectangle.getOutlineThickness());
+
+                // Scale, Point Translation, Rotation, Object Translation
+
+//                canvas.translate(
+//                        (float) rectangle.getPosition().getX(),
+//                        (float) rectangle.getPosition().getY()
+//                );
+//
+//                canvas.rotate((float) rectangle.getRotation());
+//            canvas.rotate((float) rectangle.getRotation());
+
+                canvas.drawRoundRect(
+                        (float) rectangle.getRelativeLeft(),
+                        (float) rectangle.getRelativeTop(),
+                        (float) rectangle.getRelativeRight(),
+                        (float) rectangle.getRelativeBottom(),
+                        (float) rectangle.getCornerRadius(),
+                        (float) rectangle.getCornerRadius(),
+                        paint
+                );
+
+//                path = new android.graphics.Path();
+//                path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+//                path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
+//                path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
+//                path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
+//                path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
+//                path.close();
+//
+//                canvas.drawPath(path, paint);
+            }
+
+
+            canvas.restore();
+
+            /*
+            // Draw shape by drawing lines that connect its vertices
+            android.graphics.Path path = new android.graphics.Path();
+            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+            path.moveTo((float) rectangle.topSegmentSource.getX(), (float) rectangle.topSegmentSource.getY());
+            path.lineTo((float) rectangle.topSegmentTarget.getX(), (float) rectangle.topSegmentTarget.getY());
+            for (int i = 0; i < rectangle.topRightArc.size(); i++) {
+                path.lineTo((float) ((Point) rectangle.topRightArc.get(i)).getX(), (float) ((Point) rectangle.topRightArc.get(i)).getY());
+            }
+            path.lineTo((float) rectangle.rightSegmentSource.getX(), (float) rectangle.rightSegmentSource.getY());
+            path.lineTo((float) rectangle.rightSegmentTarget.getX(), (float) rectangle.rightSegmentTarget.getY());
+            for (int i = 0; i < rectangle.bottomRightArc.size(); i++) {
+                path.lineTo((float) ((Point) rectangle.bottomRightArc.get(i)).getX(), (float) ((Point) rectangle.bottomRightArc.get(i)).getY());
+            }
+            path.lineTo((float) rectangle.bottomSegmentSource.getX(), (float) rectangle.bottomSegmentSource.getY());
+            path.lineTo((float) rectangle.bottomSegmentTarget.getX(), (float) rectangle.bottomSegmentTarget.getY());
+            for (int i = 0; i < rectangle.bottomLeftArc.size(); i++) {
+                path.lineTo((float) ((Point) rectangle.bottomLeftArc.get(i)).getX(), (float) ((Point) rectangle.bottomLeftArc.get(i)).getY());
+            }
+            path.lineTo((float) rectangle.leftSegmentSource.getX(), (float) rectangle.leftSegmentSource.getY());
+            path.lineTo((float) rectangle.leftSegmentTarget.getX(), (float) rectangle.leftSegmentTarget.getY());
+            for (int i = 0; i < rectangle.topLeftArc.size(); i++) {
+                path.lineTo((float) ((Point) rectangle.topLeftArc.get(i)).getX(), (float) ((Point) rectangle.topLeftArc.get(i)).getY());
+            }
+            path.close();
+
+            canvas.drawPath(path, paint);
+
+            // Draw pointerCoordinates in shape
+            if (rectangle.getOutlineThickness() > 0) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
+                paint.setStrokeWidth((float) rectangle.getOutlineThickness());
+
+                path = new android.graphics.Path();
                 path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-                path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
-                path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
-                path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
-                path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
+                path.moveTo((float) rectangle.topSegmentSource.getX(), (float) rectangle.topSegmentSource.getY());
+                path.lineTo((float) rectangle.topSegmentTarget.getX(), (float) rectangle.topSegmentTarget.getY());
+                for (int i = 0; i < rectangle.topRightArc.size(); i++) {
+                    path.lineTo((float) ((Point) rectangle.topRightArc.get(i)).getX(), (float) ((Point) rectangle.topRightArc.get(i)).getY());
+                }
+                path.lineTo((float) rectangle.rightSegmentSource.getX(), (float) rectangle.rightSegmentSource.getY());
+                path.lineTo((float) rectangle.rightSegmentTarget.getX(), (float) rectangle.rightSegmentTarget.getY());
+                for (int i = 0; i < rectangle.bottomRightArc.size(); i++) {
+                    path.lineTo((float) ((Point) rectangle.bottomRightArc.get(i)).getX(), (float) ((Point) rectangle.bottomRightArc.get(i)).getY());
+                }
+                path.lineTo((float) rectangle.bottomSegmentSource.getX(), (float) rectangle.bottomSegmentSource.getY());
+                path.lineTo((float) rectangle.bottomSegmentTarget.getX(), (float) rectangle.bottomSegmentTarget.getY());
+                for (int i = 0; i < rectangle.bottomLeftArc.size(); i++) {
+                    path.lineTo((float) ((Point) rectangle.bottomLeftArc.get(i)).getX(), (float) ((Point) rectangle.bottomLeftArc.get(i)).getY());
+                }
+                path.lineTo((float) rectangle.leftSegmentSource.getX(), (float) rectangle.leftSegmentSource.getY());
+                path.lineTo((float) rectangle.leftSegmentTarget.getX(), (float) rectangle.leftSegmentTarget.getY());
+                for (int i = 0; i < rectangle.topLeftArc.size(); i++) {
+                    path.lineTo((float) ((Point) rectangle.topLeftArc.get(i)).getX(), (float) ((Point) rectangle.topLeftArc.get(i)).getY());
+                }
                 path.close();
 
                 canvas.drawPath(path, paint);
-
-                // Draw pointerCoordinates in shape
-                if (rectangle.getOutlineThickness() > 0) {
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
-                    paint.setStrokeWidth((float) rectangle.getOutlineThickness());
-
-                    path = new android.graphics.Path();
-                    path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-                    path.moveTo((float) rectangle.getTopLeft().getX(), (float) rectangle.getTopLeft().getY());
-                    path.lineTo((float) rectangle.getTopRight().getX(), (float) rectangle.getTopRight().getY());
-                    path.lineTo((float) rectangle.getBottomRight().getX(), (float) rectangle.getBottomRight().getY());
-                    path.lineTo((float) rectangle.getBottomLeft().getX(), (float) rectangle.getBottomLeft().getY());
-                    path.close();
-
-                    canvas.drawPath(path, paint);
-                }
-
-            } else {
-
-                Point topLeft = rectangle.getTopLeft();
-                Point topRight = rectangle.getTopRight();
-                Point bottomRight = rectangle.getBottomRight();
-                Point bottomLeft = rectangle.getBottomLeft();
-
-                Point innerTopLeft = new Point(
-                        topLeft.getRelativeX() + rectangle.getCornerRadius(),
-                        topLeft.getRelativeY() + rectangle.getCornerRadius(),
-                        topLeft.getReferencePoint()
-                );
-
-                Point innerTopRight = new Point(
-                        topRight.getRelativeX() - rectangle.getCornerRadius(),
-                        topRight.getRelativeY() + rectangle.getCornerRadius(),
-                        topRight.getReferencePoint()
-                );
-
-                Point innerBottomRight = new Point(
-                        bottomRight.getRelativeX() - rectangle.getCornerRadius(),
-                        bottomRight.getRelativeY() - rectangle.getCornerRadius(),
-                        bottomRight.getReferencePoint()
-                );
-
-                Point innerBottomLeft = new Point(
-                        bottomLeft.getRelativeX() + rectangle.getCornerRadius(),
-                        bottomLeft.getRelativeY() - rectangle.getCornerRadius(),
-                        bottomLeft.getReferencePoint()
-                );
-
-                // Top segment
-                Point topSegmentSource = new Point(
-                        topLeft.getRelativeX() + rectangle.getCornerRadius(),
-                        topLeft.getRelativeY(),
-                        rectangle.getPosition()
-                );
-
-                Point topSegmentTarget = new Point(
-                        topRight.getRelativeX() - rectangle.getCornerRadius(),
-                        topRight.getRelativeY(),
-                        rectangle.getPosition()
-                );
-
-                List<Point> topRightArc = Geometry.getArc(innerTopRight, rectangle.getCornerRadius(), 270.0, 360.0, 10);
-
-                // Right segment
-                Point rightSegmentSource = new Point(
-                        topRight.getRelativeX(),
-                        topRight.getRelativeY() + rectangle.getCornerRadius(),
-                        rectangle.getPosition()
-                );
-
-                Point rightSegmentTarget = new Point(
-                        bottomRight.getRelativeX(),
-                        bottomRight.getRelativeY() - rectangle.getCornerRadius(),
-                        rectangle.getPosition()
-                );
-
-                List<Point> bottomRightArc = Geometry.getArc(innerBottomRight, rectangle.getCornerRadius(), 0.0, 90.0, 10);
-
-                // Bottom segment
-                Point bottomSegmentSource = new Point(
-                        bottomRight.getRelativeX() - rectangle.getCornerRadius(),
-                        bottomRight.getRelativeY(),
-                        rectangle.getPosition()
-                );
-
-                Point bottomSegmentTarget = new Point(
-                        bottomLeft.getRelativeX() + rectangle.getCornerRadius(),
-                        bottomLeft.getRelativeY(),
-                        rectangle.getPosition()
-                );
-
-                List<Point> bottomLeftArc = Geometry.getArc(innerBottomLeft, rectangle.getCornerRadius(), 90.0, 180.0, 10);
-
-                // Left segment
-                Point leftSegmentSource = new Point(
-                        bottomLeft.getRelativeX(),
-                        bottomLeft.getRelativeY() - rectangle.getCornerRadius(),
-                        rectangle.getPosition()
-                );
-
-                Point leftSegmentTarget = new Point(
-                        topLeft.getRelativeX(),
-                        topLeft.getRelativeY() + rectangle.getCornerRadius(),
-                        rectangle.getPosition()
-                );
-
-                List<Point> topLeftArc = Geometry.getArc(innerTopLeft, rectangle.getCornerRadius(), 180.0, 270.0, 10);
-
-                // Draw shape by drawing lines that connect its vertices
-                android.graphics.Path path = new android.graphics.Path();
-                path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-                path.moveTo((float) topSegmentSource.getX(), (float) topSegmentSource.getY());
-                path.lineTo((float) topSegmentTarget.getX(), (float) topSegmentTarget.getY());
-                for (int i = 0; i < topRightArc.size(); i++) {
-                    path.lineTo((float) topRightArc.get(i).getX(), (float) topRightArc.get(i).getY());
-                }
-                path.lineTo((float) rightSegmentSource.getX(), (float) rightSegmentSource.getY());
-                path.lineTo((float) rightSegmentTarget.getX(), (float) rightSegmentTarget.getY());
-                for (int i = 0; i < bottomRightArc.size(); i++) {
-                    path.lineTo((float) bottomRightArc.get(i).getX(), (float) bottomRightArc.get(i).getY());
-                }
-                path.lineTo((float) bottomSegmentSource.getX(), (float) bottomSegmentSource.getY());
-                path.lineTo((float) bottomSegmentTarget.getX(), (float) bottomSegmentTarget.getY());
-                for (int i = 0; i < bottomLeftArc.size(); i++) {
-                    path.lineTo((float) bottomLeftArc.get(i).getX(), (float) bottomLeftArc.get(i).getY());
-                }
-                path.lineTo((float) leftSegmentSource.getX(), (float) leftSegmentSource.getY());
-                path.lineTo((float) leftSegmentTarget.getX(), (float) leftSegmentTarget.getY());
-                for (int i = 0; i < topLeftArc.size(); i++) {
-                    path.lineTo((float) topLeftArc.get(i).getX(), (float) topLeftArc.get(i).getY());
-                }
-                path.close();
-
-                canvas.drawPath(path, paint);
-
-                // Draw pointerCoordinates in shape
-                if (rectangle.getOutlineThickness() > 0) {
-                    paint.setStyle(Paint.Style.STROKE);
-                    paint.setColor(Color.parseColor(rectangle.getOutlineColor()));
-                    paint.setStrokeWidth((float) rectangle.getOutlineThickness());
-
-                    path = new android.graphics.Path();
-                    path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-                    path.moveTo((float) topSegmentSource.getX(), (float) topSegmentSource.getY());
-                    path.lineTo((float) topSegmentTarget.getX(), (float) topSegmentTarget.getY());
-                    for (int i = 0; i < topRightArc.size(); i++) {
-                        path.lineTo((float) topRightArc.get(i).getX(), (float) topRightArc.get(i).getY());
-                    }
-                    path.lineTo((float) rightSegmentSource.getX(), (float) rightSegmentSource.getY());
-                    path.lineTo((float) rightSegmentTarget.getX(), (float) rightSegmentTarget.getY());
-                    for (int i = 0; i < bottomRightArc.size(); i++) {
-                        path.lineTo((float) bottomRightArc.get(i).getX(), (float) bottomRightArc.get(i).getY());
-                    }
-                    path.lineTo((float) bottomSegmentSource.getX(), (float) bottomSegmentSource.getY());
-                    path.lineTo((float) bottomSegmentTarget.getX(), (float) bottomSegmentTarget.getY());
-                    for (int i = 0; i < bottomLeftArc.size(); i++) {
-                        path.lineTo((float) bottomLeftArc.get(i).getX(), (float) bottomLeftArc.get(i).getY());
-                    }
-                    path.lineTo((float) leftSegmentSource.getX(), (float) leftSegmentSource.getY());
-                    path.lineTo((float) leftSegmentTarget.getX(), (float) leftSegmentTarget.getY());
-                    for (int i = 0; i < topLeftArc.size(); i++) {
-                        path.lineTo((float) topLeftArc.get(i).getX(), (float) topLeftArc.get(i).getY());
-                    }
-                    path.close();
-
-                    canvas.drawPath(path, paint);
-                }
+            }
 
 //                canvas.save();
 //                canvas.rotate((float) rectangle.getRotation());
@@ -745,8 +793,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 //                        paint
 //                );
 //                canvas.restore();
-            }
+            */
         }
+//        }
     }
 
     public static void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight, Display display) {

@@ -2,6 +2,7 @@ package camp.computer.clay.util.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -392,21 +393,21 @@ public class Space extends Image<Model> {
 //        // <DEBUG_LABEL>
 //        if (Application.ENABLE_GEOMETRY_LABELS) {
 //
-//            // <FPS_LABEL>
-//            Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();
-//            fpsCoordinate.setY(fpsCoordinate.getY() - 200);
-//            display.getPaint().setColor(Color.RED);
-//            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getCanvas().drawCircle((float) fpsCoordinate.getX(), (float) fpsCoordinate.getY(), 10, display.getPaint());
-//
-//            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getPaint().setTextSize(35);
-//
-//            String fpsText = "FPS: " + (int) display.getDisplayOutput().getFramesPerSecond();
-//            Rect fpsTextBounds = new Rect();
-//            display.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-//            display.getCanvas().drawText(fpsText, (float) fpsCoordinate.getX() + 20, (float) fpsCoordinate.getY() + fpsTextBounds.height() / 2.0f, display.getPaint());
-//            // </FPS_LABEL>
+        // <FPS_LABEL>
+        Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();
+        fpsCoordinate.setY(fpsCoordinate.getY() - 200);
+        display.getPaint().setColor(Color.RED);
+        display.getPaint().setStyle(Paint.Style.FILL);
+        display.getCanvas().drawCircle((float) fpsCoordinate.getX(), (float) fpsCoordinate.getY(), 10, display.getPaint());
+
+        display.getPaint().setStyle(Paint.Style.FILL);
+        display.getPaint().setTextSize(35);
+
+        String fpsText = "FPS: " + (int) display.getDisplayOutput().getFramesPerSecond();
+        Rect fpsTextBounds = new Rect();
+        display.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
+        display.getCanvas().drawText(fpsText, (float) fpsCoordinate.getX() + 20, (float) fpsCoordinate.getY() + fpsTextBounds.height() / 2.0f, display.getPaint());
+        // </FPS_LABEL>
 //
 //            // <CENTROID_LABEL>
 //            Point centroidCoordinate = getImages().filterType(Host.class).getCentroidPoint();

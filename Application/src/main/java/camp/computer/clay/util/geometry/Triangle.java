@@ -12,6 +12,9 @@ public class Triangle<T extends Entity> extends Shape<T> {
     private Point b = new Point(0, 0);
     private Point c = new Point(0, 0);
 
+    // Cached descriptive {@code Point} geometry for the {@code Shape}.
+
+
     public Triangle(T entity) {
         this.entity = entity;
     }

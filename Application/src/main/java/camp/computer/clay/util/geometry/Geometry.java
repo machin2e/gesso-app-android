@@ -1,5 +1,7 @@
 package camp.computer.clay.util.geometry;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -568,6 +570,8 @@ public abstract class Geometry {
     }
 
     public static List<Point> getArc(Point centerPosition, double radius, double startAngle, double stopAngle, int segmentCount) {
+
+        Log.v("Geometry", "getArc");
 
         List<Point> vertices = new ArrayList<>();
 
