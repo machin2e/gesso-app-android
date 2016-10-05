@@ -96,8 +96,8 @@ public abstract class Geometry {
 
     public static Point calculateMidpoint(Point source, Point target) {
         Point midpoint = new Point(
-                (source.getX() + target.getX()) / 2.0f,
-                (source.getY() + target.getY()) / 2.0f,
+                (source.x + target.x) / 2.0f,
+                (source.y + target.y) / 2.0f,
                 source.getReferencePoint()
         );
         return midpoint;
@@ -165,15 +165,23 @@ public abstract class Geometry {
 
             Point point = points.get(i);
 
-            centroidPosition.setAbsolute(
-                    centroidPosition.getAbsoluteX() + point.getAbsoluteX(),
-                    centroidPosition.getAbsoluteY() + point.getAbsoluteY()
+//            centroidPosition.setAbsolute(
+//                    centroidPosition.getAbsoluteX() + point.getAbsoluteX(),
+//                    centroidPosition.getAbsoluteY() + point.getAbsoluteY()
+//            );
+            centroidPosition.set(
+                    centroidPosition.x + point.x,
+                    centroidPosition.y + point.y
             );
         }
 
-        centroidPosition.setAbsolute(
-                centroidPosition.getAbsoluteX() / points.size(),
-                centroidPosition.getAbsoluteY() / points.size()
+//        centroidPosition.setAbsolute(
+//                centroidPosition.getAbsoluteX() / points.size(),
+//                centroidPosition.getAbsoluteY() / points.size()
+//        );
+        centroidPosition.set(
+                centroidPosition.x / points.size(),
+                centroidPosition.y / points.size()
         );
 
         return centroidPosition;
@@ -270,13 +278,13 @@ public abstract class Geometry {
 
         for (int i = 0; i < points.size(); i++) {
 
-            if (points.get(i).getX() < minX) {
-                minX = points.get(i).getX();
+            if (points.get(i).x < minX) {
+                minX = points.get(i).x;
                 minPoint = i;
             }
 
-            if (points.get(i).getX() > maxX) {
-                maxX = points.get(i).getX();
+            if (points.get(i).x > maxX) {
+                maxX = points.get(i).x;
                 maxPoint = i;
             }
         }
@@ -362,9 +370,9 @@ public abstract class Geometry {
     }
 
     private static double distance(Point A, Point B, Point C) {
-        double ABx = B.getX() - A.getX();
-        double ABy = B.getY() - A.getY();
-        double num = ABx * (A.getY() - C.getY()) - ABy * (A.getX() - C.getX());
+        double ABx = B.x - A.x;
+        double ABy = B.y - A.y;
+        double num = ABx * (A.y - C.y) - ABy * (A.x - C.x);
         if (num < 0) {
             num = -num;
         }
@@ -372,7 +380,7 @@ public abstract class Geometry {
     }
 
     private static int pointLocation(Point A, Point B, Point P) {
-        double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
+        double cp1 = (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x);
         if (cp1 > 0) {
             return 1;
         } else if (cp1 == 0) {
@@ -558,8 +566,8 @@ public abstract class Geometry {
 
             // Calculate point prior to rotation
             Point vertexPosition = new Point(
-                    (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRotation())),
-                    (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.getRotation())),
+                    (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.rotation)),
+                    (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.rotation)),
                     position
             );
 

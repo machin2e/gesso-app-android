@@ -116,13 +116,13 @@ public class Point {
      * @param point Absolute position. Converted to relative position internally.
      */
     public void copy(Point point) {
-        setX(point.getX());
-        setY(point.getY());
+        x = point.x;
+        y = point.y;
 
         // <HACK?>
         // TODO: Set these?
         setReferencePoint(point.getReferencePoint());
-        setRotation(point.getRotation());
+        rotation = point.rotation;
         // </HACK?>
     }
 

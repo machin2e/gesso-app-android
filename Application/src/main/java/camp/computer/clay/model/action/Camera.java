@@ -100,13 +100,13 @@ public class Camera {
     public void setPosition(Point targetPosition, double duration) {
 
         if (targetPosition.x == position.x && targetPosition.y == position.y) {
-
             return;
         }
 
         if (duration == 0) {
 
-            this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
+            //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
+            this.targetPosition.set(-targetPosition.x, -targetPosition.y);
 
             this.originalPosition.copy(targetPosition);
 
@@ -120,7 +120,8 @@ public class Camera {
             // this.targetPosition.setAbsoluteY(-targetPosition.y * targetScale);
             */
 
-            this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
+            //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
+            this.targetPosition.set(-targetPosition.x, -targetPosition.y);
 
             // <PLAN_ANIMATION>
             originalPosition.copy(position);
@@ -414,7 +415,11 @@ public class Camera {
             // Log.v("Progress", "frame: " + (positionFrameIndex + 1) + " of " + positionFrameLimit + ", done: " + currentDistance + ", target: " + currentDistanceTarget + ", left: " + (1.0 - currentDistance));
 
             //position.setAbsolute(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.getAbsoluteX()), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.getAbsoluteY()));
-            position.setAbsolute(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.x), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.y));
+            //position.setAbsolute(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.x), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.y));
+            position.set(
+                    scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.x),
+                    scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.y)
+            );
 
             positionFrameIndex++;
 

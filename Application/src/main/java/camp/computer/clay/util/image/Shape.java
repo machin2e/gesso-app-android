@@ -54,7 +54,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void setRotation(double angle) {
-        this.position.setRotation(angle);
+        this.position.rotation = angle;
     }
 
     public double getRotation() {

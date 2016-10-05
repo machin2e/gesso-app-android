@@ -73,7 +73,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         identityMatrix = new Matrix();
 
         // Center the space coordinate system
-        originPosition.setAbsolute(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+        //originPosition.setAbsolute(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+        originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
     @Override

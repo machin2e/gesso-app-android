@@ -72,7 +72,7 @@ public abstract class Image<T extends Entity> {
     }
 
     public void setRotation(double angle) {
-        this.position.setRotation(angle);
+        this.position.rotation = angle;
     }
 
     public void setScale(double scale) {
