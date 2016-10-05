@@ -190,7 +190,7 @@ public class ShapeGroup extends Group<Shape> {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
-            positions.add(new Point(shape.getPosition().getX(), shape.getPosition().getY()));
+            positions.add(new Point(shape.getPosition().getAbsoluteX(), shape.getPosition().getAbsoluteY()));
         }
         return positions;
     }

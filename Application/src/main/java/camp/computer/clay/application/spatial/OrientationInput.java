@@ -68,8 +68,8 @@ public class OrientationInput implements SensorEventListener {
                 SensorManager.getOrientation(inR, orientVals);
 
                 // values[0]: Azimuth, rotation around the Z axis (0<=azimuth<360). 0 = North, 90 = East, 180 = South, 270 = West
-                // values[1]: Pitch, rotation around X axis (-180<=pitch<=180), with positive values when the z-axis moves toward the relativeY-axis.
-                // values[2]: Roll, rotation around Y axis (-90<=roll<=90), with positive values when the z-axis moves toward the relativeX-axis.
+                // values[1]: Pitch, rotation around X axis (-180<=pitch<=180), with positive values when the z-axis moves toward the y-axis.
+                // values[2]: Roll, rotation around Y axis (-90<=roll<=90), with positive values when the z-axis moves toward the x-axis.
                 //
                 // From Android Documentation (https://developer.android.com/reference/android/hardware/SensorListener.html)
 

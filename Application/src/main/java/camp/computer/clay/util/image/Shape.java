@@ -34,7 +34,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public Shape(Point position) {
-        this.position.set(position);
+        this.position.copy(position);
     }
 
     public T getEntity() {
@@ -46,19 +46,19 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void setPosition(double x, double y) {
-        this.position.set(x, y);
+        this.position.setAbsolute(x, y);
     }
 
     public void setPosition(Point point) {
-        this.position.set(point.getX(), point.getY());
+        this.position.setAbsolute(point.getAbsoluteX(), point.getAbsoluteY());
     }
 
     public void setRotation(double angle) {
-        this.position.setRelativeRotation(angle);
+        this.position.setRotation(angle);
     }
 
     public double getRotation() {
-        return this.position.getRotation();
+        return this.position.getAbsoluteRotation();
     }
 
     public void setReferencePoint(Point point) {

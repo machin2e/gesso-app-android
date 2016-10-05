@@ -5,9 +5,9 @@ import camp.computer.clay.model.Path;
 public class PathGroup extends EntityGroup<Path> {
 
     /**
-     * Returns all {@code Port}s contained in the current set of {@code Path}s.
+     * Returns all {@code Port}s contained in the current setAbsolute of {@code Path}s.
      *
-     * @return The {@code Port}s contained in the current set of {@code Path}s.
+     * @return The {@code Port}s contained in the current setAbsolute of {@code Path}s.
      */
     public PortGroup getPorts() {
         PortGroup ports = new PortGroup();

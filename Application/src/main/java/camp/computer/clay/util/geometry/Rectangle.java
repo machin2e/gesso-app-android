@@ -161,19 +161,19 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 //    }
 //
 //    public double getLeft() {
-//        return position.getX() - (width / 2.0f);
+//        return position.getAbsoluteX() - (width / 2.0f);
 //    }
 //
 //    public double getTop() {
-//        return position.getY() - (height / 2.0f);
+//        return position.getAbsoluteY() - (height / 2.0f);
 //    }
 //
 //    public double getRight() {
-//        return position.getX() + (width / 2.0f);
+//        return position.getAbsoluteX() + (width / 2.0f);
 //    }
 //
 //    public double getBottom() {
-//        return position.getY() + (height / 2.0f);
+//        return position.getAbsoluteY() + (height / 2.0f);
 //    }
 
     // TODO: Return a Number that updates when the Point coordinates update
@@ -188,18 +188,18 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public double getRelativeRight() {
         // TODO: Return a Number that updates when the Point coordinates update
-//        return this.position.getRelativeX() + (width / 2.0f);
+//        return this.position.getX() + (width / 2.0f);
         return 0 + (width / 2.0f);
     }
 
     public double getRelativeBottom() {
         // TODO: Return a Number that updates when the Point coordinates update
-//        return this.position.getRelativeY() + (height / 2.0f);
+//        return this.position.getY() + (height / 2.0f);
         return 0 + (height / 2.0f);
     }
 
     public Point getTopLeft() {
-        topLeft.setRelative(
+        topLeft.set(
                 0 - (width / 2.0), // getRelativeLeft(),
                 0 - (height / 2.0) // getRelativeTop()
         );
@@ -207,7 +207,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getTopRight() {
-        topRight.setRelative(
+        topRight.set(
                 0 + (width / 2.0), // getRelativeRight(),
                 0 - (height / 2.0) // getRelativeTop()
         );
@@ -215,7 +215,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getBottomRight() {
-        bottomRight.setRelative(
+        bottomRight.set(
                 0 + (width / 2.0), // getRelativeRight(),
                 0 + (height / 2.0) // getRelativeBottom()
         );
@@ -223,7 +223,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getBottomLeft() {
-        bottomLeft.setRelative(
+        bottomLeft.set(
                 0 - (width / 2.0), // getRelativeLeft(),
                 0 + (height / 2.0) // getRelativeBottom()
         );

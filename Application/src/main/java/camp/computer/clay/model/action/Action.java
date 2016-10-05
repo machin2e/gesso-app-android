@@ -238,9 +238,9 @@ public class Action {
     protected Point offset = new Point();
 
 //    public Point getOffset() {
-//        this.offset.set(
-//                getLastEvent().getPosition().getX() - getFirstEvent().getPosition().getX(),
-//                getLastEvent().getPosition().getY() - getFirstEvent().getPosition().getY()
+//        this.offset.setAbsolute(
+//                getLastEvent().getPosition().getAbsoluteX() - getFirstEvent().getPosition().getAbsoluteX(),
+//                getLastEvent().getPosition().getAbsoluteY() - getFirstEvent().getPosition().getAbsoluteY()
 //        );
 //        return offset;
 //    }

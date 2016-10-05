@@ -61,7 +61,7 @@ public class Clay {
         // Space
         this.space = new Space(model);
 
-        // Create actor and set perspective
+        // Create actor and setAbsolute perspective
         Actor actor = new Actor(this.space);
 
         // Add actor to model

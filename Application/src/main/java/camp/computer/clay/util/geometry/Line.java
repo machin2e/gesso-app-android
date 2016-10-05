@@ -51,7 +51,7 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     public void setSource(Point source) {
-        this.source.set(source);
+        this.source.copy(source);
     }
 
     public Point getTarget() {
@@ -60,7 +60,7 @@ public class Line<T extends Entity> extends Shape<T> {
 
     public void setTarget(Point target) {
         //this.target = target;
-        this.target.set(target);
+        this.target.copy(target);
     }
 
     public Point getMidpoint() {

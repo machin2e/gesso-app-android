@@ -73,7 +73,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         identityMatrix = new Matrix();
 
         // Center the space coordinate system
-        originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
+        originPosition.setAbsolute(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
     @Override
@@ -208,9 +208,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
      * Adjust the perspective
      */
     private void adjustCamera() {
-        //canvas.translate((float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX() + (float) Application.getView().getOrientationInput().getRotationY(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY() - (float) Application.getView().getOrientationInput().getRotationX());
-        canvas.translate((float) originPosition.relativeX + (float) space.getEntity().getActor(0).getCamera().getPosition().relativeX /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.relativeY + (float) space.getEntity().getActor(0).getCamera().getPosition().relativeY /* - (float) Application.getView().getOrientationInput().getRotationX() */);
-//                (float) originPosition.getX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getX(), (float) originPosition.getY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getY());
+        //canvas.translate((float) originPosition.getAbsoluteX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteX() + (float) Application.getView().getOrientationInput().getRotationY(), (float) originPosition.getAbsoluteY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteY() - (float) Application.getView().getOrientationInput().getRotationX());
+        canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCamera().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCamera().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
+//                (float) originPosition.getAbsoluteX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteX(), (float) originPosition.getAbsoluteY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteY());
         // this.canvas.rotate((float) ApplicationView.getView().getOrientationInput().getRotationZ());
         canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
     }
@@ -337,8 +337,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                             int id = motionEvent.getPointerId(i);
                             Point perspectivePosition = actor.getCamera().getPosition();
                             double perspectiveScale = actor.getCamera().getScale();
-                            event.pointerCoordinates[id].setX((motionEvent.getHistoricalX(i, historyIndex) - (originPosition.getX() + perspectivePosition.getX())) / perspectiveScale);
-                            event.pointerCoordinates[id].setY((motionEvent.getHistoricalY(i, historyIndex) - (originPosition.getY() + perspectivePosition.getY())) / perspectiveScale);
+                            event.pointerCoordinates[id].setAbsoluteX((motionEvent.getHistoricalX(i, historyIndex) - (originPosition.getAbsoluteX() + perspectivePosition.getAbsoluteX())) / perspectiveScale);
+                            event.pointerCoordinates[id].setAbsoluteY((motionEvent.getHistoricalY(i, historyIndex) - (originPosition.getAbsoluteY() + perspectivePosition.getAbsoluteY())) / perspectiveScale);
                         }
 
                         // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
@@ -399,10 +399,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                     int id = motionEvent.getPointerId(i);
                     Point perspectivePosition = actor.getCamera().getPosition();
                     double perspectiveScale = actor.getCamera().getScale();
-//                    event.pointerCoordinates[id].setX((motionEvent.getX(i) - (originPosition.relativeX + perspectivePosition.relativeX)) / perspectiveScale);
-//                    event.pointerCoordinates[id].setY((motionEvent.getY(i) - (originPosition.relativeY + perspectivePosition.relativeY)) / perspectiveScale);
-                    event.pointerCoordinates[id].relativeX = (motionEvent.getX(i) - (originPosition.relativeX + perspectivePosition.relativeX)) / perspectiveScale;
-                    event.pointerCoordinates[id].relativeY = (motionEvent.getY(i) - (originPosition.relativeY + perspectivePosition.relativeY)) / perspectiveScale;
+//                    event.pointerCoordinates[id].setAbsoluteX((motionEvent.getAbsoluteX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale);
+//                    event.pointerCoordinates[id].setAbsoluteY((motionEvent.getAbsoluteY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale);
+                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
 
                 // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
@@ -458,22 +458,22 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStrokeWidth((float) line.getOutlineThickness());
 
         // Color
-        canvas.drawLine((float) line.getSource().getX(), (float) line.getSource().getY(), (float) line.getTarget().getX(), (float) line.getTarget().getY(), paint);
+        canvas.drawLine((float) line.getSource().getAbsoluteX(), (float) line.getSource().getAbsoluteY(), (float) line.getTarget().getAbsoluteX(), (float) line.getTarget().getAbsoluteY(), paint);
     }
 
     public void drawLine(Point source, Point target) {
 
         // Color
-        canvas.drawLine((float) source.getX(), (float) source.getY(), (float) target.getX(), (float) target.getY(), paint);
-        // TODO: canvas.drawLine((float) source.relativeX, (float) source.relativeY, (float) target.relativeX, (float) target.relativeY, paint);
+        canvas.drawLine((float) source.getAbsoluteX(), (float) source.getAbsoluteY(), (float) target.getAbsoluteX(), (float) target.getAbsoluteY(), paint);
+        // TODO: canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
 
     }
 
     public void drawCircle(Point position, double radius, double angle) {
 
         // Color
-        //canvas.drawCircle((float) position.getX(), (float) position.getY(), (float) radius, paint);
-        canvas.drawCircle((float) position.relativeX, (float) position.relativeY, (float) radius, paint);
+        //canvas.drawCircle((float) position.getAbsoluteX(), (float) position.getAbsoluteY(), (float) radius, paint);
+        canvas.drawCircle((float) position.x, (float) position.y, (float) radius, paint);
 
     }
 
@@ -482,8 +482,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.save();
 
         canvas.translate(
-                (float) circle.getPosition().relativeX,
-                (float) circle.getPosition().relativeY
+                (float) circle.getPosition().x,
+                (float) circle.getPosition().y
         );
 
         canvas.rotate((float) circle.getPosition().rotation);
@@ -527,7 +527,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // Draw
         Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
-        canvas.drawText(text, (float) position.relativeX, (float) position.relativeY + bounds.height() / 2.0f, paint);
+        canvas.drawText(text, (float) position.x, (float) position.y + bounds.height() / 2.0f, paint);
     }
 
     public void drawRectangle(Point position, double angle, double width, double height) {
@@ -535,10 +535,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.save();
 
         canvas.translate(
-//                (float) position.getX(),
-//                (float) position.getY()
-                (float) position.relativeX,
-                (float) position.relativeY
+//                (float) position.getAbsoluteX(),
+//                (float) position.getAbsoluteY()
+                (float) position.x,
+                (float) position.y
         );
 
         canvas.rotate((float) angle);
@@ -564,21 +564,21 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
 //        // <Image>
 //        canvas.translate(
-//                (float) rectangle.getPosition().getReferencePoint().getRelativeX(),
-//                (float) rectangle.getPosition().getReferencePoint().getRelativeY()
+//                (float) rectangle.getPosition().getReferencePoint().getX(),
+//                (float) rectangle.getPosition().getReferencePoint().getY()
 //        );
 //
-//        // canvas.rotate((float) rectangle.getRotation());
-//        canvas.rotate((float) rectangle.getPosition().getReferencePoint().getRelativeRotation());
+//        // canvas.rotate((float) rectangle.getAbsoluteRotation());
+//        canvas.rotate((float) rectangle.getPosition().getReferencePoint().getRotation());
 //        // </Image>
 
         // <Shape>
         canvas.translate(
-                (float) rectangle.getPosition().relativeX,
-                (float) rectangle.getPosition().relativeY
+                (float) rectangle.getPosition().x,
+                (float) rectangle.getPosition().y
         );
 
-        // canvas.rotate((float) rectangle.getRotation());
+        // canvas.rotate((float) rectangle.getAbsoluteRotation());
         canvas.rotate((float) rectangle.getPosition().rotation);
         // </Shape>
 
@@ -681,18 +681,18 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         android.graphics.Path path = new android.graphics.Path();
         for (int i = 0; i < sideCount; i++) {
 
-            Point vertexPosition = new Point((position.relativeX + radius * Math.cos(2.0f * Math.PI * (double) i / (double) sideCount)), (position.relativeY + radius * Math.sin(2.0f * Math.PI * (double) i / (double) sideCount)));
+            Point vertexPosition = new Point((position.x + radius * Math.cos(2.0f * Math.PI * (double) i / (double) sideCount)), (position.y + radius * Math.sin(2.0f * Math.PI * (double) i / (double) sideCount)));
 
             // Draw pointerCoordinates in shape
             path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
             if (i == 0) {
-                path.moveTo((float) vertexPosition.relativeX, (float) vertexPosition.relativeY);
+                path.moveTo((float) vertexPosition.x, (float) vertexPosition.y);
             }
 
-            path.lineTo((float) vertexPosition.relativeX, (float) vertexPosition.relativeY);
+            path.lineTo((float) vertexPosition.x, (float) vertexPosition.y);
         }
 
-//        path.lineTo(position.relativeX, position.relativeY);
+//        path.lineTo(position.x, position.y);
         path.close();
 
         canvas.drawPath(path, paint);
@@ -712,10 +712,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             // Draw pointerCoordinates in shape
             path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
             if (i == 0) {
-                path.moveTo((float) vertices.get(i).relativeX, (float) vertices.get(i).relativeY);
+                path.moveTo((float) vertices.get(i).x, (float) vertices.get(i).y);
             }
 
-            path.lineTo((float) vertices.get(i).relativeX, (float) vertices.get(i).relativeY);
+            path.lineTo((float) vertices.get(i).x, (float) vertices.get(i).y);
         }
 
         path.close();
@@ -732,9 +732,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     public void drawTriangle(Point position, double angle, double width, double height) {
 
         // Calculate pointerCoordinates before rotation
-        Point p1 = new Point(position.relativeX + -(width / 2.0f), position.relativeY + (height / 2.0f));
-        Point p2 = new Point(position.relativeX + 0, position.relativeY - (height / 2.0f));
-        Point p3 = new Point(position.relativeX + (width / 2.0f), position.relativeY + (height / 2.0f));
+        Point p1 = new Point(position.x + -(width / 2.0f), position.y + (height / 2.0f));
+        Point p2 = new Point(position.x + 0, position.y - (height / 2.0f));
+        Point p3 = new Point(position.x + (width / 2.0f), position.y + (height / 2.0f));
 
         // Calculate pointerCoordinates after rotation
         Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), Geometry.calculateDistance(position, p1));
@@ -743,9 +743,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-        path.moveTo((float) rp1.relativeX, (float) rp1.relativeY);
-        path.lineTo((float) rp2.relativeX, (float) rp2.relativeY);
-        path.lineTo((float) rp3.relativeX, (float) rp3.relativeY);
+        path.moveTo((float) rp1.x, (float) rp1.y);
+        path.lineTo((float) rp2.x, (float) rp2.y);
+        path.lineTo((float) rp3.x, (float) rp3.y);
         path.close();
 
         canvas.drawPath(path, paint);

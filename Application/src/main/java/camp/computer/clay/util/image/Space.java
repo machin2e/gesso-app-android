@@ -49,7 +49,7 @@ public class Space extends Image<Model> {
         setupActions();
     }
 
-    // TODO: Allow user to set and change a goal. Track it in relation to the actions taken and things built.
+    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
     protected Visibility titleVisibility = new Visibility(Visibility.Value.INVISIBLE);
     protected String titleText = "Project";
 
@@ -90,10 +90,10 @@ public class Space extends Image<Model> {
 //                    } else if (action.isDragging()) {
                     // Camera
                     if (action.getSize() > 1) {
-                        camera.setOffset(event.getPosition().relativeX - action.getFirstEvent().getPosition().relativeX, event.getPosition().relativeY - action.getFirstEvent().getPosition().relativeY);
+                        camera.setOffset(event.getPosition().x - action.getFirstEvent().getPosition().x, event.getPosition().y - action.getFirstEvent().getPosition().y);
                     }
 
-//                    camera.setOffset(action.getOffset().getX(), action.getOffset().getY());
+//                    camera.setOffset(action.getOffset().getAbsoluteX(), action.getOffset().getAbsoluteY());
 //                    }
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
@@ -401,11 +401,11 @@ public class Space extends Image<Model> {
 //        if (Application.ENABLE_GEOMETRY_LABELS) {
 //
         // <FPS_LABEL>
-        fpsCoordinate.setRelative(getImages().filterType(Host.class).getCenterPoint());
-        fpsCoordinate.relativeY = fpsCoordinate.relativeY - 200;
+        fpsCoordinate.set(getImages().filterType(Host.class).getCenterPoint());
+        fpsCoordinate.y = fpsCoordinate.y - 200;
         display.paint.setColor(Color.RED);
         display.paint.setStyle(Paint.Style.FILL);
-        display.canvas.drawCircle((float) fpsCoordinate.relativeX, (float) fpsCoordinate.relativeY, 10, display.paint);
+        display.canvas.drawCircle((float) fpsCoordinate.x, (float) fpsCoordinate.y, 10, display.paint);
 
         display.paint.setStyle(Paint.Style.FILL);
         display.paint.setTextSize(35);
@@ -413,14 +413,14 @@ public class Space extends Image<Model> {
         String fpsText = "FPS: " + (int) display.getDisplayOutput().getFramesPerSecond();
         Rect fpsTextBounds = new Rect();
         display.paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        display.canvas.drawText(fpsText, (float) fpsCoordinate.relativeX + 20, (float) fpsCoordinate.relativeY + fpsTextBounds.height() / 2.0f, display.getPaint());
+        display.canvas.drawText(fpsText, (float) fpsCoordinate.x + 20, (float) fpsCoordinate.y + fpsTextBounds.height() / 2.0f, display.getPaint());
         // </FPS_LABEL>
 //
 //            // <CENTROID_LABEL>
 //            Point centroidCoordinate = getImages().filterType(Host.class).getCentroidPoint();
 //            display.getPaint().setColor(Color.RED);
 //            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getCanvas().drawCircle((float) centroidCoordinate.getX(), (float) centroidCoordinate.getY(), 10, display.getPaint());
+//            display.getCanvas().drawCircle((float) centroidCoordinate.getAbsoluteX(), (float) centroidCoordinate.getAbsoluteY(), 10, display.getPaint());
 //
 //            display.getPaint().setStyle(Paint.Style.FILL);
 //            display.getPaint().setTextSize(35);
@@ -428,7 +428,7 @@ public class Space extends Image<Model> {
 //            String text = "CENTROID";
 //            Rect bounds = new Rect();
 //            display.getPaint().getTextBounds(text, 0, text.length(), bounds);
-//            display.getCanvas().drawText(text, (float) centroidCoordinate.getX() + 20, (float) centroidCoordinate.getY() + bounds.height() / 2.0f, display.getPaint());
+//            display.getCanvas().drawText(text, (float) centroidCoordinate.getAbsoluteX() + 20, (float) centroidCoordinate.getAbsoluteY() + bounds.height() / 2.0f, display.getPaint());
 //            // </CENTROID_LABEL>
 //
 //            // <CENTER_LABEL>
@@ -436,7 +436,7 @@ public class Space extends Image<Model> {
 //            Point baseImagesCenterCoordinate = Geometry.calculateCenter(figureCoordinates);
 //            display.getPaint().setColor(Color.RED);
 //            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getCanvas().drawCircle((float) baseImagesCenterCoordinate.getX(), (float) baseImagesCenterCoordinate.getY(), 10, display.getPaint());
+//            display.getCanvas().drawCircle((float) baseImagesCenterCoordinate.getAbsoluteX(), (float) baseImagesCenterCoordinate.getAbsoluteY(), 10, display.getPaint());
 //
 //            display.getPaint().setStyle(Paint.Style.FILL);
 //            display.getPaint().setTextSize(35);
@@ -444,7 +444,7 @@ public class Space extends Image<Model> {
 //            String centerLabeltext = "CENTER";
 //            Rect centerLabelTextBounds = new Rect();
 //            display.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-//            display.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterCoordinate.getX() + 20, (float) baseImagesCenterCoordinate.getY() + centerLabelTextBounds.height() / 2.0f, display.getPaint());
+//            display.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterCoordinate.getAbsoluteX() + 20, (float) baseImagesCenterCoordinate.getAbsoluteY() + centerLabelTextBounds.height() / 2.0f, display.getPaint());
 //            // </CENTER_LABEL>
 //
 //            // <CONVEX_HULL_LABEL>
@@ -560,15 +560,15 @@ public class Space extends Image<Model> {
     }
 
     public void setPrototypePathSourcePosition(Point position) {
-        this.prototypePathSourcePosition.set(position);
+        this.prototypePathSourcePosition.copy(position);
     }
 
     public void setPrototypePathDestinationPosition(Point position) {
-        this.prototypePathDestinationCoordinate.set(position);
+        this.prototypePathDestinationCoordinate.copy(position);
     }
 
     public void setPrototypeExtensionPosition(Point position) {
-        this.prototypeExtensionPosition.set(position);
+        this.prototypeExtensionPosition.copy(position);
     }
 
     public void setPrototypeExtensionVisibility(Visibility.Value visibility) {

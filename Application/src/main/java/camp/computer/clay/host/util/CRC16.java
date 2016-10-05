@@ -28,7 +28,7 @@ public class CRC16 {
     // - https://en.wikipedia.org/wiki/Polynomial_representations_of_cyclic_redundancy_checks
     public static final int CRC_16_IBM_NORMAL = 0x8005; // standard CRC-16 x16+x15+x2+1 (CRC-16-IBM)
     public static final int CRC_16_IBM_REVERSE = 0xA001; // standard CRC-16 x16+x15+x2+1 (CRC-16-IBM)
-    public static final int CRC_16_IBM_RECIPROCAL_REVERSE = 0xC002; // standard reverse x16+x14+relativeX+1 (CRC-16-IBM)
+    public static final int CRC_16_IBM_RECIPROCAL_REVERSE = 0xC002; // standard reverse x16+x14+x+1 (CRC-16-IBM)
 
     public static final int CRC_16_CCITT_REVERSE = 0x8408; // CCITT/SDLC/HDLC X16+X12+X5+1 (CRC-16-CCITT)
 

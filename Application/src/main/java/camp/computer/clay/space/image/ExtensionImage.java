@@ -221,7 +221,7 @@ public class ExtensionImage extends PortableImage {
                 circle.setRadius(40);
                 circle.setLabel("Port " + (getExtension().getPorts().size() + 1));
                 circle.setPosition(-90, 175);
-                // circle.setRelativeRotation(0);
+                // circle.setRotation(0);
 
                 circle.setColor("#efefef");
                 circle.setOutlineThickness(0);
@@ -251,7 +251,7 @@ public class ExtensionImage extends PortableImage {
             double connectorPositionDistance = (PIXELS_PER_MILLIMETER * (2.54 * portConnectorPositions.size() + 0.6));
             if (portConnectorPositions.size() > i) {
                 double x = (PIXELS_PER_MILLIMETER * (2.54 * i + 0.6)) - (connectorPositionDistance / 2.0);
-                portConnectorPositions.get(i).setRelativeX(x);
+                portConnectorPositions.get(i).setX(x);
             } else {
                 double x = PIXELS_PER_MILLIMETER * (2.54 * i + 0.6);
                 portConnectorPositions.add(new Point(x, 107, position));
@@ -266,8 +266,8 @@ public class ExtensionImage extends PortableImage {
             if (portShape != null) {
                 double portSpacing = 100;
                 double x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
-                portShape.getPosition().setRelativeX(x);
-                // TODO: Also update relativeY coordinate
+                portShape.getPosition().setX(x);
+                // TODO: Also update y coordinate
             }
         }
     }
@@ -282,8 +282,8 @@ public class ExtensionImage extends PortableImage {
             // <HACK>
             if (getPosition().getReferencePoint() != null) {
                 canvas.translate(
-                        (float) getPosition().getReferencePoint().relativeX,
-                        (float) getPosition().getReferencePoint().relativeY
+                        (float) getPosition().getReferencePoint().x,
+                        (float) getPosition().getReferencePoint().y
                 );
 
                 canvas.rotate((float) getPosition().getReferencePoint().rotation);
@@ -291,8 +291,8 @@ public class ExtensionImage extends PortableImage {
             // </HACK>
 
             canvas.translate(
-                    (float) getPosition().relativeX,
-                    (float) getPosition().relativeY
+                    (float) getPosition().x,
+                    (float) getPosition().y
             );
 
             canvas.rotate((float) getPosition().rotation);

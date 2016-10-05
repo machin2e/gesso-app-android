@@ -11,13 +11,13 @@ public class Point {
      * The x coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
      * {@code null} then this is equivalent to an absolute position.
      */
-    public double relativeX = 0;
+    public double x = 0;
 
     /**
      * The y coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
      * {@code null} then this is equivalent to an absolute position.
      */
-    public double relativeY = 0;
+    public double y = 0;
 
     /**
      * Relative rotation of the coordinate with which points referencing this one will be
@@ -39,26 +39,26 @@ public class Point {
      * @param otherPoint The {@code Point} to copy.
      */
     public Point(Point otherPoint) {
-        this.relativeX = otherPoint.relativeX;
-        this.relativeY = otherPoint.relativeY;
+        this.x = otherPoint.x;
+        this.y = otherPoint.y;
     }
 
     public Point(double x, double y) {
-        this.relativeX = x;
-        this.relativeY = y;
+        this.x = x;
+        this.y = y;
     }
 
     /**
      * Creates a new {@code Point} positioned relative to {@code referencePoint}.
      *
-     * @param x              The relativeX coordinate of this {@code Point} relative to {@code referencePoint}.
-     * @param y              The relativeY coordinate of this {@code Point} relative to {@code referencePoint}.
+     * @param x              The x coordinate of this {@code Point} relative to {@code referencePoint}.
+     * @param y              The y coordinate of this {@code Point} relative to {@code referencePoint}.
      * @param referencePoint
      */
     public Point(double x, double y, Point referencePoint) {
         setReferencePoint(referencePoint);
-        setRelativeX(x);
-        setRelativeY(y);
+        setX(x);
+        setY(y);
     }
 
     public Point getReferencePoint() {
@@ -69,126 +69,126 @@ public class Point {
         this.referencePoint = referencePoint;
     }
 
-    public double getRelativeX() {
-        return relativeX;
+    public double getX() {
+        return x;
     }
 
-    public double getRelativeY() {
-        return relativeY;
+    public void setX(double x) {
+        this.x = x;
     }
 
-    public void setRelative(double x, double y) {
-        this.relativeX = x;
-        this.relativeY = y;
+    public double getY() {
+        return y;
     }
 
-    public void setRelative(Point otherPoint) {
-        this.relativeX = otherPoint.relativeX;
-        this.relativeY = otherPoint.relativeY;
+    public void setY(double y) {
+        this.y = y;
     }
 
-    public void setRelativeX(double x) {
-        this.relativeX = x;
+    public void set(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public void setRelativeY(double y) {
-        this.relativeY = y;
+    public void set(Point otherPoint) {
+        this.x = otherPoint.x;
+        this.y = otherPoint.y;
     }
 
     /**
-     * @param dx Absolute offset along relativeX axis from current relativeX position.
-     * @param dy Absolute offset along relativeY axis from current relativeY position.
+     * @param dx Offset along x axis from current x position.
+     * @param dy Offset along y axis from current y position.
      */
     public void offset(double dx, double dy) {
-        this.relativeX = this.relativeX + dx;
-        this.relativeY = this.relativeY + dy;
-    }
-
-    /**
-     * @return Absolute relativeX coordinate.
-     */
-    public double getX() {
-        if (referencePoint != null) {
-            double globalX = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
-            return referencePoint.getX() + globalX;
-        } else {
-            return this.relativeX;
-        }
-    }
-
-    /**
-     * @return Absolute relativeY coordinate.
-     */
-    public double getY() {
-        if (referencePoint != null) {
-            double globalY = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.sin(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
-            return referencePoint.getY() + globalY;
-        } else {
-            return this.relativeY;
-        }
+        this.x = this.x + dx;
+        this.y = this.y + dy;
     }
 
     public double getRotation() {
-        if (referencePoint != null) {
-            return referencePoint.getRotation() + this.rotation;
-        } else {
-            return this.rotation;
-        }
-    }
-
-    public double getRelativeRotation() {
         return this.rotation;
     }
 
-    /**
-     * @param x Absolute relativeX coordinate. Converted to relative coordinate internally.
-     * @param y Absolute relativeY coordinate. Converted to relative coordinate internally.
-     */
-    public void set(double x, double y) {
-        setX(x);
-        setY(y);
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
     }
 
     /**
      * @param point Absolute position. Converted to relative position internally.
      */
-    public void set(Point point) {
-        setRelativeX(point.getRelativeX());
-        setRelativeY(point.getRelativeY());
+    public void copy(Point point) {
+        setX(point.getX());
+        setY(point.getY());
 
         // <HACK?>
         // TODO: Set these?
         setReferencePoint(point.getReferencePoint());
-        setRelativeRotation(point.getRelativeRotation());
+        setRotation(point.getRotation());
         // </HACK?>
     }
 
-    /**
-     * @param x Absolute relativeX coordinate. Converted to a relative relativeX position internally.
-     */
-    public void setX(double x) {
-        if (referencePoint != null) {
-            this.relativeX = x - referencePoint.getX();
-        } else {
-            this.relativeX = x;
-        }
-    }
-
-    /**
-     * @param y Absolute relativeY coordinate. Converted to a relative relativeY position internally.
-     */
-    public void setY(double y) {
-        if (referencePoint != null) {
-            this.relativeY = y - referencePoint.getY();
-        } else {
-            this.relativeY = y;
-        }
-    }
-
-    public void setRelativeRotation(double rotation) {
-        this.rotation = rotation;
-    }
-
     public void update() {
+    }
+
+    /**
+     * @param x Absolute x coordinate. Converted to relative coordinate internally.
+     * @param y Absolute y coordinate. Converted to relative coordinate internally.
+     */
+    public void setAbsolute(double x, double y) {
+        setAbsoluteX(x);
+        setAbsoluteY(y);
+    }
+
+    /**
+     * @return Absolute x coordinate.
+     */
+    public double getAbsoluteX() {
+        if (referencePoint != null) {
+            double absoluteX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            return referencePoint.getAbsoluteX() + absoluteX;
+        } else {
+            return this.x;
+        }
+    }
+
+    /**
+     * @param x Absolute x coordinate. Converted to a relative x position internally.
+     */
+    public void setAbsoluteX(double x) {
+        if (referencePoint != null) {
+            this.x = x - referencePoint.getAbsoluteX();
+        } else {
+            this.x = x;
+        }
+    }
+
+    /**
+     * @return Absolute y coordinate.
+     */
+    public double getAbsoluteY() {
+        if (referencePoint != null) {
+            double absoluteY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            return referencePoint.getAbsoluteY() + absoluteY;
+        } else {
+            return this.y;
+        }
+    }
+
+    /**
+     * @param y Absolute y coordinate. Converted to a relative y position internally.
+     */
+    public void setAbsoluteY(double y) {
+        if (referencePoint != null) {
+            this.y = y - referencePoint.getAbsoluteY();
+        } else {
+            this.y = y;
+        }
+    }
+
+    public double getAbsoluteRotation() {
+        if (referencePoint != null) {
+            return referencePoint.getAbsoluteRotation() + this.rotation;
+        } else {
+            return this.rotation;
+        }
     }
 }

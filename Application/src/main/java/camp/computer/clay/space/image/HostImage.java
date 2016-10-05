@@ -185,7 +185,7 @@ public class HostImage extends PortableImage {
             circle.setLabel("Port " + (i + 1));
             circle.setPosition(portCirclePositions.get(i));
             circle.setRadius(40);
-            // circle.setRelativeRotation(0);
+            // circle.setRotation(0);
             circle.setColor("#efefef");
             circle.setOutlineThickness(0);
             circle.setVisibility(Visibility.Value.INVISIBLE);
@@ -214,7 +214,7 @@ public class HostImage extends PortableImage {
             */
 
             /*
-            // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto relativeY axis points with most recent data
+            // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto y axis points with most recent data
             Line previousLine = null;
             int segmentCount = 10;
             for (int j = 0; j < segmentCount; j++) {
@@ -225,11 +225,11 @@ public class HostImage extends PortableImage {
                 if (previousLine == null) {
                     line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
                 } else {
-                    line.setSource(new Point(previousLine.getTarget().getRelativeX(), previousLine.getTarget().getRelativeY(), line.getPosition()));
+                    line.setSource(new Point(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getPosition()));
                 }
                 if (j < (segmentCount - 1)) {
                     double segmentLength = (circle.getRadius() * 2) / segmentCount;
-                    line.setTarget(new Point(line.getSource().getRelativeX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
+                    line.setTarget(new Point(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
 
 //                    Log.v("OnUpdate", "ADDING onUpdateListener");
 //                    final Circle finalCircle = circle;
@@ -237,7 +237,7 @@ public class HostImage extends PortableImage {
 //                        @Override
 //                        public void onUpdate(Line line)
 //                        {
-//                            line.getTarget().setRelativeY(Probability.generateRandomInteger(-(int) finalCircle.getRadius(), (int) finalCircle.getRadius()));
+//                            line.getTarget().setY(Probability.generateRandomInteger(-(int) finalCircle.getRadius(), (int) finalCircle.getRadius()));
 //                        }
 //                    });
 
@@ -1002,20 +1002,20 @@ public class HostImage extends PortableImage {
         //extensionImage.setPosition(event.getPosition());
         if (segmentIndex == 0) {
             extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setRelativeX(0);
-            extensionImage.getPosition().setRelativeY(-500);
+            extensionImage.getPosition().setX(0);
+            extensionImage.getPosition().setY(-500);
         } else if (segmentIndex == 1) {
             extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setRelativeX(500);
-            extensionImage.getPosition().setRelativeY(0);
+            extensionImage.getPosition().setX(500);
+            extensionImage.getPosition().setY(0);
         } else if (segmentIndex == 2) {
             extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setRelativeX(0);
-            extensionImage.getPosition().setRelativeY(500);
+            extensionImage.getPosition().setX(0);
+            extensionImage.getPosition().setY(500);
         } else if (segmentIndex == 3) {
             extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setRelativeX(-500);
-            extensionImage.getPosition().setRelativeY(0);
+            extensionImage.getPosition().setX(-500);
+            extensionImage.getPosition().setY(0);
         }
 
         //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
@@ -1075,8 +1075,8 @@ public class HostImage extends PortableImage {
             canvas.save();
 
             canvas.translate(
-                    (float) position.relativeX,
-                    (float) position.relativeY
+                    (float) position.x,
+                    (float) position.y
             );
 
             canvas.rotate((float) position.rotation);
