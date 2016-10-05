@@ -72,7 +72,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         identityMatrix = new Matrix();
 
-        // Center the space coordinate system
+        // Center the parentSpace coordinate system
         //originPosition.setAbsolute(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
@@ -209,9 +209,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
      * Adjust the perspective
      */
     private void adjustCamera() {
-        //canvas.translate((float) originPosition.getAbsoluteX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteX() + (float) Application.getView().getOrientationInput().getRotationY(), (float) originPosition.getAbsoluteY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteY() - (float) Application.getView().getOrientationInput().getRotationX());
+        //canvas.translate((float) originPosition.getAbsoluteX() + (float) parentSpace.getEntity().getActor(0).getCamera().getPosition().getAbsoluteX() + (float) Application.getView().getOrientationInput().getRotationY(), (float) originPosition.getAbsoluteY() + (float) parentSpace.getEntity().getActor(0).getCamera().getPosition().getAbsoluteY() - (float) Application.getView().getOrientationInput().getRotationX());
         canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCamera().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCamera().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
-//                (float) originPosition.getAbsoluteX() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteX(), (float) originPosition.getAbsoluteY() + (float) space.getEntity().getActor(0).getCamera().getPosition().getAbsoluteY());
+//                (float) originPosition.getAbsoluteX() + (float) parentSpace.getEntity().getActor(0).getCamera().getPosition().getAbsoluteX(), (float) originPosition.getAbsoluteY() + (float) parentSpace.getEntity().getActor(0).getCamera().getPosition().getAbsoluteY());
         // this.canvas.rotate((float) ApplicationView.getView().getOrientationInput().getRotationZ());
         canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
     }
@@ -228,7 +228,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Canvas canvas = null;
 
         // Update
-//        space.update();
+//        parentSpace.update();
         space.doUpdate();
 
         SurfaceHolder holder = getHolder();
@@ -240,7 +240,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 synchronized (holder) {
 
                     // Update
-                    //space.update();
+                    //parentSpace.update();
 
                     // Draw
                     doDraw(canvas);

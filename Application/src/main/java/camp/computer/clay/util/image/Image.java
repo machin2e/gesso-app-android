@@ -21,7 +21,7 @@ public abstract class Image<T extends Entity> {
     /**
      * The parent {@code Space} containing this {@code Image}.
      */
-    protected Space space = null;
+    protected Space parentSpace = null;
 
     protected T entity = null;
 
@@ -39,6 +39,20 @@ public abstract class Image<T extends Entity> {
 
     protected ActionListener actionListener;
 
+    public static final int DEFAULT_LAYER_INDEX = 0;
+
+    protected int layerIndex = DEFAULT_LAYER_INDEX;
+
+    public int getLayerIndex() {
+        return this.layerIndex;
+    }
+
+    public void setLayerIndex(int layerIndex) {
+        this.layerIndex = layerIndex;
+
+        parentSpace.sortImagesByLayer();
+    }
+
     public Image(T entity) {
         this.entity = entity;
     }
@@ -48,11 +62,11 @@ public abstract class Image<T extends Entity> {
     }
 
     public void setSpace(Space space) {
-        this.space = space;
+        this.parentSpace = space;
     }
 
     public Space getSpace() {
-        return this.space;
+        return this.parentSpace;
     }
 
     public Point getPosition() {
@@ -92,11 +106,13 @@ public abstract class Image<T extends Entity> {
     }
 
     public <T extends Shape> void addShape(T shape) {
+        shape.setImage(this);
         shape.getPosition().setReferencePoint(getPosition());
         this.shapes.add(shape);
     }
 
     public <T extends Shape> void addShape(T shape, String label) {
+        shape.setImage(this);
         shape.setLabel(label);
         shape.getPosition().setReferencePoint(getPosition());
         shapes.add(shape);
@@ -179,6 +195,30 @@ public abstract class Image<T extends Entity> {
 
     public Shape removeShape(int index) {
         return shapes.remove(index);
+    }
+
+    public void sortShapesByLayer() {
+
+        for (int i = 0; i < shapes.size() - 1; i++) {
+            for (int j = i + 1; j < shapes.size(); j++) {
+                // Check for out-of-order pairs, and swap them
+                if (shapes.get(i).layerIndex > shapes.get(j).layerIndex) {
+                    Shape shape = shapes.get(i);
+                    shapes.set(i, shapes.get(j));
+                    shapes.set(j, shape);
+                }
+            }
+        }
+
+        /*
+        // TODO: Sort using this after making Group implement List
+        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
+            @Override
+            public int compare(MyObject o1, MyObject o2) {
+                return o1.getStartDate().compareTo(o2.getStartDate());
+            }
+        });
+        */
     }
 
     public void update() {

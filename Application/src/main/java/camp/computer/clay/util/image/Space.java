@@ -179,6 +179,30 @@ public class Space extends Image<Model> {
         }
     }
 
+    public void sortImagesByLayer() {
+
+        for (int i = 0; i < images.size() - 1; i++) {
+            for (int j = i + 1; j < images.size(); j++) {
+                // Check for out-of-order pairs, and swap them
+                if (images.get(i).layerIndex > images.get(j).layerIndex) {
+                    Image image = images.get(i);
+                    images.set(i, images.get(j));
+                    images.set(j, image);
+                }
+            }
+        }
+
+        /*
+        // TODO: Sort using this after making Group implement List
+        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
+            @Override
+            public int compare(MyObject o1, MyObject o2) {
+                return o1.getStartDate().compareTo(o2.getStartDate());
+            }
+        });
+        */
+    }
+
     // TODO: Remove Image parameter. Create that and return it.
     private <T extends Image> void addImage(T image) {
 
@@ -186,6 +210,7 @@ public class Space extends Image<Model> {
         image.setSpace(this);
         if (!images.contains(image)) {
             images.add(image);
+            sortImagesByLayer();
         }
 
         // Position the Image
@@ -367,6 +392,14 @@ public class Space extends Image<Model> {
             images.get(i).update();
         }
 
+//        // Sort Images by increasing layer index
+//        for (int layerIndex = -10; layerIndex < 10; layerIndex++) { // HACK...
+//            for (int i = 0; i < images.size(); i++) {
+//                if (images.get(i).layerIndex == layerIndex) {
+//                }
+//            }
+//        }
+
         // Update figure layout
         // Geometry.computeCirclePacking(getImages().filterType(HostImage.class, ExtensionImage.class).getList(), 200, getImages().filterType(HostImage.class, ExtensionImage.class).getCentroidPosition());
     }
@@ -508,7 +541,7 @@ public class Space extends Image<Model> {
         }
     }
 
-    // TODO: Make this into a shape and put this on a separate layer!
+    // TODO: Make this into a shape and put this on a separate layerIndex!
     public void drawPrototypePath(Display display) {
         if (prototypePathVisibility.getValue() == Visibility.Value.VISIBLE) {
 

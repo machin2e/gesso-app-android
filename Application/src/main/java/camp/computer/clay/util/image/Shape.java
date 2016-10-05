@@ -12,6 +12,8 @@ import camp.computer.clay.util.geometry.Rectangle;
 
 public abstract class Shape<T extends Entity> {
 
+    protected Image parentImage = null;
+
     protected String label = "";
 
     protected Visibility visibility = new Visibility(Visibility.Value.VISIBLE);
@@ -26,6 +28,20 @@ public abstract class Shape<T extends Entity> {
 
     protected T entity = null;
 
+    public static final int DEFAULT_LAYER_INDEX = 0;
+
+    protected int layerIndex = DEFAULT_LAYER_INDEX;
+
+    public int getLayerIndex() {
+        return this.layerIndex;
+    }
+
+    public void setLayerIndex(int layerIndex) {
+        this.layerIndex = layerIndex;
+
+        parentImage.sortShapesByLayer();
+    }
+
     public Shape() {
     }
 
@@ -35,6 +51,14 @@ public abstract class Shape<T extends Entity> {
 
     public Shape(Point position) {
         this.position.copy(position);
+    }
+
+    public void setImage(Image image) {
+        this.parentImage = image;
+    }
+
+    public Image getImage() {
+        return this.parentImage;
     }
 
     public T getEntity() {

@@ -30,6 +30,8 @@ public class PathImage extends Image<Path> {
 
     private void setup() {
         setupActions();
+
+        layerIndex = -10;
     }
 
     private void setupActions() {
@@ -168,8 +170,8 @@ public class PathImage extends Image<Path> {
 
         // Draw the connection to the Host's Port
 
-        PortableImage hostImage = (PortableImage) space.getImage(hostPort.getPortable());
-        PortableImage extensionImage = (PortableImage) space.getImage(extensionPort.getPortable());
+        PortableImage hostImage = (PortableImage) parentSpace.getImage(hostPort.getPortable());
+        PortableImage extensionImage = (PortableImage) parentSpace.getImage(extensionPort.getPortable());
 
         Point hostConnectorPosition = hostImage.portConnectorPositions.get(hostPort.getIndex());
         Point extensionConnectorPosition = extensionImage.portConnectorPositions.get(extensionPort.getIndex());

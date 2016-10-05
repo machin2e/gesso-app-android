@@ -60,7 +60,7 @@ public abstract class PortableImage extends Image<Portable> {
     public ImageGroup getPathImages(int portIndex) {
         ImageGroup pathImages = new ImageGroup();
         PathGroup paths = getPortable().getPort(portIndex).getForwardPaths();
-        // TODO: ImageGroup images = space.getImages(paths);
+        // TODO: ImageGroup images = parentSpace.getImages(paths);
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
             PathImage pathImage = (PathImage) getSpace().getImage(path);

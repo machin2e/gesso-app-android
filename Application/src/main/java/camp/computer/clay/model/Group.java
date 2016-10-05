@@ -11,12 +11,20 @@ public class Group<T> {
         this.elements.add(element);
     }
 
+    public void add(int location, T element) {
+        this.elements.add(location, element);
+    }
+
     public void add(Group<T> elements) {
         this.elements.addAll(elements.elements);
     }
 
     public void add(List<T> elements) {
         this.elements.addAll(elements);
+    }
+
+    public void set(int location, T element) {
+        this.elements.set(location, element);
     }
 
     public Group<T> remove(T element) {

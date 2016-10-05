@@ -20,7 +20,7 @@ public abstract class Geometry {
      * Returns angle in degrees in the range [0,360), rotating CLOCKWISE, 0 and 360 degrees
      * represents NORTH, 90 degrees represents EAST, etc...
      * <p>
-     * Assumes all pointerCoordinates are in the same coordinate space.  If they are not,
+     * Assumes all pointerCoordinates are in the same coordinate parentSpace.  If they are not,
      * you will need to call SwingUtilities.convertPointToScreen or equivalent
      * on all arguments before passing them  to this function.
      *

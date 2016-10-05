@@ -45,7 +45,7 @@ public class Camera {
     protected double height;
 
     /**
-     * The space displayed from this perspective
+     * The parentSpace displayed from this perspective
      */
     protected Space space = null;
 
