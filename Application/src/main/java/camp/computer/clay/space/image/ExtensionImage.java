@@ -179,6 +179,8 @@ public class ExtensionImage extends PortableImage {
                 portShape.setColor(Color.getColor(port.getType()));
             }
         }
+
+        super.update();
     }
 
     /**
@@ -246,8 +248,9 @@ public class ExtensionImage extends PortableImage {
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
 
             // Calculate Port connector positions
+            double connectorPositionDistance = (PIXELS_PER_MILLIMETER * (2.54 * portConnectorPositions.size() + 0.6));
             if (portConnectorPositions.size() > i) {
-                double x = PIXELS_PER_MILLIMETER * (2.54 * i + 0.6);
+                double x = (PIXELS_PER_MILLIMETER * (2.54 * i + 0.6)) - (connectorPositionDistance / 2.0);
                 portConnectorPositions.get(i).setRelativeX(x);
             } else {
                 double x = PIXELS_PER_MILLIMETER * (2.54 * i + 0.6);
@@ -255,7 +258,7 @@ public class ExtensionImage extends PortableImage {
             }
         }
 
-        // Update Port positions based on the number of ports
+        // Update Port positions based on the index of ports
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
             Port port = getPortable().getPorts().get(i);
             Circle portShape = (Circle) getShape(port);
@@ -279,20 +282,20 @@ public class ExtensionImage extends PortableImage {
             // <HACK>
             if (getPosition().getReferencePoint() != null) {
                 canvas.translate(
-                        (float) getPosition().getReferencePoint().getRelativeX(),
-                        (float) getPosition().getReferencePoint().getRelativeY()
+                        (float) getPosition().getReferencePoint().relativeX,
+                        (float) getPosition().getReferencePoint().relativeY
                 );
 
-                canvas.rotate((float) getPosition().getReferencePoint().getRelativeRotation());
+                canvas.rotate((float) getPosition().getReferencePoint().rotation);
             }
             // </HACK>
 
             canvas.translate(
-                    (float) getPosition().getRelativeX(),
-                    (float) getPosition().getRelativeY()
+                    (float) getPosition().relativeX,
+                    (float) getPosition().relativeY
             );
 
-            canvas.rotate((float) getPosition().getRelativeRotation());
+            canvas.rotate((float) getPosition().rotation);
 
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);

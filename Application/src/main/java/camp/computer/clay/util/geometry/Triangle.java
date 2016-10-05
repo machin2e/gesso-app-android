@@ -24,9 +24,9 @@ public class Triangle<T extends Entity> extends Shape<T> {
     }
 
     public void setPoints(double width, double height) {
-        a = new Point(position.getX() + -(width / 2.0f), position.getY() + (height / 2.0f));
-        b = new Point(position.getX() + 0, position.getY() - (height / 2.0f));
-        c = new Point(position.getX() + (width / 2.0f), position.getY() + (height / 2.0f));
+        a = new Point(position.relativeX + -(width / 2.0f), position.relativeY + (height / 2.0f));
+        b = new Point(position.relativeX + 0, position.relativeY - (height / 2.0f));
+        c = new Point(position.relativeX + (width / 2.0f), position.relativeY + (height / 2.0f));
     }
 
     public void setPoints(Point a, Point b, Point c) {

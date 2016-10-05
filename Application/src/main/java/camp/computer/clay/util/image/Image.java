@@ -1,7 +1,5 @@
 package camp.computer.clay.util.image;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -184,9 +182,12 @@ public abstract class Image<T extends Entity> {
     }
 
     public void update() {
-        Log.v("OnUpdate", "Image.update " + shapes.size());
+
+        position.update();
+
+//        Log.v("OnUpdate", "Image.update " + shapes.size());
         for (int i = 0; i < this.shapes.size(); i++) {
-            Log.v("OnUpdate", "Image.update " + shapes.get(i));
+//            Log.v("OnUpdate", "Image.update " + shapes.get(i));
             this.shapes.get(i).update();
         }
     }

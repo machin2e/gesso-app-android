@@ -58,7 +58,9 @@ public class PathImage extends Image<Path> {
         return getEntity();
     }
 
+    @Override
     public void update() {
+        super.update();
     }
 
     public void setDockVisibility(Visibility.Value visibility) {
@@ -169,12 +171,12 @@ public class PathImage extends Image<Path> {
         PortableImage hostImage = (PortableImage) space.getImage(hostPort.getPortable());
         PortableImage extensionImage = (PortableImage) space.getImage(extensionPort.getPortable());
 
-        Point hostConnectorPosition = hostImage.portConnectorPositions.get(hostPort.getNumber() - 1);
-        Point extensionConnectorPosition = extensionImage.portConnectorPositions.get(extensionPort.getNumber() - 1);
+        Point hostConnectorPosition = hostImage.portConnectorPositions.get(hostPort.getIndex());
+        Point extensionConnectorPosition = extensionImage.portConnectorPositions.get(extensionPort.getIndex());
 
         // Draw connection between Ports
         display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
-        display.getPaint().setStrokeWidth(15.0f);
+        display.getPaint().setStrokeWidth(10.0f);
         display.drawLine(hostConnectorPosition, extensionConnectorPosition);
     }
 }

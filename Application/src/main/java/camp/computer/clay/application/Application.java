@@ -52,7 +52,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_SPEECH_OUTPUT = false;
     private static final boolean ENABLE_MOTION_INPUT = true;
 
-    private static final long MESSAGE_SEND_FREQUENCY = 500;
+    private static final long MESSAGE_SEND_FREQUENCY = 5000; // 500;
 
     public static boolean ENABLE_GEOMETRY_LABELS = false;
 
@@ -81,7 +81,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private Internet networkResource;
 
-    Prompt ui;
+    Prompt prompt;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -103,11 +103,11 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     }
 
     public Prompt getActionPrompts() {
-        return this.ui;
+        return this.prompt;
     }
 
     public void openActionEditor(Extension extension) {
-        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
+        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
         pathEditor.setVisibility(View.VISIBLE);
     }
 
@@ -136,7 +136,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // Display Interface
         Application.applicationView = this;
 
-        ui = new Prompt(this);
+        prompt = new Prompt(this);
 
 //        for (int i = 0; i < 100; i++) {
 //            String outgoingMessage = "announce device " + UUID.randomUUID();
@@ -163,7 +163,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         //setContentView(visualizationSurface);
 
         // Path Editor
-        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.path_editor_view);
+        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
         pathEditor.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -192,7 +192,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                     // TODO:
                 } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                    addPathPatchAction();
+                    addPathExtensionAction();
 
                 } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO:
@@ -738,7 +738,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }, 100L);
     }
 
-    private void addPathPatchAction() {
+    private void addPathExtensionAction() {
 
         final TextView actionConstruct = new TextView(getContext());
         actionConstruct.setText("Event (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");

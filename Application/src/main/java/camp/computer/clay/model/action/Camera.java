@@ -59,7 +59,8 @@ public class Camera {
     // Position
     protected final Point DEFAULT_POSITION = new Point(0, 0);
     protected Point targetPosition = DEFAULT_POSITION;
-    protected Point position = new Point(targetPosition.getX(), targetPosition.getY());
+    //protected Point position = new Point(targetPosition.getX(), targetPosition.getY());
+    protected Point position = new Point(targetPosition.relativeX, targetPosition.relativeY);
     protected double positionPeriod = DEFAULT_ADJUSTMENT_PERIOD;
     protected int positionFrameIndex = 0;
     protected int positionFrameLimit = 0;
@@ -98,14 +99,14 @@ public class Camera {
 
     public void setPosition(Point targetPosition, double duration) {
 
-        if (targetPosition.getX() == position.getX() && targetPosition.getY() == position.getY()) {
+        if (targetPosition.relativeX == position.relativeX && targetPosition.relativeY == position.relativeY) {
 
             return;
         }
 
         if (duration == 0) {
 
-            this.targetPosition.set(-targetPosition.getX(), -targetPosition.getY());
+            this.targetPosition.set(-targetPosition.relativeX, -targetPosition.relativeY);
 
             this.originalPosition.set(targetPosition);
 
@@ -115,11 +116,11 @@ public class Camera {
 
             /*
             // Solution 1: This works without per-frame adjustment. It's a starting point for that.
-            // this.targetPosition.setX(-targetPosition.getX() * targetScale);
-            // this.targetPosition.setY(-targetPosition.getY() * targetScale);
+            // this.targetPosition.setX(-targetPosition.relativeX * targetScale);
+            // this.targetPosition.setY(-targetPosition.relativeY * targetScale);
             */
 
-            this.targetPosition.set(-targetPosition.getX(), -targetPosition.getY());
+            this.targetPosition.set(-targetPosition.relativeX, -targetPosition.relativeY);
 
             // <PLAN_ANIMATION>
             originalPosition.set(position);
@@ -402,22 +403,27 @@ public class Camera {
         if (positionFrameIndex < positionFrameLimit) {
 
             double totalDistanceToTarget = Geometry.calculateDistance(originalPosition, targetPosition);
-            double totalDistanceToTargetX = targetPosition.getX() - originalPosition.getX();
-            double totalDistanceToTargetY = targetPosition.getY() - originalPosition.getY();
+//            double totalDistanceToTargetX = targetPosition.getX() - originalPosition.getX();
+//            double totalDistanceToTargetY = targetPosition.getY() - originalPosition.getY();
+            double totalDistanceToTargetX = targetPosition.relativeX - originalPosition.relativeX;
+            double totalDistanceToTargetY = targetPosition.relativeY - originalPosition.relativeY;
 
             // double currentDistanceToTarget = Geometry.calculateDistance(position, targetPosition);
             // double currentDistance = (distanceToTarget - currentDistanceToTarget) / distanceToTarget;
             double currentDistanceTarget = ((((double) (positionFrameIndex + 1) / (double) positionFrameLimit) * totalDistanceToTarget) / totalDistanceToTarget) /* (1.0 / scale) */;
             // Log.v("Progress", "frame: " + (positionFrameIndex + 1) + " of " + positionFrameLimit + ", done: " + currentDistance + ", target: " + currentDistanceTarget + ", left: " + (1.0 - currentDistance));
 
-            position.set(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.getX()), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.getY()));
+            //position.set(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.getX()), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.getY()));
+            position.set(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.relativeX), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.relativeY));
 
             positionFrameIndex++;
 
         } else if (positionFrameIndex == positionFrameLimit) {
 
-            position.setX(targetPosition.getX() * scale);
-            position.setY(targetPosition.getY() * scale);
+//            position.setX(targetPosition.getX() * scale);
+//            position.setY(targetPosition.getY() * scale);
+            position.relativeX = targetPosition.relativeX * scale;
+            position.relativeY = targetPosition.relativeY * scale;
 
         }
 

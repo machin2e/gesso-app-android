@@ -164,7 +164,7 @@ public class ImageGroup extends Group<Image> {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
-            positions.add(new Point(image.getPosition().getX(), image.getPosition().getY()));
+            positions.add(new Point(image.getPosition().relativeX, image.getPosition().relativeY));
         }
         return positions;
     }

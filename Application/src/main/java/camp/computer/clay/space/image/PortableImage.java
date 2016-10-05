@@ -26,7 +26,7 @@ public abstract class PortableImage extends Image<Portable> {
 
     @Override
     public void update() {
-
+        super.update();
     }
 
     @Override

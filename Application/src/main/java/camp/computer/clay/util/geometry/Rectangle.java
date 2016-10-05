@@ -9,11 +9,11 @@ import camp.computer.clay.util.image.Shape;
 
 public class Rectangle<T extends Entity> extends Shape<T> {
 
-    private double width = 1.0;
+    public double width = 1.0;
 
-    private double height = 1.0;
+    public double height = 1.0;
 
-    private double cornerRadius = 0.0;
+    public double cornerRadius = 0.0;
 
     // <CACHED_OBJECTS>
     // TODO: Move caching framework into superclass
@@ -79,33 +79,33 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public List<Line> getSegments() {
         ArrayList<Line> segments = new ArrayList<>();
-        segments.add(new Line(getTopLeft(), getTopRight()));
-        segments.add(new Line(getTopRight(), getBottomRight()));
-        segments.add(new Line(getBottomRight(), getBottomLeft()));
-        segments.add(new Line(getBottomLeft(), getTopLeft()));
+        segments.add(new Line(topLeft, topRight));
+        segments.add(new Line(topRight, bottomRight));
+        segments.add(new Line(bottomRight, bottomLeft));
+        segments.add(new Line(bottomLeft, topLeft));
         return segments;
     }
 
-    public Line getNearestSegment(Point point) {
-        double nearestDistance = Double.MAX_VALUE;
-        Line nearestSegment = null;
-
-        List<Line> segments = getSegments();
-        for (int i = 0; i < segments.size(); i++) {
-            double distanceToSegment = 0;
-            if (i < (segments.size() - 1)) {
-                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(i + 1).getTarget());
-            } else {
-                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(0).getTarget());
-            }
-            if (distanceToSegment < nearestDistance) {
-                nearestDistance = distanceToSegment;
-                nearestSegment = segments.get(i);
-            }
-        }
-
-        return nearestSegment;
-    }
+//    public Line getNearestSegment(Point point) {
+//        double nearestDistance = Double.MAX_VALUE;
+//        Line nearestSegment = null;
+//
+//        List<Line> segments = getSegments();
+//        for (int i = 0; i < segments.size(); i++) {
+//            double distanceToSegment = 0;
+//            if (i < (segments.size() - 1)) {
+//                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(i + 1).getTarget());
+//            } else {
+//                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(0).getTarget());
+//            }
+//            if (distanceToSegment < nearestDistance) {
+//                nearestDistance = distanceToSegment;
+//                nearestSegment = segments.get(i);
+//            }
+//        }
+//
+//        return nearestSegment;
+//    }
 
     @Override
     public void draw(Display display) {
@@ -159,22 +159,22 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 //    public Line getLeft() {
 //        return new Line(getBottomLeft(), getTopLeft());
 //    }
-
-    public double getLeft() {
-        return position.getX() - (width / 2.0f);
-    }
-
-    public double getTop() {
-        return position.getY() - (height / 2.0f);
-    }
-
-    public double getRight() {
-        return position.getX() + (width / 2.0f);
-    }
-
-    public double getBottom() {
-        return position.getY() + (height / 2.0f);
-    }
+//
+//    public double getLeft() {
+//        return position.getX() - (width / 2.0f);
+//    }
+//
+//    public double getTop() {
+//        return position.getY() - (height / 2.0f);
+//    }
+//
+//    public double getRight() {
+//        return position.getX() + (width / 2.0f);
+//    }
+//
+//    public double getBottom() {
+//        return position.getY() + (height / 2.0f);
+//    }
 
     // TODO: Return a Number that updates when the Point coordinates update
     public double getRelativeLeft() {
@@ -199,7 +199,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getTopLeft() {
-        //return new Point(getRelativeLeft(), getRelativeTop(), position);
         topLeft.setRelative(
                 0 - (width / 2.0), // getRelativeLeft(),
                 0 - (height / 2.0) // getRelativeTop()
@@ -208,7 +207,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getTopRight() {
-        //return new Point(getRelativeRight(), getRelativeTop(), position);
         topRight.setRelative(
                 0 + (width / 2.0), // getRelativeRight(),
                 0 - (height / 2.0) // getRelativeTop()
@@ -217,7 +215,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getBottomRight() {
-        //return new Point(getRelativeRight(), getRelativeBottom(), position);
         bottomRight.setRelative(
                 0 + (width / 2.0), // getRelativeRight(),
                 0 + (height / 2.0) // getRelativeBottom()
@@ -226,7 +223,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Point getBottomLeft() {
-        //return new Point(getRelativeLeft(), getRelativeBottom(), position);
         bottomLeft.setRelative(
                 0 - (width / 2.0), // getRelativeLeft(),
                 0 + (height / 2.0) // getRelativeBottom()

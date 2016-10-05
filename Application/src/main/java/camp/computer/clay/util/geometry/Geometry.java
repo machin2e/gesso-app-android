@@ -107,11 +107,11 @@ public abstract class Geometry {
     private static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point BC = new Point();
-        AB.setX(linePointB.getX() - linePointA.getX());
-        AB.setY(linePointB.getY() - linePointA.getY());
-        BC.setX(pointC.getX() - linePointB.getX());
-        BC.setY(pointC.getY() - linePointB.getY());
-        double dot = AB.getX() * BC.getX() + AB.getY() * BC.getY();
+        AB.setX(linePointB.relativeX - linePointA.relativeX);
+        AB.setY(linePointB.relativeY - linePointA.relativeY);
+        BC.setX(pointC.relativeX - linePointB.relativeX);
+        BC.setY(pointC.relativeY - linePointB.relativeY);
+        double dot = AB.relativeX * BC.relativeX + AB.relativeY * BC.relativeY;
         return dot;
     }
 
@@ -119,11 +119,11 @@ public abstract class Geometry {
     private static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point AC = new Point();
-        AB.setX(linePointB.getX() - linePointA.getX());
-        AB.setY(linePointB.getY() - linePointA.getY());
-        AC.setX(pointC.getX() - linePointA.getX());
-        AC.setY(pointC.getY() - linePointA.getY());
-        double cross = AB.getX() * AC.getY() - AB.getY() * AC.getX();
+        AB.setX(linePointB.relativeX - linePointA.relativeX);
+        AB.setY(linePointB.relativeY - linePointA.relativeY);
+        AC.setX(pointC.relativeX - linePointA.relativeX);
+        AC.setY(pointC.relativeY - linePointA.relativeY);
+        double cross = AB.relativeX * AC.relativeY - AB.relativeY * AC.relativeX;
         return cross;
     }
 
@@ -270,13 +270,13 @@ public abstract class Geometry {
 
         for (int i = 0; i < points.size(); i++) {
 
-            if (points.get(i).getX() < minX) {
-                minX = points.get(i).getX();
+            if (points.get(i).getRelativeX() < minX) {
+                minX = points.get(i).getRelativeX();
                 minPoint = i;
             }
 
-            if (points.get(i).getX() > maxX) {
-                maxX = points.get(i).getX();
+            if (points.get(i).getRelativeX() > maxX) {
+                maxX = points.get(i).getRelativeX();
                 maxPoint = i;
             }
         }
@@ -362,9 +362,9 @@ public abstract class Geometry {
     }
 
     private static double distance(Point A, Point B, Point C) {
-        double ABx = B.getX() - A.getX();
-        double ABy = B.getY() - A.getY();
-        double num = ABx * (A.getY() - C.getY()) - ABy * (A.getX() - C.getX());
+        double ABx = B.getRelativeX() - A.getRelativeX();
+        double ABy = B.getRelativeY() - A.getRelativeY();
+        double num = ABx * (A.getRelativeY() - C.getRelativeY()) - ABy * (A.getRelativeX() - C.getRelativeX());
         if (num < 0) {
             num = -num;
         }
@@ -372,7 +372,7 @@ public abstract class Geometry {
     }
 
     private static int pointLocation(Point A, Point B, Point P) {
-        double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
+        double cp1 = (B.getRelativeX() - A.getRelativeX()) * (P.getRelativeY() - A.getRelativeY()) - (B.getRelativeY() - A.getRelativeY()) * (P.getRelativeX() - A.getRelativeX());
         if (cp1 > 0) {
             return 1;
         } else if (cp1 == 0) {
@@ -416,8 +416,8 @@ public abstract class Geometry {
                 // Vector/Segment connecting a pair of pointerCoordinates
                 // TODO: Vector2 AB = mCircles[j].mCenter - mCircles[i].mCenter;
                 Point vectorAB = new Point(
-                        sortedPositions.get(j).getX() - sortedPositions.get(i).getX(),
-                        sortedPositions.get(j).getY() - sortedPositions.get(i).getY()
+                        sortedPositions.get(j).relativeX - sortedPositions.get(i).relativeX,
+                        sortedPositions.get(j).relativeY - sortedPositions.get(i).relativeY
                 );
 
                 double r = (sortedImages.get(i).getBoundingBox().getWidth() / 2.0f) + (sortedImages.get(i).getBoundingBox().getWidth() / 2.0f);
@@ -440,21 +440,21 @@ public abstract class Geometry {
                             sortedPositions.get(j)
                     );
                     // (double) Geometry.calculateDistance(packingCenter, vectorAB);
-                    vectorAB.setX(vectorAB.getX() / magnitude);
-                    vectorAB.setY(vectorAB.getY() / magnitude);
+                    vectorAB.setX(vectorAB.relativeX / magnitude);
+                    vectorAB.setY(vectorAB.relativeY / magnitude);
 
                     // TODO: AB *= (double)((r - Math.Sqrt(d)) * 0.5f);
-                    vectorAB.setX(vectorAB.getX() * (double) ((r - Math.sqrt(d)) * 0.5f));
-                    vectorAB.setY(vectorAB.getY() * (double) ((r - Math.sqrt(d)) * 0.5f));
+                    vectorAB.setX(vectorAB.relativeX * (double) ((r - Math.sqrt(d)) * 0.5f));
+                    vectorAB.setY(vectorAB.relativeY * (double) ((r - Math.sqrt(d)) * 0.5f));
 
 //                    if (positions.getEvent(j) != mDraggingCircle)
                     // TODO: positions.getEvent(j).mCenter += AB;
-                    sortedPositions.get(j).setX(sortedPositions.get(j).getX() + vectorAB.getX());
-                    sortedPositions.get(j).setY(sortedPositions.get(j).getY() + vectorAB.getY());
+                    sortedPositions.get(j).setX(sortedPositions.get(j).relativeX + vectorAB.relativeX);
+                    sortedPositions.get(j).setY(sortedPositions.get(j).relativeY + vectorAB.relativeY);
 //                    if (positions.getEvent(i) != mDraggingCircle)
                     // TODO: positions.getEvent(i).mCenter -= AB;
-                    sortedPositions.get(i).setX(sortedPositions.get(i).getX() - vectorAB.getX());
-                    sortedPositions.get(i).setY(sortedPositions.get(i).getY() - vectorAB.getY());
+                    sortedPositions.get(i).setX(sortedPositions.get(i).relativeX - vectorAB.relativeX);
+                    sortedPositions.get(i).setY(sortedPositions.get(i).relativeY - vectorAB.relativeY);
                 }
 
             }
@@ -466,17 +466,17 @@ public abstract class Geometry {
 //            {
             // TODO: Vector2 v = mCircles[i].mCenter - this.mPackingCenter;
             Point v = new Point(
-                    sortedPositions.get(i).getX() - packingCenter.getX(),
-                    sortedPositions.get(i).getY() - packingCenter.getY()
+                    sortedPositions.get(i).relativeX - packingCenter.relativeX,
+                    sortedPositions.get(i).relativeY - packingCenter.relativeY
             );
 
             // TODO: v *= damping;
-            v.setX(v.getX() * damping);
-            v.setY(v.getY() * damping);
+            v.setX(v.relativeX * damping);
+            v.setY(v.relativeY * damping);
 
             // TODO: mCircles[i].mCenter -= v;
-            sortedPositions.get(i).setX(sortedPositions.get(i).getX() - v.getX());
-            sortedPositions.get(i).setY(sortedPositions.get(i).getY() - v.getY());
+            sortedPositions.get(i).setX(sortedPositions.get(i).relativeX - v.relativeX);
+            sortedPositions.get(i).setY(sortedPositions.get(i).relativeY - v.relativeY);
 
             sortedImages.get(i).setPosition(sortedPositions.get(i));
 //            }
@@ -518,7 +518,7 @@ public abstract class Geometry {
      * @return true If the point is inside the boundary, false otherwise
      * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Point Inclusion in Polygon Test (W. Randolph Franklin)</a>
      */
-    public static boolean containsPoint(List<Point> vertices, Point point) {
+    public static boolean contains(List<Point> vertices, Point point) {
 
         // Setup
         double minX = vertices.get(0).getX();

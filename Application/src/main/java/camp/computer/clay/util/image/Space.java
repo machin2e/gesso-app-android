@@ -90,7 +90,7 @@ public class Space extends Image<Model> {
 //                    } else if (action.isDragging()) {
                     // Camera
                     if (action.getSize() > 1) {
-                        camera.setOffset(event.getPosition().getX() - action.getFirstEvent().getPosition().getX(), event.getPosition().getY() - action.getFirstEvent().getPosition().getY());
+                        camera.setOffset(event.getPosition().relativeX - action.getFirstEvent().getPosition().relativeX, event.getPosition().relativeY - action.getFirstEvent().getPosition().relativeY);
                     }
 
 //                    camera.setOffset(action.getOffset().getX(), action.getOffset().getY());
@@ -355,11 +355,14 @@ public class Space extends Image<Model> {
         return positions;
     }
 
-    @Override
-    public void update() {
+    public void doUpdate() {
+
+        position.update();
+
         // Update perspective
         getEntity().getActor(0).getCamera().update();
 
+//        Log.v("Images", "doUpdate: " + images.size());
         for (int i = 0; i < images.size(); i++) {
             images.get(i).update();
         }
@@ -368,8 +371,12 @@ public class Space extends Image<Model> {
         // Geometry.computeCirclePacking(getImages().filterType(HostImage.class, ExtensionImage.class).getList(), 200, getImages().filterType(HostImage.class, ExtensionImage.class).getCentroidPosition());
     }
 
+    Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();
+
     @Override
     public void draw(Display display) {
+
+        display.canvas.save();
 //        // <DEBUG_LABEL>
 //        if (Application.ENABLE_GEOMETRY_LABELS) {
 //            // <AXES_LABEL>
@@ -394,19 +401,19 @@ public class Space extends Image<Model> {
 //        if (Application.ENABLE_GEOMETRY_LABELS) {
 //
         // <FPS_LABEL>
-        Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();
+        fpsCoordinate.setRelative(getImages().filterType(Host.class).getCenterPoint());
         fpsCoordinate.setY(fpsCoordinate.getY() - 200);
-        display.getPaint().setColor(Color.RED);
-        display.getPaint().setStyle(Paint.Style.FILL);
-        display.getCanvas().drawCircle((float) fpsCoordinate.getX(), (float) fpsCoordinate.getY(), 10, display.getPaint());
+        display.paint.setColor(Color.RED);
+        display.paint.setStyle(Paint.Style.FILL);
+        display.canvas.drawCircle((float) fpsCoordinate.relativeX, (float) fpsCoordinate.relativeY, 10, display.paint);
 
-        display.getPaint().setStyle(Paint.Style.FILL);
-        display.getPaint().setTextSize(35);
+        display.paint.setStyle(Paint.Style.FILL);
+        display.paint.setTextSize(35);
 
         String fpsText = "FPS: " + (int) display.getDisplayOutput().getFramesPerSecond();
         Rect fpsTextBounds = new Rect();
-        display.getPaint().getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        display.getCanvas().drawText(fpsText, (float) fpsCoordinate.getX() + 20, (float) fpsCoordinate.getY() + fpsTextBounds.height() / 2.0f, display.getPaint());
+        display.paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
+        display.canvas.drawText(fpsText, (float) fpsCoordinate.relativeX + 20, (float) fpsCoordinate.relativeY + fpsTextBounds.height() / 2.0f, display.getPaint());
         // </FPS_LABEL>
 //
 //            // <CENTROID_LABEL>
@@ -483,6 +490,8 @@ public class Space extends Image<Model> {
 //            // </BOUNDING_BOX_LABEL>
 //        }
 //        // </DEBUG_LABEL>
+
+        display.canvas.restore();
     }
 
     private void drawPrototypeExtension(Display display) {

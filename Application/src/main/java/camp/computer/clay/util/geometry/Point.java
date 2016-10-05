@@ -11,19 +11,19 @@ public class Point {
      * The x coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
      * {@code null} then this is equivalent to an absolute position.
      */
-    protected double relativeX = 0;
+    public double relativeX = 0;
 
     /**
      * The y coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
      * {@code null} then this is equivalent to an absolute position.
      */
-    protected double relativeY = 0;
+    public double relativeY = 0;
 
     /**
      * Relative rotation of the coordinate with which points referencing this one will be
      * rotated.
      */
-    protected double rotation = 0;
+    public double rotation = 0;
 
     /**
      * Rotation rotation in degrees
@@ -82,6 +82,11 @@ public class Point {
         this.relativeY = y;
     }
 
+    public void setRelative(Point otherPoint) {
+        this.relativeX = otherPoint.relativeX;
+        this.relativeY = otherPoint.relativeY;
+    }
+
     public void setRelativeX(double x) {
         this.relativeX = x;
     }
@@ -103,7 +108,6 @@ public class Point {
      * @return Absolute relativeX coordinate.
      */
     public double getX() {
-
         if (referencePoint != null) {
             double globalX = Geometry.calculateDistance(0, 0, relativeX, relativeY) * Math.cos(Math.toRadians(referencePoint.getRotation() + Geometry.calculateRotationAngle(0, 0, relativeX, relativeY)));
             return referencePoint.getX() + globalX;
@@ -183,5 +187,8 @@ public class Point {
 
     public void setRelativeRotation(double rotation) {
         this.rotation = rotation;
+    }
+
+    public void update() {
     }
 }

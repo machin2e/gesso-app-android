@@ -12,7 +12,7 @@ public class DisplayOutput extends Thread {
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
 
-    final public static int DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT = 4;
+    final public static int DEFAULT_FPS_MOVING_AVERAGE_SAMPLE_COUNT = 1;
 
     public static boolean ENABLE_THREAD_SLEEP = true;
 
@@ -58,26 +58,26 @@ public class DisplayOutput extends Thread {
 
             frameStopTime = Time.getCurrentTime();
 
-            if (ENABLE_STATISTICS) {
-                // Store actual frames per second
-                currentFramesPerSecond = (1000.0f / (float) (frameStopTime - frameStartTime));
+//            if (ENABLE_STATISTICS) {
+            // Store actual frames per second
+            currentFramesPerSecond = (1000.0f / (float) (frameStopTime - frameStartTime));
 
-                // Store moving average
-                fpsSamples[fpsSampleIndex] = currentFramesPerSecond;
-                fpsSampleIndex = (fpsSampleIndex + 1) % fpsSampleLimit;
-            }
+//                // Store moving average
+//                fpsSamples[fpsSampleIndex] = currentFramesPerSecond;
+//                fpsSampleIndex = (fpsSampleIndex + 1) % fpsSampleLimit;
+//            }
 
             // Sleep the thread until the time remaining in the frame's allocated draw time expires.
             // This reduces energy consumption thereby increasing battery life.
 //            if (ENABLE_THREAD_SLEEP) {
-            frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
+//            frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
 //                Log.v("SleepTime", "sleepTime: " + frameSleepTime);
             try {
-                if (frameSleepTime > 0) {
-                    Thread.sleep(frameSleepTime);
-                } else {
-                    Thread.sleep(30);
-                }
+//                if (frameSleepTime > 0) {
+//                    Thread.sleep(frameSleepTime);
+//                } else {
+                Thread.sleep(10);
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -96,12 +96,14 @@ public class DisplayOutput extends Thread {
 
     public double getFramesPerSecond() {
 
-        double fpsTotal = 0;
+//        double fpsTotal = 0;
+//
+//        for (int i = 0; i < fpsSampleLimit; i++) {
+//            fpsTotal = fpsTotal + fpsSamples[i];
+//        }
+//
+//        return (fpsTotal / fpsSampleLimit);
 
-        for (int i = 0; i < fpsSampleLimit; i++) {
-            fpsTotal = fpsTotal + fpsSamples[i];
-        }
-
-        return (fpsTotal / fpsSampleLimit);
+        return currentFramesPerSecond;
     }
 }

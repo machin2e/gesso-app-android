@@ -19,7 +19,7 @@ public class Portable extends Entity {
         // Create Ports to match the Profile
         for (int i = 0; i < profile.getPorts().size(); i++) {
             Port port = new Port();
-            port.setNumber(i + 1);
+            port.setIndex(i);
             port.setType(profile.getPorts().get(i).getType());
             port.setDirection(profile.getPorts().get(i).getDirection());
             addPort(port);

@@ -61,7 +61,7 @@ public class HostImage extends PortableImage {
 
         // Headers
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 1"); // or number 1 (top)
+        rectangle.setLabel("Header 1"); // or index 1 (top)
         rectangle.setPosition(0, -132);
         rectangle.setRotation(0);
         rectangle.setColor("#404040");
@@ -69,7 +69,7 @@ public class HostImage extends PortableImage {
         addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 2"); // or number 2 (right)
+        rectangle.setLabel("Header 2"); // or index 2 (right)
         rectangle.setPosition(132, 0);
         rectangle.setRotation(90);
         rectangle.setColor("#404040");
@@ -77,7 +77,7 @@ public class HostImage extends PortableImage {
         addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 3"); // or number 3 (bottom)
+        rectangle.setLabel("Header 3"); // or index 3 (bottom)
         rectangle.setPosition(0, 132);
         rectangle.setRotation(0);
         rectangle.setColor("#404040"); // #3b3b3b
@@ -85,7 +85,7 @@ public class HostImage extends PortableImage {
         addShape(rectangle);
 
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header 4"); // or number 4 (left)
+        rectangle.setLabel("Header 4"); // or index 4 (left)
         rectangle.setPosition(-132, 0);
         rectangle.setRotation(90);
         rectangle.setColor("#404040");
@@ -372,7 +372,7 @@ public class HostImage extends PortableImage {
 
                                                                 if (addPrototypePort) {
                                                                     Port port = new Port();
-                                                                    port.setNumber(1);
+                                                                    port.setIndex(extensionPortable.getPorts().size());
                                                                     extensionPortable.addPort(port);
                                                                 }
                                                             }
@@ -563,7 +563,7 @@ public class HostImage extends PortableImage {
                                                                 hostImage.setDockVisibility(Visibility.Value.VISIBLE);
 
                                                                 // Make non-selected Hosts transparent
-                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <number>", and "LED <number>"
+                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <index>", and "LED <index>"
                                                                 ShapeGroup shapes = hostImage.getShapes().filterLabel("^Substrate$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
                                                                 shapes.setTransparency(0.1);
 //                                                                hostImage.setTransparency(0.1);
@@ -839,7 +839,7 @@ public class HostImage extends PortableImage {
         int defaultPortCount = 1;
         for (int j = 0; j < defaultPortCount; j++) {
             Port port = new Port();
-            port.setNumber(j + 1);
+            port.setIndex(j);
             extension.addPort(port);
         }
 
@@ -977,7 +977,7 @@ public class HostImage extends PortableImage {
 
     private int getHeaderIndex(Point point) {
         Shape boardShape = getShape("Substrate");
-        Line nearestSegment = null;
+        // Line nearestSegment = null;
         int segmentIndex = -1;
         List<Line> boardShapeSegments = boardShape.getSegments();
         double distanceToSegmentMidpoint = Double.MAX_VALUE;
@@ -987,13 +987,14 @@ public class HostImage extends PortableImage {
             double distance = Geometry.calculateDistance(point, midpoint);
             if (distance < distanceToSegmentMidpoint) {
                 distanceToSegmentMidpoint = distance;
-                nearestSegment = segment;
+                // nearestSegment = segment;
                 segmentIndex = i;
             }
         }
         return segmentIndex;
     }
 
+    // TODO: Refactor this... it's really dumb right now.
     private void adjustExtensionPosition(ExtensionImage extensionImage, int segmentIndex) {
 
         // <REFACTOR>
@@ -1034,10 +1035,14 @@ public class HostImage extends PortableImage {
         return (Host) getEntity();
     }
 
+    ShapeGroup lightShapeGroup = null;
+
     public void update() {
 
         // Get LED shapes
-        ShapeGroup lightShapeGroup = getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
+        if (lightShapeGroup == null) {
+            lightShapeGroup = getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
+        }
 
         // Update Port and LED shape styles
         for (int i = 0; i < getEntity().getPorts().size(); i++) {
@@ -1052,13 +1057,14 @@ public class HostImage extends PortableImage {
         }
 
 
-        // <HACK>
-        // TODO: Move into Shape base class
-        for (int i = 0; i < shapes.size(); i++) {
-            //Log.v("OnUpdate", "Image.update " + shapes.size());
-            shapes.get(i).update();
-        }
-        // </HACK>
+//        // <HACK>
+//        // TODO: Move into Shape base class
+//        for (int i = 0; i < shapes.size(); i++) {
+//            shapes.get(i).update();
+//        }
+//        // </HACK>
+
+        super.update();
     }
 
     public void draw(Display display) {
@@ -1069,11 +1075,11 @@ public class HostImage extends PortableImage {
             canvas.save();
 
             canvas.translate(
-                    (float) getPosition().getRelativeX(),
-                    (float) getPosition().getRelativeY()
+                    (float) position.relativeX,
+                    (float) position.relativeY
             );
 
-            canvas.rotate((float) getPosition().getRelativeRotation());
+            canvas.rotate((float) position.rotation);
 
             // Color
             for (int i = 0; i < shapes.size(); i++) {

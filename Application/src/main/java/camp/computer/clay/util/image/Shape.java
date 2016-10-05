@@ -22,7 +22,7 @@ public abstract class Shape<T extends Entity> {
 
     protected String color = "#fff7f7f7";
     protected String outlineColor = "#ff000000";
-    protected double outlineThickness = 1.0;
+    public double outlineThickness = 1.0;
 
     protected T entity = null;
 
@@ -84,7 +84,7 @@ public abstract class Shape<T extends Entity> {
     abstract public List<Line> getSegments();
 
     public boolean contains(Point point) {
-        return Geometry.containsPoint(getVertices(), point);
+        return Geometry.contains(getVertices(), point);
     }
 
     public void setVisibility(Visibility.Value visibility) {
@@ -165,6 +165,9 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void update() {
+
+        position.update();
+
         //Log.v("OnUpdate", "Shape.update");
         if (onUpdateListener != null) {
             onUpdateListener.onUpdate(this);

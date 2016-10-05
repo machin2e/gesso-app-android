@@ -13,12 +13,12 @@ import camp.computer.clay.util.image.Shape;
 public class Circle<T extends Entity> extends Shape<T> {
 
     /**
-     * The number of vertices to use to approximate the circle. By default, this is setValue to 12,
+     * The index of vertices to use to approximate the circle. By default, this is setValue to 12,
      * corresponding to a vertex every 30 degrees.
      */
     private int vertexCount = 12;
 
-    private double radius = 1.0;
+    public double radius = 1.0;
 
     public Circle(double radius) {
         super(new Point(0, 0));

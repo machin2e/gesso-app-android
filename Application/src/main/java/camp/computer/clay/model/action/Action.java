@@ -237,10 +237,13 @@ public class Action {
 
     protected Point offset = new Point();
 
-    public Point getOffset() {
-        this.offset.set(getLastEvent().getPosition().getX() - getFirstEvent().getPosition().getX(), getLastEvent().getPosition().getY() - getFirstEvent().getPosition().getY());
-        return offset;
-    }
+//    public Point getOffset() {
+//        this.offset.set(
+//                getLastEvent().getPosition().getX() - getFirstEvent().getPosition().getX(),
+//                getLastEvent().getPosition().getY() - getFirstEvent().getPosition().getY()
+//        );
+//        return offset;
+//    }
 
 //    // in handlers (e.g., in Images), use this to check for match, if match, then use/get/setValue on the action's events to get inputs for the routine operation
 //    public boolean matches(Event... events) {

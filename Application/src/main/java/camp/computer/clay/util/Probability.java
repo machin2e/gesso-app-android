@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 public abstract class Probability {
 
-    // TODO: Interface to host's cryptographically strong random number generator adhering to
+    // TODO: Interface to host's cryptographically strong random index generator adhering to
     // TODO: (cont'd) [RFC 1750](http://www.ietf.org/rfc/rfc1750.txt) and tests in
     // TODO: (cont'd) [FIPS 140-2](http://csrc.nist.gov/groups/STM/cmvp/standards.html#02).
     private static SecureRandom randomGenerator = new SecureRandom();

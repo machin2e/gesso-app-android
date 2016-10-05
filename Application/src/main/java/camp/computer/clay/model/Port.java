@@ -50,7 +50,18 @@ public class Port extends Entity {
         }
     }
 
-    protected int number = 0;
+    /**
+     * The {@code index} is a unique number that uniquely identifies the {@code Port}. Concretely,
+     * the {@code index} identifier is equal to the pin number defined for a particular I/O pin on
+     * the physical device (if any).
+     * <p>
+     * The {@code index} is assumed to be zero-indexed, so the corresponding I/O pin number may be
+     * offset by a value of one. (Note that this may changed to be one-indexed.)
+     * <p>
+     * The {@code Port}'s {@code index} can be used complementary to the {@code Port}'s
+     * {@code label} to refer to a specific {@code Port}.
+     */
+    protected int index = 0;
 
     protected Type type = Type.NONE;
 
@@ -96,12 +107,12 @@ public class Port extends Entity {
         return null;
     }
 
-    public int getNumber() {
-        return this.number;
+    public int getIndex() {
+        return this.index;
     }
 
-    public void setNumber(int number) {
-        this.number = number;
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public Type getType() {
