@@ -236,24 +236,41 @@ public class ExtensionImage extends PortableImage {
     private void updateHeaderShapes() {
 
         // Update Header (size, etc.)
-        // Reference: http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
-        double PIXELS_PER_MILLIMETER = 6.0;
+        // References:
+        // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
+        double PIXEL_PER_MILLIMETER = 6.0;
+
+        final int contactCount = getPortable().getPorts().size();
+        final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
+        final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
+
+//        double A = PIXEL_PER_MILLIMETER * (2.54 * contactCount + errorToleranceA);
+//        double B = PIXEL_PER_MILLIMETER * (2.54 * (contactCount - 1) + errorToleranceB);
+        double A = 2.54 * contactCount + errorToleranceA;
+        double B = 2.54 * (contactCount - 1) + errorToleranceB;
+
+        final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
+        double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
+        double contactSeparation = 2.54; // Measure in millimeters (mm)
 
         // Update dimensions of Headers based on the corresponding Entity
         Rectangle header = (Rectangle) getShape("Header");
-        double headerWidth = PIXELS_PER_MILLIMETER * (2.54 * getPortable().getPorts().size() + 0.6); // +-0.6
+        double headerWidth = PIXEL_PER_MILLIMETER * A;
         header.setWidth(headerWidth);
 
         // Update physical positions of Ports based on the corresponding Header's dimensions
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
 
             // Calculate Port connector positions
-            double connectorPositionDistance = (PIXELS_PER_MILLIMETER * (2.54 * portConnectorPositions.size() + 0.6));
-            if (portConnectorPositions.size() > i) {
-                double x = (PIXELS_PER_MILLIMETER * (2.54 * i + 0.6)) - (connectorPositionDistance / 2.0);
+            //double connectorPositionDistance = (PIXEL_PER_MILLIMETER * (2.54 * portConnectorPositions.size() + 0.6));
+
+            if (i < portConnectorPositions.size()) {
+                //double x = (PIXEL_PER_MILLIMETER * (2.54 * i + 0.6)) - (connectorPositionDistance / 2.0);
+                double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
                 portConnectorPositions.get(i).setX(x);
             } else {
-                double x = PIXELS_PER_MILLIMETER * (2.54 * i + 0.6);
+                //double x = PIXEL_PER_MILLIMETER * (2.54 * i + 0.6);
+                double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
                 portConnectorPositions.add(new Point(x, 107, position));
             }
         }

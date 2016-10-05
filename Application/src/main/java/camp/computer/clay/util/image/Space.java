@@ -179,7 +179,8 @@ public class Space extends Image<Model> {
         }
     }
 
-    public void sortImagesByLayer() {
+    // TODO: Rename to sortLayers
+    protected void sortImagesByLayer() {
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {

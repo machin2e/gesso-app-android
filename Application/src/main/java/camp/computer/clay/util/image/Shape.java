@@ -28,6 +28,7 @@ public abstract class Shape<T extends Entity> {
 
     protected T entity = null;
 
+    // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
 
     protected int layerIndex = DEFAULT_LAYER_INDEX;
@@ -41,6 +42,7 @@ public abstract class Shape<T extends Entity> {
 
         parentImage.sortShapesByLayer();
     }
+    // </LAYER>
 
     public Shape() {
     }

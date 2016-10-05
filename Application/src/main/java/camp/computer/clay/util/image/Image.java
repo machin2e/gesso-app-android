@@ -39,6 +39,7 @@ public abstract class Image<T extends Entity> {
 
     protected ActionListener actionListener;
 
+    // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
 
     protected int layerIndex = DEFAULT_LAYER_INDEX;
@@ -52,6 +53,32 @@ public abstract class Image<T extends Entity> {
 
         parentSpace.sortImagesByLayer();
     }
+
+    // TODO: Rename to sortLayers
+    public void sortShapesByLayer() {
+
+        for (int i = 0; i < shapes.size() - 1; i++) {
+            for (int j = i + 1; j < shapes.size(); j++) {
+                // Check for out-of-order pairs, and swap them
+                if (shapes.get(i).layerIndex > shapes.get(j).layerIndex) {
+                    Shape shape = shapes.get(i);
+                    shapes.set(i, shapes.get(j));
+                    shapes.set(j, shape);
+                }
+            }
+        }
+
+        /*
+        // TODO: Sort using this after making Group implement List
+        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
+            @Override
+            public int compare(MyObject o1, MyObject o2) {
+                return o1.getStartDate().compareTo(o2.getStartDate());
+            }
+        });
+        */
+    }
+    // </LAYER>
 
     public Image(T entity) {
         this.entity = entity;
@@ -195,30 +222,6 @@ public abstract class Image<T extends Entity> {
 
     public Shape removeShape(int index) {
         return shapes.remove(index);
-    }
-
-    public void sortShapesByLayer() {
-
-        for (int i = 0; i < shapes.size() - 1; i++) {
-            for (int j = i + 1; j < shapes.size(); j++) {
-                // Check for out-of-order pairs, and swap them
-                if (shapes.get(i).layerIndex > shapes.get(j).layerIndex) {
-                    Shape shape = shapes.get(i);
-                    shapes.set(i, shapes.get(j));
-                    shapes.set(j, shape);
-                }
-            }
-        }
-
-        /*
-        // TODO: Sort using this after making Group implement List
-        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
-            @Override
-            public int compare(MyObject o1, MyObject o2) {
-                return o1.getStartDate().compareTo(o2.getStartDate());
-            }
-        });
-        */
     }
 
     public void update() {

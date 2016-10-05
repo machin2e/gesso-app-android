@@ -60,7 +60,9 @@ public class HostImage extends PortableImage {
         addShape(rectangle);
 
         // Headers
-        rectangle = new Rectangle(50, 14);
+        final double headerWidth = 6.0 * (2.54 * 3);
+
+        rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 1"); // or index 1 (top)
         rectangle.setPosition(0, -132);
         rectangle.setRotation(0);
@@ -68,7 +70,7 @@ public class HostImage extends PortableImage {
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
-        rectangle = new Rectangle(50, 14);
+        rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 2"); // or index 2 (right)
         rectangle.setPosition(132, 0);
         rectangle.setRotation(90);
@@ -76,7 +78,7 @@ public class HostImage extends PortableImage {
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
-        rectangle = new Rectangle(50, 14);
+        rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 3"); // or index 3 (bottom)
         rectangle.setPosition(0, 132);
         rectangle.setRotation(0);
@@ -84,7 +86,7 @@ public class HostImage extends PortableImage {
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
-        rectangle = new Rectangle(50, 14);
+        rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 4"); // or index 4 (left)
         rectangle.setPosition(-132, 0);
         rectangle.setRotation(90);
@@ -92,21 +94,23 @@ public class HostImage extends PortableImage {
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
-        portConnectorPositions.add(new Point(-20, 132, position));
+        final double contactSeparation = 6.0 * 2.54;
+
+        portConnectorPositions.add(new Point(-contactSeparation, 132, position));
         portConnectorPositions.add(new Point(0, 132, position));
-        portConnectorPositions.add(new Point(20, 132, position));
+        portConnectorPositions.add(new Point(contactSeparation, 132, position));
 
-        portConnectorPositions.add(new Point(132, 20, position));
+        portConnectorPositions.add(new Point(132, contactSeparation, position));
         portConnectorPositions.add(new Point(132, 0, position));
-        portConnectorPositions.add(new Point(132, -20, position));
+        portConnectorPositions.add(new Point(132, -contactSeparation, position));
 
-        portConnectorPositions.add(new Point(20, -132, position));
+        portConnectorPositions.add(new Point(contactSeparation, -132, position));
         portConnectorPositions.add(new Point(0, -132, position));
-        portConnectorPositions.add(new Point(-20, -132, position));
+        portConnectorPositions.add(new Point(-contactSeparation, -132, position));
 
-        portConnectorPositions.add(new Point(-132, -20, position));
+        portConnectorPositions.add(new Point(-132, -contactSeparation, position));
         portConnectorPositions.add(new Point(-132, 0, position));
-        portConnectorPositions.add(new Point(-132, 20, position));
+        portConnectorPositions.add(new Point(-132, contactSeparation, position));
 
         // Lights
         List<Point> lightPositions = new ArrayList<>();
