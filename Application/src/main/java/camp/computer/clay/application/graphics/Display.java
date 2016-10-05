@@ -399,8 +399,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                     int id = motionEvent.getPointerId(i);
                     Point perspectivePosition = actor.getCamera().getPosition();
                     double perspectiveScale = actor.getCamera().getScale();
-                    event.pointerCoordinates[id].setX((motionEvent.getX(i) - (originPosition.relativeX + perspectivePosition.relativeX)) / perspectiveScale);
-                    event.pointerCoordinates[id].setY((motionEvent.getY(i) - (originPosition.relativeY + perspectivePosition.relativeY)) / perspectiveScale);
+//                    event.pointerCoordinates[id].setX((motionEvent.getX(i) - (originPosition.relativeX + perspectivePosition.relativeX)) / perspectiveScale);
+//                    event.pointerCoordinates[id].setY((motionEvent.getY(i) - (originPosition.relativeY + perspectivePosition.relativeY)) / perspectiveScale);
+                    event.pointerCoordinates[id].relativeX = (motionEvent.getX(i) - (originPosition.relativeX + perspectivePosition.relativeX)) / perspectiveScale;
+                    event.pointerCoordinates[id].relativeY = (motionEvent.getY(i) - (originPosition.relativeY + perspectivePosition.relativeY)) / perspectiveScale;
                 }
 
                 // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This

@@ -402,7 +402,7 @@ public class Space extends Image<Model> {
 //
         // <FPS_LABEL>
         fpsCoordinate.setRelative(getImages().filterType(Host.class).getCenterPoint());
-        fpsCoordinate.setY(fpsCoordinate.getY() - 200);
+        fpsCoordinate.relativeY = fpsCoordinate.relativeY - 200;
         display.paint.setColor(Color.RED);
         display.paint.setStyle(Paint.Style.FILL);
         display.canvas.drawCircle((float) fpsCoordinate.relativeX, (float) fpsCoordinate.relativeY, 10, display.paint);

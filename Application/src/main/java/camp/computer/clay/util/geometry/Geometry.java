@@ -107,10 +107,10 @@ public abstract class Geometry {
     private static double calculateDotProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point BC = new Point();
-        AB.setX(linePointB.relativeX - linePointA.relativeX);
-        AB.setY(linePointB.relativeY - linePointA.relativeY);
-        BC.setX(pointC.relativeX - linePointB.relativeX);
-        BC.setY(pointC.relativeY - linePointB.relativeY);
+        AB.relativeX = (linePointB.relativeX - linePointA.relativeX);
+        AB.relativeY = (linePointB.relativeY - linePointA.relativeY);
+        BC.relativeX = (pointC.relativeX - linePointB.relativeX);
+        BC.relativeY = (pointC.relativeY - linePointB.relativeY);
         double dot = AB.relativeX * BC.relativeX + AB.relativeY * BC.relativeY;
         return dot;
     }
@@ -119,10 +119,10 @@ public abstract class Geometry {
     private static double calculateCrossProduct(Point linePointA, Point linePointB, Point pointC) {
         Point AB = new Point();
         Point AC = new Point();
-        AB.setX(linePointB.relativeX - linePointA.relativeX);
-        AB.setY(linePointB.relativeY - linePointA.relativeY);
-        AC.setX(pointC.relativeX - linePointA.relativeX);
-        AC.setY(pointC.relativeY - linePointA.relativeY);
+        AB.relativeX = (linePointB.relativeX - linePointA.relativeX);
+        AB.relativeY = (linePointB.relativeY - linePointA.relativeY);
+        AC.relativeX = (pointC.relativeX - linePointA.relativeX);
+        AC.relativeY = (pointC.relativeY - linePointA.relativeY);
         double cross = AB.relativeX * AC.relativeY - AB.relativeY * AC.relativeX;
         return cross;
     }
@@ -440,21 +440,21 @@ public abstract class Geometry {
                             sortedPositions.get(j)
                     );
                     // (double) Geometry.calculateDistance(packingCenter, vectorAB);
-                    vectorAB.setX(vectorAB.relativeX / magnitude);
-                    vectorAB.setY(vectorAB.relativeY / magnitude);
+                    vectorAB.relativeX = (vectorAB.relativeX / magnitude);
+                    vectorAB.relativeY = (vectorAB.relativeY / magnitude);
 
                     // TODO: AB *= (double)((r - Math.Sqrt(d)) * 0.5f);
-                    vectorAB.setX(vectorAB.relativeX * (double) ((r - Math.sqrt(d)) * 0.5f));
-                    vectorAB.setY(vectorAB.relativeY * (double) ((r - Math.sqrt(d)) * 0.5f));
+                    vectorAB.relativeX = (vectorAB.relativeX * (double) ((r - Math.sqrt(d)) * 0.5f));
+                    vectorAB.relativeY = (vectorAB.relativeY * (double) ((r - Math.sqrt(d)) * 0.5f));
 
 //                    if (positions.getEvent(j) != mDraggingCircle)
                     // TODO: positions.getEvent(j).mCenter += AB;
-                    sortedPositions.get(j).setX(sortedPositions.get(j).relativeX + vectorAB.relativeX);
-                    sortedPositions.get(j).setY(sortedPositions.get(j).relativeY + vectorAB.relativeY);
+                    sortedPositions.get(j).relativeX = (sortedPositions.get(j).relativeX + vectorAB.relativeX);
+                    sortedPositions.get(j).relativeY = (sortedPositions.get(j).relativeY + vectorAB.relativeY);
 //                    if (positions.getEvent(i) != mDraggingCircle)
                     // TODO: positions.getEvent(i).mCenter -= AB;
-                    sortedPositions.get(i).setX(sortedPositions.get(i).relativeX - vectorAB.relativeX);
-                    sortedPositions.get(i).setY(sortedPositions.get(i).relativeY - vectorAB.relativeY);
+                    sortedPositions.get(i).relativeX = (sortedPositions.get(i).relativeX - vectorAB.relativeX);
+                    sortedPositions.get(i).relativeY = (sortedPositions.get(i).relativeY - vectorAB.relativeY);
                 }
 
             }
@@ -471,12 +471,12 @@ public abstract class Geometry {
             );
 
             // TODO: v *= damping;
-            v.setX(v.relativeX * damping);
-            v.setY(v.relativeY * damping);
+            v.relativeX = (v.relativeX * damping);
+            v.relativeY = (v.relativeY * damping);
 
             // TODO: mCircles[i].mCenter -= v;
-            sortedPositions.get(i).setX(sortedPositions.get(i).relativeX - v.relativeX);
-            sortedPositions.get(i).setY(sortedPositions.get(i).relativeY - v.relativeY);
+            sortedPositions.get(i).relativeX = (sortedPositions.get(i).relativeX - v.relativeX);
+            sortedPositions.get(i).relativeY = (sortedPositions.get(i).relativeY - v.relativeY);
 
             sortedImages.get(i).setPosition(sortedPositions.get(i));
 //            }
