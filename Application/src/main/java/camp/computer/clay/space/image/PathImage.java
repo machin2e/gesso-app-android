@@ -173,12 +173,14 @@ public class PathImage extends Image<Path> {
         PortableImage hostImage = (PortableImage) parentSpace.getImage(hostPort.getPortable());
         PortableImage extensionImage = (PortableImage) parentSpace.getImage(extensionPort.getPortable());
 
-        Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex());
-        Point extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex());
+        if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
+            Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex());
+            Point extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex());
 
-        // Draw connection between Ports
-        display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
-        display.getPaint().setStrokeWidth(10.0f);
-        display.drawLine(hostConnectorPosition, extensionConnectorPosition);
+            // Draw connection between Ports
+            display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
+            display.getPaint().setStrokeWidth(10.0f);
+            display.drawLine(hostConnectorPosition, extensionConnectorPosition);
+        }
     }
 }

@@ -299,13 +299,13 @@ public class HostImage extends PortableImage {
                                             } else {
 
                                                 // Update position of prototype Extension
-                                                parentSpace.setPrototypeExtensionPosition(event.getPosition());
+                                                parentSpace.setExtensionPrototypePosition(event.getPosition());
 
                                                 getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
                                                 setPathVisibility(Visibility.Value.INVISIBLE);
                                                 setDockVisibility(Visibility.Value.VISIBLE);
 
-                                                parentSpace.setPrototypeExtensionVisibility(Visibility.Value.VISIBLE);
+                                                parentSpace.setExtensionPrototypeVisibility(Visibility.Value.VISIBLE);
 
                                             }
 
@@ -314,9 +314,9 @@ public class HostImage extends PortableImage {
                                             if (action.isDragging()) {
 
                                                 // Prototype Path Visibility
-                                                parentSpace.setPrototypePathSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                                parentSpace.setPrototypePathDestinationPosition(event.getPosition());
-                                                parentSpace.setPrototypePathVisibility(Visibility.Value.VISIBLE);
+                                                parentSpace.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                parentSpace.setPathPrototypeDestinationPosition(event.getPosition());
+                                                parentSpace.setPathPrototypeVisibility(Visibility.Value.VISIBLE);
 
                                                 // Prototype Extension Visibility
                                                 boolean isCreateExtensionAction = true;
@@ -339,11 +339,11 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 if (isCreateExtensionAction) {
-                                                    parentSpace.setPrototypeExtensionVisibility(Visibility.Value.VISIBLE);
-                                                    parentSpace.setPrototypePathSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                                    parentSpace.setPrototypeExtensionPosition(event.getPosition());
+                                                    parentSpace.setExtensionPrototypeVisibility(Visibility.Value.VISIBLE);
+                                                    parentSpace.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                    parentSpace.setExtensionPrototypePosition(event.getPosition());
                                                 } else {
-                                                    parentSpace.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
+                                                    parentSpace.setExtensionPrototypeVisibility(Visibility.Value.INVISIBLE);
                                                 }
 
                                                 // Show Ports of nearby Hosts and Extensions
@@ -461,6 +461,16 @@ public class HostImage extends PortableImage {
 
                                                 if (getHost().getExtensions().size() > 0) {
                                                     parentSpace.getImages(getHost().getExtensions()).setTransparency(1.0);
+
+                                                    // <HACK>
+                                                    // TODO: Replace ASAP. This is shit.
+                                                    // TODO: Use "rectangle" or "circular" extension layout algorithms
+                                                    ImageGroup extensionImages = parentSpace.getImages(getHost().getExtensions());
+                                                    for (int i = 0; i < extensionImages.size(); i++) {
+                                                        ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+                                                        extensionImage.distanceToHost = 500;
+                                                    }
+                                                    // </HACK>
                                                 }
 
                                                 // Title
@@ -493,9 +503,9 @@ public class HostImage extends PortableImage {
                                             }
 
                                             // Check if connecting to a extension
-                                            if (parentSpace.getPrototypeExtensionVisibility().getValue() == Visibility.Value.VISIBLE) {
+                                            if (parentSpace.getExtensionPrototypeVisibility().getValue() == Visibility.Value.VISIBLE) {
 
-                                                parentSpace.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
+                                                parentSpace.setExtensionPrototypeVisibility(Visibility.Value.INVISIBLE);
 
                                                 // Get cached extension profiles (and retrieve additional from Internet store)
                                                 List<PortableProfile> portableProfiles = Application.getView().getClay().getPortableProfiles();
@@ -515,6 +525,9 @@ public class HostImage extends PortableImage {
 
                                                             // Add Extension from Profile
                                                             Extension extension = addExtension(portableProfile, event.getPosition());
+
+                                                            double rangle = getRelativeAngle(event.getPosition());
+                                                            Log.v("RelativeAngle", "rel. angle: " + rangle);
 
                                                             // Update Camera
                                                             camera.setFocus(extension);
@@ -652,7 +665,7 @@ public class HostImage extends PortableImage {
 
                                                         }
 
-                                                        parentSpace.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
+                                                        parentSpace.setPathPrototypeVisibility(Visibility.Value.INVISIBLE);
                                                     }
 
                                                 } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
@@ -765,7 +778,7 @@ public class HostImage extends PortableImage {
                                                             event.getActor().getCamera().setFocus(paths);
                                                         }
 
-                                                        parentSpace.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
+                                                        parentSpace.setPathPrototypeVisibility(Visibility.Value.INVISIBLE);
 
                                                     }
 
@@ -777,7 +790,7 @@ public class HostImage extends PortableImage {
 
                                                 // (Host.Port, ..., Space) Action Pattern
 
-                                                if (parentSpace.getPrototypeExtensionVisibility().getValue() == Visibility.Value.VISIBLE) {
+                                                if (parentSpace.getExtensionPrototypeVisibility().getValue() == Visibility.Value.VISIBLE) {
 
                                                     Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
                                                     Port hostPort = (Port) hostPortShape.getEntity();
@@ -791,8 +804,8 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 // Update Image
-                                                parentSpace.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
-                                                parentSpace.setPrototypeExtensionVisibility(Visibility.Value.INVISIBLE);
+                                                parentSpace.setPathPrototypeVisibility(Visibility.Value.INVISIBLE);
+                                                parentSpace.setExtensionPrototypeVisibility(Visibility.Value.INVISIBLE);
 
                                             } else {
 
@@ -810,7 +823,7 @@ public class HostImage extends PortableImage {
                                                     }
                                                 }
 
-                                                parentSpace.setPrototypePathVisibility(Visibility.Value.INVISIBLE);
+                                                parentSpace.setPathPrototypeVisibility(Visibility.Value.INVISIBLE);
                                             }
 
                                         }
@@ -864,7 +877,7 @@ public class HostImage extends PortableImage {
         // <REFACTOR>
         // Update the Extension Image position and rotation
         int headerIndex = getHeaderIndex(initialPosition);
-        adjustExtensionPosition(extensionImage, headerIndex);
+        extensionImage.adjustPosition();
         // </REFACTOR>
 
         // Configure Host's Port (i.e., the Path's source Port)
@@ -941,7 +954,7 @@ public class HostImage extends PortableImage {
         // <REFACTOR>
         // Update the Extension Image position and rotation
         int headerIndex = getHeaderIndex(initialPosition);
-        adjustExtensionPosition(extensionImage, headerIndex);
+        extensionImage.adjustPosition();
         // </REFACTOR>
 
         // Automatically select, connect paths to, and configure the Host's Ports
@@ -983,7 +996,8 @@ public class HostImage extends PortableImage {
         return extension;
     }
 
-    private int getHeaderIndex(Point point) {
+    // TODO: Remove this?
+    public int getHeaderIndex(Point point) {
         Shape boardShape = getShape("Substrate");
         // Line nearestSegment = null;
         int segmentIndex = -1;
@@ -1002,42 +1016,44 @@ public class HostImage extends PortableImage {
         return segmentIndex;
     }
 
-    // TODO: Refactor this... it's really dumb right now.
-    private void adjustExtensionPosition(ExtensionImage extensionImage, int segmentIndex) {
-
-        // <REFACTOR>
-        // Update the Extension Image position and rotation
-        //extensionImage.setPosition(event.getPosition());
-        if (segmentIndex == 0) {
-            extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setX(0);
-            extensionImage.getPosition().setY(-500);
-        } else if (segmentIndex == 1) {
-            extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setX(500);
-            extensionImage.getPosition().setY(0);
-        } else if (segmentIndex == 2) {
-            extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setX(0);
-            extensionImage.getPosition().setY(500);
-        } else if (segmentIndex == 3) {
-            extensionImage.getPosition().setReferencePoint(getPosition());
-            extensionImage.getPosition().setX(-500);
-            extensionImage.getPosition().setY(0);
-        }
-
-        //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
-        if (segmentIndex == 0) {
-            extensionImage.setRotation(0);
-        } else if (segmentIndex == 1) {
-            extensionImage.setRotation(90);
-        } else if (segmentIndex == 2) {
-            extensionImage.setRotation(180);
-        } else if (segmentIndex == 3) {
-            extensionImage.setRotation(270);
-        }
-        // </REFACTOR>
-    }
+//    public double distanceToHost = 500;
+//
+//    // TODO: Refactor this... it's really dumb right now.
+//    private void adjustPosition(ExtensionImage extensionImage, int segmentIndex) {
+//
+//        // <REFACTOR>
+//        // Update the Extension Image position and rotation
+//        //extensionImage.setPosition(event.getPosition());
+//        if (segmentIndex == 0) {
+//            extensionImage.getPosition().setReferencePoint(getPosition());
+//            extensionImage.getPosition().setX(0);
+//            extensionImage.getPosition().setY(-distanceToHost);
+//        } else if (segmentIndex == 1) {
+//            extensionImage.getPosition().setReferencePoint(getPosition());
+//            extensionImage.getPosition().setX(distanceToHost);
+//            extensionImage.getPosition().setY(0);
+//        } else if (segmentIndex == 2) {
+//            extensionImage.getPosition().setReferencePoint(getPosition());
+//            extensionImage.getPosition().setX(0);
+//            extensionImage.getPosition().setY(distanceToHost);
+//        } else if (segmentIndex == 3) {
+//            extensionImage.getPosition().setReferencePoint(getPosition());
+//            extensionImage.getPosition().setX(-distanceToHost);
+//            extensionImage.getPosition().setY(0);
+//        }
+//
+//        //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
+//        if (segmentIndex == 0) {
+//            extensionImage.setRotation(0);
+//        } else if (segmentIndex == 1) {
+//            extensionImage.setRotation(90);
+//        } else if (segmentIndex == 2) {
+//            extensionImage.setRotation(180);
+//        } else if (segmentIndex == 3) {
+//            extensionImage.setRotation(270);
+//        }
+//        // </REFACTOR>
+//    }
 
     public Host getHost() {
         return (Host) getEntity();

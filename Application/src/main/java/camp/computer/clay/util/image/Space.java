@@ -33,12 +33,12 @@ public class Space extends Image<Model> {
 
     protected ImageGroup images = new ImageGroup();
 
-    protected Visibility prototypeExtensionVisibility = new Visibility(Visibility.Value.INVISIBLE);
-    protected Point prototypeExtensionPosition = new Point();
+    protected Visibility extensionPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
+    protected Point extensionPrototypePosition = new Point();
 
-    protected Visibility prototypePathVisibility = new Visibility(Visibility.Value.INVISIBLE);
-    protected Point prototypePathSourcePosition = new Point(0, 0);
-    protected Point prototypePathDestinationCoordinate = new Point(0, 0);
+    protected Visibility pathPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
+    protected Point pathPrototypeSourcePosition = new Point(0, 0);
+    protected Point pathPrototypeDestinationCoordinate = new Point(0, 0);
 
     public Space(Model model) {
         super(model);
@@ -298,7 +298,7 @@ public class Space extends Image<Model> {
             }
 
             // Set rotation
-            image.setRotation(Probability.getRandomGenerator().nextInt(360));
+//            image.setRotation(Probability.getRandomGenerator().nextInt(360));
         }
     }
 
@@ -424,29 +424,29 @@ public class Space extends Image<Model> {
         }
 
         // Draw any prototype Paths and Extensions
-        drawPrototypePath(display);
-        drawPrototypeExtension(display);
+        drawPathPrototype(display);
+        drawExtensionPrototype(display);
 
         display.canvas.restore();
     }
 
-    private void drawPrototypeExtension(Display display) {
-        if (prototypeExtensionVisibility.getValue() == Visibility.Value.VISIBLE) {
+    private void drawExtensionPrototype(Display display) {
+        if (extensionPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
 
             Paint paint = display.getPaint();
 
-            double pathRotationAngle = Geometry.calculateRotationAngle(prototypePathSourcePosition, prototypeExtensionPosition);
+            double pathRotationAngle = Geometry.calculateRotationAngle(pathPrototypeSourcePosition, extensionPrototypePosition);
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#fff7f7f7"));
 
-            display.drawRectangle(prototypeExtensionPosition, pathRotationAngle + 180, 200, 200);
+            display.drawRectangle(extensionPrototypePosition, pathRotationAngle + 180, 200, 200);
         }
     }
 
     // TODO: Make this into a shape and put this on a separate layerIndex!
-    public void drawPrototypePath(Display display) {
-        if (prototypePathVisibility.getValue() == Visibility.Value.VISIBLE) {
+    public void drawPathPrototype(Display display) {
+        if (pathPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
 
             Paint paint = display.getPaint();
 
@@ -460,18 +460,18 @@ public class Space extends Image<Model> {
 //            paint.setColor(this.getUniqueColor());
 
             double pathRotationAngle = Geometry.calculateRotationAngle(
-                    prototypePathSourcePosition,
-                    prototypePathDestinationCoordinate
+                    pathPrototypeSourcePosition,
+                    pathPrototypeDestinationCoordinate
             );
 
             Point pathStartCoordinate = Geometry.calculatePoint(
-                    prototypePathSourcePosition,
+                    pathPrototypeSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
             Point pathStopCoordinate = Geometry.calculatePoint(
-                    prototypePathDestinationCoordinate,
+                    pathPrototypeDestinationCoordinate,
                     pathRotationAngle + 180,
                     2 * triangleSpacing
             );
@@ -483,35 +483,35 @@ public class Space extends Image<Model> {
             paint.setStyle(Paint.Style.FILL);
 //            paint.setColor(Color.parseColor("#efefef"));
             double shapeRadius = 40.0;
-            display.drawCircle(prototypePathDestinationCoordinate, shapeRadius, 0.0f);
+            display.drawCircle(pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
         }
     }
 
-    public void setPrototypePathVisibility(Visibility.Value visibility) {
-        prototypePathVisibility.setValue(visibility);
+    public void setPathPrototypeVisibility(Visibility.Value visibility) {
+        pathPrototypeVisibility.setValue(visibility);
     }
 
-    public Visibility getPrototypePathVisibility() {
-        return prototypePathVisibility;
+    public Visibility getPathPrototypeVisibility() {
+        return pathPrototypeVisibility;
     }
 
-    public void setPrototypePathSourcePosition(Point position) {
-        this.prototypePathSourcePosition.copy(position);
+    public void setPathPrototypeSourcePosition(Point position) {
+        this.pathPrototypeSourcePosition.copy(position);
     }
 
-    public void setPrototypePathDestinationPosition(Point position) {
-        this.prototypePathDestinationCoordinate.copy(position);
+    public void setPathPrototypeDestinationPosition(Point position) {
+        this.pathPrototypeDestinationCoordinate.copy(position);
     }
 
-    public void setPrototypeExtensionPosition(Point position) {
-        this.prototypeExtensionPosition.copy(position);
+    public void setExtensionPrototypePosition(Point position) {
+        this.extensionPrototypePosition.copy(position);
     }
 
-    public void setPrototypeExtensionVisibility(Visibility.Value visibility) {
-        prototypeExtensionVisibility.setValue(visibility);
+    public void setExtensionPrototypeVisibility(Visibility.Value visibility) {
+        extensionPrototypeVisibility.setValue(visibility);
     }
 
-    public Visibility getPrototypeExtensionVisibility() {
-        return prototypeExtensionVisibility;
+    public Visibility getExtensionPrototypeVisibility() {
+        return extensionPrototypeVisibility;
     }
 }

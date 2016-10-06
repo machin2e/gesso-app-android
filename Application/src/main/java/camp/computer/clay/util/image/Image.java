@@ -289,6 +289,7 @@ public abstract class Image<T extends Entity> {
         return positions;
     }
 
+    // Refactor to NOT use absolute and TO cache vertices... and NOT allocate arrays and Points every update
     public Rectangle getBoundingBox() {
 
         List<Point> boundingBoxVertices = new LinkedList<>();
@@ -306,4 +307,16 @@ public abstract class Image<T extends Entity> {
         return Geometry.calculateBoundingBox(boundingBoxVertices);
     }
 
+    public double getRelativeAngle(Point point) {
+
+        double relativeAngle = Geometry.calculateRotationAngle(position, point);
+        if (relativeAngle < 0) {
+            relativeAngle += 360.0;
+        }
+        relativeAngle = (relativeAngle - getRotation());
+        if (relativeAngle < 0) {
+            relativeAngle += 360.0;
+        }
+        return relativeAngle;
+    }
 }

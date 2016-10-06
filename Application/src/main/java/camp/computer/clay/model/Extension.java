@@ -18,4 +18,19 @@ public class Extension extends Portable {
     public Extension(PortableProfile portableProfile) {
         super(portableProfile);
     }
+
+    public Group<Host> getHost() {
+        Group<Host> hosts = new Group<>();
+        for (int i = 0; i < ports.size(); i++) {
+            Port port = ports.get(i);
+
+            Host host = port.getHost();
+
+            if (host != null) {
+                hosts.add(host);
+            }
+
+        }
+        return hosts;
+    }
 }

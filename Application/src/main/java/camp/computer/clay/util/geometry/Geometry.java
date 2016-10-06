@@ -608,4 +608,63 @@ public abstract class Geometry {
         double distance = Math.sqrt(distanceSquare);
         return distance;
     }
+
+    // Returns 1 if the lines intersect, otherwise 0. In addition, if the lines
+    // intersect the intersection point may be stored in the floats i_x and i_y.
+    //
+    // Credit:
+    // This algorithm is adapted from "Tricks of the Windows Game Programming Gurus" by Andre
+    // Lamothe, my first book covering graphics programming.
+//    public static boolean testLineIntersection(float p0_x, float p0_y, float p1_x, float p1_y,
+//                                               float p2_x, float p2_y, float p3_x, float p3_y /*, float*i_x, float*i_y*/) {
+//        float s1_x, s1_y, s2_x, s2_y;
+//        s1_x = p1_x - p0_x;
+//        s1_y = p1_y - p0_y;
+//        s2_x = p3_x - p2_x;
+//        s2_y = p3_y - p2_y;
+//
+//        float s, t;
+//        s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+//        t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+//
+//        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+//            // Collision detected
+////            if (i_x != NULL)
+////            *i_x = p0_x + (t * s1_x);
+////            if (i_y != NULL)
+////            *i_y = p0_y + (t * s1_y);
+//            return 1;
+//        }
+//
+//        return 0; // No collision
+//    }
+
+    // Returns 1 if the lines intersect, otherwise 0. In addition, if the lines
+    // intersect the intersection point may be stored in the floats i_x and i_y.
+    //
+    // Credit:
+    // This algorithm is adapted from "Tricks of the Windows Game Programming Gurus" by Andre
+    // Lamothe, my first book covering graphics programming.
+    public static boolean testLineIntersection(Point p0, Point p1, Point p2, Point p3 /*, float*i_x, float*i_y*/) {
+        double s1_x, s1_y, s2_x, s2_y;
+        s1_x = p1.getAbsoluteX() - p0.getAbsoluteX();
+        s1_y = p1.getAbsoluteY() - p0.getAbsoluteY();
+        s2_x = p3.getAbsoluteX() - p2.getAbsoluteX();
+        s2_y = p3.getAbsoluteY() - p2.getAbsoluteY();
+
+        double s, t;
+        s = (-s1_y * (p0.getAbsoluteX() - p2.getAbsoluteX()) + s1_x * (p0.getAbsoluteY() - p2.getAbsoluteY())) / (-s2_x * s1_y + s1_x * s2_y);
+        t = (s2_x * (p0.getAbsoluteY() - p2.getAbsoluteY()) - s2_y * (p0.getAbsoluteX() - p2.getAbsoluteX())) / (-s2_x * s1_y + s1_x * s2_y);
+
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            // Collision detected
+//            if (i_x != NULL)
+//            *i_x = p0_x + (t * s1_x);
+//            if (i_y != NULL)
+//            *i_y = p0_y + (t * s1_y);
+            return true;
+        }
+
+        return false; // No collision
+    }
 }

@@ -357,6 +357,8 @@ public class Camera {
 
     public void setFocus(Space space) {
 
+        // <REFACTOR>
+        // TODO: Move this somehwere better...
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
         ImageGroup portableImages = this.space.getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
@@ -366,6 +368,17 @@ public class Camera {
             portableImage.setDockVisibility(Visibility.Value.VISIBLE);
             portableImage.setTransparency(1.0);
         }
+
+        // <HACK>
+        // TODO: Replace ASAP. This is shit.
+        ImageGroup extensionImages = this.space.getImages(Extension.class);
+        for (int i = 0; i < extensionImages.size(); i++) {
+            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+            extensionImage.distanceToHost = 300;
+        }
+        // </HACK>
+
+        // </REFACTOR>
 
         // Adjust scale and position
         adjustScale();

@@ -1,5 +1,7 @@
 package camp.computer.clay.model;
 
+import android.util.Log;
+
 import camp.computer.clay.model.util.PathGroup;
 
 public class Port extends Entity {
@@ -92,6 +94,24 @@ public class Port extends Entity {
         return this.getDescendantPaths(1);
     }
 
+    // <HACK>
+    public Host getHost() {
+        PathGroup paths = this.getPaths(1);
+        for (int i = 0; i < paths.size(); i++) {
+            Path path = paths.get(i);
+            if (path.getSource() == this || path.getTarget() == this) {
+                Log.v("pathsource", "source.parent: " + path.getSource().getParent());
+                Log.v("pathsource", "target.parent: " + path.getTarget().getParent());
+                if (path.getSource().getParent() instanceof Host) {
+                    return (Host) path.getSource().getParent();
+                } else if (path.getTarget().getParent() instanceof Host) {
+                    return (Host) path.getTarget().getParent();
+                }
+            }
+        }
+        return null;
+    }
+
     public Extension getExtension() {
         PathGroup paths = this.getPaths(1);
         for (int i = 0; i < paths.size(); i++) {
@@ -106,6 +126,7 @@ public class Port extends Entity {
         }
         return null;
     }
+    // </HACK>
 
     public int getIndex() {
         return this.index;
