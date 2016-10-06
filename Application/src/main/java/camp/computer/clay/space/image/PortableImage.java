@@ -18,7 +18,7 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public abstract class PortableImage extends Image<Portable> {
 
-    public List<Point> portConnectorPositions = new ArrayList<>();
+    public List<Point> headerContactPositions = new ArrayList<>();
 
     public PortableImage(Portable portable) {
         super(portable);

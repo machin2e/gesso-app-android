@@ -96,21 +96,21 @@ public class HostImage extends PortableImage {
 
         final double contactSeparation = 6.0 * 2.54;
 
-        portConnectorPositions.add(new Point(-contactSeparation, 132, position));
-        portConnectorPositions.add(new Point(0, 132, position));
-        portConnectorPositions.add(new Point(contactSeparation, 132, position));
+        headerContactPositions.add(new Point(-contactSeparation, 132, position));
+        headerContactPositions.add(new Point(0, 132, position));
+        headerContactPositions.add(new Point(contactSeparation, 132, position));
 
-        portConnectorPositions.add(new Point(132, contactSeparation, position));
-        portConnectorPositions.add(new Point(132, 0, position));
-        portConnectorPositions.add(new Point(132, -contactSeparation, position));
+        headerContactPositions.add(new Point(132, contactSeparation, position));
+        headerContactPositions.add(new Point(132, 0, position));
+        headerContactPositions.add(new Point(132, -contactSeparation, position));
 
-        portConnectorPositions.add(new Point(contactSeparation, -132, position));
-        portConnectorPositions.add(new Point(0, -132, position));
-        portConnectorPositions.add(new Point(-contactSeparation, -132, position));
+        headerContactPositions.add(new Point(contactSeparation, -132, position));
+        headerContactPositions.add(new Point(0, -132, position));
+        headerContactPositions.add(new Point(-contactSeparation, -132, position));
 
-        portConnectorPositions.add(new Point(-132, -contactSeparation, position));
-        portConnectorPositions.add(new Point(-132, 0, position));
-        portConnectorPositions.add(new Point(-132, contactSeparation, position));
+        headerContactPositions.add(new Point(-132, -contactSeparation, position));
+        headerContactPositions.add(new Point(-132, 0, position));
+        headerContactPositions.add(new Point(-132, contactSeparation, position));
 
         // Lights
         List<Point> lightPositions = new ArrayList<>();
@@ -151,14 +151,18 @@ public class HostImage extends PortableImage {
         }
 
         // Mounting Holes
+        final double holeDiameter = 6.0 * 2.9; // 2.9 mm diameter
+        final double holeRadius = holeDiameter / 2.0; // 2.9 mm diameter
+        final double holeDistanceFromEdge = 125 - (6.0 * 3.5);
+
         List<Point> mountingHolePositions = new ArrayList<>();
-        mountingHolePositions.add(new Point(-105, -105));
-        mountingHolePositions.add(new Point(105, -105));
-        mountingHolePositions.add(new Point(105, 105));
-        mountingHolePositions.add(new Point(-105, 105));
+        mountingHolePositions.add(new Point(-holeDistanceFromEdge, -holeDistanceFromEdge)); // TODO: make hole centers 5 mm (or so) from the edge of the PCB
+        mountingHolePositions.add(new Point(holeDistanceFromEdge, -holeDistanceFromEdge));
+        mountingHolePositions.add(new Point(holeDistanceFromEdge, holeDistanceFromEdge));
+        mountingHolePositions.add(new Point(-holeDistanceFromEdge, holeDistanceFromEdge));
 
         for (int i = 0; i < mountingHolePositions.size(); i++) {
-            circle = new Circle<>(10.0);
+            circle = new Circle<>(holeRadius);
             circle.setPosition(mountingHolePositions.get(i));
             circle.setLabel("Mount " + (i + 1));
             circle.setColor("#ffffff");

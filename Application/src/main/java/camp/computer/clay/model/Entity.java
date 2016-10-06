@@ -1,11 +1,14 @@
 package camp.computer.clay.model;
 
 public abstract class Entity {
+
     // TODO: UUID.
     // TODO: Tag.
-    // TODO: Physical dimensions (of actual physical object). Add it as a label-like property.
+    // TODO: Physical dimensions/geometry (of actual physical object). Add it as a label-like property.
 
-    private Entity parent;
+    protected Entity parent;
+
+    protected String label = "";
 
     public Entity() {
     }
@@ -26,5 +29,17 @@ public abstract class Entity {
 
     public Entity getParent() {
         return this.parent;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public boolean hasLabel() {
+        return this.label != null && this.label.length() > 0;
+    }
+
+    public String getLabel() {
+        return this.label;
     }
 }

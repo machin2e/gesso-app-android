@@ -26,7 +26,6 @@ import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Triangle;
 import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.Visibility;
 
 public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -156,42 +155,57 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         canvas.restore();
 
-        // Annotation
-        if (space.getTitleVisibility().getValue() == Visibility.Value.VISIBLE) {
+//        // Annotation
+//        if (space.getTitleVisibility().getValue() == Visibility.Value.VISIBLE) {
+//
+//            canvas.save();
+//
+//            // Project Title
+//            paint.setColor(Color.BLACK);
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setTextSize(100);
+//
+//            String projectTitleText = space.getTitleText(); // "Goal";
+//            Rect projectTitleTextBounds = new Rect();
+//            paint.getTextBounds(projectTitleText, 0, projectTitleText.length(), projectTitleTextBounds);
+//            canvas.drawText(projectTitleText, (getWidth() / 2.0f) - (projectTitleTextBounds.width() / 2.0f), (250) - (projectTitleTextBounds.height() / 2.0f), paint);
+//
+//            /*
+//            // Menu
+//            paint.setColor(Color.BLACK);
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setStrokeWidth(5.0f);
+//
+//            canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 250f, (getWidth() / 2.0f) + 75f, getHeight() - 250f, paint
+//
+//            );
+//
+//            canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 215f, (getWidth() / 2.0f) + 75f, getHeight() - 215f, paint
+//
+//            );
+//
+//            canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 180f, (getWidth() / 2.0f) + 75f, getHeight() - 180f, paint
+//
+//            );
+//            */
+//
+//            canvas.restore();
+//        }
 
-            canvas.save();
+        canvas.save();
 
-            // Project Title
-            paint.setColor(Color.BLACK);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setTextSize(100);
+        // <FPS_LABEL>
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(35);
 
-            String projectTitleText = space.getTitleText(); // "Goal";
-            Rect projectTitleTextBounds = new Rect();
-            paint.getTextBounds(projectTitleText, 0, projectTitleText.length(), projectTitleTextBounds);
-            canvas.drawText(projectTitleText, (getWidth() / 2.0f) - (projectTitleTextBounds.width() / 2.0f), (250) - (projectTitleTextBounds.height() / 2.0f), paint);
+        String fpsText = "FPS: " + (int) getDisplayOutput().getFramesPerSecond();
+        Rect fpsTextBounds = new Rect();
+        paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
+        canvas.drawText(fpsText, 25, 25 + fpsTextBounds.height(), paint);
+        // </FPS_LABEL>
 
-            /*
-            // Menu
-            paint.setColor(Color.BLACK);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setStrokeWidth(5.0f);
-
-            canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 250f, (getWidth() / 2.0f) + 75f, getHeight() - 250f, paint
-
-            );
-
-            canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 215f, (getWidth() / 2.0f) + 75f, getHeight() - 215f, paint
-
-            );
-
-            canvas.drawLine((getWidth() / 2.0f) - 75f, getHeight() - 180f, (getWidth() / 2.0f) + 75f, getHeight() - 180f, paint
-
-            );
-            */
-
-            canvas.restore();
-        }
+        canvas.restore();
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap(canvasBitmap, identityMatrix, null);

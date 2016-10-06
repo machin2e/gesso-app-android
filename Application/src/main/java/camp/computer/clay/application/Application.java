@@ -1,5 +1,6 @@
 package camp.computer.clay.application;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -17,7 +18,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -77,7 +80,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
     private Clay clay;
 
-    private camp.computer.clay.application.communication.UDPHost UDPHost;
+    private UDPHost UDPHost;
 
     private Internet networkResource;
 
@@ -110,6 +113,140 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
         pathEditor.setVisibility(View.VISIBLE);
     }
+
+    // References:
+    // - http://stackoverflow.com/questions/4165414/how-to-hide-soft-keyboard-on-android-after-clicking-outside-edittext
+    boolean isTitleEditorInitialized = false;
+
+    public void openTitleEditor(String title) {
+        final RelativeLayout titleEditor = (RelativeLayout) findViewById(R.id.title_editor_view);
+
+        // Initialize Text
+        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
+        titleText.setText(title);
+
+        // Configure Text Editor
+        if (isTitleEditorInitialized == false) {
+
+            /*
+            // Set the font face
+            Typeface type = Typeface.createFromAsset(getAssets(), "fonts/Dosis-Light.ttf");
+            titleText.setTypeface(type);
+            */
+
+            // Configure to hide keyboard when a touch occurs anywhere except the text
+            titleText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+                        hideKeyboard(v);
+                    }
+                }
+            });
+
+            // Configure touch interaction
+            titleText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.getId() == titleText.getId()) {
+
+                        // Move the cursor to the end of the line
+                        titleText.setSelection(titleText.getText().length());
+
+                        // Show the cursor
+                        titleText.setCursorVisible(true);
+                    }
+                }
+            });
+
+            isTitleEditorInitialized = true;
+        }
+
+        titleText.setCursorVisible(false);
+
+        titleEditor.setVisibility(View.VISIBLE);
+
+        /*
+        // Now Set your animation
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
+        titleText.startAnimation(fadeInAnimation);
+
+        // Callback to hide editor
+        startTitleEditorService();
+        */
+    }
+
+    public void setTitleEditor(String title) {
+        // Update the Text
+        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
+        titleText.setText(title);
+
+        /*
+        // Callback to hide editor
+        startTitleEditorService();
+        */
+    }
+
+    public void closeTitleEditor() {
+        final RelativeLayout titleEditor = (RelativeLayout) findViewById(R.id.title_editor_view);
+
+        final EditText titleText = (EditText) findViewById(R.id.title_editor_text);
+
+        titleEditor.setVisibility(View.INVISIBLE);
+
+        /*
+        // Now Set your animation
+        Animation fadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
+
+        fadeOutAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                titleEditor.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        titleText.startAnimation(fadeOutAnimation);
+        */
+    }
+
+    private Handler titleEditorServiceHandler = new Handler();
+    private Runnable titleEditorServiceRunnable = new Runnable() {
+        @Override
+        public void run() {
+            // Do what you need to do.
+            // e.g., foobar();
+            closeTitleEditor();
+
+//            // Uncomment this for periodic callback
+//            if (enableFullscreenService) {
+//                fullscreenServiceHandler.postDelayed(this, FULLSCREEN_SERVICE_PERIOD);
+//            }
+        }
+    };
+
+    private void startTitleEditorService() {
+        titleEditorServiceHandler.postDelayed(titleEditorServiceRunnable, 5000);
+    }
+
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+//    public static void hideSoftKeyboard(Activity activity) {
+//        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+//        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+//    }
 
     /**
      * Called when the activity is getFirstEvent created.

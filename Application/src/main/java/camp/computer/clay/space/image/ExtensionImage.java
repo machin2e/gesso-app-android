@@ -262,16 +262,16 @@ public class ExtensionImage extends PortableImage {
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
 
             // Calculate Port connector positions
-            //double connectorPositionDistance = (PIXEL_PER_MILLIMETER * (2.54 * portConnectorPositions.size() + 0.6));
+            //double connectorPositionDistance = (PIXEL_PER_MILLIMETER * (2.54 * headerContactPositions.size() + 0.6));
 
-            if (i < portConnectorPositions.size()) {
+            if (i < headerContactPositions.size()) {
                 //double x = (PIXEL_PER_MILLIMETER * (2.54 * i + 0.6)) - (connectorPositionDistance / 2.0);
                 double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-                portConnectorPositions.get(i).setX(x);
+                headerContactPositions.get(i).setX(x);
             } else {
                 //double x = PIXEL_PER_MILLIMETER * (2.54 * i + 0.6);
                 double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-                portConnectorPositions.add(new Point(x, 107, position));
+                headerContactPositions.add(new Point(x, 107, position));
             }
         }
 

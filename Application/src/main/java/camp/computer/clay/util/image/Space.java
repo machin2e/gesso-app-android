@@ -2,12 +2,12 @@ package camp.computer.clay.util.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Extension;
@@ -62,7 +62,15 @@ public class Space extends Image<Model> {
     }
 
     public void setTitleVisibility(Visibility.Value visibility) {
-        this.titleVisibility.setValue(visibility);
+        if (titleVisibility.getValue() == Visibility.Value.INVISIBLE && visibility == Visibility.Value.VISIBLE) {
+            Application.getView().openTitleEditor(getTitleText());
+            this.titleVisibility.setValue(visibility);
+        } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.VISIBLE) {
+            Application.getView().setTitleEditor(getTitleText());
+        } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.INVISIBLE) {
+            Application.getView().closeTitleEditor();
+            this.titleVisibility.setValue(visibility);
+        }
     }
 
     public Visibility getTitleVisibility() {
@@ -405,22 +413,10 @@ public class Space extends Image<Model> {
         // Geometry.computeCirclePacking(getImages().filterType(HostImage.class, ExtensionImage.class).getList(), 200, getImages().filterType(HostImage.class, ExtensionImage.class).getCentroidPosition());
     }
 
-    Point fpsCoordinate = getImages().filterType(Host.class).getCenterPoint();
-
     @Override
     public void draw(Display display) {
 
         display.canvas.save();
-//        // <DEBUG_LABEL>
-//        if (Application.ENABLE_GEOMETRY_LABELS) {
-//            // <AXES_LABEL>
-//            display.getPaint().setColor(Color.CYAN);
-//            display.getPaint().setStrokeWidth(1.0f);
-//            display.getCanvas().drawLine(-5000, 0, 5000, 0, display.getPaint());
-//            display.getCanvas().drawLine(0, -5000, 0, 5000, display.getPaint());
-//            // </AXES_LABEL>
-//        }
-//        // </DEBUG_LABEL>
 
         // Draw
         for (int i = 0; i < images.size(); i++) {
@@ -430,100 +426,6 @@ public class Space extends Image<Model> {
         // Draw any prototype Paths and Extensions
         drawPrototypePath(display);
         drawPrototypeExtension(display);
-
-//        // <DEBUG_LABEL>
-//        if (Application.ENABLE_GEOMETRY_LABELS) {
-//
-        // <FPS_LABEL>
-        fpsCoordinate.set(getImages().filterType(Host.class).getCenterPoint());
-        fpsCoordinate.y = fpsCoordinate.y - 200;
-        display.paint.setColor(Color.RED);
-        display.paint.setStyle(Paint.Style.FILL);
-        display.canvas.drawCircle((float) fpsCoordinate.x, (float) fpsCoordinate.y, 10, display.paint);
-
-        display.paint.setStyle(Paint.Style.FILL);
-        display.paint.setTextSize(35);
-
-        String fpsText = "FPS: " + (int) display.getDisplayOutput().getFramesPerSecond();
-        Rect fpsTextBounds = new Rect();
-        display.paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        display.canvas.drawText(fpsText, (float) fpsCoordinate.x + 20, (float) fpsCoordinate.y + fpsTextBounds.height() / 2.0f, display.getPaint());
-        // </FPS_LABEL>
-//
-//            // <CENTROID_LABEL>
-//            Point centroidCoordinate = getImages().filterType(Host.class).getCentroidPoint();
-//            display.getPaint().setColor(Color.RED);
-//            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getCanvas().drawCircle((float) centroidCoordinate.getAbsoluteX(), (float) centroidCoordinate.getAbsoluteY(), 10, display.getPaint());
-//
-//            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getPaint().setTextSize(35);
-//
-//            String text = "CENTROID";
-//            Rect bounds = new Rect();
-//            display.getPaint().getTextBounds(text, 0, text.length(), bounds);
-//            display.getCanvas().drawText(text, (float) centroidCoordinate.getAbsoluteX() + 20, (float) centroidCoordinate.getAbsoluteY() + bounds.height() / 2.0f, display.getPaint());
-//            // </CENTROID_LABEL>
-//
-//            // <CENTER_LABEL>
-//            List<Point> figureCoordinates = getImages().filterType(Host.class, Extension.class).getPositions();
-//            Point baseImagesCenterCoordinate = Geometry.calculateCenter(figureCoordinates);
-//            display.getPaint().setColor(Color.RED);
-//            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getCanvas().drawCircle((float) baseImagesCenterCoordinate.getAbsoluteX(), (float) baseImagesCenterCoordinate.getAbsoluteY(), 10, display.getPaint());
-//
-//            display.getPaint().setStyle(Paint.Style.FILL);
-//            display.getPaint().setTextSize(35);
-//
-//            String centerLabeltext = "CENTER";
-//            Rect centerLabelTextBounds = new Rect();
-//            display.getPaint().getTextBounds(centerLabeltext, 0, centerLabeltext.length(), centerLabelTextBounds);
-//            display.getCanvas().drawText(centerLabeltext, (float) baseImagesCenterCoordinate.getAbsoluteX() + 20, (float) baseImagesCenterCoordinate.getAbsoluteY() + centerLabelTextBounds.height() / 2.0f, display.getPaint());
-//            // </CENTER_LABEL>
-//
-//            // <CONVEX_HULL_LABEL>
-//            List<Point> baseVertices = getImages().filterType(Host.class, Extension.class).getVertices();
-//
-//            // Hull vertices
-//            for (int i = 0; i < baseVertices.size() - 1; i++) {
-//                display.getPaint().setStrokeWidth(1.0f);
-//                display.getPaint().setColor(Color.parseColor("#FF2828"));
-//                display.getPaint().setStyle(Paint.Style.FILL);
-//
-//                Point baseVertex = baseVertices.get(i);
-//                Display.drawCircle(baseVertex, 5, 0, display);
-//            }
-//
-//            List<Point> convexHullVertices = Geometry.computeConvexHull(baseVertices);
-//
-//            display.getPaint().setStrokeWidth(1.0f);
-//            display.getPaint().setColor(Color.parseColor("#2D92FF"));
-//            display.getPaint().setStyle(Paint.Style.STROKE);
-//
-//            // Hull edges
-//            Display.drawPolygon(convexHullVertices, display);
-//
-//            // Hull vertices
-//            for (int i = 0; i < convexHullVertices.size() - 1; i++) {
-//                display.getPaint().setStrokeWidth(1.0f);
-//                display.getPaint().setColor(Color.parseColor("#FF2828"));
-//                display.getPaint().setStyle(Paint.Style.STROKE);
-//
-//                Point vertex = convexHullVertices.get(i);
-//                Display.drawCircle(vertex, 20, 0, display);
-//            }
-//            // </CONVEX_HULL_LABEL>
-//
-//            // <BOUNDING_BOX_LABEL>
-//            display.getPaint().setStrokeWidth(1.0f);
-//            display.getPaint().setColor(Color.RED);
-//            display.getPaint().setStyle(Paint.Style.STROKE);
-//
-//            Rectangle boundingBox = getImages().filterType(Host.class).getBoundingBox();
-//            Display.drawPolygon(boundingBox.getVertices(), display);
-//            // </BOUNDING_BOX_LABEL>
-//        }
-//        // </DEBUG_LABEL>
 
         display.canvas.restore();
     }
