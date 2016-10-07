@@ -114,10 +114,10 @@ public class PathImage extends Image<Path> {
         paint.setStrokeWidth(15.0f);
         paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-        double pathRotation = Geometry.calculateRotationAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
+        double pathRotation = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
         double triangleRotation = pathRotation + 90.0f;
-        Point sourcePoint = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
-        Point targetPoint = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
+        Point sourcePoint = Geometry.rotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
+        Point targetPoint = Geometry.rotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
         if (dockVisibility.getValue() == Visibility.Value.VISIBLE) {
 
@@ -152,9 +152,9 @@ public class PathImage extends Image<Path> {
             paint.setStrokeWidth(15.0f);
             paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-            double pathRotationAngle = Geometry.calculateRotationAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-            Point pathStartCoordinate = Geometry.calculatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
-            Point pathStopCoordinate = Geometry.calculatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+            double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
+            Point pathStartCoordinate = Geometry.rotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
+            Point pathStopCoordinate = Geometry.rotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
             display.drawLine(pathStartCoordinate, pathStopCoordinate);
         }

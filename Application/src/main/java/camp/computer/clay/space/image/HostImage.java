@@ -1092,7 +1092,7 @@ public class HostImage extends PortableImage {
 //            extensionImage.getPosition().setY(0);
 //        }
 //
-//        //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
+//        //double extensionImageRotation = Geometry.getAngle(hostPortShape.getPosition(), extensionImage.getPosition());
 //        if (segmentIndex == 0) {
 //            extensionImage.setRotation(0);
 //        } else if (segmentIndex == 1) {
@@ -1203,7 +1203,7 @@ public class HostImage extends PortableImage {
                     extensionImage.getPosition().setY(0 + offset);
                 }
 
-                //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
+                //double extensionImageRotation = Geometry.getAngle(hostPortShape.getPosition(), extensionImage.getPosition());
                 if (segmentIndex == 0) {
                     extensionImage.setRotation(0);
                 } else if (segmentIndex == 1) {

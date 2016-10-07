@@ -36,7 +36,7 @@ public class Point {
      * Copy constructor. Creates a new {@code Point} object with properties identical to those of
      * {@code otherPoint}.
      *
-     * @param otherPoint The {@code Point} to set2.
+     * @param otherPoint The {@code Point} to set.
      */
     public Point(Point otherPoint) {
         this.x = otherPoint.x;
@@ -90,9 +90,16 @@ public class Point {
         this.y = y;
     }
 
-    public void set(Point otherPoint) {
-        this.x = otherPoint.x;
-        this.y = otherPoint.y;
+    /**
+     * @param point Absolute position. Converted to relative position internally.
+     */
+    public void set(Point point) {
+        x = point.x;
+        y = point.y;
+
+        rotation = point.rotation;
+
+        setReferencePoint(point.getReferencePoint());
     }
 
     /**
@@ -113,26 +120,11 @@ public class Point {
     }
 
     /**
-     * @param point Absolute position. Converted to relative position internally.
-     */
-    // TODO: Delete this!
-    public void set2(Point point) {
-        x = point.x;
-        y = point.y;
-
-        // <HACK?>
-        // TODO: Set these?
-        setReferencePoint(point.getReferencePoint());
-        rotation = point.rotation;
-        // </HACK?>
-    }
-
-    /**
      * @return Absolute x coordinate.
      */
     public double getAbsoluteX() {
         if (referencePoint != null) {
-            double absoluteX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            double absoluteX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.getAngle(0, 0, x, y)));
             return referencePoint.getAbsoluteX() + absoluteX;
         } else {
             return this.x;
@@ -155,7 +147,7 @@ public class Point {
      */
     public double getAbsoluteY() {
         if (referencePoint != null) {
-            double absoluteY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.calculateRotationAngle(0, 0, x, y)));
+            double absoluteY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.getAngle(0, 0, x, y)));
             return referencePoint.getAbsoluteY() + absoluteY;
         } else {
             return this.y;

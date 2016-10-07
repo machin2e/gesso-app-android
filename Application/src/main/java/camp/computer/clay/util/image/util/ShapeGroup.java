@@ -205,20 +205,16 @@ public class ShapeGroup extends Group<Shape> {
     }
 
     public Point getCenterPosition() {
-        return Geometry.calculateCenter(getPositions());
+        return Geometry.getCenterPoint(getPositions());
     }
 
 
     public Point getCentroidPosition() {
-        return Geometry.calculateCentroid(getPositions());
+        return Geometry.getCentroidPoint(getPositions());
     }
 
     public Rectangle getBoundingBox() {
-        return Geometry.calculateBoundingBox(getVertices());
-    }
-
-    public List<Point> getBoundingShape() {
-        return Geometry.computeConvexHull(getPositions());
+        return Geometry.getBoundingBox(getVertices());
     }
 
     /**

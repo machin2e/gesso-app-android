@@ -190,19 +190,15 @@ public class ImageGroup extends Group<Image> {
     }
 
     public Point getCenterPoint() {
-        return Geometry.calculateCenter(getPositions());
+        return Geometry.getCenterPoint(getPositions());
     }
 
     public Point getCentroidPoint() {
-        return Geometry.calculateCentroid(getPositions());
+        return Geometry.getCentroidPoint(getPositions());
     }
 
     public Rectangle getBoundingBox() {
-        return Geometry.calculateBoundingBox(getVertices());
-    }
-
-    public List<Point> getBoundingShape() {
-        return Geometry.computeConvexHull(getPositions());
+        return Geometry.getBoundingBox(getVertices());
     }
 
     /**

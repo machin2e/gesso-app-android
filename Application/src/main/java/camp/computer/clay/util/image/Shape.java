@@ -53,7 +53,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public Shape(Point position) {
-        this.position.set2(position);
+        this.position.set(position);
     }
 
     public void setImage(Image image) {
@@ -97,7 +97,7 @@ public abstract class Shape<T extends Entity> {
      * @see <a href="https://en.wikipedia.org/wiki/Minimum_bounding_box">Minimum bounding box</a>
      */
     public Rectangle getBoundingBox() {
-        return Geometry.calculateBoundingBox(getVertices());
+        return Geometry.getBoundingBox(getVertices());
     }
 
     abstract public List<Line> getSegments();

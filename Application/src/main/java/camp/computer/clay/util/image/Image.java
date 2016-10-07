@@ -300,12 +300,12 @@ public abstract class Image<T extends Entity> {
             }
         }
 
-        return Geometry.calculateBoundingBox(boundingBoxVertices);
+        return Geometry.getBoundingBox(boundingBoxVertices);
     }
 
     public double getRelativeAngle(Point point) {
 
-        double relativeAngle = Geometry.calculateRotationAngle(position, point);
+        double relativeAngle = Geometry.getAngle(position, point);
         if (relativeAngle < 0) {
             relativeAngle += 360.0;
         }

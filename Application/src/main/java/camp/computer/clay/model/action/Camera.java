@@ -108,9 +108,9 @@ public class Camera {
             //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
             this.targetPosition.set(-targetPosition.x, -targetPosition.y);
 
-            this.originalPosition.set2(targetPosition);
+            this.originalPosition.set(targetPosition);
 
-            this.position.set2(targetPosition);
+            this.position.set(targetPosition);
 
         } else {
 
@@ -124,7 +124,7 @@ public class Camera {
             this.targetPosition.set(-targetPosition.x, -targetPosition.y);
 
             // <PLAN_ANIMATION>
-            originalPosition.set2(position);
+            originalPosition.set(position);
 
             positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
@@ -170,7 +170,7 @@ public class Camera {
 
     public void adjustPosition() {
         List<Point> figurePositions = getSpace().getImages().filterType(Host.class, Extension.class).getPositions();
-        Point centerPosition = Geometry.calculateCenter(figurePositions);
+        Point centerPosition = Geometry.getCenterPoint(figurePositions);
         setPosition(centerPosition);
     }
 
@@ -286,8 +286,8 @@ public class Camera {
 
         // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
-        //Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
-        Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getVertices());
+        //Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
+        Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
         adjustScale(boundingBox);
         setPosition(boundingBox.getPosition());
@@ -328,7 +328,7 @@ public class Camera {
 
         // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
-        Rectangle boundingBox = Geometry.calculateBoundingBox(hostPathPortShapes.getPositions());
+        Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
         adjustScale(boundingBox);
         setPosition(boundingBox.getPosition());
@@ -346,13 +346,13 @@ public class Camera {
         ShapeGroup shapes = getSpace().getShapes(ports);
 
         List<Point> positions = shapes.getPositions();
-        Rectangle boundingBox = Geometry.calculateBoundingBox(positions);
+        Rectangle boundingBox = Geometry.getBoundingBox(positions);
 
         // Update Scale
         adjustScale(boundingBox);
 
         // Update Position
-        setPosition(Geometry.calculateCenter(positions));
+        setPosition(Geometry.getCenterPoint(positions));
     }
 
     public void setFocus(Space space) {

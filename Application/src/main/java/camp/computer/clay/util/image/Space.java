@@ -2,10 +2,6 @@ package camp.computer.clay.util.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
@@ -23,7 +19,6 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
-import camp.computer.clay.util.Probability;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.util.ImageGroup;
@@ -223,11 +218,9 @@ public class Space extends Image<Model> {
         }
 
         // Position the Image
-        // <HACK>
         if (image instanceof HostImage) {
-            adjustLayout(image);
+            adjustLayout();
         }
-        // </HACK>
 
         // Update Camera
         getEntity().getActor(0).getCamera().setFocus(getSpace());
@@ -236,70 +229,33 @@ public class Space extends Image<Model> {
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
 
     /**
-     * Automatically determines and assigns a valid position for the specified {@code Image}.
-     *
-     * @param image The {@code Image} for which the position will be adjusted.
+     * Automatically determines and assigns a valid position for all {@code Host} {@code Image}s.
      */
-    private void adjustLayout(Image image) {
-        int adjustmentMethod = 1;
+    private void adjustLayout() {
 
-        if (adjustmentMethod == 0) {
+        ImageGroup hostImages = getImages().filterType(Host.class);
 
-            // Calculate random positions separated by minimum distance
-            final float imageSeparationDistance = 550; // 500;
-
-            List<Point> imageCoordinates = getImages().filterType(Host.class).getPositions();
-
-            Point position = null;
-            boolean foundPoint = false;
-
-            Log.v("Coordinate", "imageCoordinates.size = " + imageCoordinates.size());
-
-            if (imageCoordinates.size() == 0) {
-                position = new Point(0, 0);
-            } else if (imageCoordinates.size() == 1) {
-                position = Geometry.calculatePoint(imageCoordinates.get(0), Probability.generateRandomInteger(0, 360), imageSeparationDistance);
-            } else {
-                List<Point> hullPoints = Geometry.computeConvexHull(imageCoordinates);
-
-                int sourceIndex = Probability.generateRandomInteger(0, hullPoints.size() - 1);
-                int targetIndex = sourceIndex + 1;
-
-                Point midpoint = Geometry.calculateMidpoint(hullPoints.get(sourceIndex), hullPoints.get(targetIndex));
-                position = Geometry.calculatePoint(midpoint, Geometry.calculateRotationAngle(hullPoints.get(sourceIndex), hullPoints.get(targetIndex)) + 90, imageSeparationDistance);
-            }
-
-            // Assign the found position to the image
-            image.setPosition(position);
-            image.setRotation(Probability.getRandomGenerator().nextInt(360));
+        // Set position
+        if (hostImages.size() == 1) {
+            hostImages.get(0).setPosition(new Point(0, 0));
+        } else if (hostImages.size() == 2) {
+            hostImages.get(0).setPosition(new Point(-300, 0));
+            hostImages.get(1).setPosition(new Point(300, 0));
+        } else if (hostImages.size() == 5) {
+            hostImages.get(0).setPosition(new Point(-300, -600));
+            hostImages.get(0).setRotation(0);
+            hostImages.get(1).setPosition(new Point(300, -600));
+            hostImages.get(1).setRotation(20);
+            hostImages.get(2).setPosition(new Point(-300, 0));
+            hostImages.get(2).setRotation(40);
+            hostImages.get(3).setPosition(new Point(300, 0));
+            hostImages.get(3).setRotation(60);
+            hostImages.get(4).setPosition(new Point(-300, 600));
+            hostImages.get(4).setRotation(80);
         }
 
-        if (adjustmentMethod == 1) {
-
-            ImageGroup imageCoordinates = getImages().filterType(Host.class);
-
-            // Set position
-            if (imageCoordinates.size() == 1) {
-                imageCoordinates.get(0).setPosition(new Point(0, 0));
-            } else if (imageCoordinates.size() == 2) {
-                imageCoordinates.get(0).setPosition(new Point(-300, 0));
-                imageCoordinates.get(1).setPosition(new Point(300, 0));
-            } else if (imageCoordinates.size() == 5) {
-                imageCoordinates.get(0).setPosition(new Point(-300, -600));
-                imageCoordinates.get(0).setRotation(0);
-                imageCoordinates.get(1).setPosition(new Point(300, -600));
-                imageCoordinates.get(1).setRotation(20);
-                imageCoordinates.get(2).setPosition(new Point(-300, 0));
-                imageCoordinates.get(2).setRotation(40);
-                imageCoordinates.get(3).setPosition(new Point(300, 0));
-                imageCoordinates.get(3).setRotation(60);
-                imageCoordinates.get(4).setPosition(new Point(-300, 600));
-                imageCoordinates.get(4).setRotation(80);
-            }
-
-            // Set rotation
-//            image.setRotation(Probability.getRandomGenerator().nextInt(360));
-        }
+        // Set rotation
+        // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
     /**
@@ -342,12 +298,6 @@ public class Space extends Image<Model> {
     }
 
     public ShapeGroup getShapes() {
-//        ShapeGroup shapeGroup = new ShapeGroup();
-//        ImageGroup imageList = getImages();
-//        for (int i = 0; i < imageList.size(); i++) {
-//            shapeGroup.add(imageList.get(i).getShapes());
-//        }
-//        return shapeGroup;
         return images.getShapes();
     }
 
@@ -379,36 +329,16 @@ public class Space extends Image<Model> {
         return this.entity;
     }
 
-    // TODO: Delete this! It is redundant...
-    public static <T extends Image> List<Point> getPositions(List<T> images) {
-        List<Point> positions = new ArrayList<>();
-        for (int i = 0; i < images.size(); i++) {
-            T figure = images.get(i);
-            positions.add(figure.getPosition());
-        }
-        return positions;
-    }
+    @Override
+    public void update() {
 
-    public void doUpdate() {
-
-        // Update perspective
-        getEntity().getActor(0).getCamera().update();
-
-//        Log.v("Images", "doUpdate: " + images.size());
+        // Update Images
         for (int i = 0; i < images.size(); i++) {
             images.get(i).update();
         }
 
-//        // Sort Images by increasing layer index
-//        for (int layerIndex = -10; layerIndex < 10; layerIndex++) { // HACK...
-//            for (int i = 0; i < images.size(); i++) {
-//                if (images.get(i).layerIndex == layerIndex) {
-//                }
-//            }
-//        }
-
-        // Update figure layout
-        // Geometry.computeCirclePacking(getImages().filterType(HostImage.class, ExtensionImage.class).getList(), 200, getImages().filterType(HostImage.class, ExtensionImage.class).getCentroidPosition());
+        // Update Camera
+        getEntity().getActor(0).getCamera().update();
     }
 
     @Override
@@ -433,7 +363,7 @@ public class Space extends Image<Model> {
 
             Paint paint = display.getPaint();
 
-            double pathRotationAngle = Geometry.calculateRotationAngle(pathPrototypeSourcePosition, extensionPrototypePosition);
+            double pathRotationAngle = Geometry.getAngle(pathPrototypeSourcePosition, extensionPrototypePosition);
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#fff7f7f7"));
@@ -457,18 +387,18 @@ public class Space extends Image<Model> {
             paint.setStrokeWidth(15.0f);
 //            paint.setColor(this.getUniqueColor());
 
-            double pathRotationAngle = Geometry.calculateRotationAngle(
+            double pathRotationAngle = Geometry.getAngle(
                     pathPrototypeSourcePosition,
                     pathPrototypeDestinationCoordinate
             );
 
-            Point pathStartCoordinate = Geometry.calculatePoint(
+            Point pathStartCoordinate = Geometry.rotateTranslatePoint(
                     pathPrototypeSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
-            Point pathStopCoordinate = Geometry.calculatePoint(
+            Point pathStopCoordinate = Geometry.rotateTranslatePoint(
                     pathPrototypeDestinationCoordinate,
                     pathRotationAngle + 180,
                     2 * triangleSpacing
@@ -494,15 +424,15 @@ public class Space extends Image<Model> {
     }
 
     public void setPathPrototypeSourcePosition(Point position) {
-        this.pathPrototypeSourcePosition.set2(position);
+        this.pathPrototypeSourcePosition.set(position);
     }
 
     public void setPathPrototypeDestinationPosition(Point position) {
-        this.pathPrototypeDestinationCoordinate.set2(position);
+        this.pathPrototypeDestinationCoordinate.set(position);
     }
 
     public void setExtensionPrototypePosition(Point position) {
-        this.extensionPrototypePosition.set2(position);
+        this.extensionPrototypePosition.set(position);
     }
 
     public void setExtensionPrototypeVisibility(Visibility.Value visibility) {

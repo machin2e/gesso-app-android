@@ -244,7 +244,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Update
 //        parentSpace.update();
-        space.doUpdate();
+        space.update();
 
         SurfaceHolder holder = getHolder();
 
@@ -682,7 +682,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight) {
 
-        double pathRotationAngle = Geometry.calculateRotationAngle(startPosition, stopPosition);
+        double pathRotationAngle = Geometry.getAngle(startPosition, stopPosition);
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
@@ -694,7 +694,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         for (int k = 0; k <= triangleCount; k++) {
 
             // Calculate triangle position
-            Point triangleCenterPosition2 = Geometry.calculatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
+            Point triangleCenterPosition2 = Geometry.rotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
 
             paint.setStyle(Paint.Style.FILL);
             drawTriangle(triangleCenterPosition2, triangleRotationAngle, triangleWidth, triangleHeight);
@@ -772,9 +772,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Point p3 = new Point(position.x + (width / 2.0f), position.y + (height / 2.0f));
 
         // Calculate pointerCoordinates after rotation
-        Point rp1 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p1), Geometry.calculateDistance(position, p1));
-        Point rp2 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p2), Geometry.calculateDistance(position, p2));
-        Point rp3 = Geometry.calculatePoint(position, angle + Geometry.calculateRotationAngle(position, p3), Geometry.calculateDistance(position, p3));
+        Point rp1 = Geometry.rotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.calculateDistance(position, p1));
+        Point rp2 = Geometry.rotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.calculateDistance(position, p2));
+        Point rp3 = Geometry.rotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.calculateDistance(position, p3));
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
