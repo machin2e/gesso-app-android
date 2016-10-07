@@ -101,7 +101,7 @@ public abstract class Image<T extends Entity> {
     }
 
     public double getRotation() {
-        return this.position.getAbsoluteRotation();
+        return this.position.rotation;
     }
 
     public double getScale() {
@@ -109,7 +109,7 @@ public abstract class Image<T extends Entity> {
     }
 
     public void setPosition(Point position) {
-        this.position.setAbsolute(position.getAbsoluteX(), position.getAbsoluteY());
+        this.position.set(position.x, position.y);
     }
 
     public void setRotation(double angle) {
@@ -226,11 +226,7 @@ public abstract class Image<T extends Entity> {
 
     public void update() {
 
-        position.update();
-
-//        Log.v("OnUpdate", "Image.update " + shapes.size());
         for (int i = 0; i < this.shapes.size(); i++) {
-//            Log.v("OnUpdate", "Image.update " + shapes.get(i));
             this.shapes.get(i).update();
         }
     }

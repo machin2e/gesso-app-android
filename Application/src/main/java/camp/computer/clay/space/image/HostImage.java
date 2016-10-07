@@ -1,8 +1,6 @@
 package camp.computer.clay.space.image;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -1246,6 +1244,7 @@ public class HostImage extends PortableImage {
                     (float) position.y
             );
 
+            /*
             // <HACK>
             display.paint.setStyle(Paint.Style.FILL);
             display.paint.setColor(Color.GREEN);
@@ -1277,6 +1276,7 @@ public class HostImage extends PortableImage {
                     display.paint
             );
             // </HACK>
+            */
 
             canvas.rotate((float) position.rotation);
 
@@ -1285,6 +1285,7 @@ public class HostImage extends PortableImage {
                 shapes.get(i).draw(display);
             }
 
+            /*
             // <HACK>
             display.paint.setStyle(Paint.Style.FILL);
             display.paint.setColor(Color.RED);
@@ -1304,6 +1305,7 @@ public class HostImage extends PortableImage {
                     display.paint
             );
             // </HACK>
+            */
 
 //            // Labels
 //            if (Application.ENABLE_GEOMETRY_LABELS) {

@@ -242,7 +242,7 @@ public abstract class Geometry {
         for (int i = 0; i < points.size(); i++) {
             double distance = calculateDistance(points.get(i), point);
             if (distance < nearestDistance) {
-                nearestPoint.copy(point);
+                nearestPoint.set2(point);
             }
         }
 

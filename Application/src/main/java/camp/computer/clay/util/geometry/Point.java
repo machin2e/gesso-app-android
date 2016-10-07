@@ -36,7 +36,7 @@ public class Point {
      * Copy constructor. Creates a new {@code Point} object with properties identical to those of
      * {@code otherPoint}.
      *
-     * @param otherPoint The {@code Point} to copy.
+     * @param otherPoint The {@code Point} to set2.
      */
     public Point(Point otherPoint) {
         this.x = otherPoint.x;
@@ -115,7 +115,8 @@ public class Point {
     /**
      * @param point Absolute position. Converted to relative position internally.
      */
-    public void copy(Point point) {
+    // TODO: Delete this!
+    public void set2(Point point) {
         x = point.x;
         y = point.y;
 
@@ -124,18 +125,6 @@ public class Point {
         setReferencePoint(point.getReferencePoint());
         rotation = point.rotation;
         // </HACK?>
-    }
-
-    public void update() {
-    }
-
-    /**
-     * @param x Absolute x coordinate. Converted to relative coordinate internally.
-     * @param y Absolute y coordinate. Converted to relative coordinate internally.
-     */
-    public void setAbsolute(double x, double y) {
-        setAbsoluteX(x);
-        setAbsoluteY(y);
     }
 
     /**

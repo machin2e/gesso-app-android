@@ -108,9 +108,9 @@ public class Camera {
             //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
             this.targetPosition.set(-targetPosition.x, -targetPosition.y);
 
-            this.originalPosition.copy(targetPosition);
+            this.originalPosition.set2(targetPosition);
 
-            this.position.copy(targetPosition);
+            this.position.set2(targetPosition);
 
         } else {
 
@@ -124,7 +124,7 @@ public class Camera {
             this.targetPosition.set(-targetPosition.x, -targetPosition.y);
 
             // <PLAN_ANIMATION>
-            originalPosition.copy(position);
+            originalPosition.set2(position);
 
             positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit

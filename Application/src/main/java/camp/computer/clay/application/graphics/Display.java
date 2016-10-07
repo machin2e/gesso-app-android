@@ -614,7 +614,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         // canvas.rotate((float) rectangle.getAbsoluteRotation());
-        canvas.rotate((float) rectangle.getPosition().rotation);
+        canvas.rotate((float) rectangle.getRotation());
         // </Shape>
 
         /*

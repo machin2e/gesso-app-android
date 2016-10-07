@@ -20,6 +20,7 @@ public abstract class Shape<T extends Entity> {
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
+    public Point offset = new Point(0, 0);
     protected Point position = new Point(0, 0);
 
     protected String color = "#fff7f7f7";
@@ -52,7 +53,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public Shape(Point position) {
-        this.position.copy(position);
+        this.position.set2(position);
     }
 
     public void setImage(Image image) {
@@ -72,11 +73,11 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void setPosition(double x, double y) {
-        this.position.setAbsolute(x, y);
+        this.position.set(x, y);
     }
 
     public void setPosition(Point point) {
-        this.position.setAbsolute(point.getAbsoluteX(), point.getAbsoluteY());
+        this.position.set(point.x, point.y);
     }
 
     public void setRotation(double angle) {
@@ -84,15 +85,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public double getRotation() {
-        return this.position.getAbsoluteRotation();
-    }
-
-    public void setReferencePoint(Point point) {
-        this.position.setReferencePoint(point);
-    }
-
-    public Point getReferencePoint() {
-        return this.position.getReferencePoint();
+        return this.position.rotation;
     }
 
     abstract public List<Point> getVertices();
@@ -191,8 +184,6 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void update() {
-
-        position.update();
 
         //Log.v("OnUpdate", "Shape.update");
         if (onUpdateListener != null) {

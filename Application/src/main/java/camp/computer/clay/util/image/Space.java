@@ -391,8 +391,6 @@ public class Space extends Image<Model> {
 
     public void doUpdate() {
 
-        position.update();
-
         // Update perspective
         getEntity().getActor(0).getCamera().update();
 
@@ -496,15 +494,15 @@ public class Space extends Image<Model> {
     }
 
     public void setPathPrototypeSourcePosition(Point position) {
-        this.pathPrototypeSourcePosition.copy(position);
+        this.pathPrototypeSourcePosition.set2(position);
     }
 
     public void setPathPrototypeDestinationPosition(Point position) {
-        this.pathPrototypeDestinationCoordinate.copy(position);
+        this.pathPrototypeDestinationCoordinate.set2(position);
     }
 
     public void setExtensionPrototypePosition(Point position) {
-        this.extensionPrototypePosition.copy(position);
+        this.extensionPrototypePosition.set2(position);
     }
 
     public void setExtensionPrototypeVisibility(Visibility.Value visibility) {

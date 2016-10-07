@@ -55,7 +55,7 @@ public class Action {
                     Event event = new Event();
                     event.setType(Event.Type.HOLD);
                     event.pointerIndex = getFirstEvent().pointerIndex;
-                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just copy the previous event's since this is a synthetic event?)
+                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set2 the previous event's since this is a synthetic event?)
                     getFirstEvent().getActor().processAction(event);
 
                     isHolding[pointerIndex] = true;
