@@ -24,6 +24,8 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     protected Point bottomLeft = new Point(getRelativeLeft(), getRelativeBottom(), position);
 
     List<Point> vertices = new ArrayList<>();
+
+    ArrayList<Line> segments = new ArrayList<>();
     // </CACHED_OBJECTS>
 
     public Rectangle(T entity) {
@@ -59,8 +61,8 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     protected void updateCache() {
 
-        // Update {@code vertices}
-        if (vertices.size() < 4) {
+        // Update vertices
+        if (vertices.size() == 0) {
             vertices.add(getTopLeft());
             vertices.add(getTopRight());
             vertices.add(getBottomRight());
@@ -71,6 +73,14 @@ public class Rectangle<T extends Entity> extends Shape<T> {
             vertices.set(2, getBottomRight());
             vertices.set(3, getBottomLeft());
         }
+
+        // Update segments
+        if (segments.size() == 0) {
+            segments.add(new Line(topLeft, topRight));
+            segments.add(new Line(topRight, bottomRight));
+            segments.add(new Line(bottomRight, bottomLeft));
+            segments.add(new Line(bottomLeft, topLeft));
+        }
     }
 
     public List<Point> getVertices() {
@@ -78,11 +88,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public List<Line> getSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        segments.add(new Line(topLeft, topRight));
-        segments.add(new Line(topRight, bottomRight));
-        segments.add(new Line(bottomRight, bottomLeft));
-        segments.add(new Line(bottomLeft, topLeft));
         return segments;
     }
 

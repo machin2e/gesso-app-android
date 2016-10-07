@@ -2,11 +2,12 @@ package camp.computer.clay.model;
 
 import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.model.util.PathGroup;
+import camp.computer.clay.model.util.PortGroup;
 
 public class Portable extends Entity {
     private PortableProfile profile = null;
 
-    protected Group<Port> ports = new Group<>();
+    protected PortGroup ports = new PortGroup();
 
     public Portable() {
 
@@ -39,7 +40,7 @@ public class Portable extends Entity {
         return this.ports.get(index);
     }
 
-    public Group<Port> getPorts() {
+    public PortGroup getPorts() {
         return this.ports;
     }
 
@@ -47,7 +48,7 @@ public class Portable extends Entity {
         PathGroup paths = new PathGroup();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
-            paths.add(port.getForwardPaths());
+            paths.addAll(port.getForwardPaths());
         }
         return paths;
     }
@@ -71,7 +72,7 @@ public class Portable extends Entity {
 
             Extension extension = port.getExtension();
 
-            if (extension != null) {
+            if (extension != null && !extensions.contains(extension)) {
                 extensions.add(extension);
             }
 

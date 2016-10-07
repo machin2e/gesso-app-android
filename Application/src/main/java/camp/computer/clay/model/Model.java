@@ -50,7 +50,7 @@ public class Model extends Entity {
         Group<Port> ports = new Group<>();
         for (int i = 0; i < this.hosts.size(); i++) {
             Host host = this.hosts.get(i);
-            ports.add(host.getPorts());
+            ports.addAll(host.getPorts());
         }
         return ports;
     }
@@ -61,7 +61,7 @@ public class Model extends Entity {
             Host host = this.hosts.get(i);
             for (int j = 0; j < host.getPorts().size(); j++) {
                 Port port = host.getPorts().get(j);
-                paths.add(port.getForwardPaths());
+                paths.addAll(port.getForwardPaths());
             }
         }
         return paths;

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -34,7 +33,6 @@ import java.io.InputStream;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.application.communication.UDPHost;
-import camp.computer.clay.application.communication.redis.RedisSubThread;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.sound.SpeechOutput;
@@ -45,7 +43,6 @@ import camp.computer.clay.host.Internet;
 import camp.computer.clay.model.Extension;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
-import redis.clients.jedis.Jedis;
 
 public class Application extends FragmentActivity implements DisplayHostInterface { // was Application
     // rename Application to Setup? to provide analog to "setup" functions in classes?
@@ -616,82 +613,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //        ).start();
         // </REDIS>
     }
-
-    // <REDIS>
-    private Jedis jedis;
-
-    public class JedisConnectToDatabaseTask extends AsyncTask<String, Void, Void> {
-
-        private Exception exception;
-
-        protected Void doInBackground(String... args) {
-            try {
-                String uri = args[0].split(":")[0];
-                int port = Integer.parseInt(args[0].split(":")[1]);
-                Log.v("Redis", "Jedis Task");
-                //jedis = new Jedis("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com", 14268);
-                jedis = new Jedis(uri, port);
-                jedis.auth("testdb");
-                jedis.set("foo", "bar");
-                String value = jedis.get("foo");
-                Log.v("Redis", "foo: " + value);
-
-//                jedis.publish("events", args[0]);
-//                Log.v("Redis", "called publish");
-
-                new Thread(new RedisSubThread(jedis)).start();
-
-                //return theRSSHandler.getFeed();
-                return null;
-            } catch (Exception e) {
-                this.exception = e;
-
-                return null;
-            }
-        }
-
-        protected void onPostExecute(Void feed) {
-            // TODO: check this.exception
-            // TODO: do something with the feed
-        }
-    }
-
-    public void publish(String message) {
-        new JedisPublishTask().execute(message);
-    }
-
-    class JedisPublishTask extends AsyncTask<String, Void, Void> {
-
-        private Exception exception;
-
-        protected Void doInBackground(String... urls) {
-            try {
-//                Log.v("Jedis", "Jedis Task");
-//                Jedis jedis = new Jedis("pub-redis-14268.us-east-1-3.3.ec2.garantiadata.com", 14268);
-//                jedis.auth("testdb");
-//                jedis.setValue("foo", "bar");
-//                String value = jedis.get("foo");
-//                Log.v("Jedis", "foo: " + value);
-
-                jedis.publish("events", urls[0]);
-                Log.v("Redis", "called publish");
-
-                //return theRSSHandler.getFeed();
-                return null;
-            } catch (Exception e) {
-                this.exception = e;
-
-                return null;
-            }
-        }
-
-        protected void onPostExecute(Void feed) {
-            // TODO: check this.exception
-            // TODO: do something with the feed
-        }
-
-    }
-    // </REDIS>
 
     public void hideChat() {
         // <CHAT_AND_CONTEXT_SCOPE>

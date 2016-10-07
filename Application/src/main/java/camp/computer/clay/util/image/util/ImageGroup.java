@@ -183,7 +183,7 @@ public class ImageGroup extends Group<Image> {
         ShapeGroup shapeGroup = new ShapeGroup();
 
         for (int i = 0; i < this.elements.size(); i++) {
-            shapeGroup.add(this.elements.get(i).getShapes());
+            shapeGroup.addAll(this.elements.get(i).getShapes());
         }
 
         return shapeGroup;

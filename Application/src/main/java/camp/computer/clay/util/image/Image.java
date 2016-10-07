@@ -182,7 +182,7 @@ public abstract class Image<T extends Entity> {
 
     public ShapeGroup getShapes() {
         ShapeGroup shapeGroup = new ShapeGroup();
-        shapeGroup.add(this.shapes);
+        shapeGroup.addAll(this.shapes);
         return shapeGroup;
     }
 

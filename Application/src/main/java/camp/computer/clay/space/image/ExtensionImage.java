@@ -1,13 +1,11 @@
 package camp.computer.clay.space.image;
 
 import android.graphics.Canvas;
-import android.util.Log;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.model.Extension;
-import camp.computer.clay.model.Host;
 import camp.computer.clay.model.Path;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.action.Action;
@@ -183,7 +181,7 @@ public class ExtensionImage extends PortableImage {
         }
 
         // <HACK>
-        routePaths();
+        updatePathRoutes();
         // </HACK>
 
         super.update();
@@ -295,64 +293,23 @@ public class ExtensionImage extends PortableImage {
         }
     }
 
-    private void routePaths() {
+    private void updatePathRoutes() {
 
         // TODO: Get position around "halo" around Host based on rect (a surrounding/containing rectangle) or circular (a surrounding/containing circle) layout algo and set so they don't overlap. Mostly set X to prevent overlap, then run the router and push back the halo distance for that side of the Host, if/as necessary
 
         // <HACK>
-        adjustPosition();
+//        updateExtensionLayout();
         // </HACK>
 
+        // TODO: !!!!!!!!!!!! Start Thursday by adding corner/turtle turn "nodes" that extend straight out from
+
         // TODO: only route paths with turtle graphics maneuvers... so paths are square btwn Host and Extension
-    }
 
-    public double distanceToHost = 500;
+        // TODO: Goal: implement Ben's demo (input on one Host to analog output on another Host, with diff components)
 
-    // TODO: Refactor this... it's really dumb right now.
-    public void adjustPosition() {
+        ///// TODO: Add label/title to Path, too. ADD OPTION TO FLAG ENTITIES WITH A QUESTION, OR JUST ASK QUESTION/ADD TODO DIRECTLY THERE! ANNOTATE STRUCTURE WITH DESCRIPTIVE/CONTEXTUAL METADATA.
 
-        if (getExtension().getHost().size() == 0) {
-            return;
-        }
-
-        Host host = getExtension().getHost().get(0);
-        Log.v("pathsource", "host: " + host);
-        HostImage hostImage = (HostImage) parentSpace.getImage(host);
-        int segmentIndex = hostImage.getHeaderIndex(getPosition());
-        Log.v("pathsource", "segmentIndex: " + segmentIndex);
-
-        // <REFACTOR>
-        // Update the Extension Image position and rotation
-        //extensionImage.setPosition(event.getPosition());
-        if (segmentIndex == 0) {
-            getPosition().setReferencePoint(hostImage.getPosition());
-            getPosition().setX(0);
-            getPosition().setY(-distanceToHost);
-        } else if (segmentIndex == 1) {
-            getPosition().setReferencePoint(hostImage.getPosition());
-            getPosition().setX(distanceToHost);
-            getPosition().setY(0);
-        } else if (segmentIndex == 2) {
-            getPosition().setReferencePoint(hostImage.getPosition());
-            getPosition().setX(0);
-            getPosition().setY(distanceToHost);
-        } else if (segmentIndex == 3) {
-            getPosition().setReferencePoint(hostImage.getPosition());
-            getPosition().setX(-distanceToHost);
-            getPosition().setY(0);
-        }
-
-        //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
-        if (segmentIndex == 0) {
-            setRotation(0);
-        } else if (segmentIndex == 1) {
-            setRotation(90);
-        } else if (segmentIndex == 2) {
-            setRotation(180);
-        } else if (segmentIndex == 3) {
-            setRotation(270);
-        }
-        // </REFACTOR>
+        // TODO: Animate movement of Extensions when "extension halo" expands or contracts (breathes)
     }
 
     public void draw(Display display) {

@@ -374,7 +374,12 @@ public class Camera {
         ImageGroup extensionImages = this.space.getImages(Extension.class);
         for (int i = 0; i < extensionImages.size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-            extensionImage.distanceToHost = 300;
+
+            if (extensionImage.getExtension().getHost().size() > 0) {
+                Host host = extensionImage.getExtension().getHost().get(0);
+                HostImage hostImage = (HostImage) getSpace().getImage(host);
+                hostImage.setExtensionDistance(300);
+            }
         }
         // </HACK>
 

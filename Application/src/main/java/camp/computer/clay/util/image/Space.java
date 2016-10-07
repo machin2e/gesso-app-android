@@ -357,7 +357,7 @@ public class Space extends Image<Model> {
         ImageGroup imageList = getImages();
 
         for (int i = 0; i < imageList.size(); i++) {
-            shapeGroup.add(imageList.get(i).getShapes(entityTypes));
+            shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
         }
 
         return shapeGroup.filterType(entityTypes);

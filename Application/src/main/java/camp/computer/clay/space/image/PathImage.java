@@ -11,6 +11,7 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
@@ -180,7 +181,12 @@ public class PathImage extends Image<Path> {
             // Draw connection between Ports
             display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
             display.getPaint().setStrokeWidth(10.0f);
-            display.drawLine(hostConnectorPosition, extensionConnectorPosition);
+//            display.drawLine(hostConnectorPosition, extensionConnectorPosition);
+
+            Polyline polyline = new Polyline();
+            polyline.addVertex(hostConnectorPosition);
+            polyline.addVertex(extensionConnectorPosition);
+            display.drawPolyline(polyline);
         }
     }
 }

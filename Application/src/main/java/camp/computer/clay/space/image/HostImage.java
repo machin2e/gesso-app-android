@@ -1,6 +1,8 @@
 package camp.computer.clay.space.image;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.PortableProfile;
 import camp.computer.clay.model.util.PathGroup;
+import camp.computer.clay.model.util.PortGroup;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Line;
@@ -35,6 +38,8 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class HostImage extends PortableImage {
 
+    public List<List<Extension>> extensionAxes = new ArrayList<>();
+
     public HostImage(Host host) {
         super(host);
         setup();
@@ -43,6 +48,11 @@ public class HostImage extends PortableImage {
     private void setup() {
         setupShapes();
         setupActions();
+
+        extensionAxes.add(new ArrayList<Extension>());
+        extensionAxes.add(new ArrayList<Extension>());
+        extensionAxes.add(new ArrayList<Extension>());
+        extensionAxes.add(new ArrayList<Extension>());
     }
 
     private void setupShapes() {
@@ -465,11 +475,7 @@ public class HostImage extends PortableImage {
                                                     // <HACK>
                                                     // TODO: Replace ASAP. This is shit.
                                                     // TODO: Use "rectangle" or "circular" extension layout algorithms
-                                                    ImageGroup extensionImages = parentSpace.getImages(getHost().getExtensions());
-                                                    for (int i = 0; i < extensionImages.size(); i++) {
-                                                        ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-                                                        extensionImage.distanceToHost = 500;
-                                                    }
+                                                    setExtensionDistance(500);
                                                     // </HACK>
                                                 }
 
@@ -513,7 +519,7 @@ public class HostImage extends PortableImage {
 
                                                 if (portableProfiles.size() == 0) {
 
-                                                    // Show "default" DIY extension builder (or info about there being no extensions)
+                                                    // Show "default" DIY extension builder (or info about there being no extensionAxes)
 
                                                 } else if (portableProfiles.size() > 0) {
 
@@ -876,8 +882,8 @@ public class HostImage extends PortableImage {
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
-        int headerIndex = getHeaderIndex(initialPosition);
-        extensionImage.adjustPosition();
+//        int headerIndex = getHeaderIndex(initialPosition);
+//        updateExtensionLayout(extensionImage)
         // </REFACTOR>
 
         // Configure Host's Port (i.e., the Path's source Port)
@@ -930,6 +936,8 @@ public class HostImage extends PortableImage {
         parentSpace.getShapes(paths.getPorts()).setVisibility(Visibility.Value.VISIBLE);
         parentSpace.getImages(paths).setVisibility(Visibility.Value.VISIBLE);
 
+        updateExtensionLayout();
+
         return extension;
     }
 
@@ -953,8 +961,8 @@ public class HostImage extends PortableImage {
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
-        int headerIndex = getHeaderIndex(initialPosition);
-        extensionImage.adjustPosition();
+//        int headerIndex = getHeaderIndex(initialPosition);
+//        extensionImage.adjustPgetHeaderIndeosition();
         // </REFACTOR>
 
         // Automatically select, connect paths to, and configure the Host's Ports
@@ -993,33 +1001,77 @@ public class HostImage extends PortableImage {
             parentSpace.addEntity(path);
         }
 
+        updateExtensionLayout();
+
         return extension;
     }
 
     // TODO: Remove this?
-    public int getHeaderIndex(Point point) {
+    public int getHeaderIndex(ExtensionImage extensionImage) {
+
+        int[] indexCounts = new int[4];
+        for (int i = 0; i < indexCounts.length; i++) {
+            indexCounts[i] = 0;
+        }
+
         Shape boardShape = getShape("Substrate");
-        // Line nearestSegment = null;
         int segmentIndex = -1;
-        List<Line> boardShapeSegments = boardShape.getSegments();
-        double distanceToSegmentMidpoint = Double.MAX_VALUE;
-        for (int i = 0; i < boardShapeSegments.size(); i++) {
-            Line segment = boardShapeSegments.get(i);
-            Point midpoint = segment.getMidpoint();
-            double distance = Geometry.calculateDistance(point, midpoint);
-            if (distance < distanceToSegmentMidpoint) {
-                distanceToSegmentMidpoint = distance;
-                // nearestSegment = segment;
+        List<Line> hostShapeSegments = boardShape.getSegments();
+
+        PortGroup extensionPorts = extensionImage.getExtension().getPorts();
+        for (int j = 0; j < extensionPorts.size(); j++) {
+
+            Port extensionPort = extensionPorts.get(j);
+
+            if (extensionPort == null) {
+                continue;
+            }
+
+            if (extensionPort.getPaths().size() == 0 || extensionPort.getPaths().get(0) == null) {
+                continue;
+            }
+
+            Port hostPort = extensionPort.getPaths().get(0).getHostPort(); // HACK b/c using index 0
+
+            Log.v("Counts", "host port: " + hostPort);
+
+            Point hostPortPosition = parentSpace.getShape(hostPort).getPosition();
+
+
+            double minDistance = Double.MAX_VALUE;
+            int nearestSegmentIndex = 0;
+            for (int i = 0; i < hostShapeSegments.size(); i++) {
+
+                Line segment = hostShapeSegments.get(i);
+                Point segmentMidpoint = segment.getMidpoint();
+
+                double distance = Geometry.calculateDistance(hostPortPosition, segmentMidpoint);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestSegmentIndex = i;
+                }
+            }
+
+            indexCounts[nearestSegmentIndex]++;
+        }
+
+        // Get the segment with the most counts
+        segmentIndex = 0;
+        for (int i = 0; i < indexCounts.length; i++) {
+            Log.v("Counts", "segment count " + i + ": " + indexCounts[i]);
+            if (indexCounts[i] > indexCounts[segmentIndex]) {
                 segmentIndex = i;
             }
         }
+
         return segmentIndex;
     }
 
 //    public double distanceToHost = 500;
 //
 //    // TODO: Refactor this... it's really dumb right now.
-//    private void adjustPosition(ExtensionImage extensionImage, int segmentIndex) {
+//    private void updateExtensionLayout(ExtensionImage extensionImage, int segmentIndex) {
 //
 //        // <REFACTOR>
 //        // Update the Extension Image position and rotation
@@ -1080,7 +1132,6 @@ public class HostImage extends PortableImage {
             lightShapeGroup.get(i).setColor(portShape.getColor());
         }
 
-
 //        // <HACK>
 //        // TODO: Move into Shape base class
 //        for (int i = 0; i < shapes.size(); i++) {
@@ -1089,6 +1140,98 @@ public class HostImage extends PortableImage {
 //        // </HACK>
 
         super.update();
+    }
+
+    protected double distanceToHost = 500;
+
+    public void setExtensionDistance(double distance) {
+        distanceToHost = distance;
+        updateExtensionLayout();
+    }
+
+    public void updateExtensionLayout() {
+
+        Group<Extension> extensions = getHost().getExtensions();
+        Log.v("ExtensionCount", "extensions: " + extensions.size());
+
+        // Reset current layout
+        for (int i = 0; i < extensionAxes.size(); i++) {
+            extensionAxes.get(i).clear();
+        }
+
+        // Update each Extension's position
+        for (int i = 0; i < extensions.size(); i++) {
+            Extension extension = extensions.get(i);
+            updateExtensionSegmentIndex(extension);
+        }
+
+        for (int segmentIndex = 0; segmentIndex < extensionAxes.size(); segmentIndex++) {
+
+            for (int extensionIndex = 0; extensionIndex < extensionAxes.get(segmentIndex).size(); extensionIndex++) {
+
+                Extension extension = extensionAxes.get(segmentIndex).get(extensionIndex);
+                ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
+
+                if (extensionImage == null) {
+                    continue;
+                }
+
+//            extensionImage.adjustPosition();
+
+                final double extensionSeparationDistance = 25.0;
+                double extensionWidth = 200;
+                int extensionCount = extensionAxes.get(segmentIndex).size();
+                Log.v("ExtensionCount", "extension count: " + extensionCount);
+                double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
+
+                // <REFACTOR>
+                // Update the Extension Image position and rotation
+                //extensionImage.setPosition(event.getPosition());
+                if (segmentIndex == 0) {
+                    extensionImage.getPosition().setReferencePoint(getPosition());
+                    extensionImage.getPosition().setX(0 + offset);
+                    extensionImage.getPosition().setY(-distanceToHost);
+                } else if (segmentIndex == 1) {
+                    extensionImage.getPosition().setReferencePoint(getPosition());
+                    extensionImage.getPosition().setX(distanceToHost);
+                    extensionImage.getPosition().setY(0 + offset);
+                } else if (segmentIndex == 2) {
+                    extensionImage.getPosition().setReferencePoint(getPosition());
+                    extensionImage.getPosition().setX(0 + offset);
+                    extensionImage.getPosition().setY(distanceToHost);
+                } else if (segmentIndex == 3) {
+                    extensionImage.getPosition().setReferencePoint(getPosition());
+                    extensionImage.getPosition().setX(-distanceToHost);
+                    extensionImage.getPosition().setY(0 + offset);
+                }
+
+                //double extensionImageRotation = Geometry.calculateRotationAngle(hostPortShape.getPosition(), extensionImage.getPosition());
+                if (segmentIndex == 0) {
+                    extensionImage.setRotation(0);
+                } else if (segmentIndex == 1) {
+                    extensionImage.setRotation(90);
+                } else if (segmentIndex == 2) {
+                    extensionImage.setRotation(180);
+                } else if (segmentIndex == 3) {
+                    extensionImage.setRotation(270);
+                }
+                // </REFACTOR>
+            }
+        }
+    }
+
+    // TODO: Refactor this... it's really dumb right now.
+    public void updateExtensionSegmentIndex(Extension extension) {
+
+        ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
+
+        if (extensionImage == null || extension.getHost().size() == 0) {
+            return;
+        }
+
+        int segmentIndex = getHeaderIndex(extensionImage);
+
+        extensionAxes.get(segmentIndex).add(extension);
     }
 
     public void draw(Display display) {
@@ -1103,12 +1246,64 @@ public class HostImage extends PortableImage {
                     (float) position.y
             );
 
+            // <HACK>
+            display.paint.setStyle(Paint.Style.FILL);
+            display.paint.setColor(Color.GREEN);
+            display.paint.setStrokeWidth(2.0f);
+            display.canvas.drawLine(
+                    (float) 0,
+                    (float) 0,
+                    (float) 250,
+                    (float) 0,
+                    display.paint
+            );
+
+            display.canvas.drawText(
+                    "0°",
+                    260,
+                    13,
+                    display.paint
+            );
+
+            display.paint.setStyle(Paint.Style.STROKE);
+            display.canvas.drawArc(
+                    -250,
+                    -250,
+                    250,
+                    250,
+                    0,
+                    (float) position.rotation,
+                    false,
+                    display.paint
+            );
+            // </HACK>
+
             canvas.rotate((float) position.rotation);
 
             // Color
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);
             }
+
+            // <HACK>
+            display.paint.setStyle(Paint.Style.FILL);
+            display.paint.setColor(Color.RED);
+            display.paint.setStrokeWidth(2.0f);
+            display.canvas.drawLine(
+                    (float) 0,
+                    (float) 0,
+                    (float) 250,
+                    (float) 0,
+                    display.paint
+            );
+
+            display.canvas.drawText(
+                    "0°",
+                    260,
+                    13,
+                    display.paint
+            );
+            // </HACK>
 
 //            // Labels
 //            if (Application.ENABLE_GEOMETRY_LABELS) {

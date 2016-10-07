@@ -23,6 +23,7 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Polygon;
+import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Triangle;
 import camp.computer.clay.util.image.Space;
@@ -482,6 +483,25 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawLine((float) source.getAbsoluteX(), (float) source.getAbsoluteY(), (float) target.getAbsoluteX(), (float) target.getAbsoluteY(), paint);
         // TODO: canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
 
+    }
+
+    // TODO: Refactor with transforms
+    public void drawPolyline(List<Point> vertices) {
+
+        for (int i = 0; i < vertices.size() - 1; i++) {
+
+            canvas.drawLine(
+                    (float) vertices.get(i).getAbsoluteX(),
+                    (float) vertices.get(i).getAbsoluteY(),
+                    (float) vertices.get(i + 1).getAbsoluteX(),
+                    (float) vertices.get(i + 1).getAbsoluteY(),
+                    paint
+            );
+        }
+    }
+
+    public void drawPolyline(Polyline polyline) {
+        drawPolyline(polyline.getVertices());
     }
 
     public void drawCircle(Point position, double radius, double angle) {

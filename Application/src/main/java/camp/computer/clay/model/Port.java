@@ -1,7 +1,5 @@
 package camp.computer.clay.model;
 
-import android.util.Log;
-
 import camp.computer.clay.model.util.PathGroup;
 
 public class Port extends Entity {
@@ -100,8 +98,6 @@ public class Port extends Entity {
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
             if (path.getSource() == this || path.getTarget() == this) {
-                Log.v("pathsource", "source.parent: " + path.getSource().getParent());
-                Log.v("pathsource", "target.parent: " + path.getTarget().getParent());
                 if (path.getSource().getParent() instanceof Host) {
                     return (Host) path.getSource().getParent();
                 } else if (path.getTarget().getParent() instanceof Host) {
@@ -185,8 +181,8 @@ public class Port extends Entity {
 
     public PathGroup getPaths(int depth) {
         PathGroup connectedPaths = new PathGroup();
-        connectedPaths.add(getAncestorPaths(depth));
-        connectedPaths.add(getDescendantPaths(depth));
+        connectedPaths.addAll(getAncestorPaths(depth));
+        connectedPaths.addAll(getDescendantPaths(depth));
         return connectedPaths;
     }
 
@@ -198,8 +194,8 @@ public class Port extends Entity {
      */
     public PathGroup getPaths() {
         PathGroup paths = new PathGroup();
-        paths.add(getAncestorPaths());
-        paths.add(getDescendantPaths());
+        paths.addAll(getAncestorPaths());
+        paths.addAll(getDescendantPaths());
         return paths;
     }
 
@@ -219,7 +215,7 @@ public class Port extends Entity {
 
                 // Recursive call to the Path's source Port
                 if (depth > 1) {
-                    ancestorPaths.add(path.getSource().getAncestorPaths(depth - 1));
+                    ancestorPaths.addAll(path.getSource().getAncestorPaths(depth - 1));
                 }
             }
         }
@@ -242,7 +238,7 @@ public class Port extends Entity {
                 ancestorPaths.add(path); // Store the path
 
                 // Recursive call to the Path's source Port
-                ancestorPaths.add(path.getSource().getAncestorPaths());
+                ancestorPaths.addAll(path.getSource().getAncestorPaths());
             }
         }
 
@@ -259,7 +255,7 @@ public class Port extends Entity {
 
             // Recursive call to the Path's target Port
             if (depth > 1) {
-                descendantPaths.add(path.getTarget().getDescendantPaths(depth - 1));
+                descendantPaths.addAll(path.getTarget().getDescendantPaths(depth - 1));
             }
         }
 
@@ -273,7 +269,7 @@ public class Port extends Entity {
         for (int i = 0; i < this.paths.size(); i++) {
             Path path = this.paths.get(i);
             descendantPaths.add(path); // Store the path
-            descendantPaths.add(path.getTarget().getDescendantPaths());
+            descendantPaths.addAll(path.getTarget().getDescendantPaths());
         }
 
         return descendantPaths;
