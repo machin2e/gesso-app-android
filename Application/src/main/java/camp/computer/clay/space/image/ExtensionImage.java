@@ -17,6 +17,7 @@ import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
@@ -275,7 +276,9 @@ public class ExtensionImage extends PortableImage {
             } else {
                 //double x = PIXEL_PER_MILLIMETER * (2.54 * i + 0.6);
                 double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-                headerContactPositions.add(new Point(x, 107, position));
+                Vertex vertex = new Vertex(new Point(x, 107));
+                headerContactPositions.add(vertex);
+                addShape(vertex);
             }
         }
 

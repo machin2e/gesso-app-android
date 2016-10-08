@@ -9,7 +9,7 @@ import camp.computer.clay.model.Path;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.Portable;
 import camp.computer.clay.model.util.PathGroup;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
@@ -18,7 +18,7 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public abstract class PortableImage extends Image<Portable> {
 
-    public List<Point> headerContactPositions = new ArrayList<>();
+    public List<Vertex> headerContactPositions = new ArrayList<>();
 
     public PortableImage(Portable portable) {
         super(portable);

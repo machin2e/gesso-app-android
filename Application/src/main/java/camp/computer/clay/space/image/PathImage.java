@@ -175,8 +175,8 @@ public class PathImage extends Image<Path> {
         PortableImage extensionImage = (PortableImage) parentSpace.getImage(extensionPort.getPortable());
 
         if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
-            Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex());
-            Point extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex());
+            Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();
+            Point extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex()).getPosition();
 
             // Draw connection between Ports
             display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));

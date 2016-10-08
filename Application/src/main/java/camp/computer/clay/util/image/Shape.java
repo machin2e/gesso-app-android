@@ -30,6 +30,10 @@ public abstract class Shape<T extends Entity> {
         this.imagePosition.set(point.x, point.y);
     }
 
+    public Point getImagePosition() {
+        return this.imagePosition;
+    }
+
     protected Point position = new Point(0, 0);
 
     protected String color = "#fff7f7f7";

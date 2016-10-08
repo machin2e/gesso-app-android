@@ -27,6 +27,7 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
@@ -104,21 +105,25 @@ public class HostImage extends PortableImage {
 
         final double contactSeparation = 6.0 * 2.54;
 
-        headerContactPositions.add(new Point(-contactSeparation, 132, position));
-        headerContactPositions.add(new Point(0, 132, position));
-        headerContactPositions.add(new Point(contactSeparation, 132, position));
+        headerContactPositions.add(new Vertex(new Point(-contactSeparation, 132)));
+        headerContactPositions.add(new Vertex(new Point(0, 132, position)));
+        headerContactPositions.add(new Vertex(new Point(contactSeparation, 132, position)));
 
-        headerContactPositions.add(new Point(132, contactSeparation, position));
-        headerContactPositions.add(new Point(132, 0, position));
-        headerContactPositions.add(new Point(132, -contactSeparation, position));
+        headerContactPositions.add(new Vertex(new Point(132, contactSeparation, position)));
+        headerContactPositions.add(new Vertex(new Point(132, 0, position)));
+        headerContactPositions.add(new Vertex(new Point(132, -contactSeparation, position)));
 
-        headerContactPositions.add(new Point(contactSeparation, -132, position));
-        headerContactPositions.add(new Point(0, -132, position));
-        headerContactPositions.add(new Point(-contactSeparation, -132, position));
+        headerContactPositions.add(new Vertex(new Point(contactSeparation, -132, position)));
+        headerContactPositions.add(new Vertex(new Point(0, -132, position)));
+        headerContactPositions.add(new Vertex(new Point(-contactSeparation, -132, position)));
 
-        headerContactPositions.add(new Point(-132, -contactSeparation, position));
-        headerContactPositions.add(new Point(-132, 0, position));
-        headerContactPositions.add(new Point(-132, contactSeparation, position));
+        headerContactPositions.add(new Vertex(new Point(-132, -contactSeparation, position)));
+        headerContactPositions.add(new Vertex(new Point(-132, 0, position)));
+        headerContactPositions.add(new Vertex(new Point(-132, contactSeparation, position)));
+
+        for (int i = 0; i < headerContactPositions.size(); i++) {
+            addShape(headerContactPositions.get(i));
+        }
 
         // Lights
         List<Point> lightPositions = new ArrayList<>();
