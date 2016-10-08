@@ -197,18 +197,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void update() {
-
-        //Log.v("OnUpdate", "Shape.update");
-        if (onUpdateListener != null) {
-            onUpdateListener.onUpdate(this);
-        }
     }
 
     public abstract void draw(Display display);
-
-    protected OnUpdateListener onUpdateListener = null;
-
-    public void setOnUpdateListener(OnUpdateListener onUpdateListener) {
-        this.onUpdateListener = onUpdateListener;
-    }
 }
