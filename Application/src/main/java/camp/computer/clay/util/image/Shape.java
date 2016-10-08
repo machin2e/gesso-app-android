@@ -20,7 +20,16 @@ public abstract class Shape<T extends Entity> {
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
-    public Point offset = new Point(0, 0);
+    protected Point imagePosition = null;
+
+    public void setImagePosition(double x, double y) {
+        this.imagePosition.set(x, y);
+    }
+
+    public void setImagePosition(Point point) {
+        this.imagePosition.set(point.x, point.y);
+    }
+
     protected Point position = new Point(0, 0);
 
     protected String color = "#fff7f7f7";

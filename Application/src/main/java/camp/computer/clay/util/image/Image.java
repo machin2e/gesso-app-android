@@ -108,6 +108,10 @@ public abstract class Image<T extends Entity> {
         return this.scale;
     }
 
+    public void setPosition(double x, double y) {
+        this.position.set(x, y);
+    }
+
     public void setPosition(Point position) {
         this.position.set(position.x, position.y);
     }

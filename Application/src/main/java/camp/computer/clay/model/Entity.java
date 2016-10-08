@@ -20,6 +20,10 @@ public abstract class Entity {
         this.uuid = uuid;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
     public void setParent(Entity parent) {
         this.parent = parent;
     }

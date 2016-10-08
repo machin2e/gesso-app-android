@@ -237,20 +237,20 @@ public class Space extends Image<Model> {
 
         // Set position
         if (hostImages.size() == 1) {
-            hostImages.get(0).setPosition(new Point(0, 0));
+            hostImages.get(0).setPosition(0, 0);
         } else if (hostImages.size() == 2) {
-            hostImages.get(0).setPosition(new Point(-300, 0));
-            hostImages.get(1).setPosition(new Point(300, 0));
+            hostImages.get(0).setPosition(-300, 0);
+            hostImages.get(1).setPosition(300, 0);
         } else if (hostImages.size() == 5) {
-            hostImages.get(0).setPosition(new Point(-300, -600));
+            hostImages.get(0).setPosition(-300, -600);
             hostImages.get(0).setRotation(0);
-            hostImages.get(1).setPosition(new Point(300, -600));
+            hostImages.get(1).setPosition(300, -600);
             hostImages.get(1).setRotation(20);
-            hostImages.get(2).setPosition(new Point(-300, 0));
+            hostImages.get(2).setPosition(-300, 0);
             hostImages.get(2).setRotation(40);
-            hostImages.get(3).setPosition(new Point(300, 0));
+            hostImages.get(3).setPosition(300, 0);
             hostImages.get(3).setRotation(60);
-            hostImages.get(4).setPosition(new Point(-300, 600));
+            hostImages.get(4).setPosition(-300, 600);
             hostImages.get(4).setRotation(80);
         }
 
