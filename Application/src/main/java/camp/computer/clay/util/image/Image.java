@@ -174,7 +174,6 @@ public abstract class Image<T extends Entity> {
     }
 
     public Shape getShape(Point point) {
-
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.contains(point)) {
@@ -231,6 +230,11 @@ public abstract class Image<T extends Entity> {
     public void update() {
 
         for (int i = 0; i < this.shapes.size(); i++) {
+
+            // Update position of shapes
+//            this.shapes.get(i).getPosition().setAbsoluteX(this.shapes.get(i).getPosition().getAbsoluteX2());
+//            this.shapes.get(i).getPosition().setAbsoluteY(this.shapes.get(i).getPosition().getAbsoluteY2());
+
             this.shapes.get(i).update();
         }
     }

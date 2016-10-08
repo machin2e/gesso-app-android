@@ -98,7 +98,7 @@ public class PathImage extends Image<Path> {
 
     public void drawTrianglePath(Display display) {
 
-        Paint paint = display.getPaint();
+        Paint paint = display.paint;
 
         Path path = getPath();
 
@@ -135,7 +135,7 @@ public class PathImage extends Image<Path> {
 
     private void drawLinePath(Display display) {
 
-        Paint paint = display.getPaint();
+        Paint paint = display.paint;
 
         Path path = getPath();
         Shape sourcePortShape = getSpace().getShape(path.getSource());
@@ -179,8 +179,8 @@ public class PathImage extends Image<Path> {
             Point extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex()).getPosition();
 
             // Draw connection between Ports
-            display.getPaint().setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
-            display.getPaint().setStrokeWidth(10.0f);
+            display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
+            display.paint.setStrokeWidth(10.0f);
 //            display.drawLine(hostConnectorPosition, extensionConnectorPosition);
 
             Polyline polyline = new Polyline();

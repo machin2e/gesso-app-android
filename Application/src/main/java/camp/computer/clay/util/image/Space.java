@@ -361,7 +361,7 @@ public class Space extends Image<Model> {
     private void drawExtensionPrototype(Display display) {
         if (extensionPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
 
-            Paint paint = display.getPaint();
+            Paint paint = display.paint;
 
             double pathRotationAngle = Geometry.getAngle(pathPrototypeSourcePosition, extensionPrototypePosition);
 
@@ -376,7 +376,7 @@ public class Space extends Image<Model> {
     public void drawPathPrototype(Display display) {
         if (pathPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
 
-            Paint paint = display.getPaint();
+            Paint paint = display.paint;
 
             double triangleWidth = 20;
             double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);

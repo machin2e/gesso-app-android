@@ -1219,7 +1219,7 @@ public class HostImage extends PortableImage {
     public void draw(Display display) {
         if (isVisible()) {
 
-            Canvas canvas = display.getCanvas();
+            Canvas canvas = display.canvas;
 
             canvas.save();
 
