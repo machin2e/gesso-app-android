@@ -422,18 +422,11 @@ public class Camera {
         if (positionFrameIndex < positionFrameLimit) {
 
             double totalDistanceToTarget = Geometry.calculateDistance(originalPosition, targetPosition);
-//            double totalDistanceToTargetX = targetPosition.getAbsoluteX() - originalPosition.getAbsoluteX();
-//            double totalDistanceToTargetY = targetPosition.getAbsoluteY() - originalPosition.getAbsoluteY();
             double totalDistanceToTargetX = targetPosition.x - originalPosition.x;
             double totalDistanceToTargetY = targetPosition.y - originalPosition.y;
 
-            // double currentDistanceToTarget = Geometry.calculateDistance(position, targetPosition);
-            // double currentDistance = (distanceToTarget - currentDistanceToTarget) / distanceToTarget;
             double currentDistanceTarget = ((((double) (positionFrameIndex + 1) / (double) positionFrameLimit) * totalDistanceToTarget) / totalDistanceToTarget) /* (1.0 / scale) */;
-            // Log.v("Progress", "frame: " + (positionFrameIndex + 1) + " of " + positionFrameLimit + ", done: " + currentDistance + ", target: " + currentDistanceTarget + ", left: " + (1.0 - currentDistance));
 
-            //position.setAbsolute(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.getAbsoluteX()), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.getAbsoluteY()));
-            //position.setAbsolute(scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.x), scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.y));
             position.set(
                     scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.x),
                     scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.y)
@@ -443,8 +436,6 @@ public class Camera {
 
         } else if (positionFrameIndex == positionFrameLimit) {
 
-//            position.setAbsoluteX(targetPosition.getAbsoluteX() * scale);
-//            position.setAbsoluteY(targetPosition.getAbsoluteY() * scale);
             position.x = targetPosition.x * scale;
             position.y = targetPosition.y * scale;
 
