@@ -12,7 +12,7 @@ public class ToneOutput {
     public void play(double freqOfTone, double duration) {
         //double duration = 1000;                // seconds
         //   double freqOfTone = 1000;           // hz
-        int sampleRate = 8000;              // a number
+        int sampleRate = 8000;              // a index
 
         double dnumSamples = duration * sampleRate;
         dnumSamples = Math.ceil(dnumSamples);

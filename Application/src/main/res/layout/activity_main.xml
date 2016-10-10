@@ -1,106 +1,203 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/application_view"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/application_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="camp.computer.clay.application.Launcher">
+    tools:context="camp.computer.clay.application.Application">
 
-    <camp.computer.clay.application.visual.Display
+    <camp.computer.clay.application.graphics.Display
         android:id="@+id/app_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <RelativeLayout
-        android:id="@+id/path_editor_view"
+        android:id="@+id/title_editor_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="#00ffffff"
+        android:visibility="gone">
+
+        <!--android:background="#bb000000"-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true">
+
+            <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center_horizontal"-->
+            <!--android:padding="20dp"-->
+            <!--android:text="Title"-->
+            <!--android:textAlignment="center"-->
+            <!--android:textAllCaps="true"-->
+            <!--android:textSize="23dp"-->
+            <!--android:textStyle="normal" />-->
+
+            <EditText
+                android:id="@+id/title_editor_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:focusableInTouchMode="true"
+                android:gravity="center"
+                android:hint="Title"
+                android:orientation="vertical"
+                android:paddingBottom="12dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="12dp"
+                android:textColor="@color/black"
+                android:textSize="35dp" />
+
+            <!--android:background="#44000000"-->
+
+            <!--<Button-->
+            <!--android:id="@+id/title_editor_done_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:background="#44000000"-->
+            <!--android:paddingBottom="12dp"-->
+            <!--android:paddingLeft="20dp"-->
+            <!--android:paddingRight="20dp"-->
+            <!--android:paddingTop="12dp"-->
+            <!--android:text="Done" />-->
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/action_editor_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#bb000000"
         android:visibility="gone">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="Path Action/Script/Logic Editor/Pipeline"
-                android:padding="20dp"/>
+                android:gravity="center_horizontal"
+                android:padding="20dp"
+                android:text="Actions"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textSize="23dp"
+                android:textStyle="normal" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#44000000"
-                android:text="source wave input"
+                android:paddingBottom="12dp"
                 android:paddingLeft="20dp"
-                android:paddingTop="12dp"
                 android:paddingRight="20dp"
-                android:paddingBottom="12dp"/>
+                android:paddingTop="12dp"
+                android:text="data sources (imports)" />
+
+            <Button
+                android:id="@+id/path_editor_add_source"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="#44000000"
+                android:paddingBottom="12dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="12dp"
+                android:text="Add Source (from Extension/Port)" />
 
             <LinearLayout
                 android:id="@+id/path_editor_action_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#44000000"
-                    android:text="target pulse output"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="12dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="12dp" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#44000000"
-                    android:text="target set period (source:wave)"
                     android:layout_marginTop="5dp"
+                    android:background="#44000000"
+                    android:paddingBottom="12dp"
                     android:paddingLeft="20dp"
-                    android:paddingTop="12dp"
                     android:paddingRight="20dp"
-                    android:paddingBottom="12dp" />
+                    android:paddingTop="12dp"
+                    android:text="target set period (source:wave)" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#44000000"
-                    android:text="target set duty cycle (number:50%)"
+                    android:paddingBottom="12dp"
                     android:paddingLeft="20dp"
-                    android:paddingTop="12dp"
                     android:paddingRight="20dp"
-                    android:paddingBottom="12dp" />
+                    android:paddingTop="12dp"
+                    android:text="target set duty cycle (number:50%)" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/path_editor_add_action"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#44000000"
-                android:text="add impression"
                 android:layout_marginTop="5dp"
+                android:background="#44000000"
+                android:paddingBottom="12dp"
                 android:paddingLeft="20dp"
-                android:paddingTop="12dp"
                 android:paddingRight="20dp"
-                android:paddingBottom="12dp" />
+                android:paddingTop="12dp"
+                android:text="Add Action" />
+
+            <Button
+                android:id="@+id/path_editor_add_action_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="#44000000"
+                android:paddingBottom="12dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="12dp"
+                android:text="Browse Actions for Ext/Port Config" />
+
+            <!-- Automatically insert this based on the types of ports/protocols/extensionAxes. Then either (1) setAbsolute any needed values manually or (2) select source from another port or from an action process/pipeline. -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="#44000000"
+                android:paddingBottom="12dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="12dp"
+                android:text="Main Extension Controller(s) Actions/Widgets" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="#44000000"
+                android:paddingBottom="12dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="12dp"
+                android:text="Add TODO" />
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#44000000"
-                android:text="add todo"
-                android:layout_marginTop="5dp"
+                android:paddingBottom="12dp"
                 android:paddingLeft="20dp"
-                android:paddingTop="12dp"
                 android:paddingRight="20dp"
-                android:paddingBottom="12dp" />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#44000000"
-                android:text="add idea"
-                android:paddingLeft="20dp"
                 android:paddingTop="12dp"
-                android:paddingRight="20dp"
-                android:paddingBottom="12dp" />
+                android:text="Add Idea" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -114,23 +211,24 @@
         android:layout_marginRight="0dp"
         android:padding="0dp"
         android:visibility="gone">
+
         <HorizontalScrollView
             android:id="@+id/message_keyboard_layout_perspective"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="0dp"
             android:layout_marginLeft="0dp"
-            android:layout_marginRight="0dp">
+            android:layout_marginRight="0dp"
+            android:padding="0dp">
+
             <LinearLayout
                 android:id="@+id/message_keyboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:padding="0dp">
-            </LinearLayout>
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="0dp"></LinearLayout>
         </HorizontalScrollView>
     </RelativeLayout>
 
@@ -142,56 +240,38 @@
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
+        android:background="@drawable/timeline_button"
         android:paddingLeft="5dp"
         android:paddingRight="50dp"
-        android:background="@drawable/timeline_button"
         android:visibility="gone">
+
         <HorizontalScrollView
             android:id="@+id/message_content_layout_perspective"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true">
+
             <LinearLayout
                 android:id="@+id/message_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/message_content_hint"
-                    android:text="I want to..."
-                    android:textColor="#FFFFFFFF"
-                    android:textSize="14sp"
-                    android:padding="15dp"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
-                    android:background="@drawable/timeline_button" />
+                    android:background="@drawable/timeline_button"
+                    android:padding="15dp"
+                    android:text="I want to..."
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="14sp" />
             </LinearLayout>
         </HorizontalScrollView>
     </RelativeLayout>
 
-    <!--<RelativeLayout-->
-        <!--android:id="@+id/message_content_layout"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="bottom|center_horizontal"-->
-        <!--android:layout_marginBottom="15dp"-->
-        <!--android:layout_marginLeft="15dp"-->
-        <!--android:layout_marginRight="15dp">-->
-        <!--<EditText-->
-            <!--android:id="@+id/message_content"-->
-            <!--android:text=""-->
-            <!--android:textColor="#FFFFFFFF"-->
-            <!--android:textSize="14sp"-->
-            <!--android:padding="15dp"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="50dp"-->
-            <!--android:background="@drawable/timeline_button"-->
-            <!--android:inputType="text"-->
-            <!--android:maxLines="1"-->
-            <!--android:hint="I want to..."-->
-            <!--/>-->
-    <!--</RelativeLayout>-->
+    <!--<RelativeLayout--><!--android:id="@+id/message_content_layout"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_gravity="bottom|center_horizontal"--><!--android:layout_marginBottom="15dp"--><!--android:layout_marginLeft="15dp"--><!--android:layout_marginRight="15dp">--><!--<EditText--><!--android:id="@+id/message_content"--><!--android:text=""--><!--android:textColor="#FFFFFFFF"--><!--android:textSize="14sp"--><!--android:padding="15dp"--><!--android:layout_width="match_parent"--><!--android:layout_height="50dp"--><!--android:background="@drawable/timeline_button"--><!--android:inputType="text"--><!--android:maxLines="1"--><!--android:hint="I want to..."--><!--/>--><!--</RelativeLayout>-->
 
     <RelativeLayout
         android:id="@+id/context_button_holder"
@@ -202,33 +282,18 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:visibility="gone">
+
         <Button
             android:id="@+id/context_button"
-            android:text="\u21BA"
-            android:textColor="#FFFFFFFF"
-            android:textSize="20sp"
-            android:padding="0dp"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/context_button" />
+            android:background="@drawable/context_button"
+            android:padding="0dp"
+            android:text="\u21BA"
+            android:textColor="#FFFFFFFF"
+            android:textSize="20sp" />
     </RelativeLayout>
 
-    <!--<RelativeLayout-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="bottom|right"-->
-        <!--android:layout_marginBottom="40dp"-->
-        <!--android:layout_marginLeft="40dp"-->
-        <!--android:layout_marginRight="60dp">-->
-        <!--<Button-->
-            <!--android:id="@+id/info_cue"-->
-            <!--android:text="!"-->
-            <!--android:textColor="#FFFFFFFF"-->
-            <!--android:textSize="14sp"-->
-            <!--android:padding="0dp"-->
-            <!--android:layout_width="20dp"-->
-            <!--android:layout_height="20dp"-->
-            <!--android:background="@drawable/context_button" />-->
-    <!--</RelativeLayout>-->
+    <!--<RelativeLayout--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_gravity="bottom|right"--><!--android:layout_marginBottom="40dp"--><!--android:layout_marginLeft="40dp"--><!--android:layout_marginRight="60dp">--><!--<Button--><!--android:id="@+id/info_cue"--><!--android:text="!"--><!--android:textColor="#FFFFFFFF"--><!--android:textSize="14sp"--><!--android:padding="0dp"--><!--android:layout_width="20dp"--><!--android:layout_height="20dp"--><!--android:background="@drawable/context_button" />--><!--</RelativeLayout>-->
 
 </FrameLayout>
