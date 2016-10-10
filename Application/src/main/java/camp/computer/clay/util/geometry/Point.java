@@ -119,6 +119,10 @@ public class Point {
         this.rotation = rotation;
     }
 
+    public double gx = 0; // Absolute x (computed per update)
+    public double gy = 0; // Absolute y (computed per update)
+    public double gr = 0; // Absolute rotation (computed per update)
+
     /**
      * @return Absolute x coordinate.
      */

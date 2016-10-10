@@ -30,6 +30,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.application.communication.UDPHost;
@@ -41,6 +43,7 @@ import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
 import camp.computer.clay.model.Extension;
+import camp.computer.clay.model.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 
@@ -245,6 +248,44 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 //    }
 
+    public List<Host> restoreHosts(String filename) {
+
+        // e.g., filename = "Hosts.json"
+
+        List<Host> hosts = new ArrayList<>();
+
+        // Open specified file Host profiles
+        String jsonString = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open(filename);
+            int fileSize = inputStream.available();
+            byte[] fileBuffer = new byte[fileSize];
+            inputStream.read(fileBuffer);
+            inputStream.close();
+            jsonString = new String(fileBuffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create JSON object from file contents
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+
+            JSONObject hostObject = jsonObject.getJSONObject("host");
+            String hostTitle = hostObject.getString("title");
+
+            // Host host = new Host();
+
+            Log.v("Configuration", "reading JSON name: " + hostTitle);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return hosts;
+    }
+
     /**
      * Called when the activity is getFirstEvent created.
      */
@@ -343,68 +384,20 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // <Cache>
         // </Cache>
 
-        // Read default form profiles
-        String jsonString = null;
-        try
-
-        {
-            InputStream inputStream = getContext().getAssets().open("Hosts.json");
-            int fileSize = inputStream.available();
-            byte[] fileBuffer = new byte[fileSize];
-            inputStream.read(fileBuffer);
-            inputStream.close();
-            jsonString = new String(fileBuffer, "UTF-8");
-
-        } catch (
-                IOException e
-                )
-
-        {
-            e.printStackTrace();
-        }
-
-        // Create JSON object
-        JSONObject jsonObject = null;
-        try
-
-        {
-            jsonObject = new JSONObject(jsonString);
-
-            JSONObject formObject = jsonObject.getJSONObject("form");
-
-            String formName = formObject.getString("name");
-
-            Log.v("Configuration", "reading JSON name: " + formName);
-
-        } catch (
-                JSONException e
-                )
-
-        {
-            e.printStackTrace();
-        }
-
-
         // Clay
-        clay = new
-
-                Clay();
+        clay = new Clay();
 
         clay.addDisplay(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
-        if (UDPHost == null)
-
-        {
+        if (UDPHost == null) {
             UDPHost = new UDPHost("udp");
             clay.addHost(this.UDPHost);
             UDPHost.startServer();
         }
 
         // Internet Network Interface
-        if (networkResource == null)
-
-        {
+        if (networkResource == null) {
             networkResource = new Internet();
             clay.addResource(this.networkResource);
         }
@@ -423,11 +416,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         */
 
         // Prevent on-screen keyboard from pushing up content
-        getWindow()
-
-                .
-
-                        setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         // <CHAT_AND_CONTEXT_SCOPE>
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);

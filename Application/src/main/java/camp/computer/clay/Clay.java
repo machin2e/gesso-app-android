@@ -70,13 +70,17 @@ public class Clay {
         Application.getView().getDisplay().setSpace(space);
 
         // <TEST>
-        simulateHost();
-        simulateHost();
-        simulateHost();
-        simulateHost();
-        simulateHost();
+        addVirtualHost();
+        addVirtualHost();
+        addVirtualHost();
+        addVirtualHost();
+        addVirtualHost();
         // </TEST>
 
+    }
+
+    private Clay getClay() {
+        return this;
     }
 
     public Model getModel() {
@@ -87,13 +91,17 @@ public class Clay {
         return this.space;
     }
 
-    private void simulateHost() {
+    /**
+     * Adds a <em>virtual</em> {@code Host} that can be configured and later assigned to a physical
+     * host.
+     */
+    private void addVirtualHost() {
 
-        // <FORM_CONFIGURATION>
+        // <HOST_CONFIGURATION>
         // TODO: Read this from the device (or look up from host UUID). It will be encoded on
         // TODO: (cont'd) the device.
         final int PORT_COUNT = 12;
-        // </FORM_CONFIGURATION>
+        // </HOST_CONFIGURATION>
 
         camp.computer.clay.model.Host host = new camp.computer.clay.model.Host();
 
@@ -181,10 +189,6 @@ public class Clay {
         return null;
     }
 
-    private Clay getClay() {
-        return this;
-    }
-
     /**
      * Adds the specified unit to Clay's operating model.
      */
@@ -195,7 +199,7 @@ public class Clay {
             return null;
         }
 
-        simulateHost();
+        addVirtualHost();
 
         return null;
     }

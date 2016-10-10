@@ -334,7 +334,17 @@ public class Space extends Image<Model> {
 
         // Update Images
         for (int i = 0; i < images.size(); i++) {
-            images.get(i).update();
+            Image image = images.get(i);
+
+            // Update Image Position
+            image.getPosition().gx = image.getPosition().x;
+            image.getPosition().gy = image.getPosition().y;
+
+            // Update bounding box of Image
+            // TODO:
+
+            // Update the Image
+            image.update();
         }
 
         // Update Camera

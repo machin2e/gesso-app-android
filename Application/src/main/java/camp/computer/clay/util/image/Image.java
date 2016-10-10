@@ -230,13 +230,34 @@ public abstract class Image<T extends Entity> {
     public void update() {
 
         for (int i = 0; i < this.shapes.size(); i++) {
+            Shape shape = this.shapes.get(i);
 
-            // Update position of shapes
-//            this.shapes.get(i).getPosition().setAbsoluteX(this.shapes.get(i).getPosition().getAbsoluteX2());
-//            this.shapes.get(i).getPosition().setAbsoluteY(this.shapes.get(i).getPosition().getAbsoluteY2());
+            // Update Position of Shape
+            updateAbsoluteX(shape);
+            updateAbsoluteY(shape);
 
+            // Update bounding box of Shape
+            // TODO:
+
+            // Update the Shape
             this.shapes.get(i).update();
         }
+    }
+
+    /**
+     * @return Updates absolute x coordinate of {@code Shape} relative to this {@code Image}.
+     */
+    private void updateAbsoluteX(Shape shape) {
+        double absoluteX = Geometry.calculateDistance(0, 0, shape.getPosition().x, shape.getPosition().y) * Math.cos(Math.toRadians(getPosition().getRotation() + Geometry.getAngle(0, 0, shape.getPosition().x, shape.getPosition().y)));
+        shape.getPosition().gx = getPosition().x + absoluteX;
+    }
+
+    /**
+     * @return Updates absolute y coordinate of {@code Shape} relative to this {@code Image}.
+     */
+    private void updateAbsoluteY(Shape shape) {
+        double absoluteY = Geometry.calculateDistance(0, 0, shape.getPosition().x, shape.getPosition().y) * Math.sin(Math.toRadians(getPosition().getRotation() + Geometry.getAngle(0, 0, shape.getPosition().x, shape.getPosition().y)));
+        shape.getPosition().gy = getPosition().y + absoluteY;
     }
 
     public abstract void draw(Display display);
