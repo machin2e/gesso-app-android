@@ -16,11 +16,7 @@ import camp.computer.clay.util.geometry.Point;
  */
 public class Action {
 
-    // TODO: Entity this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
-    // TODO: Entity voice thisAction in the same way. Generify to Action<T> or subclass.
-    // TODO: (?) Entity data transmissions as events in the same way?
-
-    protected Actor actor = null;
+    private Actor actor = null;
 
     public void setActor(Actor actor) {
         this.actor = actor;
@@ -31,6 +27,9 @@ public class Action {
     }
 
     private List<Event> events = new LinkedList<>();
+
+    // "Event Future"
+//    private List<Event> eventQueue = new LinkedList<>();
 
     // TODO: Classify these! Every time an Event is added!
     // TODO: (cont'd) Note can have multiple sequences per finger in an thisAction,
@@ -56,7 +55,7 @@ public class Action {
                     event.setType(Event.Type.HOLD);
                     event.pointerIndex = getFirstEvent().pointerIndex;
                     event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
-                    getFirstEvent().getActor().processAction(event);
+                    getFirstEvent().getActor().queueAction(event);
 
                     isHolding[pointerIndex] = true;
 

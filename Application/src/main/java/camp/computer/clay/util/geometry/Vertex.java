@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
@@ -41,6 +42,7 @@ public class Vertex<T extends Entity> extends Shape<T> {
 
     @Override
     public List<Point> temp_getRelativeVertices() {
+//        List<Point> vertices = new LinkedList<>();
         vertex.set(position);
         return vertices;
     }

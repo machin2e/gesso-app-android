@@ -21,26 +21,6 @@ public abstract class Shape<T extends Entity> {
     protected double transparency = targetTransparency;
 
     protected Point imagePosition = null;
-
-    public void setImagePosition(double x, double y) {
-        if (imagePosition == null) {
-            imagePosition = new Point();
-        }
-        this.imagePosition.set(x, y);
-    }
-
-    public void setImagePosition(Point point) {
-        if (imagePosition == null) {
-            imagePosition = new Point();
-        }
-        this.imagePosition.set(point.x, point.y);
-        this.imagePosition.setRotation(point.rotation);
-    }
-
-    public Point getImagePosition() {
-        return this.imagePosition;
-    }
-
     protected Point position = new Point(0, 0);
 
     protected String color = "#fff7f7f7";
@@ -86,6 +66,25 @@ public abstract class Shape<T extends Entity> {
 
     public T getEntity() {
         return this.entity;
+    }
+
+    public void setImagePosition(double x, double y) {
+        if (imagePosition == null) {
+            imagePosition = new Point();
+        }
+        this.imagePosition.set(x, y);
+    }
+
+    public void setImagePosition(Point point) {
+        if (imagePosition == null) {
+            imagePosition = new Point();
+        }
+        this.imagePosition.set(point.x, point.y);
+        this.imagePosition.setRotation(point.rotation);
+    }
+
+    public Point getImagePosition() {
+        return this.imagePosition;
     }
 
     public Point getPosition() {
@@ -255,16 +254,12 @@ public abstract class Shape<T extends Entity> {
         return getVertices();
     }
 
-    private void updateBoundary(Image referenceImage) {
-//        List<Point> vertices = getVertices();
+    private void updateBoundary(Image referenceImage) {;
         List<Point> vertices = temp_getRelativeVertices();
 
         // Translate and rotate the vertices about the updated position
         for (int i = 0; i < vertices.size(); i++) {
-//            Geometry.rotatePoint(vertices.get(i), getRotation(), referenceImage.position); // Rotate Shape vertices about Image position
-//            Geometry.translatePoint(vertices.get(i), referenceImage.position.x, referenceImage.position.y); // Translate Image
             Geometry.rotatePoint(vertices.get(i), position.rotation); // Rotate Shape vertices about Image position
-//            Geometry.translatePoint(vertices.get(i), referenceImage.position.x, referenceImage.position.y); // Translate Image
             Geometry.translatePoint(vertices.get(i), position.x, position.y); // Translate Shape
         }
     }

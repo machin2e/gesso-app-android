@@ -3,8 +3,12 @@ package camp.computer.clay.util.image;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Extension;
 import camp.computer.clay.model.Group;
@@ -34,6 +38,8 @@ public class Space extends Image<Model> {
     protected Visibility pathPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
     protected Point pathPrototypeSourcePosition = new Point(0, 0);
     protected Point pathPrototypeDestinationCoordinate = new Point(0, 0);
+
+    private List<Actor> actors = new LinkedList<>();
 
     public Space(Model model) {
         super(model);
@@ -89,7 +95,7 @@ public class Space extends Image<Model> {
                 } else if (event.getType() == Event.Type.MOVE) {
 //                    if (action.isHolding()) {
 //                        // Space
-//                        //lastEvent.getTargetImage().processAction(action);
+//                        //lastEvent.getTargetImage().queueAction(action);
 //                    } else if (action.isDragging()) {
                     // Camera
                     if (action.getSize() > 1) {
@@ -179,6 +185,12 @@ public class Space extends Image<Model> {
 
             // Add Path Image to Space
             addImage(pathImage);
+        }
+    }
+
+    public void addActor(Actor actor) {
+        if (!this.actors.contains(actor)) {
+            this.actors.add(actor);
         }
     }
 
@@ -332,13 +344,14 @@ public class Space extends Image<Model> {
     @Override
     public void update() {
 
+        // Update Actors
+        for (int i = 0; i < actors.size(); i++) {
+            this.actors.get(i).update();
+        }
+
         // Update Images
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
-
-            // Update Image Position
-//            image.getPosition().gx = image.getPosition().x;
-//            image.getPosition().gy = image.getPosition().y;
 
             // Update bounding box of Image
             // TODO:
@@ -347,7 +360,7 @@ public class Space extends Image<Model> {
             image.update();
         }
 
-        // Update Camera
+        // Update Camera(s)
         getEntity().getActor(0).getCamera().update();
     }
 

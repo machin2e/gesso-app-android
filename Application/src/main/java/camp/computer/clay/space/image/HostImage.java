@@ -492,11 +492,11 @@ public class HostImage extends PortableImage {
 
                                                 if (event.getTargetImage() instanceof HostImage) {
 
-                                                    // If getFirstEvent processAction was on the same form, then respond
+                                                    // If getFirstEvent queueAction was on the same form, then respond
                                                     if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
 
                                                         // Host
-//                                                        event.getTargetImage().processAction(action);
+//                                                        event.getTargetImage().queueAction(action);
 
                                                         // Camera
 //                                                        camera.setFocus();
@@ -505,7 +505,7 @@ public class HostImage extends PortableImage {
                                                 } else if (event.getTargetImage() instanceof Space) {
 
                                                     // Host
-//                                                        action.getFirstEvent().getTargetImage().processAction(action);
+//                                                        action.getFirstEvent().getTargetImage().queueAction(action);
 
                                                 }
 

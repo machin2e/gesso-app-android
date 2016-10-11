@@ -14,6 +14,7 @@ import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
 import camp.computer.clay.model.Actor;
+import camp.computer.clay.model.Host;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.profile.PortableProfile;
@@ -62,7 +63,11 @@ public class Clay {
         this.space = new Space(model);
 
         // Create actor and setAbsolute perspective
-        Actor actor = new Actor(this.space);
+        Actor actor = new Actor();
+        this.space.addActor(actor);
+
+        // Camera
+        actor.getCamera().setSpace(space);
 
         // Add actor to model
         model.addActor(actor);
@@ -103,7 +108,7 @@ public class Clay {
         final int PORT_COUNT = 12;
         // </HOST_CONFIGURATION>
 
-        camp.computer.clay.model.Host host = new camp.computer.clay.model.Host();
+        Host host = new Host();
 
         for (int j = 0; j < PORT_COUNT; j++) {
             Port port = new Port();

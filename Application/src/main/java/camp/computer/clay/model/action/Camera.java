@@ -2,6 +2,7 @@ package camp.computer.clay.model.action;
 
 import android.util.Log;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
@@ -254,7 +255,6 @@ public class Camera {
             } else {
                 setScale(1.0f, 100); // Zoom out to show overview
             }
-
         }
     }
 
@@ -364,6 +364,10 @@ public class Camera {
 
     public void setFocus(Space space) {
 
+//        if (space == null) {
+//            return;
+//        }
+
         // <REFACTOR>
         // TODO: Move this somehwere better...
         // No pointerCoordinates on board or port. Touch is on map. So hide ports.
@@ -395,6 +399,7 @@ public class Camera {
         // Adjust scale and position
         adjustScale();
         adjustPosition();
+//        updateFocus();
     }
 
     public void update() {
@@ -409,6 +414,8 @@ public class Camera {
         position.setAbsoluteX(position.getAbsoluteX() * scale);
         position.setAbsoluteY(position.getAbsoluteY() * scale);
         */
+
+//        updateFocus();
 
         // Scale
         if (scale != targetScale) {
@@ -447,6 +454,21 @@ public class Camera {
             position.y = targetPosition.y * scale;
 
         }
+    }
 
+    private Point focusPosition = new Point(0, 0);
+    private List<Point> focusBoundary = new LinkedList<>();
+
+    private void updateFocus() {
+
+        List<Point> focusBoundary = space.getImages().filterVisibility(Visibility.Value.VISIBLE).getVertices();
+
+        // Compute focus bounding box
+        Rectangle boundingBox = Geometry.getBoundingBox(focusBoundary);
+
+        // Update Scale
+        adjustScale(boundingBox);
+
+//        setPosition(focusPosition);
     }
 }
