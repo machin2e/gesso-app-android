@@ -100,13 +100,17 @@ public class Camera {
         setPosition(position, positionPeriod);
     }
 
+    public void setPosition(double x, double y) {
+        setPosition(new Point(x, y));
+    }
+
     public void setPosition(Point targetPosition, double duration) {
 
-        if (targetPosition.x == position.x && targetPosition.y == position.y) {
-            return;
-        }
+//        if (targetPosition.x == position.x && targetPosition.y == position.y) {
+//            return;
+//        }
 
-        if (duration == 0) {
+        if (duration == 0.0) {
 
             //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
             this.targetPosition.set(-targetPosition.x, -targetPosition.y);
@@ -114,6 +118,8 @@ public class Camera {
             this.originalPosition.set(targetPosition);
 
             this.position.set(targetPosition);
+
+            positionFrameIndex = positionFrameLimit;
 
         } else {
 
@@ -172,9 +178,13 @@ public class Camera {
     }
 
     public void adjustPosition() {
+        adjustPosition(0);
+    }
+
+    public void adjustPosition(double duration) {
         List<Point> figurePositions = getSpace().getImages().filterType(Host.class, Extension.class).getPositions();
         Point centerPosition = Geometry.getCenterPoint(figurePositions);
-        setPosition(centerPosition);
+        setPosition(centerPosition, duration);
     }
 
     public void adjustScale() {
@@ -186,8 +196,8 @@ public class Camera {
         List<Point> imageVertices = getSpace().getImages().filterType(Host.class).getVertices();
         Log.v("BBW", "vertex #: " + imageVertices.size());
         if (imageVertices.size() > 0) {
-//            Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
-            Rectangle boundingBox = getSpace().getImages().filterType(Host.class).getBoundingBox();
+            Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+//            Rectangle boundingBox = getSpace().getImages().filterType(Host.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }
     }
@@ -448,7 +458,7 @@ public class Camera {
 
             positionFrameIndex++;
 
-        } else if (positionFrameIndex == positionFrameLimit) {
+        } else if (positionFrameIndex >= positionFrameLimit) {
 
             position.x = targetPosition.x * scale;
             position.y = targetPosition.y * scale;

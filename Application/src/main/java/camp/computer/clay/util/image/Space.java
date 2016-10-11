@@ -64,12 +64,12 @@ public class Space extends Image<Model> {
 
     public void setTitleVisibility(Visibility.Value visibility) {
         if (titleVisibility.getValue() == Visibility.Value.INVISIBLE && visibility == Visibility.Value.VISIBLE) {
-            Application.getView().openTitleEditor(getTitleText());
+//            Application.getView().openTitleEditor(getTitleText());
             this.titleVisibility.setValue(visibility);
         } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.VISIBLE) {
-            Application.getView().setTitleEditor(getTitleText());
+//            Application.getView().setTitleEditor(getTitleText());
         } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.INVISIBLE) {
-            Application.getView().closeTitleEditor();
+//            Application.getView().closeTitleEditor();
             this.titleVisibility.setValue(visibility);
         }
     }
@@ -99,7 +99,8 @@ public class Space extends Image<Model> {
 //                    } else if (action.isDragging()) {
                     // Camera
                     if (action.getSize() > 1) {
-                        camera.setOffset(event.getPosition().x - action.getFirstEvent().getPosition().x, event.getPosition().y - action.getFirstEvent().getPosition().y);
+                        //camera.setOffset(event.getPosition().x - action.getFirstEvent().getPosition().x, event.getPosition().y - action.getFirstEvent().getPosition().y);
+                        camera.setPosition(-(event.getPosition().x - action.getFirstEvent().getPosition().x), -(event.getPosition().y - action.getFirstEvent().getPosition().y));
                     }
 
 //                    camera.setOffset(action.getOffset().getAbsoluteX(), action.getOffset().getAbsoluteY());
@@ -344,10 +345,10 @@ public class Space extends Image<Model> {
     @Override
     public void update() {
 
-        // Update Actors
-        for (int i = 0; i < actors.size(); i++) {
-            this.actors.get(i).update();
-        }
+//        // Update Actors
+//        for (int i = 0; i < actors.size(); i++) {
+//            this.actors.get(i).update();
+//        }
 
         // Update Images
         for (int i = 0; i < images.size(); i++) {
@@ -358,6 +359,11 @@ public class Space extends Image<Model> {
 
             // Update the Image
             image.update();
+        }
+
+        // Update Actors
+        for (int i = 0; i < actors.size(); i++) {
+            this.actors.get(i).update();
         }
 
         // Update Camera(s)

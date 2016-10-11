@@ -19,6 +19,8 @@ public class Actor {
 
     private Camera camera = new Camera();
 
+    private List<Event> eventQueue = new LinkedList<>();
+
     private List<Action> actions = new LinkedList<>();
 
     public Actor() {
@@ -51,6 +53,22 @@ public class Actor {
     }
 
     public void queueAction(Event event) {
+        eventQueue.add(event);
+    }
+
+    private void processActionQueue() {
+        while (eventQueue.size() > 0) {
+            dequeueAction();
+        }
+    }
+
+    public void dequeueAction() {
+
+        if (eventQueue.size() == 0) {
+            return;
+        }
+
+        Event event = eventQueue.remove(0);
 
         event.setActor(this);
 
@@ -172,7 +190,7 @@ public class Actor {
             case UNSELECT: {
 
                 // Stop listening for a hold event
-                action.timerHandler.removeCallbacks(action.timerRunnable);
+//                action.timerHandler.removeCallbacks(action.timerRunnable);
 
                 // Set the target image
                 Image targetImage = getCamera().getSpace().getImage(event.getPosition());
@@ -207,7 +225,7 @@ public class Actor {
     }
 
     public void update() {
-
+        processActionQueue();
     }
 
 }

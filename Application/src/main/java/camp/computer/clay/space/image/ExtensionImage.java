@@ -30,11 +30,11 @@ public class ExtensionImage extends PortableImage {
     }
 
     private void setup() {
-        setupGeometry();
+        setupShapes();
         setupActions();
     }
 
-    private void setupGeometry() {
+    private void setupShapes() {
 
         Rectangle rectangle;
 
@@ -289,8 +289,7 @@ public class ExtensionImage extends PortableImage {
 
             if (portShape != null) {
                 double portSpacing = 100;
-                double x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
-                portShape.getPosition().setX(x);
+                portShape.getPosition().x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
                 // TODO: Also update y coordinate
             }
         }

@@ -1168,23 +1168,18 @@ public class HostImage extends PortableImage {
 
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
-                //extensionImage.setPosition(event.getPosition());
                 if (segmentIndex == 0) {
-//                    extensionImage.getPosition().setReferencePoint(getPosition());
-                    extensionImage.getPosition().setX(0 + offset);
-                    extensionImage.getPosition().setY(-distanceToExtensions);
+                    extensionImage.getPosition().x = 0 + offset;
+                    extensionImage.getPosition().y = -distanceToExtensions;
                 } else if (segmentIndex == 1) {
-//                    extensionImage.getPosition().setReferencePoint(getPosition());
-                    extensionImage.getPosition().setX(distanceToExtensions);
-                    extensionImage.getPosition().setY(0 + offset);
+                    extensionImage.getPosition().x = distanceToExtensions;
+                    extensionImage.getPosition().y = 0 + offset;
                 } else if (segmentIndex == 2) {
-//                    extensionImage.getPosition().setReferencePoint(getPosition());
-                    extensionImage.getPosition().setX(0 + offset);
-                    extensionImage.getPosition().setY(distanceToExtensions);
+                    extensionImage.getPosition().x = 0 + offset;
+                    extensionImage.getPosition().y = distanceToExtensions;
                 } else if (segmentIndex == 3) {
-//                    extensionImage.getPosition().setReferencePoint(getPosition());
-                    extensionImage.getPosition().setX(-distanceToExtensions);
-                    extensionImage.getPosition().setY(0 + offset);
+                    extensionImage.getPosition().x = -distanceToExtensions;
+                    extensionImage.getPosition().y = 0 + offset;
                 }
 
                 //double extensionImageRotation = Geometry.getAngle(hostPortShape.getPosition(), extensionImage.getPosition());

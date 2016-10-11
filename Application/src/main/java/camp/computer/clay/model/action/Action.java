@@ -40,29 +40,29 @@ public class Action {
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
     // TODO: private double[] touchPressure = new double[Event.MAXIMUM_POINT_COUNT]; // Reference: http://stackoverflow.com/questions/17540058/android-detect-touch-pressure-on-capacitive-touch-screen
 
-    public Handler timerHandler = new Handler();
-
-    public Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-
-            int pointerIndex = 0;
-
-            if (getFirstEvent().isPointing[pointerIndex]) {
-                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
-
-                    Event event = new Event();
-                    event.setType(Event.Type.HOLD);
-                    event.pointerIndex = getFirstEvent().pointerIndex;
-                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
-                    getFirstEvent().getActor().queueAction(event);
-
-                    isHolding[pointerIndex] = true;
-
-                }
-            }
-        }
-    };
+//    public Handler timerHandler = new Handler();
+//
+//    public Runnable timerRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//
+//            int pointerIndex = 0;
+//
+//            if (getFirstEvent().isPointing[pointerIndex]) {
+//                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
+//
+//                    Event event = new Event();
+//                    event.setType(Event.Type.HOLD);
+//                    event.pointerIndex = getFirstEvent().pointerIndex;
+//                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
+//                    getFirstEvent().getActor().queueAction(event);
+//
+//                    isHolding[pointerIndex] = true;
+//
+//                }
+//            }
+//        }
+//    };
 
     public Action() {
         setup();
@@ -102,9 +102,9 @@ public class Action {
 
         if (events.size() == 1) {
 
-            // Start timer to check for hold
-            timerHandler.removeCallbacks(timerRunnable);
-            timerHandler.postDelayed(timerRunnable, Event.MINIMUM_HOLD_DURATION);
+//            // Start timer to check for hold
+//            timerHandler.removeCallbacks(timerRunnable);
+//            timerHandler.postDelayed(timerRunnable, Event.MINIMUM_HOLD_DURATION);
 
         } else if (events.size() > 1) {
 
