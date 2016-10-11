@@ -110,7 +110,7 @@ public class Action {
         } else if (events.size() > 1) {
 
             // Calculate drag distance
-            this.dragDistance[event.pointerIndex] = Geometry.calculateDistance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
+            this.dragDistance[event.pointerIndex] = Geometry.distance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
 
             if (getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
                 isDragging[event.pointerIndex] = true;
@@ -216,7 +216,7 @@ public class Action {
     public double getDistance() {
         Event firstEvent = getFirstEvent();
         Event lastEvent = getLastEvent();
-        double distance = Geometry.calculateDistance(
+        double distance = Geometry.distance(
                 firstEvent.getPosition(),
                 lastEvent.getPosition()
         );

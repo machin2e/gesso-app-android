@@ -30,11 +30,11 @@ public class ExtensionImage extends PortableImage {
     }
 
     private void setup() {
-        setupShapes();
+        setupGeometry();
         setupActions();
     }
 
-    private void setupShapes() {
+    private void setupGeometry() {
 
         Rectangle rectangle;
 
@@ -323,6 +323,7 @@ public class ExtensionImage extends PortableImage {
             canvas.save();
 
             // <HACK>
+            /*
             if (getPosition().getReferencePoint() != null) {
                 canvas.translate(
                         (float) getPosition().getReferencePoint().x,
@@ -331,6 +332,7 @@ public class ExtensionImage extends PortableImage {
 
                 canvas.rotate((float) getPosition().getReferencePoint().rotation);
             }
+            */
             // </HACK>
 
             canvas.translate(

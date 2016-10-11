@@ -52,6 +52,6 @@ public class Text extends Shape {
     }
 
     public double getLength() {
-        return Geometry.calculateDistance(source, target);
+        return Geometry.distance(source, target);
     }
 }

@@ -116,8 +116,8 @@ public class PathImage extends Image<Path> {
 
         double pathRotation = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
         double triangleRotation = pathRotation + 90.0f;
-        Point sourcePoint = Geometry.rotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
-        Point targetPoint = Geometry.rotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
+        Point sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
+        Point targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
         if (dockVisibility.getValue() == Visibility.Value.VISIBLE) {
 
@@ -153,8 +153,8 @@ public class PathImage extends Image<Path> {
             paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
             double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-            Point pathStartCoordinate = Geometry.rotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
-            Point pathStopCoordinate = Geometry.rotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+            Point pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
+            Point pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
             display.drawLine(pathStartCoordinate, pathStopCoordinate);
         }

@@ -1,5 +1,7 @@
 package camp.computer.clay.model.action;
 
+import android.util.Log;
+
 import java.util.List;
 
 import camp.computer.clay.application.Application;
@@ -179,9 +181,12 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getVertices();
-        if (figureVertices.size() > 0) {
-            Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+//        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getVertices();
+        List<Point> imageVertices = getSpace().getImages().filterType(Host.class).getVertices();
+        Log.v("BBW", "vertex #: " + imageVertices.size());
+        if (imageVertices.size() > 0) {
+//            Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+            Rectangle boundingBox = getSpace().getImages().filterType(Host.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }
     }
@@ -212,6 +217,8 @@ public class Camera {
         double horizontalScale = getWidth() / boundingBox.getWidth();
         double verticalScale = getHeight() / boundingBox.getHeight();
 
+        Log.v("BBW", "bb width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
+
         if (horizontalScale <= MAXIMUM_SCALE || horizontalScale <= MAXIMUM_SCALE) {
             if (horizontalScale < verticalScale) {
                 setScale(horizontalScale, duration);
@@ -240,7 +247,7 @@ public class Camera {
             Portable sourcePortable = sourcePort.getPortable();
             PortableImage sourcePortableImage = (PortableImage) space.getImage(sourcePortable);
 
-            double distanceToPortable = Geometry.calculateDistance(sourcePortableImage.getPosition(), targetPosition);
+            double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
 
             if (distanceToPortable > 800) {
                 setScale(0.6f, 100); // Zoom out to show overview
@@ -421,7 +428,7 @@ public class Camera {
         // Position
         if (positionFrameIndex < positionFrameLimit) {
 
-            double totalDistanceToTarget = Geometry.calculateDistance(originalPosition, targetPosition);
+            double totalDistanceToTarget = Geometry.distance(originalPosition, targetPosition);
             double totalDistanceToTargetX = targetPosition.x - originalPosition.x;
             double totalDistanceToTargetY = targetPosition.y - originalPosition.y;
 

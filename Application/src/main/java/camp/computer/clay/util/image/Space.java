@@ -337,8 +337,8 @@ public class Space extends Image<Model> {
             Image image = images.get(i);
 
             // Update Image Position
-            image.getPosition().gx = image.getPosition().x;
-            image.getPosition().gy = image.getPosition().y;
+//            image.getPosition().gx = image.getPosition().x;
+//            image.getPosition().gy = image.getPosition().y;
 
             // Update bounding box of Image
             // TODO:
@@ -402,13 +402,13 @@ public class Space extends Image<Model> {
                     pathPrototypeDestinationCoordinate
             );
 
-            Point pathStartCoordinate = Geometry.rotateTranslatePoint(
+            Point pathStartCoordinate = Geometry.getRotateTranslatePoint(
                     pathPrototypeSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
-            Point pathStopCoordinate = Geometry.rotateTranslatePoint(
+            Point pathStopCoordinate = Geometry.getRotateTranslatePoint(
                     pathPrototypeDestinationCoordinate,
                     pathRotationAngle + 180,
                     2 * triangleSpacing

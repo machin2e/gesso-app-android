@@ -339,13 +339,13 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStrokeWidth((float) line.getOutlineThickness());
 
         // Color
-        canvas.drawLine((float) line.getSource().getAbsoluteX(), (float) line.getSource().getAbsoluteY(), (float) line.getTarget().getAbsoluteX(), (float) line.getTarget().getAbsoluteY(), paint);
+        canvas.drawLine((float) line.getSource().x, (float) line.getSource().y, (float) line.getTarget().x, (float) line.getTarget().y, paint);
     }
 
     public void drawLine(Point source, Point target) {
 
         // Color
-        canvas.drawLine((float) source.getAbsoluteX(), (float) source.getAbsoluteY(), (float) target.getAbsoluteX(), (float) target.getAbsoluteY(), paint);
+        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
         // TODO: canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
 
     }
@@ -359,11 +359,19 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         for (int i = 0; i < vertices.size() - 1; i++) {
 
+//            canvas.drawLine(
+//                    (float) vertices.get(i).getAbsoluteX(),
+//                    (float) vertices.get(i).getAbsoluteY(),
+//                    (float) vertices.get(i + 1).getAbsoluteX(),
+//                    (float) vertices.get(i + 1).getAbsoluteY(),
+//                    paint
+//            );
+
             canvas.drawLine(
-                    (float) vertices.get(i).getAbsoluteX(),
-                    (float) vertices.get(i).getAbsoluteY(),
-                    (float) vertices.get(i + 1).getAbsoluteX(),
-                    (float) vertices.get(i + 1).getAbsoluteY(),
+                    (float) vertices.get(i).x,
+                    (float) vertices.get(i).y,
+                    (float) vertices.get(i + 1).x,
+                    (float) vertices.get(i + 1).y,
                     paint
             );
         }
@@ -451,6 +459,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     public void drawRectangle(Point position, double angle, double width, double height) {
 
         canvas.save();
+
         canvas.translate((float) position.x, (float) position.y);
         canvas.rotate((float) angle);
 
@@ -467,9 +476,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawCircle(Point position, double radius, double angle) {
 
+        canvas.save();
+
+        canvas.translate((float) position.x, (float) position.y);
+        canvas.rotate((float) angle);
+
         // Color
         //canvas.drawCircle((float) position.getAbsoluteX(), (float) position.getAbsoluteY(), (float) radius, paint);
         canvas.drawCircle((float) position.x, (float) position.y, (float) radius, paint);
+
+        canvas.restore();
 
     }
 
@@ -494,7 +510,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         double triangleRotationAngle = pathRotationAngle + 90.0f;
 
-        double pathDistance = Geometry.calculateDistance(startPosition, stopPosition);
+        double pathDistance = Geometry.distance(startPosition, stopPosition);
 
         int triangleCount = (int) (pathDistance / (triangleHeight + 15));
         double triangleSpacing2 = pathDistance / triangleCount;
@@ -502,7 +518,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         for (int k = 0; k <= triangleCount; k++) {
 
             // Calculate triangle position
-            Point triangleCenterPosition = Geometry.rotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
+            Point triangleCenterPosition = Geometry.getRotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
 
             paint.setStyle(Paint.Style.FILL);
             drawTriangle(triangleCenterPosition, triangleRotationAngle, triangleWidth, triangleHeight);
@@ -517,18 +533,14 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     // TODO: Refactor with transforms
     public void drawPolygon(List<Point> vertices) {
 
+        // Draw vertex Points in Shape
         android.graphics.Path path = new android.graphics.Path();
-        for (int i = 0; i < vertices.size(); i++) {
-
-            // Draw pointerCoordinates in shape
-            path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-            if (i == 0) {
-                path.moveTo((float) vertices.get(i).x, (float) vertices.get(i).y);
-            }
-
+        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+        path.moveTo((float) vertices.get(0).x, (float) vertices.get(0).y);
+        for (int i = 1; i < vertices.size(); i++) {
             path.lineTo((float) vertices.get(i).x, (float) vertices.get(i).y);
         }
-
+//        path.lineTo((float) vertices.get(0).x, (float) vertices.get(0).y);
         path.close();
 
         canvas.drawPath(path, paint);
@@ -548,9 +560,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Point p3 = new Point(position.x + (width / 2.0f), position.y + (height / 2.0f));
 
         // Calculate pointerCoordinates after rotation
-        Point rp1 = Geometry.rotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.calculateDistance(position, p1));
-        Point rp2 = Geometry.rotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.calculateDistance(position, p2));
-        Point rp3 = Geometry.rotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.calculateDistance(position, p3));
+        Point rp1 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.distance(position, p1));
+        Point rp2 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.distance(position, p2));
+        Point rp3 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.distance(position, p3));
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);

@@ -6,7 +6,7 @@ import java.util.List;
 public abstract class Geometry {
 
     public static double getAngle(Point source, Point target) {
-        return Geometry.getAngle(source.getAbsoluteX(), source.getAbsoluteY(), target.getAbsoluteX(), target.getAbsoluteY());
+        return Geometry.getAngle(source.x, source.y, target.x, target.y);
     }
 
     /**
@@ -55,29 +55,57 @@ public abstract class Geometry {
         return angle;
     }
 
+    public static void translatePoint(Point point, double x, double y) {
+        point.x = point.x + x;
+        point.y = point.y + y;
+    }
+
     /**
-     * Calculates coordinates of a point rotated about about another point by {@code angle} degrees.
-     * <p>
-     * References:
-     * - http://www.gamefromscratch.com/post/2012/11/24/GameDev-math-recipes-Rotating-one-point-around-another-point.aspx
-     *
-     * @return
+     * Rotates {@code point} by {@code rotation} degrees about point (0, 0).
+     * @param point
+     * @param rotation
      */
-//    public static Point rotatePoint(Point center, double angle, Point point) {
-//        return Geometry.rotateTranslatePoint(center, angle + Geometry.getAngle(center, point), calculateDistance(center, point));
+    public static void rotatePoint(Point point, double rotation) {
+//        Geometry.rotateTranslatePoint2(point, referencePoint, , distance(referencePoint, point));
+
+        double distance = distance(0, 0, point.x, point.y);
+        double totalRotation = rotation + Geometry.getAngle(0, 0, point.x, point.y);
+
+        point.x = 0 + distance * Math.cos(Math.toRadians(totalRotation));
+        point.y = 0 + distance * Math.sin(Math.toRadians(totalRotation));
+    }
+
+    /**
+     * Rotates {@code point} by {@code rotation} degrees about {@code referencePoint}. Stores the
+     * result in {@code point}.
+     */
+    public static void rotatePoint(Point point, double rotation, Point referencePoint) {
+//        Geometry.rotateTranslatePoint2(point, referencePoint, , distance(referencePoint, point));
+
+        double distance = distance(referencePoint, point);
+        double totalRotation = rotation + Geometry.getAngle(referencePoint, point);
+
+        point.x = referencePoint.x + distance * Math.cos(Math.toRadians(totalRotation));
+        point.y = referencePoint.y + distance * Math.sin(Math.toRadians(totalRotation));
+    }
+
+//    public static void rotatePoint(double x1, double y1, double angle, double x2, double y2) {
+//        Geometry.rotateTranslatePoint2(x1, y1, angle + Geometry.getAngle(x1, y1, x2, y2), distance(x1, y1, x2, y2));
 //    }
 
-//    public static Point rotatePoint(double x1, double y1, double angle, double x2, double y2) {
-//        return Geometry.rotateTranslatePoint(x1, y1, angle + Geometry.getAngle(x1, y1, x2, y2), calculateDistance(x1, y1, x2, y2));
+//    public static void rotateTranslatePoint2(Point point, Point referencePoint, double rotation, double distance) {
+//        point.x = referencePoint.x + distance * Math.cos(Math.toRadians(rotation));
+//        point.y = referencePoint.y + distance * Math.sin(Math.toRadians(rotation));
 //    }
-    public static Point rotateTranslatePoint(Point originPoint, double rotation, double distance) {
+
+    public static Point getRotateTranslatePoint(Point referencePoint, double rotation, double distance) {
         Point point = new Point();
-        point.setAbsoluteX(originPoint.getAbsoluteX() + distance * Math.cos(Math.toRadians(rotation)));
-        point.setAbsoluteY(originPoint.getAbsoluteY() + distance * Math.sin(Math.toRadians(rotation)));
+        point.x = referencePoint.x + distance * Math.cos(Math.toRadians(rotation));
+        point.y = referencePoint.y + distance * Math.sin(Math.toRadians(rotation));
         return point;
     }
 
-//    public static Point rotateTranslatePoint(double x, double y, double rotation, double distance) {
+//    public static Point getRotateTranslatePoint(double x, double y, double rotation, double distance) {
 //        Point point = new Point();
 //        point.setAbsoluteX(x + distance * Math.cos(Math.toRadians(rotation)));
 //        point.setAbsoluteY(y + distance * Math.sin(Math.toRadians(rotation)));
@@ -87,8 +115,8 @@ public abstract class Geometry {
     public static Point midpoint(Point source, Point target) {
         Point midpoint = new Point(
                 (source.x + target.x) / 2.0f,
-                (source.y + target.y) / 2.0f,
-                source.getReferencePoint()
+                (source.y + target.y) / 2.0f //,
+//                source.getReferencePoint()
         );
         return midpoint;
     }
@@ -132,16 +160,16 @@ public abstract class Geometry {
 //    // References:
 //    // - http://stackoverflow.com/questions/4438244/how-to-calculate-shortest-2d-distance-between-a-point-and-a-line-segment-in-all
 //    public static double distanceToLine(Point linePointA, Point linePointB, Point point, boolean isSegment) {
-//        double distance = crossProduct(linePointA, linePointB, point) / calculateDistance(linePointA, linePointB);
+//        double distance = crossProduct(linePointA, linePointB, point) / distance(linePointA, linePointB);
 //        if (isSegment) {
 //            double dot1 = dotProduct(linePointA, linePointB, point);
 //            if (dot1 > 0) {
-//                return calculateDistance(linePointB, point);
+//                return distance(linePointB, point);
 //            }
 //
 //            double dot2 = dotProduct(linePointB, linePointA, point);
 //            if (dot2 > 0) {
-//                return calculateDistance(linePointA, point);
+//                return distance(linePointA, point);
 //            }
 //        }
 //        return Math.abs(distance);
@@ -156,8 +184,8 @@ public abstract class Geometry {
             Point point = points.get(i);
 
 //            centroidPosition.setAbsolute(
-//                    centroidPosition.getAbsoluteX() + point.getAbsoluteX(),
-//                    centroidPosition.getAbsoluteY() + point.getAbsoluteY()
+//                    centroidPosition.x + point.x,
+//                    centroidPosition.y + point.y
 //            );
             centroidPosition.set(
                     centroidPosition.x + point.x,
@@ -166,8 +194,8 @@ public abstract class Geometry {
         }
 
 //        centroidPosition.setAbsolute(
-//                centroidPosition.getAbsoluteX() / points.size(),
-//                centroidPosition.getAbsoluteY() / points.size()
+//                centroidPosition.x / points.size(),
+//                centroidPosition.y / points.size()
 //        );
         centroidPosition.set(
                 centroidPosition.x / points.size(),
@@ -188,20 +216,20 @@ public abstract class Geometry {
         for (int i = 0; i < points.size(); i++) {
             Point point = points.get(i);
 
-            double absoluteX = point.getAbsoluteX();
-            double absoluteY = point.getAbsoluteY();
+            double x = point.x;
+            double y = point.y;
 
-            if (absoluteX < minX) {
-                minX = absoluteX;
+            if (x < minX) {
+                minX = x;
             }
-            if (absoluteY < minY) {
-                minY = absoluteY;
+            if (y < minY) {
+                minY = y;
             }
-            if (absoluteX > maxX) {
-                maxX = absoluteX;
+            if (x > maxX) {
+                maxX = x;
             }
-            if (absoluteY > maxY) {
-                maxY = absoluteY;
+            if (y > maxY) {
+                maxY = y;
             }
         }
 
@@ -229,11 +257,11 @@ public abstract class Geometry {
 //
 //        // Initialize point
 //        Point nearestPoint = points.get(0);
-//        double nearestDistance = calculateDistance(point, nearestPoint);
+//        double nearestDistance = distance(point, nearestPoint);
 //
 //        // Search for the nearest point
 //        for (int i = 0; i < points.size(); i++) {
-//            double distance = calculateDistance(points.get(i), point);
+//            double distance = distance(points.get(i), point);
 //            if (distance < nearestDistance) {
 //                nearestPoint.set(point);
 //            }
@@ -254,28 +282,28 @@ public abstract class Geometry {
     public static boolean contains(List<Point> vertices, Point point) {
 
         // Setup
-        double minX = vertices.get(0).getAbsoluteX();
-        double maxX = vertices.get(0).getAbsoluteX();
-        double minY = vertices.get(0).getAbsoluteY();
-        double maxY = vertices.get(0).getAbsoluteY();
+        double minX = vertices.get(0).x;
+        double maxX = vertices.get(0).x;
+        double minY = vertices.get(0).y;
+        double maxY = vertices.get(0).y;
 
         for (int i = 1; i < vertices.size(); i++) {
             Point vertex = vertices.get(i);
-            minX = Math.min(vertex.getAbsoluteX(), minX);
-            maxX = Math.max(vertex.getAbsoluteX(), maxX);
-            minY = Math.min(vertex.getAbsoluteY(), minY);
-            maxY = Math.max(vertex.getAbsoluteY(), maxY);
+            minX = Math.min(vertex.x, minX);
+            maxX = Math.max(vertex.x, maxX);
+            minY = Math.min(vertex.y, minY);
+            maxY = Math.max(vertex.y, maxY);
         }
 
-        if (point.getAbsoluteX() < minX || point.getAbsoluteX() > maxX || point.getAbsoluteY() < minY || point.getAbsoluteY() > maxY) {
+        if (point.x < minX || point.x > maxX || point.y < minY || point.y > maxY) {
             return false;
         }
 
         // Procedure
         boolean isContained = false;
         for (int i = 0, j = vertices.size() - 1; i < vertices.size(); j = i++) {
-            if ((vertices.get(i).getAbsoluteY() > point.getAbsoluteY()) != (vertices.get(j).getAbsoluteY() > point.getAbsoluteY()) &&
-                    point.getAbsoluteX() < (vertices.get(j).getAbsoluteX() - vertices.get(i).getAbsoluteX()) * (point.getAbsoluteY() - vertices.get(i).getAbsoluteY()) / (vertices.get(j).getAbsoluteY() - vertices.get(i).getAbsoluteY()) + vertices.get(i).getAbsoluteX()) {
+            if ((vertices.get(i).y > point.y) != (vertices.get(j).y > point.y) &&
+                    point.x < (vertices.get(j).x - vertices.get(i).x) * (point.y - vertices.get(i).y) / (vertices.get(j).y - vertices.get(i).y) + vertices.get(i).x) {
                 isContained = !isContained;
             }
         }
@@ -283,20 +311,19 @@ public abstract class Geometry {
         return isContained;
     }
 
-    public static List<Point> getRegularPolygon(Point position, double radius, int segmentCount) {
+    public static List<Point> getRegularPolygon(Point position, double radius, int vertexCount) {
 
         List<Point> vertices = new ArrayList<>();
 
+        int segmentCount = vertexCount - 1;
+
+        // Calculate vertex Points on boundary of a circle
         for (int i = 0; i < segmentCount; i++) {
-
-            // Calculate point prior to rotation
-            Point vertexPosition = new Point(
-                    (0 + radius * (Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.rotation)),
-                    (0 + radius * (Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount)) + Math.toRadians(position.rotation)),
-                    position
+            Point vertex = new Point(
+                    0 + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount) + Math.toRadians(position.rotation),
+                    0 + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount) + Math.toRadians(position.rotation)
             );
-
-            vertices.add(vertexPosition);
+            vertices.add(vertex);
         }
 
         return vertices;
@@ -324,11 +351,11 @@ public abstract class Geometry {
 //        return vertices;
 //    }
 
-    public static double calculateDistance(Point source, Point target) {
-        return calculateDistance(source.getAbsoluteX(), source.getAbsoluteY(), target.getAbsoluteX(), target.getAbsoluteY());
+    public static double distance(Point source, Point target) {
+        return distance(source.x, source.y, target.x, target.y);
     }
 
-    public static double calculateDistance(double x1, double y1, double x2, double y2) {
+    public static double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
@@ -370,14 +397,14 @@ public abstract class Geometry {
 //    // Lamothe, my first book covering graphics programming.
 //    public static boolean testLineIntersection(Point p0, Point p1, Point p2, Point p3 /*, float*i_x, float*i_y*/) {
 //        double s1_x, s1_y, s2_x, s2_y;
-//        s1_x = p1.getAbsoluteX() - p0.getAbsoluteX();
-//        s1_y = p1.getAbsoluteY() - p0.getAbsoluteY();
-//        s2_x = p3.getAbsoluteX() - p2.getAbsoluteX();
-//        s2_y = p3.getAbsoluteY() - p2.getAbsoluteY();
+//        s1_x = p1.x - p0.x;
+//        s1_y = p1.y - p0.y;
+//        s2_x = p3.x - p2.x;
+//        s2_y = p3.y - p2.y;
 //
 //        double s, t;
-//        s = (-s1_y * (p0.getAbsoluteX() - p2.getAbsoluteX()) + s1_x * (p0.getAbsoluteY() - p2.getAbsoluteY())) / (-s2_x * s1_y + s1_x * s2_y);
-//        t = (s2_x * (p0.getAbsoluteY() - p2.getAbsoluteY()) - s2_y * (p0.getAbsoluteX() - p2.getAbsoluteX())) / (-s2_x * s1_y + s1_x * s2_y);
+//        s = (-s1_y * (p0.x - p2.x) + s1_x * (p0.y - p2.y)) / (-s2_x * s1_y + s1_x * s2_y);
+//        t = (s2_x * (p0.y - p2.y) - s2_y * (p0.x - p2.x)) / (-s2_x * s1_y + s1_x * s2_y);
 //
 //        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
 //            // Collision detected

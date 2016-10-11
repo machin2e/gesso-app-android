@@ -138,7 +138,8 @@ public abstract class Image<T extends Entity> {
 
     public <T extends Shape> void addShape(T shape) {
         shape.setImage(this);
-        shape.getPosition().setReferencePoint(getPosition());
+        shape.setImagePosition(shape.position);
+//        shape.getPosition().setReferencePoint(getPosition());
         this.shapes.add(shape);
     }
 
@@ -232,36 +233,42 @@ public abstract class Image<T extends Entity> {
         for (int i = 0; i < this.shapes.size(); i++) {
             Shape shape = this.shapes.get(i);
 
-            // Update Position of Shape
-            updateAbsoluteX(shape);
-            updateAbsoluteY(shape);
-
-            // Update bounding box of Shape
-            // TODO:
-
             // Update the Shape
-            this.shapes.get(i).update();
+            //shape.update();
+            shape.updateGeometry(this);
         }
     }
 
-    /**
-     * @return Updates absolute x coordinate of {@code Shape} relative to this {@code Image}.
-     */
-    private void updateAbsoluteX(Shape shape) {
-        double absoluteX = Geometry.calculateDistance(0, 0, shape.getPosition().x, shape.getPosition().y) * Math.cos(Math.toRadians(getPosition().getRotation() + Geometry.getAngle(0, 0, shape.getPosition().x, shape.getPosition().y)));
-        shape.getPosition().gx = getPosition().x + absoluteX;
-    }
-
-    /**
-     * @return Updates absolute y coordinate of {@code Shape} relative to this {@code Image}.
-     */
-    private void updateAbsoluteY(Shape shape) {
-        double absoluteY = Geometry.calculateDistance(0, 0, shape.getPosition().x, shape.getPosition().y) * Math.sin(Math.toRadians(getPosition().getRotation() + Geometry.getAngle(0, 0, shape.getPosition().x, shape.getPosition().y)));
-        shape.getPosition().gy = getPosition().y + absoluteY;
-    }
+//    /**
+//     * @return Updates absolute x coordinate of {@code Shape} relative to this {@code Image}.
+//     */
+//    private void updateAbsoluteX(Shape shape) {
+//        double absoluteX = Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(getPosition().getRotation() + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+//        shape.getPosition().x = getPosition().x + absoluteX;
+//    }
+//
+//    /**
+//     * @return Updates absolute y coordinate of {@code Shape} relative to this {@code Image}.
+//     */
+//    private void updateAbsoluteY(Shape shape) {
+//        double absoluteY = Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(getPosition().getRotation() + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+//        shape.getPosition().y = getPosition().y + absoluteY;
+//    }
+//
+//    private void updateAbsoluteRotation(Shape shape) {
+//        double absoluteRotation = getPosition().getRotation() + shape.imagePosition.getRotation();
+//        shape.setRotation(absoluteRotation);
+//    }
 
     public abstract void draw(Display display);
 
+    /**
+     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+     * {@code point}.
+     *
+     * @param point
+     * @return
+     */
     public boolean contains(Point point) {
         if (isVisible()) {
             for (int i = 0; i < shapes.size(); i++) {
@@ -314,24 +321,25 @@ public abstract class Image<T extends Entity> {
         return positions;
     }
 
-    // Refactor to NOT use absolute and TO cache vertices... and NOT allocate arrays and Points every update
-    public Rectangle getBoundingBox() {
+//    // Refactor to NOT use absolute and TO cache vertices... and NOT allocate arrays and Points every update
+//    public Rectangle getBoundingBox() {
+//
+//        List<Point> boundingBoxVertices = new LinkedList<>();
+//
+//        for (int i = 0; i < shapes.size(); i++) {
+//
+//            Shape shape = shapes.get(i);
+//            List<Point> shapeVertices = shape.getVertices();
+//
+//            for (int j = 0; j < shapeVertices.size(); j++) {
+//                boundingBoxVertices.add(shapeVertices.get(j));
+//            }
+//        }
+//
+//        return Geometry.getBoundingBox(boundingBoxVertices);
+//    }
 
-        List<Point> boundingBoxVertices = new LinkedList<>();
-
-        for (int i = 0; i < shapes.size(); i++) {
-
-            Shape shape = shapes.get(i);
-            List<Point> shapeVertices = shape.getVertices();
-
-            for (int j = 0; j < shapeVertices.size(); j++) {
-                boundingBoxVertices.add(shapeVertices.get(j));
-            }
-        }
-
-        return Geometry.getBoundingBox(boundingBoxVertices);
-    }
-
+    // TODO: Delete!
     public double getRelativeAngle(Point point) {
 
         double relativeAngle = Geometry.getAngle(position, point);

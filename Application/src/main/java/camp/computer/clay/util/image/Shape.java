@@ -23,11 +23,18 @@ public abstract class Shape<T extends Entity> {
     protected Point imagePosition = null;
 
     public void setImagePosition(double x, double y) {
+        if (imagePosition == null) {
+            imagePosition = new Point();
+        }
         this.imagePosition.set(x, y);
     }
 
     public void setImagePosition(Point point) {
+        if (imagePosition == null) {
+            imagePosition = new Point();
+        }
         this.imagePosition.set(point.x, point.y);
+        this.imagePosition.setRotation(point.rotation);
     }
 
     public Point getImagePosition() {
@@ -197,6 +204,69 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void update() {
+    }
+
+    /**
+     * Updates the {@code Shape}'s geometry. Specifically, computes the absolute positioning,
+     * rotation, and scaling in preparation for drawing and collision detection.
+     *
+     * @param referenceImage Position of the containing {@code Image} relative to which the
+     *                       {@code Shape} will be drawn.
+     */
+    protected void updateGeometry(Image referenceImage) {
+
+        // Update the position
+        updatePosition(referenceImage);
+
+        // Update rotation
+        updateRotation(referenceImage);
+
+        // Update the bounds (using the results from the update position and rotation)
+        updateBoundary(referenceImage);
+    }
+
+    private void updatePosition(Image referenceImage) {
+        updatePositionX(referenceImage);
+        updatePositionY(referenceImage);
+    }
+
+    /**
+     * @return Updates absolute x coordinate of {@code Shape} relative to this {@code Image}.
+     */
+    private void updatePositionX(Image referenceImage) {
+        double x = Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referenceImage.position.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+        position.x = referenceImage.position.x + x;
+    }
+
+    /**
+     * @return Updates absolute y coordinate of {@code Shape} relative to this {@code Image}.
+     */
+    private void updatePositionY(Image referenceImage) {
+        double y = Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referenceImage.position.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+        position.y = referenceImage.position.y + y;
+    }
+
+    private void updateRotation(Image referenceImage) {
+        this.position.rotation = referenceImage.position.rotation + imagePosition.rotation;
+    }
+
+    // TODO: Delete! Refactor this out.
+    public List<Point> temp_getRelativeVertices() {
+        return getVertices();
+    }
+
+    private void updateBoundary(Image referenceImage) {
+//        List<Point> vertices = getVertices();
+        List<Point> vertices = temp_getRelativeVertices();
+
+        // Translate and rotate the vertices about the updated position
+        for (int i = 0; i < vertices.size(); i++) {
+//            Geometry.rotatePoint(vertices.get(i), getRotation(), referenceImage.position); // Rotate Shape vertices about Image position
+//            Geometry.translatePoint(vertices.get(i), referenceImage.position.x, referenceImage.position.y); // Translate Image
+            Geometry.rotatePoint(vertices.get(i), position.rotation); // Rotate Shape vertices about Image position
+//            Geometry.translatePoint(vertices.get(i), referenceImage.position.x, referenceImage.position.y); // Translate Image
+            Geometry.translatePoint(vertices.get(i), position.x, position.y); // Translate Shape
+        }
     }
 
     public abstract void draw(Display display);

@@ -1,5 +1,8 @@
 package camp.computer.clay.util.geometry;
 
+import android.graphics.Color;
+import android.graphics.Paint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,17 +12,41 @@ import camp.computer.clay.util.image.Shape;
 
 public class Vertex<T extends Entity> extends Shape<T> {
 
+    protected List<Point> vertices = new ArrayList<>();
+
+    private Point vertex = new Point();
+
     public Vertex() {
+        setup();
+    }
+
+    public Vertex(Point position) {
+        super(position);
+        setup();
     }
 
     public Vertex(T entity) {
         this.entity = entity;
+        setup();
+    }
+
+    private void setup() {
+        setupGeometry();
+    }
+
+    private void setupGeometry() {
+        vertices = new ArrayList<>();
+        vertices.add(vertex);
+    }
+
+    @Override
+    public List<Point> temp_getRelativeVertices() {
+        vertex.set(position);
+        return vertices;
     }
 
     @Override
     public List<Point> getVertices() {
-        List<Point> vertices = new ArrayList<>();
-        vertices.add(getPosition());
         return vertices;
     }
 
@@ -33,10 +60,12 @@ public class Vertex<T extends Entity> extends Shape<T> {
         if (isVisible()) {
             // display.drawVertex(this);
         }
-    }
 
-    public Vertex(Point position) {
-        super(position);
+        // Draw bounding box!
+        display.paint.setColor(Color.GREEN);
+        display.paint.setStyle(Paint.Style.STROKE);
+        display.paint.setStrokeWidth(2.0f);
+        display.canvas.drawLine((float) position.x - 10, (float) position.y - 10, (float) position.x + 10, (float) position.y + 10, display.paint);
     }
 
     public void setX(double x) {

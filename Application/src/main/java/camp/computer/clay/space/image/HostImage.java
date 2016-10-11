@@ -45,7 +45,7 @@ public class HostImage extends PortableImage {
     }
 
     private void setup() {
-        setupShapes();
+        setupGeometry();
         setupActions();
 
         extensionAxes.add(new ArrayList<Extension>());
@@ -54,7 +54,7 @@ public class HostImage extends PortableImage {
         extensionAxes.add(new ArrayList<Extension>());
     }
 
-    private void setupShapes() {
+    private void setupGeometry() {
         Rectangle rectangle;
         Circle circle;
 
@@ -106,20 +106,20 @@ public class HostImage extends PortableImage {
         final double contactSeparation = 6.0 * 2.54;
 
         headerContactPositions.add(new Vertex(new Point(-contactSeparation, 132)));
-        headerContactPositions.add(new Vertex(new Point(0, 132, position)));
-        headerContactPositions.add(new Vertex(new Point(contactSeparation, 132, position)));
+        headerContactPositions.add(new Vertex(new Point(0, 132)));
+        headerContactPositions.add(new Vertex(new Point(contactSeparation, 132)));
 
-        headerContactPositions.add(new Vertex(new Point(132, contactSeparation, position)));
-        headerContactPositions.add(new Vertex(new Point(132, 0, position)));
-        headerContactPositions.add(new Vertex(new Point(132, -contactSeparation, position)));
+        headerContactPositions.add(new Vertex(new Point(132, contactSeparation)));
+        headerContactPositions.add(new Vertex(new Point(132, 0)));
+        headerContactPositions.add(new Vertex(new Point(132, -contactSeparation)));
 
-        headerContactPositions.add(new Vertex(new Point(contactSeparation, -132, position)));
-        headerContactPositions.add(new Vertex(new Point(0, -132, position)));
-        headerContactPositions.add(new Vertex(new Point(-contactSeparation, -132, position)));
+        headerContactPositions.add(new Vertex(new Point(contactSeparation, -132)));
+        headerContactPositions.add(new Vertex(new Point(0, -132)));
+        headerContactPositions.add(new Vertex(new Point(-contactSeparation, -132)));
 
-        headerContactPositions.add(new Vertex(new Point(-132, -contactSeparation, position)));
-        headerContactPositions.add(new Vertex(new Point(-132, 0, position)));
-        headerContactPositions.add(new Vertex(new Point(-132, contactSeparation, position)));
+        headerContactPositions.add(new Vertex(new Point(-132, -contactSeparation)));
+        headerContactPositions.add(new Vertex(new Point(-132, 0)));
+        headerContactPositions.add(new Vertex(new Point(-132, contactSeparation)));
 
         for (int i = 0; i < headerContactPositions.size(); i++) {
             addShape(headerContactPositions.get(i));
@@ -338,7 +338,7 @@ public class HostImage extends PortableImage {
                                                     Image otherImage = imageGroup.get(i);
 
                                                     // Update style of nearby Hosts
-                                                    double distanceToHostImage = Geometry.calculateDistance(
+                                                    double distanceToHostImage = Geometry.distance(
                                                             event.getPosition(),
                                                             otherImage.getPosition()
                                                     );
@@ -963,7 +963,7 @@ public class HostImage extends PortableImage {
             for (int j = 0; j < getHost().getPorts().size(); j++) {
                 if (getHost().getPorts().get(j).getType() == Port.Type.NONE) {
 
-                    double distanceToPort = Geometry.calculateDistance(
+                    double distanceToPort = Geometry.distance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
                             extensionImage.getPosition()
                     );
@@ -1034,7 +1034,7 @@ public class HostImage extends PortableImage {
                 Line segment = hostShapeSegments.get(i);
                 Point segmentMidpoint = segment.getMidpoint();
 
-                double distance = Geometry.calculateDistance(hostPortPosition, segmentMidpoint);
+                double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
 
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -1170,19 +1170,19 @@ public class HostImage extends PortableImage {
                 // Update the Extension Image position and rotation
                 //extensionImage.setPosition(event.getPosition());
                 if (segmentIndex == 0) {
-                    extensionImage.getPosition().setReferencePoint(getPosition());
+//                    extensionImage.getPosition().setReferencePoint(getPosition());
                     extensionImage.getPosition().setX(0 + offset);
                     extensionImage.getPosition().setY(-distanceToExtensions);
                 } else if (segmentIndex == 1) {
-                    extensionImage.getPosition().setReferencePoint(getPosition());
+//                    extensionImage.getPosition().setReferencePoint(getPosition());
                     extensionImage.getPosition().setX(distanceToExtensions);
                     extensionImage.getPosition().setY(0 + offset);
                 } else if (segmentIndex == 2) {
-                    extensionImage.getPosition().setReferencePoint(getPosition());
+//                    extensionImage.getPosition().setReferencePoint(getPosition());
                     extensionImage.getPosition().setX(0 + offset);
                     extensionImage.getPosition().setY(distanceToExtensions);
                 } else if (segmentIndex == 3) {
-                    extensionImage.getPosition().setReferencePoint(getPosition());
+//                    extensionImage.getPosition().setReferencePoint(getPosition());
                     extensionImage.getPosition().setX(-distanceToExtensions);
                     extensionImage.getPosition().setY(0 + offset);
                 }
@@ -1223,46 +1223,46 @@ public class HostImage extends PortableImage {
 
             canvas.save();
 
-            canvas.translate(
-                    (float) position.x,
-                    (float) position.y
-            );
-
-            /*
-            // <HACK>
-            display.paint.setStyle(Paint.Style.FILL);
-            display.paint.setColor(Color.GREEN);
-            display.paint.setStrokeWidth(2.0f);
-            display.canvas.drawLine(
-                    (float) 0,
-                    (float) 0,
-                    (float) 250,
-                    (float) 0,
-                    display.paint
-            );
-
-            display.canvas.drawText(
-                    "0°",
-                    260,
-                    13,
-                    display.paint
-            );
-
-            display.paint.setStyle(Paint.Style.STROKE);
-            display.canvas.drawArc(
-                    -250,
-                    -250,
-                    250,
-                    250,
-                    0,
-                    (float) position.rotation,
-                    false,
-                    display.paint
-            );
-            // </HACK>
-            */
-
-            canvas.rotate((float) position.rotation);
+//            canvas.translate(
+//                    (float) position.x,
+//                    (float) position.y
+//            );
+//
+//            /*
+//            // <HACK>
+//            display.paint.setStyle(Paint.Style.FILL);
+//            display.paint.setColor(Color.GREEN);
+//            display.paint.setStrokeWidth(2.0f);
+//            display.canvas.drawLine(
+//                    (float) 0,
+//                    (float) 0,
+//                    (float) 250,
+//                    (float) 0,
+//                    display.paint
+//            );
+//
+//            display.canvas.drawText(
+//                    "0°",
+//                    260,
+//                    13,
+//                    display.paint
+//            );
+//
+//            display.paint.setStyle(Paint.Style.STROKE);
+//            display.canvas.drawArc(
+//                    -250,
+//                    -250,
+//                    250,
+//                    250,
+//                    0,
+//                    (float) position.rotation,
+//                    false,
+//                    display.paint
+//            );
+//            // </HACK>
+//            */
+//
+//            canvas.rotate((float) position.rotation);
 
             // Color
             for (int i = 0; i < shapes.size(); i++) {
