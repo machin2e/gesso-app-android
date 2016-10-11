@@ -1133,6 +1133,7 @@ public class HostImage extends PortableImage {
 
     public void updateExtensionLayout() {
 
+        /*
         Group<Extension> extensions = getHost().getExtensions();
 //        Log.v("ExtensionCount", "extensions: " + extensions.size());
 
@@ -1195,6 +1196,7 @@ public class HostImage extends PortableImage {
                 // </REFACTOR>
             }
         }
+        */
     }
 
     // TODO: Refactor this... it's really dumb right now.

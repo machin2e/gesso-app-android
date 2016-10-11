@@ -198,9 +198,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         Canvas canvas = null;
 
-        // Update
-        space.update();
-
         SurfaceHolder holder = getHolder();
 
         try {
@@ -210,7 +207,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 synchronized (holder) {
 
                     // Update
-                    //parentSpace.update();
+                    space.update();
 
                     // Draw
                     doDraw(canvas);
@@ -359,14 +356,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         for (int i = 0; i < vertices.size() - 1; i++) {
 
-//            canvas.drawLine(
-//                    (float) vertices.get(i).getAbsoluteX(),
-//                    (float) vertices.get(i).getAbsoluteY(),
-//                    (float) vertices.get(i + 1).getAbsoluteX(),
-//                    (float) vertices.get(i + 1).getAbsoluteY(),
-//                    paint
-//            );
-
             canvas.drawLine(
                     (float) vertices.get(i).x,
                     (float) vertices.get(i).y,
@@ -482,7 +471,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.rotate((float) angle);
 
         // Color
-        //canvas.drawCircle((float) position.getAbsoluteX(), (float) position.getAbsoluteY(), (float) radius, paint);
         canvas.drawCircle((float) position.x, (float) position.y, (float) radius, paint);
 
         canvas.restore();

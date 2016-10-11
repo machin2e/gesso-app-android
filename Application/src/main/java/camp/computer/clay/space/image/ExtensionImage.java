@@ -167,6 +167,8 @@ public class ExtensionImage extends PortableImage {
 
     public void update() {
 
+        super.update();
+
         // Create additional Images or Shapes to match the corresponding Entity
         updateImage();
 
@@ -184,8 +186,6 @@ public class ExtensionImage extends PortableImage {
         // <HACK>
         updatePathRoutes();
         // </HACK>
-
-        super.update();
     }
 
     /**
@@ -334,12 +334,12 @@ public class ExtensionImage extends PortableImage {
             */
             // </HACK>
 
-            canvas.translate(
-                    (float) getPosition().x,
-                    (float) getPosition().y
-            );
-
-            canvas.rotate((float) getPosition().rotation);
+//            canvas.translate(
+//                    (float) getPosition().x,
+//                    (float) getPosition().y
+//            );
+//
+//            canvas.rotate((float) getPosition().rotation);
 
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);
