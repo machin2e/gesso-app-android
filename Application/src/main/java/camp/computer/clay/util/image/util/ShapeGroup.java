@@ -249,7 +249,7 @@ public class ShapeGroup extends Group<Shape> {
         }
     }
 
-    public void setVisibility(Visibility.Value visibility) {
+    public void setVisibility(Visibility visibility) {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             shape.setVisibility(visibility);

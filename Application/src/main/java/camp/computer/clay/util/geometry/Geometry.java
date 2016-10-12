@@ -207,7 +207,7 @@ public abstract class Geometry {
         return new Rectangle(minX, minY, maxX, maxY);
     }
 
-//    public static List<Point> getBoundingBox(List<Point> points) {
+//    public static List<Point> getBoundingBox(List<Point> endpoints) {
 //
 //        List<Point> boundary = new LinkedList<>();
 //
@@ -216,8 +216,8 @@ public abstract class Geometry {
 //        double minY = Double.MAX_VALUE;
 //        double maxY = -Double.MAX_VALUE;
 //
-//        for (int i = 0; i < points.size(); i++) {
-//            Point point = points.get(i);
+//        for (int i = 0; i < endpoints.size(); i++) {
+//            Point point = endpoints.get(i);
 //
 //            double x = point.x;
 //            double y = point.y;
@@ -247,7 +247,7 @@ public abstract class Geometry {
 //    }
 
     /**
-     * Calculates and returns the center {@code Point} of the {@code Point}s in {@code points}.
+     * Calculates and returns the center {@code Point} of the {@code Point}s in {@code endpoints}.
      *
      * @param points
      * @return

@@ -90,8 +90,8 @@ public class ExtensionImage extends PortableImage {
                         if (action.isTap()) {
 
                             // Focus on touched base
-                            setPathVisibility(Visibility.Value.VISIBLE);
-                            getPortShapes().setVisibility(Visibility.Value.VISIBLE);
+                            setPathVisibility(Visibility.VISIBLE);
+                            getPortShapes().setVisibility(Visibility.VISIBLE);
                             setTransparency(1.0);
 
                             // Show ports and paths of touched form
@@ -105,11 +105,11 @@ public class ExtensionImage extends PortableImage {
                                     Path path = paths.get(j);
 
                                     // Show ports
-                                    getSpace().getShape(path.getSource()).setVisibility(Visibility.Value.VISIBLE);
-                                    getSpace().getShape(path.getTarget()).setVisibility(Visibility.Value.VISIBLE);
+                                    getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                    getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                     // Show path
-                                    getSpace().getImage(path).setVisibility(Visibility.Value.VISIBLE);
+                                    getSpace().getImage(path).setVisibility(Visibility.VISIBLE);
                                 }
                             }
 
@@ -118,7 +118,7 @@ public class ExtensionImage extends PortableImage {
 
                             // Title
                             parentSpace.setTitleText("Extension");
-                            parentSpace.setTitleVisibility(Visibility.Value.VISIBLE);
+                            parentSpace.setTitleVisibility(Visibility.VISIBLE);
                         }
                     }
                 }
@@ -217,7 +217,7 @@ public class ExtensionImage extends PortableImage {
                 circle.setColor("#efefef");
                 circle.setOutlineThickness(0);
 
-                circle.setVisibility(Visibility.Value.INVISIBLE);
+                circle.setVisibility(Visibility.INVISIBLE);
 
                 addShape(circle);
             }

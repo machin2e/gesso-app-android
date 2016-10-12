@@ -107,7 +107,7 @@ public abstract class PortableImage extends Image<Portable> {
     }
 
     // TODO: Move into PathImage
-    public void setPathVisibility(Visibility.Value visibility) {
+    public void setPathVisibility(Visibility visibility) {
         Group<Port> ports = getPortable().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
@@ -118,17 +118,17 @@ public abstract class PortableImage extends Image<Portable> {
 
     // TODO: Move into PathImage
     // TODO: Replace with ImageGroup.filter().setVisibility()
-    public void setPathVisibility(Port port, Visibility.Value visibility) {
+    public void setPathVisibility(Port port, Visibility visibility) {
         ImageGroup pathImages = getPathImages(port);
         for (int i = 0; i < pathImages.size(); i++) {
             PathImage pathImage = (PathImage) pathImages.get(i);
 
             // Update visibility
-            if (visibility == Visibility.Value.VISIBLE) {
-                pathImage.setVisibility(Visibility.Value.VISIBLE);
+            if (visibility == Visibility.VISIBLE) {
+                pathImage.setVisibility(Visibility.VISIBLE);
                 // pathImage.setDockVisibility(Visibility.INVISIBLE);
-            } else if (visibility == Visibility.Value.INVISIBLE) {
-                pathImage.setVisibility(Visibility.Value.INVISIBLE);
+            } else if (visibility == Visibility.INVISIBLE) {
+                pathImage.setVisibility(Visibility.INVISIBLE);
                 // pathImage.setDockVisibility(Visibility.VISIBLE);
             }
 
@@ -141,7 +141,7 @@ public abstract class PortableImage extends Image<Portable> {
     }
 
     // TODO: Move into PathImage
-    public void setDockVisibility(Visibility.Value visibility) {
+    public void setDockVisibility(Visibility visibility) {
         Group<Port> ports = getPortable().getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
@@ -151,7 +151,7 @@ public abstract class PortableImage extends Image<Portable> {
     }
 
     // TODO: Move into PathImage
-    public void setDockVisibility(Port port, Visibility.Value visibility) {
+    public void setDockVisibility(Port port, Visibility visibility) {
         ImageGroup pathImages = getPathImages(port);
         for (int i = 0; i < pathImages.size(); i++) {
             PathImage pathImage = (PathImage) pathImages.get(i);

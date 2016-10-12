@@ -15,7 +15,7 @@ public class Point {
     public double y = 0;
 
     /**
-     * Relative rotation of the coordinate with which points referencing this one will be
+     * Relative rotation of the coordinate with which endpoints referencing this one will be
      * rotated.
      */
     public double rotation = 0;

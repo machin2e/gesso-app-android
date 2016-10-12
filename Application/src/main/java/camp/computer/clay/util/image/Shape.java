@@ -17,7 +17,7 @@ public abstract class Shape<T extends Entity> {
 
     protected String label = "";
 
-    protected Visibility visibility = new Visibility(Visibility.Value.VISIBLE);
+    protected Visibility visibility = Visibility.VISIBLE;
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
@@ -128,8 +128,8 @@ public abstract class Shape<T extends Entity> {
         return Geometry.contains(getBoundary(), point);
     }
 
-    public void setVisibility(Visibility.Value visibility) {
-        this.visibility.setValue(visibility);
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
     public Visibility getVisibility() {
@@ -137,7 +137,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public boolean isVisible() {
-        return visibility.getValue() == Visibility.Value.VISIBLE;
+        return visibility == Visibility.VISIBLE;
     }
 
     public void setColor(String color) {

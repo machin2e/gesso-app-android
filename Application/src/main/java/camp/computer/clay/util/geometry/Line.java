@@ -9,22 +9,25 @@ import camp.computer.clay.util.image.Shape;
 
 public class Line<T extends Entity> extends Shape<T> {
 
-    protected Point source = new Point();
-    protected Point target = new Point();
+    protected List<Point> endpoints = new ArrayList<>();
 
     public Line() {
+        super();
     }
 
     public Line(T entity) {
-        this.entity = entity;
+        super(entity);
+    }
+
+    public Line(Point source, Point target) {
+        endpoints.clear();
+        endpoints.add(source);
+        endpoints.add(target);
     }
 
     @Override
     protected List<Point> getVertices() {
-        List<Point> vertices = new ArrayList<>();
-        vertices.add(getSource());
-        vertices.add(getTarget());
-        return vertices;
+        return endpoints;
     }
 
     @Override
@@ -34,25 +37,23 @@ public class Line<T extends Entity> extends Shape<T> {
         }
     }
 
-    public Line(Point source, Point target) {
-        this.source = source;
-        this.target = target;
+    public List<Point> getPoints() {
+        return endpoints;
     }
 
     public Point getSource() {
-        return this.source;
+        return this.endpoints.get(0);
     }
 
     public void setSource(Point source) {
-        this.source.set(source);
+        this.endpoints.get(0).set(source);
     }
 
     public Point getTarget() {
-        return this.target;
+        return this.endpoints.get(1);
     }
 
     public void setTarget(Point target) {
-        //this.target = target;
-        this.target.set(target);
+        this.endpoints.get(1).set(target);
     }
 }

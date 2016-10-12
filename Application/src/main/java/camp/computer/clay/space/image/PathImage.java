@@ -19,7 +19,7 @@ import camp.computer.clay.util.image.Visibility;
 
 public class PathImage extends Image<Path> {
 
-    private Visibility dockVisibility = new Visibility(Visibility.Value.VISIBLE);
+    private Visibility dockVisibility = Visibility.VISIBLE;
 
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
@@ -79,8 +79,8 @@ public class PathImage extends Image<Path> {
         }
     }
 
-    public void setDockVisibility(Visibility.Value visibility) {
-        this.dockVisibility.setValue(visibility);
+    public void setDockVisibility(Visibility visibility) {
+        this.dockVisibility = visibility;
     }
 
     public Visibility getDockVisibility() {
@@ -88,7 +88,7 @@ public class PathImage extends Image<Path> {
     }
 
     public boolean isDockVisible() {
-        return this.dockVisibility.getValue() == Visibility.Value.VISIBLE;
+        return this.dockVisibility == Visibility.VISIBLE;
     }
 
     public void drawTrianglePath(Display display) {
@@ -101,7 +101,7 @@ public class PathImage extends Image<Path> {
         Shape targetPortShape = getSpace().getShape(path.getTarget());
 
         // Show target port
-        targetPortShape.setVisibility(Visibility.Value.VISIBLE);
+        targetPortShape.setVisibility(Visibility.VISIBLE);
         //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
@@ -114,7 +114,7 @@ public class PathImage extends Image<Path> {
         Point sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
         Point targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
-        if (dockVisibility.getValue() == Visibility.Value.VISIBLE) {
+        if (dockVisibility == Visibility.VISIBLE) {
 
             paint.setStyle(Paint.Style.FILL);
             display.drawTriangle(sourcePoint, triangleRotation, triangleWidth, triangleHeight);
@@ -139,7 +139,7 @@ public class PathImage extends Image<Path> {
         if (sourcePortShape != null && targetPortShape != null) {
 
             // Show target port
-            targetPortShape.setVisibility(Visibility.Value.VISIBLE);
+            targetPortShape.setVisibility(Visibility.VISIBLE);
             //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
             // Color

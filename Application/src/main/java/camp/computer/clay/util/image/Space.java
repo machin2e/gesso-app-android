@@ -32,10 +32,10 @@ public class Space extends Image<Model> {
 
     protected ImageGroup images = new ImageGroup();
 
-    protected Visibility extensionPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
+    protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
     protected Point extensionPrototypePosition = new Point();
 
-    protected Visibility pathPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
+    protected Visibility pathPrototypeVisibility = Visibility.INVISIBLE;
     protected Point pathPrototypeSourcePosition = new Point(0, 0);
     protected Point pathPrototypeDestinationCoordinate = new Point(0, 0);
 
@@ -51,7 +51,7 @@ public class Space extends Image<Model> {
     }
 
     // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visibility titleVisibility = new Visibility(Visibility.Value.INVISIBLE);
+    protected Visibility titleVisibility = Visibility.INVISIBLE;
     protected String titleText = "Project";
 
     public void setTitleText(String text) {
@@ -62,15 +62,15 @@ public class Space extends Image<Model> {
         return this.titleText;
     }
 
-    public void setTitleVisibility(Visibility.Value visibility) {
-        if (titleVisibility.getValue() == Visibility.Value.INVISIBLE && visibility == Visibility.Value.VISIBLE) {
+    public void setTitleVisibility(Visibility visibility) {
+        if (titleVisibility == Visibility.INVISIBLE && visibility == Visibility.VISIBLE) {
 //            Application.getView().openTitleEditor(getTitleText());
-            this.titleVisibility.setValue(visibility);
-        } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.VISIBLE) {
+            this.titleVisibility = visibility;
+        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.VISIBLE) {
 //            Application.getView().setTitleEditor(getTitleText());
-        } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.INVISIBLE) {
+        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.INVISIBLE) {
 //            Application.getView().closeTitleEditor();
-            this.titleVisibility.setValue(visibility);
+            this.titleVisibility = visibility;
         }
     }
 
@@ -115,7 +115,7 @@ public class Space extends Image<Model> {
 
                             // Title
                             setTitleText("Project");
-                            setTitleVisibility(Visibility.Value.VISIBLE);
+                            setTitleVisibility(Visibility.VISIBLE);
                         }
 
                     } else {
@@ -125,7 +125,7 @@ public class Space extends Image<Model> {
                         if (action.isTap()) {
 
                             // Title
-                            setTitleVisibility(Visibility.Value.INVISIBLE);
+                            setTitleVisibility(Visibility.INVISIBLE);
 
                             // Camera
                             camera.setFocus(getSpace());
@@ -302,7 +302,7 @@ public class Space extends Image<Model> {
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
     public Image getImage(Point point) {
-        ImageGroup image = images.filterVisibility(Visibility.Value.VISIBLE).filterContains(point);
+        ImageGroup image = images.filterVisibility(Visibility.VISIBLE).filterContains(point);
         if (image.size() > 0) {
             return image.get(0);
         } else {
@@ -394,7 +394,7 @@ public class Space extends Image<Model> {
     }
 
     private void drawExtensionPrototype(Display display) {
-        if (extensionPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
+        if (extensionPrototypeVisibility == Visibility.VISIBLE) {
 
             Paint paint = display.paint;
 
@@ -409,7 +409,7 @@ public class Space extends Image<Model> {
 
     // TODO: Make this into a shape and put this on a separate layerIndex!
     public void drawPathPrototype(Display display) {
-        if (pathPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
+        if (pathPrototypeVisibility == Visibility.VISIBLE) {
 
             Paint paint = display.paint;
 
@@ -450,8 +450,8 @@ public class Space extends Image<Model> {
         }
     }
 
-    public void setPathPrototypeVisibility(Visibility.Value visibility) {
-        pathPrototypeVisibility.setValue(visibility);
+    public void setPathPrototypeVisibility(Visibility visibility) {
+        pathPrototypeVisibility = visibility;
     }
 
     public Visibility getPathPrototypeVisibility() {
@@ -470,8 +470,8 @@ public class Space extends Image<Model> {
         this.extensionPrototypePosition.set(position);
     }
 
-    public void setExtensionPrototypeVisibility(Visibility.Value visibility) {
-        extensionPrototypeVisibility.setValue(visibility);
+    public void setExtensionPrototypeVisibility(Visibility visibility) {
+        extensionPrototypeVisibility = visibility;
     }
 
     public Visibility getExtensionPrototypeVisibility() {

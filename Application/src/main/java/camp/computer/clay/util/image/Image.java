@@ -32,7 +32,7 @@ public abstract class Image<T extends Entity> {
 
     protected double scale = 1.0;
 
-    protected Visibility visibility = new Visibility(Visibility.Value.VISIBLE);
+    protected Visibility visibility = Visibility.VISIBLE;
 
     protected double targetTransparency = 1.0;
 
@@ -126,11 +126,11 @@ public abstract class Image<T extends Entity> {
     }
 
     public boolean isVisible() {
-        return visibility.getValue() == Visibility.Value.VISIBLE;
+        return visibility == Visibility.VISIBLE;
     }
 
-    public void setVisibility(Visibility.Value visibility) {
-        this.visibility.setValue(visibility);
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
     public Visibility getVisibility() {

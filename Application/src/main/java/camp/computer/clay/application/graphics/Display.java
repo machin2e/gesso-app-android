@@ -329,6 +329,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
+    public void drawLine(Point source, Point target) {
+        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
+    }
+
     public void drawLine(Line line) {
 
         paint.setStyle(Paint.Style.STROKE);
@@ -337,14 +341,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Color
         canvas.drawLine((float) line.getSource().x, (float) line.getSource().y, (float) line.getTarget().x, (float) line.getTarget().y, paint);
-    }
-
-    public void drawLine(Point source, Point target) {
-
-        // Color
-        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
-        // TODO: canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
-
     }
 
     public void drawPolyline(Polyline polyline) {

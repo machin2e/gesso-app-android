@@ -141,13 +141,13 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public ImageGroup filterVisibility(Visibility.Value visibility) {
+    public ImageGroup filterVisibility(Visibility visibility) {
 
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
-            if (image.getVisibility().getValue() == visibility) {
+            if (image.getVisibility() == visibility) {
                 imageGroup.add(image);
             }
 
@@ -229,7 +229,7 @@ public class ImageGroup extends Group<Image> {
         }
     }
 
-    public void setVisibility(Visibility.Value visibility) {
+    public void setVisibility(Visibility visibility) {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
             image.setVisibility(visibility);

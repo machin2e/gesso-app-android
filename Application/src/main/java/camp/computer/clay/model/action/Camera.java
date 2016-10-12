@@ -379,9 +379,9 @@ public class Camera {
         ImageGroup portableImages = this.space.getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
             PortableImage portableImage = (PortableImage) portableImages.get(i);
-            portableImage.getPortShapes().setVisibility(Visibility.Value.INVISIBLE);
-            portableImage.setPathVisibility(Visibility.Value.INVISIBLE);
-            portableImage.setDockVisibility(Visibility.Value.VISIBLE);
+            portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableImage.setPathVisibility(Visibility.INVISIBLE);
+            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }
 
@@ -467,7 +467,7 @@ public class Camera {
     private void updateFocus() {
 
         // Compute focus bounding box
-        Rectangle boundingBox = space.getImages().filterVisibility(Visibility.Value.VISIBLE).getBoundingBox();
+        Rectangle boundingBox = space.getImages().filterVisibility(Visibility.VISIBLE).getBoundingBox();
 
         // Update Scale
         adjustScale(boundingBox);
