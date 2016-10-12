@@ -9,14 +9,14 @@ import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 
 public class Text extends Shape {
-    private Point source = new Point(0, 0);
-    private Point target = new Point(0, 0);
+
+    protected String text = "";
 
     public Text() {
     }
 
     @Override
-    public List<Point> getBoundary() {
+    protected List<Point> getVertices() {
         return null;
     }
 
@@ -25,28 +25,15 @@ public class Text extends Shape {
 
     }
 
-    public Text(Point source, Point target) {
-        this.source = source;
-        this.target = target;
+    public Text(Point position) {
+        super(position);
     }
 
-    public Point getSource() {
-        return this.source;
+    public String getText() {
+        return this.text;
     }
 
-    public Point getTarget() {
-        return this.target;
-    }
-
-    public void setSource(Point source) {
-        this.source = source;
-    }
-
-    public void setTarget(Point target) {
-        this.target = target;
-    }
-
-    public double getLength() {
-        return Geometry.distance(source, target);
+    public void setText(String text) {
+        this.text = text;
     }
 }

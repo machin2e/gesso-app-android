@@ -1,5 +1,8 @@
 package camp.computer.clay.util.geometry;
 
+import android.graphics.Color;
+import android.graphics.Paint;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,15 +37,10 @@ public class Vertex<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> getVertices() {
+    protected List<Point> getVertices() {
         List<Point> vertices = new LinkedList<>();
         vertices.add(new Point(imagePosition));
         return vertices;
-    }
-
-    @Override
-    public List<Point> getBoundary() {
-        return boundary;
     }
 
     @Override

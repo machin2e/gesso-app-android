@@ -38,6 +38,8 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         height = (bottom - top);
 
         setup();
+
+        updateBoundary(); // TODO: Replace with updateGeometry(this.position)
     }
 
     protected void setup() {
@@ -69,12 +71,8 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         segments.add(left);
     }
 
-    public List<Point> getBoundary() {
-        return boundary;
-    }
-
     @Override
-    public List<Point> getVertices() {
+    protected List<Point> getVertices() {
 
         List<Point> vertices = new LinkedList<>();
 
@@ -96,10 +94,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         ));
 
         return vertices;
-    }
-
-    public List<Line> getSegments() {
-        return segments;
     }
 
     public double getCornerRadius() {
@@ -136,7 +130,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
             display.paint.setColor(Color.GREEN);
             display.paint.setStyle(Paint.Style.STROKE);
             display.paint.setStrokeWidth(2.0f);
-            display.drawPolygon(getBoundary());
+            display.drawPolygon(getBoundingBox());
             */
         }
     }

@@ -169,15 +169,6 @@ public class ImageGroup extends Group<Image> {
         return positions;
     }
 
-    public List<Point> getVertices() {
-        List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
-            positions.addAll(image.getVertices());
-        }
-        return positions;
-    }
-
     public ShapeGroup getShapes() {
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -197,7 +188,13 @@ public class ImageGroup extends Group<Image> {
     }
 
     public Rectangle getBoundingBox() {
-        return Geometry.getBoundingBox(getVertices());
+
+        List<Point> imageBoundaries = new LinkedList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            imageBoundaries.addAll(elements.get(i).getBoundingBox().getBoundary());
+        }
+
+        return Geometry.getBoundingBox(imageBoundaries);
     }
 
     /**

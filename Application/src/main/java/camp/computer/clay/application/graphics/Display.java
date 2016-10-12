@@ -348,7 +348,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void drawPolyline(Polyline polyline) {
-        drawPolyline(polyline.getBoundary());
+        drawPolyline(polyline.getPoints());
     }
 
     // TODO: Refactor with transforms

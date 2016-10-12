@@ -3,6 +3,7 @@ package camp.computer.clay.util.geometry;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Geometry {
@@ -174,7 +175,6 @@ public abstract class Geometry {
         return centroidPoint;
     }
 
-    // TODO: Cache the result on a per-shape basis... remove per-step Rectangle allocation
     public static Rectangle getBoundingBox(List<Point> points) {
 
         double minX = Double.MAX_VALUE;
@@ -206,6 +206,45 @@ public abstract class Geometry {
 
         return new Rectangle(minX, minY, maxX, maxY);
     }
+
+//    public static List<Point> getBoundingBox(List<Point> points) {
+//
+//        List<Point> boundary = new LinkedList<>();
+//
+//        double minX = Double.MAX_VALUE;
+//        double maxX = -Double.MAX_VALUE;
+//        double minY = Double.MAX_VALUE;
+//        double maxY = -Double.MAX_VALUE;
+//
+//        for (int i = 0; i < points.size(); i++) {
+//            Point point = points.get(i);
+//
+//            double x = point.x;
+//            double y = point.y;
+//
+//            if (x < minX) {
+//                minX = x;
+//            }
+//            if (y < minY) {
+//                minY = y;
+//            }
+//            if (x > maxX) {
+//                maxX = x;
+//            }
+//            if (y > maxY) {
+//                maxY = y;
+//            }
+//        }
+//
+//        Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
+//
+//        boundary.add(new Point(minX, minY));
+//        boundary.add(new Point(maxX, minY));
+//        boundary.add(new Point(maxX, maxY));
+//        boundary.add(new Point(minX, maxY));
+//
+//        return boundary;
+//    }
 
     /**
      * Calculates and returns the center {@code Point} of the {@code Point}s in {@code points}.

@@ -1,5 +1,6 @@
 package camp.computer.clay.util.geometry;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
@@ -36,8 +37,12 @@ public class Triangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> getBoundary() {
-        return null;
+    protected List<Point> getVertices() {
+        List<Point> vertices = new LinkedList<>();
+        vertices.add(a);
+        vertices.add(b);
+        vertices.add(c);
+        return vertices;
     }
 
     @Override

@@ -32,6 +32,21 @@ public abstract class Shape<T extends Entity> {
 
     protected List<Point> boundary = new ArrayList<>();
 
+    protected boolean isValid = false;
+
+    /**
+     * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * <p>
+     * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
+     * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
+     * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
+     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     */
+    public void invalidate() {
+        this.isValid = false;
+    }
+
     // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
 
@@ -101,7 +116,13 @@ public abstract class Shape<T extends Entity> {
         return this.position.rotation;
     }
 
-    abstract public List<Point> getBoundary();
+    protected abstract List<Point> getVertices();
+
+    public abstract void draw(Display display);
+
+    public List<Point> getBoundary() {
+        return this.boundary;
+    }
 
     public boolean contains(Point point) {
         return Geometry.contains(getBoundary(), point);
@@ -184,67 +205,48 @@ public abstract class Shape<T extends Entity> {
         return this.label;
     }
 
-    public void update() {
-        Log.v("BBBB", "shape.position.x: " + position.x + ", y: " + position.y);
+    public void update(Point referencePoint) {
+        updateGeometry(referencePoint);
     }
 
     /**
      * Updates the {@code Shape}'s geometry. Specifically, computes the absolute positioning,
      * rotation, and scaling in preparation for drawing and collision detection.
      *
-     * @param referenceImage Position of the containing {@code Image} relative to which the
+     * @param referencePoint Position of the containing {@code Image} relative to which the
      *                       {@code Shape} will be drawn.
      */
-    protected void updateGeometry(Image referenceImage) {
+    protected void updateGeometry(Point referencePoint) {
 
-        updatePosition(referenceImage); // Update the position
-        updateRotation(referenceImage); // Update rotation
-        updateBoundary(referenceImage); // Update the bounds (using the results from the update position and rotation)
+        if (!isValid) {
+            updatePosition(referencePoint); // Update the position
+            updateRotation(referencePoint); // Update rotation
+            updateBoundary(); // Update the bounds (using the results from the update position and rotation)
+            isValid = true;
+        }
     }
 
     /**
-     * Translate the center position of the {@code Shape}. Effectively, this updates the position
-     * of the {@code Shape}.
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
+     * the center position of the {@code Shape}. Effectively, this updates the position of the
+     * {@code Shape}.
      *
-     * @param referenceImage
+     * @param referencePoint
      */
-    private void updatePosition(Image referenceImage) {
-        updatePositionX(referenceImage);
-        updatePositionY(referenceImage);
+    private void updatePosition(Point referencePoint) {
+        position.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+        position.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
     }
 
-    /**
-     * @return Updates absolute x coordinate of {@code Shape} relative to this {@code Image}.
-     */
-    private void updatePositionX(Image referenceImage) {
-        double x = Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referenceImage.position.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-        position.x = referenceImage.position.x + x;
-    }
-
-    /**
-     * @return Updates absolute y coordinate of {@code Shape} relative to this {@code Image}.
-     */
-    private void updatePositionY(Image referenceImage) {
-        double y = Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referenceImage.position.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-        position.y = referenceImage.position.y + y;
-    }
-
-    private void updateRotation(Image referenceImage) {
-        this.position.rotation = referenceImage.position.rotation + imagePosition.rotation;
-    }
-
-    // TODO: Delete! Refactor this out.
-    public List<Point> getVertices() {
-        return getBoundary(); // HACK
+    private void updateRotation(Point referencePoint) {
+        this.position.rotation = referencePoint.rotation + imagePosition.rotation;
     }
 
     /**
      * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
      * detection.
-     *
-     * @param referenceImage
      */
-    private void updateBoundary(Image referenceImage) {
+    protected void updateBoundary() {
 
         List<Point> vertices = getVertices();
         List<Point> boundary = getBoundary();
@@ -256,6 +258,4 @@ public abstract class Shape<T extends Entity> {
             Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
         }
     }
-
-    public abstract void draw(Display display);
 }

@@ -20,7 +20,7 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> getBoundary() {
+    protected List<Point> getVertices() {
         List<Point> vertices = new ArrayList<>();
         vertices.add(getSource());
         vertices.add(getTarget());

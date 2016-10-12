@@ -9,28 +9,35 @@ import camp.computer.clay.util.image.Shape;
 
 public class Polygon<T extends Entity> extends Shape<T> {
 
-    private List<Point> vertices = new ArrayList<>();
+    protected List<Point> vertices = new ArrayList<>();
 
     public Polygon(T entity) {
         this.entity = entity;
+        setup();
     }
 
     public Polygon(Point position, List<Point> vertices) {
         super(position);
         this.vertices.addAll(vertices);
+        setup();
     }
 
-    public Point getVertex(int index) {
-        return vertices.get(index);
-    }
-
-    public void setVertices(List<Point> vertices) {
-        this.vertices.clear();
+    public Polygon(List<Point> vertices) {
+        super();
         this.vertices.addAll(vertices);
+        setup();
+    }
+
+    private void setup() {
+        setupGeometry();
+    }
+
+    private void setupGeometry() {
+
     }
 
     @Override
-    public List<Point> getBoundary() {
+    protected List<Point> getVertices() {
         return vertices;
     }
 

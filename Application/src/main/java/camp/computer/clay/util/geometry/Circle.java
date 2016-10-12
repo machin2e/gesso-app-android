@@ -49,7 +49,7 @@ public class Circle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> getVertices() {
+    protected List<Point> getVertices() {
         List<Point> vertices = new LinkedList<>();
         int segmentCount = BOUNDARY_VERTEX_COUNT - 1;
         for (int i = 0; i < segmentCount; i++) {
@@ -84,7 +84,7 @@ public class Circle<T extends Entity> extends Shape<T> {
             display.paint.setColor(Color.GREEN);
             display.paint.setStyle(Paint.Style.STROKE);
             display.paint.setStrokeWidth(2.0f);
-            display.drawPolygon(getBoundary());
+            display.drawPolygon(getBoundingBox());
             */
         }
     }

@@ -61,11 +61,6 @@ public class PathImage extends Image<Path> {
         return getEntity();
     }
 
-    @Override
-    public void update() {
-        super.update();
-    }
-
     public void draw(Display display) {
 
         if (isVisible()) {

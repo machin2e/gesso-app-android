@@ -28,17 +28,12 @@ public class Polyline<T extends Entity> extends Shape<T> {
         this.vertices.add(point);
     }
 
-    public Point getVertex(int index) {
-        return vertices.get(index);
-    }
-
-    public void setVertices(List<Point> vertices) {
-        this.vertices.clear();
-        this.vertices.addAll(vertices);
-    }
-
     @Override
-    public List<Point> getBoundary() {
+    protected List<Point> getVertices() {
+        return vertices;
+    }
+
+    public List<Point> getPoints() {
         return vertices;
     }
 

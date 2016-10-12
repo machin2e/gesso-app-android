@@ -13,6 +13,8 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.geometry.Polygon;
+import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public abstract class Image<T extends Entity> {
@@ -224,12 +226,18 @@ public abstract class Image<T extends Entity> {
 
     public void update() {
 
+        updateGeometry();
+    }
+
+    private void updateGeometry() {
+
+        // Update Shapes
         for (int i = 0; i < this.shapes.size(); i++) {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            shape.update();
-            shape.updateGeometry(this);
+            shape.invalidate(); // HACK
+            shape.update(position);
         }
     }
 
@@ -285,13 +293,12 @@ public abstract class Image<T extends Entity> {
         this.transparency = this.targetTransparency;
     }
 
-    public List<Point> getVertices() {
-        List<Point> positions = new LinkedList<>();
+    public Rectangle getBoundingBox() {
+        List<Point> shapeBoundaries = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            positions.addAll(shape.getBoundary());
+            shapeBoundaries.addAll(shapes.get(i).getBoundary());
         }
-        return positions;
+        return Geometry.getBoundingBox(shapeBoundaries);
     }
 
     // TODO: Delete!

@@ -192,15 +192,8 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-//        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getBoundary();
-        Log.v("BBB", "A");
-        List<Point> imageVertices = getSpace().getImages().filterType(Host.class).getVertices();
-        Log.v("BBB", "B");
-        if (imageVertices.size() > 0) {
-            Log.v("BBB", "C");
-            Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
-            Log.v("BBB", "-");
-//            Rectangle boundingBox = getSpace().getImages().filterType(Host.class).getBoundingBox();
+        Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+        if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
         }
     }
@@ -306,7 +299,6 @@ public class Camera {
 
         // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
-        //Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
         Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
         adjustScale(boundingBox);
@@ -474,10 +466,8 @@ public class Camera {
 
     private void updateFocus() {
 
-        List<Point> focusBoundary = space.getImages().filterVisibility(Visibility.Value.VISIBLE).getVertices();
-
         // Compute focus bounding box
-        Rectangle boundingBox = Geometry.getBoundingBox(focusBoundary);
+        Rectangle boundingBox = space.getImages().filterVisibility(Visibility.Value.VISIBLE).getBoundingBox();
 
         // Update Scale
         adjustScale(boundingBox);
