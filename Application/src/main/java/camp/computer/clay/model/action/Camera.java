@@ -48,7 +48,7 @@ public class Camera {
     protected double height;
 
     /**
-     * The parentSpace displayed from this perspective
+     * The {@code Space} displayed from this perspective
      */
     protected Space space = null;
 
@@ -154,6 +154,10 @@ public class Camera {
         this.targetPosition.offset(dx, dy);
         this.originalPosition.offset(dx, dy);
         this.position.offset(dx, dy);
+    }
+
+    public void setOffset(Point point) {
+        setOffset(point.x, point.y);
     }
 
     public void setScale(double scale, double duration) {
@@ -281,10 +285,10 @@ public class Camera {
         }
         // </REFACTOR>
 
-        // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
         Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
+        // Update scale and position
         adjustScale(boundingBox);
         setPosition(boundingBox.getPosition());
     }
@@ -322,10 +326,10 @@ public class Camera {
         }
         // </REFACTOR>
 
-        // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);
         Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
+        // Update scale and position
         adjustScale(boundingBox);
         setPosition(boundingBox.getPosition());
     }

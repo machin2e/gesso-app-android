@@ -82,7 +82,6 @@ public class Space extends Image<Model> {
     }
 
     private void setupActions() {
-        // Setup interactivity
         setOnActionListener(new ActionListener() {
             @Override
             public void onAction(Action action) {
@@ -91,27 +90,18 @@ public class Space extends Image<Model> {
                 Camera camera = event.getActor().getCamera();
 
                 if (event.getType() == Event.Type.NONE) {
+
                 } else if (event.getType() == Event.Type.SELECT) {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
                 } else if (event.getType() == Event.Type.MOVE) {
-//                    if (action.isHolding()) {
-//                        // Space
-//                        //lastEvent.getTargetImage().queueAction(action);
-//                    } else if (action.isDragging()) {
-                    // Camera
-                    if (action.getSize() > 1) {
-                        //camera.setOffset(event.getPosition().x - action.getFirstEvent().getPosition().x, event.getPosition().y - action.getFirstEvent().getPosition().y);
-                        camera.setPosition(-(event.getPosition().x - action.getFirstEvent().getPosition().x), -(event.getPosition().y - action.getFirstEvent().getPosition().y));
-                    }
 
-//                    camera.setOffset(action.getOffset().getAbsoluteX(), action.getOffset().getAbsoluteY());
-//                    }
+                    camera.setOffset(action.getOffset());
+
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
                     // Previous Action targeted also this Extension
-                    // TODO: Refactor
                     if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
 
                         if (action.isTap()) {
@@ -198,8 +188,11 @@ public class Space extends Image<Model> {
         }
     }
 
-    // TODO: Rename to sortLayers
-    protected void sortImagesByLayer() {
+    /**
+     * Sorts {@code Image}s by layer.
+     */
+    @Override
+    public void updateLayers() {
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {
@@ -230,7 +223,7 @@ public class Space extends Image<Model> {
         image.setSpace(this);
         if (!images.contains(image)) {
             images.add(image);
-            sortImagesByLayer();
+            updateLayers();
         }
 
         // Position the Image

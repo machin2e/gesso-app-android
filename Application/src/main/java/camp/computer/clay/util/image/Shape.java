@@ -58,7 +58,7 @@ public abstract class Shape<T extends Entity> {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-//        parentImage.sortShapesByLayer();
+//        parentImage.updateLayers();
     }
     // </LAYER>
 

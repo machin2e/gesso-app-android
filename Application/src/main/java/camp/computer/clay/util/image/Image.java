@@ -13,7 +13,6 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
@@ -51,12 +50,13 @@ public abstract class Image<T extends Entity> {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-
-        parentSpace.sortImagesByLayer();
+        parentSpace.updateLayers();
     }
 
-    // TODO: Rename to sortLayers
-    public void sortShapesByLayer() {
+    /**
+     * Sorts {@code Shapes}s in the {@code Image} by layer.
+     */
+    public void updateLayers() {
 
         for (int i = 0; i < shapes.size() - 1; i++) {
             for (int j = i + 1; j < shapes.size(); j++) {
@@ -161,14 +161,10 @@ public abstract class Image<T extends Entity> {
         shapes.add(shape);
 
         // Update layer ordering
-        sortShapesByLayer();
+        updateLayers();
 
         // Invalidate Shape
         shape.invalidate();
-    }
-
-    public Shape getShape(int index) {
-        return shapes.get(index);
     }
 
     public Shape getShape(String label) {
@@ -256,7 +252,6 @@ public abstract class Image<T extends Entity> {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            //shape.invalidate(); // HACK
             shape.update(position);
         }
     }
@@ -335,15 +330,15 @@ public abstract class Image<T extends Entity> {
         return relativeAngle;
     }
 
-    public Point getPoint(double x, double y) {
-        Point point = new Point();
-
-        double x2 = Geometry.distance(0, 0, x, y) * Math.cos(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
-        point.x = position.x + x2;
-
-        double y2 = Geometry.distance(0, 0, x, y) * Math.sin(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
-        point.y = position.y + y2;
-
-        return point;
-    }
+//    public Point getPoint(double x, double y) {
+//        Point point = new Point();
+//
+//        double x2 = Geometry.distance(0, 0, x, y) * Math.cos(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
+//        point.x = position.x + x2;
+//
+//        double y2 = Geometry.distance(0, 0, x, y) * Math.sin(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
+//        point.y = position.y + y2;
+//
+//        return point;
+//    }
 }
