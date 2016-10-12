@@ -16,12 +16,7 @@ public class Text extends Shape {
     }
 
     @Override
-    public List<Point> getVertices() {
-        return null;
-    }
-
-    @Override
-    public List<Line> getSegments() {
+    public List<Point> getBoundary() {
         return null;
     }
 

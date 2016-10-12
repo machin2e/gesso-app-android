@@ -20,18 +20,11 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> getVertices() {
+    public List<Point> getBoundary() {
         List<Point> vertices = new ArrayList<>();
         vertices.add(getSource());
         vertices.add(getTarget());
         return vertices;
-    }
-
-    @Override
-    public List<Line> getSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        segments.add(new Line(getSource(), getTarget()));
-        return segments;
     }
 
     @Override
@@ -61,9 +54,5 @@ public class Line<T extends Entity> extends Shape<T> {
     public void setTarget(Point target) {
         //this.target = target;
         this.target.set(target);
-    }
-
-    public Point getMidpoint() {
-        return Geometry.midpoint(source, target);
     }
 }

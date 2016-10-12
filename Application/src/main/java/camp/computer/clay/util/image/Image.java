@@ -13,7 +13,6 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public abstract class Image<T extends Entity> {
@@ -290,7 +289,7 @@ public abstract class Image<T extends Entity> {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
-            positions.addAll(shape.getVertices());
+            positions.addAll(shape.getBoundary());
         }
         return positions;
     }

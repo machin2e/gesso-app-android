@@ -51,7 +51,7 @@ public abstract class Geometry {
      * General-purpose function that returns true if the given point is contained inside the shape
      * defined by the boundary pointerCoordinates.
      *
-     * @param vertices The vertices defining the boundary polygon
+     * @param vertices The boundary defining the boundary polygon
      * @param point    The point to check
      * @return true If the point is inside the boundary, false otherwise
      * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Point Inclusion in Polygon Test (W. Randolph Franklin)</a>

@@ -192,7 +192,7 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-//        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getVertices();
+//        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getBoundary();
         Log.v("BBB", "A");
         List<Point> imageVertices = getSpace().getImages().filterType(Host.class).getVertices();
         Log.v("BBB", "B");

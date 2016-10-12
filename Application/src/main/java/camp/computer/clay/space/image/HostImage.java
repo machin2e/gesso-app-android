@@ -1004,7 +1004,7 @@ public class HostImage extends PortableImage {
 
         Shape boardShape = getShape("Substrate");
         int segmentIndex = -1;
-        List<Line> hostShapeSegments = boardShape.getSegments();
+        List<Point> hostShapeBoundary = boardShape.getBoundary();
 
         PortGroup extensionPorts = extensionImage.getExtension().getPorts();
         for (int j = 0; j < extensionPorts.size(); j++) {
@@ -1028,10 +1028,11 @@ public class HostImage extends PortableImage {
 
             double minDistance = Double.MAX_VALUE;
             int nearestSegmentIndex = 0;
-            for (int i = 0; i < hostShapeSegments.size(); i++) {
+            for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
 
-                Line segment = hostShapeSegments.get(i);
-                Point segmentMidpoint = segment.getMidpoint();
+//                Line segment = hostShapeBoundary.get(i);
+//                Point segmentMidpoint = segment.getMidpoint();
+                Point segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
 
                 double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
 

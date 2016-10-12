@@ -1,8 +1,5 @@
 package camp.computer.clay.util.geometry;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,8 +15,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     public double height = 1.0;
 
     public double cornerRadius = 0.0;
-
-    private List<Point> vertices = new ArrayList<>();
 
     private ArrayList<Line> segments = new ArrayList<>();
 
@@ -57,10 +52,10 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         Point bottomRight = new Point(0 + (width / 2.0), 0 + (height / 2.0));
         Point bottomLeft = new Point(0 - (width / 2.0), 0 + (height / 2.0));
 
-        vertices.add(topLeft);
-        vertices.add(topRight);
-        vertices.add(bottomRight);
-        vertices.add(bottomLeft);
+        boundary.add(topLeft);
+        boundary.add(topRight);
+        boundary.add(bottomRight);
+        boundary.add(bottomLeft);
 
         // Create segment Lines (relative to the Shape)
         Line top = new Line(topLeft, topRight);
@@ -74,29 +69,31 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         segments.add(left);
     }
 
-    public List<Point> getVertices() {
-        return vertices;
+    public List<Point> getBoundary() {
+        return boundary;
     }
 
     @Override
-    public List<Point> getBaseVertices() {
-        
-        vertices.get(0).set(
+    public List<Point> getVertices() {
+
+        List<Point> vertices = new LinkedList<>();
+
+        vertices.add(new Point(
                 0 - (width / 2.0),
                 0 - (height / 2.0)
-        );
-        vertices.get(1).set(
+        ));
+        vertices.add(new Point(
                 0 + (width / 2.0),
                 0 - (height / 2.0)
-        );
-        vertices.get(2).set(
+        ));
+        vertices.add(new Point(
                 0 + (width / 2.0),
                 0 + (height / 2.0)
-        );
-        vertices.get(3).set(
+        ));
+        vertices.add(new Point(
                 0 - (width / 2.0),
                 0 + (height / 2.0)
-        );
+        ));
 
         return vertices;
     }
@@ -139,7 +136,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
             display.paint.setColor(Color.GREEN);
             display.paint.setStyle(Paint.Style.STROKE);
             display.paint.setStrokeWidth(2.0f);
-            display.drawPolygon(getVertices());
+            display.drawPolygon(getBoundary());
             */
         }
     }

@@ -2,6 +2,7 @@ package camp.computer.clay.util.image;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
@@ -28,6 +29,8 @@ public abstract class Shape<T extends Entity> {
     public double outlineThickness = 1.0;
 
     protected T entity = null;
+
+    protected List<Point> boundary = new ArrayList<>();
 
     // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
@@ -98,22 +101,10 @@ public abstract class Shape<T extends Entity> {
         return this.position.rotation;
     }
 
-    abstract public List<Point> getVertices();
-
-    /**
-     * Returns the axis-aligned minimum bounding box for the setValue of vertices that define the shape.
-     *
-     * @return A {@code Rectangle} representing the minimum bounding box.
-     * @see <a href="https://en.wikipedia.org/wiki/Minimum_bounding_box">Minimum bounding box</a>
-     */
-    public Rectangle getBoundingBox() {
-        return Geometry.getBoundingBox(getVertices());
-    }
-
-    abstract public List<Line> getSegments();
+    abstract public List<Point> getBoundary();
 
     public boolean contains(Point point) {
-        return Geometry.contains(getVertices(), point);
+        return Geometry.contains(getBoundary(), point);
     }
 
     public void setVisibility(Visibility.Value visibility) {
@@ -243,8 +234,8 @@ public abstract class Shape<T extends Entity> {
     }
 
     // TODO: Delete! Refactor this out.
-    public List<Point> getBaseVertices() {
-        return getVertices(); // HACK
+    public List<Point> getVertices() {
+        return getBoundary(); // HACK
     }
 
     /**
@@ -255,13 +246,14 @@ public abstract class Shape<T extends Entity> {
      */
     private void updateBoundary(Image referenceImage) {
 
-        getBaseVertices();
         List<Point> vertices = getVertices();
+        List<Point> boundary = getBoundary();
 
-        // Translate and rotate the vertices about the updated position
+        // Translate and rotate the boundary about the updated position
         for (int i = 0; i < vertices.size(); i++) {
-            Geometry.rotatePoint(vertices.get(i), position.rotation); // Rotate Shape vertices about Image position
-            Geometry.translatePoint(vertices.get(i), position.x, position.y); // Translate Shape
+            boundary.get(i).set(vertices.get(i));
+            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about Image position
+            Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
         }
     }
 

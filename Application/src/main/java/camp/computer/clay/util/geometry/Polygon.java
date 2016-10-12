@@ -30,17 +30,8 @@ public class Polygon<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> getVertices() {
+    public List<Point> getBoundary() {
         return vertices;
-    }
-
-    @Override
-    public List<Line> getSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        for (int i = 0; i < vertices.size() - 1; i++) {
-            segments.add(new Line(vertices.get(i), vertices.get(i + 1)));
-        }
-        return segments;
     }
 
     @Override

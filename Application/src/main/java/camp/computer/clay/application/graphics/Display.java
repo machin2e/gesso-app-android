@@ -348,7 +348,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void drawPolyline(Polyline polyline) {
-        drawPolyline(polyline.getVertices());
+        drawPolyline(polyline.getBoundary());
     }
 
     // TODO: Refactor with transforms
@@ -500,7 +500,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     // TODO: Refactor with transforms
     public void drawPolygon(Polygon polygon) {
-        drawPolygon(polygon.getVertices());
+        drawPolygon(polygon.getBoundary());
     }
 
     // TODO: Refactor with transforms
@@ -513,7 +513,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         for (int i = 1; i < vertices.size(); i++) {
             path.lineTo((float) vertices.get(i).x, (float) vertices.get(i).y);
         }
-//        path.lineTo((float) vertices.get(0).x, (float) vertices.get(0).y);
+//        path.lineTo((float) boundary.get(0).x, (float) boundary.get(0).y);
         path.close();
 
         canvas.drawPath(path, paint);
