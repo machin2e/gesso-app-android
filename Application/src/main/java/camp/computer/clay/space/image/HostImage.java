@@ -1216,88 +1216,13 @@ public class HostImage extends PortableImage {
     public void draw(Display display) {
         if (isVisible()) {
 
-            Canvas canvas = display.canvas;
+            display.canvas.save();
 
-            canvas.save();
-
-//            canvas.translate(
-//                    (float) position.x,
-//                    (float) position.y
-//            );
-//
-//            /*
-//            // <HACK>
-//            display.paint.setStyle(Paint.Style.FILL);
-//            display.paint.setColor(Color.GREEN);
-//            display.paint.setStrokeWidth(2.0f);
-//            display.canvas.drawLine(
-//                    (float) 0,
-//                    (float) 0,
-//                    (float) 250,
-//                    (float) 0,
-//                    display.paint
-//            );
-//
-//            display.canvas.drawText(
-//                    "0°",
-//                    260,
-//                    13,
-//                    display.paint
-//            );
-//
-//            display.paint.setStyle(Paint.Style.STROKE);
-//            display.canvas.drawArc(
-//                    -250,
-//                    -250,
-//                    250,
-//                    250,
-//                    0,
-//                    (float) position.rotation,
-//                    false,
-//                    display.paint
-//            );
-//            // </HACK>
-//            */
-//
-//            canvas.rotate((float) position.rotation);
-
-            // Color
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);
             }
 
-            /*
-            // <HACK>
-            display.paint.setStyle(Paint.Style.FILL);
-            display.paint.setColor(Color.RED);
-            display.paint.setStrokeWidth(2.0f);
-            display.canvas.drawLine(
-                    (float) 0,
-                    (float) 0,
-                    (float) 250,
-                    (float) 0,
-                    display.paint
-            );
-
-            display.canvas.drawText(
-                    "0°",
-                    260,
-                    13,
-                    display.paint
-            );
-            // </HACK>
-            */
-
-//            // Labels
-//            if (Application.ENABLE_GEOMETRY_LABELS) {
-//                display.getPaint().setColor(Color.GREEN);
-//                display.getPaint().setStyle(Paint.Style.STROKE);
-//                Rectangle boardShape = (Rectangle) getShape("Substrate");
-//                display.drawCircle(getPosition(), boardShape.getWidth(), 0);
-//                display.drawCircle(getPosition(), boardShape.getWidth() / 2.0f, 0);
-//            }
-
-            canvas.restore();
+            display.canvas.restore();
         }
     }
 }

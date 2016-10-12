@@ -345,10 +345,10 @@ public class Space extends Image<Model> {
     @Override
     public void update() {
 
-//        // Update Actors
-//        for (int i = 0; i < actors.size(); i++) {
-//            this.actors.get(i).update();
-//        }
+        // Update Actors
+        for (int i = 0; i < actors.size(); i++) {
+            this.actors.get(i).update();
+        }
 
         // Update Images
         for (int i = 0; i < images.size(); i++) {
@@ -359,11 +359,6 @@ public class Space extends Image<Model> {
 
             // Update the Image
             image.update();
-        }
-
-        // Update Actors
-        for (int i = 0; i < actors.size(); i++) {
-            this.actors.get(i).update();
         }
 
         // Update Camera(s)

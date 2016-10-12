@@ -1,7 +1,5 @@
 package camp.computer.clay.space.image;
 
-import android.graphics.Canvas;
-
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
@@ -167,35 +165,24 @@ public class ExtensionImage extends PortableImage {
 
     public void update() {
 
-        super.update();
-
         // Create additional Images or Shapes to match the corresponding Entity
-        updateImage();
-
-        // Update Port style
-        for (int i = 0; i < getExtension().getPorts().size(); i++) {
-            Port port = getExtension().getPorts().get(i);
-            Shape portShape = getShape(port);
-
-            // Update color of Port shape based on type
-            if (portShape != null) {
-                portShape.setColor(Color.getColor(port.getType()));
-            }
-        }
+        updateGeometry();
+        updateStyle();
 
         // <HACK>
         updatePathRoutes();
         // </HACK>
+
+        super.update();
     }
 
     /**
      * Update the {@code Image} to match the state of the corresponding {@code Entity}.
      */
-    private void updateImage() {
+    private void updateGeometry() {
 
-        updatePortShapes();
-
-        updateHeaderShapes();
+        updatePortGeometry();
+        updateHeaderGeometry();
 
         // TODO: Clean up/delete images/shapes for any removed ports...
     }
@@ -203,14 +190,13 @@ public class ExtensionImage extends PortableImage {
     /**
      * Add or remove {@code Shape}'s for each of the {@code Extension}'s {@code Port}s.
      */
-    private void updatePortShapes() {
+    private void updatePortGeometry() {
 
         // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
         ShapeGroup portShapes = getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);
-
-            if (!getPortable().getPorts().contains((Port) portShape.getEntity())) {
+            if (!getPortable().getPorts().contains(portShape.getEntity())) {
                 portShapes.remove(portShape);
             }
         }
@@ -236,51 +222,6 @@ public class ExtensionImage extends PortableImage {
                 addShape(circle);
             }
         }
-    }
-
-    private void updateHeaderShapes() {
-
-        // Update Header (size, etc.)
-        // References:
-        // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
-        double PIXEL_PER_MILLIMETER = 6.0;
-
-        final int contactCount = getPortable().getPorts().size();
-        final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
-        final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
-
-//        double A = PIXEL_PER_MILLIMETER * (2.54 * contactCount + errorToleranceA);
-//        double B = PIXEL_PER_MILLIMETER * (2.54 * (contactCount - 1) + errorToleranceB);
-        double A = 2.54 * contactCount + errorToleranceA;
-        double B = 2.54 * (contactCount - 1) + errorToleranceB;
-
-        final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
-        double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
-        double contactSeparation = 2.54; // Measure in millimeters (mm)
-
-        // Update dimensions of Headers based on the corresponding Entity
-        Rectangle header = (Rectangle) getShape("Header");
-        double headerWidth = PIXEL_PER_MILLIMETER * A;
-        header.setWidth(headerWidth);
-
-        // Update physical positions of Ports based on the corresponding Header's dimensions
-        for (int i = 0; i < getPortable().getPorts().size(); i++) {
-
-            // Calculate Port connector positions
-            //double connectorPositionDistance = (PIXEL_PER_MILLIMETER * (2.54 * headerContactPositions.size() + 0.6));
-
-            if (i < headerContactPositions.size()) {
-                //double x = (PIXEL_PER_MILLIMETER * (2.54 * i + 0.6)) - (connectorPositionDistance / 2.0);
-                double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-                headerContactPositions.get(i).setX(x);
-            } else {
-                //double x = PIXEL_PER_MILLIMETER * (2.54 * i + 0.6);
-                double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-                Vertex vertex = new Vertex(new Point(x, 107));
-                headerContactPositions.add(vertex);
-                addShape(vertex);
-            }
-        }
 
         // Update Port positions based on the index of ports
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
@@ -289,8 +230,63 @@ public class ExtensionImage extends PortableImage {
 
             if (portShape != null) {
                 double portSpacing = 100;
-                portShape.getPosition().x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
+                portShape.getImagePosition().x = (i * portSpacing) - (((getPortable().getPorts().size() - 1) * portSpacing) / 2.0);
                 // TODO: Also update y coordinate
+            }
+        }
+    }
+
+    public double PIXEL_PER_MILLIMETER = 6.0;
+
+    private void updateHeaderGeometry() {
+
+        // <FACTOR_OUT>
+        // References:
+        // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
+
+        final int contactCount = getPortable().getPorts().size();
+        final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
+        final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
+
+        double A = 2.54 * contactCount + errorToleranceA;
+        double B = 2.54 * (contactCount - 1) + errorToleranceB;
+
+        final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
+        double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
+        double contactSeparation = 2.54; // Measure in millimeters (mm)
+        // </FACTOR_OUT>
+
+        // Update Headers Geometry to match the corresponding Extension Profile
+        Rectangle header = (Rectangle) getShape("Header");
+        double headerWidth = PIXEL_PER_MILLIMETER * A;
+        header.setWidth(headerWidth);
+
+        // Update Contact Positions for Header
+        for (int i = 0; i < getPortable().getPorts().size(); i++) {
+            double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
+            if (i < headerContactPositions.size()) {
+                headerContactPositions.get(i).getImagePosition().x = x;
+            } else {
+                Vertex vertex = new Vertex(new Point(x, 107));
+                headerContactPositions.add(vertex);
+                addShape(vertex);
+            }
+        }
+    }
+
+    private void updateStyle() {
+        updatePortStyle();
+    }
+
+    private void updatePortStyle() {
+        // Update Port style
+        for (int i = 0; i < getExtension().getPorts().size(); i++) {
+            Port port = getExtension().getPorts().get(i);
+            Shape portShape = getShape(port);
+
+            // Update color of Port shape based on type
+            if (portShape != null) {
+                portShape.setColor(Color.getColor(port.getType()));
             }
         }
     }
@@ -317,9 +313,7 @@ public class ExtensionImage extends PortableImage {
     public void draw(Display display) {
         if (isVisible()) {
 
-            Canvas canvas = display.canvas;
-
-            canvas.save();
+            display.canvas.save();
 
             // <HACK>
             /*
@@ -345,7 +339,7 @@ public class ExtensionImage extends PortableImage {
                 shapes.get(i).draw(display);
             }
 
-            canvas.restore();
+            display.canvas.restore();
         }
     }
 }

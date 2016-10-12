@@ -69,12 +69,4 @@ public class Vertex<T extends Entity> extends Shape<T> {
         display.paint.setStrokeWidth(2.0f);
         display.canvas.drawLine((float) position.x - 10, (float) position.y - 10, (float) position.x + 10, (float) position.y + 10, display.paint);
     }
-
-    public void setX(double x) {
-        this.position.x = x;
-    }
-
-    public void setY(double y) {
-        this.position.y = y;
-    }
 }

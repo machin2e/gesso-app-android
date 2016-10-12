@@ -2,6 +2,7 @@ package camp.computer.clay.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Camera;
@@ -19,7 +20,7 @@ public class Actor {
 
     private Camera camera = new Camera();
 
-    private List<Event> eventQueue = new LinkedList<>();
+    private Queue<Event> eventQueue = new LinkedList<>();
 
     private List<Action> actions = new LinkedList<>();
 
@@ -54,12 +55,13 @@ public class Actor {
 
     public void queueAction(Event event) {
         eventQueue.add(event);
+        dequeueAction(); // HACK
     }
 
     private void processActionQueue() {
-        while (eventQueue.size() > 0) {
-            dequeueAction();
-        }
+//        while (eventQueue.size() > 0) {
+//            dequeueAction();
+//        }
     }
 
     public void dequeueAction() {
@@ -68,7 +70,7 @@ public class Actor {
             return;
         }
 
-        Event event = eventQueue.remove(0);
+        Event event = eventQueue.remove();
 
         event.setActor(this);
 

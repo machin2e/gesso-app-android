@@ -2,6 +2,7 @@ package camp.computer.clay.space.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Path;
@@ -31,7 +32,6 @@ public class PathImage extends Image<Path> {
 
     private void setup() {
         setupActions();
-
         layerIndex = -10;
     }
 
@@ -66,18 +66,6 @@ public class PathImage extends Image<Path> {
         super.update();
     }
 
-    public void setDockVisibility(Visibility.Value visibility) {
-        this.dockVisibility.setValue(visibility);
-    }
-
-    public Visibility getDockVisibility() {
-        return this.dockVisibility;
-    }
-
-    public boolean isDockVisible() {
-        return this.dockVisibility.getValue() == Visibility.Value.VISIBLE;
-    }
-
     public void draw(Display display) {
 
         if (isVisible()) {
@@ -94,6 +82,18 @@ public class PathImage extends Image<Path> {
                 drawPhysicalPath(display);
             }
         }
+    }
+
+    public void setDockVisibility(Visibility.Value visibility) {
+        this.dockVisibility.setValue(visibility);
+    }
+
+    public Visibility getDockVisibility() {
+        return this.dockVisibility;
+    }
+
+    public boolean isDockVisible() {
+        return this.dockVisibility.getValue() == Visibility.Value.VISIBLE;
     }
 
     public void drawTrianglePath(Display display) {

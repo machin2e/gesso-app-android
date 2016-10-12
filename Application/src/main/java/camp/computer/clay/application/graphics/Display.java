@@ -370,22 +370,13 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         canvas.save();
 
-        canvas.translate(
-                (float) circle.getPosition().x,
-                (float) circle.getPosition().y
-        );
-
+        canvas.translate((float) circle.getPosition().x, (float) circle.getPosition().y);
         canvas.rotate((float) circle.getPosition().rotation);
 
         // Fill
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(circle.colorCode);
-        canvas.drawCircle(
-                0,
-                0,
-                (float) circle.radius,
-                paint
-        );
+        canvas.drawCircle(0, 0, (float) circle.radius, paint);
 
         // Outline
         if (circle.getOutlineThickness() > 0) {
@@ -393,15 +384,23 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             paint.setColor(circle.outlineColorCode);
             paint.setStrokeWidth((float) circle.outlineThickness);
 
-            canvas.drawCircle(
-                    0,
-                    0,
-                    (float) circle.radius,
-                    paint
-            );
+            canvas.drawCircle(0, 0, (float) circle.radius, paint);
         }
 
         canvas.restore();
+    }
+
+    public void drawCircle(Point position, double radius, double angle) {
+
+        canvas.save();
+
+        canvas.translate((float) position.x, (float) position.y);
+        canvas.rotate((float) angle);
+
+        canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
+
+        canvas.restore();
+
     }
 
     public void drawRectangle(Rectangle rectangle) {
@@ -461,20 +460,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         );
 
         canvas.restore();
-    }
-
-    public void drawCircle(Point position, double radius, double angle) {
-
-        canvas.save();
-
-        canvas.translate((float) position.x, (float) position.y);
-        canvas.rotate((float) angle);
-
-        // Color
-        canvas.drawCircle((float) position.x, (float) position.y, (float) radius, paint);
-
-        canvas.restore();
-
     }
 
     public void drawText(Point position, String text, double size) {

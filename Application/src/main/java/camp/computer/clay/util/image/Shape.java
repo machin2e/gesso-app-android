@@ -214,14 +214,9 @@ public abstract class Shape<T extends Entity> {
      */
     protected void updateGeometry(Image referenceImage) {
 
-        // Update the position
-        updatePosition(referenceImage);
-
-        // Update rotation
-        updateRotation(referenceImage);
-
-        // Update the bounds (using the results from the update position and rotation)
-        updateBoundary(referenceImage);
+        updatePosition(referenceImage); // Update the position
+        updateRotation(referenceImage); // Update rotation
+        updateBounds(referenceImage); // Update the bounds (using the results from the update position and rotation)
     }
 
     private void updatePosition(Image referenceImage) {
@@ -254,7 +249,14 @@ public abstract class Shape<T extends Entity> {
         return getVertices();
     }
 
-    private void updateBoundary(Image referenceImage) {;
+    /**
+     * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
+     * detection.
+     *
+     * @param referenceImage
+     */
+    private void updateBounds(Image referenceImage) {
+
         List<Point> vertices = temp_getRelativeVertices();
 
         // Translate and rotate the vertices about the updated position

@@ -139,7 +139,6 @@ public abstract class Image<T extends Entity> {
     public <T extends Shape> void addShape(T shape) {
         shape.setImage(this);
         shape.setImagePosition(shape.position);
-//        shape.getPosition().setReferencePoint(getPosition());
         this.shapes.add(shape);
     }
 
