@@ -305,4 +305,16 @@ public abstract class Image<T extends Entity> {
         }
         return relativeAngle;
     }
+
+    public Point getPoint(double x, double y) {
+        Point point = new Point();
+
+        double x2 = Geometry.distance(0, 0, x, y) * Math.cos(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
+        point.x = position.x + x2;
+
+        double y2 = Geometry.distance(0, 0, x, y) * Math.sin(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
+        point.y = position.y + y2;
+
+        return point;
+    }
 }

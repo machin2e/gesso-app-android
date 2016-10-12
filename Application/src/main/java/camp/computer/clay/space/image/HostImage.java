@@ -1133,7 +1133,6 @@ public class HostImage extends PortableImage {
 
     public void updateExtensionLayout() {
 
-        /*
         Group<Extension> extensions = getHost().getExtensions();
 //        Log.v("ExtensionCount", "extensions: " + extensions.size());
 
@@ -1170,33 +1169,52 @@ public class HostImage extends PortableImage {
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
                 if (segmentIndex == 0) {
-                    extensionImage.getPosition().x = 0 + offset;
-                    extensionImage.getPosition().y = -distanceToExtensions;
+//                    extensionImage.getPosition().x = 0 + offset;
+//                    extensionImage.getPosition().y = -distanceToExtensions;
+                    Point p = this.getPoint(
+                            0 + offset,
+                            -distanceToExtensions
+                    );
+                    extensionImage.getPosition().set(p);
                 } else if (segmentIndex == 1) {
-                    extensionImage.getPosition().x = distanceToExtensions;
-                    extensionImage.getPosition().y = 0 + offset;
+//                    extensionImage.getPosition().x = distanceToExtensions;
+//                    extensionImage.getPosition().y = 0 + offset;
+                    Point p = this.getPoint(
+                            distanceToExtensions,
+                            0 + offset
+                    );
+                    extensionImage.getPosition().set(p);
                 } else if (segmentIndex == 2) {
-                    extensionImage.getPosition().x = 0 + offset;
-                    extensionImage.getPosition().y = distanceToExtensions;
+//                    extensionImage.getPosition().x = 0 + offset;
+//                    extensionImage.getPosition().y = distanceToExtensions;
+                    Point p = this.getPoint(
+                            0 + offset,
+                            distanceToExtensions
+                    );
+                    extensionImage.getPosition().set(p);
                 } else if (segmentIndex == 3) {
-                    extensionImage.getPosition().x = -distanceToExtensions;
-                    extensionImage.getPosition().y = 0 + offset;
+//                    extensionImage.getPosition().x = -distanceToExtensions;
+//                    extensionImage.getPosition().y = 0 + offset;
+                    Point p = this.getPoint(
+                            -distanceToExtensions,
+                            0 + offset
+                    );
+                    extensionImage.getPosition().set(p);
                 }
 
                 //double extensionImageRotation = Geometry.getAngle(hostPortShape.getPosition(), extensionImage.getPosition());
                 if (segmentIndex == 0) {
-                    extensionImage.setRotation(0);
+                    extensionImage.setRotation(getRotation() + 0);
                 } else if (segmentIndex == 1) {
-                    extensionImage.setRotation(90);
+                    extensionImage.setRotation(getRotation() + 90);
                 } else if (segmentIndex == 2) {
-                    extensionImage.setRotation(180);
+                    extensionImage.setRotation(getRotation() + 180);
                 } else if (segmentIndex == 3) {
-                    extensionImage.setRotation(270);
+                    extensionImage.setRotation(getRotation() + 270);
                 }
                 // </REFACTOR>
             }
         }
-        */
     }
 
     // TODO: Refactor this... it's really dumb right now.
