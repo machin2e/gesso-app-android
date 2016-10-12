@@ -17,6 +17,7 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
@@ -237,8 +238,6 @@ public class ExtensionImage extends PortableImage {
         }
     }
 
-    public double PIXEL_PER_MILLIMETER = 6.0;
-
     private void updateHeaderGeometry() {
 
         // <FACTOR_OUT>
@@ -259,12 +258,12 @@ public class ExtensionImage extends PortableImage {
 
         // Update Headers Geometry to match the corresponding Extension Profile
         Rectangle header = (Rectangle) getShape("Header");
-        double headerWidth = PIXEL_PER_MILLIMETER * A;
+        double headerWidth = Space.PIXEL_PER_MILLIMETER * A;
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
-            double x = PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
+            double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < headerContactPositions.size()) {
                 headerContactPositions.get(i).getImagePosition().x = x;
             } else {

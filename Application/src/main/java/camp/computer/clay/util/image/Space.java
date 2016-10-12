@@ -23,12 +23,15 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
+import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Space extends Image<Model> {
+
+    public static double PIXEL_PER_MILLIMETER = 6.0;
 
     protected ImageGroup images = new ImageGroup();
 
@@ -236,7 +239,12 @@ public class Space extends Image<Model> {
         }
 
         // Update Camera
-        getEntity().getActor(0).getCamera().setFocus(getSpace());
+        getEntity().getActor(0).getCamera().setFocus(this);
+    }
+
+    @Override
+    public Space getSpace() {
+        return this;
     }
 
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
@@ -476,5 +484,32 @@ public class Space extends Image<Model> {
 
     public Visibility getExtensionPrototypeVisibility() {
         return extensionPrototypeVisibility;
+    }
+
+    public void setPortableSeparation(double distance) {
+        // <HACK>
+        // TODO: Replace ASAP. This is shit.
+        ImageGroup extensionImages = getImages(Extension.class);
+        for (int i = 0; i < extensionImages.size(); i++) {
+            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+
+            if (extensionImage.getExtension().getHost().size() > 0) {
+                Host host = extensionImage.getExtension().getHost().get(0);
+                HostImage hostImage = (HostImage) getSpace().getImage(host);
+                hostImage.setExtensionDistance(distance);
+            }
+        }
+        // </HACK>
+    }
+
+    public void hidePortables() {
+        ImageGroup portableImages = getImages(Host.class, Extension.class);
+        for (int i = 0; i < portableImages.size(); i++) {
+            PortableImage portableImage = (PortableImage) portableImages.get(i);
+            portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableImage.setPathVisibility(Visibility.INVISIBLE);
+            portableImage.setDockVisibility(Visibility.VISIBLE);
+            portableImage.setTransparency(1.0);
+        }
     }
 }

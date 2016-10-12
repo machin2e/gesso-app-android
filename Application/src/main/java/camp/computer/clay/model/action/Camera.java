@@ -62,9 +62,7 @@ public class Camera {
     // Position
     protected final Point DEFAULT_POSITION = new Point(0, 0);
     protected Point targetPosition = DEFAULT_POSITION;
-    //protected Point position = new Point(targetPosition.getAbsoluteX(), targetPosition.getAbsoluteY());
     protected Point position = new Point(targetPosition.x, targetPosition.y);
-    protected double positionPeriod = DEFAULT_ADJUSTMENT_PERIOD;
     protected int positionFrameIndex = 0;
     protected int positionFrameLimit = 0;
     protected Point originalPosition = new Point();
@@ -74,6 +72,14 @@ public class Camera {
 
     public Camera(Space space) {
         this.space = space;
+    }
+
+    public void setSpace(Space space) {
+        this.space = space;
+    }
+
+    public Space getSpace() {
+        return this.space;
     }
 
     public void setWidth(double width) {
@@ -97,27 +103,24 @@ public class Camera {
     }
 
     public void setPosition(Point position) {
-        setPosition(position, positionPeriod);
+        setPosition(position.x, position.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
 
     public void setPosition(double x, double y) {
-        setPosition(new Point(x, y));
+        setPosition(x, y, DEFAULT_ADJUSTMENT_PERIOD);
     }
 
-    public void setPosition(Point targetPosition, double duration) {
+    private void setPosition(double x, double y, double duration) {
 
 //        if (targetPosition.x == position.x && targetPosition.y == position.y) {
 //            return;
 //        }
 
-        if (duration == 0.0) {
+        if (duration < 5.0) {
 
-            //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
-            this.targetPosition.set(-targetPosition.x, -targetPosition.y);
-
-            this.originalPosition.set(targetPosition);
-
-            this.position.set(targetPosition);
+            this.targetPosition.set(-x, -y);
+            this.originalPosition.set(x, y);
+            this.position.set(x, y);
 
             positionFrameIndex = positionFrameLimit;
 
@@ -130,7 +133,7 @@ public class Camera {
             */
 
             //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
-            this.targetPosition.set(-targetPosition.x, -targetPosition.y);
+            this.targetPosition.set(-x, -y);
 
             // <PLAN_ANIMATION>
             originalPosition.set(position);
@@ -142,14 +145,15 @@ public class Camera {
         }
     }
 
-    public void setOffset(double xOffset, double yOffset) {
-        this.targetPosition.offset(xOffset, yOffset);
-        this.originalPosition.offset(xOffset, yOffset);
-        this.position.offset(xOffset, yOffset);
+    public void adjustPosition() {
+        Point centerPosition = getSpace().getImages().filterType(Host.class, Extension.class).getCenterPoint();
+        setPosition(centerPosition.x, centerPosition.y, 0);
     }
 
-    public void setScale(double scale) {
-        setScale(scale, scalePeriod);
+    public void setOffset(double dx, double dy) {
+        this.targetPosition.offset(dx, dy);
+        this.originalPosition.offset(dx, dy);
+        this.position.offset(dx, dy);
     }
 
     public void setScale(double scale, double duration) {
@@ -167,24 +171,6 @@ public class Camera {
 
     public double getScale() {
         return this.scale;
-    }
-
-    public void setSpace(Space space) {
-        this.space = space;
-    }
-
-    public Space getSpace() {
-        return this.space;
-    }
-
-    public void adjustPosition() {
-        adjustPosition(0);
-    }
-
-    public void adjustPosition(double duration) {
-        List<Point> figurePositions = getSpace().getImages().filterType(Host.class, Extension.class).getPositions();
-        Point centerPosition = Geometry.getCenterPoint(figurePositions);
-        setPosition(centerPosition, duration);
     }
 
     public void adjustScale() {
@@ -216,15 +202,15 @@ public class Camera {
      */
     public void adjustScale(Rectangle boundingBox, double duration) {
 
-//        // Multiply the bounding box
-//        double paddingMultiplier = 1.0; // 1.10;
-//        boundingBox.setWidth(boundingBox.getWidth() * paddingMultiplier);
-//        boundingBox.setHeight(boundingBox.getHeight() * paddingMultiplier);
+        /*
+        // Multiply the bounding box
+        double paddingMultiplier = 1.0; // 1.10;
+        boundingBox.setWidth(boundingBox.getWidth() * paddingMultiplier);
+        boundingBox.setHeight(boundingBox.getHeight() * paddingMultiplier);
+        */
 
         double horizontalScale = getWidth() / boundingBox.getWidth();
         double verticalScale = getHeight() / boundingBox.getHeight();
-
-        Log.v("BBW", "bb width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
 
         if (horizontalScale <= MAXIMUM_SCALE || horizontalScale <= MAXIMUM_SCALE) {
             if (horizontalScale < verticalScale) {
@@ -233,7 +219,6 @@ public class Camera {
                 setScale(verticalScale, duration);
             }
         } else {
-            //setScale(DEFAULT_SCALE, DEFAULT_SCALE_PERIOD);
             setScale(MAXIMUM_SCALE, DEFAULT_SCALE_PERIOD);
         }
     }
@@ -245,7 +230,6 @@ public class Camera {
      * @param targetPosition
      */
     public void setFocus(Port sourcePort, Point targetPosition) {
-        // TODO: setFocus(Path prototypePath)
 
         // Check if a Host Image is nearby
         Image nearestHostImage = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
@@ -266,6 +250,7 @@ public class Camera {
 
     public void setFocus(Host host) {
 
+        // <REFACTOR>
         HostImage hostImage = (HostImage) space.getImage(host);
 
         // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
@@ -279,15 +264,13 @@ public class Camera {
         for (int i = 0; i < hostPorts.size(); i++) {
             Port port = hostPorts.get(i);
 
-            // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
-
             if (!basePathPorts.contains(port)) {
                 basePathPorts.add(port);
             }
 
             PathGroup portPaths = port.getPaths();
-            for (int i1 = 0; i1 < portPaths.size(); i1++) {
-                Path path = portPaths.get(i1);
+            for (int j = 0; j < portPaths.size(); j++) {
+                Path path = portPaths.get(j);
                 if (!basePathPorts.contains(path.getSource())) {
                     basePathPorts.add(path.getSource());
                 }
@@ -296,6 +279,7 @@ public class Camera {
                 }
             }
         }
+        // </REFACTOR>
 
         // Camera
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
@@ -307,6 +291,7 @@ public class Camera {
 
     public void setFocus(Extension extension) {
 
+        // <REFACTOR>
         ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
         // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
@@ -314,32 +299,31 @@ public class Camera {
         otherPortableImages.remove(extensionImage);
         otherPortableImages.setTransparency(0.1);
 
-        // Get ports along every Path connected to the Ports on the touched PhoneHost
-        Group<Port> basePathPorts = new Group<>();
+        // Get ports along every Path connected to the Ports on the selected Host
+        Group<Port> hostPathPorts = new Group<>();
         Group<Port> extensionPorts = extensionImage.getExtension().getPorts();
         for (int i = 0; i < extensionPorts.size(); i++) {
             Port port = extensionPorts.get(i);
 
-            // TODO: ((PortImage) getCamera().getSpace().getImage(port)).getVisiblePaths()
-
-            if (!basePathPorts.contains(port)) {
-                basePathPorts.add(port);
+            if (!hostPathPorts.contains(port)) {
+                hostPathPorts.add(port);
             }
 
             PathGroup portPaths = port.getPaths();
-            for (int i1 = 0; i1 < portPaths.size(); i1++) {
-                Path path = portPaths.get(i1);
-                if (!basePathPorts.contains(path.getSource())) {
-                    basePathPorts.add(path.getSource());
+            for (int j = 0; j < portPaths.size(); j++) {
+                Path path = portPaths.get(j);
+                if (!hostPathPorts.contains(path.getSource())) {
+                    hostPathPorts.add(path.getSource());
                 }
-                if (!basePathPorts.contains(path.getTarget())) {
-                    basePathPorts.add(path.getTarget());
+                if (!hostPathPorts.contains(path.getTarget())) {
+                    hostPathPorts.add(path.getTarget());
                 }
             }
         }
+        // </REFACTOR>
 
         // Camera
-        ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
+        ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);
         Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
         adjustScale(boundingBox);
@@ -353,58 +337,27 @@ public class Camera {
      */
     public void setFocus(PathGroup paths) {
 
-        // Camera
-        PortGroup ports = paths.getPorts();
-        ShapeGroup shapes = getSpace().getShapes(ports);
+        // Get bounding box around the Ports in the specified Paths
+        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
+        List<Point> portPositions = pathPortShapes.getPositions();
+        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
 
-        List<Point> positions = shapes.getPositions();
-        Rectangle boundingBox = Geometry.getBoundingBox(positions);
-
-        // Update Scale
+        // Update scale and position
         adjustScale(boundingBox);
-
-        // Update Position
-        setPosition(Geometry.getCenterPoint(positions));
+        setPosition(Geometry.getCenterPoint(portPositions));
     }
 
     public void setFocus(Space space) {
 
-//        if (space == null) {
-//            return;
-//        }
+        // Hide Portables' Ports.
+        space.hidePortables();
 
-        // <REFACTOR>
-        // TODO: Move this somehwere better...
-        // No pointerCoordinates on board or port. Touch is on map. So hide ports.
-        ImageGroup portableImages = this.space.getImages(Host.class, Extension.class);
-        for (int i = 0; i < portableImages.size(); i++) {
-            PortableImage portableImage = (PortableImage) portableImages.get(i);
-            portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            portableImage.setPathVisibility(Visibility.INVISIBLE);
-            portableImage.setDockVisibility(Visibility.VISIBLE);
-            portableImage.setTransparency(1.0);
-        }
+        // Update distance between Hosts and Extensions
+        space.setPortableSeparation(300);
 
-        // <HACK>
-        // TODO: Replace ASAP. This is shit.
-        ImageGroup extensionImages = this.space.getImages(Extension.class);
-        for (int i = 0; i < extensionImages.size(); i++) {
-            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-
-            if (extensionImage.getExtension().getHost().size() > 0) {
-                Host host = extensionImage.getExtension().getHost().get(0);
-                HostImage hostImage = (HostImage) getSpace().getImage(host);
-                hostImage.setExtensionDistance(300);
-            }
-        }
-        // </HACK>
-
-        // </REFACTOR>
-
-        // Adjust scale and position
+        // Update scale and position
         adjustScale();
         adjustPosition();
-//        updateFocus();
     }
 
     public void update() {
@@ -420,21 +373,13 @@ public class Camera {
         position.setAbsoluteY(position.getAbsoluteY() * scale);
         */
 
-//        updateFocus();
-
         // Scale
-        if (scale != targetScale) {
-
-            if (scale > targetScale) {
-                scale -= scaleDelta;
-            } else {
-                scale += scaleDelta;
-            }
-
-            if (Math.abs(scale - targetScale) < scaleDelta) {
-                scale = targetScale;
-            }
-
+        if (Math.abs(scale - targetScale) <= scaleDelta) {
+            scale = targetScale;
+        } else if (scale > targetScale) {
+            scale -= scaleDelta;
+        } else {
+            scale += scaleDelta;
         }
 
         // Position
@@ -453,25 +398,11 @@ public class Camera {
 
             positionFrameIndex++;
 
-        } else if (positionFrameIndex >= positionFrameLimit) {
+        } else { // if (positionFrameIndex >= positionFrameLimit) {
 
             position.x = targetPosition.x * scale;
             position.y = targetPosition.y * scale;
 
         }
-    }
-
-    private Point focusPosition = new Point(0, 0);
-    private List<Point> focusBoundary = new LinkedList<>();
-
-    private void updateFocus() {
-
-        // Compute focus bounding box
-        Rectangle boundingBox = space.getImages().filterVisibility(Visibility.VISIBLE).getBoundingBox();
-
-        // Update Scale
-        adjustScale(boundingBox);
-
-//        setPosition(focusPosition);
     }
 }
