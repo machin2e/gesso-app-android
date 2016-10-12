@@ -73,6 +73,22 @@ public class Point {
         rotation = point.rotation;
     }
 
+    public void set(Point point, Point referencePoint) {
+        double x2 = Geometry.distance(0, 0, point.x, point.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, point.x, point.y)));
+        this.x = referencePoint.x + x2;
+
+        double y2 = Geometry.distance(0, 0, point.x, point.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, point.x, point.y)));
+        this.y = referencePoint.y + y2;
+    }
+
+    public void set(double x, double y, Point referencePoint) {
+        double x2 = Geometry.distance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, x, y)));
+        this.x = referencePoint.x + x2;
+
+        double y2 = Geometry.distance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, x, y)));
+        this.y = referencePoint.y + y2;
+    }
+
     /**
      * @param dx Offset along x axis from current x position.
      * @param dy Offset along y axis from current y position.

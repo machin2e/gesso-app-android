@@ -350,15 +350,29 @@ public class Space extends Image<Model> {
             this.actors.get(i).update();
         }
 
-        // Update Images
+//        // Update Images
+//        for (int i = 0; i < images.size(); i++) {
+//            Image image = images.get(i);
+//
+//            // Update bounding box of Image
+//            // TODO:
+//
+//            // Update the Image
+//            image.update();
+//        }
+
+        // Draw Portables
         for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+            if (!(images.get(i) instanceof ExtensionImage)) {
+                images.get(i).update();
+            }
+        }
 
-            // Update bounding box of Image
-            // TODO:
-
-            // Update the Image
-            image.update();
+        // Draw Extensions
+        for (int i = 0; i < images.size(); i++) {
+            if (images.get(i) instanceof ExtensionImage) {
+                images.get(i).update();
+            }
         }
 
         // Update Camera(s)
@@ -370,9 +384,18 @@ public class Space extends Image<Model> {
 
         display.canvas.save();
 
-        // Draw
+        // Draw Portables
         for (int i = 0; i < images.size(); i++) {
-            images.get(i).draw(display);
+            if (!(images.get(i) instanceof ExtensionImage)) {
+                images.get(i).draw(display);
+            }
+        }
+
+        // Draw Extensions
+        for (int i = 0; i < images.size(); i++) {
+            if (images.get(i) instanceof ExtensionImage) {
+                images.get(i).draw(display);
+            }
         }
 
         // Draw any prototype Paths and Extensions
