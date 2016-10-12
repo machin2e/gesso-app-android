@@ -37,7 +37,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     public Rectangle(double left, double top, double right, double bottom) {
-//        super(new Point((right + left) / 2.0, (top + bottom) / 2.0));
         position.x = (right + left) / 2.0;
         position.y = (top + bottom) / 2.0;
         width = (right - left);
@@ -80,12 +79,8 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> temp_getRelativeVertices() {
-//        List<Point> vertices = new LinkedList<>();
-//        vertices.add(new Point());
-//        vertices.add(new Point());
-//        vertices.add(new Point());
-//        vertices.add(new Point());
+    public List<Point> getBaseVertices() {
+        
         vertices.get(0).set(
                 0 - (width / 2.0),
                 0 - (height / 2.0)
@@ -102,6 +97,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
                 0 - (width / 2.0),
                 0 + (height / 2.0)
         );
+
         return vertices;
     }
 
@@ -138,11 +134,13 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         if (isVisible()) {
             display.drawRectangle(this);
 
+            /*
             // Draw bounding box!
             display.paint.setColor(Color.GREEN);
             display.paint.setStyle(Paint.Style.STROKE);
             display.paint.setStrokeWidth(2.0f);
             display.drawPolygon(getVertices());
+            */
         }
     }
 }

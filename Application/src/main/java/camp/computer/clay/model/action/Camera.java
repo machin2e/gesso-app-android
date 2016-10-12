@@ -193,10 +193,13 @@ public class Camera {
 
     public void adjustScale(double duration) {
 //        List<Point> figureVertices = getSpace().getImages().filterType(Host.class, Extension.class).getVertices();
+        Log.v("BBB", "A");
         List<Point> imageVertices = getSpace().getImages().filterType(Host.class).getVertices();
-        Log.v("BBW", "vertex #: " + imageVertices.size());
+        Log.v("BBB", "B");
         if (imageVertices.size() > 0) {
+            Log.v("BBB", "C");
             Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+            Log.v("BBB", "-");
 //            Rectangle boundingBox = getSpace().getImages().filterType(Host.class).getBoundingBox();
             adjustScale(boundingBox, duration);
         }

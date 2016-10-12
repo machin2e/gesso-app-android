@@ -1,6 +1,5 @@
 package camp.computer.clay.space.image;
 
-import android.graphics.Canvas;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class HostImage extends PortableImage {
 
-    public List<List<Extension>> extensionAxes = new ArrayList<>();
+    public List<List<Extension>> segmentExtensions = new ArrayList<>();
 
     public HostImage(Host host) {
         super(host);
@@ -48,10 +47,10 @@ public class HostImage extends PortableImage {
         setupGeometry();
         setupActions();
 
-        extensionAxes.add(new ArrayList<Extension>());
-        extensionAxes.add(new ArrayList<Extension>());
-        extensionAxes.add(new ArrayList<Extension>());
-        extensionAxes.add(new ArrayList<Extension>());
+        segmentExtensions.add(new ArrayList<Extension>());
+        segmentExtensions.add(new ArrayList<Extension>());
+        segmentExtensions.add(new ArrayList<Extension>());
+        segmentExtensions.add(new ArrayList<Extension>());
     }
 
     private void setupGeometry() {
@@ -522,7 +521,7 @@ public class HostImage extends PortableImage {
 
                                                 if (portableProfiles.size() == 0) {
 
-                                                    // Show "default" DIY extension builder (or info about there being no extensionAxes)
+                                                    // Show "default" DIY extension builder (or info about there being no segmentExtensions)
 
                                                 } else if (portableProfiles.size() > 0) {
 
@@ -1137,8 +1136,8 @@ public class HostImage extends PortableImage {
 //        Log.v("ExtensionCount", "extensions: " + extensions.size());
 
         // Reset current layout
-        for (int i = 0; i < extensionAxes.size(); i++) {
-            extensionAxes.get(i).clear();
+        for (int i = 0; i < segmentExtensions.size(); i++) {
+            segmentExtensions.get(i).clear();
         }
 
         // Update each Extension's position
@@ -1147,11 +1146,11 @@ public class HostImage extends PortableImage {
             updateExtensionSegmentIndex(extension);
         }
 
-        for (int segmentIndex = 0; segmentIndex < extensionAxes.size(); segmentIndex++) {
+        for (int segmentIndex = 0; segmentIndex < segmentExtensions.size(); segmentIndex++) {
 
-            for (int extensionIndex = 0; extensionIndex < extensionAxes.get(segmentIndex).size(); extensionIndex++) {
+            for (int extensionIndex = 0; extensionIndex < segmentExtensions.get(segmentIndex).size(); extensionIndex++) {
 
-                Extension extension = extensionAxes.get(segmentIndex).get(extensionIndex);
+                Extension extension = segmentExtensions.get(segmentIndex).get(extensionIndex);
                 ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
 
                 if (extensionImage == null) {
@@ -1162,7 +1161,7 @@ public class HostImage extends PortableImage {
 
                 final double extensionSeparationDistance = 25.0;
                 double extensionWidth = 200;
-                int extensionCount = extensionAxes.get(segmentIndex).size();
+                int extensionCount = segmentExtensions.get(segmentIndex).size();
 //                Log.v("ExtensionCount", "extension count: " + extensionCount);
                 double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
 
@@ -1193,7 +1192,7 @@ public class HostImage extends PortableImage {
                             position
                     );
                 }
-                
+
                 if (segmentIndex == 0) {
                     extensionImage.setRotation(getRotation() + 0);
                 } else if (segmentIndex == 1) {
@@ -1219,7 +1218,7 @@ public class HostImage extends PortableImage {
 
         int segmentIndex = getHeaderIndex(extensionImage);
 
-        extensionAxes.get(segmentIndex).add(extension);
+        segmentExtensions.get(segmentIndex).add(extension);
     }
 
     public void draw(Display display) {

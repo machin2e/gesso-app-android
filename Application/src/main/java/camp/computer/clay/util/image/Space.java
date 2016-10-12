@@ -350,29 +350,15 @@ public class Space extends Image<Model> {
             this.actors.get(i).update();
         }
 
-//        // Update Images
-//        for (int i = 0; i < images.size(); i++) {
-//            Image image = images.get(i);
-//
-//            // Update bounding box of Image
-//            // TODO:
-//
-//            // Update the Image
-//            image.update();
-//        }
-
-        // Draw Portables
+        // Update Images
         for (int i = 0; i < images.size(); i++) {
-            if (!(images.get(i) instanceof ExtensionImage)) {
-                images.get(i).update();
-            }
-        }
+            Image image = images.get(i);
 
-        // Draw Extensions
-        for (int i = 0; i < images.size(); i++) {
-            if (images.get(i) instanceof ExtensionImage) {
-                images.get(i).update();
-            }
+            // Update bounding box of Image
+            // TODO:
+
+            // Update the Image
+            image.update();
         }
 
         // Update Camera(s)
@@ -403,6 +389,8 @@ public class Space extends Image<Model> {
         drawExtensionPrototype(display);
 
         display.canvas.restore();
+
+//        getEntity().getActor(0).getCamera().setFocus(this);
     }
 
     private void drawExtensionPrototype(Display display) {

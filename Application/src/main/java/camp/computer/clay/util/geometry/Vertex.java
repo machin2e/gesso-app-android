@@ -41,9 +41,8 @@ public class Vertex<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> temp_getRelativeVertices() {
-//        List<Point> vertices = new LinkedList<>();
-        vertex.set(position);
+    public List<Point> getBaseVertices() {
+        vertex.set(imagePosition);
         return vertices;
     }
 
@@ -63,10 +62,12 @@ public class Vertex<T extends Entity> extends Shape<T> {
             // display.drawVertex(this);
         }
 
+        /*
         // Draw bounding box!
         display.paint.setColor(Color.GREEN);
         display.paint.setStyle(Paint.Style.STROKE);
         display.paint.setStrokeWidth(2.0f);
         display.canvas.drawLine((float) position.x - 10, (float) position.y - 10, (float) position.x + 10, (float) position.y + 10, display.paint);
+        */
     }
 }

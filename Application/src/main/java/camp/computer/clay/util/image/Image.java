@@ -137,9 +137,12 @@ public abstract class Image<T extends Entity> {
     }
 
     public <T extends Shape> void addShape(T shape) {
-        shape.setImage(this);
+//        shape.setImage(this);
         shape.setImagePosition(shape.position);
         this.shapes.add(shape);
+
+        // Sort layers
+        sortShapesByLayer();
     }
 
     public Shape getShape(int index) {
@@ -226,7 +229,7 @@ public abstract class Image<T extends Entity> {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            //shape.update();
+            shape.update();
             shape.updateGeometry(this);
         }
     }

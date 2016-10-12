@@ -1,5 +1,7 @@
 package camp.computer.clay.util.geometry;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,6 +201,8 @@ public abstract class Geometry {
                 maxY = y;
             }
         }
+
+        Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
 
         return new Rectangle(minX, minY, maxX, maxY);
     }

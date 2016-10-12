@@ -17,6 +17,8 @@ public class Circle<T extends Entity> extends Shape<T> {
 
     protected List<Point> vertices = new ArrayList<>();
 
+    protected List<Point> bounds = new ArrayList<>();
+
     /**
      * The index of vertices to use to approximate the circle. By default, this is setValue to 12,
      * corresponding to a vertex every 30 degrees.
@@ -53,7 +55,7 @@ public class Circle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public List<Point> temp_getRelativeVertices() {
+    public List<Point> getBaseVertices() {
         int segmentCount = vertexCount - 1;
         for (int i = 0; i < segmentCount; i++) {
 
@@ -92,11 +94,13 @@ public class Circle<T extends Entity> extends Shape<T> {
         if (isVisible()) {
             display.drawCircle(this);
 
+            /*
             // Draw bounding box!
             display.paint.setColor(Color.GREEN);
             display.paint.setStyle(Paint.Style.STROKE);
             display.paint.setStrokeWidth(2.0f);
             display.drawPolygon(getVertices());
+            */
         }
     }
 }

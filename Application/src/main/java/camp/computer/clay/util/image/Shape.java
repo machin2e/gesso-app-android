@@ -1,5 +1,7 @@
 package camp.computer.clay.util.image;
 
+import android.util.Log;
+
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
@@ -11,8 +13,6 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 
 public abstract class Shape<T extends Entity> {
-
-    protected Image parentImage = null;
 
     protected String label = "";
 
@@ -40,8 +40,7 @@ public abstract class Shape<T extends Entity> {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-
-        parentImage.sortShapesByLayer();
+//        parentImage.sortShapesByLayer();
     }
     // </LAYER>
 
@@ -54,14 +53,6 @@ public abstract class Shape<T extends Entity> {
 
     public Shape(Point position) {
         this.position.set(position);
-    }
-
-    public void setImage(Image image) {
-        this.parentImage = image;
-    }
-
-    public Image getImage() {
-        return this.parentImage;
     }
 
     public T getEntity() {
@@ -203,6 +194,7 @@ public abstract class Shape<T extends Entity> {
     }
 
     public void update() {
+        Log.v("BBBB", "shape.position.x: " + position.x + ", y: " + position.y);
     }
 
     /**
@@ -216,9 +208,15 @@ public abstract class Shape<T extends Entity> {
 
         updatePosition(referenceImage); // Update the position
         updateRotation(referenceImage); // Update rotation
-        updateBounds(referenceImage); // Update the bounds (using the results from the update position and rotation)
+        updateBoundary(referenceImage); // Update the bounds (using the results from the update position and rotation)
     }
 
+    /**
+     * Translate the center position of the {@code Shape}. Effectively, this updates the position
+     * of the {@code Shape}.
+     *
+     * @param referenceImage
+     */
     private void updatePosition(Image referenceImage) {
         updatePositionX(referenceImage);
         updatePositionY(referenceImage);
@@ -245,8 +243,8 @@ public abstract class Shape<T extends Entity> {
     }
 
     // TODO: Delete! Refactor this out.
-    public List<Point> temp_getRelativeVertices() {
-        return getVertices();
+    public List<Point> getBaseVertices() {
+        return getVertices(); // HACK
     }
 
     /**
@@ -255,9 +253,10 @@ public abstract class Shape<T extends Entity> {
      *
      * @param referenceImage
      */
-    private void updateBounds(Image referenceImage) {
+    private void updateBoundary(Image referenceImage) {
 
-        List<Point> vertices = temp_getRelativeVertices();
+        getBaseVertices();
+        List<Point> vertices = getVertices();
 
         // Translate and rotate the vertices about the updated position
         for (int i = 0; i < vertices.size(); i++) {
