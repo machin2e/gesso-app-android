@@ -82,6 +82,7 @@ public abstract class Shape<T extends Entity> {
             imagePosition = new Point();
         }
         this.imagePosition.set(x, y);
+        invalidate();
     }
 
     public void setImagePosition(Point point) {
@@ -90,6 +91,7 @@ public abstract class Shape<T extends Entity> {
         }
         this.imagePosition.set(point.x, point.y);
         this.imagePosition.setRotation(point.rotation);
+        invalidate();
     }
 
     public Point getImagePosition() {
@@ -102,14 +104,17 @@ public abstract class Shape<T extends Entity> {
 
     public void setPosition(double x, double y) {
         this.position.set(x, y);
+        invalidate();
     }
 
     public void setPosition(Point point) {
         this.position.set(point.x, point.y);
+        invalidate();
     }
 
     public void setRotation(double angle) {
         this.position.rotation = angle;
+        invalidate();
     }
 
     public double getRotation() {

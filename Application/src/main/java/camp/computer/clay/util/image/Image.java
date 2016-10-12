@@ -81,6 +81,21 @@ public abstract class Image<T extends Entity> {
     }
     // </LAYER>
 
+    /**
+     * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * <p>
+     * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
+     * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
+     * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
+     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     */
+    public void invalidate() {
+        for (int i = 0; i < shapes.size(); i++) {
+            shapes.get(i).invalidate();
+        }
+    }
+
     public Image(T entity) {
         this.entity = entity;
     }
@@ -110,19 +125,23 @@ public abstract class Image<T extends Entity> {
     }
 
     public void setPosition(double x, double y) {
-        this.position.set(x, y);
+        position.set(x, y);
+        invalidate();
     }
 
     public void setPosition(Point position) {
-        this.position.set(position.x, position.y);
+        position.set(position.x, position.y);
+        invalidate();
     }
 
     public void setRotation(double angle) {
         this.position.rotation = angle;
+        invalidate();
     }
 
     public void setScale(double scale) {
         this.scale = scale;
+        invalidate();
     }
 
     public boolean isVisible() {
@@ -138,12 +157,14 @@ public abstract class Image<T extends Entity> {
     }
 
     public <T extends Shape> void addShape(T shape) {
-//        shape.setImage(this);
-        shape.setImagePosition(shape.position);
-        this.shapes.add(shape);
+        shape.setImagePosition(shape.getPosition());
+        shapes.add(shape);
 
-        // Sort layers
+        // Update layer ordering
         sortShapesByLayer();
+
+        // Invalidate Shape
+        shape.invalidate();
     }
 
     public Shape getShape(int index) {
@@ -225,18 +246,17 @@ public abstract class Image<T extends Entity> {
     }
 
     public void update() {
-
         updateGeometry();
     }
 
-    private void updateGeometry() {
+    protected void updateGeometry() {
 
         // Update Shapes
         for (int i = 0; i < this.shapes.size(); i++) {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            shape.invalidate(); // HACK
+            //shape.invalidate(); // HACK
             shape.update(position);
         }
     }

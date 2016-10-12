@@ -179,7 +179,8 @@ public class ExtensionImage extends PortableImage {
     /**
      * Update the {@code Image} to match the state of the corresponding {@code Entity}.
      */
-    private void updateGeometry() {
+    protected void updateGeometry() {
+        super.updateGeometry();
 
         updatePortGeometry();
         updateHeaderGeometry();
