@@ -1,5 +1,7 @@
 package camp.computer.clay.model.action;
 
+import android.util.Log;
+
 import java.util.List;
 
 import camp.computer.clay.application.Application;
@@ -229,6 +231,8 @@ public class Camera {
      */
     public void setFocus(Port sourcePort, Point targetPosition) {
 
+        Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
+
         // Check if a Host Image is nearby
         Image nearestHostImage = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
         if (nearestHostImage != null) {
@@ -247,6 +251,8 @@ public class Camera {
     }
 
     public void setFocus(Host host) {
+
+        Log.v("SetFocus", "setFocus(Host)");
 
         // <REFACTOR>
         HostImage hostImage = (HostImage) space.getImage(host);
@@ -289,6 +295,8 @@ public class Camera {
 
     public void setFocus(Extension extension) {
 
+        Log.v("SetFocus", "setFocus(Extension)");
+
         // <REFACTOR>
         ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
@@ -320,6 +328,10 @@ public class Camera {
         }
         // </REFACTOR>
 
+        // Increase distance between Host and Extension
+        HostImage hostImage = (HostImage) getSpace().getImage(extension.getHost().get(0));
+        hostImage.setExtensionDistance(500);
+
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);
         Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
@@ -335,6 +347,8 @@ public class Camera {
      */
     public void setFocus(PathGroup paths) {
 
+        Log.v("SetFocus", "setFocus(PathGroup)");
+
         // Get bounding box around the Ports in the specified Paths
         ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
         List<Point> portPositions = pathPortShapes.getPositions();
@@ -346,6 +360,8 @@ public class Camera {
     }
 
     public void setFocus(Space space) {
+
+        Log.v("SetFocus", "setFocus(Space)");
 
         // Hide Portables' Ports.
         space.hideAllPorts();

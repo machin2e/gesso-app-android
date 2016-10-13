@@ -13,14 +13,29 @@ public class Polyline<T extends Entity> extends Shape<T> {
 
     public Polyline() {
         super();
+        setup();
     }
 
     public Polyline(T entity) {
         this.entity = entity;
+        setup();
     }
 
     public Polyline(Point position, List<Point> vertices) {
         super(position);
+        setup();
+        setVertices(vertices);
+    }
+
+    private void setup() {
+        setupGeometry();
+    }
+
+    private void setupGeometry() {
+        this.vertices.addAll(vertices);
+    }
+
+    public void setVertices(List<Point> vertices) {
         this.vertices.addAll(vertices);
     }
 

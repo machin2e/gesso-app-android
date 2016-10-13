@@ -42,8 +42,8 @@ public class ExtensionImage extends PortableImage {
         rectangle.setWidth(200);
         rectangle.setHeight(200);
         rectangle.setLabel("Board");
-        rectangle.setColor("#f7f7f7");
-        rectangle.setOutlineThickness(1);
+        rectangle.setColor("#ff008000"); // #f7f7f7
+        rectangle.setOutlineThickness(0);
         addShape(rectangle);
 
         // Headers
@@ -86,7 +86,6 @@ public class ExtensionImage extends PortableImage {
                         }
 
                     } else {
-
 
                         if (action.isTap()) {
 
@@ -200,6 +199,7 @@ public class ExtensionImage extends PortableImage {
             Shape portShape = portShapes.get(i);
             if (!getPortable().getPorts().contains(portShape.getEntity())) {
                 portShapes.remove(portShape);
+                invalidate();
             }
         }
 
@@ -222,6 +222,8 @@ public class ExtensionImage extends PortableImage {
                 circle.setVisibility(Visibility.INVISIBLE);
 
                 addShape(circle);
+
+                invalidate();
             }
         }
 

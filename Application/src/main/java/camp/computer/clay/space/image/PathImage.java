@@ -2,7 +2,6 @@ package camp.computer.clay.space.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Path;
@@ -11,14 +10,15 @@ import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.geometry.Polyline;
-import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 
 public class PathImage extends Image<Path> {
+
+    // A single PathImage is created to represent all Paths between a Host and an Extension.
 
     private Visibility dockVisibility = Visibility.VISIBLE;
 
@@ -32,8 +32,21 @@ public class PathImage extends Image<Path> {
     }
 
     private void setup() {
+        setupGeometry();
         setupActions();
         layerIndex = -10;
+    }
+
+    private void setupGeometry() {
+        Segment segment;
+
+        // Board
+        segment = new Segment<>();
+        segment.setOutlineThickness(2.0);
+        segment.setLabel("Path");
+        segment.setColor("#1f1f1e"); // #f7f7f7
+        segment.setOutlineThickness(1);
+        addShape(segment);
     }
 
     private void setupActions() {
@@ -79,15 +92,18 @@ public class PathImage extends Image<Path> {
             }
         }
 
+        /*
         // Bounding Box
         display.paint.setColor(Color.RED);
         display.paint.setStrokeWidth(2.0f);
+        display.paint.setStyle(Paint.Style.STROKE);
         Rectangle boundingBox = getBoundingBox();
         Log.v("PathImage", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
         display.drawRectangle(boundingBox);
 
         // Center Point
         display.canvas.drawCircle(0, 0, 5, display.paint);
+        */
     }
 
     public void setDockVisibility(Visibility visibility) {
@@ -162,11 +178,20 @@ public class PathImage extends Image<Path> {
             Point pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
             Point pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
-            // TODO: Create Line and add it to the PathImage. Update its geometry to change position, rotation, etc.
+//            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
-            display.drawLine(pathStartCoordinate, pathStopCoordinate);
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+//            double pathRotation = getSpace().getImage(getPath().getHost()).getRotation();
+
+            Segment segment = (Segment) getShape("Path");
+            segment.setOutlineThickness(15.0);
+            segment.setOutlineColor(sourcePortShape.getColor());
+
+            segment.setSource(pathStartCoordinate);
+            segment.setTarget(pathStopCoordinate);
+
+            display.drawSegment(segment);
         }
-
     }
 
     private void drawPhysicalPath(Display display) {
@@ -189,12 +214,22 @@ public class PathImage extends Image<Path> {
             // Draw connection between Ports
             display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
             display.paint.setStrokeWidth(10.0f);
-//            display.drawLine(hostConnectorPosition, extensionConnectorPosition);
+//            display.drawSegment(hostConnectorPosition, extensionConnectorPosition);
 
-            Polyline polyline = new Polyline();
-            polyline.addVertex(hostConnectorPosition);
-            polyline.addVertex(extensionConnectorPosition);
-            display.drawPolyline(polyline);
+//            Polyline polyline = new Polyline();
+//            polyline.addVertex(hostConnectorPosition);
+//            polyline.addVertex(extensionConnectorPosition);
+//            display.drawPolyline(polyline);
+
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+            Segment segment = (Segment) getShape("Path");
+            segment.setOutlineThickness(10.0);
+            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getType()));
+
+            segment.setSource(hostConnectorPosition);
+            segment.setTarget(extensionConnectorPosition);
+
+            display.drawSegment(segment);
         }
     }
 }

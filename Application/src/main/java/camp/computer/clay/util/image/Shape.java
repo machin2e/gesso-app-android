@@ -1,7 +1,5 @@
 package camp.computer.clay.util.image;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +7,7 @@ import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.geometry.Rectangle;
 
 public abstract class Shape<T extends Entity> {
 

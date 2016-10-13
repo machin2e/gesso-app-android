@@ -23,7 +23,6 @@ import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.model.util.PortGroup;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
@@ -221,9 +220,9 @@ public class HostImage extends PortableImage {
                 circle.setRotation(270);
             }
 
-            // Line (Port Data Plot)
+            // Segment (Port Data Plot)
             /*
-            Line line = new Line();
+            Segment line = new Segment();
             addShape(line);
             line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
             line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
@@ -235,10 +234,10 @@ public class HostImage extends PortableImage {
 
             /*
             // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto y axis endpoints with most recent data
-            Line previousLine = null;
+            Segment previousLine = null;
             int segmentCount = 10;
             for (int j = 0; j < segmentCount; j++) {
-                Line line = new Line();
+                Segment line = new Segment();
                 addShape(line);
                 line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
 
@@ -253,9 +252,9 @@ public class HostImage extends PortableImage {
 
 //                    Log.v("OnUpdate", "ADDING onUpdateListener");
 //                    final Circle finalCircle = circle;
-//                    line.setOnUpdateListener(new OnUpdateListener<Line>() {
+//                    line.setOnUpdateListener(new OnUpdateListener<Segment>() {
 //                        @Override
-//                        public void onUpdate(Line line)
+//                        public void onUpdate(Segment line)
 //                        {
 //                            line.getTarget().setY(Probability.generateRandomInteger(-(int) finalCircle.getRadius(), (int) finalCircle.getRadius()));
 //                        }
@@ -765,25 +764,30 @@ public class HostImage extends PortableImage {
                                                                 sourcePort.addForwardPath(path);
 
                                                                 parentSpace.addEntity(path);
+
+                                                                if (path.getExtension() != null) {
+                                                                    event.getActor().getCamera().setFocus(path.getExtension());
+                                                                }
                                                             }
 
-                                                            // Remove focus from other forms and their ports
-                                                            ImageGroup hostImages = getSpace().getImages(Host.class);
-                                                            for (int i = 0; i < hostImages.size(); i++) {
-                                                                HostImage hostImage = (HostImage) hostImages.get(i);
-                                                                hostImage.setTransparency(0.05f);
-                                                                hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                                                hostImage.setPathVisibility(Visibility.INVISIBLE);
-                                                                hostImage.setDockVisibility(Visibility.VISIBLE);
-                                                            }
-
-                                                            // Show Path and all contained Ports
-                                                            PathGroup paths = sourcePort.getPaths();
-                                                            parentSpace.getShapes(paths.getPorts()).setVisibility(Visibility.VISIBLE);
-                                                            parentSpace.getImages(paths).setVisibility(Visibility.VISIBLE);
+//                                                            // Remove focus from other forms and their ports
+//                                                            ImageGroup hostImages = getSpace().getImages(Host.class);
+//                                                            for (int i = 0; i < hostImages.size(); i++) {
+//                                                                HostImage hostImage = (HostImage) hostImages.get(i);
+//                                                                hostImage.setTransparency(0.05f);
+//                                                                hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+//                                                                hostImage.setPathVisibility(Visibility.INVISIBLE);
+//                                                                hostImage.setDockVisibility(Visibility.VISIBLE);
+//                                                            }
+//
+//                                                            // Show Path and all contained Ports
+//                                                            PathGroup paths = sourcePort.getPaths();
+//                                                            parentSpace.getShapes(paths.getPorts()).setVisibility(Visibility.VISIBLE);
+//                                                            parentSpace.getImages(paths).setVisibility(Visibility.VISIBLE);
 
                                                             // Camera
-                                                            event.getActor().getCamera().setFocus(paths);
+//                                                            event.getActor().getCamera().setFocus(paths);
+
                                                         }
 
                                                         parentSpace.setPathPrototypeVisibility(Visibility.INVISIBLE);
@@ -1030,7 +1034,7 @@ public class HostImage extends PortableImage {
             int nearestSegmentIndex = 0;
             for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
 
-//                Line segment = hostShapeBoundary.get(i);
+//                Segment segment = hostShapeBoundary.get(i);
 //                Point segmentMidpoint = segment.getMidpoint();
                 Point segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
 

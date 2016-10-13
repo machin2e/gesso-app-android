@@ -26,6 +26,7 @@ import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
@@ -373,6 +374,14 @@ public class Space extends Image<Model> {
 
         // Update Camera(s)
         getEntity().getActor(0).getCamera().update();
+
+
+//        // Sandbox
+//        Line line = new Line();
+//        line.setRotation(45);
+//        for (int i = -100; i <= 100; i += 10) {
+//            Point linePoint = line.getPoint(i);
+//        }
     }
 
     @Override

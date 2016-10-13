@@ -16,7 +16,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public double cornerRadius = 0.0;
 
-    private ArrayList<Line> segments = new ArrayList<>();
+    private ArrayList<Segment> segments = new ArrayList<>();
 
     public Rectangle(T entity) {
         this.entity = entity;
@@ -27,7 +27,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         super();
         this.width = width;
         this.height = height;
-
         setup();
     }
 
@@ -38,7 +37,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         height = (bottom - top);
 
         setup();
-
         updateBoundary(); // TODO: Replace with updateGeometry(this.position)
     }
 
@@ -60,10 +58,10 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         boundary.add(bottomLeft);
 
         // Create segment Lines (relative to the Shape)
-        Line top = new Line(topLeft, topRight);
-        Line right = new Line(topRight, bottomRight);
-        Line bottom = new Line(bottomRight, bottomLeft);
-        Line left = new Line(bottomLeft, topLeft);
+        Segment top = new Segment(topLeft, topRight);
+        Segment right = new Segment(topRight, bottomRight);
+        Segment bottom = new Segment(bottomRight, bottomLeft);
+        Segment left = new Segment(bottomLeft, topLeft);
 
         segments.add(top);
         segments.add(right);
@@ -102,6 +100,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public void setCornerRadius(double cornerRadius) {
         this.cornerRadius = cornerRadius;
+        invalidate();
     }
 
     public double getWidth() {
@@ -110,6 +109,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public void setWidth(double width) {
         this.width = width;
+        invalidate();
     }
 
     public double getHeight() {
@@ -118,6 +118,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public void setHeight(double height) {
         this.height = height;
+        invalidate();
     }
 
     @Override

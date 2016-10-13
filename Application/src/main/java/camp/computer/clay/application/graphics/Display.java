@@ -20,7 +20,7 @@ import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Line;
+import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Polyline;
@@ -329,18 +329,18 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public void drawLine(Point source, Point target) {
+    public void drawSegment(Point source, Point target) {
         canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
     }
 
-    public void drawLine(Line line) {
+    public void drawSegment(Segment segment) {
 
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(line.outlineColorCode);
-        paint.setStrokeWidth((float) line.getOutlineThickness());
+        paint.setColor(segment.outlineColorCode);
+        paint.setStrokeWidth((float) segment.getOutlineThickness());
 
         // Color
-        canvas.drawLine((float) line.getSource().x, (float) line.getSource().y, (float) line.getTarget().x, (float) line.getTarget().y, paint);
+        canvas.drawLine((float) segment.getSource().x, (float) segment.getSource().y, (float) segment.getTarget().x, (float) segment.getTarget().y, paint);
     }
 
     public void drawPolyline(Polyline polyline) {

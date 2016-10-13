@@ -54,7 +54,7 @@ public class Vertex<T extends Entity> extends Shape<T> {
         display.paint.setColor(Color.GREEN);
         display.paint.setStyle(Paint.Style.STROKE);
         display.paint.setStrokeWidth(2.0f);
-        display.canvas.drawLine((float) position.x - 10, (float) position.y - 10, (float) position.x + 10, (float) position.y + 10, display.paint);
+        display.canvas.drawSegment((float) position.x - 10, (float) position.y - 10, (float) position.x + 10, (float) position.y + 10, display.paint);
         */
     }
 }
