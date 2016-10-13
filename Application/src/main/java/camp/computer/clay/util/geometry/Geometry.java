@@ -177,34 +177,40 @@ public abstract class Geometry {
 
     public static Rectangle getBoundingBox(List<Point> points) {
 
-        double minX = Double.MAX_VALUE;
-        double maxX = -Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxY = -Double.MAX_VALUE;
+        if (points.size() == 0) {
 
-        for (int i = 0; i < points.size(); i++) {
-            Point point = points.get(i);
+            return new Rectangle(0, 0, 0, 0);
 
-            double x = point.x;
-            double y = point.y;
+        } else {
 
-            if (x < minX) {
-                minX = x;
+            double minX = Double.MAX_VALUE;
+            double maxX = -Double.MAX_VALUE;
+            double minY = Double.MAX_VALUE;
+            double maxY = -Double.MAX_VALUE;
+
+            for (int i = 0; i < points.size(); i++) {
+                Point point = points.get(i);
+
+                double x = point.x;
+                double y = point.y;
+
+                if (x < minX) {
+                    minX = x;
+                }
+                if (y < minY) {
+                    minY = y;
+                }
+                if (x > maxX) {
+                    maxX = x;
+                }
+                if (y > maxY) {
+                    maxY = y;
+                }
             }
-            if (y < minY) {
-                minY = y;
-            }
-            if (x > maxX) {
-                maxX = x;
-            }
-            if (y > maxY) {
-                maxY = y;
-            }
+
+            // Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
+            return new Rectangle(minX, minY, maxX, maxY);
         }
-
-        Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
-
-        return new Rectangle(minX, minY, maxX, maxY);
     }
 
 //    public static List<Point> getBoundingBox(List<Point> endpoints) {

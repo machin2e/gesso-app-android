@@ -1,8 +1,5 @@
 package camp.computer.clay.model.action;
 
-import android.util.Log;
-
-import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
@@ -13,7 +10,6 @@ import camp.computer.clay.model.Path;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.Portable;
 import camp.computer.clay.model.util.PathGroup;
-import camp.computer.clay.model.util.PortGroup;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PortableImage;
@@ -22,7 +18,6 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Time;
@@ -116,7 +111,7 @@ public class Camera {
 //            return;
 //        }
 
-        if (duration < 5.0) {
+        if (duration == 0.0) {
 
             this.targetPosition.set(-x, -y);
             this.originalPosition.set(x, y);
@@ -132,7 +127,6 @@ public class Camera {
             // this.targetPosition.setAbsoluteY(-targetPosition.y * targetScale);
             */
 
-            //this.targetPosition.setAbsolute(-targetPosition.x, -targetPosition.y);
             this.targetPosition.set(-x, -y);
 
             // <PLAN_ANIMATION>
@@ -147,7 +141,7 @@ public class Camera {
 
     public void adjustPosition() {
         Point centerPosition = getSpace().getImages().filterType(Host.class, Extension.class).getCenterPoint();
-        setPosition(centerPosition.x, centerPosition.y, 0);
+        setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
 
     public void setOffset(double dx, double dy) {
@@ -354,7 +348,7 @@ public class Camera {
     public void setFocus(Space space) {
 
         // Hide Portables' Ports.
-        space.hidePortables();
+        space.hideAllPorts();
 
         // Update distance between Hosts and Extensions
         space.setPortableSeparation(300);

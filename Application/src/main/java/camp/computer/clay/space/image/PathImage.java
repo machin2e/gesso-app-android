@@ -13,6 +13,7 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Polyline;
+import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
@@ -77,6 +78,16 @@ public class PathImage extends Image<Path> {
                 drawPhysicalPath(display);
             }
         }
+
+        // Bounding Box
+        display.paint.setColor(Color.RED);
+        display.paint.setStrokeWidth(2.0f);
+        Rectangle boundingBox = getBoundingBox();
+        Log.v("PathImage", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
+        display.drawRectangle(boundingBox);
+
+        // Center Point
+        display.canvas.drawCircle(0, 0, 5, display.paint);
     }
 
     public void setDockVisibility(Visibility visibility) {
@@ -150,6 +161,8 @@ public class PathImage extends Image<Path> {
             double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
             Point pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
             Point pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+
+            // TODO: Create Line and add it to the PathImage. Update its geometry to change position, rotation, etc.
 
             display.drawLine(pathStartCoordinate, pathStopCoordinate);
         }

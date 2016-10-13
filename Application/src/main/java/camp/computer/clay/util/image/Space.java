@@ -2,6 +2,7 @@ package camp.computer.clay.util.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -97,33 +98,41 @@ public class Space extends Image<Model> {
 
                 } else if (event.getType() == Event.Type.MOVE) {
 
-                    camera.setOffset(action.getOffset());
+                    Log.v("Space_Action", "MOVE");
+
+                    if (action.isDragging()) {
+                        Log.v("Space_Action", "DRAG");
+                        camera.setOffset(action.getOffset());
+                    }
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    // Previous Action targeted also this Extension
-                    if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
+//                    // Previous Action targeted also this Extension
+//                    if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
+//
+//                        if (action.isTap()) {
+//
+//                            Log.v("Space_Action", "UNSELECT 2");
+//
+//                            // Title
+//                            setTitleText("Project");
+//                            setTitleVisibility(Visibility.VISIBLE);
+//                        }
+//
+//                    } else {
 
-                        if (action.isTap()) {
+                    // NOT a repeat tap on this Image
 
-                            // Title
-                            setTitleText("Project");
-                            setTitleVisibility(Visibility.VISIBLE);
-                        }
+                    if (action.isTap()) {
+                        Log.v("Space_Action", "UNSELECT 1");
 
-                    } else {
+                        // Title
+                        setTitleVisibility(Visibility.INVISIBLE);
 
-                        // NOT a repeat tap on this Image
-
-                        if (action.isTap()) {
-
-                            // Title
-                            setTitleVisibility(Visibility.INVISIBLE);
-
-                            // Camera
-                            camera.setFocus(getSpace());
-                        }
+                        // Camera
+                        camera.setFocus(getSpace());
                     }
+//                    }
                 }
             }
         });
@@ -495,7 +504,7 @@ public class Space extends Image<Model> {
         // </HACK>
     }
 
-    public void hidePortables() {
+    public void hideAllPorts() {
         ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
             PortableImage portableImage = (PortableImage) portableImages.get(i);

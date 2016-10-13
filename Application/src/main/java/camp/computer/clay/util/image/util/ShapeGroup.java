@@ -45,7 +45,6 @@ public class ShapeGroup extends Group<Shape> {
 
                 boolean isMatch = matcher.matches();
 
-//                if (this.elements.get(i).getLabel().equals(labels[j])) {
                 if (isMatch) {
                     shapeGroup.add(this.elements.get(i));
                 }

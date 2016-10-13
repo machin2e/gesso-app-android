@@ -22,7 +22,7 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<Entity, Integer> colorMap = new HashMap<Entity, Integer>();
+    private static HashMap<Entity, Integer> colorMap = new HashMap<>();
 
     public static int getUniqueColor(Entity entity) {
 
@@ -69,9 +69,9 @@ public abstract class Color {
     public static String PORT_COLOR_SWITCH = "#ffd35238";
     public static String PORT_COLOR_PULSE = "#ff75b441";
     public static String PORT_COLOR_WAVE = "#ff6573c8";
-    public static String PORT_COLOR_REFERENCE = "#ffd1a33c";
-    public static String PORT_COLOR_CMOS = "#ffd35238";
-    public static String PORT_COLOR_TTL = "#ffc65d6b";
+    public static String PORT_COLOR_REFERENCE = "#ff333333";
+    public static String PORT_COLOR_CMOS = "#ffff0000";
+    public static String PORT_COLOR_TTL = "#ffd25141";
 
     public static String getColor(Port.Type portType) {
         if (portType == Port.Type.NONE) {
