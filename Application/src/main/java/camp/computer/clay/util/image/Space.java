@@ -242,7 +242,7 @@ public class Space extends Image<Model> {
         }
 
         // Update Camera
-        getEntity().getActor(0).getCamera().setFocus(this);
+//        getEntity().getActor(0).getCamera().setFocus(this);
     }
 
     @Override

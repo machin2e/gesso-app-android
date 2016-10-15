@@ -20,8 +20,6 @@ public class Actor {
 
     private Camera camera = new Camera();
 
-    private Queue<Event> eventQueue = new LinkedList<>();
-
     private List<Action> actions = new LinkedList<>();
 
     public Actor() {
@@ -53,24 +51,7 @@ public class Actor {
         return this.camera;
     }
 
-    public void queueAction(Event event) {
-        eventQueue.add(event);
-        dequeueAction(); // HACK
-    }
-
-    private void processActionQueue() {
-//        while (eventQueue.size() > 0) {
-//            dequeueAction();
-//        }
-    }
-
-    public void dequeueAction() {
-
-        if (eventQueue.size() == 0) {
-            return;
-        }
-
-        Event event = eventQueue.remove();
+    public void addAction(Event event) {
 
         event.setActor(this);
 
@@ -87,7 +68,7 @@ public class Actor {
                 action.addEvent(event);
 
                 // Record actions on timeline
-                // TODO: Cache and store the queueAction actions before deleting them completely! Do it in
+                // TODO: Cache and store the addAction actions before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
                 if (actions.size() > 3) {
                     actions.remove(0);
@@ -156,6 +137,8 @@ public class Actor {
 
                 // Action the event
                 event.getTargetImage().processAction(action);
+
+                break;
             }
 
             case HOLD: {
@@ -170,6 +153,8 @@ public class Actor {
 
                 // Action the event
                 event.getTargetImage().processAction(action);
+
+                break;
             }
 
             case MOVE: {
@@ -187,12 +172,14 @@ public class Actor {
 
                     action.getFirstEvent().getTargetImage().processAction(action);
                 }
+
+                break;
             }
 
             case UNSELECT: {
 
                 // Stop listening for a hold event
-//                action.timerHandler.removeCallbacks(action.timerRunnable);
+                action.timerHandler.removeCallbacks(action.timerRunnable);
 
                 // Set the target image
                 Image targetImage = getCamera().getSpace().getImage(event.getPosition());
@@ -202,8 +189,10 @@ public class Actor {
                 Shape targetShape = targetImage.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
-                //event.getTargetImage().queueAction(action);
+                //event.getTargetImage().addAction(action);
                 action.getFirstEvent().getTargetImage().processAction(action);
+
+                break;
             }
         }
     }
@@ -227,7 +216,6 @@ public class Actor {
     }
 
     public void update() {
-        processActionQueue();
     }
 
 }

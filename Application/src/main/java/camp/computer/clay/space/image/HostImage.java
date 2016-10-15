@@ -298,25 +298,24 @@ public class HostImage extends PortableImage {
 
                                         if (action.getFirstEvent().getTargetShape().getLabel().equals("Substrate")) {
 
-                                            // Holding
-                                            if (action.isHolding()) {
+                                            if (action.isDragging()) {
+
+                                                // Update position of prototype Extension
+                                                space.setExtensionPrototypePosition(event.getPosition());
+
+                                                getPortShapes().setVisibility(Visibility.INVISIBLE);
+                                                setPathVisibility(Visibility.INVISIBLE);
+                                                setDockVisibility(Visibility.VISIBLE);
+
+                                                space.setExtensionPrototypeVisibility(Visibility.VISIBLE);
+
+                                            } else if (action.isHolding()) {
 
                                                 // Update position of Host image
                                                 setPosition(event.getPosition());
 
                                                 // Camera
                                                 camera.setFocus(getHost());
-
-                                            } else {
-
-                                                // Update position of prototype Extension
-                                                parentSpace.setExtensionPrototypePosition(event.getPosition());
-
-                                                getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                                setPathVisibility(Visibility.INVISIBLE);
-                                                setDockVisibility(Visibility.VISIBLE);
-
-                                                parentSpace.setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
                                             }
 
@@ -325,13 +324,13 @@ public class HostImage extends PortableImage {
                                             if (action.isDragging()) {
 
                                                 // Prototype Path Visibility
-                                                parentSpace.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                                parentSpace.setPathPrototypeDestinationPosition(event.getPosition());
-                                                parentSpace.setPathPrototypeVisibility(Visibility.VISIBLE);
+                                                space.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                space.setPathPrototypeDestinationPosition(event.getPosition());
+                                                space.setPathPrototypeVisibility(Visibility.VISIBLE);
 
                                                 // Prototype Extension Visibility
                                                 boolean isCreateExtensionAction = true;
-                                                ImageGroup imageGroup = parentSpace.getImages(Host.class, Extension.class);
+                                                ImageGroup imageGroup = space.getImages(Host.class, Extension.class);
                                                 for (int i = 0; i < imageGroup.size(); i++) {
                                                     Image otherImage = imageGroup.get(i);
 
@@ -350,11 +349,11 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 if (isCreateExtensionAction) {
-                                                    parentSpace.setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                                                    parentSpace.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                                    parentSpace.setExtensionPrototypePosition(event.getPosition());
+                                                    space.setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                                                    space.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                    space.setExtensionPrototypePosition(event.getPosition());
                                                 } else {
-                                                    parentSpace.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                                    space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
                                                 }
 
                                                 // Show Ports of nearby Hosts and Extensions
@@ -408,15 +407,14 @@ public class HostImage extends PortableImage {
                                                     }
                                                 }
 
+                                                // Camera
+                                                camera.setFocus(sourcePort, event.getPosition());
+
                                             } else if (action.isHolding()) {
 
 //                                                // Holding and dragging
 
                                             }
-
-                                            // Camera
-                                            Port sourcePort = (Port) action.getFirstEvent().getTargetShape().getEntity();
-                                            camera.setFocus(sourcePort, event.getPosition());
 
                                         }
 
@@ -448,21 +446,21 @@ public class HostImage extends PortableImage {
                                                         Path path = paths.get(j);
 
                                                         // Show source and target ports in path
-                                                        parentSpace.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                        parentSpace.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                                        space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                                        space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                         // Show path connection
-                                                        parentSpace.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                        space.getImage(path).setVisibility(Visibility.VISIBLE);
 
 //                                                        // Show Extensions connected to Port
 //                                                        if (path.getSource().getExtension() != null) {
 //                                                            Extension extension = path.getSource().getExtension();
-//                                                            parentSpace.getImage(extension).setVisibility(Visibility.VISIBLE);
+//                                                            space.getImage(extension).setVisibility(Visibility.VISIBLE);
 //                                                        }
 //
 //                                                        if (path.getTarget().getExtension() != null) {
 //                                                            Extension extension = path.getSource().getExtension();
-//                                                            parentSpace.getImage(extension).setVisibility(Visibility.VISIBLE);
+//                                                            space.getImage(extension).setVisibility(Visibility.VISIBLE);
 //                                                        }
                                                     }
                                                 }
@@ -471,7 +469,7 @@ public class HostImage extends PortableImage {
                                                 camera.setFocus(getHost());
 
                                                 if (getHost().getExtensions().size() > 0) {
-                                                    parentSpace.getImages(getHost().getExtensions()).setTransparency(1.0);
+                                                    space.getImages(getHost().getExtensions()).setTransparency(1.0);
 
                                                     // <HACK>
                                                     // TODO: Replace ASAP. This is shit.
@@ -481,8 +479,8 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 // Title
-                                                parentSpace.setTitleText("Host");
-                                                parentSpace.setTitleVisibility(Visibility.VISIBLE);
+                                                space.setTitleText("Host");
+                                                space.setTitleVisibility(Visibility.VISIBLE);
 
                                             } else {
 
@@ -490,11 +488,11 @@ public class HostImage extends PortableImage {
 
                                                 if (event.getTargetImage() instanceof HostImage) {
 
-                                                    // If getFirstEvent queueAction was on the same form, then respond
+                                                    // If getFirstEvent addAction was on the same form, then respond
                                                     if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
 
                                                         // Host
-//                                                        event.getTargetImage().queueAction(action);
+//                                                        event.getTargetImage().addAction(action);
 
                                                         // Camera
 //                                                        camera.setFocus();
@@ -503,16 +501,16 @@ public class HostImage extends PortableImage {
                                                 } else if (event.getTargetImage() instanceof Space) {
 
                                                     // Host
-//                                                        action.getFirstEvent().getTargetImage().queueAction(action);
+//                                                        action.getFirstEvent().getTargetImage().addAction(action);
 
                                                 }
 
                                             }
 
                                             // Check if connecting to a extension
-                                            if (parentSpace.getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                                            if (space.getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
-                                                parentSpace.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                                space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                                                 // Get cached extension profiles (and retrieve additional from Internet store)
                                                 List<PortableProfile> portableProfiles = Application.getView().getClay().getPortableProfiles();
@@ -550,7 +548,7 @@ public class HostImage extends PortableImage {
 
                                                 // (Host.Port, ..., Host.Port) Action Pattern
 
-                                                if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape()) { // if (action.isTap()) {
+                                                if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape() && action.isTap()) { // if (action.isTap()) {
 
                                                     // (Host.Port A, ..., Host.Port A) Action Pattern
                                                     // i.e., The action's first and last events address the same port. Therefore, it must be either a tap or a hold.
@@ -563,14 +561,14 @@ public class HostImage extends PortableImage {
 
                                                         if (port.getType() == Port.Type.NONE) {
 
-                                                            Log.v("TouchPort", "A");
+                                                            Log.v("TouchPort", "-A");
 
                                                             port.setDirection(Port.Direction.INPUT);
                                                             port.setType(Port.Type.next(port.getType()));
 
                                                         } else if (!port.hasForwardPath() && port.getAncestorPaths().size() == 0) {
 
-                                                            Log.v("TouchPort", "B");
+                                                            Log.v("TouchPort", "-B");
 
                                                             Port.Type nextType = port.getType();
                                                             while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
@@ -580,10 +578,10 @@ public class HostImage extends PortableImage {
 
                                                         } else if (!hasVisiblePaths(portIndex) && !hasVisibleAncestorPaths(portIndex)) {
 
-                                                            Log.v("TouchPort", "C");
+                                                            Log.v("TouchPort", "-C");
 
                                                             // Hide Ports on the non-selected Hosts
-                                                            ImageGroup hostImages = parentSpace.getImages(Host.class);
+                                                            ImageGroup hostImages = space.getImages(Host.class);
                                                             for (int i = 0; i < hostImages.size(); i++) {
                                                                 HostImage hostImage = (HostImage) hostImages.get(i);
                                                                 hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
@@ -598,7 +596,7 @@ public class HostImage extends PortableImage {
                                                             }
 
                                                             // Hide Ports on the non-selected Extensions (like above, but for Extensions)
-                                                            ImageGroup extensionImages = parentSpace.getImages().filterType(Extension.class);
+                                                            ImageGroup extensionImages = space.getImages().filterType(Extension.class);
                                                             for (int i = 0; i < extensionImages.size(); i++) {
                                                                 ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 //                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
@@ -620,11 +618,11 @@ public class HostImage extends PortableImage {
                                                                 Path path = paths.get(i);
 
                                                                 // Show Ports
-                                                                parentSpace.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                                parentSpace.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                                                space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                                                space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                                 // Show Path
-                                                                parentSpace.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                                space.getImage(path).setVisibility(Visibility.VISIBLE);
                                                             }
 
                                                             // Show all Paths also connected to the Extension to which the touched Port is connected
@@ -638,11 +636,11 @@ public class HostImage extends PortableImage {
                                                                             Path siblingPath = siblingPaths.get(j);
 
                                                                             // Show Ports
-                                                                            parentSpace.getShape(siblingPath.getSource()).setVisibility(Visibility.VISIBLE);
-                                                                            parentSpace.getShape(siblingPath.getTarget()).setVisibility(Visibility.VISIBLE);
+                                                                            space.getShape(siblingPath.getSource()).setVisibility(Visibility.VISIBLE);
+                                                                            space.getShape(siblingPath.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                                             // Show Path
-                                                                            parentSpace.getImage(siblingPath).setVisibility(Visibility.VISIBLE);
+                                                                            space.getImage(siblingPath).setVisibility(Visibility.VISIBLE);
                                                                         }
                                                                     }
                                                                 }
@@ -652,14 +650,14 @@ public class HostImage extends PortableImage {
                                                             // TODO: Put this code in Camera
                                                             // Camera
                                                             Group<Port> pathPorts = paths.getPorts();
-                                                            ShapeGroup pathPortShapes = parentSpace.getShapes().filterEntity(pathPorts);
+                                                            ShapeGroup pathPortShapes = space.getShapes().filterEntity(pathPorts);
                                                             camera.adjustScale(pathPortShapes.getBoundingBox());
                                                             camera.setPosition(pathPortShapes.getCenterPosition());
                                                             // </HACK>
 
                                                         } else if (hasVisiblePaths(portIndex) || hasVisibleAncestorPaths(portIndex)) {
 
-                                                            Log.v("TouchPort", "D");
+                                                            Log.v("TouchPort", "-D");
 
                                                             // Paths are being shown. Touching a port changes the port type. This will also
                                                             // updates the corresponding path requirement.
@@ -672,7 +670,7 @@ public class HostImage extends PortableImage {
 
                                                         }
 
-                                                        parentSpace.setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                        space.setPathPrototypeVisibility(Visibility.INVISIBLE);
                                                     }
 
                                                 } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
@@ -684,12 +682,12 @@ public class HostImage extends PortableImage {
 
                                                     if (action.isDragging()) {
 
-                                                        Log.v("Events", "B");
+                                                        Log.v("Events", "B.1");
 
                                                         Port sourcePort = (Port) sourcePortShape.getEntity();
                                                         Port targetPort = null;
 
-                                                        Shape targetPortShape = parentSpace.getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
+                                                        Shape targetPortShape = space.getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
                                                         targetPort = (Port) targetPortShape.getEntity();
 
                                                         if (targetPort == null) {
@@ -763,7 +761,7 @@ public class HostImage extends PortableImage {
 
                                                                 sourcePort.addForwardPath(path);
 
-                                                                parentSpace.addEntity(path);
+                                                                space.addEntity(path);
 
                                                                 if (path.getExtension() != null) {
                                                                     event.getActor().getCamera().setFocus(path.getExtension());
@@ -782,15 +780,15 @@ public class HostImage extends PortableImage {
 //
 //                                                            // Show Path and all contained Ports
 //                                                            PathGroup paths = sourcePort.getPaths();
-//                                                            parentSpace.getShapes(paths.getPorts()).setVisibility(Visibility.VISIBLE);
-//                                                            parentSpace.getImages(paths).setVisibility(Visibility.VISIBLE);
+//                                                            space.getShapes(paths.getPorts()).setVisibility(Visibility.VISIBLE);
+//                                                            space.getImages(paths).setVisibility(Visibility.VISIBLE);
 
                                                             // Camera
 //                                                            event.getActor().getCamera().setFocus(paths);
 
                                                         }
 
-                                                        parentSpace.setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                        space.setPathPrototypeVisibility(Visibility.INVISIBLE);
 
                                                     }
 
@@ -798,11 +796,11 @@ public class HostImage extends PortableImage {
 
                                             } else if (action.getLastEvent().getTargetShape() == null
                                                     // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
-                                                    && action.getLastEvent().getTargetImage() == parentSpace) {
+                                                    && action.getLastEvent().getTargetImage() == space) {
 
                                                 // (Host.Port, ..., Space) Action Pattern
 
-                                                if (parentSpace.getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                                                if (space.getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
                                                     Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
                                                     Port hostPort = (Port) hostPortShape.getEntity();
@@ -816,8 +814,8 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 // Update Image
-                                                parentSpace.setPathPrototypeVisibility(Visibility.INVISIBLE);
-                                                parentSpace.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                                space.setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                                             } else {
 
@@ -835,7 +833,7 @@ public class HostImage extends PortableImage {
                                                     }
                                                 }
 
-                                                parentSpace.setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                space.setPathPrototypeVisibility(Visibility.INVISIBLE);
                                             }
 
                                         }
@@ -877,13 +875,13 @@ public class HostImage extends PortableImage {
         }
 
         // Add Extension to Model
-        parentSpace.getModel().addExtension(extension);
+        space.getModel().addExtension(extension);
 
         // Add Extension to Space
-        parentSpace.addEntity(extension);
+        space.addEntity(extension);
 
         // Get the just-created Extension Image
-        ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
+        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
         extensionImage.setPosition(initialPosition);
 
         // <REFACTOR>
@@ -911,7 +909,7 @@ public class HostImage extends PortableImage {
         hostPort.addForwardPath(path);
 
         // Add Path to Space
-        parentSpace.addEntity(path);
+        space.addEntity(path);
 
         // Remove focus from other Hosts and their Ports
         ImageGroup hostImages = getSpace().getImages(Host.class);
@@ -925,8 +923,8 @@ public class HostImage extends PortableImage {
 
         // Show Path and all contained Ports
         PathGroup paths = hostPort.getPaths();
-        parentSpace.getShapes(paths.getPorts()).setVisibility(Visibility.VISIBLE);
-        parentSpace.getImages(paths).setVisibility(Visibility.VISIBLE);
+        space.getShapes(paths.getPorts()).setVisibility(Visibility.VISIBLE);
+        space.getImages(paths).setVisibility(Visibility.VISIBLE);
 
         updateExtensionLayout();
 
@@ -940,13 +938,13 @@ public class HostImage extends PortableImage {
         final Extension extension = new Extension(portableProfile);
 
         // Add Extension to Model
-        parentSpace.getModel().addExtension(extension);
+        space.getModel().addExtension(extension);
 
         // Add Extension to Space
-        parentSpace.addEntity(extension);
+        space.addEntity(extension);
 
         // Get the just-created Extension Image
-        ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
+        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
         // Update the Extension Image position and rotation
         extensionImage.setPosition(initialPosition);
@@ -990,7 +988,7 @@ public class HostImage extends PortableImage {
 
             selectedHostPort.addForwardPath(path);
 
-            parentSpace.addEntity(path);
+            space.addEntity(path);
         }
 
         updateExtensionLayout();
@@ -1027,7 +1025,7 @@ public class HostImage extends PortableImage {
 
             Log.v("Counts", "host port: " + hostPort);
 
-            Point hostPortPosition = parentSpace.getShape(hostPort).getPosition();
+            Point hostPortPosition = space.getShape(hostPort).getPosition();
 
 
             double minDistance = Double.MAX_VALUE;
@@ -1156,7 +1154,7 @@ public class HostImage extends PortableImage {
             for (int extensionIndex = 0; extensionIndex < segmentExtensions.get(segmentIndex).size(); extensionIndex++) {
 
                 Extension extension = segmentExtensions.get(segmentIndex).get(extensionIndex);
-                ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
+                ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
                 if (extensionImage == null) {
                     continue;
@@ -1215,7 +1213,7 @@ public class HostImage extends PortableImage {
     // TODO: Refactor this... it's really dumb right now.
     public void updateExtensionSegmentIndex(Extension extension) {
 
-        ExtensionImage extensionImage = (ExtensionImage) parentSpace.getImage(extension);
+        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
         if (extensionImage == null || extension.getHost().size() == 0) {
             return;

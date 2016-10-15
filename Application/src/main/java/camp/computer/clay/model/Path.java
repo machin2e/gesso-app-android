@@ -101,19 +101,19 @@ public class Path extends Entity {
     }
 
     public Host getHost() {
-        if (getSource().getPortable().getClass() == Extension.class) {
-            return (Host) getTarget().getPortable();
-        } else if (getTarget().getPortable().getClass() == Extension.class) {
+        if (getSource().getPortable().getClass() == Host.class) {
             return (Host) getSource().getPortable();
+        } else if (getTarget().getPortable().getClass() == Host.class) {
+            return (Host) getTarget().getPortable();
         }
         return null;
     }
 
     public Extension getExtension() {
-        if (getSource().getPortable().getClass() == Host.class) {
-            return (Extension) getTarget().getPortable();
-        } else if (getTarget().getPortable().getClass() == Host.class) {
+        if (getSource().getPortable().getClass() == Extension.class) {
             return (Extension) getSource().getPortable();
+        } else if (getTarget().getPortable().getClass() == Extension.class) {
+            return (Extension) getTarget().getPortable();
         }
         return null;
     }

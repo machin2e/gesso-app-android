@@ -72,7 +72,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         identityMatrix = new Matrix();
 
-        // Center the parentSpace coordinate system
+        // Center the space coordinate system
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
@@ -305,17 +305,17 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
-                    actor.queueAction(event);
+                    actor.addAction(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     event.setType(Event.Type.MOVE);
                     event.pointerIndex = pointerId;
-                    actor.queueAction(event);
+                    actor.addAction(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
-                    actor.queueAction(event);
+                    actor.addAction(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {

@@ -21,7 +21,7 @@ public abstract class Image<T extends Entity> {
     /**
      * The parent {@code Space} containing this {@code Image}.
      */
-    protected Space parentSpace = null;
+    protected Space space = null;
 
     protected T entity = null;
 
@@ -50,7 +50,7 @@ public abstract class Image<T extends Entity> {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-        parentSpace.updateLayers();
+        space.updateLayers();
     }
 
     /**
@@ -105,11 +105,11 @@ public abstract class Image<T extends Entity> {
     }
 
     public void setSpace(Space space) {
-        this.parentSpace = space;
+        this.space = space;
     }
 
     public Space getSpace() {
-        return this.parentSpace;
+        return this.space;
     }
 
     public Point getPosition() {

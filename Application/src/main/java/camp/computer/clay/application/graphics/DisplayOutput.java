@@ -3,9 +3,9 @@ package camp.computer.clay.application.graphics;
 import camp.computer.clay.util.time.Time;
 
 /**
- * DisplayOutput is a background thread that periodically updates the parentSpace state
+ * DisplayOutput is a background thread that periodically updates the space state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
- * parentSpace's state then re-rendering it.
+ * space's state then re-rendering it.
  */
 public class DisplayOutput extends Thread {
 
@@ -53,7 +53,7 @@ public class DisplayOutput extends Thread {
 
             frameStartTime = Time.getCurrentTime();
 
-            // Advance the parentSpace state
+            // Advance the space state
             display.update();
 
             frameStopTime = Time.getCurrentTime();

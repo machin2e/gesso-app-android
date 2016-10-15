@@ -1,5 +1,7 @@
 package camp.computer.clay.space.image;
 
+import android.util.Log;
+
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
@@ -62,6 +64,8 @@ public class ExtensionImage extends PortableImage {
             @Override
             public void onAction(Action action) {
 
+                Log.v("ExtensionImage", "onAction " + action.getLastEvent().getType());
+
                 Event event = action.getLastEvent();
 
                 if (event.getType() == Event.Type.NONE) {
@@ -70,6 +74,7 @@ public class ExtensionImage extends PortableImage {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
+                    Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
                     createProfile();
 
                 } else if (event.getType() == Event.Type.MOVE) {
@@ -117,8 +122,8 @@ public class ExtensionImage extends PortableImage {
                             event.getActor().getCamera().setFocus(getExtension());
 
                             // Title
-                            parentSpace.setTitleText("Extension");
-                            parentSpace.setTitleVisibility(Visibility.VISIBLE);
+                            space.setTitleText("Extension");
+                            space.setTitleVisibility(Visibility.VISIBLE);
                         }
                     }
                 }
