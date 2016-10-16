@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -64,12 +65,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 
+        // Get dimensions of the Surface
         canvasWidth = getWidth();
         canvasHeight = getHeight();
+
+        // Create a bitmap to use as a drawing buffer equal in size to the full size of the Surface
         canvasBitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
         canvas = new Canvas();
         canvas.setBitmap(canvasBitmap);
 
+        // Create Identity Matrix
         identityMatrix = new Matrix();
 
         // Center the space coordinate system
@@ -78,7 +83,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        // TODO: Resize the Viewport to width and height
+        Log.v("Display", "surfaceChanged");
+        Log.v("Display", "width: " + width + ", height: " + height);
     }
 
     @Override

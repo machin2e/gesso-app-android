@@ -44,7 +44,7 @@ public class ExtensionImage extends PortableImage {
         rectangle.setWidth(200);
         rectangle.setHeight(200);
         rectangle.setLabel("Board");
-        rectangle.setColor("#ff008000"); // #f7f7f7
+        rectangle.setColor("#ff53BA5D"); // Gray: #f7f7f7, Greens: #32CD32
         rectangle.setOutlineThickness(0);
         addShape(rectangle);
 

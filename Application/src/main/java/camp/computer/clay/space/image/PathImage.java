@@ -181,7 +181,7 @@ public class PathImage extends Image<Path> {
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-//            double pathRotation = getSpace().getImage(getPath().getHost()).getRotation();
+//            double pathRotation = getSpace().getImage(getPath().getHosts()).getRotation();
 
             Segment segment = (Segment) getShape("Path");
             segment.setOutlineThickness(15.0);

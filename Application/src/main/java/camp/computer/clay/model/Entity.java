@@ -2,6 +2,8 @@ package camp.computer.clay.model;
 
 import java.util.UUID;
 
+import camp.computer.clay.util.image.Image;
+
 public abstract class Entity {
 
     // TODO: Add support for Components (as in the ECS architecture)
@@ -9,8 +11,6 @@ public abstract class Entity {
     protected UUID uuid = null;
 
     protected Entity parent;
-
-    protected String label = "";
 
     public Entity() {
         this.uuid = UUID.randomUUID();
@@ -32,6 +32,9 @@ public abstract class Entity {
         return this.parent;
     }
 
+    // <TAG_COMPONENT>
+    protected String label = "";
+
     public void setLabel(String label) {
         this.label = label;
     }
@@ -39,4 +42,17 @@ public abstract class Entity {
     public String getLabel() {
         return this.label;
     }
+    // </TAG_COMPONENT>
+
+    // <IMAGE_COMPONENT>
+    protected Image image = null;
+
+    public Image getImage() {
+        return this.image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+    // </IMAGE_COMPONENT>
 }

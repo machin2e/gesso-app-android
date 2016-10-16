@@ -762,17 +762,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                contextScope.setText("✓");
 //                contextScope.setText("☉");
                 //contextScope.setText("☌"); // When dragging to connect path
-                //contextScope.setText("☍"); // Just after connected path
-                // ☉ // Just after tapping a node
-                // ☐ // Just after tapping machine
-                // ☊
-                // ☋
-                // ☝
-                // ☜
-                // ☞
-                // ☟
-                // ☺ // Smile
-                // ☹ // Frown
             }
         });
 

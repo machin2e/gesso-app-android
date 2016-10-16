@@ -450,7 +450,8 @@ public class HostImage extends PortableImage {
                                                         space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                         // Show path connection
-                                                        space.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                        //space.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                        path.getImage().setVisibility(Visibility.VISIBLE);
 
 //                                                        // Show Extensions connected to Port
 //                                                        if (path.getSource().getExtension() != null) {
@@ -576,43 +577,47 @@ public class HostImage extends PortableImage {
                                                             }
                                                             port.setType(nextType);
 
-                                                        } else if (!hasVisiblePaths(portIndex) && !hasVisibleAncestorPaths(portIndex)) {
+                                                        } else if (!hasVisiblePaths(portIndex)) { // && !hasVisibleAncestorPaths(portIndex)) {
+                                                            // TODO: Replace above condition with check if the same _Extension_ is selected
 
                                                             Log.v("TouchPort", "-C");
 
-                                                            // Hide Ports on the non-selected Hosts
-                                                            ImageGroup hostImages = space.getImages(Host.class);
-                                                            for (int i = 0; i < hostImages.size(); i++) {
-                                                                HostImage hostImage = (HostImage) hostImages.get(i);
-                                                                hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                                                hostImage.setPathVisibility(Visibility.INVISIBLE);
-                                                                hostImage.setDockVisibility(Visibility.VISIBLE);
-
-                                                                // Make non-selected Hosts transparent
-                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <index>", and "LED <index>"
-                                                                ShapeGroup shapes = hostImage.getShapes().filterLabel("^Substrate$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
-                                                                shapes.setTransparency(0.1);
-//                                                                hostImage.setTransparency(0.1);
-                                                            }
-
-                                                            // Hide Ports on the non-selected Extensions (like above, but for Extensions)
-                                                            ImageGroup extensionImages = space.getImages().filterType(Extension.class);
-                                                            for (int i = 0; i < extensionImages.size(); i++) {
-                                                                ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-//                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
-
-                                                                extensionImage.setTransparency(0.1);
-
-                                                                extensionImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                                                extensionImage.setPathVisibility(Visibility.INVISIBLE);
+//                                                            HostImage selectedHostImage = (HostImage) space.getImage(getHosts());
+//
+//                                                            // Hide Ports on the non-selected Hosts
+//                                                            //ImageGroup hostImages = space.getImages(Host.class).remove(selectedHostImage);
+//                                                            ImageGroup hostImages = space.getImages(Host.class);
+//                                                            for (int i = 0; i < hostImages.size(); i++) {
+//                                                                HostImage hostImage = (HostImage) hostImages.get(i);
+//                                                                hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+//                                                                hostImage.setPathVisibility(Visibility.INVISIBLE);
+//                                                                hostImage.setDockVisibility(Visibility.VISIBLE);
+//
+//                                                                // Make non-selected Hosts transparent
+//                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <index>", and "LED <index>"
+//                                                                ShapeGroup shapes = hostImage.getShapes().filterLabel("^Substrate$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
+//                                                                shapes.setTransparency(0.1);
+////                                                                hostImage.setTransparency(0.1);
 //                                                            }
-                                                            }
-
-                                                            // Show the Port's Paths
+//
+//                                                            // Hide Ports on the non-selected Extensions (like above, but for Extensions)
+//                                                            ImageGroup extensionImages = space.getImages().filterType(Extension.class);
+//                                                            for (int i = 0; i < extensionImages.size(); i++) {
+//                                                                ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+////                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
+//
+//                                                                extensionImage.setTransparency(0.1);
+//
+//                                                                extensionImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+//                                                                extensionImage.setPathVisibility(Visibility.INVISIBLE);
+////                                                            }
+//                                                            }
+//
+//                                                            // Show the Port's Paths
                                                             setVisibility(Visibility.VISIBLE);
                                                             setPathVisibility(port, Visibility.VISIBLE);
                                                             setDockVisibility(port, Visibility.INVISIBLE);
-
+//
                                                             PathGroup paths = port.getPaths();
                                                             for (int i = 0; i < paths.size(); i++) {
                                                                 Path path = paths.get(i);
@@ -622,7 +627,8 @@ public class HostImage extends PortableImage {
                                                                 space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                                 // Show Path
-                                                                space.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                                //space.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                                path.getImage().setVisibility(Visibility.VISIBLE);
                                                             }
 
                                                             // Show all Paths also connected to the Extension to which the touched Port is connected
@@ -640,7 +646,8 @@ public class HostImage extends PortableImage {
                                                                             space.getShape(siblingPath.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                                             // Show Path
-                                                                            space.getImage(siblingPath).setVisibility(Visibility.VISIBLE);
+                                                                            //space.getImage(siblingPath).setVisibility(Visibility.VISIBLE);
+                                                                            siblingPath.getImage().setVisibility(Visibility.VISIBLE);
                                                                         }
                                                                     }
                                                                 }
@@ -655,7 +662,7 @@ public class HostImage extends PortableImage {
                                                             camera.setPosition(pathPortShapes.getCenterPosition());
                                                             // </HACK>
 
-                                                        } else if (hasVisiblePaths(portIndex) || hasVisibleAncestorPaths(portIndex)) {
+                                                        } else if (hasVisiblePaths(portIndex)) { // || hasVisibleAncestorPaths(portIndex)) {
 
                                                             Log.v("TouchPort", "-D");
 
@@ -881,8 +888,8 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Get the just-created Extension Image
-        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
-        extensionImage.setPosition(initialPosition);
+        //ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+        extension.getImage().setPosition(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -944,10 +951,10 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Get the just-created Extension Image
-        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+        //ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
         // Update the Extension Image position and rotation
-        extensionImage.setPosition(initialPosition);
+        extension.getImage().setPosition(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -966,7 +973,7 @@ public class HostImage extends PortableImage {
 
                     double distanceToPort = Geometry.distance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                            extensionImage.getPosition()
+                            extension.getImage().getPosition()
                     );
 
                     // Check if the port is the nearest
@@ -1154,11 +1161,11 @@ public class HostImage extends PortableImage {
             for (int extensionIndex = 0; extensionIndex < segmentExtensions.get(segmentIndex).size(); extensionIndex++) {
 
                 Extension extension = segmentExtensions.get(segmentIndex).get(extensionIndex);
-                ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+                //ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
-                if (extensionImage == null) {
-                    continue;
-                }
+//                if (extensionImage == null) {
+//                    continue;
+//                }
 
 //            extensionImage.adjustPosition();
 
@@ -1171,25 +1178,25 @@ public class HostImage extends PortableImage {
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
                 if (segmentIndex == 0) {
-                    extensionImage.getPosition().set(
+                    extension.getImage().getPosition().set(
                             0 + offset,
                             -distanceToExtensions,
                             position
                     );
                 } else if (segmentIndex == 1) {
-                    extensionImage.getPosition().set(
+                    extension.getImage().getPosition().set(
                             distanceToExtensions,
                             0 + offset,
                             position
                     );
                 } else if (segmentIndex == 2) {
-                    extensionImage.getPosition().set(
+                    extension.getImage().getPosition().set(
                             0 + offset,
                             distanceToExtensions,
                             position
                     );
                 } else if (segmentIndex == 3) {
-                    extensionImage.getPosition().set(
+                    extension.getImage().getPosition().set(
                             -distanceToExtensions,
                             0 + offset,
                             position
@@ -1197,13 +1204,13 @@ public class HostImage extends PortableImage {
                 }
 
                 if (segmentIndex == 0) {
-                    extensionImage.setRotation(getRotation() + 0);
+                    extension.getImage().setRotation(getRotation() + 0);
                 } else if (segmentIndex == 1) {
-                    extensionImage.setRotation(getRotation() + 90);
+                    extension.getImage().setRotation(getRotation() + 90);
                 } else if (segmentIndex == 2) {
-                    extensionImage.setRotation(getRotation() + 180);
+                    extension.getImage().setRotation(getRotation() + 180);
                 } else if (segmentIndex == 3) {
-                    extensionImage.setRotation(getRotation() + 270);
+                    extension.getImage().setRotation(getRotation() + 270);
                 }
                 // </REFACTOR>
             }
@@ -1213,9 +1220,10 @@ public class HostImage extends PortableImage {
     // TODO: Refactor this... it's really dumb right now.
     public void updateExtensionSegmentIndex(Extension extension) {
 
-        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+//        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+        ExtensionImage extensionImage = (ExtensionImage) extension.getImage();
 
-        if (extensionImage == null || extension.getHost().size() == 0) {
+        if (extensionImage == null || extension.getHosts().size() == 0) {
             return;
         }
 

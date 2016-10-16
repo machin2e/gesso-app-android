@@ -7,7 +7,6 @@ import android.util.Log;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Entity;
@@ -26,7 +25,6 @@ import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Line;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
@@ -148,8 +146,11 @@ public class Space extends Image<Model> {
 
             Host host = (Host) entity;
 
-            // Create PhoneHost Image
+            // Create Host Image
             HostImage hostImage = new HostImage(host);
+
+            // Assign Image to Entity
+            host.setImage(hostImage);
 
             // Create Port Shapes for each of the PhoneHost's Ports
             for (int i = 0; i < host.getPorts().size(); i++) {
@@ -157,7 +158,7 @@ public class Space extends Image<Model> {
                 addEntity(port);
             }
 
-            // Add PhoneHost Image to Space
+            // Add Host Image to Space
             addImage(hostImage);
 
         } else if (entity instanceof Extension) {
@@ -166,6 +167,9 @@ public class Space extends Image<Model> {
 
             // Create Extension Image
             ExtensionImage extensionImage = new ExtensionImage(extension);
+
+            // Assign Image to Entity
+            extension.setImage(extensionImage);
 
             // Create Port Shapes for each of the Extension's Ports
             for (int i = 0; i < extension.getPorts().size(); i++) {
@@ -186,6 +190,9 @@ public class Space extends Image<Model> {
 
             // Create Path Image
             PathImage pathImage = new PathImage(path);
+
+            // Assign Image to Entity
+            path.setImage(pathImage);
 
             // Add Path Image to Space
             addImage(pathImage);
@@ -504,8 +511,8 @@ public class Space extends Image<Model> {
         for (int i = 0; i < extensionImages.size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 
-            if (extensionImage.getExtension().getHost().size() > 0) {
-                Host host = extensionImage.getExtension().getHost().get(0);
+            if (extensionImage.getExtension().getHosts().size() > 0) {
+                Host host = extensionImage.getExtension().getHosts().get(0);
                 HostImage hostImage = (HostImage) getSpace().getImage(host);
                 hostImage.setExtensionDistance(distance);
             }

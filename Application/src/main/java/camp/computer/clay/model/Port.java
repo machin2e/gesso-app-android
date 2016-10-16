@@ -81,13 +81,6 @@ public class Port extends Entity {
         }
     }
 
-    public void removeDescendantPath(Path path) {
-        if (hasForwardPath(path)) {
-            this.paths.remove(path);
-        }
-    }
-
-    // TODO: Rename to getRemotePorts() // returns "virtual ports" exposed to remove devices (other Clay)
     public PathGroup getForwardPaths() { // formerly getPaths()
         return this.getDescendantPaths(1);
     }
