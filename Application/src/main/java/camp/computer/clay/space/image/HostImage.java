@@ -577,92 +577,94 @@ public class HostImage extends PortableImage {
                                                             }
                                                             port.setType(nextType);
 
-                                                        } else if (!hasVisiblePaths(portIndex)) { // && !hasVisibleAncestorPaths(portIndex)) {
-                                                            // TODO: Replace above condition with check if the same _Extension_ is selected
-
-                                                            Log.v("TouchPort", "-C");
-
-//                                                            HostImage selectedHostImage = (HostImage) space.getImage(getHosts());
+                                                        } 
+//                                                        else if (!hasVisiblePaths(portIndex)) { // && !hasVisibleAncestorPaths(portIndex)) {
+//                                                            // TODO: Replace above condition with check if the same _Extension_ is selected
 //
-//                                                            // Hide Ports on the non-selected Hosts
-//                                                            //ImageGroup hostImages = space.getImages(Host.class).remove(selectedHostImage);
-//                                                            ImageGroup hostImages = space.getImages(Host.class);
-//                                                            for (int i = 0; i < hostImages.size(); i++) {
-//                                                                HostImage hostImage = (HostImage) hostImages.get(i);
-//                                                                hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-//                                                                hostImage.setPathVisibility(Visibility.INVISIBLE);
-//                                                                hostImage.setDockVisibility(Visibility.VISIBLE);
+//                                                            Log.v("TouchPort", "-C");
 //
-//                                                                // Make non-selected Hosts transparent
-//                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <index>", and "LED <index>"
-//                                                                ShapeGroup shapes = hostImage.getShapes().filterLabel("^Substrate$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
-//                                                                shapes.setTransparency(0.1);
-////                                                                hostImage.setTransparency(0.1);
-//                                                            }
-//
-//                                                            // Hide Ports on the non-selected Extensions (like above, but for Extensions)
-//                                                            ImageGroup extensionImages = space.getImages().filterType(Extension.class);
-//                                                            for (int i = 0; i < extensionImages.size(); i++) {
-//                                                                ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
-////                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
-//
-//                                                                extensionImage.setTransparency(0.1);
-//
-//                                                                extensionImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-//                                                                extensionImage.setPathVisibility(Visibility.INVISIBLE);
+////                                                            HostImage selectedHostImage = (HostImage) space.getImage(getHosts());
+////
+////                                                            // Hide Ports on the non-selected Hosts
+////                                                            //ImageGroup hostImages = space.getImages(Host.class).remove(selectedHostImage);
+////                                                            ImageGroup hostImages = space.getImages(Host.class);
+////                                                            for (int i = 0; i < hostImages.size(); i++) {
+////                                                                HostImage hostImage = (HostImage) hostImages.get(i);
+////                                                                hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+////                                                                hostImage.setPathVisibility(Visibility.INVISIBLE);
+////                                                                hostImage.setDockVisibility(Visibility.VISIBLE);
+////
+////                                                                // Make non-selected Hosts transparent
+////                                                                // i.e., Get shapes in image matching labels "Substrate", "Header <index>", and "LED <index>"
+////                                                                ShapeGroup shapes = hostImage.getShapes().filterLabel("^Substrate$", "^Header (1|2|3|4)$", "^LED (1[0-2]|[1-9])$");
+////                                                                shapes.setTransparency(0.1);
+//////                                                                hostImage.setTransparency(0.1);
 ////                                                            }
+////
+////                                                            // Hide Ports on the non-selected Extensions (like above, but for Extensions)
+////                                                            ImageGroup extensionImages = space.getImages().filterType(Extension.class);
+////                                                            for (int i = 0; i < extensionImages.size(); i++) {
+////                                                                ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+//////                                                            if (extensionImage.getExtension() != getParentImage().getEntity()) {
+////
+////                                                                extensionImage.setTransparency(0.1);
+////
+////                                                                extensionImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
+////                                                                extensionImage.setPathVisibility(Visibility.INVISIBLE);
+//////                                                            }
+////                                                            }
+////
+////                                                            // Show the Port's Paths
+//                                                            setVisibility(Visibility.VISIBLE);
+//                                                            setPathVisibility(port, Visibility.VISIBLE);
+////                                                            setDockVisibility(port, Visibility.INVISIBLE);
+////
+//                                                            PathGroup paths = port.getPaths();
+//                                                            for (int i = 0; i < paths.size(); i++) {
+//                                                                Path path = paths.get(i);
+//
+//                                                                // Show Ports
+//                                                                space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+//                                                                space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+//
+//                                                                // Show Path
+//                                                                //space.getImage(path).setVisibility(Visibility.VISIBLE);
+//                                                                path.getImage().setVisibility(Visibility.VISIBLE);
 //                                                            }
 //
-//                                                            // Show the Port's Paths
-                                                            setVisibility(Visibility.VISIBLE);
-                                                            setPathVisibility(port, Visibility.VISIBLE);
-//                                                            setDockVisibility(port, Visibility.INVISIBLE);
+//                                                            // Show all Paths also connected to the Extension to which the touched Port is connected
+//                                                            if (port.getExtension() != null) {
+//                                                                Group<Port> siblingPorts = port.getExtension().getPorts();
+//                                                                for (int i = 0; i < siblingPorts.size(); i++) {
+//                                                                    Port siblingPort = siblingPorts.get(i);
+//                                                                    if (siblingPort != port) {
+//                                                                        PathGroup siblingPaths = siblingPort.getPaths();
+//                                                                        for (int j = 0; j < siblingPaths.size(); j++) {
+//                                                                            Path siblingPath = siblingPaths.get(j);
 //
-                                                            PathGroup paths = port.getPaths();
-                                                            for (int i = 0; i < paths.size(); i++) {
-                                                                Path path = paths.get(i);
-
-                                                                // Show Ports
-                                                                space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                                space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
-
-                                                                // Show Path
-                                                                //space.getImage(path).setVisibility(Visibility.VISIBLE);
-                                                                path.getImage().setVisibility(Visibility.VISIBLE);
-                                                            }
-
-                                                            // Show all Paths also connected to the Extension to which the touched Port is connected
-                                                            if (port.getExtension() != null) {
-                                                                Group<Port> siblingPorts = port.getExtension().getPorts();
-                                                                for (int i = 0; i < siblingPorts.size(); i++) {
-                                                                    Port siblingPort = siblingPorts.get(i);
-                                                                    if (siblingPort != port) {
-                                                                        PathGroup siblingPaths = siblingPort.getPaths();
-                                                                        for (int j = 0; j < siblingPaths.size(); j++) {
-                                                                            Path siblingPath = siblingPaths.get(j);
-
-                                                                            // Show Ports
-                                                                            space.getShape(siblingPath.getSource()).setVisibility(Visibility.VISIBLE);
-                                                                            space.getShape(siblingPath.getTarget()).setVisibility(Visibility.VISIBLE);
-
-                                                                            // Show Path
-                                                                            //space.getImage(siblingPath).setVisibility(Visibility.VISIBLE);
-                                                                            siblingPath.getImage().setVisibility(Visibility.VISIBLE);
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-
-                                                            // <HACK>
-                                                            // TODO: Put this code in Camera
-                                                            // Camera
-                                                            Group<Port> pathPorts = paths.getPorts();
-                                                            ShapeGroup pathPortShapes = space.getShapes().filterEntity(pathPorts);
-                                                            camera.adjustScale(pathPortShapes.getBoundingBox());
-                                                            camera.setPosition(pathPortShapes.getCenterPosition());
-                                                            // </HACK>
-
-                                                        } else if (hasVisiblePaths(portIndex)) { // || hasVisibleAncestorPaths(portIndex)) {
+//                                                                            // Show Ports
+//                                                                            space.getShape(siblingPath.getSource()).setVisibility(Visibility.VISIBLE);
+//                                                                            space.getShape(siblingPath.getTarget()).setVisibility(Visibility.VISIBLE);
+//
+//                                                                            // Show Path
+//                                                                            //space.getImage(siblingPath).setVisibility(Visibility.VISIBLE);
+//                                                                            siblingPath.getImage().setVisibility(Visibility.VISIBLE);
+//                                                                        }
+//                                                                    }
+//                                                                }
+//                                                            }
+//
+//                                                            // <HACK>
+//                                                            // TODO: Put this code in Camera
+//                                                            // Camera
+//                                                            Group<Port> pathPorts = paths.getPorts();
+//                                                            ShapeGroup pathPortShapes = space.getShapes().filterEntity(pathPorts);
+//                                                            camera.adjustScale(pathPortShapes.getBoundingBox());
+//                                                            camera.setPosition(pathPortShapes.getCenterPosition());
+//                                                            // </HACK>
+//
+//                                                        }
+                                                        else if (hasVisiblePaths(portIndex)) { // || hasVisibleAncestorPaths(portIndex)) {
 
                                                             Log.v("TouchPort", "-D");
 
@@ -673,7 +675,28 @@ public class HostImage extends PortableImage {
                                                             while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
                                                                 nextType = Port.Type.next(nextType);
                                                             }
-                                                            port.setType(nextType);
+
+                                                            // <FILTER>
+                                                            // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.apply(Editor)
+                                                            Group<Path> paths = port.getPaths();
+                                                            for (int i = 0; i < paths.size(); i++) {
+                                                                Path path = paths.get(i);
+
+                                                                // <FILTER>
+                                                                // TODO: Make Filter/Editor
+                                                                Group<Port> ports = path.getPorts();
+                                                                for (int j = 0; j < ports.size(); j++) {
+                                                                    ports.get(j).setType(nextType);
+                                                                }
+                                                                // </FILTER>
+                                                            }
+                                                            // </FILTER>
+
+//                                                            Port.Type nextType = port.getType();
+//                                                            while ((nextType == Port.Type.NONE) || (nextType == port.getType())) {
+//                                                                nextType = Port.Type.next(nextType);
+//                                                            }
+//                                                            port.setType(nextType);
 
                                                         }
 
