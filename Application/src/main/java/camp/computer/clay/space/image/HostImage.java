@@ -633,61 +633,14 @@ public class HostImage extends PortableImage {
                                                         Shape targetPortShape = space.getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
                                                         targetPort = (Port) targetPortShape.getEntity();
 
-                                                        Log.v("Events", "C.2");
-
-//                                                        // Update source Port configuration
-//                                                        if (sourcePort.getDirection() == Port.Direction.NONE) {
-//                                                            sourcePort.setDirection(Port.Direction.INPUT);
-//                                                        }
-//                                                        if (sourcePort.getType() == Port.Type.NONE) {
-//                                                            sourcePort.setType(Port.Type.next(sourcePort.getType()));
-//                                                        }
-//
-//                                                        // Update target Port configuration
-//                                                        if (targetPort.getDirection() == Port.Direction.NONE) {
-//                                                            targetPort.setDirection(Port.Direction.OUTPUT);
-//                                                        }
-//                                                        if (targetPort.getType() == Port.Type.NONE) {
-//                                                            targetPort.setType(sourcePort.getType());
-//                                                        }
-
                                                         Log.v("Events", "D.1");
 
                                                         // Create and configure new Path
                                                         Path path = new Path(sourcePort, targetPort);
 
-//                                                        // Set Path type
-//                                                        if (sourcePort.getParent() instanceof Extension || targetPort.getParent() instanceof Extension) {
-//                                                            path.setType(Path.Type.ELECTRONIC);
-//                                                        } else {
-//                                                            path.setType(Path.Type.MESH);
-//                                                        }
-
-                                                        // Set Port types
-//                                                        if (sourcePort.getParent() instanceof Extension) {
-//                                                            Extension extension = (Extension) sourcePort.getParent();
-//                                                            if (extension.getProfile() == null) {
-//                                                                targetPort.setType(sourcePort.getType());
-//                                                            } else {
-//                                                                sourcePort.setType(targetPort.getType());
-//                                                            }
-//                                                        } else if (targetPort.getParent() instanceof Extension) {
-//                                                            Extension extension = (Extension) targetPort.getParent();
-//                                                            if (extension.getProfile() == null) {
-//                                                                Log.v("AddPath", "NO profile");
-//                                                                targetPort.setType(sourcePort.getType());
-//                                                            } else {
-//                                                                Log.v("AddPath", "has profile");
-//                                                                sourcePort.setType(targetPort.getType());
-//                                                            }
-//                                                        }
-//                                                        path.setMode(sourcePort.getType());
-
                                                         space.addEntity(path);
 
-//                                                        if (path.getExtension() != null) {
                                                         event.getActor().getCamera().setFocus(path.getExtension());
-//                                                        }
 
                                                         space.setPathPrototypeVisibility(Visibility.INVISIBLE);
 
@@ -711,32 +664,13 @@ public class HostImage extends PortableImage {
 
                                                     // Update Camera
                                                     camera.setFocus(extension);
-
                                                 }
 
                                                 // Update Image
                                                 space.setPathPrototypeVisibility(Visibility.INVISIBLE);
                                                 space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
-                                            } else {
-
-                                                // Get Port associated with the touched Port shape
-                                                Port port = (Port) action.getFirstEvent().getTargetShape().getEntity();
-
-                                                // Port type and flow direction
-                                                if (port != null) {
-                                                    // Update data model
-                                                    if (port.getDirection() == Port.Direction.NONE) {
-                                                        port.setDirection(Port.Direction.INPUT);
-                                                    }
-                                                    if (port.getType() == Port.Type.NONE) {
-                                                        port.setType(Port.Type.next(port.getType()));
-                                                    }
-                                                }
-
-                                                space.setPathPrototypeVisibility(Visibility.INVISIBLE);
                                             }
-
                                         }
                                     }
                                 }
