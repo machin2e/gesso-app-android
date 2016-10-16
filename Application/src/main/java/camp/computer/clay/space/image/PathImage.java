@@ -20,7 +20,7 @@ public class PathImage extends Image<Path> {
 
     // A single PathImage is created to represent all Paths between a Host and an Extension.
 
-    private Visibility dockVisibility = Visibility.VISIBLE;
+//    private Visibility dockVisibility = Visibility.VISIBLE;
 
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
@@ -106,17 +106,17 @@ public class PathImage extends Image<Path> {
         */
     }
 
-    public void setDockVisibility(Visibility visibility) {
-        this.dockVisibility = visibility;
-    }
+//    public void setDockVisibility(Visibility visibility) {
+//        this.dockVisibility = visibility;
+//    }
 
-    public Visibility getDockVisibility() {
-        return this.dockVisibility;
-    }
+//    public Visibility getDockVisibility() {
+//        return this.dockVisibility;
+//    }
 
-    public boolean isDockVisible() {
-        return this.dockVisibility == Visibility.VISIBLE;
-    }
+//    public boolean isDockVisible() {
+//        return this.dockVisibility == Visibility.VISIBLE;
+//    }
 
     public void drawTrianglePath(Display display) {
 
@@ -141,18 +141,18 @@ public class PathImage extends Image<Path> {
         Point sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
         Point targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
-        if (dockVisibility == Visibility.VISIBLE) {
-
-            paint.setStyle(Paint.Style.FILL);
-            display.drawTriangle(sourcePoint, triangleRotation, triangleWidth, triangleHeight);
-
-            paint.setStyle(Paint.Style.FILL);
-            display.drawTriangle(targetPoint, triangleRotation, triangleWidth, triangleHeight);
-
-        } else {
+//        if (dockVisibility == Visibility.VISIBLE) {
+//
+//            paint.setStyle(Paint.Style.FILL);
+//            display.drawTriangle(sourcePoint, triangleRotation, triangleWidth, triangleHeight);
+//
+//            paint.setStyle(Paint.Style.FILL);
+//            display.drawTriangle(targetPoint, triangleRotation, triangleWidth, triangleHeight);
+//
+//        } else {
 
             display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
-        }
+//        }
     }
 
     private void drawLinePath(Display display) {

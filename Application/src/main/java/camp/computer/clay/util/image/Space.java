@@ -526,8 +526,25 @@ public class Space extends Image<Model> {
             PortableImage portableImage = (PortableImage) portableImages.get(i);
             portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             portableImage.setPathVisibility(Visibility.INVISIBLE);
-            portableImage.setDockVisibility(Visibility.VISIBLE);
+//            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }
+    }
+
+    public Group<Host> getHosts(Extension extension) {
+
+        Group<Host> hostGroup = new Group<>();
+
+        List<Host> hosts = getModel().getHosts();
+
+        for (int i = 0; i < hosts.size(); i++) {
+            if (hosts.get(i).getExtensions().contains(extension)) {
+                if (!hostGroup.contains(hosts.get(i))) {
+                    hostGroup.add(hosts.get(i));
+                }
+            }
+        }
+
+        return hostGroup;
     }
 }

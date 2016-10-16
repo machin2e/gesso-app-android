@@ -17,7 +17,7 @@ import camp.computer.clay.model.Actor;
 import camp.computer.clay.model.Host;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.model.Port;
-import camp.computer.clay.model.profile.PortableProfile;
+import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
@@ -42,10 +42,10 @@ public class Clay {
     // Group of discovered phoneHosts
     private List<PhoneHost> phoneHosts = new ArrayList<>();
 
-    private List<PortableProfile> portableProfiles = new ArrayList<>();
+    private List<Profile> profiles = new ArrayList<>();
 
-    public List<PortableProfile> getPortableProfiles() {
-        return this.portableProfiles;
+    public List<Profile> getProfiles() {
+        return this.profiles;
     }
 
     public Clay() {

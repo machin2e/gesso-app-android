@@ -61,7 +61,7 @@ public class Model extends Entity {
             Host host = this.hosts.get(i);
             for (int j = 0; j < host.getPorts().size(); j++) {
                 Port port = host.getPorts().get(j);
-                paths.addAll(port.getForwardPaths());
+                paths.addAll(port.getPaths());
             }
         }
         return paths;

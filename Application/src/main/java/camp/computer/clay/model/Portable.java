@@ -1,19 +1,25 @@
 package camp.computer.clay.model;
 
-import camp.computer.clay.model.profile.PortableProfile;
+import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.model.util.PortGroup;
 
 public class Portable extends Entity {
-    private PortableProfile profile = null;
+
+    public static Group<Portable> Manager = new Group<>();
+
+    private Profile profile = null;
 
     protected PortGroup ports = new PortGroup();
 
     public Portable() {
-
+        // Add to Manager
+        if (!Manager.contains(this)) {
+            Manager.add(this);
+        }
     }
 
-    public Portable(PortableProfile profile) {
+    public Portable(Profile profile) {
         // Set the Profile used to configure the Extension
         this.profile = profile;
 
@@ -27,6 +33,11 @@ public class Portable extends Entity {
         }
 
         // TODO: Update the rest of the Extension to reflect the Profile!
+
+        // Add to Manager
+        if (!Manager.contains(this)) {
+            Manager.add(this);
+        }
     }
 
     public void addPort(Port port) {
@@ -48,12 +59,12 @@ public class Portable extends Entity {
         PathGroup paths = new PathGroup();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
-            paths.addAll(port.getForwardPaths());
+            paths.addAll(port.getPaths());
         }
         return paths;
     }
 
-    public PortableProfile getProfile() {
+    public Profile getProfile() {
         return this.profile;
     }
 
@@ -61,7 +72,7 @@ public class Portable extends Entity {
         return this.profile != null;
     }
 
-    public void setProfile(PortableProfile profile) {
+    public void setProfile(Profile profile) {
         this.profile = profile;
     }
 

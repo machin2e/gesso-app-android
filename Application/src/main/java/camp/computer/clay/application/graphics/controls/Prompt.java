@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.model.profile.PortableProfile;
+import camp.computer.clay.model.profile.Profile;
 
 public class Prompt {
 
@@ -84,7 +84,7 @@ public class Prompt {
     }
 
     // TODO: public <T> void promptSelection(List<T> options, OnActionListener onActionListener) {
-    public <T> void promptSelection(final List<PortableProfile> options, final OnActionListener onActionListener) {
+    public <T> void promptSelection(final List<Profile> options, final OnActionListener onActionListener) {
 
         // Items
 //        List<String> options = new ArrayList<>();
@@ -111,7 +111,7 @@ public class Prompt {
 
         // Add Profiles from Repository
         for (int i = 0; i < options.size(); i++) {
-//            PortableProfile extensionProfile = getClay().getPortableProfiles().get(i);
+//            Profile extensionProfile = getClay().getProfiles().get(i);
 //            options.add(extensionProfile.getLabel());
             arrayAdapter.add(options.get(i).getLabel());
         }
@@ -140,7 +140,7 @@ public class Prompt {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String selectionLabel = arrayAdapter.getItem(position);
-                PortableProfile selection = options.get(position);
+                Profile selection = options.get(position);
 
                 // Configure based on Profile
                 // Add Ports based on Profile

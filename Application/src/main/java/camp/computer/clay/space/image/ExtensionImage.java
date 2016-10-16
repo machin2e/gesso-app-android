@@ -11,7 +11,7 @@ import camp.computer.clay.model.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.model.profile.PortableProfile;
+import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
@@ -135,19 +135,19 @@ public class ExtensionImage extends PortableImage {
     private void createProfile() {
         if (!getExtension().hasProfile()) {
 
-            // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated PortableProfile)
+            // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated Profile)
             Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
                     // Create Extension Profile
-                    PortableProfile portableProfile = new PortableProfile(getExtension());
-                    portableProfile.setLabel(text);
+                    Profile profile = new Profile(getExtension());
+                    profile.setLabel(text);
 
                     // Assign the Profile to the Extension
-                    getExtension().setProfile(portableProfile);
+                    getExtension().setProfile(profile);
 
                     // Cache the new Extension Profile
-                    Application.getView().getClay().getPortableProfiles().add(portableProfile);
+                    Application.getView().getClay().getProfiles().add(profile);
 
                     // TODO: Persist the profile in the user's private store (either local or online)
 

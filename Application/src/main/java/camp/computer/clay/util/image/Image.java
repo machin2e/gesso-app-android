@@ -16,7 +16,7 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public abstract class Image<T extends Entity> {
+public abstract class Image<T extends Entity> extends Entity {
 
     /**
      * The parent {@code Space} containing this {@code Image}.

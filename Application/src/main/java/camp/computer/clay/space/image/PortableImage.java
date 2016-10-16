@@ -59,15 +59,14 @@ public abstract class PortableImage extends Image<Portable> {
     // TODO: Move into Port? something (inner class? custom PortShape?)
     public ImageGroup getPathImages(int portIndex) {
         ImageGroup pathImages = new ImageGroup();
-        PathGroup paths = getPortable().getPort(portIndex).getForwardPaths();
-        // TODO: ImageGroup images = space.getImages(paths);
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(path);
-            pathImages.add(pathImage);
-        }
-
-        return pathImages;
+        PathGroup paths = getPortable().getPort(portIndex).getPaths();
+        return space.getImages(paths);
+//        for (int i = 0; i < paths.size(); i++) {
+//            Path path = paths.get(i);
+//            PathImage pathImage = (PathImage) getSpace().getImage(path);
+//            pathImages.add(pathImage);
+//        }
+//        return pathImages;
     }
 
     // TODO: Move into Port? something (inner class? custom PortShape?)
@@ -75,31 +74,31 @@ public abstract class PortableImage extends Image<Portable> {
         ImageGroup pathImages = getPathImages(portIndex);
         for (int i = 0; i < pathImages.size(); i++) {
             PathImage pathImage = (PathImage) pathImages.get(i);
-            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
+            if (pathImage.isVisible()) {
                 return true;
             }
         }
         return false;
     }
 
-    // TODO: Move into Port? something (inner class? custom PortShape?)
-    public boolean hasVisibleAncestorPaths(int portIndex) {
-        PathGroup ancestorPaths = getPortable().getPort(portIndex).getAncestorPaths();
-        for (int i = 0; i < ancestorPaths.size(); i++) {
-            Path ancestorPath = ancestorPaths.get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(ancestorPath);
-            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    // TODO: Move into Port? something (inner class? custom PortShape?)
+//    public boolean hasVisibleAncestorPaths(int portIndex) {
+//        PathGroup ancestorPaths = getPortable().getPort(portIndex).getAncestorPaths();
+//        for (int i = 0; i < ancestorPaths.size(); i++) {
+//            Path ancestorPath = ancestorPaths.get(i);
+//            PathImage pathImage = (PathImage) getSpace().getImage(ancestorPath);
+//            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     // TODO: Move into Port? something (inner class? custom PortShape?)
     public ImageGroup getPathImages(Port port) {
         ImageGroup pathImages = new ImageGroup();
-        for (int i = 0; i < port.getForwardPaths().size(); i++) {
-            Path path = port.getForwardPaths().get(i);
+        for (int i = 0; i < port.getPaths().size(); i++) {
+            Path path = port.getPaths().get(i);
             PathImage pathImage = (PathImage) getSpace().getImage(path);
             pathImages.add(pathImage);
         }
@@ -136,36 +135,38 @@ public abstract class PortableImage extends Image<Portable> {
             Port targetPort = pathImage.getPath().getTarget();
             Portable targetPortable = (Portable) targetPort.getParent();
             PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
-            targetPortableImage.setPathVisibility(targetPort, visibility);
+            if (targetPortableImage != this) { // HACK
+                targetPortableImage.setPathVisibility(targetPort, visibility);
+            }
         }
     }
 
-    // TODO: Move into PathImage
-    public void setDockVisibility(Visibility visibility) {
-        Group<Port> ports = getPortable().getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
+//    // TODO: Move into PathImage
+//    public void setDockVisibility(Visibility visibility) {
+//        Group<Port> ports = getPortable().getPorts();
+//        for (int i = 0; i < ports.size(); i++) {
+//            Port port = ports.get(i);
+//
+//            setDockVisibility(port, visibility);
+//        }
+//    }
 
-            setDockVisibility(port, visibility);
-        }
-    }
-
-    // TODO: Move into PathImage
-    public void setDockVisibility(Port port, Visibility visibility) {
-        ImageGroup pathImages = getPathImages(port);
-        for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
-
-            // Update visibility
-            pathImage.setDockVisibility(visibility);
-
-            // Deep
-            Port targetPort = pathImage.getPath().getTarget();
-            Portable targetPortable = (Portable) targetPort.getParent();
-            PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
-            targetPortableImage.setDockVisibility(targetPort, visibility);
-        }
-    }
+//    // TODO: Move into PathImage
+//    public void setDockVisibility(Port port, Visibility visibility) {
+//        ImageGroup pathImages = getPathImages(port);
+//        for (int i = 0; i < pathImages.size(); i++) {
+//            PathImage pathImage = (PathImage) pathImages.get(i);
+//
+//            // Update visibility
+//            pathImage.setDockVisibility(visibility);
+//
+//            // Deep
+//            Port targetPort = pathImage.getPath().getTarget();
+//            Portable targetPortable = (Portable) targetPort.getParent();
+//            PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
+//            targetPortableImage.setDockVisibility(targetPort, visibility);
+//        }
+//    }
 
     // </REFACTOR>
 }

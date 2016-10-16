@@ -9,7 +9,7 @@ import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 
-public abstract class Shape<T extends Entity> {
+public abstract class Shape<T extends Entity> extends Entity {
 
     protected String label = "";
 

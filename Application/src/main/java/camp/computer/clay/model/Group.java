@@ -7,10 +7,44 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.UUID;
 
-public class Group<T> implements List<T> {
+public class Group<T extends Entity> implements List<T> {
 
+    // TODO: private List<T> elements = new LinkedList<>();
     protected List<T> elements = new LinkedList<>();
+
+    public T get(UUID uuid) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).getUuid().equals(uuid)) {
+                return elements.get(i);
+            }
+        }
+        return null;
+    }
+
+    public boolean contains(UUID uuid) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).getUuid().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
+    // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
+    // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
+//    public interface Filter {
+//        public void filter();
+//    }
+//
+//    public Group filter(Filter filter) {
+//        Group group = new Group();
+//        return group;
+//    }
+
+    // <LIST_INTERFACE>
 
     /**
      * Inserts the specified object into this {@code List} at the specified location.
@@ -345,4 +379,6 @@ public class Group<T> implements List<T> {
     public <T1> T1[] toArray(T1[] array) {
         return this.elements.toArray(array);
     }
+
+    // </LIST_INTERFACE>
 }

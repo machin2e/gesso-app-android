@@ -4,6 +4,8 @@ import camp.computer.clay.model.util.PathGroup;
 
 public class Port extends Entity {
 
+    public static Group<Port> Manager = new Group<>();
+
     public enum Direction {
         NONE("none"),
         OUTPUT("output"),
@@ -50,6 +52,13 @@ public class Port extends Entity {
         }
     }
 
+    public Port() {
+        // Add to Manager
+        if (!Manager.contains(this)) {
+            Manager.add(this);
+        }
+    }
+
     /**
      * The {@code index} is a unique number that uniquely identifies the {@code Port}. Concretely,
      * the {@code index} identifier is equal to the pin number defined for a particular I/O pin on
@@ -67,55 +76,18 @@ public class Port extends Entity {
 
     protected Direction direction = Direction.NONE;
 
-    protected PathGroup paths = new PathGroup();
+//    protected PathGroup paths = new PathGroup();
 
     public Portable getPortable() {
         return (Portable) getParent();
     }
 
-    // TODO: Rename or add to exposePort(PhoneHost remoteHost) then add the "virtual" Port to the remote PhoneHost
-    public void addForwardPath(Path path) {
-        if (!hasForwardPath(path)) {
-            this.paths.add(path);
-            path.setParent(this);
-        }
-    }
-
-    public PathGroup getForwardPaths() { // formerly getPaths()
-        return this.getDescendantPaths(1);
-    }
-
-    // <HACK>
-    public Host getHost() {
-        PathGroup paths = this.getPaths(1);
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            if (path.getSource() == this || path.getTarget() == this) {
-                if (path.getSource().getParent() instanceof Host) {
-                    return (Host) path.getSource().getParent();
-                } else if (path.getTarget().getParent() instanceof Host) {
-                    return (Host) path.getTarget().getParent();
-                }
-            }
-        }
-        return null;
-    }
-
-    public Extension getExtension() {
-        PathGroup paths = this.getPaths(1);
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            if (path.getSource() == this || path.getTarget() == this) {
-                if (path.getSource().getParent() instanceof Extension) {
-                    return (Extension) path.getSource().getParent();
-                } else if (path.getTarget().getParent() instanceof Extension) {
-                    return (Extension) path.getTarget().getParent();
-                }
-            }
-        }
-        return null;
-    }
-    // </HACK>
+//    public void addPath(Path path) {
+//        if (!hasPath(path)) {
+//            this.paths.add(path);
+//            path.setParent(this);
+//        }
+//    }
 
     public int getIndex() {
         return this.index;
@@ -132,24 +104,24 @@ public class Port extends Entity {
     public void setType(Type type) {
         this.type = type;
 
-        // Recursively setValue physically connected ports to the same type
-        for (int i = 0; i < this.paths.size(); i++) {
-            Path path = this.paths.get(i);
-            if (path.getType() == Path.Type.ELECTRONIC) {
-
-                if (path.getSource() == this) {
-                    if (path.getTarget().getType() != type) {
-                        path.getTarget().setType(type);
-                    }
-                }
-
-                if (path.getTarget() == this) {
-                    if (path.getSource().getType() != type) {
-                        path.getSource().setType(type);
-                    }
-                }
-            }
-        }
+//        // Recursively set the Ports in the Path to the specified type
+//        for (int i = 0; i < this.paths.size(); i++) {
+//            Path path = this.paths.get(i);
+//            if (path.getType() == Path.Type.ELECTRONIC) {
+//
+//                if (path.getSource() == this) {
+//                    if (path.getTarget().getType() != type) {
+//                        path.getTarget().setType(type);
+//                    }
+//                }
+//
+//                if (path.getTarget() == this) {
+//                    if (path.getSource().getType() != type) {
+//                        path.getSource().setType(type);
+//                    }
+//                }
+//            }
+//        }
     }
 
     public Direction getDirection() {
@@ -160,23 +132,29 @@ public class Port extends Entity {
         this.direction = direction;
     }
 
-    public boolean hasForwardPath() {
-        if (this.paths.size() > 0) {
-            return true;
-        } else {
-            return false;
+    public boolean hasPath() {
+
+        for (int i = 0; i < Path.Manager.size(); i++) {
+            Path path = Path.Manager.get(i);
+            if (path.contains(this)) {
+                return true;
+            }
         }
+
+        return false;
+
+//        if (this.paths.size() > 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
     }
 
-    public boolean hasForwardPath(Path path) {
-        return this.paths.contains(path);
-    }
+    public boolean hasPath(Path path) {
 
-    public PathGroup getPaths(int depth) {
-        PathGroup connectedPaths = new PathGroup();
-        connectedPaths.addAll(getAncestorPaths(depth));
-        connectedPaths.addAll(getDescendantPaths(depth));
-        return connectedPaths;
+        return Path.Manager.contains(path.getUuid());
+
+//        return this.paths.contains(path);
     }
 
     /**
@@ -186,127 +164,48 @@ public class Port extends Entity {
      * @return List of paths in the graph containing the port.
      */
     public PathGroup getPaths() {
+
+        // TODO: Make into Filter
         PathGroup paths = new PathGroup();
-        paths.addAll(getAncestorPaths());
-        paths.addAll(getDescendantPaths());
+        for (int i = 0; i < Path.Manager.size(); i++) {
+            Path path = Path.Manager.get(i);
+            if (path.contains(this)) {
+                paths.add(path);
+            }
+        }
         return paths;
+
+//        return this.paths;
     }
 
-    public PathGroup getAncestorPaths(int depth) {
+    // <HACK>
+//    public Host getHost() {
+//        for (int i = 0; i < paths.size(); i++) {
+//            Path path = paths.get(i);
+//            if (path.getSource() == this || path.getTarget() == this) {
+//                if (path.getSource().getPortable() instanceof Host) {
+//                    return (Host) path.getSource().getPortable();
+//                } else if (path.getTarget().getPortable() instanceof Host) {
+//                    return (Host) path.getTarget().getPortable();
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
-        PathGroup ancestorPaths = new PathGroup();
-
-        Model model = (Model) getParent().getParent();
-
-        PathGroup paths = model.getPaths();
-
-        // Search for direct ancestor paths from port
+    public Extension getExtension() {
+        PathGroup paths = getPaths();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
-            if (path.getTarget() == this) {
-                ancestorPaths.add(path); // Store the path
-
-                // Recursive call to the Path's source Port
-                if (depth > 1) {
-                    ancestorPaths.addAll(path.getSource().getAncestorPaths(depth - 1));
+            if (path.getSource() == this || path.getTarget() == this) {
+                if (path.getSource().getPortable() instanceof Extension) {
+                    return (Extension) path.getSource().getPortable();
+                } else if (path.getTarget().getPortable() instanceof Extension) {
+                    return (Extension) path.getTarget().getPortable();
                 }
             }
         }
-//        }
-
-        return ancestorPaths;
+        return null;
     }
-
-    public PathGroup getAncestorPaths() {
-
-        Model model = (Model) getParent().getParent();
-        PathGroup paths = model.getPaths();
-
-        PathGroup ancestorPaths = new PathGroup();
-
-        // Search for direct ancestor paths from port
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            if (path.getTarget() == this) {
-                ancestorPaths.add(path); // Store the path
-
-                // Recursive call to the Path's source Port
-                ancestorPaths.addAll(path.getSource().getAncestorPaths());
-            }
-        }
-
-        return ancestorPaths;
-    }
-
-    public PathGroup getDescendantPaths(int depth) {
-
-        PathGroup descendantPaths = new PathGroup();
-
-        for (int i = 0; i < this.paths.size(); i++) {
-            Path path = this.paths.get(i);
-            descendantPaths.add(path); // Store the path
-
-            // Recursive call to the Path's target Port
-            if (depth > 1) {
-                descendantPaths.addAll(path.getTarget().getDescendantPaths(depth - 1));
-            }
-        }
-
-        return descendantPaths;
-    }
-
-    public PathGroup getDescendantPaths() {
-
-        PathGroup descendantPaths = new PathGroup();
-
-        for (int i = 0; i < this.paths.size(); i++) {
-            Path path = this.paths.get(i);
-            descendantPaths.add(path); // Store the path
-            descendantPaths.addAll(path.getTarget().getDescendantPaths());
-        }
-
-        return descendantPaths;
-    }
-
-    public boolean hasAncestor(Port port) {
-        PathGroup ancestorPaths = getAncestorPaths();
-        for (int i = 0; i < ancestorPaths.size(); i++) {
-            Path ancestorPath = ancestorPaths.get(i);
-            if (ancestorPath.getSource() == port || ancestorPath.getTarget() == port) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasDescendant(Port port) {
-        PathGroup descendantPaths = getDescendantPaths();
-        for (int i = 0; i < descendantPaths.size(); i++) {
-            Path descendantPath = descendantPaths.get(i);
-            if (descendantPath.getSource() == port || descendantPath.getTarget() == port) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns a list of the ports contained in the list of paths {@code paths}.
-     *
-     * @param paths List of paths for which a list contained ports will be returned.
-     * @return List of ports contained in the specified list of paths {@code paths}.
-     */
-//    public Group<Port> getPorts(List<Path> paths) {
-//        Group<Port> ports = new Group<>();
-//        for (int i = 0; i < paths.size(); i++) {
-//            Path path = paths.get(i);
-//            if (!ports.contains(path.getSource())) {
-//                ports.add(path.getSource());
-//            }
-//            if (!ports.contains(path.getTarget())) {
-//                ports.add(path.getTarget());
-//            }
-//        }
-//        return ports;
-//    }
+    // </HACK>
 }

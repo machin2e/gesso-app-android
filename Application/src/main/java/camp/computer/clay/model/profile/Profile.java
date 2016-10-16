@@ -7,7 +7,7 @@ import java.util.UUID;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.Portable;
 
-public class PortableProfile {
+public class Profile {
     private UUID uuid = null;
 
     private String label = "";
@@ -16,10 +16,10 @@ public class PortableProfile {
 
     // TODO: Add geometry endpoints or UUID to Image
 
-    public PortableProfile() {
+    public Profile() {
     }
 
-    public PortableProfile(Portable portable) {
+    public Profile(Portable portable) {
         for (int i = 0; i < portable.getPorts().size(); i++) {
             Port port = portable.getPorts().get(i);
             PortProfile portProfile = new PortProfile(port);

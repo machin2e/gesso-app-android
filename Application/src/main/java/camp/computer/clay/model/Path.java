@@ -1,8 +1,12 @@
 package camp.computer.clay.model;
 
+import java.util.UUID;
+
 import camp.computer.clay.model.util.PortGroup;
 
 public class Path extends Entity {
+
+    public static Group<Path> Manager = new Group<>();
 
     // TODO: Physical dimensions (distance between boards)
 
@@ -50,15 +54,25 @@ public class Path extends Entity {
 
     private Direction direction = Direction.NONE;
 
-    private Port source;
+    //private Port source;
+    // TODO: (?) Entity sourcePort;
+    private UUID source;
 
-    private Port target;
+    //private Port target;
+    private UUID target;
 
     public Path(Port sourcePort, Port targetPort) {
         this.type = Type.NONE;
         this.direction = Direction.NONE;
-        this.source = sourcePort;
-        this.target = targetPort;
+//        this.source = sourcePort;
+//        this.target = targetPort;
+        this.source = sourcePort.getUuid();
+        this.target = targetPort.getUuid();
+
+        // Add to Manager
+        if (!Manager.contains(this)) {
+            Manager.add(this);
+        }
     }
 
     public Type getType() {
@@ -78,25 +92,25 @@ public class Path extends Entity {
     }
 
     public void setSource(Port port) {
-        this.source = port;
+        this.source = port.getUuid();
     }
 
     public Port getSource() {
-        return this.source;
+        return Port.Manager.get(source);
     }
 
     public void setTarget(Port target) {
-        this.target = target;
+        this.target = target.getUuid();
     }
 
     public Port getTarget() {
-        return this.target;
+        return Port.Manager.get(target);
     }
 
     public PortGroup getPorts() {
         PortGroup ports = new PortGroup();
-        ports.add(source);
-        ports.add(target);
+        ports.add(getSource());
+        ports.add(getTarget());
         return ports;
     }
 
@@ -128,7 +142,7 @@ public class Path extends Entity {
     }
 
     public boolean contains(Port port) {
-        if (this.source == port || this.target == port) {
+        if (this.source == port.getUuid() || this.target == port.getUuid()) {
             return true;
         } else {
             return false;
