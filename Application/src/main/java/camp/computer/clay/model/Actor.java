@@ -53,13 +53,18 @@ public class Actor {
         return this.camera;
     }
 
-    public void addAction(Event event) {
+    public void queueEvent(Event event) {
         incomingEvents.add(event);
     }
 
-    public void doAction() {
+    private void dequeueEvents() {
+        while (incomingEvents.size() > 0) {
+            Event event = incomingEvents.remove(0);
+            doAction(event);
+        }
+    }
 
-        Event event = incomingEvents.remove(0);
+    private void doAction(Event event) {
 
         event.setActor(this);
 
@@ -76,7 +81,7 @@ public class Actor {
                 action.addEvent(event);
 
                 // Record actions on timeline
-                // TODO: Cache and store the addAction actions before deleting them completely! Do it in
+                // TODO: Cache and store the queueEvent actions before deleting them completely! Do it in
                 // TODO: (cont'd) a background thread.
                 if (actions.size() > 3) {
                     actions.remove(0);
@@ -197,7 +202,7 @@ public class Actor {
                 Shape targetShape = targetImage.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
-                //event.getTargetImage().addAction(action);
+                //event.getTargetImage().queueEvent(action);
                 action.getFirstEvent().getTargetImage().processAction(action);
 
                 break;
@@ -225,9 +230,7 @@ public class Actor {
 
     public void update() {
 
-        while (incomingEvents.size() > 0) {
-            doAction();
-        }
+        dequeueEvents();
     }
 
 }

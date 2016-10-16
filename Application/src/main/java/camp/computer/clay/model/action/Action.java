@@ -55,7 +55,7 @@ public class Action {
 //                    event.setType(Event.Type.HOLD);
 //                    event.pointerIndex = getFirstEvent().pointerIndex;
 //                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
-//                    getFirstEvent().getActor().addAction(event);
+//                    getFirstEvent().getActor().queueEvent(event);
 //
 //                    isHolding[pointerIndex] = true;
 //

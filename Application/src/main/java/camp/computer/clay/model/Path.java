@@ -62,12 +62,28 @@ public class Path extends Entity {
     private UUID target;
 
     public Path(Port sourcePort, Port targetPort) {
-        this.type = Type.NONE;
-        this.direction = Direction.NONE;
+        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
+        this.direction = Direction.BOTH; // Default to BOTH
 //        this.source = sourcePort;
 //        this.target = targetPort;
         this.source = sourcePort.getUuid();
         this.target = targetPort.getUuid();
+
+        // Update source Port configuration
+        if (sourcePort.getDirection() == Port.Direction.NONE) {
+            sourcePort.setDirection(Port.Direction.BOTH); // Default to BOTH
+        }
+        if (sourcePort.getType() == Port.Type.NONE) {
+            sourcePort.setType(Port.Type.next(sourcePort.getType()));
+        }
+
+        // Update target Port configuration
+        if (targetPort.getDirection() == Port.Direction.NONE) {
+            targetPort.setDirection(Port.Direction.BOTH); // Default to BOTH
+        }
+        if (targetPort.getType() == Port.Type.NONE) {
+            targetPort.setType(sourcePort.getType());
+        }
 
         // Add to Manager
         if (!Manager.contains(this)) {
@@ -81,6 +97,18 @@ public class Path extends Entity {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public void setMode(Port.Type type) {
+        // Update type of Ports in Path (BUT NOT DIRECTION)
+        // <FILTER>
+        // TODO: Make Path.Filter
+        Group<Port> ports = getPorts();
+        for (int i = 0; i < ports.size(); i++) {
+            Port port = ports.get(i);
+            port.setType(type);
+        }
+        // </FILTER>
     }
 
     public Direction getDirection() {
