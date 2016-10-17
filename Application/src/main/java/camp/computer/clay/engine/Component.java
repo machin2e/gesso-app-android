@@ -1,4 +1,4 @@
-package camp.computer.clay.engine.components;
+package camp.computer.clay.engine;
 
 import camp.computer.clay.engine.Addressable;
 

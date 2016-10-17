@@ -14,7 +14,7 @@ public class Profile {
 
     private List<PortProfile> portProfiles = new ArrayList<>();
 
-    // TODO: Add geometry endpoints or UUID to ImageComponent
+    // TODO: Add geometry endpoints or UUID to Image
 
     public Profile() {
     }

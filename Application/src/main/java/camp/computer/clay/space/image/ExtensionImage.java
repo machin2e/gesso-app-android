@@ -6,13 +6,13 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.model.Extension;
+import camp.computer.clay.model.Group;
 import camp.computer.clay.model.Path;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Point;
@@ -39,7 +39,7 @@ public class ExtensionImage extends PortableImage {
 
         Rectangle rectangle;
 
-        // Create Shapes for ImageComponent
+        // Create Shapes for Image
         rectangle = new Rectangle(getExtension());
         rectangle.setWidth(200);
         rectangle.setHeight(200);
@@ -105,7 +105,7 @@ public class ExtensionImage extends PortableImage {
                                 Shape portShape = portShapes.get(i);
                                 Port port = (Port) portShape.getEntity();
 
-                                PathGroup paths = port.getPaths();
+                                Group<Path> paths = port.getPaths();
                                 for (int j = 0; j < paths.size(); j++) {
                                     Path path = paths.get(j);
 
@@ -182,7 +182,7 @@ public class ExtensionImage extends PortableImage {
     }
 
     /**
-     * Update the {@code ImageComponent} to match the state of the corresponding {@code Entity}.
+     * Update the {@code Image} to match the state of the corresponding {@code Entity}.
      */
     protected void updateGeometry() {
         super.updateGeometry();
@@ -198,7 +198,7 @@ public class ExtensionImage extends PortableImage {
      */
     private void updatePortGeometry() {
 
-        // Remove Port shapes from the ImageComponent that do not have a corresponding Port in the Entity
+        // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
         ShapeGroup portShapes = getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);

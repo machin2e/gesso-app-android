@@ -12,16 +12,14 @@ import camp.computer.clay.model.Host;
 import camp.computer.clay.model.Path;
 import camp.computer.clay.model.Port;
 import camp.computer.clay.model.Portable;
-import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Clock;
 
@@ -234,9 +232,9 @@ public class Camera {
 
         Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
 
-        // Check if a Host ImageComponent is nearby
-        ImageComponent nearestHostImageComponent = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
-        if (nearestHostImageComponent != null) {
+        // Check if a Host Image is nearby
+        Image nearestHostImage = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
+        if (nearestHostImage != null) {
 
             Portable sourcePortable = sourcePort.getPortable();
             PortableImage sourcePortableImage = (PortableImage) space.getImage(sourcePortable);
@@ -279,7 +277,7 @@ public class Camera {
                 basePathPorts.add(port);
             }
 
-            PathGroup portPaths = port.getPaths();
+            Group<Path> portPaths = port.getPaths();
             for (int j = 0; j < portPaths.size(); j++) {
                 Path path = portPaths.get(j);
                 if (!basePathPorts.contains(path.getSource())) {
@@ -308,9 +306,15 @@ public class Camera {
         ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
         // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
-        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
-        otherPortableImages.remove(extensionImage);
-        otherPortableImages.setTransparency(0.1);
+//        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
+//        otherPortableImages.remove(extensionImage);
+//        otherPortableImages.setTransparency(0.1);
+
+        // TODO: Group<Portable> otherPortables = getSpace().getEntities();
+        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.retainType, Host.class, Extension.class);
+        Log.v("Entities", "otherPortables.size: " + otherPortables.size());
+        otherPortables.remove(extension);
+        otherPortables.setTransparency(0.1);
 
         // Get ports along every Path connected to the Ports on the selected Host
         Group<Port> hostPathPorts = new Group<>();
@@ -322,7 +326,7 @@ public class Camera {
                 hostPathPorts.add(port);
             }
 
-            PathGroup portPaths = port.getPaths();
+            Group<Path> portPaths = port.getPaths();
             for (int j = 0; j < portPaths.size(); j++) {
                 Path path = portPaths.get(j);
                 if (!hostPathPorts.contains(path.getSource())) {
@@ -347,24 +351,24 @@ public class Camera {
         setPosition(boundingBox.getPosition());
     }
 
-    /**
-     * Adjusts the focus so the {@code Path}s in {@code paths} are in view.
-     *
-     * @param paths
-     */
-    public void setFocus(PathGroup paths) {
-
-        Log.v("SetFocus", "setFocus(PathGroup)");
-
-        // Get bounding box around the Ports in the specified Paths
-        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
-        List<Point> portPositions = pathPortShapes.getPositions();
-        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
-
-        // Update scale and position
-        adjustScale(boundingBox);
-        setPosition(Geometry.getCenterPoint(portPositions));
-    }
+//    /**
+//     * Adjusts the focus so the {@code Path}s in {@code paths} are in view.
+//     *
+//     * @param paths
+//     */
+//    public void setFocus(PathGroup paths) {
+//
+//        Log.v("SetFocus", "setFocus(PathGroup)");
+//
+//        // Get bounding box around the Ports in the specified Paths
+//        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
+//        List<Point> portPositions = pathPortShapes.getPositions();
+//        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
+//
+//        // Update scale and position
+//        adjustScale(boundingBox);
+//        setPosition(Geometry.getCenterPoint(portPositions));
+//    }
 
     public void setFocus(Space space) {
 

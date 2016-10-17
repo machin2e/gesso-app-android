@@ -1,7 +1,5 @@
 package camp.computer.clay.model;
 
-import camp.computer.clay.model.util.PathGroup;
-
 public class Port extends Entity {
 
     public static Group<Port> Manager = new Group<>();
@@ -126,10 +124,10 @@ public class Port extends Entity {
      *
      * @return List of paths in the graph containing the port.
      */
-    public PathGroup getPaths() {
+    public Group<Path> getPaths() {
 
         // TODO: Make into Filter
-        PathGroup paths = new PathGroup();
+        Group<Path> paths = new Group<Path>();
         for (int i = 0; i < Path.Manager.size(); i++) {
             Path path = Path.Manager.get(i);
             if (path.contains(this)) {
@@ -141,7 +139,7 @@ public class Port extends Entity {
 
     // <HACK>
     public Extension getExtension() {
-        PathGroup paths = getPaths();
+        Group<Path> paths = getPaths();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
             if (path.getSource() == this || path.getTarget() == this) {

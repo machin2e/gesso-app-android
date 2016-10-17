@@ -3,8 +3,8 @@ package camp.computer.clay.model;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Addressable;
-import camp.computer.clay.engine.components.Component;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.engine.Component;
+import camp.computer.clay.util.image.Image;
 
 public abstract class Entity extends Addressable {
 
@@ -51,20 +51,36 @@ public abstract class Entity extends Addressable {
     // </TAG_COMPONENT>
 
     // <IMAGE_COMPONENT>
-    protected ImageComponent imageComponent = null;
+    protected Image image = null;
 
-    public ImageComponent getImage() {
-        return this.imageComponent;
+    public Image getImage() {
+        return this.image;
     }
 
-    public void setImage(ImageComponent imageComponent) {
-        this.imageComponent = imageComponent;
+    public void setImage(Image image) {
+        this.image = image;
     }
     // </IMAGE_COMPONENT>
 
     // <COMPONENT_INTERFACE>
     public boolean addComponent(Component component) {
         return true;
+    }
+
+    public Component removeComponent(UUID uuid) {
+        return components.remove(uuid);
+    }
+
+    public Group<Component> getComponents() {
+        return components;
+    }
+
+    public Component getComponent(UUID uuid) {
+        return components.get(uuid);
+    }
+
+    public boolean hasComponent(UUID uuid) {
+        return components.contains(uuid);
     }
     // </COMPONENT_INTERFACE>
 }

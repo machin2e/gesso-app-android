@@ -12,11 +12,11 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 
-public class PathImage extends ImageComponent<Path> {
+public class PathImage extends Image<Path> {
 
     // A single PathImage is created to represent all Paths between a Host and an Extension.
 

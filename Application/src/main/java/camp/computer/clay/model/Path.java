@@ -2,8 +2,6 @@ package camp.computer.clay.model;
 
 import java.util.UUID;
 
-import camp.computer.clay.model.util.PortGroup;
-
 public class Path extends Entity {
 
     public static Group<Path> Manager = new Group<>();
@@ -135,8 +133,8 @@ public class Path extends Entity {
         return Port.Manager.get(target);
     }
 
-    public PortGroup getPorts() {
-        PortGroup ports = new PortGroup();
+    public Group<Port> getPorts() {
+        Group<Port> ports = new Group<>();
         ports.add(getSource());
         ports.add(getTarget());
         return ports;

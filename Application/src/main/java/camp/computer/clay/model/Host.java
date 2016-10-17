@@ -1,10 +1,8 @@
 package camp.computer.clay.model;
 
-import android.util.Log;
-
-import java.util.UUID;
-
+import camp.computer.clay.engine.components.TransformComponent;
 import camp.computer.clay.model.profile.Profile;
+import camp.computer.clay.util.image.Image;
 
 public class Host extends Portable {
 
@@ -17,7 +15,14 @@ public class Host extends Portable {
     }
 
     private void setup() {
+        setupComponents();
     }
 
-    // has Script/is Scriptable (i.e., Host runs a Script)
+    private void setupComponents() {
+        // TODO: InputComponent/ControllerComponent
+        addComponent(new TransformComponent());
+        addComponent(new Image());
+    }
+
+    // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)
 }

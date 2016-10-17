@@ -1,5 +1,6 @@
 package camp.computer.clay.engine.components;
 
+import camp.computer.clay.engine.Component;
 import camp.computer.clay.util.geometry.Geometry;
 
 /**

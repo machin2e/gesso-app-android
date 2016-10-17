@@ -40,23 +40,26 @@ public class Group<E extends Addressable> implements List<E> {
         return false;
     }
 
+    public E remove(UUID uuid) {
+        E element = get(uuid);
+        remove(element);
+        return element;
+    }
+
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
     public interface Filter<E extends Addressable, D> {
-        //boolean filter(E entity, D... data); // TODO: boolean test(E element)
         boolean filter(E entity, D... data); // TODO: boolean test(E element)
     }
 
     public interface Mapper<E extends Addressable, D> {
-        //Group<E> map(Group group);
         void map(E entity, D data);
     }
 
     // R : result type
     // D : data
     public interface Collector<E extends Addressable, R, D> {
-        //Group<E> map(Group group);
         R collect(E entity, D data);
     }
 
@@ -70,21 +73,16 @@ public class Group<E extends Addressable> implements List<E> {
         return result;
     }
 
-    // TODO: (?) public Group<E> map(Mapper mapper) { ... }
-    //public <E extends Addressable, D> Group<E> map(Mapper mapper, D data) {
     public <D> Group<E> map(Mapper mapper, D data) {
         // Group<E> result = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             mapper.map(elements.get(i), data);
         }
         // return result;
-
         return this;
     }
 
-    // TODO: public <R, D> Group<R> collect(Collector collector, D data) {
     public <R, D> List<R> collect(Collector collector, D data) {
-        // TODO: Group<R> result = new Group<>();
         List<R> result = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             R resultGroup = (R) collector.collect(elements.get(i), data);
@@ -170,11 +168,11 @@ public class Group<E extends Addressable> implements List<E> {
 
     public void setTransparency(double transparency) {
 
-        List<Point> positions = getPositionCollector();
-        Log.v("Collector", "positions.size: " + positions.size());
-        for (int i = 0; i < positions.size(); i++) {
-            Log.v("Collector", "position.x: " + positions.get(i).x + ", y: " + positions.get(i).y);
-        }
+//        List<Point> positions = getPositionCollector();
+//        Log.v("Collector", "positions.size: " + positions.size());
+//        for (int i = 0; i < positions.size(); i++) {
+//            Log.v("Collector", "position.x: " + positions.get(i).x + ", y: " + positions.get(i).y);
+//        }
 
         map(Mappers.setTransparency, transparency); // OR: Mappers.setVisibility.filter(this);
     }

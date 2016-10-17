@@ -1,8 +1,6 @@
 package camp.computer.clay.model;
 
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.model.util.PathGroup;
-import camp.computer.clay.model.util.PortGroup;
 
 public class Portable extends Entity {
 
@@ -10,7 +8,7 @@ public class Portable extends Entity {
 
     private Profile profile = null;
 
-    protected PortGroup ports = new PortGroup();
+    protected Group<Port> ports = new Group<>();
 
     public Portable() {
         // Add to Manager
@@ -51,12 +49,12 @@ public class Portable extends Entity {
         return this.ports.get(index);
     }
 
-    public PortGroup getPorts() {
+    public Group<Port> getPorts() {
         return this.ports;
     }
 
-    public PathGroup getPaths() {
-        PathGroup paths = new PathGroup();
+    public Group<Path> getPaths() {
+        Group<Path> paths = new Group<>();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
             paths.addAll(port.getPaths());
