@@ -141,7 +141,19 @@ public class Space extends Image<Model> {
         return getEntity();
     }
 
+    // TODO: Replace with Entity.Manager
+    private Group<Entity> entities = new Group<>();
+
+    public Group<Entity> getEntities() {
+        return this.entities;
+    }
+
     public <T extends Entity> void addEntity(T entity) {
+
+        if (!entities.contains(entity)) {
+            entities.add(entity);
+        }
+
         if (entity instanceof Host) {
 
             Host host = (Host) entity;

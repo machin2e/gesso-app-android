@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
+import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Extension;
 import camp.computer.clay.model.Group;
 import camp.computer.clay.model.Host;
@@ -22,7 +23,7 @@ import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
-import camp.computer.clay.util.time.Time;
+import camp.computer.clay.util.time.Clock;
 
 public class Camera {
 
@@ -134,7 +135,7 @@ public class Camera {
             // <PLAN_ANIMATION>
             originalPosition.set(position);
 
-            positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND));
+            positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             positionFrameIndex = 0;
             // </PLAN_ANIMATION>
@@ -163,7 +164,7 @@ public class Camera {
         if (duration == 0) {
             this.scale = scale;
         } else {
-            double frameCount = Application.getView().getFramesPerSecond() * (duration / Time.MILLISECONDS_PER_SECOND);
+            double frameCount = Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND);
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
             scaleDelta = Math.abs(scale - this.scale) / frameCount;
         }
@@ -257,10 +258,16 @@ public class Camera {
         // <REFACTOR>
         HostImage hostImage = (HostImage) space.getImage(host);
 
-        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
-        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
-        otherPortableImages.remove(hostImage);
-        otherPortableImages.setTransparency(0.1);
+//        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
+//        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
+//        otherPortableImages.remove(hostImage);
+//        otherPortableImages.setTransparency(0.1);
+
+        // TODO: Group<Portable> otherPortables = getSpace().getEntities();
+        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.retainType, Host.class, Extension.class);
+        Log.v("Entities", "otherPortables.size: " + otherPortables.size());
+        otherPortables.remove(host);
+        otherPortables.setTransparency(0.1);
 
         // Get ports along every Path connected to the Ports on the touched PhoneHost
         Group<Port> basePathPorts = new Group<>();

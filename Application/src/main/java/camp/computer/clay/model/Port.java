@@ -76,18 +76,9 @@ public class Port extends Entity {
 
     protected Direction direction = Direction.NONE;
 
-//    protected PathGroup paths = new PathGroup();
-
     public Portable getPortable() {
         return (Portable) getParent();
     }
-
-//    public void addPath(Path path) {
-//        if (!hasPath(path)) {
-//            this.paths.add(path);
-//            path.setParent(this);
-//        }
-//    }
 
     public int getIndex() {
         return this.index;
@@ -104,24 +95,7 @@ public class Port extends Entity {
     public void setType(Type type) {
         this.type = type;
 
-//        // Recursively set the Ports in the Path to the specified type
-//        for (int i = 0; i < this.paths.size(); i++) {
-//            Path path = this.paths.get(i);
-//            if (path.getType() == Path.Type.ELECTRONIC) {
-//
-//                if (path.getSource() == this) {
-//                    if (path.getTarget().getType() != type) {
-//                        path.getTarget().setType(type);
-//                    }
-//                }
-//
-//                if (path.getTarget() == this) {
-//                    if (path.getSource().getType() != type) {
-//                        path.getSource().setType(type);
-//                    }
-//                }
-//            }
-//        }
+        // TODO: Update all other Ports in the connected Path
     }
 
     public Direction getDirection() {
@@ -133,28 +107,17 @@ public class Port extends Entity {
     }
 
     public boolean hasPath() {
-
         for (int i = 0; i < Path.Manager.size(); i++) {
             Path path = Path.Manager.get(i);
             if (path.contains(this)) {
                 return true;
             }
         }
-
         return false;
-
-//        if (this.paths.size() > 0) {
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
     public boolean hasPath(Path path) {
-
         return Path.Manager.contains(path.getUuid());
-
-//        return this.paths.contains(path);
     }
 
     /**
@@ -174,25 +137,9 @@ public class Port extends Entity {
             }
         }
         return paths;
-
-//        return this.paths;
     }
 
     // <HACK>
-//    public Host getHost() {
-//        for (int i = 0; i < paths.size(); i++) {
-//            Path path = paths.get(i);
-//            if (path.getSource() == this || path.getTarget() == this) {
-//                if (path.getSource().getPortable() instanceof Host) {
-//                    return (Host) path.getSource().getPortable();
-//                } else if (path.getTarget().getPortable() instanceof Host) {
-//                    return (Host) path.getTarget().getPortable();
-//                }
-//            }
-//        }
-//        return null;
-//    }
-
     public Extension getExtension() {
         PathGroup paths = getPaths();
         for (int i = 0; i < paths.size(); i++) {

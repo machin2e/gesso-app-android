@@ -305,7 +305,6 @@ public class HostImage extends PortableImage {
 
                                                 getPortShapes().setVisibility(Visibility.INVISIBLE);
                                                 setPathVisibility(Visibility.INVISIBLE);
-//                                                setDockVisibility(Visibility.VISIBLE);
 
                                                 space.setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
@@ -434,7 +433,6 @@ public class HostImage extends PortableImage {
                                                 // Focus on touched form
                                                 setPathVisibility(Visibility.VISIBLE);
                                                 getPortShapes().setVisibility(Visibility.VISIBLE);
-                                                //setDockVisibility(Visibility.INVISIBLE);
 
                                                 setTransparency(1.0);
 
@@ -449,20 +447,8 @@ public class HostImage extends PortableImage {
                                                         space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
                                                         space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
-                                                        // Show path connection
-                                                        //space.getImage(path).setVisibility(Visibility.VISIBLE);
+                                                        // Show Path connection
                                                         path.getImage().setVisibility(Visibility.VISIBLE);
-
-//                                                        // Show Extensions connected to Port
-//                                                        if (path.getSource().getExtension() != null) {
-//                                                            Extension extension = path.getSource().getExtension();
-//                                                            space.getImage(extension).setVisibility(Visibility.VISIBLE);
-//                                                        }
-//
-//                                                        if (path.getTarget().getExtension() != null) {
-//                                                            Extension extension = path.getSource().getExtension();
-//                                                            space.getImage(extension).setVisibility(Visibility.VISIBLE);
-//                                                        }
                                                     }
                                                 }
 
@@ -530,7 +516,7 @@ public class HostImage extends PortableImage {
                                                         public void onComplete(Profile profile) {
 
                                                             // Add Extension from Profile
-                                                            Extension extension = addExtension(profile, event.getPosition());
+                                                            Extension extension = fetchExtension(profile, event.getPosition());
 
                                                             double rangle = getRelativeAngle(event.getPosition());
                                                             Log.v("RelativeAngle", "rel. angle: " + rangle);
@@ -596,7 +582,7 @@ public class HostImage extends PortableImage {
                                                             }
 
                                                             // <FILTER>
-                                                            // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.apply(Editor)
+                                                            // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
                                                             Group<Path> paths = port.getPaths();
                                                             for (int i = 0; i < paths.size(); i++) {
                                                                 Path path = paths.get(i);
@@ -740,7 +726,6 @@ public class HostImage extends PortableImage {
         // Create Path from Host to Extension
         Path path = new Path(hostPort, extensionPort);
         path.setType(Path.Type.ELECTRONIC);
-//        hostPort.addPath(path);
 
         // Add Path to Space
         space.addEntity(path);
@@ -752,7 +737,6 @@ public class HostImage extends PortableImage {
             hostImage.setTransparency(0.05f);
             hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             hostImage.setPathVisibility(Visibility.INVISIBLE);
-//            hostImage.setDockVisibility(Visibility.VISIBLE);
         }
 
         // Show Path and all contained Ports
@@ -765,7 +749,14 @@ public class HostImage extends PortableImage {
         return extension;
     }
 
-    private Extension addExtension(Profile profile, Point initialPosition) {
+    /**
+     * Adds and existing {@code Extension}.
+     *
+     * @param profile
+     * @param initialPosition
+     * @return
+     */
+    private Extension fetchExtension(Profile profile, Point initialPosition) {
         // Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
         // Create the Extension
@@ -820,8 +811,6 @@ public class HostImage extends PortableImage {
             Path path = new Path(selectedHostPort, extension.getPorts().get(i));
             path.setType(Path.Type.ELECTRONIC);
 
-//            selectedHostPort.addPath(path);
-
             space.addEntity(path);
         }
 
@@ -833,8 +822,6 @@ public class HostImage extends PortableImage {
     // TODO: Remove this?
     public int getHeaderIndex(Extension extension) {
 
-        Log.v("HostImage", "getHeaderIndex");
-
         int[] indexCounts = new int[4];
         for (int i = 0; i < indexCounts.length; i++) {
             indexCounts[i] = 0;
@@ -844,36 +831,23 @@ public class HostImage extends PortableImage {
         int segmentIndex = -1;
         List<Point> hostShapeBoundary = boardShape.getBoundary();
 
-        Log.v("Counts", "extension.getPorts(): " + extension.getPorts().size());
-
         PortGroup extensionPorts = extension.getPorts();
         for (int j = 0; j < extensionPorts.size(); j++) {
 
             Port extensionPort = extensionPorts.get(j);
 
-            if (extensionPort == null) {
-                continue;
-            }
-
-            if (extensionPort.getPaths().size() == 0 || extensionPort.getPaths().get(0) == null) {
+            if (extensionPort == null || extensionPort.getPaths().size() == 0 || extensionPort.getPaths().get(0) == null) {
                 continue;
             }
 
             Port hostPort = extensionPort.getPaths().get(0).getHostPort(); // HACK b/c using index 0
 
-            Log.v("Counts", "host port: " + hostPort);
-
             Point hostPortPosition = space.getShape(hostPort).getPosition();
-
-            Log.v("Counts", "hostShapeBoundary.size(): " + hostShapeBoundary.size());
-
 
             double minDistance = Double.MAX_VALUE;
             int nearestSegmentIndex = 0;
             for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
 
-//                Segment segment = hostShapeBoundary.get(i);
-//                Point segmentMidpoint = segment.getMidpoint();
                 Point segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
 
                 double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
@@ -881,7 +855,6 @@ public class HostImage extends PortableImage {
                 if (distance < minDistance) {
                     minDistance = distance;
                     nearestSegmentIndex = i;
-                    Log.v("HostImage", "nearestSegment: " + nearestSegmentIndex);
                 }
             }
 
@@ -891,7 +864,6 @@ public class HostImage extends PortableImage {
         // Get the segment with the most counts
         segmentIndex = 0;
         for (int i = 0; i < indexCounts.length; i++) {
-            Log.v("Counts", "segment count " + i + ": " + indexCounts[i]);
             if (indexCounts[i] > indexCounts[segmentIndex]) {
                 segmentIndex = i;
             }
@@ -899,45 +871,6 @@ public class HostImage extends PortableImage {
 
         return segmentIndex;
     }
-
-//    public double distanceToExtensions = 500;
-//
-//    // TODO: Refactor this... it's really dumb right now.
-//    private void updateExtensionLayout(ExtensionImage extensionImage, int segmentIndex) {
-//
-//        // <REFACTOR>
-//        // Update the Extension Image position and rotation
-//        //extensionImage.setPosition(event.getPosition());
-//        if (segmentIndex == 0) {
-//            extensionImage.getPosition().setReferencePoint(getPosition());
-//            extensionImage.getPosition().setX(0);
-//            extensionImage.getPosition().setY(-distanceToExtensions);
-//        } else if (segmentIndex == 1) {
-//            extensionImage.getPosition().setReferencePoint(getPosition());
-//            extensionImage.getPosition().setX(distanceToExtensions);
-//            extensionImage.getPosition().setY(0);
-//        } else if (segmentIndex == 2) {
-//            extensionImage.getPosition().setReferencePoint(getPosition());
-//            extensionImage.getPosition().setX(0);
-//            extensionImage.getPosition().setY(distanceToExtensions);
-//        } else if (segmentIndex == 3) {
-//            extensionImage.getPosition().setReferencePoint(getPosition());
-//            extensionImage.getPosition().setX(-distanceToExtensions);
-//            extensionImage.getPosition().setY(0);
-//        }
-//
-//        //double extensionImageRotation = Geometry.getAngle(hostPortShape.getPosition(), extensionImage.getPosition());
-//        if (segmentIndex == 0) {
-//            extensionImage.setRotation(0);
-//        } else if (segmentIndex == 1) {
-//            extensionImage.setRotation(90);
-//        } else if (segmentIndex == 2) {
-//            extensionImage.setRotation(180);
-//        } else if (segmentIndex == 3) {
-//            extensionImage.setRotation(270);
-//        }
-//        // </REFACTOR>
-//    }
 
     public Host getHost() {
         return (Host) getEntity();
@@ -989,28 +922,16 @@ public class HostImage extends PortableImage {
             updateExtensionSegmentIndex(extension);
         }
 
-        Log.v("HostImage", "segmentExtensions.size(): " + segmentExtensions.size());
-
         for (int segmentIndex = 0; segmentIndex < segmentExtensions.size(); segmentIndex++) {
 
             for (int extensionIndex = 0; extensionIndex < segmentExtensions.get(segmentIndex).size(); extensionIndex++) {
 
                 Extension extension = segmentExtensions.get(segmentIndex).get(extensionIndex);
-//                ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
-
-//                if (extensionImage == null) {
-//                    continue;
-//                }
-
-//            extensionImage.adjustPosition();
 
                 final double extensionSeparationDistance = 25.0;
                 double extensionWidth = 200;
                 int extensionCount = segmentExtensions.get(segmentIndex).size();
-//                Log.v("ExtensionCount", "extension count: " + extensionCount);
                 double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
-
-                Log.v("HostImage", "extension segmnetIndex: " + segmentIndex);
 
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
@@ -1056,15 +977,10 @@ public class HostImage extends PortableImage {
 
     // TODO: Refactor this... it's really dumb right now.
     public void updateExtensionSegmentIndex(Extension extension) {
-
-        Log.v("HostImage", "updateExtensionSegmentIndex");
-
         if (extension.getImage() == null || extension.getHosts().size() == 0) {
             return;
         }
-
         int segmentIndex = getHeaderIndex(extension);
-
         segmentExtensions.get(segmentIndex).add(extension);
     }
 

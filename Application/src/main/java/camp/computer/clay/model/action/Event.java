@@ -4,7 +4,7 @@ import camp.computer.clay.model.Actor;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.time.Time;
+import camp.computer.clay.util.time.Clock;
 
 public class Event {
 
@@ -60,7 +60,7 @@ public class Event {
     public int pointerIndex = -1;
 
     public Event() {
-        this.timestamp = Time.getCurrentTime();
+        this.timestamp = Clock.getCurrentTime();
         setup();
     }
 

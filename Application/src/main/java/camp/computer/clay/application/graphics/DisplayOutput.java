@@ -1,6 +1,6 @@
 package camp.computer.clay.application.graphics;
 
-import camp.computer.clay.util.time.Time;
+import camp.computer.clay.util.time.Clock;
 
 /**
  * DisplayOutput is a background thread that periodically updates the space state
@@ -51,12 +51,12 @@ public class DisplayOutput extends Thread {
 
         while (isRunning) {
 
-            frameStartTime = Time.getCurrentTime();
+            frameStartTime = Clock.getCurrentTime();
 
             // Advance the space state
             display.update();
 
-            frameStopTime = Time.getCurrentTime();
+            frameStopTime = Clock.getCurrentTime();
 
 //            if (ENABLE_STATISTICS) {
             // Store actual frames per second

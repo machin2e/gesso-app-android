@@ -188,7 +188,7 @@ public class Prompt {
         dialogBuilder.setTitle("Complete these steps to assemble");
 
         // TODO: Difficulty
-        // TODO: Average Time
+        // TODO: Average Clock
 
         // Create data adapter
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(

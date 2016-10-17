@@ -1,5 +1,7 @@
 package camp.computer.clay.util.image.util;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -180,6 +182,7 @@ public class ImageGroup extends Group<Image> {
     }
 
     public Point getCenterPoint() {
+
         return Geometry.getCenterPoint(getPositions());
     }
 
@@ -222,18 +225,20 @@ public class ImageGroup extends Group<Image> {
         return nearestImage;
     }
 
-    public void setTransparency(double transparency) {
-        for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
-            image.setTransparency(transparency);
-        }
-    }
+//    public void setTransparency(double transparency) {
+////        for (int i = 0; i < elements.size(); i++) {
+////            Image image = elements.get(i);
+////            image.setTransparency(transparency);
+////        }
+//        setTransparencyMapper(transparency);
+//    }
 
     public void setVisibility(Visibility visibility) {
         for (int i = 0; i < elements.size(); i++) {
             Image image = elements.get(i);
             image.setVisibility(visibility);
         }
+//        setVisibilityMapper(visibility);
     }
 
     // TODO: EntityGroup : getEntity()

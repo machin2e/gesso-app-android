@@ -1,7 +1,10 @@
 package camp.computer.clay.model;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,12 +12,16 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-public class Group<T extends Entity> implements List<T> {
+import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.image.Visibility;
 
-    // TODO: private List<T> elements = new LinkedList<>();
-    protected List<T> elements = new LinkedList<>();
+public class Group<E extends Entity> implements List<E> {
+// TODO: public class Group<E> implements List<E> {
 
-    public T get(UUID uuid) {
+    // TODO: private List<E> elements = new LinkedList<>();
+    protected List<E> elements = new LinkedList<>();
+
+    public E get(UUID uuid) {
         for (int i = 0; i < elements.size(); i++) {
             if (elements.get(i).getUuid().equals(uuid)) {
                 return elements.get(i);
@@ -35,14 +42,141 @@ public class Group<T extends Entity> implements List<T> {
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
-//    public interface Filter {
-//        public void filter();
-//    }
+    public interface Filter<E extends Entity, D> {
+        //boolean filter(E entity, D... data); // TODO: boolean test(E element)
+        boolean filter(E entity, D... data); // TODO: boolean test(E element)
+    }
+
+    public interface Mapper<E extends Entity, D> {
+        //Group<E> map(Group group);
+        void map(E entity, D data);
+    }
+
+    // R : result type
+    // D : data
+    public interface Collector<E extends Entity, R, D> {
+        //Group<E> map(Group group);
+        R collect(E entity, D data);
+    }
+
+    public <D> Group filter(Filter filter, D... data) {
+        Group<E> result = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            if (filter.filter(elements.get(i), data) == true) {
+                result.add(elements.get(i));
+            }
+        }
+        return result;
+    }
+
+    // TODO: (?) public Group<E> map(Mapper mapper) { ... }
+    //public <E extends Entity, D> Group<E> map(Mapper mapper, D data) {
+    public <D> Group<E> map(Mapper mapper, D data) {
+        // Group<E> result = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            mapper.map(elements.get(i), data);
+        }
+        // return result;
+
+        return this;
+    }
+
+    // TODO: public <R, D> Group<R> collect(Collector collector, D data) {
+    public <R, D> List<R> collect(Collector collector, D data) {
+        // TODO: Group<R> result = new Group<>();
+        List<R> result = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            R resultGroup = (R) collector.collect(elements.get(i), data);
+            result.add(resultGroup);
+        }
+        return result;
+    }
+
+    public static class Filters {
+
+        public static Filter retainType = new Filter<Entity, Class<?>>() {
+            @Override
+            public boolean filter(Entity entity, Class<?>... entityTypes) {
+                if (Arrays.asList(entityTypes).contains(entity.getClass())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+
+        // TODO: hasComponent
+    }
+
+    public static class Collectors {
+
+        public static Collector getPosition = new Collector<Entity, Point, Void>() {
+            @Override
+            public Point collect(Entity entity, Void data) {
+                if (entity.getImage() != null) {
+                    return entity.getImage().getPosition();
+                } else {
+                    return null;
+                }
+            }
+        };
+    }
+
+    public static class Mappers { // was Operations
+
+        public static Mapper setVisibility = new Mapper<Entity, Visibility>() {
+            @Override
+            public void map(Entity entity, Visibility visibility) {
+                entity.getImage().setVisibility(visibility);
+            }
+        };
+
+        public static Mapper setTransparency = new Mapper<Entity, Double>() {
+            @Override
+            public void map(Entity entity, Double transparency) {
+//                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
+                if (entity.getImage() != null) {
+                    entity.getImage().setTransparency(transparency);
+                }
+            }
+        };
+
+//        public static Mapper setVisibility = new Mapper<Host, Visibility>() {
+//            @Override
+//            public void map(Host entity, Visibility data) {
+//                entity.getImage().setVisibility(data);
+//            }
+//        };
 //
-//    public Group filter(Filter filter) {
-//        Group group = new Group();
-//        return group;
-//    }
+//        public static Mapper setTransparency = new Mapper<Host, Double>() {
+//            @Override
+//            public void map(Host entity, Double transparency) {
+//                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
+//                    entity.getImage().setTransparency(transparency);
+//                }
+//            }
+//        };
+
+    }
+
+    public Group<E> setVisibilityMapper(Visibility visibility) {
+        return map(Mappers.setVisibility, visibility); // OR: Mappers.setVisibility.filter(this);
+    }
+
+    public List<Point> getPositionCollector() {
+        return collect(Collectors.getPosition, null);
+    }
+
+    public void setTransparency(double transparency) {
+
+        List<Point> positions = getPositionCollector();
+        Log.v("Collector", "positions.size: " + positions.size());
+        for (int i = 0; i < positions.size(); i++) {
+            Log.v("Collector", "position.x: " + positions.get(i).x + ", y: " + positions.get(i).y);
+        }
+
+        map(Mappers.setTransparency, transparency); // OR: Mappers.setVisibility.filter(this);
+    }
 
     // <LIST_INTERFACE>
 
@@ -63,7 +197,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws IndexOutOfBoundsException     if {@code location < 0 || location > size()}
      */
     @Override
-    public void add(int location, T object) {
+    public void add(int location, E object) {
         this.elements.add(location, object);
     }
 
@@ -78,7 +212,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws IllegalArgumentException      if the object cannot be added to this {@code List}.
      */
     @Override
-    public boolean add(T object) {
+    public boolean add(E object) {
         this.elements.add(object);
         return true;
     }
@@ -100,7 +234,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws NullPointerException          if {@code collection} is {@code null}.
      */
     @Override
-    public boolean addAll(int location, Collection<? extends T> collection) {
+    public boolean addAll(int location, Collection<? extends E> collection) {
         return this.elements.addAll(location, collection);
     }
 
@@ -119,7 +253,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws NullPointerException          if {@code collection} is {@code null}.
      */
     @Override
-    public boolean addAll(Collection<? extends T> collection) {
+    public boolean addAll(Collection<? extends E> collection) {
         return this.elements.addAll(collection);
     }
 
@@ -169,7 +303,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws IndexOutOfBoundsException if {@code location < 0 || location >= size()}
      */
     @Override
-    public T get(int location) {
+    public E get(int location) {
         return this.elements.get(location);
     }
 
@@ -207,7 +341,7 @@ public class Group<T extends Entity> implements List<T> {
      */
     @NonNull
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return this.elements.iterator();
     }
 
@@ -232,7 +366,7 @@ public class Group<T extends Entity> implements List<T> {
      * @see ListIterator
      */
     @Override
-    public ListIterator<T> listIterator() {
+    public ListIterator<E> listIterator() {
         return this.elements.listIterator();
     }
 
@@ -248,7 +382,7 @@ public class Group<T extends Entity> implements List<T> {
      */
     @NonNull
     @Override
-    public ListIterator<T> listIterator(int location) {
+    public ListIterator<E> listIterator(int location) {
         return this.elements.listIterator(location);
     }
 
@@ -261,7 +395,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws IndexOutOfBoundsException     if {@code location < 0 || location >= size()}
      */
     @Override
-    public T remove(int location) {
+    public E remove(int location) {
         return this.elements.remove(location);
     }
 
@@ -320,7 +454,7 @@ public class Group<T extends Entity> implements List<T> {
      * @throws IndexOutOfBoundsException     if {@code location < 0 || location >= size()}
      */
     @Override
-    public T set(int location, T object) {
+    public E set(int location, E object) {
         return this.elements.set(location, object);
     }
 
@@ -347,7 +481,7 @@ public class Group<T extends Entity> implements List<T> {
      */
     @NonNull
     @Override
-    public List<T> subList(int start, int end) {
+    public List<E> subList(int start, int end) {
         return this.subList(start, end);
     }
 

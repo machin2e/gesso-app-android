@@ -285,8 +285,8 @@ public class Messenger {
             Message outgoingMessage = peekOutgoingMessage();
 
 //            Log.v("UDP", "                 Message: " + outgoingMessage.getDescriptor());
-//            Log.v("UDP", "Time since getLastEvent dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
-//            Log.v("UDP", " Time since getLastEvent message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
+//            Log.v("UDP", "Clock since getLastEvent dispatch: " + (currentTime.getTime() - timeLastSentMessage.getTime()));
+//            Log.v("UDP", " Clock since getLastEvent message: " + (currentTime.getTime() - outgoingMessage.getTimeLastSent().getTime()));
 //            Log.v("UDP", "                 Retries: " + outgoingMessage.getRetryCount());
 //            Log.v("UDP", "-----");
 
@@ -294,7 +294,7 @@ public class Messenger {
             long currentTimeMillis = currentTime.getTime();
 
 //            Log.v ("UDP_Time", "Try count: " + outgoingMessage.getRetryCount());
-//            Log.v ("UDP_Time", "Time since retry (must be > " + Message.RETRY_SEND_PERIOD + " ms): " + (currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()));
+//            Log.v ("UDP_Time", "Clock since retry (must be > " + Message.RETRY_SEND_PERIOD + " ms): " + (currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()));
 //            Log.v ("UDP_Time", "retry time (must be > 5 s): " + ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD));
 
             //if (((currentTimeMillis - timeLastSentMessage.getTime ()) > outgoingMessagePeriod && outgoingMessage.getRetryCount() == 0) || (outgoingMessage.getRetryCount() == 0 || (outgoingMessage.getRetryCount() > 0 && ((currentTimeMillis - outgoingMessage.getTimeLastSent().getTime ()) > Message.RETRY_SEND_PERIOD)))) {
