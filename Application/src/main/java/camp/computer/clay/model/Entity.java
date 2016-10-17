@@ -2,32 +2,38 @@ package camp.computer.clay.model;
 
 import java.util.UUID;
 
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.Addressable;
+import camp.computer.clay.engine.components.Component;
+import camp.computer.clay.util.image.ImageComponent;
 
-public abstract class Entity {
+public abstract class Entity extends Addressable {
+
+    // TODO: public static Group<Entity> Manager = new Group<>();
 
     // TODO: Add support for Components (as in the ECS architecture)
 
-    protected UUID uuid = null;
+    protected Entity parent; // TODO: Delete!
 
-    protected Entity parent;
+    protected Group<Component> components = null;
 
     public Entity() {
-        this.uuid = UUID.randomUUID();
+        super();
+        setup();
     }
 
     public Entity(UUID uuid) {
-        this.uuid = uuid;
+        super(uuid);
+        setup();
     }
 
-    public UUID getUuid() {
-        return this.uuid;
+    private void setup() {
+        components = new Group<>();
     }
 
+    // TODO: DELETE
     public void setParent(Entity parent) {
         this.parent = parent;
     }
-
     public Entity getParent() {
         return this.parent;
     }
@@ -45,14 +51,20 @@ public abstract class Entity {
     // </TAG_COMPONENT>
 
     // <IMAGE_COMPONENT>
-    protected Image image = null;
+    protected ImageComponent imageComponent = null;
 
-    public Image getImage() {
-        return this.image;
+    public ImageComponent getImage() {
+        return this.imageComponent;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setImage(ImageComponent imageComponent) {
+        this.imageComponent = imageComponent;
     }
     // </IMAGE_COMPONENT>
+
+    // <COMPONENT_INTERFACE>
+    public boolean addComponent(Component component) {
+        return true;
+    }
+    // </COMPONENT_INTERFACE>
 }

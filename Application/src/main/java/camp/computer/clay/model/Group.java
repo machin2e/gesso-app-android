@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
+import camp.computer.clay.engine.Addressable;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Visibility;
 
-public class Group<E extends Entity> implements List<E> {
+public class Group<E extends Addressable> implements List<E> {
 // TODO: public class Group<E> implements List<E> {
 
     // TODO: private List<E> elements = new LinkedList<>();
@@ -42,19 +43,19 @@ public class Group<E extends Entity> implements List<E> {
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
-    public interface Filter<E extends Entity, D> {
+    public interface Filter<E extends Addressable, D> {
         //boolean filter(E entity, D... data); // TODO: boolean test(E element)
         boolean filter(E entity, D... data); // TODO: boolean test(E element)
     }
 
-    public interface Mapper<E extends Entity, D> {
+    public interface Mapper<E extends Addressable, D> {
         //Group<E> map(Group group);
         void map(E entity, D data);
     }
 
     // R : result type
     // D : data
-    public interface Collector<E extends Entity, R, D> {
+    public interface Collector<E extends Addressable, R, D> {
         //Group<E> map(Group group);
         R collect(E entity, D data);
     }
@@ -70,7 +71,7 @@ public class Group<E extends Entity> implements List<E> {
     }
 
     // TODO: (?) public Group<E> map(Mapper mapper) { ... }
-    //public <E extends Entity, D> Group<E> map(Mapper mapper, D data) {
+    //public <E extends Addressable, D> Group<E> map(Mapper mapper, D data) {
     public <D> Group<E> map(Mapper mapper, D data) {
         // Group<E> result = new Group<>();
         for (int i = 0; i < elements.size(); i++) {

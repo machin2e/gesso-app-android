@@ -10,13 +10,13 @@ import camp.computer.clay.model.Port;
 import camp.computer.clay.model.Portable;
 import camp.computer.clay.model.util.PathGroup;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public abstract class PortableImage extends Image<Portable> {
+public abstract class PortableImage extends ImageComponent<Portable> {
 
     public List<Vertex> headerContactPositions = new ArrayList<>();
 
@@ -131,7 +131,7 @@ public abstract class PortableImage extends Image<Portable> {
                 // pathImage.setDockVisibility(Visibility.VISIBLE);
             }
 
-            // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
+            // Recursively traverse Ports in descendant Paths and setValue their Path imageComponent visibility
             Port targetPort = pathImage.getPath().getTarget();
             Portable targetPortable = (Portable) targetPort.getParent();
             PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);

@@ -2,14 +2,12 @@ package camp.computer.clay.model;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
 
 /**
  * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
@@ -140,12 +138,12 @@ public class Actor {
 
             case SELECT: {
 
-                // Set the target image
-                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
-                event.setTargetImage(targetImage);
+                // Set the target imageComponent
+                ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
+                event.setTargetImage(targetImageComponent);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShape(event.getPosition());
+                Shape targetShape = targetImageComponent.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 // Action the event
@@ -156,12 +154,12 @@ public class Actor {
 
             case HOLD: {
 
-                // Set the target image
-                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
-                event.setTargetImage(targetImage);
+                // Set the target imageComponent
+                ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
+                event.setTargetImage(targetImageComponent);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShape(event.getPosition());
+                Shape targetShape = targetImageComponent.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 // Action the event
@@ -175,12 +173,12 @@ public class Actor {
                 // Classify/Callback
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
-                    // Set the target image
-                    Image targetImage = getCamera().getSpace().getImage(event.getPosition());
-                    event.setTargetImage(targetImage);
+                    // Set the target imageComponent
+                    ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
+                    event.setTargetImage(targetImageComponent);
 
                     // Set the target shape
-                    Shape targetShape = targetImage.getShape(event.getPosition());
+                    Shape targetShape = targetImageComponent.getShape(event.getPosition());
                     event.setTargetShape(targetShape);
 
                     action.getFirstEvent().getTargetImage().processAction(action);
@@ -194,12 +192,12 @@ public class Actor {
                 // Stop listening for a hold event
 //                action.timerHandler.removeCallbacks(action.timerRunnable);
 
-                // Set the target image
-                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
-                event.setTargetImage(targetImage);
+                // Set the target imageComponent
+                ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
+                event.setTargetImage(targetImageComponent);
 
                 // Set the target shape
-                Shape targetShape = targetImage.getShape(event.getPosition());
+                Shape targetShape = targetImageComponent.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 //event.getTargetImage().queueEvent(action);

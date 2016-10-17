@@ -19,7 +19,7 @@ import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
@@ -234,9 +234,9 @@ public class Camera {
 
         Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
 
-        // Check if a Host Image is nearby
-        Image nearestHostImage = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
-        if (nearestHostImage != null) {
+        // Check if a Host ImageComponent is nearby
+        ImageComponent nearestHostImageComponent = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
+        if (nearestHostImageComponent != null) {
 
             Portable sourcePortable = sourcePort.getPortable();
             PortableImage sourcePortableImage = (PortableImage) space.getImage(sourcePortable);

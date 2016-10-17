@@ -1,7 +1,5 @@
 package camp.computer.clay.util.image.util;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,21 +8,21 @@ import camp.computer.clay.model.Group;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 
 /**
  * ImageGroup is an interface for managing and manipulating sets of elements.
  */
-public class ImageGroup extends Group<Image> {
+public class ImageGroup extends Group<ImageComponent> {
 
     public ImageGroup() {
     }
 
     // TODO: Move this into the Group base class
-    public ImageGroup remove(Image image) {
-        elements.remove(image);
+    public ImageGroup remove(ImageComponent imageComponent) {
+        elements.remove(imageComponent);
         return this;
     }
 
@@ -85,10 +83,10 @@ public class ImageGroup extends Group<Image> {
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
+            ImageComponent imageComponent = elements.get(i);
 
-            if (image.contains(point)) {
-                imageGroup.add(image);
+            if (imageComponent.contains(point)) {
+                imageGroup.add(imageComponent);
             }
 
         }
@@ -109,12 +107,12 @@ public class ImageGroup extends Group<Image> {
 
         for (int i = 0; i < elements.size(); i++) {
 
-            Image image = elements.get(i);
+            ImageComponent imageComponent = elements.get(i);
 
-            double distanceToImage = Geometry.distance(point, image.getPosition());
+            double distanceToImage = Geometry.distance(point, imageComponent.getPosition());
 
             if (distanceToImage < distance) {
-                imageGroup.add(image);
+                imageGroup.add(imageComponent);
             }
 
         }
@@ -134,9 +132,9 @@ public class ImageGroup extends Group<Image> {
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
-            if (shape.contains(image.getPosition())) {
-                imageGroup.add(image);
+            ImageComponent imageComponent = elements.get(i);
+            if (shape.contains(imageComponent.getPosition())) {
+                imageGroup.add(imageComponent);
             }
         }
 
@@ -148,9 +146,9 @@ public class ImageGroup extends Group<Image> {
         ImageGroup imageGroup = new ImageGroup();
 
         for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
-            if (image.getVisibility() == visibility) {
-                imageGroup.add(image);
+            ImageComponent imageComponent = elements.get(i);
+            if (imageComponent.getVisibility() == visibility) {
+                imageGroup.add(imageComponent);
             }
 
         }
@@ -158,15 +156,15 @@ public class ImageGroup extends Group<Image> {
         return imageGroup;
     }
 
-    public List<Image> getList() {
+    public List<ImageComponent> getList() {
         return elements;
     }
 
     public List<Point> getPositions() {
         List<Point> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
-            positions.add(new Point(image.getPosition().x, image.getPosition().y));
+            ImageComponent imageComponent = elements.get(i);
+            positions.add(new Point(imageComponent.getPosition().x, imageComponent.getPosition().y));
         }
         return positions;
     }
@@ -201,42 +199,42 @@ public class ImageGroup extends Group<Image> {
     }
 
     /**
-     * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     * Finds and returns the nearest <em>visible</em> <code>ImageComponent</code>.
      *
      * @param position
      * @return
      */
-    public Image getNearestImage(Point position) {
+    public ImageComponent getNearestImage(Point position) {
 
         double shortestDistance = Float.MAX_VALUE;
-        Image nearestImage = null;
+        ImageComponent nearestImageComponent = null;
 
         for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
+            ImageComponent imageComponent = elements.get(i);
 
-            double currentDistance = Geometry.distance(position, image.getPosition());
+            double currentDistance = Geometry.distance(position, imageComponent.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;
-                nearestImage = image;
+                nearestImageComponent = imageComponent;
             }
         }
 
-        return nearestImage;
+        return nearestImageComponent;
     }
 
 //    public void setTransparency(double transparency) {
 ////        for (int i = 0; i < elements.size(); i++) {
-////            Image image = elements.get(i);
-////            image.setTransparency(transparency);
+////            ImageComponent imageComponent = elements.get(i);
+////            imageComponent.setTransparency(transparency);
 ////        }
 //        setTransparencyMapper(transparency);
 //    }
 
     public void setVisibility(Visibility visibility) {
         for (int i = 0; i < elements.size(); i++) {
-            Image image = elements.get(i);
-            image.setVisibility(visibility);
+            ImageComponent imageComponent = elements.get(i);
+            imageComponent.setVisibility(visibility);
         }
 //        setVisibilityMapper(visibility);
     }

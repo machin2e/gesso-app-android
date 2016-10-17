@@ -2,10 +2,12 @@ package camp.computer.clay.util.image;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.Addressable;
 import camp.computer.clay.model.Entity;
 import camp.computer.clay.model.Group;
 import camp.computer.clay.model.action.Action;
@@ -16,10 +18,10 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public abstract class Image<T extends Entity> extends Entity {
+public abstract class ImageComponent<T extends Entity> extends Addressable {
 
     /**
-     * The parent {@code Space} containing this {@code Image}.
+     * The parent {@code Space} containing this {@code ImageComponent}.
      */
     protected Space space = null;
 
@@ -54,7 +56,7 @@ public abstract class Image<T extends Entity> extends Entity {
     }
 
     /**
-     * Sorts {@code Shapes}s in the {@code Image} by layer.
+     * Sorts {@code Shapes}s in the {@code ImageComponent} by layer.
      */
     public void updateLayers() {
 
@@ -96,7 +98,7 @@ public abstract class Image<T extends Entity> extends Entity {
         }
     }
 
-    public Image(T entity) {
+    public ImageComponent(T entity) {
         this.entity = entity;
     }
 
@@ -259,7 +261,7 @@ public abstract class Image<T extends Entity> extends Entity {
     public abstract void draw(Display display);
 
     /**
-     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+     * Returns {@code true} if any of the {@code Shape}s in the {@code ImageComponent} contain the
      * {@code point}.
      *
      * @param point

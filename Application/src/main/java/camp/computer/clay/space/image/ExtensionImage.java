@@ -39,7 +39,7 @@ public class ExtensionImage extends PortableImage {
 
         Rectangle rectangle;
 
-        // Create Shapes for Image
+        // Create Shapes for ImageComponent
         rectangle = new Rectangle(getExtension());
         rectangle.setWidth(200);
         rectangle.setHeight(200);
@@ -182,7 +182,7 @@ public class ExtensionImage extends PortableImage {
     }
 
     /**
-     * Update the {@code Image} to match the state of the corresponding {@code Entity}.
+     * Update the {@code ImageComponent} to match the state of the corresponding {@code Entity}.
      */
     protected void updateGeometry() {
         super.updateGeometry();
@@ -198,7 +198,7 @@ public class ExtensionImage extends PortableImage {
      */
     private void updatePortGeometry() {
 
-        // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
+        // Remove Port shapes from the ImageComponent that do not have a corresponding Port in the Entity
         ShapeGroup portShapes = getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);

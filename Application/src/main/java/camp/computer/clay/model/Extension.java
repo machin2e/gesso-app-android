@@ -1,5 +1,7 @@
 package camp.computer.clay.model;
 
+import java.util.UUID;
+
 import camp.computer.clay.model.profile.Profile;
 
 /**

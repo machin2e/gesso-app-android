@@ -26,7 +26,7 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -310,7 +310,7 @@ public class HostImage extends PortableImage {
 
                                             } else if (action.isHolding()) {
 
-                                                // Update position of Host image
+                                                // Update position of Host imageComponent
                                                 setPosition(event.getPosition());
 
                                                 // Camera
@@ -331,12 +331,12 @@ public class HostImage extends PortableImage {
                                                 boolean isCreateExtensionAction = true;
                                                 ImageGroup imageGroup = space.getImages(Host.class, Extension.class);
                                                 for (int i = 0; i < imageGroup.size(); i++) {
-                                                    Image otherImage = imageGroup.get(i);
+                                                    ImageComponent otherImageComponent = imageGroup.get(i);
 
                                                     // Update style of nearby Hosts
                                                     double distanceToHostImage = Geometry.distance(
                                                             event.getPosition(),
-                                                            otherImage.getPosition()
+                                                            otherImageComponent.getPosition()
                                                     );
 
                                                     if (distanceToHostImage < 500) {
@@ -344,7 +344,7 @@ public class HostImage extends PortableImage {
                                                         break;
                                                     }
 
-                                                    // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
+                                                    // TODO: if distance > 800: connect to cloud service and show "cloud portable" imageComponent
                                                 }
 
                                                 if (isCreateExtensionAction) {
@@ -652,7 +652,7 @@ public class HostImage extends PortableImage {
                                                     camera.setFocus(extension);
                                                 }
 
-                                                // Update Image
+                                                // Update ImageComponent
                                                 space.setPathPrototypeVisibility(Visibility.INVISIBLE);
                                                 space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
@@ -705,7 +705,7 @@ public class HostImage extends PortableImage {
         extension.getImage().setPosition(initialPosition);
 
         // <REFACTOR>
-        // Update the Extension Image position and rotation
+        // Update the Extension ImageComponent position and rotation
 //        int headerIndex = getHeaderIndex(initialPosition);
 //        updateExtensionLayout(extensionImage)
         // </REFACTOR>
@@ -768,14 +768,14 @@ public class HostImage extends PortableImage {
         // Add Extension to Space
         space.addEntity(extension);
 
-        // Get the just-created Extension Image
+        // Get the just-created Extension ImageComponent
         //ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
-        // Update the Extension Image position and rotation
+        // Update the Extension ImageComponent position and rotation
         extension.getImage().setPosition(initialPosition);
 
         // <REFACTOR>
-        // Update the Extension Image position and rotation
+        // Update the Extension ImageComponent position and rotation
 //        int headerIndex = getHeaderIndex(initialPosition);
 //        extensionImage.adjustPgetHeaderIndeosition();
         // </REFACTOR>
@@ -934,7 +934,7 @@ public class HostImage extends PortableImage {
                 double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
 
                 // <REFACTOR>
-                // Update the Extension Image position and rotation
+                // Update the Extension ImageComponent position and rotation
                 if (segmentIndex == 0) {
                     extension.getImage().getPosition().set(
                             0 + offset,

@@ -1,7 +1,7 @@
 package camp.computer.clay.model.action;
 
 import camp.computer.clay.model.Actor;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.time.Clock;
@@ -47,7 +47,7 @@ public class Event {
     // TODO: Delete this!
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
 
-    private Image[] targetImages = new Image[MAXIMUM_POINT_COUNT];
+    private ImageComponent[] targetImageComponents = new ImageComponent[MAXIMUM_POINT_COUNT];
 
     private Shape[] targetShapes = new Shape[MAXIMUM_POINT_COUNT];
 
@@ -67,7 +67,7 @@ public class Event {
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
             pointerCoordinates[i] = new Point(0, 0);
-            targetImages[i] = null;
+            targetImageComponents[i] = null;
             targetShapes[i] = null;
             isPointing[i] = false;
         }
@@ -119,29 +119,29 @@ public class Event {
     }
 
     public boolean isPointing(int pointerIndex) { // was isTouching
-        return this.targetImages[pointerIndex] != null;
+        return this.targetImageComponents[pointerIndex] != null;
     }
 
     public boolean isPointing() { // was isTouching
         return isPointing(0);
     }
 
-    public void setTargetImage(int pointerIndex, Image image) {
-        this.targetImages[pointerIndex] = image;
+    public void setTargetImage(int pointerIndex, ImageComponent imageComponent) {
+        this.targetImageComponents[pointerIndex] = imageComponent;
     }
 
-    public void setTargetImage(Image image) {
-        setTargetImage(0, image);
-        if (image != null) {
+    public void setTargetImage(ImageComponent imageComponent) {
+        setTargetImage(0, imageComponent);
+        if (imageComponent != null) {
             isPointing[0] = true;
         }
     }
 
-    public Image getTargetImage(int pointerIndex) {
-        return this.targetImages[pointerIndex];
+    public ImageComponent getTargetImage(int pointerIndex) {
+        return this.targetImageComponents[pointerIndex];
     }
 
-    public Image getTargetImage() {
+    public ImageComponent getTargetImage() {
         return getTargetImage(0);
     }
 
