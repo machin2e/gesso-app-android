@@ -1,5 +1,7 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine.entity;
 
+import camp.computer.clay.engine.Entity;
+import camp.computer.clay.model.Group;
 import camp.computer.clay.model.profile.Profile;
 
 public class Portable extends Entity {

@@ -42,8 +42,8 @@ import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
-import camp.computer.clay.model.Extension;
-import camp.computer.clay.model.Host;
+import camp.computer.clay.engine.entity.Extension;
+import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 

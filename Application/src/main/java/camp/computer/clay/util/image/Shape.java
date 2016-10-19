@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.Addressable;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 
-public abstract class Shape<T extends Entity> extends Entity {
+public abstract class Shape<T extends Entity> extends Addressable {
 
     protected String label = "";
 
@@ -61,9 +62,9 @@ public abstract class Shape<T extends Entity> extends Entity {
     public Shape() {
     }
 
-    public Shape(T entity) {
-        this.entity = entity;
-    }
+//    public Shape(T entity) {
+//        this.entity = entity;
+//    }
 
     public Shape(Point position) {
         this.position.set(position);

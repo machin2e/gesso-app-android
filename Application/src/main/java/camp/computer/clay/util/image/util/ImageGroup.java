@@ -3,7 +3,7 @@ package camp.computer.clay.util.image.util;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.model.Group;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;

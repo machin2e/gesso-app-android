@@ -4,8 +4,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Path;
-import camp.computer.clay.model.Port;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;

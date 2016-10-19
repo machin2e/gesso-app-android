@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.image.Shape;
 
 public class Segment<T extends Entity> extends Shape<T> {
@@ -17,10 +17,10 @@ public class Segment<T extends Entity> extends Shape<T> {
         setup();
     }
 
-    public Segment(T entity) {
-        super(entity);
-        setup();
-    }
+//    public Segment(T entity) {
+//        super(entity);
+//        setup();
+//    }
 
     public Segment(Point source, Point target) {
         setup();

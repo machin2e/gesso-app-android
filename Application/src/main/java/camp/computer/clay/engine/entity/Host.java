@@ -1,6 +1,6 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine.entity;
 
-import camp.computer.clay.engine.components.TransformComponent;
+import camp.computer.clay.engine.component.TransformComponent;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.image.Image;
 

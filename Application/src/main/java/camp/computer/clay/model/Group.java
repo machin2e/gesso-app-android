@@ -1,7 +1,6 @@
 package camp.computer.clay.model;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +12,7 @@ import java.util.ListIterator;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Addressable;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Visibility;
 

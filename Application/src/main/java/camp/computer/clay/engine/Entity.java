@@ -1,9 +1,8 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine;
 
 import java.util.UUID;
 
-import camp.computer.clay.engine.Addressable;
-import camp.computer.clay.engine.Component;
+import camp.computer.clay.model.Group;
 import camp.computer.clay.util.image.Image;
 
 public abstract class Entity extends Addressable {

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.image.Shape;
 
 public class Rectangle<T extends Entity> extends Shape<T> {

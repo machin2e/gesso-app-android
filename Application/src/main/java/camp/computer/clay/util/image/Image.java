@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Component;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.model.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;

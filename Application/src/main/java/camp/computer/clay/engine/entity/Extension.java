@@ -1,7 +1,6 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine.entity;
 
-import java.util.UUID;
-
+import camp.computer.clay.model.Group;
 import camp.computer.clay.model.profile.Profile;
 
 /**

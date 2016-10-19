@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.model.Port;
-import camp.computer.clay.model.Portable;
+import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.engine.entity.Portable;
 
 public class Profile {
     private UUID uuid = null;

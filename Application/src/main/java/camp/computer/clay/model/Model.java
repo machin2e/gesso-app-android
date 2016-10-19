@@ -3,6 +3,12 @@ package camp.computer.clay.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Extension;
+import camp.computer.clay.engine.entity.Host;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
+
 /**
  * {@code Model} represents the build state of available and online Clay Hosts and Entities of the
  * discovered physical environment sensed or computed based on data collected from Clay hosts.

@@ -1,4 +1,7 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine.entity;
+
+import camp.computer.clay.engine.Entity;
+import camp.computer.clay.model.Group;
 
 public class Port extends Entity {
 

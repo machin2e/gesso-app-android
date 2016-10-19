@@ -1,6 +1,9 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine.entity;
 
 import java.util.UUID;
+
+import camp.computer.clay.engine.Entity;
+import camp.computer.clay.model.Group;
 
 public class Path extends Entity {
 

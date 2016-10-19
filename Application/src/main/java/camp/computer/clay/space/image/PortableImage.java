@@ -5,9 +5,9 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Group;
-import camp.computer.clay.model.Path;
-import camp.computer.clay.model.Port;
-import camp.computer.clay.model.Portable;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Visibility;

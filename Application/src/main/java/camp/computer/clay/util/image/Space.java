@@ -9,13 +9,13 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.model.Actor;
-import camp.computer.clay.model.Entity;
-import camp.computer.clay.model.Extension;
+import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.model.Group;
-import camp.computer.clay.model.Host;
+import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.Model;
-import camp.computer.clay.model.Path;
-import camp.computer.clay.model.Port;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Camera;

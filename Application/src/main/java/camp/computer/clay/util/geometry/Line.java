@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.image.Shape;
 
 public class Line<T extends Entity> extends Shape<T> {
@@ -14,10 +14,10 @@ public class Line<T extends Entity> extends Shape<T> {
         setup();
     }
 
-    public Line(T entity) {
-        super(entity);
-        setup();
-    }
+//    public Line(T entity) {
+//        super(entity);
+//        setup();
+//    }
 
     public Line(Point position, double rotation) {
         setup();

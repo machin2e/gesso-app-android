@@ -1,4 +1,4 @@
-package camp.computer.clay.util.typography;
+package camp.computer.clay.util.geometry;
 
 import java.util.List;
 
