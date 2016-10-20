@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;

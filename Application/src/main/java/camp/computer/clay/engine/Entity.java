@@ -3,9 +3,9 @@ package camp.computer.clay.engine;
 import java.util.UUID;
 
 import camp.computer.clay.model.Group;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 
-public abstract class Entity extends Addressable {
+public abstract class Entity extends Groupable {
 
     // TODO: public static Group<Entity> Manager = new Group<>();
 
@@ -37,6 +37,8 @@ public abstract class Entity extends Addressable {
         return this.parent;
     }
 
+
+
     // <TAG_COMPONENT>
     protected String label = "";
 
@@ -49,17 +51,39 @@ public abstract class Entity extends Addressable {
     }
     // </TAG_COMPONENT>
 
-    // <IMAGE_COMPONENT>
-    protected ImageComponent imageComponent = null;
 
-    public ImageComponent getImageComponent() {
-        return this.imageComponent;
+
+//    // <TRANSFORM_COMPONENT>
+//    protected Point position = new Point(0, 0);
+//
+//    public Point getPosition() {
+//        return position;
+//    }
+//
+//    public boolean hasPosition() {
+//        return (this.position != null);
+//    }
+//
+//    public void setPosition(Point position) {
+//        this.position = position;
+//    }
+//    // </TRANSFORM_COMPONENT>
+
+
+
+    // <IMAGE_COMPONENT>
+    protected Image image = null;
+
+    public Image getImage() {
+        return this.image;
     }
 
-    public void setImageComponent(ImageComponent imageComponent) {
-        this.imageComponent = imageComponent;
+    public void setImage(Image image) {
+        this.image = image;
     }
     // </IMAGE_COMPONENT>
+
+
 
     // <GENERIC_COMPONENT_INTERFACE>
     public boolean addComponent(Component component) {

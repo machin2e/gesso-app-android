@@ -64,7 +64,7 @@ public class Message {
         return this.source;
     }
 
-    // TODO: getImageComponent().getAddress()
+    // TODO: getImage().getAddress()
     public String getTargetAddress() {
         return this.target;
     }

@@ -12,13 +12,13 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 
-public class PathImageComponent extends ImageComponent<Path> {
+public class PathImage extends Image<Path> {
 
-    // A single PathImageComponent is created to represent all Paths between a Host and an Extension.
+    // A single PathImage is created to represent all Paths between a Host and an Extension.
 
 //    private Visibility dockVisibility = Visibility.VISIBLE;
 
@@ -26,7 +26,7 @@ public class PathImageComponent extends ImageComponent<Path> {
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
 
-    public PathImageComponent(Path path) {
+    public PathImage(Path path) {
         super(path);
         setup();
     }
@@ -98,7 +98,7 @@ public class PathImageComponent extends ImageComponent<Path> {
         display.paint.setStrokeWidth(2.0f);
         display.paint.setStyle(Paint.Style.STROKE);
         Rectangle boundingBox = getBoundingBox();
-        Log.v("PathImageComponent", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
+        Log.v("PathImage", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
         display.drawRectangle(boundingBox);
 
         // Center Point
@@ -180,8 +180,8 @@ public class PathImageComponent extends ImageComponent<Path> {
 
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
-            // TODO: Create Segment and add it to the PathImageComponent. Update its geometry to change position, rotation, etc.
-//            double pathRotation = getSpace().getImageComponent(getPath().getHosts()).getRotation();
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+//            double pathRotation = getSpace().getImage(getPath().getHosts()).getRotation();
 
             Segment segment = (Segment) getShape("Path");
             segment.setOutlineThickness(15.0);
@@ -204,8 +204,8 @@ public class PathImageComponent extends ImageComponent<Path> {
 
         // Draw the connection to the Host's Port
 
-        PortableImageComponent hostImage = (PortableImageComponent) space.getImage(hostPort.getPortable());
-        PortableImageComponent extensionImage = (PortableImageComponent) space.getImage(extensionPort.getPortable());
+        PortableImage hostImage = (PortableImage) space.getImage(hostPort.getPortable());
+        PortableImage extensionImage = (PortableImage) space.getImage(extensionPort.getPortable());
 
         if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
             Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();
@@ -221,7 +221,7 @@ public class PathImageComponent extends ImageComponent<Path> {
 //            polyline.addVertex(extensionConnectorPosition);
 //            display.drawPolyline(polyline);
 
-            // TODO: Create Segment and add it to the PathImageComponent. Update its geometry to change position, rotation, etc.
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
             Segment segment = (Segment) getShape("Path");
             segment.setOutlineThickness(10.0);
             segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getType()));

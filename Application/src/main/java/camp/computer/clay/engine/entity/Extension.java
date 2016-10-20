@@ -26,6 +26,6 @@ public class Extension extends Portable {
 //            }
 //        }
 //        return hosts;
-        return getImageComponent().getSpace().getHosts(this);
+        return getImage().getSpace().getHosts(this);
     }
 }

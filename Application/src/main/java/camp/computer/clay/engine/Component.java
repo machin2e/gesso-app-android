@@ -1,8 +1,11 @@
 package camp.computer.clay.engine;
 
-import camp.computer.clay.engine.Addressable;
+public abstract class Component extends Groupable {
 
-public abstract class Component extends Addressable {
+    public enum Type {
+        Transform, // i.e., Position
+        Geometry // i.e., Image
+    }
 
     // TODO: PortableComponent
 

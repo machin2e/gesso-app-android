@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Actor;
+import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.model.Group;
@@ -20,18 +20,18 @@ import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.space.image.ExtensionImageComponent;
-import camp.computer.clay.space.image.HostImageComponent;
-import camp.computer.clay.space.image.PathImageComponent;
-import camp.computer.clay.space.image.PortableImageComponent;
+import camp.computer.clay.space.image.ExtensionImage;
+import camp.computer.clay.space.image.HostImage;
+import camp.computer.clay.space.image.PathImage;
+import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-// TODO: DO NOT extend ImageComponent. Remove this class!
-//public class Space extends ImageComponent<Model> {
-public class Space extends ImageComponent<Model> {
+// TODO: DO NOT extend Image. Remove this class!
+//public class Space extends Image<Model> {
+public class Space extends Image<Model> {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
@@ -122,7 +122,7 @@ public class Space extends ImageComponent<Model> {
 //
 //                    } else {
 
-                    // NOT a repeat tap on this ImageComponent
+                    // NOT a repeat tap on this Image
 
                     if (action.isTap()) {
                         Log.v("Space_Action", "UNSELECT 1");
@@ -160,11 +160,11 @@ public class Space extends ImageComponent<Model> {
 
             Host host = (Host) entity;
 
-            // Create Host ImageComponent
-            HostImageComponent hostImage = new HostImageComponent(host);
+            // Create Host Image
+            HostImage hostImage = new HostImage(host);
 
-            // Assign ImageComponent to Entity
-            host.setImageComponent(hostImage);
+            // Assign Image to Entity
+            host.setImage(hostImage);
 
             // Create Port Shapes for each of the PhoneHost's Ports
             for (int i = 0; i < host.getPorts().size(); i++) {
@@ -172,18 +172,18 @@ public class Space extends ImageComponent<Model> {
                 addEntity(port);
             }
 
-            // Add Host ImageComponent to Space
+            // Add Host Image to Space
             addImage(hostImage);
 
         } else if (entity instanceof Extension) {
 
             Extension extension = (Extension) entity;
 
-            // Create Extension ImageComponent
-            ExtensionImageComponent extensionImage = new ExtensionImageComponent(extension);
+            // Create Extension Image
+            ExtensionImage extensionImage = new ExtensionImage(extension);
 
-            // Assign ImageComponent to Entity
-            extension.setImageComponent(extensionImage);
+            // Assign Image to Entity
+            extension.setImage(extensionImage);
 
             // Create Port Shapes for each of the Extension's Ports
             for (int i = 0; i < extension.getPorts().size(); i++) {
@@ -191,7 +191,7 @@ public class Space extends ImageComponent<Model> {
                 addEntity(port);
             }
 
-            // Add Extension ImageComponent to Space
+            // Add Extension Image to Space
             addImage(extensionImage);
 
         } else if (entity instanceof Port) {
@@ -202,13 +202,13 @@ public class Space extends ImageComponent<Model> {
 
             Path path = (Path) entity;
 
-            // Create Path ImageComponent
-            PathImageComponent pathImage = new PathImageComponent(path);
+            // Create Path Image
+            PathImage pathImage = new PathImage(path);
 
-            // Assign ImageComponent to Entity
-            path.setImageComponent(pathImage);
+            // Assign Image to Entity
+            path.setImage(pathImage);
 
-            // Add Path ImageComponent to Space
+            // Add Path Image to Space
             addImage(pathImage);
         }
     }
@@ -220,7 +220,7 @@ public class Space extends ImageComponent<Model> {
     }
 
     /**
-     * Sorts {@code ImageComponent}s by layer.
+     * Sorts {@code Image}s by layer.
      */
     @Override
     public void updateLayers() {
@@ -229,9 +229,9 @@ public class Space extends ImageComponent<Model> {
             for (int j = i + 1; j < images.size(); j++) {
                 // Check for out-of-order pairs, and swap them
                 if (images.get(i).layerIndex > images.get(j).layerIndex) {
-                    ImageComponent imageComponent = images.get(i);
+                    Image image = images.get(i);
                     images.set(i, images.get(j));
-                    images.set(j, imageComponent);
+                    images.set(j, image);
                 }
             }
         }
@@ -247,18 +247,18 @@ public class Space extends ImageComponent<Model> {
         */
     }
 
-    // TODO: Remove ImageComponent parameter. Create that and return it.
-    private <T extends ImageComponent> void addImage(T image) {
+    // TODO: Remove Image parameter. Create that and return it.
+    private <T extends Image> void addImage(T image) {
 
-        // Add ImageComponent
+        // Add Image
         image.setSpace(this);
         if (!images.contains(image)) {
             images.add(image);
             updateLayers();
         }
 
-        // Position the ImageComponent
-        if (image instanceof HostImageComponent) {
+        // Position the Image
+        if (image instanceof HostImage) {
             adjustLayout();
         }
 
@@ -274,7 +274,7 @@ public class Space extends ImageComponent<Model> {
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
 
     /**
-     * Automatically determines and assigns a valid position for all {@code Host} {@code ImageComponent}s.
+     * Automatically determines and assigns a valid position for all {@code Host} {@code Image}s.
      */
     private void adjustLayout() {
 
@@ -300,23 +300,23 @@ public class Space extends ImageComponent<Model> {
         }
 
         // Set rotation
-        // imageComponent.setRotation(Probability.getRandomGenerator().nextInt(360));
+        // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
     /**
-     * Returns {@code true} if the {@code Space} contains a {@code ImageComponent} corresponding to the
+     * Returns {@code true} if the {@code Space} contains a {@code Image} corresponding to the
      * specified {@code Entity}.
      *
-     * @param entity The {@code Entity} for which the corresponding {@code ImageComponent} will be
+     * @param entity The {@code Entity} for which the corresponding {@code Image} will be
      *               returned, if any.
-     * @return The {@code ImageComponent} corresponding to the specified {@code Entity}, if one is
+     * @return The {@code Image} corresponding to the specified {@code Entity}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
     public boolean contains(Entity entity) {
         return images.filterEntity(entity).size() > 0;
     }
 
-    public ImageComponent getImage(Entity entity) {
+    public Image getImage(Entity entity) {
         return images.filterEntity(entity).get(0);
     }
 
@@ -333,7 +333,7 @@ public class Space extends ImageComponent<Model> {
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
-    public ImageComponent getImage(Point point) {
+    public Image getImage(Point point) {
         ImageGroup image = images.filterVisibility(Visibility.VISIBLE).filterContains(point);
         if (image.size() > 0) {
             return image.get(0);
@@ -361,8 +361,8 @@ public class Space extends ImageComponent<Model> {
     public Shape getShape(Entity entity) {
         ImageGroup images = getImages();
         for (int i = 0; i < images.size(); i++) {
-            ImageComponent imageComponent = images.get(i);
-            Shape shape = imageComponent.getShape(entity);
+            Image image = images.get(i);
+            Shape shape = image.getShape(entity);
             if (shape != null) {
                 return shape;
             }
@@ -384,13 +384,13 @@ public class Space extends ImageComponent<Model> {
 
         // Update Images
         for (int i = 0; i < images.size(); i++) {
-            ImageComponent imageComponent = images.get(i);
+            Image image = images.get(i);
 
-            // Update bounding box of ImageComponent
+            // Update bounding box of Image
             // TODO:
 
-            // Update the ImageComponent
-            imageComponent.update();
+            // Update the Image
+            image.update();
         }
 
         // Update Camera(s)
@@ -412,14 +412,14 @@ public class Space extends ImageComponent<Model> {
 
         // Draw Portables
         for (int i = 0; i < images.size(); i++) {
-            if (!(images.get(i) instanceof ExtensionImageComponent)) {
+            if (!(images.get(i) instanceof ExtensionImage)) {
                 images.get(i).draw(display);
             }
         }
 
         // Draw Extensions
         for (int i = 0; i < images.size(); i++) {
-            if (images.get(i) instanceof ExtensionImageComponent) {
+            if (images.get(i) instanceof ExtensionImage) {
                 images.get(i).draw(display);
             }
         }
@@ -523,11 +523,11 @@ public class Space extends ImageComponent<Model> {
         // TODO: Replace ASAP. This is shit.
         ImageGroup extensionImages = getImages(Extension.class);
         for (int i = 0; i < extensionImages.size(); i++) {
-            ExtensionImageComponent extensionImage = (ExtensionImageComponent) extensionImages.get(i);
+            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 
             if (extensionImage.getExtension().getHosts().size() > 0) {
                 Host host = extensionImage.getExtension().getHosts().get(0);
-                HostImageComponent hostImage = (HostImageComponent) getSpace().getImage(host);
+                HostImage hostImage = (HostImage) getSpace().getImage(host);
                 hostImage.setExtensionDistance(distance);
             }
         }
@@ -537,7 +537,7 @@ public class Space extends ImageComponent<Model> {
     public void hideAllPorts() {
         ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
-            PortableImageComponent portableImage = (PortableImageComponent) portableImages.get(i);
+            PortableImage portableImage = (PortableImage) portableImages.get(i);
             portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             portableImage.setPathVisibility(Visibility.INVISIBLE);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);

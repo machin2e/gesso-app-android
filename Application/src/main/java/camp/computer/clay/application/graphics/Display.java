@@ -17,7 +17,7 @@ import android.view.SurfaceView;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.model.Actor;
+import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;

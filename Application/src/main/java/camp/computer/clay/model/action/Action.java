@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.Actor;
+import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;

@@ -11,15 +11,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import camp.computer.clay.engine.Addressable;
+import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Visibility;
 
-public class Group<E extends Addressable> implements List<E> {
-// TODO: public class Group<E> implements List<E> {
+public class Group<E extends Groupable> implements List<E> {
 
-    // TODO: private List<E> elements = new LinkedList<>();
     protected List<E> elements = new LinkedList<>();
 
     public E get(UUID uuid) {
@@ -49,18 +47,9 @@ public class Group<E extends Addressable> implements List<E> {
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
-    public interface Filter<E extends Addressable, D> {
-        boolean filter(E entity, D... data); // TODO: boolean test(E element)
-    }
 
-    public interface Mapper<E extends Addressable, D> {
-        void map(E entity, D data);
-    }
-
-    // R : result type
-    // D : data
-    public interface Collector<E extends Addressable, R, D> {
-        R collect(E entity, D data);
+    public interface Filter<V extends Groupable, D> {
+        boolean filter(V entity, D... data);
     }
 
     public <D> Group filter(Filter filter, D... data) {
@@ -73,8 +62,8 @@ public class Group<E extends Addressable> implements List<E> {
         return result;
     }
 
-    public <D> Group<E> map(Mapper mapper, D data) {
-        // Group<E> result = new Group<>();
+    public <D> Group<E> transform(Mapper mapper, D data) {
+        // Group<V> result = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             mapper.map(elements.get(i), data);
         }
@@ -82,10 +71,10 @@ public class Group<E extends Addressable> implements List<E> {
         return this;
     }
 
-    public <R, D> List<R> collect(Collector collector, D data) {
+    public <R, D> List<R> collect(Mapper collector, D data) {
         List<R> result = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
-            R resultGroup = (R) collector.collect(elements.get(i), data);
+            R resultGroup = (R) collector.map(elements.get(i), data);
             result.add(resultGroup);
         }
         return result;
@@ -93,7 +82,7 @@ public class Group<E extends Addressable> implements List<E> {
 
     public static class Filters {
 
-        public static Filter retainType = new Filter<Entity, Class<?>>() {
+        public static Filter filterType = new Filter<Entity, Class<?>>() {
             @Override
             public boolean filter(Entity entity, Class<?>... entityTypes) {
                 if (Arrays.asList(entityTypes).contains(entity.getClass())) {
@@ -107,13 +96,44 @@ public class Group<E extends Addressable> implements List<E> {
         // TODO: hasComponent
     }
 
-    public static class Collectors {
+    public interface Mapper<E extends Groupable, M extends Groupable, D> {
+        M map(E value, D data);
+    }
 
-        public static Collector getPosition = new Collector<Entity, Point, Void>() {
+    public <V extends Groupable, M extends Groupable, D> Group<M> map(Mapper mapper, D data) {
+        Group<M> group = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            group.add((M) mapper.map(elements.get(i), data));
+        }
+        return group;
+    }
+
+    public static class Mappers { // was Operations
+
+        public static Mapper setVisibility = new Mapper<Entity, Entity, Visibility>() {
             @Override
-            public Point collect(Entity entity, Void data) {
-                if (entity.getImageComponent() != null) {
-                    return entity.getImageComponent().getPosition();
+            public Entity map(Entity entity, Visibility visibility) {
+                entity.getImage().setVisibility(visibility);
+                return entity;
+            }
+        };
+
+        public static Mapper setTransparency = new Mapper<Entity, Entity, Double>() {
+            @Override
+            public Entity map(Entity entity, Double transparency) {
+//                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
+                if (entity.getImage() != null) {
+                    entity.getImage().setTransparency(transparency);
+                }
+                return entity;
+            }
+        };
+
+        public static Mapper getPosition = new Mapper<Entity, Point, Void>() {
+            @Override
+            public Point map(Entity entity, Void data) {
+                if (entity.getImage() != null) {
+                    return entity.getImage().getPosition();
                 } else {
                     return null;
                 }
@@ -121,49 +141,8 @@ public class Group<E extends Addressable> implements List<E> {
         };
     }
 
-    public static class Mappers { // was Operations
-
-        public static Mapper setVisibility = new Mapper<Entity, Visibility>() {
-            @Override
-            public void map(Entity entity, Visibility visibility) {
-                entity.getImageComponent().setVisibility(visibility);
-            }
-        };
-
-        public static Mapper setTransparency = new Mapper<Entity, Double>() {
-            @Override
-            public void map(Entity entity, Double transparency) {
-//                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-                if (entity.getImageComponent() != null) {
-                    entity.getImageComponent().setTransparency(transparency);
-                }
-            }
-        };
-
-//        public static Mapper setVisibility = new Mapper<Host, Visibility>() {
-//            @Override
-//            public void map(Host entity, Visibility data) {
-//                entity.getImageComponent().setVisibility(data);
-//            }
-//        };
-//
-//        public static Mapper setTransparency = new Mapper<Host, Double>() {
-//            @Override
-//            public void map(Host entity, Double transparency) {
-//                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-//                    entity.getImageComponent().setTransparency(transparency);
-//                }
-//            }
-//        };
-
-    }
-
     public Group<E> setVisibilityMapper(Visibility visibility) {
         return map(Mappers.setVisibility, visibility); // OR: Mappers.setVisibility.filter(this);
-    }
-
-    public List<Point> getPositionCollector() {
-        return collect(Collectors.getPosition, null);
     }
 
     public void setTransparency(double transparency) {
@@ -175,6 +154,17 @@ public class Group<E extends Addressable> implements List<E> {
 //        }
 
         map(Mappers.setTransparency, transparency); // OR: Mappers.setVisibility.filter(this);
+
+//        map(new Mapper<Entity, Entity, Double>() {
+//            @Override
+//            public Entity map(Entity entity, Double transparency) {
+////                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
+//                if (entity.getImage() != null) {
+//                    entity.getImage().setTransparency(transparency);
+//                }
+//                return entity;
+//            }
+//        }, null);
     }
 
     // <LIST_INTERFACE>

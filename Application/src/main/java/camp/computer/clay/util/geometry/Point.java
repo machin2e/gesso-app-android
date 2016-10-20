@@ -1,6 +1,8 @@
 package camp.computer.clay.util.geometry;
 
-public class Point {
+import camp.computer.clay.engine.Component;
+
+public class Point extends Component {
 
     /**
      * The x coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is

@@ -13,7 +13,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
-import camp.computer.clay.model.Actor;
+import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.engine.entity.Port;

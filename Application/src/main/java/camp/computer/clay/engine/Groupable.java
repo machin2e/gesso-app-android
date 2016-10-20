@@ -2,15 +2,15 @@ package camp.computer.clay.engine;
 
 import java.util.UUID;
 
-public abstract class Addressable {
+public abstract class Groupable {
 
     protected UUID uuid = null;
 
-    public Addressable() {
+    public Groupable() {
         setup(null);
     }
 
-    public Addressable(UUID uuid) {
+    public Groupable(UUID uuid) {
         setup(uuid);
     }
 

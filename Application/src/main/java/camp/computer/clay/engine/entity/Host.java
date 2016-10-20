@@ -2,7 +2,7 @@ package camp.computer.clay.engine.entity;
 
 import camp.computer.clay.engine.component.TransformComponent;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 
 public class Host extends Portable {
 
@@ -21,7 +21,7 @@ public class Host extends Portable {
     private void setupComponents() {
         // TODO: InputComponent/ControllerComponent
         addComponent(new TransformComponent());
-        addComponent(new ImageComponent());
+        addComponent(new Image());
     }
 
     // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)

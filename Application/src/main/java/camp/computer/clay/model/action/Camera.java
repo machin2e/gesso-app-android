@@ -10,13 +10,13 @@ import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.engine.entity.Portable;
-import camp.computer.clay.space.image.ExtensionImageComponent;
-import camp.computer.clay.space.image.HostImageComponent;
-import camp.computer.clay.space.image.PortableImageComponent;
+import camp.computer.clay.space.image.ExtensionImage;
+import camp.computer.clay.space.image.HostImage;
+import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Clock;
@@ -230,12 +230,12 @@ public class Camera {
 
         Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
 
-        // Check if a Host ImageComponent is nearby
-        ImageComponent nearestHostImageComponent = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
-        if (nearestHostImageComponent != null) {
+        // Check if a Host Image is nearby
+        Image nearestHostImage = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
+        if (nearestHostImage != null) {
 
             Portable sourcePortable = sourcePort.getPortable();
-            PortableImageComponent sourcePortableImage = (PortableImageComponent) space.getImage(sourcePortable);
+            PortableImage sourcePortableImage = (PortableImage) space.getImage(sourcePortable);
 
             double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
 
@@ -252,7 +252,7 @@ public class Camera {
         Log.v("SetFocus", "setFocus(Host)");
 
         // <REFACTOR>
-        HostImageComponent hostImage = (HostImageComponent) space.getImage(host);
+        HostImage hostImage = (HostImage) space.getImage(host);
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -260,7 +260,7 @@ public class Camera {
 //        otherPortableImages.setTransparency(0.1);
 
         // TODO: Group<Portable> otherPortables = getSpace().getEntities();
-        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.retainType, Host.class, Extension.class);
+        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.filterType, Host.class, Extension.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(host);
         otherPortables.setTransparency(0.1);
@@ -301,7 +301,7 @@ public class Camera {
         Log.v("SetFocus", "setFocus(Extension)");
 
         // <REFACTOR>
-        ExtensionImageComponent extensionImage = (ExtensionImageComponent) space.getImage(extension);
+        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
 
         // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -309,7 +309,7 @@ public class Camera {
 //        otherPortableImages.setTransparency(0.1);
 
         // TODO: Group<Portable> otherPortables = getSpace().getEntities();
-        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.retainType, Host.class, Extension.class);
+        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.filterType, Host.class, Extension.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(extension);
         otherPortables.setTransparency(0.1);
@@ -338,7 +338,7 @@ public class Camera {
         // </REFACTOR>
 
         // Increase distance between Host and Extension
-        HostImageComponent hostImage = (HostImageComponent) getSpace().getImage(extension.getHosts().get(0));
+        HostImage hostImage = (HostImage) getSpace().getImage(extension.getHosts().get(0));
         hostImage.setExtensionDistance(500);
 
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);

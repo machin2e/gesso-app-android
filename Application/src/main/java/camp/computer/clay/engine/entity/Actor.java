@@ -1,12 +1,13 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine.entity;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.engine.Entity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.image.ImageComponent;
+import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 
 /**
@@ -14,7 +15,7 @@ import camp.computer.clay.util.image.Shape;
  * based on the actions recognized on one of the {@code PhoneHost} objects associated with the
  * {@code Actor}.
  */
-public class Actor {
+public class Actor extends Entity {
 
     private Camera camera = new Camera();
 
@@ -138,12 +139,12 @@ public class Actor {
 
             case SELECT: {
 
-                // Set the target imageComponent
-                ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
-                event.setTargetImage(targetImageComponent);
+                // Set the target image
+                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImageComponent.getShape(event.getPosition());
+                Shape targetShape = targetImage.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 // Action the event
@@ -154,12 +155,12 @@ public class Actor {
 
             case HOLD: {
 
-                // Set the target imageComponent
-                ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
-                event.setTargetImage(targetImageComponent);
+                // Set the target image
+                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImageComponent.getShape(event.getPosition());
+                Shape targetShape = targetImage.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 // Action the event
@@ -173,12 +174,12 @@ public class Actor {
                 // Classify/Callback
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
-                    // Set the target imageComponent
-                    ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
-                    event.setTargetImage(targetImageComponent);
+                    // Set the target image
+                    Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                    event.setTargetImage(targetImage);
 
                     // Set the target shape
-                    Shape targetShape = targetImageComponent.getShape(event.getPosition());
+                    Shape targetShape = targetImage.getShape(event.getPosition());
                     event.setTargetShape(targetShape);
 
                     action.getFirstEvent().getTargetImage().processAction(action);
@@ -192,12 +193,12 @@ public class Actor {
                 // Stop listening for a hold event
 //                action.timerHandler.removeCallbacks(action.timerRunnable);
 
-                // Set the target imageComponent
-                ImageComponent targetImageComponent = getCamera().getSpace().getImage(event.getPosition());
-                event.setTargetImage(targetImageComponent);
+                // Set the target image
+                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                event.setTargetImage(targetImage);
 
                 // Set the target shape
-                Shape targetShape = targetImageComponent.getShape(event.getPosition());
+                Shape targetShape = targetImage.getShape(event.getPosition());
                 event.setTargetShape(targetShape);
 
                 //event.getTargetImage().queueEvent(action);
