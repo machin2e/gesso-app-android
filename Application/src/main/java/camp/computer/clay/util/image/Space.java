@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.engine.entity.Extension;
@@ -141,16 +140,16 @@ public class Space extends Image<Model> {
     }
 
     // TODO: Replace with Entity.Manager
-    private Group<Entity> entities = new Group<>();
+//    private Group<Entity> entities = new Group<>();
 
     public Group<Entity> getEntities() {
-        return this.entities;
+        return this.getModel().getEntities();
     }
 
     public <T extends Entity> void addEntity(T entity) {
 
-        if (!entities.contains(entity)) {
-            entities.add(entity);
+        if (!getEntities().contains(entity)) {
+            getEntities().add(entity);
         }
 
         if (entity instanceof Host) {
@@ -285,7 +284,7 @@ public class Space extends Image<Model> {
 
         Group<Image> hostImages = getEntities().filterType2(Host.class).getImages();
 
-        // Set position
+        // Set position on grid layout
         if (hostImages.size() == 1) {
             hostImages.get(0).setPosition(0, 0);
         } else if (hostImages.size() == 2) {
@@ -304,11 +303,17 @@ public class Space extends Image<Model> {
             hostImages.get(4).setRotation(80);
         }
 
+        // TODO: Set position on "scatter" layout
+
         // Set rotation
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    // TODO: Remove this!
+    public Model getEntity() {
+        return this.entity;
+    }
+
+    // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
     public ShapeGroup getShapes() {
 //        return getImages().getShapes();
         ShapeGroup shapes = new ShapeGroup();
@@ -343,10 +348,6 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public Model getEntity() {
-        return this.entity;
-    }
-
     @Override
     public void update() {
 
@@ -356,9 +357,9 @@ public class Space extends Image<Model> {
         }
 
         // Update Images
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).hasImage()) {
-                Image image = entities.get(i).getImage();
+        for (int i = 0; i < getEntities().size(); i++) {
+            if (getEntities().get(i).hasImage()) {
+                Image image = getEntities().get(i).getImage();
 
                 // Update bounding box of Image
                 // TODO:
@@ -386,19 +387,19 @@ public class Space extends Image<Model> {
         display.canvas.save();
 
         // Draw Portables
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).hasImage()) {
-                if (!(entities.get(i).getImage() instanceof ExtensionImage)) {
-                    entities.get(i).getImage().draw(display);
+        for (int i = 0; i < getEntities().size(); i++) {
+            if (getEntities().get(i).hasImage()) {
+                if (!(getEntities().get(i).getImage() instanceof ExtensionImage)) {
+                    getEntities().get(i).getImage().draw(display);
                 }
             }
         }
 
         // Draw Extensions
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).hasImage()) {
-                if (entities.get(i).getImage() instanceof ExtensionImage) {
-                    entities.get(i).getImage().draw(display);
+        for (int i = 0; i < getEntities().size(); i++) {
+            if (getEntities().get(i).hasImage()) {
+                if (getEntities().get(i).getImage() instanceof ExtensionImage) {
+                    getEntities().get(i).getImage().draw(display);
                 }
             }
         }
@@ -523,22 +524,5 @@ public class Space extends Image<Model> {
 //            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }
-    }
-
-    public Group<Host> getHosts(Extension extension) {
-
-        Group<Host> hostGroup = new Group<>();
-
-        List<Host> hosts = getModel().getHosts();
-
-        for (int i = 0; i < hosts.size(); i++) {
-            if (hosts.get(i).getExtensions().contains(extension)) {
-                if (!hostGroup.contains(hosts.get(i))) {
-                    hostGroup.add(hosts.get(i));
-                }
-            }
-        }
-
-        return hostGroup;
     }
 }

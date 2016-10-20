@@ -694,9 +694,6 @@ public class HostImage extends PortableImage {
             extension.addPort(port);
         }
 
-        // Add Extension to Model
-        space.getModel().addExtension(extension);
-
         // Add Extension to Space
         space.addEntity(extension);
 
@@ -769,9 +766,6 @@ public class HostImage extends PortableImage {
 
         // Create the Extension
         final Extension extension = new Extension(profile);
-
-        // Add Extension to Model
-        space.getModel().addExtension(extension);
 
         // Add Extension to Space
         space.addEntity(extension);

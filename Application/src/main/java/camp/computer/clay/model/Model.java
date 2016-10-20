@@ -3,6 +3,7 @@ package camp.computer.clay.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.Component;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.entity.Extension;
@@ -18,9 +19,7 @@ public class Model extends Entity {
 
     private List<Actor> actors = new ArrayList<>();
 
-    private List<Host> hosts = new ArrayList<>();
-
-    private List<Extension> extensions = new ArrayList<>();
+    private Group<Entity> entities = new Group<>();
 
     public void addActor(Actor actor) {
         this.actors.add(actor);
@@ -38,50 +37,11 @@ public class Model extends Entity {
         return this.actors;
     }
 
-    public void addHost(Host host) {
-        this.hosts.add(host);
-        host.setParent(this);
+    public void addEntity(Entity entity) {
+        this.entities.add(entity);
     }
 
-    public Host getHost(int index) {
-        return this.hosts.get(index);
-    }
-
-    public List<Host> getHosts() {
-        return this.hosts;
-    }
-
-    public Group<Port> getPorts() {
-        Group<Port> ports = new Group<>();
-        for (int i = 0; i < this.hosts.size(); i++) {
-            Host host = this.hosts.get(i);
-            ports.addAll(host.getPorts());
-        }
-        return ports;
-    }
-
-    public Group<Path> getPaths() {
-        Group<Path> paths = new Group<>();
-        for (int i = 0; i < this.hosts.size(); i++) {
-            Host host = this.hosts.get(i);
-            for (int j = 0; j < host.getPorts().size(); j++) {
-                Port port = host.getPorts().get(j);
-                paths.addAll(port.getPaths());
-            }
-        }
-        return paths;
-    }
-
-    public void addExtension(Extension extension) {
-        this.extensions.add(extension);
-        extension.setParent(this);
-    }
-
-    public Extension getExtension(int index) {
-        return this.extensions.get(index);
-    }
-
-    public List<Extension> getExtensions() {
-        return this.extensions;
+    public Group<Entity> getEntities() {
+        return this.entities;
     }
 }

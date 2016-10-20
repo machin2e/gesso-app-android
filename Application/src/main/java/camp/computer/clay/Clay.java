@@ -116,8 +116,6 @@ public class Clay {
             host.addPort(port);
         }
 
-        model.addHost(host);
-
         space.addEntity(host);
     }
 
