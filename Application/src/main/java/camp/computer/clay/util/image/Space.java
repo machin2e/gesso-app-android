@@ -308,18 +308,6 @@ public class Space extends Image<Model> {
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    // TODO: Delete. Replace with reduce(Reducer.containsPoint)
-    public Image getImage(Point point) {
-//        Group<Image> image = getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
-        Group<Image> image = getEntities().getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
-        // TODO: Group<Image> image = getEntities().filterVisibility(Visibility.VISIBLE).filterContains(point);
-        if (image.size() > 0) {
-            return image.get(0);
-        } else {
-            return this;
-        }
-    }
-
     // TODO: Remove this!
     public ShapeGroup getShapes() {
 //        return getImages().getShapes();

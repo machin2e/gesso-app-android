@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.model.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Visibility;
 
 /**
  * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
@@ -140,7 +142,8 @@ public class Actor extends Entity {
             case SELECT: {
 
                 // Set the target image
-                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                Group<Image> targetImages = getCamera().getSpace().getEntities().getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -156,7 +159,8 @@ public class Actor extends Entity {
             case HOLD: {
 
                 // Set the target image
-                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                Group<Image> targetImages = getCamera().getSpace().getEntities().getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -175,7 +179,8 @@ public class Actor extends Entity {
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
-                    Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                    Group<Image> targetImages = getCamera().getSpace().getEntities().getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
+                    Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     // Set the target shape
@@ -194,7 +199,8 @@ public class Actor extends Entity {
 //                action.timerHandler.removeCallbacks(action.timerRunnable);
 
                 // Set the target image
-                Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                Group<Image> targetImages = getCamera().getSpace().getEntities().getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // Image targetImage = getCamera().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
