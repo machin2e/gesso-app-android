@@ -24,18 +24,18 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class HostImage extends PortableImage {
+public class HostImageComponent extends PortableImageComponent {
 
     public List<List<Extension>> segmentExtensions = new ArrayList<>();
 
-    public HostImage(Host host) {
+    public HostImageComponent(Host host) {
         super(host);
         setup();
     }
@@ -308,7 +308,7 @@ public class HostImage extends PortableImage {
 
                                             } else if (action.isHolding()) {
 
-                                                // Update position of Host image
+                                                // Update position of Host imageComponent
                                                 setPosition(event.getPosition());
 
                                                 // Camera
@@ -329,12 +329,12 @@ public class HostImage extends PortableImage {
                                                 boolean isCreateExtensionAction = true;
                                                 ImageGroup imageGroup = space.getImages(Host.class, Extension.class);
                                                 for (int i = 0; i < imageGroup.size(); i++) {
-                                                    Image otherImage = imageGroup.get(i);
+                                                    ImageComponent otherImageComponent = imageGroup.get(i);
 
                                                     // Update style of nearby Hosts
                                                     double distanceToHostImage = Geometry.distance(
                                                             event.getPosition(),
-                                                            otherImage.getPosition()
+                                                            otherImageComponent.getPosition()
                                                     );
 
                                                     if (distanceToHostImage < 500) {
@@ -342,7 +342,7 @@ public class HostImage extends PortableImage {
                                                         break;
                                                     }
 
-                                                    // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
+                                                    // TODO: if distance > 800: connect to cloud service and show "cloud portable" imageComponent
                                                 }
 
                                                 if (isCreateExtensionAction) {
@@ -362,18 +362,18 @@ public class HostImage extends PortableImage {
                                                 ImageGroup nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
 
                                                 for (int i = 0; i < imageGroup.size(); i++) {
-                                                    PortableImage portableImage = (PortableImage) imageGroup.get(i);
+                                                    PortableImageComponent portableImage = (PortableImageComponent) imageGroup.get(i);
 
                                                     if (portableImage.getPortable() == sourcePort.getPortable() || nearbyPortableImages.contains(portableImage)) {
 
 //                                                        // <HACK>
-                                                        PortableImage nearbyImage = portableImage;
+                                                        PortableImageComponent nearbyImage = portableImage;
                                                         nearbyImage.setTransparency(1.0f);
                                                         nearbyImage.getPortShapes().setVisibility(Visibility.VISIBLE);
 
                                                         // Add additional Port to Extension if it has no more available Ports
                                                         if (portableImage.getPortable().getProfile() == null) {
-                                                            if (portableImage instanceof ExtensionImage) {
+                                                            if (portableImage instanceof ExtensionImageComponent) {
                                                                 Portable extensionPortable = portableImage.getPortable();
 
                                                                 boolean addPrototypePort = true;
@@ -397,7 +397,7 @@ public class HostImage extends PortableImage {
 
                                                     } else {
 
-                                                        PortableImage nearbyFigure = portableImage;
+                                                        PortableImageComponent nearbyFigure = portableImage;
                                                         nearbyFigure.setTransparency(0.1f);
                                                         nearbyFigure.getPortShapes().setVisibility(Visibility.INVISIBLE);
 
@@ -446,7 +446,7 @@ public class HostImage extends PortableImage {
                                                         space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                         // Show Path connection
-                                                        path.getImage().setVisibility(Visibility.VISIBLE);
+                                                        path.getImageComponent().setVisibility(Visibility.VISIBLE);
                                                     }
                                                 }
 
@@ -472,10 +472,10 @@ public class HostImage extends PortableImage {
 
                                                 // TODO: Release longer than tap!
 
-                                                if (event.getTargetImage() instanceof HostImage) {
+                                                if (event.getTargetImage() instanceof HostImageComponent) {
 
                                                     // If getFirstEvent queueEvent was on the same form, then respond
-                                                    if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
+                                                    if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImageComponent) {
 
                                                         // Host
 //                                                        event.getTargetImage().queueEvent(action);
@@ -651,7 +651,7 @@ public class HostImage extends PortableImage {
                                                     camera.setFocus(extension);
                                                 }
 
-                                                // Update Image
+                                                // Update ImageComponent
                                                 space.setPathPrototypeVisibility(Visibility.INVISIBLE);
                                                 space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
@@ -671,7 +671,7 @@ public class HostImage extends PortableImage {
      */
     private Extension createExtension(Port hostPort, Point initialPosition) {
 
-        // TODO: Remove initialPosition... find the position by analyzing the geometry of the HostImage
+        // TODO: Remove initialPosition... find the position by analyzing the geometry of the HostImageComponent
 
         //Log.v("Extension", "Creating Extension from Port");
 
@@ -701,10 +701,10 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Set the initial position of the Extension
-        extension.getImage().setPosition(initialPosition);
+        extension.getImageComponent().setPosition(initialPosition);
 
         // <REFACTOR>
-        // Update the Extension Image position and rotation
+        // Update the Extension ImageComponent position and rotation
 //        int headerIndex = getHeaderIndex(initialPosition);
 //        updateExtensionLayout(extensionImage)
         // </REFACTOR>
@@ -732,7 +732,7 @@ public class HostImage extends PortableImage {
         // Remove focus from other Hosts and their Ports
         ImageGroup hostImages = getSpace().getImages(Host.class);
         for (int i = 0; i < hostImages.size(); i++) {
-            HostImage hostImage = (HostImage) hostImages.get(i);
+            HostImageComponent hostImage = (HostImageComponent) hostImages.get(i);
             hostImage.setTransparency(0.05f);
             hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             hostImage.setPathVisibility(Visibility.INVISIBLE);
@@ -773,14 +773,14 @@ public class HostImage extends PortableImage {
         // Add Extension to Space
         space.addEntity(extension);
 
-        // Get the just-created Extension Image
-        //ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+        // Get the just-created Extension ImageComponent
+        //ExtensionImageComponent extensionImage = (ExtensionImageComponent) space.getImageComponent(extension);
 
-        // Update the Extension Image position and rotation
-        extension.getImage().setPosition(initialPosition);
+        // Update the Extension ImageComponent position and rotation
+        extension.getImageComponent().setPosition(initialPosition);
 
         // <REFACTOR>
-        // Update the Extension Image position and rotation
+        // Update the Extension ImageComponent position and rotation
 //        int headerIndex = getHeaderIndex(initialPosition);
 //        extensionImage.adjustPgetHeaderIndeosition();
         // </REFACTOR>
@@ -796,7 +796,7 @@ public class HostImage extends PortableImage {
 
                     double distanceToPort = Geometry.distance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                            extension.getImage().getPosition()
+                            extension.getImageComponent().getPosition()
                     );
 
                     // Check if the port is the nearest
@@ -939,27 +939,27 @@ public class HostImage extends PortableImage {
                 double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
 
                 // <REFACTOR>
-                // Update the Extension Image position and rotation
+                // Update the Extension ImageComponent position and rotation
                 if (segmentIndex == 0) {
-                    extension.getImage().getPosition().set(
+                    extension.getImageComponent().getPosition().set(
                             0 + offset,
                             -distanceToExtensions,
                             position
                     );
                 } else if (segmentIndex == 1) {
-                    extension.getImage().getPosition().set(
+                    extension.getImageComponent().getPosition().set(
                             distanceToExtensions,
                             0 + offset,
                             position
                     );
                 } else if (segmentIndex == 2) {
-                    extension.getImage().getPosition().set(
+                    extension.getImageComponent().getPosition().set(
                             0 + offset,
                             distanceToExtensions,
                             position
                     );
                 } else if (segmentIndex == 3) {
-                    extension.getImage().getPosition().set(
+                    extension.getImageComponent().getPosition().set(
                             -distanceToExtensions,
                             0 + offset,
                             position
@@ -967,13 +967,13 @@ public class HostImage extends PortableImage {
                 }
 
                 if (segmentIndex == 0) {
-                    extension.getImage().setRotation(getRotation() + 0);
+                    extension.getImageComponent().setRotation(getRotation() + 0);
                 } else if (segmentIndex == 1) {
-                    extension.getImage().setRotation(getRotation() + 90);
+                    extension.getImageComponent().setRotation(getRotation() + 90);
                 } else if (segmentIndex == 2) {
-                    extension.getImage().setRotation(getRotation() + 180);
+                    extension.getImageComponent().setRotation(getRotation() + 180);
                 } else if (segmentIndex == 3) {
-                    extension.getImage().setRotation(getRotation() + 270);
+                    extension.getImageComponent().setRotation(getRotation() + 270);
                 }
                 // </REFACTOR>
             }
@@ -982,7 +982,7 @@ public class HostImage extends PortableImage {
 
     // TODO: Refactor this... it's really dumb right now.
     public void updateExtensionSegmentIndex(Extension extension) {
-        if (extension.getImage() == null || extension.getHosts().size() == 0) {
+        if (extension.getImageComponent() == null || extension.getHosts().size() == 0) {
             return;
         }
         int segmentIndex = getHeaderIndex(extension);

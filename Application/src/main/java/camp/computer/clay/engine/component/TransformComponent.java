@@ -28,6 +28,11 @@ public class TransformComponent extends Component {
     public double rotation = 0;
 
     /**
+     * Scale.
+     */
+    public double scale = 1.0;
+
+    /**
      * Rotation rotation in degrees
      */
     public TransformComponent() {
@@ -111,5 +116,13 @@ public class TransformComponent extends Component {
 
     public void setRotation(double rotation) {
         this.rotation = rotation;
+    }
+
+    public double getScale() {
+        return this.scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
     }
 }

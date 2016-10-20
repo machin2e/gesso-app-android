@@ -112,8 +112,8 @@ public class Group<E extends Addressable> implements List<E> {
         public static Collector getPosition = new Collector<Entity, Point, Void>() {
             @Override
             public Point collect(Entity entity, Void data) {
-                if (entity.getImage() != null) {
-                    return entity.getImage().getPosition();
+                if (entity.getImageComponent() != null) {
+                    return entity.getImageComponent().getPosition();
                 } else {
                     return null;
                 }
@@ -126,7 +126,7 @@ public class Group<E extends Addressable> implements List<E> {
         public static Mapper setVisibility = new Mapper<Entity, Visibility>() {
             @Override
             public void map(Entity entity, Visibility visibility) {
-                entity.getImage().setVisibility(visibility);
+                entity.getImageComponent().setVisibility(visibility);
             }
         };
 
@@ -134,8 +134,8 @@ public class Group<E extends Addressable> implements List<E> {
             @Override
             public void map(Entity entity, Double transparency) {
 //                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-                if (entity.getImage() != null) {
-                    entity.getImage().setTransparency(transparency);
+                if (entity.getImageComponent() != null) {
+                    entity.getImageComponent().setTransparency(transparency);
                 }
             }
         };
@@ -143,7 +143,7 @@ public class Group<E extends Addressable> implements List<E> {
 //        public static Mapper setVisibility = new Mapper<Host, Visibility>() {
 //            @Override
 //            public void map(Host entity, Visibility data) {
-//                entity.getImage().setVisibility(data);
+//                entity.getImageComponent().setVisibility(data);
 //            }
 //        };
 //
@@ -151,7 +151,7 @@ public class Group<E extends Addressable> implements List<E> {
 //            @Override
 //            public void map(Host entity, Double transparency) {
 //                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-//                    entity.getImage().setTransparency(transparency);
+//                    entity.getImageComponent().setTransparency(transparency);
 //                }
 //            }
 //        };

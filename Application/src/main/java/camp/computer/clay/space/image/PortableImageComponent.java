@@ -9,16 +9,16 @@ import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public abstract class PortableImage extends Image<Portable> {
+public abstract class PortableImageComponent extends ImageComponent<Portable> {
 
     public List<Vertex> headerContactPositions = new ArrayList<>();
 
-    public PortableImage(Portable portable) {
+    public PortableImageComponent(Portable portable) {
         super(portable);
     }
 
@@ -61,7 +61,7 @@ public abstract class PortableImage extends Image<Portable> {
         return space.getImages(paths);
 //        for (int i = 0; i < paths.size(); i++) {
 //            Path path = paths.get(i);
-//            PathImage pathImage = (PathImage) getSpace().getImage(path);
+//            PathImageComponent pathImage = (PathImageComponent) getSpace().getImageComponent(path);
 //            pathImages.add(pathImage);
 //        }
 //        return pathImages;
@@ -71,7 +71,7 @@ public abstract class PortableImage extends Image<Portable> {
     public boolean hasVisiblePaths(int portIndex) {
         ImageGroup pathImages = getPathImages(portIndex);
         for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
+            PathImageComponent pathImage = (PathImageComponent) pathImages.get(i);
             if (pathImage.isVisible()) {
                 return true;
             }
@@ -84,7 +84,7 @@ public abstract class PortableImage extends Image<Portable> {
 //        PathGroup ancestorPaths = getPortable().getPort(portIndex).getAncestorPaths();
 //        for (int i = 0; i < ancestorPaths.size(); i++) {
 //            Path ancestorPath = ancestorPaths.get(i);
-//            PathImage pathImage = (PathImage) getSpace().getImage(ancestorPath);
+//            PathImageComponent pathImage = (PathImageComponent) getSpace().getImageComponent(ancestorPath);
 //            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
 //                return true;
 //            }
@@ -97,13 +97,13 @@ public abstract class PortableImage extends Image<Portable> {
         ImageGroup pathImages = new ImageGroup();
         for (int i = 0; i < port.getPaths().size(); i++) {
             Path path = port.getPaths().get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(path);
+            PathImageComponent pathImage = (PathImageComponent) getSpace().getImage(path);
             pathImages.add(pathImage);
         }
         return pathImages;
     }
 
-    // TODO: Move into PathImage
+    // TODO: Move into PathImageComponent
     public void setPathVisibility(Visibility visibility) {
         Group<Port> ports = getPortable().getPorts();
         for (int i = 0; i < ports.size(); i++) {
@@ -113,12 +113,12 @@ public abstract class PortableImage extends Image<Portable> {
         }
     }
 
-    // TODO: Move into PathImage
+    // TODO: Move into PathImageComponent
     // TODO: Replace with ImageGroup.filter().setVisibility()
     public void setPathVisibility(Port port, Visibility visibility) {
         ImageGroup pathImages = getPathImages(port);
         for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
+            PathImageComponent pathImage = (PathImageComponent) pathImages.get(i);
 
             // Update visibility
             if (visibility == Visibility.VISIBLE) {
@@ -129,17 +129,17 @@ public abstract class PortableImage extends Image<Portable> {
                 // pathImage.setDockVisibility(Visibility.VISIBLE);
             }
 
-            // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
+            // Recursively traverse Ports in descendant Paths and setValue their Path imageComponent visibility
             Port targetPort = pathImage.getPath().getTarget();
             Portable targetPortable = (Portable) targetPort.getParent();
-            PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
+            PortableImageComponent targetPortableImage = (PortableImageComponent) getSpace().getImage(targetPortable);
             if (targetPortableImage != this) { // HACK
                 targetPortableImage.setPathVisibility(targetPort, visibility);
             }
         }
     }
 
-//    // TODO: Move into PathImage
+//    // TODO: Move into PathImageComponent
 //    public void setDockVisibility(Visibility visibility) {
 //        Group<Port> ports = getPortable().getPorts();
 //        for (int i = 0; i < ports.size(); i++) {
@@ -149,11 +149,11 @@ public abstract class PortableImage extends Image<Portable> {
 //        }
 //    }
 
-//    // TODO: Move into PathImage
+//    // TODO: Move into PathImageComponent
 //    public void setDockVisibility(Port port, Visibility visibility) {
 //        ImageGroup pathImages = getPathImages(port);
 //        for (int i = 0; i < pathImages.size(); i++) {
-//            PathImage pathImage = (PathImage) pathImages.get(i);
+//            PathImageComponent pathImage = (PathImageComponent) pathImages.get(i);
 //
 //            // Update visibility
 //            pathImage.setDockVisibility(visibility);
@@ -161,7 +161,7 @@ public abstract class PortableImage extends Image<Portable> {
 //            // Deep
 //            Port targetPort = pathImage.getPath().getTarget();
 //            Portable targetPortable = (Portable) targetPort.getParent();
-//            PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
+//            PortableImageComponent targetPortableImage = (PortableImageComponent) getSpace().getImageComponent(targetPortable);
 //            targetPortableImage.setDockVisibility(targetPort, visibility);
 //        }
 //    }

@@ -3,7 +3,7 @@ package camp.computer.clay.engine;
 import java.util.UUID;
 
 import camp.computer.clay.model.Group;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.ImageComponent;
 
 public abstract class Entity extends Addressable {
 
@@ -50,19 +50,20 @@ public abstract class Entity extends Addressable {
     // </TAG_COMPONENT>
 
     // <IMAGE_COMPONENT>
-    protected Image image = null;
+    protected ImageComponent imageComponent = null;
 
-    public Image getImage() {
-        return this.image;
+    public ImageComponent getImageComponent() {
+        return this.imageComponent;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setImageComponent(ImageComponent imageComponent) {
+        this.imageComponent = imageComponent;
     }
     // </IMAGE_COMPONENT>
 
-    // <COMPONENT_INTERFACE>
+    // <GENERIC_COMPONENT_INTERFACE>
     public boolean addComponent(Component component) {
+        this.components.add(component);
         return true;
     }
 
@@ -81,5 +82,5 @@ public abstract class Entity extends Addressable {
     public boolean hasComponent(UUID uuid) {
         return components.contains(uuid);
     }
-    // </COMPONENT_INTERFACE>
+    // </GENERIC_COMPONENT_INTERFACE>
 }

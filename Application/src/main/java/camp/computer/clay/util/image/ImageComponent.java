@@ -17,10 +17,10 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class Image<T extends Entity> extends Component {
+public class ImageComponent<T extends Entity> extends Component {
 
     /**
-     * The parent {@code Space} containing this {@code Image}.
+     * The parent {@code Space} containing this {@code ImageComponent}.
      */
     protected Space space = null;
 
@@ -55,7 +55,7 @@ public class Image<T extends Entity> extends Component {
     }
 
     /**
-     * Sorts {@code Shapes}s in the {@code Image} by layer.
+     * Sorts {@code Shapes}s in the {@code ImageComponent} by layer.
      */
     public void updateLayers() {
 
@@ -97,11 +97,11 @@ public class Image<T extends Entity> extends Component {
         }
     }
 
-    public Image() {
+    public ImageComponent() {
         super();
     }
 
-    public Image(T entity) {
+    public ImageComponent(T entity) {
         this.entity = entity;
     }
 
@@ -265,7 +265,7 @@ public class Image<T extends Entity> extends Component {
     }
 
     /**
-     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+     * Returns {@code true} if any of the {@code Shape}s in the {@code ImageComponent} contain the
      * {@code point}.
      *
      * @param point

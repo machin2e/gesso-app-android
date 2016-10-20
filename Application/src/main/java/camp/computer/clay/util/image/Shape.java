@@ -215,7 +215,7 @@ public abstract class Shape<T extends Entity> extends Addressable {
      * Updates the {@code Shape}'s geometry. Specifically, computes the absolute positioning,
      * rotation, and scaling in preparation for drawing and collision detection.
      *
-     * @param referencePoint Position of the containing {@code Image} relative to which the
+     * @param referencePoint Position of the containing {@code ImageComponent} relative to which the
      *                       {@code Shape} will be drawn.
      */
     protected void updateGeometry(Point referencePoint) {
@@ -229,7 +229,7 @@ public abstract class Shape<T extends Entity> extends Addressable {
     }
 
     /**
-     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code ImageComponent}. Translate
      * the center position of the {@code Shape}. Effectively, this updates the position of the
      * {@code Shape}.
      *
@@ -256,7 +256,7 @@ public abstract class Shape<T extends Entity> extends Addressable {
         // Translate and rotate the boundary about the updated position
         for (int i = 0; i < vertices.size(); i++) {
             boundary.get(i).set(vertices.get(i));
-            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about Image position
+            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about ImageComponent position
             Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
         }
     }
