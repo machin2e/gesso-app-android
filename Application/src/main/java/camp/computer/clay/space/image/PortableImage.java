@@ -11,7 +11,6 @@ import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public abstract class PortableImage extends Image<Portable> {
@@ -55,13 +54,13 @@ public abstract class PortableImage extends Image<Portable> {
 //    }
 
     // TODO: Move into Port? something (inner class? custom PortShape?)
-    public ImageGroup getPathImages(int portIndex) {
-        ImageGroup pathImages = new ImageGroup();
+    public Group<Image> getPathImages(int portIndex) {
+        Group<Image> pathImages = new Group<>();
         Group<Path> paths = getPortable().getPort(portIndex).getPaths();
         return space.getImages(paths);
 //        for (int i = 0; i < paths.size(); i++) {
 //            Path path = paths.get(i);
-//            PathImage pathImage = (PathImage) getSpace().getImage(path);
+//            PathImage pathImage = (PathImage) getSpace().getImages(path);
 //            pathImages.add(pathImage);
 //        }
 //        return pathImages;
@@ -69,7 +68,7 @@ public abstract class PortableImage extends Image<Portable> {
 
     // TODO: Move into Port? something (inner class? custom PortShape?)
     public boolean hasVisiblePaths(int portIndex) {
-        ImageGroup pathImages = getPathImages(portIndex);
+        Group<Image> pathImages = getPathImages(portIndex);
         for (int i = 0; i < pathImages.size(); i++) {
             PathImage pathImage = (PathImage) pathImages.get(i);
             if (pathImage.isVisible()) {
@@ -84,7 +83,7 @@ public abstract class PortableImage extends Image<Portable> {
 //        PathGroup ancestorPaths = getPortable().getPort(portIndex).getAncestorPaths();
 //        for (int i = 0; i < ancestorPaths.size(); i++) {
 //            Path ancestorPath = ancestorPaths.get(i);
-//            PathImage pathImage = (PathImage) getSpace().getImage(ancestorPath);
+//            PathImage pathImage = (PathImage) getSpace().getImages(ancestorPath);
 //            if (pathImage.isVisible() && !pathImage.isDockVisible()) {
 //                return true;
 //            }
@@ -93,11 +92,11 @@ public abstract class PortableImage extends Image<Portable> {
 //    }
 
     // TODO: Move into Port? something (inner class? custom PortShape?)
-    public ImageGroup getPathImages(Port port) {
-        ImageGroup pathImages = new ImageGroup();
+    public Group<Image> getPathImages(Port port) {
+        Group<Image> pathImages = new Group<>();
         for (int i = 0; i < port.getPaths().size(); i++) {
             Path path = port.getPaths().get(i);
-            PathImage pathImage = (PathImage) getSpace().getImage(path);
+            PathImage pathImage = (PathImage) path.getImage();
             pathImages.add(pathImage);
         }
         return pathImages;
@@ -116,7 +115,7 @@ public abstract class PortableImage extends Image<Portable> {
     // TODO: Move into PathImage
     // TODO: Replace with ImageGroup.filter().setVisibility()
     public void setPathVisibility(Port port, Visibility visibility) {
-        ImageGroup pathImages = getPathImages(port);
+        Group<Image> pathImages = getPathImages(port);
         for (int i = 0; i < pathImages.size(); i++) {
             PathImage pathImage = (PathImage) pathImages.get(i);
 
@@ -132,7 +131,7 @@ public abstract class PortableImage extends Image<Portable> {
             // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
             Port targetPort = pathImage.getPath().getTarget();
             Portable targetPortable = (Portable) targetPort.getParent();
-            PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
+            PortableImage targetPortableImage = (PortableImage) targetPortable.getImage();
             if (targetPortableImage != this) { // HACK
                 targetPortableImage.setPathVisibility(targetPort, visibility);
             }
@@ -161,7 +160,7 @@ public abstract class PortableImage extends Image<Portable> {
 //            // Deep
 //            Port targetPort = pathImage.getPath().getTarget();
 //            Portable targetPortable = (Portable) targetPort.getParent();
-//            PortableImage targetPortableImage = (PortableImage) getSpace().getImage(targetPortable);
+//            PortableImage targetPortableImage = (PortableImage) getSpace().getImages(targetPortable);
 //            targetPortableImage.setDockVisibility(targetPort, visibility);
 //        }
 //    }

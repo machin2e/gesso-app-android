@@ -139,7 +139,9 @@ public class Camera {
     }
 
     public void adjustPosition() {
-        Point centerPosition = getSpace().getImages().filterType(Host.class, Extension.class).getCenterPoint();
+        //Point centerPosition = getSpace().getImages().filterType2(Host.class, Extension.class).getCenterPoint();
+        Point centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
+        Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
 
@@ -175,7 +177,8 @@ public class Camera {
     }
 
     public void adjustScale(double duration) {
-        Rectangle boundingBox = getSpace().getImages().filterType(Host.class, Extension.class).getBoundingBox();
+        //Rectangle boundingBox = getSpace().getImages().filterType2(Host.class, Extension.class).getBoundingBox();
+        Rectangle boundingBox = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
         }
@@ -230,21 +233,21 @@ public class Camera {
 
         Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
 
-        // Check if a Host Image is nearby
-        Image nearestHostImage = getSpace().getImages().filterType(Host.class).getNearestImage(targetPosition);
-        if (nearestHostImage != null) {
-
-            Portable sourcePortable = sourcePort.getPortable();
-            PortableImage sourcePortableImage = (PortableImage) space.getImage(sourcePortable);
-
-            double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
-
-            if (distanceToPortable > 800) {
-                setScale(0.6f, 100); // Zoom out to show overview
-            } else {
-                setScale(1.0f, 100); // Zoom out to show overview
-            }
-        }
+//        // Check if a Host Image is nearby
+//        Image nearestHostImage = getSpace().getImages().filterType2(Host.class).getNearestImage(targetPosition);
+//        if (nearestHostImage != null) {
+//
+//            Portable sourcePortable = sourcePort.getPortable();
+//            PortableImage sourcePortableImage = (PortableImage) sourcePortable.getImage();
+//
+//            double distanceToPortable = Geometry.distance(sourcePortableImage.getImagePosition(), targetPosition);
+//
+//            if (distanceToPortable > 800) {
+//                setScale(0.6f, 100); // Zoom out to show overview
+//            } else {
+//                setScale(1.0f, 100); // Zoom out to show overview
+//            }
+//        }
     }
 
     public void setFocus(Host host) {
@@ -252,7 +255,7 @@ public class Camera {
         Log.v("SetFocus", "setFocus(Host)");
 
         // <REFACTOR>
-        HostImage hostImage = (HostImage) space.getImage(host);
+        HostImage hostImage = (HostImage) host.getImage();
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -301,7 +304,7 @@ public class Camera {
         Log.v("SetFocus", "setFocus(Extension)");
 
         // <REFACTOR>
-        ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+        ExtensionImage extensionImage = (ExtensionImage) extension.getImage();
 
         // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -338,7 +341,7 @@ public class Camera {
         // </REFACTOR>
 
         // Increase distance between Host and Extension
-        HostImage hostImage = (HostImage) getSpace().getImage(extension.getHosts().get(0));
+        HostImage hostImage = (HostImage) extension.getHosts().get(0).getImage();
         hostImage.setExtensionDistance(500);
 
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);

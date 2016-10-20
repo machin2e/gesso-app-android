@@ -111,24 +111,24 @@ public class ShapeGroup extends Group<Shape> {
      * @param distance
      * @return
      */
-    public ShapeGroup filterArea(Point point, double distance) {
-
-        ShapeGroup shapeGroup = new ShapeGroup();
-
-        for (int i = 0; i < elements.size(); i++) {
-            Shape shape = elements.get(i);
-
-            double distanceToShape = Geometry.distance(point, shape.getPosition());
-
-            if (distanceToShape < distance) {
-                shapeGroup.add(shape);
-            }
-
-        }
-
-        return shapeGroup;
-
-    }
+//    public ShapeGroup filterArea(Point point, double distance) {
+//
+//        ShapeGroup shapeGroup = new ShapeGroup();
+//
+//        for (int i = 0; i < elements.size(); i++) {
+//            Shape shape = elements.get(i);
+//
+//            double distanceToShape = Geometry.distance(point, shape.getImagePosition());
+//
+//            if (distanceToShape < distance) {
+//                shapeGroup.add(shape);
+//            }
+//
+//        }
+//
+//        return shapeGroup;
+//
+//    }
 
     public ShapeGroup filterContains(Point point) {
 
@@ -185,14 +185,14 @@ public class ShapeGroup extends Group<Shape> {
         return elements;
     }
 
-    public List<Point> getPositions() {
-        List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            Shape shape = elements.get(i);
-            positions.add(new Point(shape.getPosition().x, shape.getPosition().y));
-        }
-        return positions;
-    }
+//    public List<Point> getPositions() {
+//        List<Point> positions = new LinkedList<>();
+//        for (int i = 0; i < elements.size(); i++) {
+//            Shape shape = elements.get(i);
+//            positions.add(new Point(shape.getImagePosition().x, shape.getImagePosition().y));
+//        }
+//        return positions;
+//    }
 
     public List<Point> getVertices() {
         List<Point> positions = new LinkedList<>();
@@ -201,15 +201,6 @@ public class ShapeGroup extends Group<Shape> {
             positions.addAll(shape.getBoundary());
         }
         return positions;
-    }
-
-    public Point getCenterPosition() {
-        return Geometry.getCenterPoint(getPositions());
-    }
-
-
-    public Point getCentroidPosition() {
-        return Geometry.getCentroidPoint(getPositions());
     }
 
     public Rectangle getBoundingBox() {

@@ -56,7 +56,7 @@ public abstract class Entity extends Groupable {
 //    // <TRANSFORM_COMPONENT>
 //    protected Point position = new Point(0, 0);
 //
-//    public Point getPosition() {
+//    public Point getImagePosition() {
 //        return position;
 //    }
 //

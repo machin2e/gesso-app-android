@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.engine.entity.Extension;
@@ -26,15 +27,12 @@ import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 // TODO: DO NOT extend Image. Remove this class!
 public class Space extends Image<Model> {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
-
-//    protected ImageGroup images = new ImageGroup();
 
     protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
     protected Point extensionPrototypePosition = new Point();
@@ -230,7 +228,7 @@ public class Space extends Image<Model> {
     @Override
     public void updateLayers() {
 
-        ImageGroup images = getImages();
+        Group<Image> images = getImages();
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {
@@ -285,7 +283,7 @@ public class Space extends Image<Model> {
      */
     private void adjustLayout() {
 
-        ImageGroup hostImages = getImages().filterType(Host.class);
+        Group<Image> hostImages = getImages().filterType2(Host.class);
 
         // Set position
         if (hostImages.size() == 1) {
@@ -310,28 +308,10 @@ public class Space extends Image<Model> {
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    /**
-     * Returns {@code true} if the {@code Space} contains a {@code Image} corresponding to the
-     * specified {@code Entity}.
-     *
-     * @param entity The {@code Entity} for which the corresponding {@code Image} will be
-     *               returned, if any.
-     * @return The {@code Image} corresponding to the specified {@code Entity}, if one is
-     * present. If one is not present, this method returns {@code null}.
-     */
-//    public boolean contains(Entity entity) {
-//        return images.filterEntity(entity).size() > 0;
-//    }
-
     // HACK
-    public Image getImage(Entity entity) {
-        return entity.getImage();
-    }
-
-    // HACK
-    public <T extends Entity> ImageGroup getImages(Group<T> entities) {
+    public <T extends Entity> Group<Image> getImages(Group<T> entities) {
 //        return images.filterEntity(entities);
-        ImageGroup images = new ImageGroup();
+        Group<Image> images = new Group<>();
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).getImage() != null) {
                 images.add(entities.get(i).getImage());
@@ -341,24 +321,29 @@ public class Space extends Image<Model> {
     }
 
     // HACK
-    public ImageGroup getImages() {
+    public Group<Image> getImages() {
+
+        // this.entities.map(Group.Mappers.)
+        return this.entities.getImages();
+
 //        return images.filterEntity(entities);
-        ImageGroup images = new ImageGroup();
-        for (int i = 0; i < this.entities.size(); i++) {
-            if (entities.get(i) != null && entities.get(i).getImage() != null) {
-                images.add(entities.get(i).getImage());
-            }
-        }
-        return images;
+//        ImageGroup images = new ImageGroup();
+//        for (int i = 0; i < this.entities.size(); i++) {
+//            if (entities.get(i) != null && entities.get(i).getImages() != null) {
+//                images.add(entities.get(i).getImages());
+//            }
+//        }
+//        return images;
     }
 
-    public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes) {
-        return getImages().filterType(entityTypes);
+    public <T extends Entity> Group<Image> getImages(Class<? extends Groupable>... entityTypes) {
+        return getImages().filterType2(entityTypes);
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
     public Image getImage(Point point) {
-        ImageGroup image = getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
+        Group<Image> image = getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
+        // TODO: Group<Image> image = getEntities().filterVisibility(Visibility.VISIBLE).filterContains(point);
         if (image.size() > 0) {
             return image.get(0);
         } else {
@@ -367,13 +352,19 @@ public class Space extends Image<Model> {
     }
 
     public ShapeGroup getShapes() {
-        return getImages().getShapes();
+//        return getImages().getShapes();
+        ShapeGroup shapes = new ShapeGroup();
+        Group<Image> images = getImages();
+        for (int i = 0; i < images.size(); i++) {
+            shapes.addAll(images.get(i).getShapes());
+        }
+        return shapes;
     }
 
     // TODO: Refactor to be cleaner and leverage other classes...
     public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
         ShapeGroup shapeGroup = new ShapeGroup();
-        ImageGroup imageList = getImages();
+        Group<Image> imageList = getImages();
 
         for (int i = 0; i < imageList.size(); i++) {
             shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
@@ -383,7 +374,7 @@ public class Space extends Image<Model> {
     }
 
     public Shape getShape(Entity entity) {
-        ImageGroup images = getImages();
+        Group<Image> images = getImages();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
             Shape shape = image.getShape(entity);
@@ -551,13 +542,13 @@ public class Space extends Image<Model> {
     public void setPortableSeparation(double distance) {
         // <HACK>
         // TODO: Replace ASAP. This is shit.
-        ImageGroup extensionImages = getImages(Extension.class);
+        Group<Image> extensionImages = getImages(Extension.class);
         for (int i = 0; i < extensionImages.size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 
             if (extensionImage.getExtension().getHosts().size() > 0) {
                 Host host = extensionImage.getExtension().getHosts().get(0);
-                HostImage hostImage = (HostImage) getSpace().getImage(host);
+                HostImage hostImage = (HostImage) host.getImage();
                 hostImage.setExtensionDistance(distance);
             }
         }
@@ -565,7 +556,8 @@ public class Space extends Image<Model> {
     }
 
     public void hideAllPorts() {
-        ImageGroup portableImages = getImages(Host.class, Extension.class);
+        Group<Image> portableImages = getEntities().filterType2(Host.class, Extension.class).getImages();
+//        ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
             PortableImage portableImage = (PortableImage) portableImages.get(i);
             portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);

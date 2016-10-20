@@ -1,6 +1,7 @@
 package camp.computer.clay.model;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,8 +14,13 @@ import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.image.Image;
+import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
+import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Group<E extends Groupable> implements List<E> {
 
@@ -46,7 +52,7 @@ public class Group<E extends Groupable> implements List<E> {
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
-    // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
+    // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getImagePosition(...)).
 
     public interface Filter<V extends Groupable, D> {
         boolean filter(V entity, D... data);
@@ -93,9 +99,40 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
+        public static Filter filterVisibility = new Filter<Image, Visibility>() {
+            @Override
+            public boolean filter(Image entity, Visibility... visibilities) {
+                //if (entity.getImage().getVisibility() == visibilities[0]) {
+                if (entity.getVisibility() == visibilities[0]) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+
+        public static Filter filterContains = new Filter<Image, Point>() {
+            @Override
+            public boolean filter(Image entity, Point... points) {
+                if (entity.contains(points[0])) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+
         // TODO: hasComponent
     }
 
+    /**
+     * Interface for custom map functions.
+     *
+     * @param <E> "Input" group element type.
+     * @param <M> "Result" group element type.
+     * @param <D> Type of data to pass to the {@code Mapper}. Set to {@code Void} if there's no
+     *            data.
+     */
     public interface Mapper<E extends Groupable, M extends Groupable, D> {
         M map(E value, D data);
     }
@@ -103,17 +140,28 @@ public class Group<E extends Groupable> implements List<E> {
     public <V extends Groupable, M extends Groupable, D> Group<M> map(Mapper mapper, D data) {
         Group<M> group = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
-            group.add((M) mapper.map(elements.get(i), data));
+            M result = (M) mapper.map(elements.get(i), data);
+            if (result != null) {
+                group.add(result);
+            }
         }
         return group;
     }
 
     public static class Mappers { // was Operations
 
-        public static Mapper setVisibility = new Mapper<Entity, Entity, Visibility>() {
+//        public static Mapper setVisibility = new Mapper<Entity, Entity, Visibility>() {
+//            @Override
+//            public Entity map(Entity entity, Visibility visibility) {
+//                entity.getImage().setVisibility(visibility);
+//                return entity;
+//            }
+//        };
+
+        public static Mapper setVisibility = new Mapper<Image, Image, Visibility>() {
             @Override
-            public Entity map(Entity entity, Visibility visibility) {
-                entity.getImage().setVisibility(visibility);
+            public Image map(Image entity, Visibility visibility) {
+                entity.setVisibility(visibility);
                 return entity;
             }
         };
@@ -129,11 +177,45 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-        public static Mapper getPosition = new Mapper<Entity, Point, Void>() {
+        public static Mapper getImagePosition = new Mapper<Image, Point, Void>() {
             @Override
-            public Point map(Entity entity, Void data) {
+            public Point map(Image entity, Void data) {
+                if (entity != null) {
+                    return entity.getPosition();
+                } else {
+                    return null;
+                }
+            }
+        };
+
+        // HACK?
+        public static Mapper getShapePosition = new Mapper<Shape, Point, Void>() {
+            @Override
+            public Point map(Shape entity, Void data) {
+                if (entity != null) {
+                    return entity.getPosition();
+                } else {
+                    return null;
+                }
+            }
+        };
+
+//        public static Mapper getPosition = new Mapper<Entity, Point, Void>() {
+//            @Override
+//            public Point map(Entity entity, Void data) {
+//                if (entity.getImage() != null) {
+//                    return entity.getImage().getPosition();
+//                } else {
+//                    return null;
+//                }
+//            }
+//        };
+
+        public static Mapper getImage = new Mapper<Entity, Image, Void>() {
+            @Override
+            public Image map(Entity entity, Void data) {
                 if (entity.getImage() != null) {
-                    return entity.getImage().getPosition();
+                    return entity.getImage();
                 } else {
                     return null;
                 }
@@ -141,8 +223,13 @@ public class Group<E extends Groupable> implements List<E> {
         };
     }
 
-    public Group<E> setVisibilityMapper(Visibility visibility) {
-        return map(Mappers.setVisibility, visibility); // OR: Mappers.setVisibility.filter(this);
+    // TODO: Convert to Filter and restrict to Image types
+    public Group<E> filterVisibility(Visibility visibility) {
+        return filter(Filters.filterVisibility, visibility); // OR: Mappers.setVisibility.filter(this);
+    }
+
+    public Group<E> filterContains(Point point) {
+        return filter(Filters.filterContains, point);
     }
 
     public void setTransparency(double transparency) {
@@ -159,13 +246,139 @@ public class Group<E extends Groupable> implements List<E> {
 //            @Override
 //            public Entity map(Entity entity, Double transparency) {
 ////                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-//                if (entity.getImage() != null) {
-//                    entity.getImage().setTransparency(transparency);
+//                if (entity.getImages() != null) {
+//                    entity.getImages().setTransparency(transparency);
 //                }
 //                return entity;
 //            }
 //        }, null);
     }
+
+    public void setVisibility(Visibility visibility) {
+        map(Mappers.setVisibility, visibility);
+    }
+
+    public Group<Image> getImages() {
+        return map(Mappers.getImage, null);
+    }
+
+    public Group<Point> getPositions() {
+        Log.v("Reflect", "E: " + this.getClass());
+        if (this.getClass() == ShapeGroup.class) { // HACK
+            return map(Mappers.getShapePosition, null);
+        } else {
+            return map(Mappers.getImagePosition, null);
+        }
+    }
+
+    /**
+     * Removes all elements except those with the specified type.
+     *
+     * @param entityTypes
+     * @return
+     */
+    public <E extends Groupable> Group<E> filterType2(Class<? extends Groupable>... entityTypes) {
+
+        Group<E> imageGroup = new Group<>();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+            for (int j = 0; j < entityTypes.length; j++) {
+                Class<?> type = entityTypes[j];
+                if (this.elements.get(i).getClass() == type) {
+                    imageGroup.add((E) this.elements.get(i));
+                }
+            }
+        }
+
+        return imageGroup;
+    }
+
+    /**
+     * Filters elements that fall within the area defined by {@code shape}.
+     *
+     * @param shape The {@code Shape} covering the area to filter.
+     * @return The {@code ImageGroup} containing the area covered by {@code shape}.
+     */
+    // HACK: Expects Group<Image>
+    public Group<Image> filterArea(Point point, double distance) {
+
+        Group<Image> imageGroup = new Group<>();
+
+        for (int i = 0; i < elements.size(); i++) {
+
+            Image image = (Image) elements.get(i);
+
+            double distanceToImage = Geometry.distance(point, image.getPosition());
+
+            if (distanceToImage < distance) {
+                imageGroup.add(image);
+            }
+
+        }
+
+        return imageGroup;
+
+    }
+
+    /**
+     * Finds and returns the nearest <em>visible</em> <code>Image</code>.
+     *
+     * @param position
+     * @return
+     */
+    // HACK: Expects Group<Image>
+    public Image getNearestImage(Point position) {
+
+        double shortestDistance = Float.MAX_VALUE;
+        Image nearestImage = null;
+
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = (Image) elements.get(i);
+
+            double currentDistance = Geometry.distance(position, image.getPosition());
+
+            if (currentDistance < shortestDistance) {
+                shortestDistance = currentDistance;
+                nearestImage = image;
+            }
+        }
+
+        return nearestImage;
+    }
+
+    // HACK: Expects Group<Image>
+    // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
+    public Point getCenterPoint() {
+        return Geometry.getCenterPoint(getPositions());
+    }
+
+    // HACK: Expects Group<Image>
+    // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
+    public Point getCentroidPosition() {
+        return Geometry.getCentroidPoint(getPositions());
+    }
+
+    // HACK: Expects Group<Image>
+    public Rectangle getBoundingBox() {
+
+        List<Point> imageBoundaries = new LinkedList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = (Image) elements.get(i);
+            imageBoundaries.addAll(image.getBoundingBox().getBoundary());
+        }
+
+        return Geometry.getBoundingBox(imageBoundaries);
+    }
+
+//    public Rectangle getBoundingBox() {
+//
+//        List<Point> imageBoundaries = new LinkedList<>();
+//        for (int i = 0; i < elements.size(); i++) {
+//            imageBoundaries.addAll(elements.get(i).getBoundingBox().getBoundary());
+//        }
+//
+//        return Geometry.getBoundingBox(imageBoundaries);
+//    }
 
     // <LIST_INTERFACE>
 

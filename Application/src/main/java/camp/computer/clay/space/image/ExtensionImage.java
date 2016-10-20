@@ -114,7 +114,7 @@ public class ExtensionImage extends PortableImage {
                                     getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                     // Show path
-                                    getSpace().getImage(path).setVisibility(Visibility.VISIBLE);
+                                    path.getImage().setVisibility(Visibility.VISIBLE);
                                 }
                             }
 
@@ -324,23 +324,23 @@ public class ExtensionImage extends PortableImage {
 
             // <HACK>
             /*
-            if (getPosition().getReferencePoint() != null) {
+            if (getImagePosition().getReferencePoint() != null) {
                 canvas.translate(
-                        (float) getPosition().getReferencePoint().x,
-                        (float) getPosition().getReferencePoint().y
+                        (float) getImagePosition().getReferencePoint().x,
+                        (float) getImagePosition().getReferencePoint().y
                 );
 
-                canvas.rotate((float) getPosition().getReferencePoint().rotation);
+                canvas.rotate((float) getImagePosition().getReferencePoint().rotation);
             }
             */
             // </HACK>
 
 //            canvas.translate(
-//                    (float) getPosition().x,
-//                    (float) getPosition().y
+//                    (float) getImagePosition().x,
+//                    (float) getImagePosition().y
 //            );
 //
-//            canvas.rotate((float) getPosition().rotation);
+//            canvas.rotate((float) getImagePosition().rotation);
 
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.model.Group;
+
 public abstract class Geometry {
 
     public static void translatePoint(Point point, double x, double y) {

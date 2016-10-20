@@ -28,7 +28,6 @@ import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class HostImage extends PortableImage {
@@ -176,7 +175,7 @@ public class HostImage extends PortableImage {
             circle.setLabel("Mount " + (i + 1));
             circle.setColor("#ffffff");
             circle.setOutlineThickness(0);
-//            circle.getVisibility().setReference(getShape("Substrate").getVisibility());
+//            circle.getVisibility().setReference(getShapes("Substrate").getVisibility());
             addShape(circle);
         }
 
@@ -222,9 +221,9 @@ public class HostImage extends PortableImage {
             /*
             Segment line = new Segment();
             addShape(line);
-            line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
-            line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
-            line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
+            line.setReferencePoint(circle.getImagePosition()); // Remove this? Weird to have a line with a center...
+            line.setSource(new Point(-circle.getRadius(), 0, line.getImagePosition()));
+            line.setTarget(new Point(circle.getRadius(), 0, line.getImagePosition()));
             line.setRotation(90);
             line.setOutlineColor("#ff000000");
             line.getVisibility().setReferencePoint(circle.getVisibility());
@@ -237,16 +236,16 @@ public class HostImage extends PortableImage {
             for (int j = 0; j < segmentCount; j++) {
                 Segment line = new Segment();
                 addShape(line);
-                line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
+                line.setReferencePoint(circle.getImagePosition()); // Remove this? Weird to have a line with a center...
 
                 if (previousLine == null) {
-                    line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
+                    line.setSource(new Point(-circle.getRadius(), 0, line.getImagePosition()));
                 } else {
-                    line.setSource(new Point(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getPosition()));
+                    line.setSource(new Point(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getImagePosition()));
                 }
                 if (j < (segmentCount - 1)) {
                     double segmentLength = (circle.getRadius() * 2) / segmentCount;
-                    line.setTarget(new Point(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
+                    line.setTarget(new Point(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getImagePosition()));
 
 //                    Log.v("OnUpdate", "ADDING onUpdateListener");
 //                    final Circle finalCircle = circle;
@@ -259,7 +258,7 @@ public class HostImage extends PortableImage {
 //                    });
 
                 } else {
-                    line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
+                    line.setTarget(new Point(circle.getRadius(), 0, line.getImagePosition()));
                 }
 
                 line.setRotation(90);
@@ -327,7 +326,7 @@ public class HostImage extends PortableImage {
 
                                                 // Prototype Extension Visibility
                                                 boolean isCreateExtensionAction = true;
-                                                ImageGroup imageGroup = space.getImages(Host.class, Extension.class);
+                                                Group<Image> imageGroup = space.getImages(Host.class, Extension.class);
                                                 for (int i = 0; i < imageGroup.size(); i++) {
                                                     Image otherImage = imageGroup.get(i);
 
@@ -359,7 +358,7 @@ public class HostImage extends PortableImage {
 
                                                 // Show Ports of nearby Hosts and Extensions
                                                 double nearbyRadiusThreshold = 200 + 60;
-                                                ImageGroup nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
+                                                Group<Image> nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
 
                                                 for (int i = 0; i < imageGroup.size(); i++) {
                                                     PortableImage portableImage = (PortableImage) imageGroup.get(i);
@@ -676,7 +675,7 @@ public class HostImage extends PortableImage {
         //Log.v("Extension", "Creating Extension from Port");
 
         //Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
-//        Shape hostPortShape = getShape(hostPort);
+//        Shape hostPortShape = getShapes(hostPort);
 
         //Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
@@ -730,7 +729,7 @@ public class HostImage extends PortableImage {
         space.addEntity(path);
 
         // Remove focus from other Hosts and their Ports
-        ImageGroup hostImages = getSpace().getImages(Host.class);
+        Group<Image> hostImages = getSpace().getImages(Host.class);
         for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.setTransparency(0.05f);
@@ -774,7 +773,7 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Get the just-created Extension Image
-        //ExtensionImage extensionImage = (ExtensionImage) space.getImage(extension);
+        //ExtensionImage extensionImage = (ExtensionImage) space.getImages(extension);
 
         // Update the Extension Image position and rotation
         extension.getImage().setPosition(initialPosition);
@@ -806,7 +805,7 @@ public class HostImage extends PortableImage {
                     }
                 }
             }
-            // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
+            // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getImagePosition()).getEntity();
 
             // Configure Host's Port
             selectedHostPort.setType(profile.getPorts().get(i).getType());
