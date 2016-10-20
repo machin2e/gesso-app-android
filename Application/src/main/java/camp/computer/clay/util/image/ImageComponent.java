@@ -30,8 +30,6 @@ public class ImageComponent<T extends Entity> extends Component {
 
     protected Point position = new Point(0, 0);
 
-    protected double scale = 1.0;
-
     protected Visibility visibility = Visibility.VISIBLE;
 
     protected double targetTransparency = 1.0;
@@ -125,10 +123,6 @@ public class ImageComponent<T extends Entity> extends Component {
         return this.position.rotation;
     }
 
-    public double getScale() {
-        return this.scale;
-    }
-
     public void setPosition(double x, double y) {
         position.set(x, y);
         invalidate();
@@ -141,11 +135,6 @@ public class ImageComponent<T extends Entity> extends Component {
 
     public void setRotation(double angle) {
         this.position.rotation = angle;
-        invalidate();
-    }
-
-    public void setScale(double scale) {
-        this.scale = scale;
         invalidate();
     }
 

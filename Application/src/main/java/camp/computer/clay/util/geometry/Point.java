@@ -21,6 +21,11 @@ public class Point {
     public double rotation = 0;
 
     /**
+     * Scale for the {@code Point}.
+     */
+    protected double scale = 1.0;
+
+    /**
      * Rotation rotation in degrees
      */
     public Point() {
@@ -104,5 +109,13 @@ public class Point {
 
     public void setRotation(double rotation) {
         this.rotation = rotation;
+    }
+
+    public double getScale() {
+        return this.scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
     }
 }
