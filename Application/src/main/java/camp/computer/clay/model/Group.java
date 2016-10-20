@@ -195,8 +195,8 @@ public class Group<E extends Groupable> implements List<E> {
             @Override
             public Entity map(Entity entity, Double transparency) {
 //                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-                if (entity.getImage() != null) {
-                    entity.getImage().setTransparency(transparency);
+                if (entity.getComponent(Image.class) != null) {
+                    entity.getComponent(Image.class).setTransparency(transparency);
                 }
                 return entity;
             }
@@ -239,8 +239,8 @@ public class Group<E extends Groupable> implements List<E> {
         public static Mapper getImage = new Mapper<Entity, Image, Void>() {
             @Override
             public Image map(Entity entity, Void data) {
-                if (entity.getImage() != null) {
-                    return entity.getImage();
+                if (entity.getComponent(Image.class) != null) {
+                    return entity.getComponent(Image.class);
                 } else {
                     return null;
                 }
@@ -322,7 +322,7 @@ public class Group<E extends Groupable> implements List<E> {
     /**
      * Filters elements that fall within the area defined by {@code shape}.
      *
-     * @param shape The {@code Shape} covering the area to filter.
+     * @param point The {@code Shape} covering the area to filter.
      * @return The {@code ImageGroup} containing the area covered by {@code shape}.
      */
     // HACK: Expects Group<Image>

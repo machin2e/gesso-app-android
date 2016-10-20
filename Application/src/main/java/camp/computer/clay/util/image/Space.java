@@ -51,34 +51,6 @@ public class Space extends Image<Model> {
         setupActions();
     }
 
-    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visibility titleVisibility = Visibility.INVISIBLE;
-    protected String titleText = "Project";
-
-    public void setTitleText(String text) {
-        this.titleText = text;
-    }
-
-    public String getTitleText() {
-        return this.titleText;
-    }
-
-    public void setTitleVisibility(Visibility visibility) {
-        if (titleVisibility == Visibility.INVISIBLE && visibility == Visibility.VISIBLE) {
-//            Application.getView().openTitleEditor(getTitleText());
-            this.titleVisibility = visibility;
-        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.VISIBLE) {
-//            Application.getView().setTitleEditor(getTitleText());
-        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.INVISIBLE) {
-//            Application.getView().closeTitleEditor();
-            this.titleVisibility = visibility;
-        }
-    }
-
-    public Visibility getTitleVisibility() {
-        return this.titleVisibility;
-    }
-
     private void setupActions() {
         setOnActionListener(new ActionListener() {
             @Override
@@ -161,7 +133,7 @@ public class Space extends Image<Model> {
             hostImage.setSpace(this);
 
             // Assign Image to Entity
-            host.setImage(hostImage);
+            host.setComponent(hostImage);
 
             // Create Port Shapes for each of the PhoneHost's Ports
             for (int i = 0; i < host.getPorts().size(); i++) {
@@ -184,7 +156,7 @@ public class Space extends Image<Model> {
             extensionImage.setSpace(this);
 
             // Assign Image to Entity
-            extension.setImage(extensionImage);
+            extension.setComponent(extensionImage);
 
             // Create Port Shapes for each of the Extension's Ports
             for (int i = 0; i < extension.getPorts().size(); i++) {
@@ -208,10 +180,7 @@ public class Space extends Image<Model> {
             pathImage.setSpace(this);
 
             // Assign Image to Entity
-            path.setImage(pathImage);
-
-            // Add Path Image to Space
-//            addImage(pathImage);
+            path.setComponent(pathImage);
         }
     }
 
@@ -250,25 +219,6 @@ public class Space extends Image<Model> {
         });
         */
     }
-
-//    // TODO: Remove Image parameter. Create that and return it.
-//    private <T extends Image> void addImage(T image) {
-//
-//        // Add Image
-//        image.setSpace(this);
-//        if (!images.contains(image)) {
-//            images.add(image);
-//            updateLayers();
-//        }
-//
-//        // Position the Image
-//        if (image instanceof HostImage) {
-//            adjustLayout();
-//        }
-//
-//        // Update Camera
-////        getEntity().getActor(0).getCamera().setFocus(this);
-//    }
 
     @Override
     public Space getSpace() {
@@ -358,8 +308,8 @@ public class Space extends Image<Model> {
 
         // Update Images
         for (int i = 0; i < getEntities().size(); i++) {
-            if (getEntities().get(i).hasImage()) {
-                Image image = getEntities().get(i).getImage();
+            if (getEntities().get(i).hasComponent(Image.class)) {
+                Image image = getEntities().get(i).getComponent(Image.class);
 
                 // Update bounding box of Image
                 // TODO:
@@ -388,18 +338,18 @@ public class Space extends Image<Model> {
 
         // Draw Portables
         for (int i = 0; i < getEntities().size(); i++) {
-            if (getEntities().get(i).hasImage()) {
-                if (!(getEntities().get(i).getImage() instanceof ExtensionImage)) {
-                    getEntities().get(i).getImage().draw(display);
+            if (getEntities().get(i).hasComponent(Image.class)) {
+                if (!(getEntities().get(i).getComponent(Image.class) instanceof ExtensionImage)) {
+                    getEntities().get(i).getComponent(Image.class).draw(display);
                 }
             }
         }
 
         // Draw Extensions
         for (int i = 0; i < getEntities().size(); i++) {
-            if (getEntities().get(i).hasImage()) {
-                if (getEntities().get(i).getImage() instanceof ExtensionImage) {
-                    getEntities().get(i).getImage().draw(display);
+            if (getEntities().get(i).hasComponent(Image.class)) {
+                if (getEntities().get(i).getComponent(Image.class) instanceof ExtensionImage) {
+                    getEntities().get(i).getComponent(Image.class).draw(display);
                 }
             }
         }
@@ -413,6 +363,9 @@ public class Space extends Image<Model> {
 //        getEntity().getActor(0).getCamera().setFocus(this);
     }
 
+
+
+    // <EXTENSION_PROTOTYPE>
     private void drawExtensionPrototype(Display display) {
         if (extensionPrototypeVisibility == Visibility.VISIBLE) {
 
@@ -497,6 +450,8 @@ public class Space extends Image<Model> {
     public Visibility getExtensionPrototypeVisibility() {
         return extensionPrototypeVisibility;
     }
+    // </EXTENSION_PROTOTYPE>
+
 
     public void setPortableSeparation(double distance) {
         // <HACK>
@@ -507,14 +462,18 @@ public class Space extends Image<Model> {
 
             if (extensionImage.getExtension().getHosts().size() > 0) {
                 Host host = extensionImage.getExtension().getHosts().get(0);
-                HostImage hostImage = (HostImage) host.getImage();
+                HostImage hostImage = (HostImage) host.getComponent(Image.class);
                 hostImage.setExtensionDistance(distance);
             }
         }
         // </HACK>
     }
 
+
+
     public void hideAllPorts() {
+        // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
+
         Group<Image> portableImages = getEntities().filterType2(Host.class, Extension.class).getImages();
 //        ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
@@ -525,4 +484,36 @@ public class Space extends Image<Model> {
             portableImage.setTransparency(1.0);
         }
     }
+
+
+
+    // <TITLE>
+    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
+    protected Visibility titleVisibility = Visibility.INVISIBLE;
+    protected String titleText = "Project";
+
+    public void setTitleText(String text) {
+        this.titleText = text;
+    }
+
+    public String getTitleText() {
+        return this.titleText;
+    }
+
+    public void setTitleVisibility(Visibility visibility) {
+        if (titleVisibility == Visibility.INVISIBLE && visibility == Visibility.VISIBLE) {
+//            Application.getView().openTitleEditor(getTitleText());
+            this.titleVisibility = visibility;
+        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.VISIBLE) {
+//            Application.getView().setTitleEditor(getTitleText());
+        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.INVISIBLE) {
+//            Application.getView().closeTitleEditor();
+            this.titleVisibility = visibility;
+        }
+    }
+
+    public Visibility getTitleVisibility() {
+        return this.titleVisibility;
+    }
+    // </TITLE>
 }

@@ -255,7 +255,7 @@ public class Camera {
         Log.v("SetFocus", "setFocus(Host)");
 
         // <REFACTOR>
-        HostImage hostImage = (HostImage) host.getImage();
+        HostImage hostImage = (HostImage) host.getComponent(Image.class);
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -304,7 +304,7 @@ public class Camera {
         Log.v("SetFocus", "setFocus(Extension)");
 
         // <REFACTOR>
-        ExtensionImage extensionImage = (ExtensionImage) extension.getImage();
+        ExtensionImage extensionImage = (ExtensionImage) extension.getComponent(Image.class);
 
         // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -341,7 +341,7 @@ public class Camera {
         // </REFACTOR>
 
         // Increase distance between Host and Extension
-        HostImage hostImage = (HostImage) extension.getHosts().get(0).getImage();
+        HostImage hostImage = (HostImage) extension.getHosts().get(0).getComponent(Image.class);
         hostImage.setExtensionDistance(500);
 
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);

@@ -204,8 +204,8 @@ public class PathImage extends Image<Path> {
 
         // Draw the connection to the Host's Port
 
-        PortableImage hostImage = (PortableImage) hostPort.getPortable().getImage();
-        PortableImage extensionImage = (PortableImage) extensionPort.getPortable().getImage();
+        PortableImage hostImage = (PortableImage) hostPort.getPortable().getComponent(Image.class);
+        PortableImage extensionImage = (PortableImage) extensionPort.getPortable().getComponent(Image.class);
 
         if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
             Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();

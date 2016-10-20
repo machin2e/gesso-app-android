@@ -4,6 +4,7 @@ import java.util.List;
 
 import camp.computer.clay.model.Group;
 import camp.computer.clay.model.profile.Profile;
+import camp.computer.clay.util.image.Image;
 
 /**
  * {@code Extension} represents a device connected to a {@code Host}.
@@ -35,7 +36,7 @@ public class Extension extends Portable {
 
         Group<Host> hostGroup = new Group<>();
 
-        List<Host> hosts = getImage().getSpace().getModel().getEntities().filterType2(Host.class);
+        List<Host> hosts = getComponent(Image.class).getSpace().getModel().getEntities().filterType2(Host.class);
 
         for (int i = 0; i < hosts.size(); i++) {
             if (hosts.get(i).getExtensions().contains(extension)) {

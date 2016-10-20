@@ -18,6 +18,7 @@ import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
+import camp.computer.clay.util.image.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -114,7 +115,7 @@ public class ExtensionImage extends PortableImage {
                                     getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                     // Show path
-                                    path.getImage().setVisibility(Visibility.VISIBLE);
+                                    path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
                                 }
                             }
 

@@ -71,20 +71,41 @@ public abstract class Entity extends Groupable {
 
 
 
+    // <TEMPORARY_COMPONENT_INTERFACE>
+    public <C extends Component> void setComponent(C component) {
+        if (component instanceof Image) {
+            this.image = (Image) component;
+        }
+    }
+
+    public boolean hasComponent(Class<?> type) {
+        return getComponent(type) != null;
+    }
+
+    public Image getComponent(Class<?> type) {
+        if (type == Image.class) {
+            return this.image;
+        }
+        return null;
+    }
+    // </TEMPORARY_COMPONENT_INTERFACE>
+
+
+
     // <IMAGE_COMPONENT>
     protected Image image = null;
 
-    public boolean hasImage() {
-        return (this.image != null);
-    }
+//    public boolean hasImage() {
+//        return hasComponent(Image.class);
+//    }
 
-    public Image getImage() {
-        return this.image;
-    }
+//    public Image getImage() {
+//        return getComponent(Image.class);
+//    }
 
-    public void setImage(Image image) {
-        this.image = image;
-    }
+//    public void setImage(Image image) {
+//        setComponent(image);
+//    }
     // </IMAGE_COMPONENT>
 
 

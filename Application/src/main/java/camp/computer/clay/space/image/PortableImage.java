@@ -96,7 +96,7 @@ public abstract class PortableImage extends Image<Portable> {
         Group<Image> pathImages = new Group<>();
         for (int i = 0; i < port.getPaths().size(); i++) {
             Path path = port.getPaths().get(i);
-            PathImage pathImage = (PathImage) path.getImage();
+            PathImage pathImage = (PathImage) path.getComponent(Image.class);
             pathImages.add(pathImage);
         }
         return pathImages;
@@ -131,7 +131,7 @@ public abstract class PortableImage extends Image<Portable> {
             // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
             Port targetPort = pathImage.getPath().getTarget();
             Portable targetPortable = (Portable) targetPort.getParent();
-            PortableImage targetPortableImage = (PortableImage) targetPortable.getImage();
+            PortableImage targetPortableImage = (PortableImage) targetPortable.getComponent(Image.class);
             if (targetPortableImage != this) { // HACK
                 targetPortableImage.setPathVisibility(targetPort, visibility);
             }

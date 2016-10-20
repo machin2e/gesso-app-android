@@ -446,7 +446,7 @@ public class HostImage extends PortableImage {
                                                         space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                         // Show Path connection
-                                                        path.getImage().setVisibility(Visibility.VISIBLE);
+                                                        path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
                                                     }
                                                 }
 
@@ -698,7 +698,7 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Set the initial position of the Extension
-        extension.getImage().setPosition(initialPosition);
+        extension.getComponent(Image.class).setPosition(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -774,7 +774,7 @@ public class HostImage extends PortableImage {
         //ExtensionImage extensionImage = (ExtensionImage) space.getImages(extension);
 
         // Update the Extension Image position and rotation
-        extension.getImage().setPosition(initialPosition);
+        extension.getComponent(Image.class).setPosition(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -793,7 +793,7 @@ public class HostImage extends PortableImage {
 
                     double distanceToPort = Geometry.distance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                            extension.getImage().getPosition()
+                            extension.getComponent(Image.class).getPosition()
                     );
 
                     // Check if the port is the nearest
@@ -938,25 +938,25 @@ public class HostImage extends PortableImage {
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
                 if (segmentIndex == 0) {
-                    extension.getImage().getPosition().set(
+                    extension.getComponent(Image.class).getPosition().set(
                             0 + offset,
                             -distanceToExtensions,
                             position
                     );
                 } else if (segmentIndex == 1) {
-                    extension.getImage().getPosition().set(
+                    extension.getComponent(Image.class).getPosition().set(
                             distanceToExtensions,
                             0 + offset,
                             position
                     );
                 } else if (segmentIndex == 2) {
-                    extension.getImage().getPosition().set(
+                    extension.getComponent(Image.class).getPosition().set(
                             0 + offset,
                             distanceToExtensions,
                             position
                     );
                 } else if (segmentIndex == 3) {
-                    extension.getImage().getPosition().set(
+                    extension.getComponent(Image.class).getPosition().set(
                             -distanceToExtensions,
                             0 + offset,
                             position
@@ -964,13 +964,13 @@ public class HostImage extends PortableImage {
                 }
 
                 if (segmentIndex == 0) {
-                    extension.getImage().setRotation(getRotation() + 0);
+                    extension.getComponent(Image.class).setRotation(getRotation() + 0);
                 } else if (segmentIndex == 1) {
-                    extension.getImage().setRotation(getRotation() + 90);
+                    extension.getComponent(Image.class).setRotation(getRotation() + 90);
                 } else if (segmentIndex == 2) {
-                    extension.getImage().setRotation(getRotation() + 180);
+                    extension.getComponent(Image.class).setRotation(getRotation() + 180);
                 } else if (segmentIndex == 3) {
-                    extension.getImage().setRotation(getRotation() + 270);
+                    extension.getComponent(Image.class).setRotation(getRotation() + 270);
                 }
                 // </REFACTOR>
             }
@@ -979,7 +979,7 @@ public class HostImage extends PortableImage {
 
     // TODO: Refactor this... it's really dumb right now.
     public void updateExtensionSegmentIndex(Extension extension) {
-        if (extension.getImage() == null || extension.getHosts().size() == 0) {
+        if (extension.getComponent(Image.class) == null || extension.getHosts().size() == 0) {
             return;
         }
         int segmentIndex = getHeaderIndex(extension);
