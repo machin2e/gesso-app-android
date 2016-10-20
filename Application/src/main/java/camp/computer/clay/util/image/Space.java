@@ -228,7 +228,7 @@ public class Space extends Image<Model> {
     @Override
     public void updateLayers() {
 
-        Group<Image> images = getImages();
+        Group<Image> images = getEntities().getImages();
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {
@@ -283,7 +283,7 @@ public class Space extends Image<Model> {
      */
     private void adjustLayout() {
 
-        Group<Image> hostImages = getImages().filterType2(Host.class);
+        Group<Image> hostImages = getEntities().filterType2(Host.class).getImages();
 
         // Set position
         if (hostImages.size() == 1) {
@@ -308,41 +308,10 @@ public class Space extends Image<Model> {
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    // HACK
-    public <T extends Entity> Group<Image> getImages(Group<T> entities) {
-//        return images.filterEntity(entities);
-        Group<Image> images = new Group<>();
-        for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).getImage() != null) {
-                images.add(entities.get(i).getImage());
-            }
-        }
-        return images;
-    }
-
-    // HACK
-    public Group<Image> getImages() {
-
-        // this.entities.map(Group.Mappers.)
-        return this.entities.getImages();
-
-//        return images.filterEntity(entities);
-//        ImageGroup images = new ImageGroup();
-//        for (int i = 0; i < this.entities.size(); i++) {
-//            if (entities.get(i) != null && entities.get(i).getImages() != null) {
-//                images.add(entities.get(i).getImages());
-//            }
-//        }
-//        return images;
-    }
-
-    public <T extends Entity> Group<Image> getImages(Class<? extends Groupable>... entityTypes) {
-        return getImages().filterType2(entityTypes);
-    }
-
-    // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
+    // TODO: Delete. Replace with reduce(Reducer.containsPoint)
     public Image getImage(Point point) {
-        Group<Image> image = getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
+//        Group<Image> image = getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
+        Group<Image> image = getEntities().getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
         // TODO: Group<Image> image = getEntities().filterVisibility(Visibility.VISIBLE).filterContains(point);
         if (image.size() > 0) {
             return image.get(0);
@@ -351,10 +320,11 @@ public class Space extends Image<Model> {
         }
     }
 
+    // TODO: Remove this!
     public ShapeGroup getShapes() {
 //        return getImages().getShapes();
         ShapeGroup shapes = new ShapeGroup();
-        Group<Image> images = getImages();
+        Group<Image> images = getEntities().getImages();
         for (int i = 0; i < images.size(); i++) {
             shapes.addAll(images.get(i).getShapes());
         }
@@ -364,7 +334,7 @@ public class Space extends Image<Model> {
     // TODO: Refactor to be cleaner and leverage other classes...
     public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
         ShapeGroup shapeGroup = new ShapeGroup();
-        Group<Image> imageList = getImages();
+        Group<Image> imageList = getEntities().getImages();
 
         for (int i = 0; i < imageList.size(); i++) {
             shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
@@ -374,7 +344,7 @@ public class Space extends Image<Model> {
     }
 
     public Shape getShape(Entity entity) {
-        Group<Image> images = getImages();
+        Group<Image> images = getEntities().getImages();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
             Shape shape = image.getShape(entity);
@@ -542,7 +512,7 @@ public class Space extends Image<Model> {
     public void setPortableSeparation(double distance) {
         // <HACK>
         // TODO: Replace ASAP. This is shit.
-        Group<Image> extensionImages = getImages(Extension.class);
+        Group<Image> extensionImages = getEntities().filterType2(Extension.class).getImages();
         for (int i = 0; i < extensionImages.size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 

@@ -206,7 +206,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                titleEditor.setVisibility(View.GONE);
+                titleEditor.setImageVisibility(View.GONE);
             }
 
             @Override

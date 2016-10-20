@@ -57,7 +57,7 @@ public abstract class PortableImage extends Image<Portable> {
     public Group<Image> getPathImages(int portIndex) {
         Group<Image> pathImages = new Group<>();
         Group<Path> paths = getPortable().getPort(portIndex).getPaths();
-        return space.getImages(paths);
+        return paths.getImages();
 //        for (int i = 0; i < paths.size(); i++) {
 //            Path path = paths.get(i);
 //            PathImage pathImage = (PathImage) getSpace().getImages(path);
@@ -113,7 +113,7 @@ public abstract class PortableImage extends Image<Portable> {
     }
 
     // TODO: Move into PathImage
-    // TODO: Replace with ImageGroup.filter().setVisibility()
+    // TODO: Replace with ImageGroup.filter().setImageVisibility()
     public void setPathVisibility(Port port, Visibility visibility) {
         Group<Image> pathImages = getPathImages(port);
         for (int i = 0; i < pathImages.size(); i++) {

@@ -3,6 +3,9 @@ package camp.computer.clay.model;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +15,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
+import camp.computer.clay.engine.Component;
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Geometry;
@@ -150,21 +154,42 @@ public class Group<E extends Groupable> implements List<E> {
 
     public static class Mappers { // was Operations
 
-//        public static Mapper setVisibility = new Mapper<Entity, Entity, Visibility>() {
+//        public static Mapper setImageVisibility = new Mapper<Entity, Entity, Visibility>() {
 //            @Override
 //            public Entity map(Entity entity, Visibility visibility) {
-//                entity.getImage().setVisibility(visibility);
+//                entity.getImage().setImageVisibility(visibility);
 //                return entity;
 //            }
 //        };
 
-        public static Mapper setVisibility = new Mapper<Image, Image, Visibility>() {
+        // HACK:
+        public static Mapper setVisibilityGeneric = new Mapper<Groupable, Groupable, Visibility>() {
             @Override
-            public Image map(Image entity, Visibility visibility) {
-                entity.setVisibility(visibility);
-                return entity;
+            public Image map(Groupable entity, Visibility visibility) {
+                if (entity.getClass() == Shape.class) { // HACK
+                    ((Shape) entity).setVisibility(visibility);
+                } else if (entity.getClass() == Image.class) { // HACK
+                    ((Shape) entity).setVisibility(visibility);
+                }
+                return null;
             }
         };
+
+//        public static Mapper setImageVisibility = new Mapper<Image, Image, Visibility>() {
+//            @Override
+//            public Image map(Image entity, Visibility visibility) {
+//                entity.setVisibility(visibility);
+//                return entity;
+//            }
+//        };
+//
+//        public static Mapper setShapeVisibility = new Mapper<Shape, Shape, Visibility>() {
+//            @Override
+//            public Shape map(Shape entity, Visibility visibility) {
+//                entity.setVisibility(visibility);
+//                return entity;
+//            }
+//        };
 
         public static Mapper setTransparency = new Mapper<Entity, Entity, Double>() {
             @Override
@@ -225,7 +250,7 @@ public class Group<E extends Groupable> implements List<E> {
 
     // TODO: Convert to Filter and restrict to Image types
     public Group<E> filterVisibility(Visibility visibility) {
-        return filter(Filters.filterVisibility, visibility); // OR: Mappers.setVisibility.filter(this);
+        return filter(Filters.filterVisibility, visibility); // OR: Mappers.setImageVisibility.filter(this);
     }
 
     public Group<E> filterContains(Point point) {
@@ -240,7 +265,7 @@ public class Group<E extends Groupable> implements List<E> {
 //            Log.v("Collector", "position.x: " + positions.get(i).x + ", y: " + positions.get(i).y);
 //        }
 
-        map(Mappers.setTransparency, transparency); // OR: Mappers.setVisibility.filter(this);
+        map(Mappers.setTransparency, transparency); // OR: Mappers.setImageVisibility.filter(this);
 
 //        map(new Mapper<Entity, Entity, Double>() {
 //            @Override
@@ -255,7 +280,8 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     public void setVisibility(Visibility visibility) {
-        map(Mappers.setVisibility, visibility);
+        Log.v("Reflect", "E: " + this.getClass());
+        map(Mappers.setVisibilityGeneric, visibility);
     }
 
     public Group<Image> getImages() {
