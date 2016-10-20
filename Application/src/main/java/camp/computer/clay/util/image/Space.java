@@ -30,12 +30,11 @@ import camp.computer.clay.util.image.util.ImageGroup;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 // TODO: DO NOT extend Image. Remove this class!
-//public class Space extends Image<Model> {
 public class Space extends Image<Model> {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
-    protected ImageGroup images = new ImageGroup();
+//    protected ImageGroup images = new ImageGroup();
 
     protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
     protected Point extensionPrototypePosition = new Point();
@@ -162,6 +161,7 @@ public class Space extends Image<Model> {
 
             // Create Host Image
             HostImage hostImage = new HostImage(host);
+            hostImage.setSpace(this);
 
             // Assign Image to Entity
             host.setImage(hostImage);
@@ -173,7 +173,10 @@ public class Space extends Image<Model> {
             }
 
             // Add Host Image to Space
-            addImage(hostImage);
+//            addImage(hostImage);
+
+            // Position the Image
+            adjustLayout();
 
         } else if (entity instanceof Extension) {
 
@@ -181,6 +184,7 @@ public class Space extends Image<Model> {
 
             // Create Extension Image
             ExtensionImage extensionImage = new ExtensionImage(extension);
+            extensionImage.setSpace(this);
 
             // Assign Image to Entity
             extension.setImage(extensionImage);
@@ -192,7 +196,7 @@ public class Space extends Image<Model> {
             }
 
             // Add Extension Image to Space
-            addImage(extensionImage);
+//            addImage(extensionImage);
 
         } else if (entity instanceof Port) {
 
@@ -204,12 +208,13 @@ public class Space extends Image<Model> {
 
             // Create Path Image
             PathImage pathImage = new PathImage(path);
+            pathImage.setSpace(this);
 
             // Assign Image to Entity
             path.setImage(pathImage);
 
             // Add Path Image to Space
-            addImage(pathImage);
+//            addImage(pathImage);
         }
     }
 
@@ -224,6 +229,8 @@ public class Space extends Image<Model> {
      */
     @Override
     public void updateLayers() {
+
+        ImageGroup images = getImages();
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {
@@ -247,24 +254,24 @@ public class Space extends Image<Model> {
         */
     }
 
-    // TODO: Remove Image parameter. Create that and return it.
-    private <T extends Image> void addImage(T image) {
-
-        // Add Image
-        image.setSpace(this);
-        if (!images.contains(image)) {
-            images.add(image);
-            updateLayers();
-        }
-
-        // Position the Image
-        if (image instanceof HostImage) {
-            adjustLayout();
-        }
-
-        // Update Camera
-//        getEntity().getActor(0).getCamera().setFocus(this);
-    }
+//    // TODO: Remove Image parameter. Create that and return it.
+//    private <T extends Image> void addImage(T image) {
+//
+//        // Add Image
+//        image.setSpace(this);
+//        if (!images.contains(image)) {
+//            images.add(image);
+//            updateLayers();
+//        }
+//
+//        // Position the Image
+//        if (image instanceof HostImage) {
+//            adjustLayout();
+//        }
+//
+//        // Update Camera
+////        getEntity().getActor(0).getCamera().setFocus(this);
+//    }
 
     @Override
     public Space getSpace() {
@@ -312,29 +319,46 @@ public class Space extends Image<Model> {
      * @return The {@code Image} corresponding to the specified {@code Entity}, if one is
      * present. If one is not present, this method returns {@code null}.
      */
-    public boolean contains(Entity entity) {
-        return images.filterEntity(entity).size() > 0;
-    }
+//    public boolean contains(Entity entity) {
+//        return images.filterEntity(entity).size() > 0;
+//    }
 
+    // HACK
     public Image getImage(Entity entity) {
-        return images.filterEntity(entity).get(0);
+        return entity.getImage();
     }
 
+    // HACK
     public <T extends Entity> ImageGroup getImages(Group<T> entities) {
-        return images.filterEntity(entities);
+//        return images.filterEntity(entities);
+        ImageGroup images = new ImageGroup();
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).getImage() != null) {
+                images.add(entities.get(i).getImage());
+            }
+        }
+        return images;
     }
 
+    // HACK
     public ImageGroup getImages() {
+//        return images.filterEntity(entities);
+        ImageGroup images = new ImageGroup();
+        for (int i = 0; i < this.entities.size(); i++) {
+            if (entities.get(i) != null && entities.get(i).getImage() != null) {
+                images.add(entities.get(i).getImage());
+            }
+        }
         return images;
     }
 
     public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes) {
-        return images.filterType(entityTypes);
+        return getImages().filterType(entityTypes);
     }
 
     // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
     public Image getImage(Point point) {
-        ImageGroup image = images.filterVisibility(Visibility.VISIBLE).filterContains(point);
+        ImageGroup image = getImages().filterVisibility(Visibility.VISIBLE).filterContains(point);
         if (image.size() > 0) {
             return image.get(0);
         } else {
@@ -343,7 +367,7 @@ public class Space extends Image<Model> {
     }
 
     public ShapeGroup getShapes() {
-        return images.getShapes();
+        return getImages().getShapes();
     }
 
     // TODO: Refactor to be cleaner and leverage other classes...
@@ -383,14 +407,16 @@ public class Space extends Image<Model> {
         }
 
         // Update Images
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).hasImage()) {
+                Image image = entities.get(i).getImage();
 
-            // Update bounding box of Image
-            // TODO:
+                // Update bounding box of Image
+                // TODO:
 
-            // Update the Image
-            image.update();
+                // Update the Image
+                image.update();
+            }
         }
 
         // Update Camera(s)
@@ -411,16 +437,20 @@ public class Space extends Image<Model> {
         display.canvas.save();
 
         // Draw Portables
-        for (int i = 0; i < images.size(); i++) {
-            if (!(images.get(i) instanceof ExtensionImage)) {
-                images.get(i).draw(display);
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).hasImage()) {
+                if (!(entities.get(i).getImage() instanceof ExtensionImage)) {
+                    entities.get(i).getImage().draw(display);
+                }
             }
         }
 
         // Draw Extensions
-        for (int i = 0; i < images.size(); i++) {
-            if (images.get(i) instanceof ExtensionImage) {
-                images.get(i).draw(display);
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).hasImage()) {
+                if (entities.get(i).getImage() instanceof ExtensionImage) {
+                    entities.get(i).getImage().draw(display);
+                }
             }
         }
 

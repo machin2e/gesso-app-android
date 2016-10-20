@@ -74,6 +74,10 @@ public abstract class Entity extends Groupable {
     // <IMAGE_COMPONENT>
     protected Image image = null;
 
+    public boolean hasImage() {
+        return (this.image != null);
+    }
+
     public Image getImage() {
         return this.image;
     }

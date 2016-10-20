@@ -161,13 +161,13 @@ public class ImageGroup extends Group<Image> {
     }
 
     public Group<Point> getPositions() {
-//        List<Point> positions = new LinkedList<>();
-//        for (int i = 0; i < elements.size(); i++) {
-//            Image image = elements.get(i);
-//            positions.add(new Point(image.getPosition().x, image.getPosition().y));
-//        }
-//        return positions;
-        return map(Mappers.getPosition, null);
+        Group<Point> positions = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = elements.get(i);
+            positions.add(new Point(image.getPosition().x, image.getPosition().y));
+        }
+        return positions;
+//        return map(Mappers.getPosition, null);
     }
 
     public ShapeGroup getShapes() {
