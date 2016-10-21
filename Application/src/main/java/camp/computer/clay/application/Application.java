@@ -47,10 +47,9 @@ import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 
-public class Application extends FragmentActivity implements DisplayHostInterface { // was Application
-    // rename Application to Setup? to provide analog to "setup" functions in classes?
+public class Application extends FragmentActivity implements DisplayHostInterface {
 
-    // <Settings>
+    // <SETTINGS>
     private static final boolean ENABLE_TONE_OUTPUT = false;
     private static final boolean ENABLE_SPEECH_OUTPUT = false;
     private static final boolean ENABLE_MOTION_INPUT = true;
@@ -64,7 +63,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
      * during debugging.
      */
     private static final boolean ENABLE_FULLSCREEN = true;
-    // </Settings>
+    // </SETTINGS>
 
     public Display display;
 
@@ -110,8 +109,13 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     }
 
     public void openActionEditor(Extension extension) {
-        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
-        pathEditor.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
+                pathEditor.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     // References:

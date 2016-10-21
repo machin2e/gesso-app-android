@@ -258,25 +258,7 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     public void setTransparency(double transparency) {
-
-//        List<Point> positions = getPositionCollector();
-//        Log.v("Collector", "positions.size: " + positions.size());
-//        for (int i = 0; i < positions.size(); i++) {
-//            Log.v("Collector", "position.x: " + positions.get(i).x + ", y: " + positions.get(i).y);
-//        }
-
-        map(Mappers.setTransparency, transparency); // OR: Mappers.setImageVisibility.filter(this);
-
-//        map(new Mapper<Entity, Entity, Double>() {
-//            @Override
-//            public Entity map(Entity entity, Double transparency) {
-////                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
-//                if (entity.getImages() != null) {
-//                    entity.getImages().setTransparency(transparency);
-//                }
-//                return entity;
-//            }
-//        }, null);
+        map(Mappers.setTransparency, transparency);
     }
 
     public void setVisibility(Visibility visibility) {

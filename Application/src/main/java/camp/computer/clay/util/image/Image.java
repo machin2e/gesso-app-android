@@ -28,7 +28,7 @@ public class Image<T extends Entity> extends Component {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-    protected Point position = new Point(0, 0);
+//    protected Point position = new Point(0, 0);
 
     protected Visibility visibility = Visibility.VISIBLE;
 
@@ -116,15 +116,15 @@ public class Image<T extends Entity> extends Component {
     }
 
     public Point getPosition() {
-        return this.position;
+        return this.entity.getPosition();
     }
 
     public double getRotation() {
-        return this.position.rotation;
+        return this.entity.getPosition().rotation;
     }
 
     public void setPosition(double x, double y) {
-        position.set(x, y);
+        entity.getPosition().set(x, y);
         invalidate();
     }
 
@@ -134,7 +134,7 @@ public class Image<T extends Entity> extends Component {
     }
 
     public void setRotation(double angle) {
-        this.position.rotation = angle;
+        this.entity.getPosition().rotation = angle;
         invalidate();
     }
 
@@ -246,7 +246,7 @@ public class Image<T extends Entity> extends Component {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            shape.update(position);
+            shape.update(entity.getPosition());
         }
     }
 
@@ -314,7 +314,7 @@ public class Image<T extends Entity> extends Component {
     // TODO: Delete!
     public double getRelativeAngle(Point point) {
 
-        double relativeAngle = Geometry.getAngle(position, point);
+        double relativeAngle = Geometry.getAngle(entity.getPosition(), point);
         if (relativeAngle < 0) {
             relativeAngle += 360.0;
         }

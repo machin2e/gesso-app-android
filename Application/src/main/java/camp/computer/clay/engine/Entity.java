@@ -3,6 +3,7 @@ package camp.computer.clay.engine;
 import java.util.UUID;
 
 import camp.computer.clay.model.Group;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Image;
 
 public abstract class Entity extends Groupable {
@@ -53,21 +54,21 @@ public abstract class Entity extends Groupable {
 
 
 
-//    // <TRANSFORM_COMPONENT>
-//    protected Point position = new Point(0, 0);
-//
-//    public Point getImagePosition() {
-//        return position;
-//    }
-//
-//    public boolean hasPosition() {
-//        return (this.position != null);
-//    }
-//
-//    public void setPosition(Point position) {
-//        this.position = position;
-//    }
-//    // </TRANSFORM_COMPONENT>
+    // <TRANSFORM_COMPONENT>
+    protected Point position = new Point(0, 0);
+
+    public Point getPosition() {
+        return position;
+    }
+
+    public boolean hasPosition() {
+        return (this.position != null);
+    }
+
+    public void setPosition(Point position) {
+        this.position = position;
+    }
+    // </TRANSFORM_COMPONENT>
 
 
 

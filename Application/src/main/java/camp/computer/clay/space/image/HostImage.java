@@ -830,7 +830,6 @@ public class HostImage extends PortableImage {
         }
 
         Shape boardShape = getShape("Substrate");
-        int segmentIndex = -1;
         List<Point> hostShapeBoundary = boardShape.getBoundary();
 
         Group<Port> extensionPorts = extension.getPorts();
@@ -843,19 +842,18 @@ public class HostImage extends PortableImage {
             }
 
             Port hostPort = extensionPort.getPaths().get(0).getHostPort(); // HACK b/c using index 0
-
             Point hostPortPosition = space.getShape(hostPort).getPosition();
 
-            double minDistance = Double.MAX_VALUE;
-            int nearestSegmentIndex = 0;
+            double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
+            int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected Host)
             for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
 
                 Point segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
 
                 double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
 
-                if (distance < minDistance) {
-                    minDistance = distance;
+                if (distance < minimumSegmentDistance) {
+                    minimumSegmentDistance = distance;
                     nearestSegmentIndex = i;
                 }
             }
@@ -864,6 +862,7 @@ public class HostImage extends PortableImage {
         }
 
         // Get the segment with the most counts
+        int segmentIndex = -1;
         segmentIndex = 0;
         for (int i = 0; i < indexCounts.length; i++) {
             if (indexCounts[i] > indexCounts[segmentIndex]) {
@@ -913,12 +912,12 @@ public class HostImage extends PortableImage {
 
         Group<Extension> extensions = getHost().getExtensions();
 
-        // Reset current layout
+        // Reset current layout in preparation for updating it in the presently-running update step.
         for (int i = 0; i < segmentExtensions.size(); i++) {
             segmentExtensions.get(i).clear();
         }
 
-        // Update each Extension's position
+        // Update each Extension's placement, relative to the connected Host
         for (int i = 0; i < extensions.size(); i++) {
             Extension extension = extensions.get(i);
             updateExtensionSegmentIndex(extension);
@@ -941,25 +940,25 @@ public class HostImage extends PortableImage {
                     extension.getComponent(Image.class).getPosition().set(
                             0 + offset,
                             -distanceToExtensions,
-                            position
+                            entity.getPosition()
                     );
                 } else if (segmentIndex == 1) {
                     extension.getComponent(Image.class).getPosition().set(
                             distanceToExtensions,
                             0 + offset,
-                            position
+                            entity.getPosition()
                     );
                 } else if (segmentIndex == 2) {
                     extension.getComponent(Image.class).getPosition().set(
                             0 + offset,
                             distanceToExtensions,
-                            position
+                            entity.getPosition()
                     );
                 } else if (segmentIndex == 3) {
                     extension.getComponent(Image.class).getPosition().set(
                             -distanceToExtensions,
                             0 + offset,
-                            position
+                            entity.getPosition()
                     );
                 }
 
