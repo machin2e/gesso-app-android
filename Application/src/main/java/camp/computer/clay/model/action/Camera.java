@@ -3,9 +3,9 @@ package camp.computer.clay.model.action;
 import android.util.Log;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;

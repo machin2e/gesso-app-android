@@ -3,8 +3,7 @@ package camp.computer.clay.engine.entity;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.engine.Entity;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;

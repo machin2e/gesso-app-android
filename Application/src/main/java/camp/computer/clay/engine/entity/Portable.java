@@ -1,7 +1,6 @@
 package camp.computer.clay.engine.entity;
 
-import camp.computer.clay.engine.Entity;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.model.profile.Profile;
 
 public class Portable extends Entity {
@@ -13,7 +12,7 @@ public class Portable extends Entity {
     protected Group<Port> ports = new Group<>();
 
     public Portable() {
-        // Add to Manager
+        // Add to Entity Manager
         if (!Manager.contains(this)) {
             Manager.add(this);
         }

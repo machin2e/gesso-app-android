@@ -1,8 +1,10 @@
-package camp.computer.clay.engine;
+package camp.computer.clay.engine.entity;
 
 import java.util.UUID;
 
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Groupable;
+import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 
@@ -34,10 +36,10 @@ public abstract class Entity extends Groupable {
     public void setParent(Entity parent) {
         this.parent = parent;
     }
+
     public Entity getParent() {
         return this.parent;
     }
-
 
 
     // <TAG_COMPONENT>
@@ -53,62 +55,35 @@ public abstract class Entity extends Groupable {
     // </TAG_COMPONENT>
 
 
-
-    // <TRANSFORM_COMPONENT>
-    protected Transform position = new Transform(0, 0); // TODO: Eventually, put this in the list of components.
-
-    public Transform getPosition() {
-        return position;
-    }
-
-    public boolean hasPosition() {
-        return (this.position != null);
-    }
-
-    public void setPosition(Transform position) {
-        this.position = position;
-    }
-    // </TRANSFORM_COMPONENT>
-
+    // <COMPONENT_PLACEHOLDERS>
+    protected Transform transform = new Transform(0, 0); // TODO: Eventually, put this in the list of components.
+    protected Image image = null; // TODO: Eventually, put this in the list of components.
+    // </COMPONENT_PLACEHOLDERS>
 
 
     // <TEMPORARY_COMPONENT_INTERFACE>
     public <C extends Component> void setComponent(C component) {
-        if (component instanceof Image) {
+        if (component instanceof Transform) {
+            this.transform = (Transform) component;
+        } else if (component instanceof Image) {
             this.image = (Image) component;
         }
     }
 
-    public boolean hasComponent(Class<?> type) {
+    public <C extends Component> boolean hasComponent(Class<C> type) {
         return getComponent(type) != null;
     }
 
-    public Image getComponent(Class<?> type) {
-        if (type == Image.class) {
-            return this.image;
+    public <C extends Component> C getComponent(Class<C> type) {
+        if (type == Transform.class) {
+            return type.cast(this.transform);
+        } else if (type == Image.class) {
+            return type.cast(this.image);
+        } else {
+            return null;
         }
-        return null;
     }
     // </TEMPORARY_COMPONENT_INTERFACE>
-
-
-
-    // <IMAGE_COMPONENT>
-    protected Image image = null; // TODO: Eventually, put this in the list of components.
-
-//    public boolean hasImage() {
-//        return hasComponent(Image.class);
-//    }
-
-//    public Image getImage() {
-//        return getComponent(Image.class);
-//    }
-
-//    public void setImage(Image image) {
-//        setComponent(image);
-//    }
-    // </IMAGE_COMPONENT>
-
 
 
     // <GENERIC_COMPONENT_INTERFACE>
@@ -129,8 +104,42 @@ public abstract class Entity extends Groupable {
         return components.get(uuid);
     }
 
+    public Component getComponent(UUID entityUuid, UUID componentUuid) {
+        return null;
+    }
+
     public boolean hasComponent(UUID uuid) {
         return components.contains(uuid);
     }
     // </GENERIC_COMPONENT_INTERFACE>
+
+
+    // <TRANSFORM_COMPONENT>
+//    public Transform getPosition() {
+//        return transform;
+//    }
+
+//    public boolean hasTransform() {
+//        return (this.transform != null);
+//    }
+
+//    public void setPosition(Transform transform) {
+//        this.transform = transform;
+//    }
+    // </TRANSFORM_COMPONENT>
+
+
+    // <IMAGE_COMPONENT>
+//    public boolean hasImage() {
+//        return hasComponent(Image.class);
+//    }
+
+//    public Image getImage() {
+//        return getComponent(Image.class);
+//    }
+
+//    public void setImage(Image image) {
+//        setComponent(image);
+//    }
+    // </IMAGE_COMPONENT>
 }

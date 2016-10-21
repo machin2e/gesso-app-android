@@ -9,7 +9,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.entity.Extension;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
@@ -308,7 +308,7 @@ public class HostImage extends PortableImage {
                                             } else if (action.isHolding()) {
 
                                                 // Update position of Host image
-                                                getEntity().getPosition().set(event.getPosition());
+                                                getEntity().getComponent(Transform.class).set(event.getPosition());
 
                                                 // Camera
                                                 camera.setFocus(getHost());
@@ -334,7 +334,7 @@ public class HostImage extends PortableImage {
                                                     // Update style of nearby Hosts
                                                     double distanceToHostImage = Geometry.distance(
                                                             event.getPosition(),
-                                                            otherImage.getEntity().getPosition()
+                                                            otherImage.getEntity().getComponent(Transform.class)
                                                     );
 
                                                     if (distanceToHostImage < 375) { // 500
@@ -695,7 +695,7 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Set the initial position of the Extension
-        extension.getPosition().set(initialPosition);
+        extension.getComponent(Transform.class).set(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -771,7 +771,7 @@ public class HostImage extends PortableImage {
         //ExtensionImage extensionImage = (ExtensionImage) space.getImages(extension);
 
         // Update the Extension Image position and rotation
-        extension.getPosition().set(initialPosition);
+        extension.getComponent(Transform.class).set(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -790,7 +790,7 @@ public class HostImage extends PortableImage {
 
                     double distanceToPort = Geometry.distance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                            extension.getComponent(Image.class).getEntity().getPosition()
+                            extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
                     );
 
                     // Check if the port is the nearest
@@ -934,40 +934,40 @@ public class HostImage extends PortableImage {
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
                 if (segmentIndex == 0) {
-                    extension.getPosition().set(
+                    extension.getComponent(Transform.class).set(
                             0 + offset,
                             -distanceToExtensions,
-                            entity.getPosition()
+                            entity.getComponent(Transform.class)
                     );
                 } else if (segmentIndex == 1) {
-                    extension.getPosition().set(
+                    extension.getComponent(Transform.class).set(
                             distanceToExtensions,
                             0 + offset,
-                            entity.getPosition()
+                            entity.getComponent(Transform.class)
                     );
                 } else if (segmentIndex == 2) {
-                    extension.getPosition().set(
+                    extension.getComponent(Transform.class).set(
                             0 + offset,
                             distanceToExtensions,
-                            entity.getPosition()
+                            entity.getComponent(Transform.class)
                     );
                 } else if (segmentIndex == 3) {
-                    extension.getPosition().set(
+                    extension.getComponent(Transform.class).set(
                             -distanceToExtensions,
                             0 + offset,
-                            entity.getPosition()
+                            entity.getComponent(Transform.class)
                     );
                 }
 
-                double hostEntityRotation = getEntity().getPosition().getRotation();
+                double hostEntityRotation = getEntity().getComponent(Transform.class).getRotation();
                 if (segmentIndex == 0) {
-                    extension.getPosition().setRotation(hostEntityRotation + 0);
+                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 0);
                 } else if (segmentIndex == 1) {
-                    extension.getPosition().setRotation(hostEntityRotation + 90);
+                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 90);
                 } else if (segmentIndex == 2) {
-                    extension.getPosition().setRotation(hostEntityRotation + 180);
+                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 180);
                 } else if (segmentIndex == 3) {
-                    extension.getPosition().setRotation(hostEntityRotation + 270);
+                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 270);
                 }
                 // </REFACTOR>
             }

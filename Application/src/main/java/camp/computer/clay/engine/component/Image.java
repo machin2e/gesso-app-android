@@ -6,14 +6,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.Component;
-import camp.computer.clay.engine.Entity;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
@@ -221,7 +219,7 @@ public class Image<T extends Entity> extends Component {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            shape.update(entity.getPosition());
+            shape.update(entity.getComponent(Transform.class));
         }
     }
 

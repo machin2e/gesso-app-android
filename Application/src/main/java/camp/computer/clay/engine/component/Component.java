@@ -1,4 +1,6 @@
-package camp.computer.clay.engine;
+package camp.computer.clay.engine.component;
+
+import camp.computer.clay.engine.Groupable;
 
 public abstract class Component extends Groupable {
 

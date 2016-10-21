@@ -3,7 +3,7 @@ package camp.computer.clay.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Port;
 
 public abstract class Color {

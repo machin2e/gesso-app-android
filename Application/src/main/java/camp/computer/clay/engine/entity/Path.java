@@ -2,8 +2,7 @@ package camp.computer.clay.engine.entity;
 
 import java.util.UUID;
 
-import camp.computer.clay.engine.Entity;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
 
 public class Path extends Entity {
 

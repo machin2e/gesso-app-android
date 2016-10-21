@@ -1,4 +1,4 @@
-package camp.computer.clay.model;
+package camp.computer.clay.engine;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -75,15 +74,6 @@ public class Group<E extends Groupable> implements List<E> {
         }
         // return result;
         return this;
-    }
-
-    public <R, D> List<R> collect(Mapper collector, D data) {
-        List<R> result = new ArrayList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            R resultGroup = (R) collector.map(elements.get(i), data);
-            result.add(resultGroup);
-        }
-        return result;
     }
 
     public static class Filters {
@@ -203,7 +193,7 @@ public class Group<E extends Groupable> implements List<E> {
             @Override
             public Transform map(Entity entity, Void data) {
                 if (entity != null) {
-                    return entity.getPosition();
+                    return entity.getComponent(Transform.class);
                 } else {
                     return null;
                 }
@@ -314,7 +304,7 @@ public class Group<E extends Groupable> implements List<E> {
 
             Image image = (Image) elements.get(i);
 
-            double distanceToImage = Geometry.distance(point, image.getEntity().getPosition());
+            double distanceToImage = Geometry.distance(point, image.getEntity().getComponent(Transform.class));
 
             if (distanceToImage < distance) {
                 imageGroup.add(image);

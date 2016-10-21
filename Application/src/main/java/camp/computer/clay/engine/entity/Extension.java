@@ -2,7 +2,8 @@ package camp.computer.clay.engine.entity;
 
 import java.util.List;
 
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.engine.component.Image;
 
@@ -17,6 +18,16 @@ public class Extension extends Portable {
 
     public Extension(Profile profile) {
         super(profile);
+    }
+
+    private void setup() {
+        setupComponents();
+    }
+
+    private void setupComponents() {
+        // TODO: InputComponent/ControllerComponent/ActorComponent
+        addComponent(new Transform());
+        addComponent(new Image());
     }
 
     public Group<Host> getHosts() {

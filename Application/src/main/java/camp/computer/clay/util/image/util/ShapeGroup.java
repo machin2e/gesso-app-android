@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import camp.computer.clay.engine.Entity;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;

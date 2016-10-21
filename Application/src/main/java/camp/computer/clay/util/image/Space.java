@@ -10,9 +10,9 @@ import java.util.List;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Actor;
-import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.Model;
 import camp.computer.clay.engine.entity.Path;
@@ -237,21 +237,21 @@ public class Space extends Image<Model> {
 
         // Set position on grid layout
         if (hostImages.size() == 1) {
-            hostImages.get(0).getEntity().getPosition().set(0, 0);
+            hostImages.get(0).getEntity().getComponent(Transform.class).set(0, 0);
         } else if (hostImages.size() == 2) {
-            hostImages.get(0).getEntity().getPosition().set(-300, 0);
-            hostImages.get(1).getEntity().getPosition().set(300, 0);
+            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, 0);
+            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, 0);
         } else if (hostImages.size() == 5) {
-            hostImages.get(0).getEntity().getPosition().set(-300, -600);
-            hostImages.get(0).getEntity().getPosition().setRotation(0);
-            hostImages.get(1).getEntity().getPosition().set(300, -600);
-            hostImages.get(1).getEntity().getPosition().setRotation(20);
-            hostImages.get(2).getEntity().getPosition().set(-300, 0);
-            hostImages.get(2).getEntity().getPosition().setRotation(40);
-            hostImages.get(3).getEntity().getPosition().set(300, 0);
-            hostImages.get(3).getEntity().getPosition().setRotation(60);
-            hostImages.get(4).getEntity().getPosition().set(-300, 600);
-            hostImages.get(4).getEntity().getPosition().setRotation(80);
+            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, -600);
+            hostImages.get(0).getEntity().getComponent(Transform.class).setRotation(0);
+            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, -600);
+            hostImages.get(1).getEntity().getComponent(Transform.class).setRotation(20);
+            hostImages.get(2).getEntity().getComponent(Transform.class).set(-300, 0);
+            hostImages.get(2).getEntity().getComponent(Transform.class).setRotation(40);
+            hostImages.get(3).getEntity().getComponent(Transform.class).set(300, 0);
+            hostImages.get(3).getEntity().getComponent(Transform.class).setRotation(60);
+            hostImages.get(4).getEntity().getComponent(Transform.class).set(-300, 600);
+            hostImages.get(4).getEntity().getComponent(Transform.class).setRotation(80);
         }
 
         // TODO: Set position on "scatter" layout

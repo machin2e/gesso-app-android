@@ -19,7 +19,7 @@ public class Host extends Portable {
     }
 
     private void setupComponents() {
-        // TODO: InputComponent/ControllerComponent
+        // TODO: InputComponent/ControllerComponent/ActorComponent
         addComponent(new Transform());
         addComponent(new Image());
     }
