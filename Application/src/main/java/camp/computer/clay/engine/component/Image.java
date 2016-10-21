@@ -1,4 +1,4 @@
-package camp.computer.clay.util.image;
+package camp.computer.clay.engine.component;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +13,11 @@ import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Image<T extends Entity> extends Component {
@@ -39,7 +42,7 @@ public class Image<T extends Entity> extends Component {
     // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
 
-    protected int layerIndex = DEFAULT_LAYER_INDEX;
+    public int layerIndex = DEFAULT_LAYER_INDEX;
 
     public int getLayerIndex() {
         return this.layerIndex;
@@ -153,7 +156,7 @@ public class Image<T extends Entity> extends Component {
         return null;
     }
 
-    public Shape getShape(Point point) {
+    public Shape getShape(Transform point) {
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.contains(point)) {
@@ -233,7 +236,7 @@ public class Image<T extends Entity> extends Component {
      * @param point
      * @return
      */
-    public boolean contains(Point point) {
+    public boolean contains(Transform point) {
         if (isVisible()) {
             for (int i = 0; i < shapes.size(); i++) {
                 if (shapes.get(i).contains(point)) {
@@ -245,7 +248,7 @@ public class Image<T extends Entity> extends Component {
     }
 
     public Rectangle getBoundingBox() {
-        List<Point> shapeBoundaries = new LinkedList<>();
+        List<Transform> shapeBoundaries = new LinkedList<>();
         for (int i = 0; i < shapes.size(); i++) {
             shapeBoundaries.addAll(shapes.get(i).getBoundary());
         }

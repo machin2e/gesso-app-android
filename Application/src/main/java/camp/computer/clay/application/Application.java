@@ -46,6 +46,7 @@ import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
+import camp.computer.clay.engine.component.Transform;
 
 public class Application extends FragmentActivity implements DisplayHostInterface {
 
@@ -652,8 +653,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         messageKeyboardLayout.invalidate();
     }
 
-    public camp.computer.clay.util.geometry.Point convertToVisiblePosition(Point point) {
-        camp.computer.clay.util.geometry.Point visiblePosition = new camp.computer.clay.util.geometry.Point();
+    public Transform convertToVisiblePosition(Point point) {
+        Transform visiblePosition = new Transform();
         return visiblePosition;
     }
 

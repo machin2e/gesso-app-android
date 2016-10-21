@@ -9,14 +9,12 @@ import camp.computer.clay.model.Group;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
-import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Clock;
@@ -54,12 +52,12 @@ public class Camera {
     protected double scaleDelta = 0;
 
     // Position
-    protected final Point DEFAULT_POSITION = new Point(0, 0);
-    protected Point targetPosition = DEFAULT_POSITION;
-    protected Point position = new Point(targetPosition.x, targetPosition.y);
+    protected final Transform DEFAULT_POSITION = new Transform(0, 0);
+    protected Transform targetPosition = DEFAULT_POSITION;
+    protected Transform position = new Transform(targetPosition.x, targetPosition.y);
     protected int positionFrameIndex = 0;
     protected int positionFrameLimit = 0;
-    protected Point originalPosition = new Point();
+    protected Transform originalPosition = new Transform();
 
     public Camera() {
     }
@@ -92,11 +90,11 @@ public class Camera {
         return this.height;
     }
 
-    public Point getPosition() {
+    public Transform getPosition() {
         return this.position;
     }
 
-    public void setPosition(Point position) {
+    public void setPosition(Transform position) {
         setPosition(position.x, position.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
 
@@ -139,9 +137,9 @@ public class Camera {
     }
 
     public void adjustPosition() {
-        //Point centerPosition = getSpace().getImages().filterType2(Host.class, Extension.class).getCenterPoint();
-        //Point centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
-        Point centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getCenterPoint();
+        //Transform centerPosition = getSpace().getImages().filterType2(Host.class, Extension.class).getCenterPoint();
+        //Transform centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
+        Transform centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
@@ -152,7 +150,7 @@ public class Camera {
         this.position.offset(dx, dy);
     }
 
-    public void setOffset(Point point) {
+    public void setOffset(Transform point) {
         setOffset(point.x, point.y);
     }
 
@@ -230,7 +228,7 @@ public class Camera {
      * @param sourcePort
      * @param targetPosition
      */
-    public void setFocus(Port sourcePort, Point targetPosition) {
+    public void setFocus(Port sourcePort, Transform targetPosition) {
 
         Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
 
@@ -364,7 +362,7 @@ public class Camera {
 //
 //        // Get bounding box around the Ports in the specified Paths
 //        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
-//        List<Point> portPositions = pathPortShapes.getPositions();
+//        List<Transform> portPositions = pathPortShapes.getPositions();
 //        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
 //
 //        // Update scale and position

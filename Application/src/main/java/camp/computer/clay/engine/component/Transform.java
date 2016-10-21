@@ -1,8 +1,9 @@
-package camp.computer.clay.util.geometry;
+package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.Component;
+import camp.computer.clay.util.geometry.Geometry;
 
-public class Point extends Component {
+public class Transform extends Component {
 
     /**
      * The x coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
@@ -23,29 +24,29 @@ public class Point extends Component {
     public double rotation = 0;
 
     /**
-     * Scale for the {@code Point}.
+     * Scale for the {@code Transform}.
      */
     protected double scale = 1.0;
 
     /**
      * Rotation rotation in degrees
      */
-    public Point() {
+    public Transform() {
         this(0, 0);
     }
 
     /**
-     * Copy constructor. Creates a new {@code Point} object with properties identical to those of
+     * Copy constructor. Creates a new {@code Transform} object with properties identical to those of
      * {@code otherPoint}.
      *
-     * @param otherPoint The {@code Point} to set.
+     * @param otherPoint The {@code Transform} to set.
      */
-    public Point(Point otherPoint) {
+    public Transform(Transform otherPoint) {
         this.x = otherPoint.x;
         this.y = otherPoint.y;
     }
 
-    public Point(double x, double y) {
+    public Transform(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -74,13 +75,13 @@ public class Point extends Component {
     /**
      * @param point Absolute position. Converted to relative position internally.
      */
-    public void set(Point point) {
+    public void set(Transform point) {
         x = point.x;
         y = point.y;
         rotation = point.rotation;
     }
 
-    public void set(Point point, Point referencePoint) {
+    public void set(Transform point, Transform referencePoint) {
         double x2 = Geometry.distance(0, 0, point.x, point.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, point.x, point.y)));
         this.x = referencePoint.x + x2;
 
@@ -88,7 +89,7 @@ public class Point extends Component {
         this.y = referencePoint.y + y2;
     }
 
-    public void set(double x, double y, Point referencePoint) {
+    public void set(double x, double y, Transform referencePoint) {
         double x2 = Geometry.distance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, x, y)));
         this.x = referencePoint.x + x2;
 

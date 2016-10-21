@@ -3,8 +3,8 @@ package camp.computer.clay.engine;
 import java.util.UUID;
 
 import camp.computer.clay.model.Group;
-import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Image;
 
 public abstract class Entity extends Groupable {
 
@@ -55,9 +55,9 @@ public abstract class Entity extends Groupable {
 
 
     // <TRANSFORM_COMPONENT>
-    protected Point position = new Point(0, 0);
+    protected Transform position = new Transform(0, 0); // TODO: Eventually, put this in the list of components.
 
-    public Point getPosition() {
+    public Transform getPosition() {
         return position;
     }
 
@@ -65,7 +65,7 @@ public abstract class Entity extends Groupable {
         return (this.position != null);
     }
 
-    public void setPosition(Point position) {
+    public void setPosition(Transform position) {
         this.position = position;
     }
     // </TRANSFORM_COMPONENT>
@@ -94,7 +94,7 @@ public abstract class Entity extends Groupable {
 
 
     // <IMAGE_COMPONENT>
-    protected Image image = null;
+    protected Image image = null; // TODO: Eventually, put this in the list of components.
 
 //    public boolean hasImage() {
 //        return hasComponent(Image.class);

@@ -5,24 +5,25 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Polygon<T extends Entity> extends Shape<T> {
 
-    protected List<Point> vertices = new ArrayList<>();
+    protected List<Transform> vertices = new ArrayList<>();
 
     public Polygon(T entity) {
         this.entity = entity;
         setup();
     }
 
-    public Polygon(Point position, List<Point> vertices) {
+    public Polygon(Transform position, List<Transform> vertices) {
         super(position);
         this.vertices.addAll(vertices);
         setup();
     }
 
-    public Polygon(List<Point> vertices) {
+    public Polygon(List<Transform> vertices) {
         super();
         this.vertices.addAll(vertices);
         setup();
@@ -37,7 +38,7 @@ public class Polygon<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Point> getVertices() {
+    protected List<Transform> getVertices() {
         return vertices;
     }
 

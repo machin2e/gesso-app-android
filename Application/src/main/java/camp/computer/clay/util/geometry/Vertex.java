@@ -6,6 +6,7 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Vertex<T extends Entity> extends Shape<T> {
@@ -14,7 +15,7 @@ public class Vertex<T extends Entity> extends Shape<T> {
         setup();
     }
 
-    public Vertex(Point position) {
+    public Vertex(Transform position) {
         super(position);
         setup();
     }
@@ -30,13 +31,13 @@ public class Vertex<T extends Entity> extends Shape<T> {
 
     private void setupGeometry() {
         boundary = new ArrayList<>();
-        boundary.add(new Point());
+        boundary.add(new Transform());
     }
 
     @Override
-    protected List<Point> getVertices() {
-        List<Point> vertices = new LinkedList<>();
-        vertices.add(new Point(imagePosition));
+    protected List<Transform> getVertices() {
+        List<Transform> vertices = new LinkedList<>();
+        vertices.add(new Transform(imagePosition));
         return vertices;
     }
 

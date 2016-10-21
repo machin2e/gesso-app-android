@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.engine.entity.Extension;
@@ -25,7 +26,7 @@ import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 // TODO: DO NOT extend Image. Remove this class!
@@ -34,11 +35,11 @@ public class Space extends Image<Model> {
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
     protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
-    protected Point extensionPrototypePosition = new Point();
+    protected Transform extensionPrototypePosition = new Transform();
 
     protected Visibility pathPrototypeVisibility = Visibility.INVISIBLE;
-    protected Point pathPrototypeSourcePosition = new Point(0, 0);
-    protected Point pathPrototypeDestinationCoordinate = new Point(0, 0);
+    protected Transform pathPrototypeSourcePosition = new Transform(0, 0);
+    protected Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
     private List<Actor> actors = new LinkedList<>();
 
@@ -327,7 +328,7 @@ public class Space extends Image<Model> {
 //        Line line = new Line();
 //        line.setRotation(45);
 //        for (int i = -100; i <= 100; i += 10) {
-//            Point linePoint = line.getPoint(i);
+//            Transform linePoint = line.getPoint(i);
 //        }
     }
 
@@ -400,13 +401,13 @@ public class Space extends Image<Model> {
                     pathPrototypeDestinationCoordinate
             );
 
-            Point pathStartCoordinate = Geometry.getRotateTranslatePoint(
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
                     pathPrototypeSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
-            Point pathStopCoordinate = Geometry.getRotateTranslatePoint(
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
                     pathPrototypeDestinationCoordinate,
                     pathRotationAngle + 180,
                     2 * triangleSpacing
@@ -431,15 +432,15 @@ public class Space extends Image<Model> {
         return pathPrototypeVisibility;
     }
 
-    public void setPathPrototypeSourcePosition(Point position) {
+    public void setPathPrototypeSourcePosition(Transform position) {
         this.pathPrototypeSourcePosition.set(position);
     }
 
-    public void setPathPrototypeDestinationPosition(Point position) {
+    public void setPathPrototypeDestinationPosition(Transform position) {
         this.pathPrototypeDestinationCoordinate.set(position);
     }
 
-    public void setExtensionPrototypePosition(Point position) {
+    public void setExtensionPrototypePosition(Transform position) {
         this.extensionPrototypePosition.set(position);
     }
 

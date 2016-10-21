@@ -1,16 +1,13 @@
 package camp.computer.clay.util.geometry;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.component.Transform;
 
 public abstract class Geometry {
 
-    public static void translatePoint(Point point, double x, double y) {
+    public static void translatePoint(Transform point, double x, double y) {
         point.x = point.x + x;
         point.y = point.y + y;
     }
@@ -20,7 +17,7 @@ public abstract class Geometry {
      * @param point
      * @param rotation
      */
-    public static void rotatePoint(Point point, double rotation) {
+    public static void rotatePoint(Transform point, double rotation) {
 
         double distance = distance(0, 0, point.x, point.y);
         double totalRotation = rotation + Geometry.getAngle(0, 0, point.x, point.y);
@@ -33,7 +30,7 @@ public abstract class Geometry {
      * Rotates {@code point} by {@code rotation} degrees about {@code referencePoint}. Stores the
      * result in {@code point}.
      */
-    public static void rotatePoint(Point point, double rotation, Point referencePoint) {
+    public static void rotatePoint(Transform point, double rotation, Transform referencePoint) {
 
         double distance = distance(referencePoint, point);
         double totalRotation = rotation + Geometry.getAngle(referencePoint, point);
@@ -42,7 +39,7 @@ public abstract class Geometry {
         point.y = referencePoint.y + distance * Math.sin(Math.toRadians(totalRotation));
     }
 
-    public static double distance(Point source, Point target) {
+    public static double distance(Transform source, Transform target) {
         return distance(source.x, source.y, target.x, target.y);
     }
 
@@ -57,9 +54,9 @@ public abstract class Geometry {
      * @param vertices The boundary defining the boundary polygon
      * @param point    The point to check
      * @return true If the point is inside the boundary, false otherwise
-     * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Point Inclusion in Polygon Test (W. Randolph Franklin)</a>
+     * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Transform Inclusion in Polygon Test (W. Randolph Franklin)</a>
      */
-    public static boolean contains(List<Point> vertices, Point point) {
+    public static boolean contains(List<Transform> vertices, Transform point) {
 
         double minX = vertices.get(0).x;
         double maxX = vertices.get(0).x;
@@ -67,7 +64,7 @@ public abstract class Geometry {
         double maxY = vertices.get(0).y;
 
         for (int i = 1; i < vertices.size(); i++) {
-            Point vertex = vertices.get(i);
+            Transform vertex = vertices.get(i);
             minX = Math.min(vertex.x, minX);
             maxX = Math.max(vertex.x, maxX);
             minY = Math.min(vertex.y, minY);
@@ -90,23 +87,23 @@ public abstract class Geometry {
         return isContained;
     }
 
-    public static Point midpoint(Point p1, Point p2) {
-        Point midpoint = new Point(
+    public static Transform midpoint(Transform p1, Transform p2) {
+        Transform midpoint = new Transform(
                 (p1.x + p2.x) / 2.0f,
                 (p1.y + p2.y) / 2.0f
         );
         return midpoint;
     }
 
-    public static Point midpoint(double x1, double y1, double x2, double y2) {
-        Point midpoint = new Point(
+    public static Transform midpoint(double x1, double y1, double x2, double y2) {
+        Transform midpoint = new Transform(
                 (x1 + x2) / 2.0f,
                 (y1 + y2) / 2.0f
         );
         return midpoint;
     }
 
-    public static double getAngle(Point source, Point target) {
+    public static double getAngle(Transform source, Transform target) {
         return Geometry.getAngle(source.x, source.y, target.x, target.y);
     }
 
@@ -120,9 +117,9 @@ public abstract class Geometry {
      * you will need to call SwingUtilities.convertPointToScreen or equivalent
      * on all arguments before passing them  to this function.
      *
-     * @param x1 Point we are rotating around.
+     * @param x1 Transform we are rotating around.
      * @param y1
-     * @param x2 Point to which we want to calculate the rotation, relative to the center point.
+     * @param x2 Transform to which we want to calculate the rotation, relative to the center point.
      * @param y2
      * @return rotation in degrees.  This is the rotation from centerPt to targetPt.
      */
@@ -156,19 +153,19 @@ public abstract class Geometry {
         return angle;
     }
 
-    public static Point getRotateTranslatePoint(Point referencePoint, double rotation, double distance) {
-        Point point = new Point();
+    public static Transform getRotateTranslatePoint(Transform referencePoint, double rotation, double distance) {
+        Transform point = new Transform();
         point.x = referencePoint.x + distance * Math.cos(Math.toRadians(rotation));
         point.y = referencePoint.y + distance * Math.sin(Math.toRadians(rotation));
         return point;
     }
 
-    public static Point getCentroidPoint(List<Point> points) {
+    public static Transform getCentroidPoint(List<Transform> points) {
 
-        Point centroidPoint = new Point(0, 0);
+        Transform centroidPoint = new Transform(0, 0);
 
         for (int i = 0; i < points.size(); i++) {
-            Point point = points.get(i);
+            Transform point = points.get(i);
             centroidPoint.set(centroidPoint.x + point.x, centroidPoint.y + point.y);
         }
 
@@ -177,7 +174,7 @@ public abstract class Geometry {
         return centroidPoint;
     }
 
-    public static Rectangle getBoundingBox(List<Point> points) {
+    public static Rectangle getBoundingBox(List<Transform> points) {
 
         if (points.size() == 0) {
 
@@ -191,7 +188,7 @@ public abstract class Geometry {
             double maxY = -Double.MAX_VALUE;
 
             for (int i = 0; i < points.size(); i++) {
-                Point point = points.get(i);
+                Transform point = points.get(i);
 
                 double x = point.x;
                 double y = point.y;
@@ -215,9 +212,9 @@ public abstract class Geometry {
         }
     }
 
-//    public static List<Point> getBoundingBox(List<Point> endpoints) {
+//    public static List<Transform> getBoundingBox(List<Transform> endpoints) {
 //
-//        List<Point> boundary = new LinkedList<>();
+//        List<Transform> boundary = new LinkedList<>();
 //
 //        double minX = Double.MAX_VALUE;
 //        double maxX = -Double.MAX_VALUE;
@@ -225,7 +222,7 @@ public abstract class Geometry {
 //        double maxY = -Double.MAX_VALUE;
 //
 //        for (int i = 0; i < endpoints.size(); i++) {
-//            Point point = endpoints.get(i);
+//            Transform point = endpoints.get(i);
 //
 //            double x = point.x;
 //            double y = point.y;
@@ -246,33 +243,33 @@ public abstract class Geometry {
 //
 //        Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
 //
-//        boundary.add(new Point(minX, minY));
-//        boundary.add(new Point(maxX, minY));
-//        boundary.add(new Point(maxX, maxY));
-//        boundary.add(new Point(minX, maxY));
+//        boundary.add(new Transform(minX, minY));
+//        boundary.add(new Transform(maxX, minY));
+//        boundary.add(new Transform(maxX, maxY));
+//        boundary.add(new Transform(minX, maxY));
 //
 //        return boundary;
 //    }
 
     /**
-     * Calculates and returns the center {@code Point} of the {@code Point}s in {@code endpoints}.
+     * Calculates and returns the center {@code Transform} of the {@code Transform}s in {@code endpoints}.
      *
      * @param points
      * @return
      */
-    public static Point getCenterPoint(List<Point> points) {
+    public static Transform getCenterPoint(List<Transform> points) {
         return getBoundingBox(points).getPosition();
     }
 
-    public static List<Point> getRegularPolygon(Point position, double radius, int vertexCount) {
+    public static List<Transform> getRegularPolygon(Transform position, double radius, int vertexCount) {
 
-        List<Point> vertices = new ArrayList<>();
+        List<Transform> vertices = new ArrayList<>();
 
         int segmentCount = vertexCount - 1;
 
         // Calculate vertex Points on boundary of a circle
         for (int i = 0; i < segmentCount; i++) {
-            Point vertex = new Point(
+            Transform vertex = new Transform(
                     0 + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount) + Math.toRadians(position.rotation),
                     0 + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount) + Math.toRadians(position.rotation)
             );

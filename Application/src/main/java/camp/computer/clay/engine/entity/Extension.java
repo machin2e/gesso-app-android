@@ -4,7 +4,7 @@ import java.util.List;
 
 import camp.computer.clay.model.Group;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 
 /**
  * {@code Extension} represents a device connected to a {@code Host}.

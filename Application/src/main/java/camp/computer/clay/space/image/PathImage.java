@@ -11,8 +11,8 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
-import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 
@@ -101,7 +101,7 @@ public class PathImage extends Image<Path> {
         Log.v("PathImage", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
         display.drawRectangle(boundingBox);
 
-        // Center Point
+        // Center Transform
         display.canvas.drawCircle(0, 0, 5, display.paint);
         */
     }
@@ -138,8 +138,8 @@ public class PathImage extends Image<Path> {
 
         double pathRotation = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
         double triangleRotation = pathRotation + 90.0f;
-        Point sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
-        Point targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
+        Transform sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
+        Transform targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
 //        if (dockVisibility == Visibility.VISIBLE) {
 //
@@ -175,8 +175,8 @@ public class PathImage extends Image<Path> {
             paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
             double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-            Point pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
-            Point pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
 
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
@@ -208,8 +208,8 @@ public class PathImage extends Image<Path> {
         PortableImage extensionImage = (PortableImage) extensionPort.getPortable().getComponent(Image.class);
 
         if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
-            Point hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();
-            Point extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex()).getPosition();
+            Transform hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();
+            Transform extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex()).getPosition();
 
             // Draw connection between Ports
             display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));

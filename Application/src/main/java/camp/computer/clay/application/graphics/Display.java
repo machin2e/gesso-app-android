@@ -22,7 +22,7 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -44,7 +44,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     private DisplayOutput displayOutput;
 
     // Coordinate System (Grid)
-    private Point originPosition = new Point();
+    private Transform originPosition = new Transform();
 
     // Space
     private Space space;
@@ -284,7 +284,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Point perspectivePosition = actor.getCamera().getPosition();
+                    Transform perspectivePosition = actor.getCamera().getPosition();
                     double perspectiveScale = actor.getCamera().getScale();
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
@@ -336,7 +336,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public void drawSegment(Point source, Point target) {
+    public void drawSegment(Transform source, Transform target) {
         canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
     }
 
@@ -355,7 +355,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     // TODO: Refactor with transforms
-    public void drawPolyline(List<Point> vertices) {
+    public void drawPolyline(List<Transform> vertices) {
 
         for (int i = 0; i < vertices.size() - 1; i++) {
 
@@ -393,7 +393,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.restore();
     }
 
-    public void drawCircle(Point position, double radius, double angle) {
+    public void drawCircle(Transform position, double radius, double angle) {
 
         canvas.save();
 
@@ -447,7 +447,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.restore();
     }
 
-    public void drawRectangle(Point position, double angle, double width, double height) {
+    public void drawRectangle(Transform position, double angle, double width, double height) {
 
         canvas.save();
 
@@ -465,7 +465,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.restore();
     }
 
-    public void drawText(Point position, String text, double size) {
+    public void drawText(Transform position, String text, double size) {
 
         // Style
         paint.setTextSize((float) size);
@@ -480,7 +480,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawText(text, (float) position.x, (float) position.y + bounds.height() / 2.0f, paint);
     }
 
-    public void drawTrianglePath(Point startPosition, Point stopPosition, double triangleWidth, double triangleHeight) {
+    public void drawTrianglePath(Transform startPosition, Transform stopPosition, double triangleWidth, double triangleHeight) {
 
         double pathRotationAngle = Geometry.getAngle(startPosition, stopPosition);
 
@@ -494,7 +494,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         for (int k = 0; k <= triangleCount; k++) {
 
             // Calculate triangle position
-            Point triangleCenterPosition = Geometry.getRotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
+            Transform triangleCenterPosition = Geometry.getRotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
 
             paint.setStyle(Paint.Style.FILL);
             drawTriangle(triangleCenterPosition, triangleRotationAngle, triangleWidth, triangleHeight);
@@ -507,7 +507,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     // TODO: Refactor with transforms
-    public void drawPolygon(List<Point> vertices) {
+    public void drawPolygon(List<Transform> vertices) {
 
         // Draw vertex Points in Shape
         android.graphics.Path path = new android.graphics.Path();
@@ -528,17 +528,17 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     // TODO: Refactor with transforms
-    public void drawTriangle(Point position, double angle, double width, double height) {
+    public void drawTriangle(Transform position, double angle, double width, double height) {
 
         // Calculate pointerCoordinates before rotation
-        Point p1 = new Point(position.x + -(width / 2.0f), position.y + (height / 2.0f));
-        Point p2 = new Point(position.x + 0, position.y - (height / 2.0f));
-        Point p3 = new Point(position.x + (width / 2.0f), position.y + (height / 2.0f));
+        Transform p1 = new Transform(position.x + -(width / 2.0f), position.y + (height / 2.0f));
+        Transform p2 = new Transform(position.x + 0, position.y - (height / 2.0f));
+        Transform p3 = new Transform(position.x + (width / 2.0f), position.y + (height / 2.0f));
 
         // Calculate pointerCoordinates after rotation
-        Point rp1 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.distance(position, p1));
-        Point rp2 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.distance(position, p2));
-        Point rp3 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.distance(position, p3));
+        Transform rp1 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.distance(position, p1));
+        Transform rp2 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.distance(position, p2));
+        Transform rp3 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.distance(position, p3));
 
         android.graphics.Path path = new android.graphics.Path();
         path.setFillType(android.graphics.Path.FillType.EVEN_ODD);

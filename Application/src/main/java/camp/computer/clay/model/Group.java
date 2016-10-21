@@ -15,9 +15,9 @@ import java.util.UUID;
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
@@ -111,9 +111,9 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-        public static Filter filterContains = new Filter<Image, Point>() {
+        public static Filter filterContains = new Filter<Image, Transform>() {
             @Override
-            public boolean filter(Image entity, Point... points) {
+            public boolean filter(Image entity, Transform... points) {
                 if (entity.contains(points[0])) {
                     return true;
                 } else {
@@ -199,9 +199,9 @@ public class Group<E extends Groupable> implements List<E> {
         };
 
         // Assumes Group<Entity>. Returns the Positions of the contained Entities.
-        public static Mapper getPosition = new Mapper<Entity, Point, Void>() {
+        public static Mapper getPosition = new Mapper<Entity, Transform, Void>() {
             @Override
-            public Point map(Entity entity, Void data) {
+            public Transform map(Entity entity, Void data) {
                 if (entity != null) {
                     return entity.getPosition();
                 } else {
@@ -211,9 +211,9 @@ public class Group<E extends Groupable> implements List<E> {
         };
 
         // HACK?
-        public static Mapper getShapePosition = new Mapper<Shape, Point, Void>() {
+        public static Mapper getShapePosition = new Mapper<Shape, Transform, Void>() {
             @Override
-            public Point map(Shape entity, Void data) {
+            public Transform map(Shape entity, Void data) {
                 if (entity != null) {
                     return entity.getPosition();
                 } else {
@@ -222,9 +222,9 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-//        public static Mapper getPosition = new Mapper<Entity, Point, Void>() {
+//        public static Mapper getPosition = new Mapper<Entity, Transform, Void>() {
 //            @Override
-//            public Point map(Entity entity, Void data) {
+//            public Transform map(Entity entity, Void data) {
 //                if (entity.getImage() != null) {
 //                    return entity.getImage().getPosition();
 //                } else {
@@ -250,7 +250,7 @@ public class Group<E extends Groupable> implements List<E> {
         return filter(Filters.filterVisibility, visibility); // OR: Mappers.setImageVisibility.filter(this);
     }
 
-    public Group<E> filterContains(Point point) {
+    public Group<E> filterContains(Transform point) {
         return filter(Filters.filterContains, point);
     }
 
@@ -267,7 +267,7 @@ public class Group<E extends Groupable> implements List<E> {
         return map(Mappers.getImage, null);
     }
 
-    public Group<Point> getPositions() {
+    public Group<Transform> getPositions() {
         Log.v("Reflect", "E: " + this.getClass());
         if (this.getClass() == ShapeGroup.class) { // HACK
             return map(Mappers.getShapePosition, null);
@@ -306,7 +306,7 @@ public class Group<E extends Groupable> implements List<E> {
      * @return The {@code ImageGroup} containing the area covered by {@code shape}.
      */
     // HACK: Expects Group<Image>
-    public Group<Image> filterArea(Point point, double distance) {
+    public Group<Image> filterArea(Transform point, double distance) {
 
         Group<Image> imageGroup = new Group<>();
 
@@ -333,7 +333,7 @@ public class Group<E extends Groupable> implements List<E> {
      * @return
      */
 //    // HACK: Expects Group<Image>
-//    public Image getNearestImage(Point position) {
+//    public Image getNearestImage(Transform position) {
 //
 //        double shortestDistance = Float.MAX_VALUE;
 //        Image nearestImage = null;
@@ -353,21 +353,21 @@ public class Group<E extends Groupable> implements List<E> {
 //    }
 
     // HACK: Expects Group<Image>
-    // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
-    public Point getCenterPoint() {
+    // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
+    public Transform getCenterPoint() {
         return Geometry.getCenterPoint(getPositions());
     }
 
 //    // HACK: Expects Group<Image>
-//    // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
-//    public Point getCentroidPosition() {
+//    // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
+//    public Transform getCentroidPosition() {
 //        return Geometry.getCentroidPoint(getPositions());
 //    }
 
     // HACK: Expects Group<Image>
     public Rectangle getBoundingBox() {
 
-        List<Point> imageBoundaries = new LinkedList<>();
+        List<Transform> imageBoundaries = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = (Image) elements.get(i);
             imageBoundaries.addAll(image.getBoundingBox().getBoundary());
@@ -378,7 +378,7 @@ public class Group<E extends Groupable> implements List<E> {
 
 //    public Rectangle getBoundingBox() {
 //
-//        List<Point> imageBoundaries = new LinkedList<>();
+//        List<Transform> imageBoundaries = new LinkedList<>();
 //        for (int i = 0; i < elements.size(); i++) {
 //            imageBoundaries.addAll(elements.get(i).getBoundingBox().getBoundary());
 //        }

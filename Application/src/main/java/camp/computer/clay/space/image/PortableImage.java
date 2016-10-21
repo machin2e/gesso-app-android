@@ -9,7 +9,7 @@ import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 

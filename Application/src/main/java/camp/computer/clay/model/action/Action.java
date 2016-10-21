@@ -7,7 +7,7 @@ import java.util.List;
 import camp.computer.clay.engine.entity.Actor;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 
 /**
  * An Action is a sequence of one or more events.
@@ -52,7 +52,7 @@ public class Action {
 //                    Event event = new Event();
 //                    event.setType(Event.Type.HOLD);
 //                    event.pointerIndex = getFirstEvent().pointerIndex;
-//                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
+//                    event.pointerCoordinates[0] = new Transform(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
 //                    getFirstEvent().getActor().queueEvent(event);
 //
 //                    isHolding[pointerIndex] = true;
@@ -183,8 +183,8 @@ public class Action {
         return getLastEvent().getTimestamp() - getFirstEvent().getTimestamp();
     }
 
-    public ArrayList<Point> getTouchPath() {
-        ArrayList<Point> touchCoordinates = new ArrayList<>();
+    public ArrayList<Transform> getTouchPath() {
+        ArrayList<Transform> touchCoordinates = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
             touchCoordinates.add(events.get(i).getPosition());
         }
@@ -210,7 +210,7 @@ public class Action {
     /**
      * Returns point-to-point distance between getFirstEvent and getLastEvent action positions.
      *
-     * @return Point-to-point distance between the getFirstEvent and getLastEvent events' positions.
+     * @return Transform-to-point distance between the getFirstEvent and getLastEvent events' positions.
      */
     public double getDistance() {
         Event firstEvent = getFirstEvent();
@@ -234,9 +234,9 @@ public class Action {
         return (getLastEvent() == event);
     }
 
-    protected Point offset = new Point();
+    protected Transform offset = new Transform();
 
-    public Point getOffset() {
+    public Transform getOffset() {
         this.offset.set(
                 getLastEvent().getPosition().x - getFirstEvent().getPosition().x,
                 getLastEvent().getPosition().y - getFirstEvent().getPosition().y

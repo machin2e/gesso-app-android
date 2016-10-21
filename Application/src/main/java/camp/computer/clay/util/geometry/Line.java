@@ -5,6 +5,7 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Line<T extends Entity> extends Shape<T> {
@@ -19,7 +20,7 @@ public class Line<T extends Entity> extends Shape<T> {
 //        setup();
 //    }
 
-    public Line(Point position, double rotation) {
+    public Line(Transform position, double rotation) {
         setup();
         position.set(position);
         position.setRotation(rotation);
@@ -33,10 +34,10 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Point> getVertices() {
-        List<Point> vertices = new LinkedList<>();
-//        vertices.add(new Point(source));
-//        vertices.add(new Point(target));
+    protected List<Transform> getVertices() {
+        List<Transform> vertices = new LinkedList<>();
+//        vertices.add(new Transform(source));
+//        vertices.add(new Transform(target));
         return vertices;
     }
 
@@ -48,12 +49,12 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     /**
-     * Returns a {@code Point} on the {@code Line} offset from {@code position} by {@code offset}.
+     * Returns a {@code Transform} on the {@code Line} offset from {@code position} by {@code offset}.
      *
      * @param offset
      * @return
      */
-    public Point getPoint(double offset) {
+    public Transform getPoint(double offset) {
         return Geometry.getRotateTranslatePoint(position, position.rotation, offset);
     }
 }

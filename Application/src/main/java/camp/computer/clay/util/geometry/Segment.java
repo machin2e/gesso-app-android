@@ -5,12 +5,13 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Segment<T extends Entity> extends Shape<T> {
 
-    protected Point source = new Point();
-    protected Point target = new Point();
+    protected Transform source = new Transform();
+    protected Transform target = new Transform();
 
     public Segment() {
         super();
@@ -22,7 +23,7 @@ public class Segment<T extends Entity> extends Shape<T> {
 //        setup();
 //    }
 
-    public Segment(Point source, Point target) {
+    public Segment(Transform source, Transform target) {
         setup();
         set(source, target);
     }
@@ -32,15 +33,15 @@ public class Segment<T extends Entity> extends Shape<T> {
     }
 
     private void setupGeometry() {
-        boundary.add(new Point(source));
-        boundary.add(new Point(target));
+        boundary.add(new Transform(source));
+        boundary.add(new Transform(target));
     }
 
     @Override
-    protected List<Point> getVertices() {
-        List<Point> vertices = new LinkedList<>();
-        vertices.add(new Point(source));
-        vertices.add(new Point(target));
+    protected List<Transform> getVertices() {
+        List<Transform> vertices = new LinkedList<>();
+        vertices.add(new Transform(source));
+        vertices.add(new Transform(target));
         return vertices;
     }
 
@@ -51,11 +52,11 @@ public class Segment<T extends Entity> extends Shape<T> {
         }
     }
 
-    public Point getSource() {
+    public Transform getSource() {
         return source;
     }
 
-    public void setSource(Point source) {
+    public void setSource(Transform source) {
         this.source.set(source);
 
         // Update Position
@@ -67,11 +68,11 @@ public class Segment<T extends Entity> extends Shape<T> {
         invalidate();
     }
 
-    public Point getTarget() {
+    public Transform getTarget() {
         return target;
     }
 
-    public void setTarget(Point target) {
+    public void setTarget(Transform target) {
         this.target.set(target);
 
         // Update Position
@@ -83,7 +84,7 @@ public class Segment<T extends Entity> extends Shape<T> {
         invalidate();
     }
 
-    public void set(Point source, Point target) {
+    public void set(Transform source, Transform target) {
         this.source.set(source);
         this.target.set(target);
 

@@ -5,11 +5,12 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Polyline<T extends Entity> extends Shape<T> {
 
-    private List<Point> vertices = new ArrayList<>();
+    private List<Transform> vertices = new ArrayList<>();
 
     public Polyline() {
         super();
@@ -21,7 +22,7 @@ public class Polyline<T extends Entity> extends Shape<T> {
         setup();
     }
 
-    public Polyline(Point position, List<Point> vertices) {
+    public Polyline(Transform position, List<Transform> vertices) {
         super(position);
         setup();
         setVertices(vertices);
@@ -35,20 +36,20 @@ public class Polyline<T extends Entity> extends Shape<T> {
         this.vertices.addAll(vertices);
     }
 
-    public void setVertices(List<Point> vertices) {
+    public void setVertices(List<Transform> vertices) {
         this.vertices.addAll(vertices);
     }
 
-    public void addVertex(Point point) {
+    public void addVertex(Transform point) {
         this.vertices.add(point);
     }
 
     @Override
-    protected List<Point> getVertices() {
+    protected List<Transform> getVertices() {
         return vertices;
     }
 
-    public List<Point> getPoints() {
+    public List<Transform> getPoints() {
         return vertices;
     }
 

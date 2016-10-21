@@ -8,7 +8,7 @@ import camp.computer.clay.model.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 

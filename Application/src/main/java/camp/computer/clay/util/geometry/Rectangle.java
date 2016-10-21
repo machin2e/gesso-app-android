@@ -6,6 +6,7 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Rectangle<T extends Entity> extends Shape<T> {
@@ -47,10 +48,10 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     private void setupGeometry() {
 
         // Create vertex Points (relative to the Shape)
-        Point topLeft = new Point(0 - (width / 2.0), 0 - (height / 2.0));
-        Point topRight = new Point(0 + (width / 2.0), 0 - (height / 2.0));
-        Point bottomRight = new Point(0 + (width / 2.0), 0 + (height / 2.0));
-        Point bottomLeft = new Point(0 - (width / 2.0), 0 + (height / 2.0));
+        Transform topLeft = new Transform(0 - (width / 2.0), 0 - (height / 2.0));
+        Transform topRight = new Transform(0 + (width / 2.0), 0 - (height / 2.0));
+        Transform bottomRight = new Transform(0 + (width / 2.0), 0 + (height / 2.0));
+        Transform bottomLeft = new Transform(0 - (width / 2.0), 0 + (height / 2.0));
 
         boundary.add(topLeft);
         boundary.add(topRight);
@@ -70,23 +71,23 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Point> getVertices() {
+    protected List<Transform> getVertices() {
 
-        List<Point> vertices = new LinkedList<>();
+        List<Transform> vertices = new LinkedList<>();
 
-        vertices.add(new Point(
+        vertices.add(new Transform(
                 0 - (width / 2.0),
                 0 - (height / 2.0)
         ));
-        vertices.add(new Point(
+        vertices.add(new Transform(
                 0 + (width / 2.0),
                 0 - (height / 2.0)
         ));
-        vertices.add(new Point(
+        vertices.add(new Transform(
                 0 + (width / 2.0),
                 0 + (height / 2.0)
         ));
-        vertices.add(new Point(
+        vertices.add(new Transform(
                 0 - (width / 2.0),
                 0 + (height / 2.0)
         ));

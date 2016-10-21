@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.model.Group;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
@@ -111,7 +111,7 @@ public class ShapeGroup extends Group<Shape> {
      * @param distance
      * @return
      */
-//    public ShapeGroup filterArea(Point point, double distance) {
+//    public ShapeGroup filterArea(Transform point, double distance) {
 //
 //        ShapeGroup shapeGroup = new ShapeGroup();
 //
@@ -130,7 +130,7 @@ public class ShapeGroup extends Group<Shape> {
 //
 //    }
 
-    public ShapeGroup filterContains(Point point) {
+    public ShapeGroup filterContains(Transform point) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -185,17 +185,17 @@ public class ShapeGroup extends Group<Shape> {
         return elements;
     }
 
-//    public List<Point> getPositions() {
-//        List<Point> positions = new LinkedList<>();
+//    public List<Transform> getPositions() {
+//        List<Transform> positions = new LinkedList<>();
 //        for (int i = 0; i < elements.size(); i++) {
 //            Shape shape = elements.get(i);
-//            positions.add(new Point(shape.getPosition().x, shape.getPosition().y));
+//            positions.add(new Transform(shape.getPosition().x, shape.getPosition().y));
 //        }
 //        return positions;
 //    }
 
-    public List<Point> getVertices() {
-        List<Point> positions = new LinkedList<>();
+    public List<Transform> getVertices() {
+        List<Transform> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             positions.addAll(shape.getBoundary());
@@ -213,7 +213,7 @@ public class ShapeGroup extends Group<Shape> {
      * @param position
      * @return
      */
-    public Shape getNearest(Point position) {
+    public Shape getNearest(Transform position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Shape nearestShape = null;

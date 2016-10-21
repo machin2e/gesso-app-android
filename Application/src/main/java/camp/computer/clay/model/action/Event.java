@@ -1,9 +1,9 @@
 package camp.computer.clay.model.action;
 
 import camp.computer.clay.engine.entity.Actor;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.time.Clock;
 
 public class Event {
@@ -42,7 +42,7 @@ public class Event {
     /**
      * The pointerCoordinates at which actions were performed (e.g., the touch pointerCoordinates on a touchscreen).
      */
-    public Point[] pointerCoordinates = new Point[MAXIMUM_POINT_COUNT];
+    public Transform[] pointerCoordinates = new Transform[MAXIMUM_POINT_COUNT];
 
     // TODO: Delete this!
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
@@ -66,7 +66,7 @@ public class Event {
 
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
-            pointerCoordinates[i] = new Point(0, 0);
+            pointerCoordinates[i] = new Transform(0, 0);
             targetImages[i] = null;
             targetShapes[i] = null;
             isPointing[i] = false;
@@ -110,7 +110,7 @@ public class Event {
         this.type = type;
     }
 
-    public Point getPosition() {
+    public Transform getPosition() {
         return this.pointerCoordinates[0];
     }
 

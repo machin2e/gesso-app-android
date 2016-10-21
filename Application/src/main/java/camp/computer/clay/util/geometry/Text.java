@@ -3,8 +3,8 @@ package camp.computer.clay.util.geometry;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.geometry.Point;
 
 public class Text extends Shape {
 
@@ -14,7 +14,7 @@ public class Text extends Shape {
     }
 
     @Override
-    protected List<Point> getVertices() {
+    protected List<Transform> getVertices() {
         return null;
     }
 
@@ -23,7 +23,7 @@ public class Text extends Shape {
 
     }
 
-    public Text(Point position) {
+    public Text(Transform position) {
         super(position);
     }
 

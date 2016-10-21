@@ -8,7 +8,7 @@ import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 
 public abstract class Shape<T extends Entity> extends Groupable {
 
@@ -18,8 +18,8 @@ public abstract class Shape<T extends Entity> extends Groupable {
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
-    protected Point imagePosition = null;
-    protected Point position = new Point(0, 0);
+    protected Transform imagePosition = null;
+    protected Transform position = new Transform(0, 0);
 
     protected String color = "#fff7f7f7";
     protected String outlineColor = "#ff000000";
@@ -27,7 +27,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     protected T entity = null;
 
-    protected List<Point> boundary = new ArrayList<>();
+    protected List<Transform> boundary = new ArrayList<>();
 
     protected boolean isValid = false;
 
@@ -47,7 +47,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
     // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
 
-    protected int layerIndex = DEFAULT_LAYER_INDEX;
+    public int layerIndex = DEFAULT_LAYER_INDEX;
 
     public int getLayerIndex() {
         return this.layerIndex;
@@ -66,7 +66,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
 //        this.entity = entity;
 //    }
 
-    public Shape(Point position) {
+    public Shape(Transform position) {
         this.position.set(position);
     }
 
@@ -76,26 +76,26 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     public void setImagePosition(double x, double y) {
         if (imagePosition == null) {
-            imagePosition = new Point();
+            imagePosition = new Transform();
         }
         this.imagePosition.set(x, y);
         invalidate();
     }
 
-    public void setImagePosition(Point point) {
+    public void setImagePosition(Transform point) {
         if (imagePosition == null) {
-            imagePosition = new Point();
+            imagePosition = new Transform();
         }
         this.imagePosition.set(point.x, point.y);
         this.imagePosition.setRotation(point.rotation);
         invalidate();
     }
 
-    public Point getImagePosition() {
+    public Transform getImagePosition() {
         return this.imagePosition;
     }
 
-    public Point getPosition() {
+    public Transform getPosition() {
         return position;
     }
 
@@ -104,7 +104,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         invalidate();
     }
 
-    public void setPosition(Point point) {
+    public void setPosition(Transform point) {
         this.position.set(point.x, point.y);
         invalidate();
     }
@@ -118,15 +118,15 @@ public abstract class Shape<T extends Entity> extends Groupable {
         return this.position.rotation;
     }
 
-    protected abstract List<Point> getVertices();
+    protected abstract List<Transform> getVertices();
 
     public abstract void draw(Display display);
 
-    public List<Point> getBoundary() {
+    public List<Transform> getBoundary() {
         return this.boundary;
     }
 
-    public boolean contains(Point point) {
+    public boolean contains(Transform point) {
         return Geometry.contains(getBoundary(), point);
     }
 
@@ -207,7 +207,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         return this.label;
     }
 
-    public void update(Point referencePoint) {
+    public void update(Transform referencePoint) {
         updateGeometry(referencePoint);
     }
 
@@ -218,7 +218,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
      * @param referencePoint Position of the containing {@code Image} relative to which the
      *                       {@code Shape} will be drawn.
      */
-    protected void updateGeometry(Point referencePoint) {
+    protected void updateGeometry(Transform referencePoint) {
 
         if (!isValid) {
             updatePosition(referencePoint); // Update the position
@@ -235,12 +235,12 @@ public abstract class Shape<T extends Entity> extends Groupable {
      *
      * @param referencePoint
      */
-    private void updatePosition(Point referencePoint) {
+    private void updatePosition(Transform referencePoint) {
         position.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
         position.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
     }
 
-    private void updateRotation(Point referencePoint) {
+    private void updateRotation(Transform referencePoint) {
         this.position.rotation = referencePoint.rotation + imagePosition.rotation;
     }
 
@@ -250,8 +250,8 @@ public abstract class Shape<T extends Entity> extends Groupable {
      */
     protected void updateBoundary() {
 
-        List<Point> vertices = getVertices();
-        List<Point> boundary = getBoundary();
+        List<Transform> vertices = getVertices();
+        List<Transform> boundary = getBoundary();
 
         // Translate and rotate the boundary about the updated position
         for (int i = 0; i < vertices.size(); i++) {

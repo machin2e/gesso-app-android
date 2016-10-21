@@ -21,10 +21,10 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -100,40 +100,40 @@ public class HostImage extends PortableImage {
 
         final double contactSeparation = 6.0 * 2.54;
 
-        headerContactPositions.add(new Vertex(new Point(-contactSeparation, 132)));
-        headerContactPositions.add(new Vertex(new Point(0, 132)));
-        headerContactPositions.add(new Vertex(new Point(contactSeparation, 132)));
+        headerContactPositions.add(new Vertex(new Transform(-contactSeparation, 132)));
+        headerContactPositions.add(new Vertex(new Transform(0, 132)));
+        headerContactPositions.add(new Vertex(new Transform(contactSeparation, 132)));
 
-        headerContactPositions.add(new Vertex(new Point(132, contactSeparation)));
-        headerContactPositions.add(new Vertex(new Point(132, 0)));
-        headerContactPositions.add(new Vertex(new Point(132, -contactSeparation)));
+        headerContactPositions.add(new Vertex(new Transform(132, contactSeparation)));
+        headerContactPositions.add(new Vertex(new Transform(132, 0)));
+        headerContactPositions.add(new Vertex(new Transform(132, -contactSeparation)));
 
-        headerContactPositions.add(new Vertex(new Point(contactSeparation, -132)));
-        headerContactPositions.add(new Vertex(new Point(0, -132)));
-        headerContactPositions.add(new Vertex(new Point(-contactSeparation, -132)));
+        headerContactPositions.add(new Vertex(new Transform(contactSeparation, -132)));
+        headerContactPositions.add(new Vertex(new Transform(0, -132)));
+        headerContactPositions.add(new Vertex(new Transform(-contactSeparation, -132)));
 
-        headerContactPositions.add(new Vertex(new Point(-132, -contactSeparation)));
-        headerContactPositions.add(new Vertex(new Point(-132, 0)));
-        headerContactPositions.add(new Vertex(new Point(-132, contactSeparation)));
+        headerContactPositions.add(new Vertex(new Transform(-132, -contactSeparation)));
+        headerContactPositions.add(new Vertex(new Transform(-132, 0)));
+        headerContactPositions.add(new Vertex(new Transform(-132, contactSeparation)));
 
         for (int i = 0; i < headerContactPositions.size(); i++) {
             addShape(headerContactPositions.get(i));
         }
 
         // Lights
-        List<Point> lightPositions = new ArrayList<>();
-        lightPositions.add(new Point(-20, 105));
-        lightPositions.add(new Point(0, 105));
-        lightPositions.add(new Point(20, 105));
-        lightPositions.add(new Point(105, 20));
-        lightPositions.add(new Point(105, 0));
-        lightPositions.add(new Point(105, -20));
-        lightPositions.add(new Point(20, -105));
-        lightPositions.add(new Point(0, -105));
-        lightPositions.add(new Point(-20, -105));
-        lightPositions.add(new Point(-105, -20));
-        lightPositions.add(new Point(-105, 0));
-        lightPositions.add(new Point(-105, 20));
+        List<Transform> lightPositions = new ArrayList<>();
+        lightPositions.add(new Transform(-20, 105));
+        lightPositions.add(new Transform(0, 105));
+        lightPositions.add(new Transform(20, 105));
+        lightPositions.add(new Transform(105, 20));
+        lightPositions.add(new Transform(105, 0));
+        lightPositions.add(new Transform(105, -20));
+        lightPositions.add(new Transform(20, -105));
+        lightPositions.add(new Transform(0, -105));
+        lightPositions.add(new Transform(-20, -105));
+        lightPositions.add(new Transform(-105, -20));
+        lightPositions.add(new Transform(-105, 0));
+        lightPositions.add(new Transform(-105, 20));
 
         List<Double> lightRotations = new ArrayList<>();
         lightRotations.add(0.0);
@@ -163,11 +163,11 @@ public class HostImage extends PortableImage {
         final double holeRadius = holeDiameter / 2.0; // 2.9 mm diameter
         final double holeDistanceFromEdge = 125 - (6.0 * 3.5);
 
-        List<Point> mountingHolePositions = new ArrayList<>();
-        mountingHolePositions.add(new Point(-holeDistanceFromEdge, -holeDistanceFromEdge)); // TODO: make hole centers 5 mm (or so) from the edge of the PCB
-        mountingHolePositions.add(new Point(holeDistanceFromEdge, -holeDistanceFromEdge));
-        mountingHolePositions.add(new Point(holeDistanceFromEdge, holeDistanceFromEdge));
-        mountingHolePositions.add(new Point(-holeDistanceFromEdge, holeDistanceFromEdge));
+        List<Transform> mountingHolePositions = new ArrayList<>();
+        mountingHolePositions.add(new Transform(-holeDistanceFromEdge, -holeDistanceFromEdge)); // TODO: make hole centers 5 mm (or so) from the edge of the PCB
+        mountingHolePositions.add(new Transform(holeDistanceFromEdge, -holeDistanceFromEdge));
+        mountingHolePositions.add(new Transform(holeDistanceFromEdge, holeDistanceFromEdge));
+        mountingHolePositions.add(new Transform(-holeDistanceFromEdge, holeDistanceFromEdge));
 
         for (int i = 0; i < mountingHolePositions.size(); i++) {
             circle = new Circle<>(holeRadius);
@@ -180,19 +180,19 @@ public class HostImage extends PortableImage {
         }
 
         // Setup Ports
-        List<Point> portCirclePositions = new ArrayList<>();
-        portCirclePositions.add(new Point(-90, 200));
-        portCirclePositions.add(new Point(0, 200));
-        portCirclePositions.add(new Point(90, 200));
-        portCirclePositions.add(new Point(200, 90));
-        portCirclePositions.add(new Point(200, 0));
-        portCirclePositions.add(new Point(200, -90));
-        portCirclePositions.add(new Point(90, -200));
-        portCirclePositions.add(new Point(0, -200));
-        portCirclePositions.add(new Point(-90, -200));
-        portCirclePositions.add(new Point(-200, -90));
-        portCirclePositions.add(new Point(-200, 0));
-        portCirclePositions.add(new Point(-200, 90));
+        List<Transform> portCirclePositions = new ArrayList<>();
+        portCirclePositions.add(new Transform(-90, 200));
+        portCirclePositions.add(new Transform(0, 200));
+        portCirclePositions.add(new Transform(90, 200));
+        portCirclePositions.add(new Transform(200, 90));
+        portCirclePositions.add(new Transform(200, 0));
+        portCirclePositions.add(new Transform(200, -90));
+        portCirclePositions.add(new Transform(90, -200));
+        portCirclePositions.add(new Transform(0, -200));
+        portCirclePositions.add(new Transform(-90, -200));
+        portCirclePositions.add(new Transform(-200, -90));
+        portCirclePositions.add(new Transform(-200, 0));
+        portCirclePositions.add(new Transform(-200, 90));
 
         for (int i = 0; i < getPortable().getPorts().size(); i++) {
 
@@ -222,8 +222,8 @@ public class HostImage extends PortableImage {
             Segment line = new Segment();
             addShape(line);
             line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
-            line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
-            line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
+            line.setSource(new Transform(-circle.getRadius(), 0, line.getPosition()));
+            line.setTarget(new Transform(circle.getRadius(), 0, line.getPosition()));
             line.setRotation(90);
             line.setOutlineColor("#ff000000");
             line.getVisibility().setReferencePoint(circle.getVisibility());
@@ -239,13 +239,13 @@ public class HostImage extends PortableImage {
                 line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
 
                 if (previousLine == null) {
-                    line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
+                    line.setSource(new Transform(-circle.getRadius(), 0, line.getPosition()));
                 } else {
-                    line.setSource(new Point(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getPosition()));
+                    line.setSource(new Transform(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getPosition()));
                 }
                 if (j < (segmentCount - 1)) {
                     double segmentLength = (circle.getRadius() * 2) / segmentCount;
-                    line.setTarget(new Point(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
+                    line.setTarget(new Transform(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
 
 //                    Log.v("OnUpdate", "ADDING onUpdateListener");
 //                    final Circle finalCircle = circle;
@@ -258,7 +258,7 @@ public class HostImage extends PortableImage {
 //                    });
 
                 } else {
-                    line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
+                    line.setTarget(new Transform(circle.getRadius(), 0, line.getPosition()));
                 }
 
                 line.setRotation(90);
@@ -666,7 +666,7 @@ public class HostImage extends PortableImage {
      *
      * @param hostPort
      */
-    private Extension createExtension(Port hostPort, Point initialPosition) {
+    private Extension createExtension(Port hostPort, Transform initialPosition) {
 
         // TODO: Remove initialPosition... find the position by analyzing the geometry of the HostImage
 
@@ -758,7 +758,7 @@ public class HostImage extends PortableImage {
      * @param initialPosition
      * @return
      */
-    private Extension fetchExtension(Profile profile, Point initialPosition) {
+    private Extension fetchExtension(Profile profile, Transform initialPosition) {
         // Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
         // Create the Extension
@@ -827,7 +827,7 @@ public class HostImage extends PortableImage {
         }
 
         Shape boardShape = getShape("Substrate");
-        List<Point> hostShapeBoundary = boardShape.getBoundary();
+        List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
         Group<Port> extensionPorts = extension.getPorts();
         for (int j = 0; j < extensionPorts.size(); j++) {
@@ -839,13 +839,13 @@ public class HostImage extends PortableImage {
             }
 
             Port hostPort = extensionPort.getPaths().get(0).getHostPort(); // HACK b/c using index 0
-            Point hostPortPosition = space.getShape(hostPort).getPosition();
+            Transform hostPortPosition = space.getShape(hostPort).getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected Host)
             for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
 
-                Point segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
+                Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
 
                 double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
 

@@ -15,10 +15,10 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Vertex;
-import camp.computer.clay.util.image.Image;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -275,7 +275,7 @@ public class ExtensionImage extends PortableImage {
             if (i < headerContactPositions.size()) {
                 headerContactPositions.get(i).getImagePosition().x = x;
             } else {
-                Vertex vertex = new Vertex(new Point(x, 107));
+                Vertex vertex = new Vertex(new Transform(x, 107));
                 headerContactPositions.add(vertex);
                 addShape(vertex);
             }

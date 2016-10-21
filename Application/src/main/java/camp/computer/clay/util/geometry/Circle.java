@@ -5,6 +5,7 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 /**
@@ -21,7 +22,7 @@ public class Circle<T extends Entity> extends Shape<T> {
     public double radius = 1.0;
 
     public Circle(double radius) {
-        super(new Point(0, 0));
+        super(new Transform(0, 0));
         this.radius = radius;
         setup();
     }
@@ -48,13 +49,13 @@ public class Circle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Point> getVertices() {
-        List<Point> vertices = new LinkedList<>();
+    protected List<Transform> getVertices() {
+        List<Transform> vertices = new LinkedList<>();
         int segmentCount = BOUNDARY_VERTEX_COUNT - 1;
         for (int i = 0; i < segmentCount; i++) {
 
             // Calculate point prior to rotation
-            vertices.add(new Point(
+            vertices.add(new Transform(
                     0 + radius * Math.cos(2.0f * Math.PI * (double) i / (double) segmentCount) + Math.toRadians(position.rotation),
                     0 + radius * Math.sin(2.0f * Math.PI * (double) i / (double) segmentCount) + Math.toRadians(position.rotation)
             ));
@@ -69,7 +70,7 @@ public class Circle<T extends Entity> extends Shape<T> {
      * @return
      */
     @Override
-    public List<Point> getBoundary() {
+    public List<Transform> getBoundary() {
         return boundary;
     }
 
