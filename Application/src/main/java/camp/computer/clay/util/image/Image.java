@@ -28,8 +28,6 @@ public class Image<T extends Entity> extends Component {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-//    protected Point position = new Point(0, 0);
-
     protected Visibility visibility = Visibility.VISIBLE;
 
     protected double targetTransparency = 1.0;
@@ -115,29 +113,6 @@ public class Image<T extends Entity> extends Component {
         return this.space;
     }
 
-//    public Point getPosition() {
-//        return this.entity.getPosition();
-//    }
-
-//    public double getRotation() {
-//        return this.entity.getPosition().rotation;
-//    }
-
-//    public void setPosition(double x, double y) {
-//        entity.getPosition().set(x, y);
-//        invalidate();
-//    }
-//
-//    public void setPosition(Point position) {
-//        position.set(position.x, position.y);
-//        invalidate();
-//    }
-//
-//    public void setRotation(double angle) {
-//        this.entity.getPosition().rotation = angle;
-//        invalidate();
-//    }
-
     public boolean isVisible() {
         return visibility == Visibility.VISIBLE;
     }
@@ -154,11 +129,8 @@ public class Image<T extends Entity> extends Component {
         shape.setImagePosition(shape.getPosition());
         shapes.add(shape);
 
-        // Update layer ordering
-        updateLayers();
-
-        // Invalidate Shape
-        shape.invalidate();
+        updateLayers(); // Update layer ordering
+        shape.invalidate(); // Invalidate Shape
     }
 
     public Shape getShape(String label) {
@@ -253,6 +225,7 @@ public class Image<T extends Entity> extends Component {
     public void draw(Display display) {
     }
 
+    // <COLLISION_COMPONENT>
     /**
      * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
      * {@code point}.
@@ -271,6 +244,16 @@ public class Image<T extends Entity> extends Component {
         return false;
     }
 
+    public Rectangle getBoundingBox() {
+        List<Point> shapeBoundaries = new LinkedList<>();
+        for (int i = 0; i < shapes.size(); i++) {
+            shapeBoundaries.addAll(shapes.get(i).getBoundary());
+        }
+        return Geometry.getBoundingBox(shapeBoundaries);
+    }
+    // </COLLISION_COMPONENT>
+
+    // <INPUT_COMPONENT>
     public void setOnActionListener(ActionListener actionListener) {
         this.actionListener = actionListener;
     }
@@ -280,7 +263,9 @@ public class Image<T extends Entity> extends Component {
             actionListener.onAction(action);
         }
     }
+    // </INPUT_COMPONENT>
 
+    // <STYLE_COMPONENT?>
     // TODO: Delete?
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
@@ -302,38 +287,5 @@ public class Image<T extends Entity> extends Component {
 
         this.transparency = this.targetTransparency;
     }
-
-    public Rectangle getBoundingBox() {
-        List<Point> shapeBoundaries = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            shapeBoundaries.addAll(shapes.get(i).getBoundary());
-        }
-        return Geometry.getBoundingBox(shapeBoundaries);
-    }
-
-//    // TODO: Delete!
-//    public double getRelativeAngle(Point point) {
-//
-//        double relativeAngle = Geometry.getAngle(entity.getPosition(), point);
-//        if (relativeAngle < 0) {
-//            relativeAngle += 360.0;
-//        }
-//        relativeAngle = (relativeAngle - getEntity().getPosition().getRotation());
-//        if (relativeAngle < 0) {
-//            relativeAngle += 360.0;
-//        }
-//        return relativeAngle;
-//    }
-
-//    public Point getPoint(double x, double y) {
-//        Point point = new Point();
-//
-//        double x2 = Geometry.distance(0, 0, x, y) * Math.cos(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
-//        point.x = position.x + x2;
-//
-//        double y2 = Geometry.distance(0, 0, x, y) * Math.sin(Math.toRadians(position.rotation + Geometry.getAngle(0, 0, x, y)));
-//        point.y = position.y + y2;
-//
-//        return point;
-//    }
+    // </STYLE_COMPONENT?>
 }
