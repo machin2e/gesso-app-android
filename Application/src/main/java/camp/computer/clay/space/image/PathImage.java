@@ -98,7 +98,7 @@ public class PathImage extends Image<Path> {
         display.paint.setStrokeWidth(2.0f);
         display.paint.setStyle(Paint.Style.STROKE);
         Rectangle boundingBox = getBoundingBox();
-        Log.v("PathImage", "x: " + boundingBox.getImagePosition().x + ", y: " + boundingBox.getImagePosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
+        Log.v("PathImage", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
         display.drawRectangle(boundingBox);
 
         // Center Point

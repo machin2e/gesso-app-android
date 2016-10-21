@@ -221,9 +221,9 @@ public class HostImage extends PortableImage {
             /*
             Segment line = new Segment();
             addShape(line);
-            line.setReferencePoint(circle.getImagePosition()); // Remove this? Weird to have a line with a center...
-            line.setSource(new Point(-circle.getRadius(), 0, line.getImagePosition()));
-            line.setTarget(new Point(circle.getRadius(), 0, line.getImagePosition()));
+            line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
+            line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
+            line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
             line.setRotation(90);
             line.setOutlineColor("#ff000000");
             line.getVisibility().setReferencePoint(circle.getVisibility());
@@ -236,16 +236,16 @@ public class HostImage extends PortableImage {
             for (int j = 0; j < segmentCount; j++) {
                 Segment line = new Segment();
                 addShape(line);
-                line.setReferencePoint(circle.getImagePosition()); // Remove this? Weird to have a line with a center...
+                line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
 
                 if (previousLine == null) {
-                    line.setSource(new Point(-circle.getRadius(), 0, line.getImagePosition()));
+                    line.setSource(new Point(-circle.getRadius(), 0, line.getPosition()));
                 } else {
-                    line.setSource(new Point(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getImagePosition()));
+                    line.setSource(new Point(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getPosition()));
                 }
                 if (j < (segmentCount - 1)) {
                     double segmentLength = (circle.getRadius() * 2) / segmentCount;
-                    line.setTarget(new Point(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getImagePosition()));
+                    line.setTarget(new Point(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
 
 //                    Log.v("OnUpdate", "ADDING onUpdateListener");
 //                    final Circle finalCircle = circle;
@@ -258,7 +258,7 @@ public class HostImage extends PortableImage {
 //                    });
 
                 } else {
-                    line.setTarget(new Point(circle.getRadius(), 0, line.getImagePosition()));
+                    line.setTarget(new Point(circle.getRadius(), 0, line.getPosition()));
                 }
 
                 line.setRotation(90);
@@ -308,7 +308,7 @@ public class HostImage extends PortableImage {
                                             } else if (action.isHolding()) {
 
                                                 // Update position of Host image
-                                                setPosition(event.getPosition());
+                                                getEntity().getPosition().set(event.getPosition());
 
                                                 // Camera
                                                 camera.setFocus(getHost());
@@ -334,7 +334,7 @@ public class HostImage extends PortableImage {
                                                     // Update style of nearby Hosts
                                                     double distanceToHostImage = Geometry.distance(
                                                             event.getPosition(),
-                                                            otherImage.getPosition()
+                                                            otherImage.getEntity().getPosition()
                                                     );
 
                                                     if (distanceToHostImage < 375) { // 500
@@ -517,9 +517,6 @@ public class HostImage extends PortableImage {
                                                             // Add Extension from Profile
                                                             Extension extension = fetchExtension(profile, event.getPosition());
 
-                                                            double rangle = getRelativeAngle(event.getPosition());
-                                                            Log.v("RelativeAngle", "rel. angle: " + rangle);
-
                                                             // Update Camera
                                                             camera.setFocus(extension);
                                                         }
@@ -698,7 +695,7 @@ public class HostImage extends PortableImage {
         space.addEntity(extension);
 
         // Set the initial position of the Extension
-        extension.getComponent(Image.class).setPosition(initialPosition);
+        extension.getPosition().set(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -774,7 +771,7 @@ public class HostImage extends PortableImage {
         //ExtensionImage extensionImage = (ExtensionImage) space.getImages(extension);
 
         // Update the Extension Image position and rotation
-        extension.getComponent(Image.class).setPosition(initialPosition);
+        extension.getPosition().set(initialPosition);
 
         // <REFACTOR>
         // Update the Extension Image position and rotation
@@ -793,7 +790,7 @@ public class HostImage extends PortableImage {
 
                     double distanceToPort = Geometry.distance(
                             getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                            extension.getComponent(Image.class).getPosition()
+                            extension.getComponent(Image.class).getEntity().getPosition()
                     );
 
                     // Check if the port is the nearest
@@ -803,7 +800,7 @@ public class HostImage extends PortableImage {
                     }
                 }
             }
-            // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getImagePosition()).getEntity();
+            // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
 
             // Configure Host's Port
             selectedHostPort.setType(profile.getPorts().get(i).getType());
@@ -937,39 +934,40 @@ public class HostImage extends PortableImage {
                 // <REFACTOR>
                 // Update the Extension Image position and rotation
                 if (segmentIndex == 0) {
-                    extension.getComponent(Image.class).getPosition().set(
+                    extension.getPosition().set(
                             0 + offset,
                             -distanceToExtensions,
                             entity.getPosition()
                     );
                 } else if (segmentIndex == 1) {
-                    extension.getComponent(Image.class).getPosition().set(
+                    extension.getPosition().set(
                             distanceToExtensions,
                             0 + offset,
                             entity.getPosition()
                     );
                 } else if (segmentIndex == 2) {
-                    extension.getComponent(Image.class).getPosition().set(
+                    extension.getPosition().set(
                             0 + offset,
                             distanceToExtensions,
                             entity.getPosition()
                     );
                 } else if (segmentIndex == 3) {
-                    extension.getComponent(Image.class).getPosition().set(
+                    extension.getPosition().set(
                             -distanceToExtensions,
                             0 + offset,
                             entity.getPosition()
                     );
                 }
 
+                double hostEntityRotation = getEntity().getPosition().getRotation();
                 if (segmentIndex == 0) {
-                    extension.getComponent(Image.class).setRotation(getRotation() + 0);
+                    extension.getPosition().setRotation(hostEntityRotation + 0);
                 } else if (segmentIndex == 1) {
-                    extension.getComponent(Image.class).setRotation(getRotation() + 90);
+                    extension.getPosition().setRotation(hostEntityRotation + 90);
                 } else if (segmentIndex == 2) {
-                    extension.getComponent(Image.class).setRotation(getRotation() + 180);
+                    extension.getPosition().setRotation(hostEntityRotation + 180);
                 } else if (segmentIndex == 3) {
-                    extension.getComponent(Image.class).setRotation(getRotation() + 270);
+                    extension.getPosition().setRotation(hostEntityRotation + 270);
                 }
                 // </REFACTOR>
             }

@@ -118,7 +118,7 @@ public class ShapeGroup extends Group<Shape> {
 //        for (int i = 0; i < elements.size(); i++) {
 //            Shape shape = elements.get(i);
 //
-//            double distanceToShape = Geometry.distance(point, shape.getImagePosition());
+//            double distanceToShape = Geometry.distance(point, shape.getPosition());
 //
 //            if (distanceToShape < distance) {
 //                shapeGroup.add(shape);
@@ -189,7 +189,7 @@ public class ShapeGroup extends Group<Shape> {
 //        List<Point> positions = new LinkedList<>();
 //        for (int i = 0; i < elements.size(); i++) {
 //            Shape shape = elements.get(i);
-//            positions.add(new Point(shape.getImagePosition().x, shape.getImagePosition().y));
+//            positions.add(new Point(shape.getPosition().x, shape.getPosition().y));
 //        }
 //        return positions;
 //    }

@@ -140,7 +140,8 @@ public class Camera {
 
     public void adjustPosition() {
         //Point centerPosition = getSpace().getImages().filterType2(Host.class, Extension.class).getCenterPoint();
-        Point centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
+        //Point centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
+        Point centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
@@ -240,7 +241,7 @@ public class Camera {
 //            Portable sourcePortable = sourcePort.getPortable();
 //            PortableImage sourcePortableImage = (PortableImage) sourcePortable.getImage();
 //
-//            double distanceToPortable = Geometry.distance(sourcePortableImage.getImagePosition(), targetPosition);
+//            double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
 //
 //            if (distanceToPortable > 800) {
 //                setScale(0.6f, 100); // Zoom out to show overview

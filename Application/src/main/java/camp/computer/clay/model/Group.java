@@ -3,9 +3,6 @@ package camp.computer.clay.model;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +12,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
-import camp.computer.clay.engine.Component;
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.Entity;
 import camp.computer.clay.util.geometry.Geometry;
@@ -56,7 +52,7 @@ public class Group<E extends Groupable> implements List<E> {
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
-    // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getImagePosition(...)).
+    // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
 
     public interface Filter<V extends Groupable, D> {
         boolean filter(V entity, D... data);
@@ -202,9 +198,10 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-        public static Mapper getImagePosition = new Mapper<Image, Point, Void>() {
+        // Assumes Group<Entity>. Returns the Positions of the contained Entities.
+        public static Mapper getPosition = new Mapper<Entity, Point, Void>() {
             @Override
-            public Point map(Image entity, Void data) {
+            public Point map(Entity entity, Void data) {
                 if (entity != null) {
                     return entity.getPosition();
                 } else {
@@ -275,7 +272,8 @@ public class Group<E extends Groupable> implements List<E> {
         if (this.getClass() == ShapeGroup.class) { // HACK
             return map(Mappers.getShapePosition, null);
         } else {
-            return map(Mappers.getImagePosition, null);
+            // Assumes Group<Entity>
+            return map(Mappers.getPosition, null);
         }
     }
 
@@ -316,7 +314,7 @@ public class Group<E extends Groupable> implements List<E> {
 
             Image image = (Image) elements.get(i);
 
-            double distanceToImage = Geometry.distance(point, image.getPosition());
+            double distanceToImage = Geometry.distance(point, image.getEntity().getPosition());
 
             if (distanceToImage < distance) {
                 imageGroup.add(image);
@@ -334,25 +332,25 @@ public class Group<E extends Groupable> implements List<E> {
      * @param position
      * @return
      */
-    // HACK: Expects Group<Image>
-    public Image getNearestImage(Point position) {
-
-        double shortestDistance = Float.MAX_VALUE;
-        Image nearestImage = null;
-
-        for (int i = 0; i < elements.size(); i++) {
-            Image image = (Image) elements.get(i);
-
-            double currentDistance = Geometry.distance(position, image.getPosition());
-
-            if (currentDistance < shortestDistance) {
-                shortestDistance = currentDistance;
-                nearestImage = image;
-            }
-        }
-
-        return nearestImage;
-    }
+//    // HACK: Expects Group<Image>
+//    public Image getNearestImage(Point position) {
+//
+//        double shortestDistance = Float.MAX_VALUE;
+//        Image nearestImage = null;
+//
+//        for (int i = 0; i < elements.size(); i++) {
+//            Image image = (Image) elements.get(i);
+//
+//            double currentDistance = Geometry.distance(position, image.getPosition());
+//
+//            if (currentDistance < shortestDistance) {
+//                shortestDistance = currentDistance;
+//                nearestImage = image;
+//            }
+//        }
+//
+//        return nearestImage;
+//    }
 
     // HACK: Expects Group<Image>
     // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
@@ -360,11 +358,11 @@ public class Group<E extends Groupable> implements List<E> {
         return Geometry.getCenterPoint(getPositions());
     }
 
-    // HACK: Expects Group<Image>
-    // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
-    public Point getCentroidPosition() {
-        return Geometry.getCentroidPoint(getPositions());
-    }
+//    // HACK: Expects Group<Image>
+//    // TODO: Restrict it to Group<Point> and use reduce(Reducers.getCenterPoint)
+//    public Point getCentroidPosition() {
+//        return Geometry.getCentroidPoint(getPositions());
+//    }
 
     // HACK: Expects Group<Image>
     public Rectangle getBoundingBox() {

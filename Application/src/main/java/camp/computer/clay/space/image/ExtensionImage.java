@@ -325,23 +325,23 @@ public class ExtensionImage extends PortableImage {
 
             // <HACK>
             /*
-            if (getImagePosition().getReferencePoint() != null) {
+            if (getPosition().getReferencePoint() != null) {
                 canvas.translate(
-                        (float) getImagePosition().getReferencePoint().x,
-                        (float) getImagePosition().getReferencePoint().y
+                        (float) getPosition().getReferencePoint().x,
+                        (float) getPosition().getReferencePoint().y
                 );
 
-                canvas.rotate((float) getImagePosition().getReferencePoint().rotation);
+                canvas.rotate((float) getPosition().getReferencePoint().rotation);
             }
             */
             // </HACK>
 
 //            canvas.translate(
-//                    (float) getImagePosition().x,
-//                    (float) getImagePosition().y
+//                    (float) getPosition().x,
+//                    (float) getPosition().y
 //            );
 //
-//            canvas.rotate((float) getImagePosition().rotation);
+//            canvas.rotate((float) getPosition().rotation);
 
             for (int i = 0; i < shapes.size(); i++) {
                 shapes.get(i).draw(display);

@@ -115,28 +115,28 @@ public class Image<T extends Entity> extends Component {
         return this.space;
     }
 
-    public Point getPosition() {
-        return this.entity.getPosition();
-    }
+//    public Point getPosition() {
+//        return this.entity.getPosition();
+//    }
 
-    public double getRotation() {
-        return this.entity.getPosition().rotation;
-    }
+//    public double getRotation() {
+//        return this.entity.getPosition().rotation;
+//    }
 
-    public void setPosition(double x, double y) {
-        entity.getPosition().set(x, y);
-        invalidate();
-    }
-
-    public void setPosition(Point position) {
-        position.set(position.x, position.y);
-        invalidate();
-    }
-
-    public void setRotation(double angle) {
-        this.entity.getPosition().rotation = angle;
-        invalidate();
-    }
+//    public void setPosition(double x, double y) {
+//        entity.getPosition().set(x, y);
+//        invalidate();
+//    }
+//
+//    public void setPosition(Point position) {
+//        position.set(position.x, position.y);
+//        invalidate();
+//    }
+//
+//    public void setRotation(double angle) {
+//        this.entity.getPosition().rotation = angle;
+//        invalidate();
+//    }
 
     public boolean isVisible() {
         return visibility == Visibility.VISIBLE;
@@ -311,19 +311,19 @@ public class Image<T extends Entity> extends Component {
         return Geometry.getBoundingBox(shapeBoundaries);
     }
 
-    // TODO: Delete!
-    public double getRelativeAngle(Point point) {
-
-        double relativeAngle = Geometry.getAngle(entity.getPosition(), point);
-        if (relativeAngle < 0) {
-            relativeAngle += 360.0;
-        }
-        relativeAngle = (relativeAngle - getRotation());
-        if (relativeAngle < 0) {
-            relativeAngle += 360.0;
-        }
-        return relativeAngle;
-    }
+//    // TODO: Delete!
+//    public double getRelativeAngle(Point point) {
+//
+//        double relativeAngle = Geometry.getAngle(entity.getPosition(), point);
+//        if (relativeAngle < 0) {
+//            relativeAngle += 360.0;
+//        }
+//        relativeAngle = (relativeAngle - getEntity().getPosition().getRotation());
+//        if (relativeAngle < 0) {
+//            relativeAngle += 360.0;
+//        }
+//        return relativeAngle;
+//    }
 
 //    public Point getPoint(double x, double y) {
 //        Point point = new Point();
