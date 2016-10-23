@@ -1,24 +1,22 @@
 package camp.computer.clay.engine.entity;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
 
 public class Portable extends Entity {
-
-    public static Group<Portable> Manager = new Group<>();
 
     private Profile profile = null;
 
     protected Group<Port> ports = new Group<>();
 
     public Portable() {
-        // Add to Entity Manager
-        if (!Manager.contains(this)) {
-            Manager.add(this);
-        }
+        super();
     }
 
     public Portable(Profile profile) {
+        super();
+
         // Set the Profile used to configure the Extension
         this.profile = profile;
 
@@ -29,13 +27,6 @@ public class Portable extends Entity {
             port.setType(profile.getPorts().get(i).getType());
             port.setDirection(profile.getPorts().get(i).getDirection());
             addPort(port);
-        }
-
-        // TODO: Update the rest of the Extension to reflect the Profile!
-
-        // Add to Manager
-        if (!Manager.contains(this)) {
-            Manager.add(this);
         }
     }
 

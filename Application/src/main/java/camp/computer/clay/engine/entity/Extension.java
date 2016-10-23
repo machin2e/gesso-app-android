@@ -14,10 +14,12 @@ public class Extension extends Portable {
 
     public Extension() {
         super();
+        setup();
     }
 
     public Extension(Profile profile) {
         super(profile);
+        setup();
     }
 
     private void setup() {
@@ -26,8 +28,8 @@ public class Extension extends Portable {
 
     private void setupComponents() {
         // TODO: InputComponent/ControllerComponent/ActorComponent
-        addComponent(new Transform());
-        addComponent(new Image());
+        setComponent(new Transform()); // addComponent(new Transform());
+        // addComponent(new Image());
     }
 
     public Group<Host> getHosts() {

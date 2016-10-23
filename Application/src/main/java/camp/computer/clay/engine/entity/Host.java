@@ -8,10 +8,12 @@ public class Host extends Portable {
 
     public Host() {
         super();
+        setup();
     }
 
     public Host(Profile profile) {
         super(profile);
+        setup();
     }
 
     private void setup() {
@@ -20,8 +22,8 @@ public class Host extends Portable {
 
     private void setupComponents() {
         // TODO: InputComponent/ControllerComponent/ActorComponent
-        addComponent(new Transform());
-        addComponent(new Image());
+        setComponent(new Transform()); // addComponent(new Transform());
+        // addComponent(new Image());
     }
 
     // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)

@@ -3,10 +3,11 @@ package camp.computer.clay.engine.entity;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Transform;
 
 public class Path extends Entity {
 
-    public static Group<Path> Manager = new Group<>();
+//    public static Group<Path> Manager = new Group<>();
 
     // TODO: Physical dimensions (distance between boards)
 
@@ -62,6 +63,8 @@ public class Path extends Entity {
     private UUID target;
 
     public Path(Port sourcePort, Port targetPort) {
+        super();
+
         this.type = Type.ELECTRONIC; // Default to ELECTRONIC
         this.direction = Direction.BOTH; // Default to BOTH
 //        this.source = sourcePort;
@@ -85,10 +88,20 @@ public class Path extends Entity {
             targetPort.setType(sourcePort.getType());
         }
 
-        // Add to Manager
-        if (!Manager.contains(this)) {
-            Manager.add(this);
-        }
+        setup();
+
+//        // Add to Manager
+//        if (!Manager.contains(this)) {
+//            Manager.add(this);
+//        }
+    }
+
+    private void setup() {
+        setupComponents();
+    }
+
+    private void setupComponents() {
+        setComponent(new Transform()); // addComponent(new Transform());
     }
 
     public Type getType() {
@@ -124,7 +137,7 @@ public class Path extends Entity {
     }
 
     public Port getSource() {
-        return Port.Manager.get(source);
+        return (Port) Entity.Manager.get(source);
     }
 
     public void setTarget(Port target) {
@@ -132,7 +145,7 @@ public class Path extends Entity {
     }
 
     public Port getTarget() {
-        return Port.Manager.get(target);
+        return (Port) Entity.Manager.get(target);
     }
 
     public Group<Port> getPorts() {

@@ -9,7 +9,7 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.entity.Actor;
+import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
@@ -19,7 +19,7 @@ import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.model.action.Camera;
+import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
@@ -337,21 +337,10 @@ public class Space extends Image<Model> {
 
         display.canvas.save();
 
-        // Draw Portables
+        // Draw Entities
         for (int i = 0; i < getEntities().size(); i++) {
             if (getEntities().get(i).hasComponent(Image.class)) {
-                if (!(getEntities().get(i).getComponent(Image.class) instanceof ExtensionImage)) {
-                    getEntities().get(i).getComponent(Image.class).draw(display);
-                }
-            }
-        }
-
-        // Draw Extensions
-        for (int i = 0; i < getEntities().size(); i++) {
-            if (getEntities().get(i).hasComponent(Image.class)) {
-                if (getEntities().get(i).getComponent(Image.class) instanceof ExtensionImage) {
-                    getEntities().get(i).getComponent(Image.class).draw(display);
-                }
+                getEntities().get(i).getComponent(Image.class).draw(display);
             }
         }
 
@@ -363,7 +352,6 @@ public class Space extends Image<Model> {
 
 //        getEntity().getActor(0).getCamera().setFocus(this);
     }
-
 
 
     // <EXTENSION_PROTOTYPE>
@@ -471,7 +459,6 @@ public class Space extends Image<Model> {
     }
 
 
-
     public void hideAllPorts() {
         // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
 
@@ -485,7 +472,6 @@ public class Space extends Image<Model> {
             portableImage.setTransparency(1.0);
         }
     }
-
 
 
     // <TITLE>

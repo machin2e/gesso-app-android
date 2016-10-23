@@ -1,6 +1,6 @@
 package camp.computer.clay.model.action;
 
-import camp.computer.clay.engine.entity.Actor;
+import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;

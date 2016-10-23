@@ -1,14 +1,9 @@
-package camp.computer.clay.model.action;
+package camp.computer.clay.engine.entity;
 
 import android.util.Log;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.entity.Host;
-import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.util.geometry.Geometry;
@@ -19,7 +14,7 @@ import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Clock;
 
-public class Camera {
+public class Camera extends Entity {
 
     // TODO: Caption generation for each Perspective/Camera
 
@@ -60,10 +55,7 @@ public class Camera {
     protected Transform originalPosition = new Transform();
 
     public Camera() {
-    }
-
-    public Camera(Space space) {
-        this.space = space;
+        super();
     }
 
     public void setSpace(Space space) {

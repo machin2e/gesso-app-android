@@ -62,10 +62,6 @@ public abstract class Shape<T extends Entity> extends Groupable {
     public Shape() {
     }
 
-//    public Shape(T entity) {
-//        this.entity = entity;
-//    }
-
     public Shape(Transform position) {
         this.position.set(position);
     }
@@ -246,7 +242,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     /**
      * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
-     * detection.
+     * detection. Hey there, mango bongo.
      */
     protected void updateBoundary() {
 

@@ -219,7 +219,7 @@ public class Image<T extends Entity> extends Component {
             Shape shape = this.shapes.get(i);
 
             // Update the Shape
-            shape.update(entity.getComponent(Transform.class));
+            shape.update(getEntity().getComponent(Transform.class));
         }
     }
 

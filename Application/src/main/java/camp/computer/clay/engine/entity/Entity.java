@@ -10,11 +10,40 @@ import camp.computer.clay.engine.component.Image;
 
 public abstract class Entity extends Groupable {
 
+    // <ENTITY_MANAGEMENT>
     // TODO: public static Group<Entity> Manager = new Group<>();
+    public static Group<Entity> Manager = new Group<>();
 
-    // TODO: Add support for Components (as in the ECS architecture)
+    public static void addEntity2(Entity entity) {
+        Manager.add(entity);
+    }
 
-    protected Entity parent; // TODO: Delete!
+    public static boolean hasEntity(UUID uuid) {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Entity getEntity(UUID uuid) {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
+                return Entity.Manager.get(i);
+            }
+        }
+        return null;
+    }
+
+    public static Entity removeEntity(UUID uuid) {
+        Entity entity = getEntity(uuid);
+        if (entity != null) {
+            Entity.Manager.remove(entity);
+        }
+        return entity;
+    }
+    // </ENTITY_MANAGEMENT>
 
     protected Group<Component> components = null;
 
@@ -29,8 +58,15 @@ public abstract class Entity extends Groupable {
     }
 
     private void setup() {
+
+        // Add Entity to Manager
+        Entity.addEntity2(this);
+
+        // Create list of Components
         components = new Group<>();
     }
+
+    protected Entity parent; // TODO: Delete!
 
     // TODO: DELETE
     public void setParent(Entity parent) {
@@ -55,10 +91,11 @@ public abstract class Entity extends Groupable {
     // </TAG_COMPONENT>
 
 
-    // <COMPONENT_PLACEHOLDERS>
-    protected Transform transform = new Transform(0, 0); // TODO: Eventually, put this in the list of components.
+    // <TEMPORARY_COMPONENTS_REFERENCES>
+    // TODO: Store these in the Entity.components Group.
+    protected Transform transform = null; // new Transform(0, 0); // TODO: Eventually, put this in the list of components.
     protected Image image = null; // TODO: Eventually, put this in the list of components.
-    // </COMPONENT_PLACEHOLDERS>
+    // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
     // <TEMPORARY_COMPONENT_INTERFACE>

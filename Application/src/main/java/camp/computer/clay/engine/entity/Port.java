@@ -4,7 +4,7 @@ import camp.computer.clay.engine.Group;
 
 public class Port extends Entity {
 
-    public static Group<Port> Manager = new Group<>();
+//    public static Group<Port> Manager = new Group<>();
 
     public enum Direction {
         NONE("none"),
@@ -107,8 +107,9 @@ public class Port extends Entity {
     }
 
     public boolean hasPath() {
-        for (int i = 0; i < Path.Manager.size(); i++) {
-            Path path = Path.Manager.get(i);
+        Group<Path> pathGroup = Entity.Manager.filterType2(Path.class);
+        for (int i = 0; i < pathGroup.size(); i++) {
+            Path path = pathGroup.get(i);
             if (path.contains(this)) {
                 return true;
             }
@@ -128,10 +129,12 @@ public class Port extends Entity {
      */
     public Group<Path> getPaths() {
 
+        Group<Path> pathGroup = Entity.Manager.filterType2(Path.class);
+
         // TODO: Make into Filter
-        Group<Path> paths = new Group<Path>();
-        for (int i = 0; i < Path.Manager.size(); i++) {
-            Path path = Path.Manager.get(i);
+        Group<Path> paths = new Group<>();
+        for (int i = 0; i < pathGroup.size(); i++) {
+            Path path = pathGroup.get(i);
             if (path.contains(this)) {
                 paths.add(path);
             }

@@ -16,7 +16,7 @@ import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.model.action.Camera;
+import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Circle;
@@ -32,7 +32,7 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class HostImage extends PortableImage {
 
-    public List<List<Extension>> segmentExtensions = new ArrayList<>();
+    public List<List<Extension>> headerExtensions = new ArrayList<>();
 
     public HostImage(Host host) {
         super(host);
@@ -43,10 +43,10 @@ public class HostImage extends PortableImage {
         setupGeometry();
         setupActions();
 
-        segmentExtensions.add(new ArrayList<Extension>());
-        segmentExtensions.add(new ArrayList<Extension>());
-        segmentExtensions.add(new ArrayList<Extension>());
-        segmentExtensions.add(new ArrayList<Extension>());
+        headerExtensions.add(new ArrayList<Extension>());
+        headerExtensions.add(new ArrayList<Extension>());
+        headerExtensions.add(new ArrayList<Extension>());
+        headerExtensions.add(new ArrayList<Extension>());
     }
 
     private void setupGeometry() {
@@ -504,7 +504,7 @@ public class HostImage extends PortableImage {
 
                                                 if (profiles.size() == 0) {
 
-                                                    // Show "default" DIY extension builder (or info about there being no segmentExtensions)
+                                                    // Show "default" DIY extension builder (or info about there being no headerExtensions)
 
                                                 } else if (profiles.size() > 0) {
 
@@ -691,9 +691,6 @@ public class HostImage extends PortableImage {
             extension.addPort(port);
         }
 
-        // Add Extension to Space
-        space.addEntity(extension);
-
         // Set the initial position of the Extension
         extension.getComponent(Transform.class).set(initialPosition);
 
@@ -719,6 +716,9 @@ public class HostImage extends PortableImage {
         // Create Path from Host to Extension
         Path path = new Path(hostPort, extensionPort);
         path.setType(Path.Type.ELECTRONIC);
+
+        // Add Extension to Space
+        space.addEntity(extension);
 
         // Add Path to Space
         space.addEntity(path);
@@ -907,51 +907,52 @@ public class HostImage extends PortableImage {
 
     public void updateExtensionLayout() {
 
+        // Get Extensions connected to the Host.
         Group<Extension> extensions = getHost().getExtensions();
 
         // Reset current layout in preparation for updating it in the presently-running update step.
-        for (int i = 0; i < segmentExtensions.size(); i++) {
-            segmentExtensions.get(i).clear();
+        for (int i = 0; i < headerExtensions.size(); i++) {
+            headerExtensions.get(i).clear();
         }
 
-        // Update each Extension's placement, relative to the connected Host
+        // Assign the Extensions connected to this Host to the most-strongly-connected Header.
+        // This can be thought of as the "high level layout" of Extension relative to the Host.
         for (int i = 0; i < extensions.size(); i++) {
             Extension extension = extensions.get(i);
-            updateExtensionSegmentIndex(extension);
+            updateExtensionHeaderIndex(extension);
         }
 
-        for (int segmentIndex = 0; segmentIndex < segmentExtensions.size(); segmentIndex++) {
+        // Update each Extension's placement, relative to the connected Host.
+        for (int headerIndex = 0; headerIndex < headerExtensions.size(); headerIndex++) {
+            for (int extensionIndex = 0; extensionIndex < headerExtensions.get(headerIndex).size(); extensionIndex++) {
 
-            for (int extensionIndex = 0; extensionIndex < segmentExtensions.get(segmentIndex).size(); extensionIndex++) {
-
-                Extension extension = segmentExtensions.get(segmentIndex).get(extensionIndex);
+                Extension extension = headerExtensions.get(headerIndex).get(extensionIndex);
 
                 final double extensionSeparationDistance = 25.0;
                 double extensionWidth = 200;
-                int extensionCount = segmentExtensions.get(segmentIndex).size();
+                int extensionCount = headerExtensions.get(headerIndex).size();
                 double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
 
-                // <REFACTOR>
-                // Update the Extension Image position and rotation
-                if (segmentIndex == 0) {
+                // Update the Extension's position.
+                if (headerIndex == 0) {
                     extension.getComponent(Transform.class).set(
                             0 + offset,
                             -distanceToExtensions,
                             entity.getComponent(Transform.class)
                     );
-                } else if (segmentIndex == 1) {
+                } else if (headerIndex == 1) {
                     extension.getComponent(Transform.class).set(
                             distanceToExtensions,
                             0 + offset,
                             entity.getComponent(Transform.class)
                     );
-                } else if (segmentIndex == 2) {
+                } else if (headerIndex == 2) {
                     extension.getComponent(Transform.class).set(
                             0 + offset,
                             distanceToExtensions,
                             entity.getComponent(Transform.class)
                     );
-                } else if (segmentIndex == 3) {
+                } else if (headerIndex == 3) {
                     extension.getComponent(Transform.class).set(
                             -distanceToExtensions,
                             0 + offset,
@@ -959,28 +960,31 @@ public class HostImage extends PortableImage {
                     );
                 }
 
+                // Update the Extension's rotation.
                 double hostEntityRotation = getEntity().getComponent(Transform.class).getRotation();
-                if (segmentIndex == 0) {
+                if (headerIndex == 0) {
                     extension.getComponent(Transform.class).setRotation(hostEntityRotation + 0);
-                } else if (segmentIndex == 1) {
+                } else if (headerIndex == 1) {
                     extension.getComponent(Transform.class).setRotation(hostEntityRotation + 90);
-                } else if (segmentIndex == 2) {
+                } else if (headerIndex == 2) {
                     extension.getComponent(Transform.class).setRotation(hostEntityRotation + 180);
-                } else if (segmentIndex == 3) {
+                } else if (headerIndex == 3) {
                     extension.getComponent(Transform.class).setRotation(hostEntityRotation + 270);
                 }
-                // </REFACTOR>
+
+                // Invalidate Image Component so its geometry (i.e., shapes) will be updated.
+                extension.getComponent(Image.class).invalidate();
             }
         }
     }
 
     // TODO: Refactor this... it's really dumb right now.
-    public void updateExtensionSegmentIndex(Extension extension) {
+    public void updateExtensionHeaderIndex(Extension extension) {
         if (extension.getComponent(Image.class) == null || extension.getHosts().size() == 0) {
             return;
         }
         int segmentIndex = getHeaderIndex(extension);
-        segmentExtensions.get(segmentIndex).add(extension);
+        headerExtensions.get(segmentIndex).add(extension);
     }
 
     public void draw(Display display) {

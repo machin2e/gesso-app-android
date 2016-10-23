@@ -1,11 +1,12 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
@@ -16,7 +17,7 @@ import camp.computer.clay.util.image.Visibility;
  * based on the actions recognized on one of the {@code PhoneHost} objects associated with the
  * {@code Actor}.
  */
-public class Actor extends Entity {
+public class Actor extends Component {
 
     private Camera camera = new Camera();
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Actor;
+import camp.computer.clay.engine.component.Actor;
 
 /**
  * {@code Model} represents the build state of available and online Clay Hosts and Entities of the
