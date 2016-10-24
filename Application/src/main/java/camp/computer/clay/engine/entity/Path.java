@@ -7,10 +7,6 @@ import camp.computer.clay.engine.component.Transform;
 
 public class Path extends Entity {
 
-//    public static Group<Path> Manager = new Group<>();
-
-    // TODO: Physical dimensions (distance between boards)
-
     public enum Direction {
 
         NONE(0),   // source  |  destination
@@ -55,53 +51,32 @@ public class Path extends Entity {
 
     private Direction direction = Direction.NONE;
 
-    //private Port source;
     // TODO: (?) Entity sourcePort;
     private UUID source;
 
-    //private Port target;
     private UUID target;
 
-    public Path(Port sourcePort, Port targetPort) {
+    public Path() {
         super();
-
-        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
-        this.direction = Direction.BOTH; // Default to BOTH
-//        this.source = sourcePort;
-//        this.target = targetPort;
-        this.source = sourcePort.getUuid();
-        this.target = targetPort.getUuid();
-
-        // Update source Port configuration
-        if (sourcePort.getDirection() == Port.Direction.NONE) {
-            sourcePort.setDirection(Port.Direction.BOTH); // Default to BOTH
-        }
-        if (sourcePort.getType() == Port.Type.NONE) {
-            sourcePort.setType(Port.Type.next(sourcePort.getType()));
-        }
-
-        // Update target Port configuration
-        if (targetPort.getDirection() == Port.Direction.NONE) {
-            targetPort.setDirection(Port.Direction.BOTH); // Default to BOTH
-        }
-        if (targetPort.getType() == Port.Type.NONE) {
-            targetPort.setType(sourcePort.getType());
-        }
-
         setup();
-
-//        // Add to Manager
-//        if (!Manager.contains(this)) {
-//            Manager.add(this);
-//        }
     }
+
+//    public Path(Port sourcePort, Port targetPort) {
+//        super();
+//
+//        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
+//        this.direction = Direction.BOTH; // Default to BOTH
+//
+//        set(sourcePort, targetPort);
+//
+//        setup();
+//    }
 
     private void setup() {
-        setupComponents();
-    }
+        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
+        this.direction = Direction.BOTH; // Default to BOTH
 
-    private void setupComponents() {
-        setComponent(new Transform()); // addComponent(new Transform());
+        // TODO: Path.connectPath(source, destination) and do what the following constructor does... auto-configure Ports and Path
     }
 
     public Type getType() {
@@ -130,6 +105,31 @@ public class Path extends Entity {
 
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    public void set(Port sourcePort, Port targetPort) {
+
+        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
+        this.direction = Direction.BOTH; // Default to BOTH
+
+        this.source = sourcePort.getUuid();
+        this.target = targetPort.getUuid();
+
+        // Update source Port configuration
+        if (sourcePort.getDirection() == Port.Direction.NONE) {
+            sourcePort.setDirection(Port.Direction.BOTH); // Default to BOTH
+        }
+        if (sourcePort.getType() == Port.Type.NONE) {
+            sourcePort.setType(Port.Type.next(sourcePort.getType()));
+        }
+
+        // Update target Port configuration
+        if (targetPort.getDirection() == Port.Direction.NONE) {
+            targetPort.setDirection(Port.Direction.BOTH); // Default to BOTH
+        }
+        if (targetPort.getType() == Port.Type.NONE) {
+            targetPort.setType(sourcePort.getType());
+        }
     }
 
     public void setSource(Port port) {

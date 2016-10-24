@@ -883,8 +883,9 @@ public class HostImage extends PortableImage {
                                                         Log.v("Events", "D.1");
 
                                                         // Create and configure new Path
-                                                        UUID pathUuid = Clay.createPathEntity(sourcePort, targetPort);
+                                                        UUID pathUuid = Clay.createEntity(Path.class);
                                                         Path path = (Path) Entity.getEntity(pathUuid);
+                                                        path.set(sourcePort, targetPort);
 
                                                         event.getActor().getCamera().setFocus(path.getExtension());
 
@@ -944,7 +945,7 @@ public class HostImage extends PortableImage {
         // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
 
         // Create Extension Entity
-        UUID extensionUuid = Clay.createExtensionEntity();
+        UUID extensionUuid = Clay.createEntity(Extension.class);
         Extension extension = (Extension) Entity.Manager.get(extensionUuid);
 
         // Set the initial position of the Extension
@@ -963,8 +964,9 @@ public class HostImage extends PortableImage {
 
         // Create Path from Host to Extension
         // Create and configure new Path
-        UUID pathUuid = Clay.createPathEntity(hostPort, extensionPort);
+        UUID pathUuid = Clay.createEntity(Path.class);
         Path path = (Path) Entity.getEntity(pathUuid);
+        path.set(hostPort, extensionPort);
 
         path.setType(Path.Type.ELECTRONIC);
 
@@ -1013,57 +1015,65 @@ public class HostImage extends PortableImage {
         // Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
         // Create the Extension
-        final Extension extension = new Extension(profile);
+        Extension extension = new Extension(profile);
 
-        // Get the just-created Extension Image
-        //ExtensionImage extensionImage = (ExtensionImage) space.getImages(extension);
-
-        // Update the Extension Image position and rotation
+        // Update Extension Position
         extension.getComponent(Transform.class).set(initialPosition);
 
-        // <REFACTOR>
-        // Update the Extension Image position and rotation
-//        int headerIndex = getHeaderIndex(initialPosition);
-//        extensionImage.adjustPgetHeaderIndeosition();
-        // </REFACTOR>
+        // Automatically select and connect all Paths to Host
+        autoConnectToHost(extension);
 
-        // Automatically select, connect paths to, and configure the Host's Ports
-        for (int i = 0; i < profile.getPorts().size(); i++) {
-
-            // Select an available Host Port
-            Port selectedHostPort = null;
-            double distanceToSelectedPort = Double.MAX_VALUE;
-            for (int j = 0; j < getHost().getPorts().size(); j++) {
-                if (getHost().getPorts().get(j).getType() == Port.Type.NONE) {
-
-                    double distanceToPort = Geometry.distance(
-                            getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
-                            extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
-                    );
-
-                    // Check if the port is the nearest
-                    if (distanceToPort < distanceToSelectedPort) {
-                        selectedHostPort = getHost().getPorts().get(j);
-                        distanceToSelectedPort = distanceToPort;
-                    }
-                }
-            }
-            // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
-
-            // Configure Host's Port
-            selectedHostPort.setType(profile.getPorts().get(i).getType());
-            selectedHostPort.setDirection(profile.getPorts().get(i).getDirection());
-
-            // Create Path from Extension Port to Host Port
-            UUID pathUuid = Clay.createPathEntity(selectedHostPort, extension.getPorts().get(i));
-            Path path = (Path) Entity.getEntity(pathUuid);
-
-            path.setType(Path.Type.ELECTRONIC);
-        }
+        // TODO: Start IASM based on automatically configured Paths to Host.
 
         updateExtensionLayout();
 
         return extension;
+    }
+
+    private boolean autoConnectToHost(Extension extension) {
+
+        // Automatically select, connect paths to, and configure the Host's Ports
+        for (int i = 0; i < extension.getPorts().size(); i++) {
+
+            // Select an available Host Port
+            Port selectedHostPort = autoSelectNearestAvailableHostPort(extension);
+
+            // Configure Host's Port
+            selectedHostPort.setType(extension.getPorts().get(i).getType());
+            selectedHostPort.setDirection(extension.getPorts().get(i).getDirection());
+
+            // Create Path from Extension Port to Host Port
+            UUID pathUuid = Clay.createEntity(Path.class);
+            Path path = (Path) Entity.getEntity(pathUuid);
+            path.set(selectedHostPort, extension.getPorts().get(i));
+
+            path.setType(Path.Type.ELECTRONIC);
+        }
+
+        return true;
+    }
+
+    private Port autoSelectNearestAvailableHostPort(Extension extension) {
+        // Select an available Host Port
+        Port selectedHostPort = null;
+        double distanceToSelectedPort = Double.MAX_VALUE;
+        for (int j = 0; j < getHost().getPorts().size(); j++) {
+            if (getHost().getPorts().get(j).getType() == Port.Type.NONE) {
+
+                double distanceToPort = Geometry.distance(
+                        getPortShapes().filterEntity(getHost().getPorts().get(j)).get(0).getPosition(),
+                        extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
+                );
+
+                // Check if the port is the nearest
+                if (distanceToPort < distanceToSelectedPort) {
+                    selectedHostPort = getHost().getPorts().get(j);
+                    distanceToSelectedPort = distanceToPort;
+                }
+            }
+        }
+        // TODO: selectedHostPort = (Port) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
+        return selectedHostPort;
     }
 
     // TODO: Remove this?

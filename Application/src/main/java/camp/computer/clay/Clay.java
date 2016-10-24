@@ -75,13 +75,16 @@ public class Clay {
         Application.getView().getDisplay().setSpace(space);
 
         // <TEST>
-        createHostEntity();
-        createHostEntity();
-        createHostEntity();
-        createHostEntity();
-        createHostEntity();
+        createEntity(Host.class);
+        createEntity(Host.class);
+        createEntity(Host.class);
+        createEntity(Host.class);
+        createEntity(Host.class);
         // </TEST>
 
+        // <HACK>
+        Space.getSpace().adjustLayout();
+        // </HACK>
     }
 
     private Clay getClay() {
@@ -92,11 +95,23 @@ public class Clay {
         return this.space;
     }
 
+    public static UUID createEntity(Class<?> entityType) {
+        if (entityType == Host.class) {
+            return createHostEntity();
+        } else if (entityType == Extension.class) {
+            return createExtensionEntity();
+        } else if (entityType == Path.class) {
+            return createPathEntity();
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Adds a <em>virtual</em> {@code Host} that can be configured and later assigned to a physical
      * host.
      */
-    public static UUID createHostEntity() {
+    private static UUID createHostEntity() {
 
         // Create Entity
         Host host = new Host();
@@ -119,14 +134,10 @@ public class Clay {
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
 
-        // <HACK>
-        Space.getSpace().adjustLayout();
-        // </HACK>
-
         return host.getUuid();
     }
 
-    public static UUID createExtensionEntity() {
+    private static UUID createExtensionEntity() {
 
         // Create Entity
         Extension extension = new Extension();
@@ -151,13 +162,22 @@ public class Clay {
         return extension.getUuid();
     }
 
-    public static UUID createPathEntity(Port sourcePort, Port targetPort) {
-        Path path = new Path(sourcePort, targetPort);
+    private static UUID createPathEntity() {
+        Path path = new Path();
         PathImage pathImage = new PathImage(path); // Create Path Image
+        path.setComponent(new Transform());
         path.setComponent(pathImage); // Assign Image to Entity
 
         return path.getUuid();
     }
+
+//    private static UUID createPathEntity(Port sourcePort, Port targetPort) {
+//        Path path = new Path(sourcePort, targetPort);
+//        PathImage pathImage = new PathImage(path); // Create Path Image
+//        path.setComponent(pathImage); // Assign Image to Entity
+//
+//        return path.getUuid();
+//    }
 
     /*
      * Clay's essential operating system functions.
@@ -242,7 +262,7 @@ public class Clay {
             return null;
         }
 
-        createHostEntity();
+        createEntity(Host.class);
 
         return null;
     }

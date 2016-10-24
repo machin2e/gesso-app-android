@@ -25,7 +25,8 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-// TODO: DO NOT extend Image. Remove this class!
+// TODO: DO NOT extend Image. Try to remove Space class. If cannot, then consider making it an
+// TODO: (...) Entity and adding a ActionListenerComponent.
 public class Space extends Image {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
