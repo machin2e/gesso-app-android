@@ -28,29 +28,19 @@ public class Extension extends Portable {
 
     private void setupComponents() {
         // TODO: InputComponent/ControllerComponent/ActorComponent
-        setComponent(new Transform()); // addComponent(new Transform());
+//        setComponent(new Transform()); // addComponent(new Transform());
         // addComponent(new Image());
     }
 
     public Group<Host> getHosts() {
-//        Group<Host> hosts = new Group<>();
-//        for (int i = 0; i < ports.size(); i++) {
-//            Port port = ports.get(i);
-//            Host host = port.getHost();
-//            if (host != null) {
-//                hosts.add(host);
-//            }
-//        }
-//        return hosts;
         return getHosts(this);
     }
 
     private Group<Host> getHosts(Extension extension) {
 
+        List<Host> hosts = Entity.Manager.filterType2(Host.class);
+
         Group<Host> hostGroup = new Group<>();
-
-        List<Host> hosts = getComponent(Image.class).getSpace().getModel().getEntities().filterType2(Host.class);
-
         for (int i = 0; i < hosts.size(); i++) {
             if (hosts.get(i).getExtensions().contains(extension)) {
                 if (!hostGroup.contains(hosts.get(i))) {

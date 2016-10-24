@@ -4,10 +4,13 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import camp.computer.clay.Clay;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.application.graphics.controls.Prompt;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
@@ -49,19 +52,279 @@ public class HostImage extends PortableImage {
         headerExtensions.add(new ArrayList<Extension>());
     }
 
+    // TODO:
     private void setupGeometry() {
+        //Application.getView().restoreGeometry(getEntity().getComponent(Image.class), "Geometry.json");
+        Application.getView().restoreGeometry(this, "Geometry.json");
+        for (int i = 0; i < shapes.size(); i++) {
+
+            if (shapes.get(i).getLabel().startsWith("Port")) {
+                String label = shapes.get(i).getLabel();
+                Port port = getHost().getPort(label);
+                shapes.get(i).setEntity(port);
+            }
+
+//            addShape(shapes.get(i));
+        }
+    }
+
+    private void setupGeometry2() {
+        Rectangle rectangle;
+        Circle circle;
+
+        double mmScaleFactor = 6.0;
+
+        final double boardWidth = 50.8 * mmScaleFactor;
+        final double boardCornerRadius = 4.064 * mmScaleFactor;
+
+        final double headerSize = 3; // Vary this for each header, generally
+        final double headerOffsetFromCenter = 26.5 * mmScaleFactor; // -132
+        final double headerWidth = (2.54 * headerSize) * mmScaleFactor; // 6.0 * (2.54 * 3)
+        final double headerHeight = 2.33 * mmScaleFactor;
+
+        final double contactSeparation = 2.54 * mmScaleFactor;
+
+        final double portCircleOffsetFromCenter = 40.0 * mmScaleFactor;
+        final double portCircleSeparationDistance = 19.0  * mmScaleFactor;
+        final double portCircleRadius = 8.33 * mmScaleFactor;
+
+        final double lightOffsetFromCenter = 21.0 * mmScaleFactor; // 105
+        final double lightSeparationDistance = 3.33 * mmScaleFactor;
+
+        final double holeDiameter = 2.9 * mmScaleFactor; // 2.9 mm diameter
+        final double holeRadius = holeDiameter / 2.0; // 2.9 mm diameter
+        final double holeOffsetFromCenter = (boardWidth / 2.0) - (mmScaleFactor * 3.5); // 125 - (6.0 * 3.5)
+
+        // Board
+        rectangle = new Rectangle(boardWidth, boardWidth);
+        rectangle.setWidth(boardWidth); // 250px
+        rectangle.setHeight(boardWidth); // 250px
+        rectangle.setCornerRadius(boardCornerRadius); // 20.0
+        rectangle.setLabel("Board");
+        rectangle.setColor("#1f1f1e"); // #f7f7f7
+        rectangle.setOutlineThickness(1);
+        addShape(rectangle);
+
+        // Headers
+        rectangle = new Rectangle(headerWidth, headerHeight); // 14
+        rectangle.setLabel("Header 1"); // or index 1 (top)
+        rectangle.setPosition(0, -headerOffsetFromCenter);
+        rectangle.setRotation(0);
+        rectangle.setColor("#404040");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
+
+        rectangle = new Rectangle(headerWidth, headerHeight);
+        rectangle.setLabel("Header 2"); // or index 2 (right)
+        rectangle.setPosition(headerOffsetFromCenter, 0);
+        rectangle.setRotation(90);
+        rectangle.setColor("#404040");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
+
+        rectangle = new Rectangle(headerWidth, headerHeight);
+        rectangle.setLabel("Header 3"); // or index 3 (bottom)
+        rectangle.setPosition(0, headerOffsetFromCenter);
+        rectangle.setRotation(180);
+        rectangle.setColor("#404040"); // #3b3b3b
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
+
+        rectangle = new Rectangle(headerWidth, headerHeight);
+        rectangle.setLabel("Header 4"); // or index 4 (left)
+        rectangle.setPosition(-headerOffsetFromCenter, 0);
+        rectangle.setRotation(270);
+        rectangle.setColor("#404040");
+        rectangle.setOutlineThickness(0);
+        addShape(rectangle);
+
+        headerContactPositions.add(new Vertex(new Transform(-contactSeparation, headerOffsetFromCenter)));
+        headerContactPositions.add(new Vertex(new Transform(0, headerOffsetFromCenter)));
+        headerContactPositions.add(new Vertex(new Transform(contactSeparation, headerOffsetFromCenter)));
+
+        headerContactPositions.add(new Vertex(new Transform(headerOffsetFromCenter, contactSeparation)));
+        headerContactPositions.add(new Vertex(new Transform(headerOffsetFromCenter, 0)));
+        headerContactPositions.add(new Vertex(new Transform(headerOffsetFromCenter, -contactSeparation)));
+
+        headerContactPositions.add(new Vertex(new Transform(contactSeparation, -headerOffsetFromCenter)));
+        headerContactPositions.add(new Vertex(new Transform(0, -headerOffsetFromCenter)));
+        headerContactPositions.add(new Vertex(new Transform(-contactSeparation, -headerOffsetFromCenter)));
+
+        headerContactPositions.add(new Vertex(new Transform(-headerOffsetFromCenter, -contactSeparation)));
+        headerContactPositions.add(new Vertex(new Transform(-headerOffsetFromCenter, 0)));
+        headerContactPositions.add(new Vertex(new Transform(-headerOffsetFromCenter, contactSeparation)));
+
+        for (int i = 0; i < headerContactPositions.size(); i++) {
+            Log.v("Dimensions", "header contact " + i + ": " + headerContactPositions.get(i).getPosition().x + ", " + headerContactPositions.get(i).getPosition().y);
+            addShape(headerContactPositions.get(i));
+        }
+
+        // Lights
+        List<Transform> lightPositions = new ArrayList<>();
+        lightPositions.add(new Transform(-lightSeparationDistance, lightOffsetFromCenter));
+        lightPositions.add(new Transform(0, lightOffsetFromCenter));
+        lightPositions.add(new Transform(lightSeparationDistance, lightOffsetFromCenter));
+        lightPositions.add(new Transform(lightOffsetFromCenter, lightSeparationDistance));
+        lightPositions.add(new Transform(lightOffsetFromCenter, 0));
+        lightPositions.add(new Transform(lightOffsetFromCenter, -lightSeparationDistance));
+        lightPositions.add(new Transform(lightSeparationDistance, -lightOffsetFromCenter));
+        lightPositions.add(new Transform(0, -lightOffsetFromCenter));
+        lightPositions.add(new Transform(-lightSeparationDistance, -lightOffsetFromCenter));
+        lightPositions.add(new Transform(-lightOffsetFromCenter, -lightSeparationDistance));
+        lightPositions.add(new Transform(-lightOffsetFromCenter, 0));
+        lightPositions.add(new Transform(-lightOffsetFromCenter, lightSeparationDistance));
+
+        List<Double> lightRotations = new ArrayList<>();
+        lightRotations.add(0.0);
+        lightRotations.add(0.0);
+        lightRotations.add(0.0);
+        lightRotations.add(90.0);
+        lightRotations.add(90.0);
+        lightRotations.add(90.0);
+        lightRotations.add(180.0);
+        lightRotations.add(180.0);
+        lightRotations.add(180.0);
+        lightRotations.add(270.0);
+        lightRotations.add(270.0);
+        lightRotations.add(270.0);
+
+        for (int i = 0; i < lightPositions.size(); i++) {
+            rectangle = new Rectangle(12, 20);
+            rectangle.setPosition(lightPositions.get(i));
+            rectangle.setRotation(lightRotations.get(i));
+            rectangle.setCornerRadius(3.0);
+            rectangle.setLabel("LED " + (i + 1));
+            addShape(rectangle);
+            Log.v("Dimensions", "light " + i + ": " + lightPositions.get(i).x + ", " + lightPositions.get(i).y);
+        }
+
+        // Mounting Holes
+        List<Transform> mountingHolePositions = new ArrayList<>();
+        mountingHolePositions.add(new Transform(-holeOffsetFromCenter, -holeOffsetFromCenter)); // TODO: make hole centers 5 mm (or so) from the edge of the PCB
+        mountingHolePositions.add(new Transform(holeOffsetFromCenter, -holeOffsetFromCenter));
+        mountingHolePositions.add(new Transform(holeOffsetFromCenter, holeOffsetFromCenter));
+        mountingHolePositions.add(new Transform(-holeOffsetFromCenter, holeOffsetFromCenter));
+
+        for (int i = 0; i < mountingHolePositions.size(); i++) {
+            circle = new Circle<>(holeRadius);
+            circle.setPosition(mountingHolePositions.get(i));
+            circle.setLabel("Mount " + (i + 1));
+            circle.setColor("#ffffff");
+            circle.setOutlineThickness(0);
+//            circle.getVisibility().setReference(getShapes("Board").getVisibility());
+            addShape(circle);
+            Log.v("Dimensions", "hole " + i + ": " + mountingHolePositions.get(i).x + ", " + mountingHolePositions.get(i).y);
+        }
+
+        // Setup Ports
+        List<Transform> portCirclePositions = new ArrayList<>();
+        portCirclePositions.add(new Transform(-portCircleSeparationDistance, portCircleOffsetFromCenter));
+        portCirclePositions.add(new Transform(0, portCircleOffsetFromCenter));
+        portCirclePositions.add(new Transform(portCircleSeparationDistance, portCircleOffsetFromCenter));
+        portCirclePositions.add(new Transform(portCircleOffsetFromCenter, portCircleSeparationDistance));
+        portCirclePositions.add(new Transform(portCircleOffsetFromCenter, 0));
+        portCirclePositions.add(new Transform(portCircleOffsetFromCenter, -portCircleSeparationDistance));
+        portCirclePositions.add(new Transform(portCircleSeparationDistance, -portCircleOffsetFromCenter));
+        portCirclePositions.add(new Transform(0, -portCircleOffsetFromCenter));
+        portCirclePositions.add(new Transform(-portCircleSeparationDistance, -portCircleOffsetFromCenter));
+        portCirclePositions.add(new Transform(-portCircleOffsetFromCenter, -portCircleSeparationDistance));
+        portCirclePositions.add(new Transform(-portCircleOffsetFromCenter, 0));
+        portCirclePositions.add(new Transform(-portCircleOffsetFromCenter, portCircleSeparationDistance));
+
+        for (int i = 0; i < getPortable().getPorts().size(); i++) {
+
+            // Circle
+            circle = new Circle<>(getHost().getPort(i));
+            circle.setLabel("Port " + (i + 1));
+            circle.setPosition(portCirclePositions.get(i));
+            circle.setRadius(portCircleRadius);
+            // circle.setRotation(0);
+            circle.setColor("#efefef");
+            circle.setOutlineThickness(0);
+            circle.setVisibility(Visibility.INVISIBLE);
+            addShape(circle);
+
+            if (i < 3) {
+                circle.setRotation(0);
+            } else if (i < 6) {
+                circle.setRotation(90);
+            } else if (i < 9) {
+                circle.setRotation(180);
+            } else if (i < 12) {
+                circle.setRotation(270);
+            }
+
+            // Segment (Port Data Plot)
+            /*
+            Segment line = new Segment();
+            addShape(line);
+            line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
+            line.setSource(new Transform(-circle.getRadius(), 0, line.getPosition()));
+            line.setTarget(new Transform(circle.getRadius(), 0, line.getPosition()));
+            line.setRotation(90);
+            line.setOutlineColor("#ff000000");
+            line.getVisibility().setReferencePoint(circle.getVisibility());
+            */
+
+            /*
+            // TODO: Replace the lines with a Polyline/Plot(numPoints)/Plot(numSegments) w. source and destination and calculate paths to be equal lengths) + setData() function to map onto y axis endpoints with most recent data
+            Segment previousLine = null;
+            int segmentCount = 10;
+            for (int j = 0; j < segmentCount; j++) {
+                Segment line = new Segment();
+                addShape(line);
+                line.setReferencePoint(circle.getPosition()); // Remove this? Weird to have a line with a center...
+
+                if (previousLine == null) {
+                    line.setSource(new Transform(-circle.getRadius(), 0, line.getPosition()));
+                } else {
+                    line.setSource(new Transform(previousLine.getTarget().getX(), previousLine.getTarget().getY(), line.getPosition()));
+                }
+                if (j < (segmentCount - 1)) {
+                    double segmentLength = (circle.getRadius() * 2) / segmentCount;
+                    line.setTarget(new Transform(line.getSource().getX() + segmentLength, Probability.generateRandomInteger(-(int) circle.getRadius(), (int) circle.getRadius()), line.getPosition()));
+
+//                    Log.v("OnUpdate", "ADDING onUpdateListener");
+//                    final Circle finalCircle = circle;
+//                    line.setOnUpdateListener(new OnUpdateListener<Segment>() {
+//                        @Override
+//                        public void onUpdate(Segment line)
+//                        {
+//                            line.getTarget().setY(Probability.generateRandomInteger(-(int) finalCircle.getRadius(), (int) finalCircle.getRadius()));
+//                        }
+//                    });
+
+                } else {
+                    line.setTarget(new Transform(circle.getRadius(), 0, line.getPosition()));
+                }
+
+                line.setRotation(90);
+                line.setOutlineColor("#ff000000");
+                line.setOutlineThickness(3.0);
+                line.getVisibility().setReferencePoint(circle.getVisibility());
+
+                previousLine = line;
+            }
+            */
+        }
+    }
+
+    public static void createHostImage(Host host) {
+
+        Image hostImage = new Image();
+
         Rectangle rectangle;
         Circle circle;
 
         // Board
-        rectangle = new Rectangle<>(getHost());
+        rectangle = new Rectangle<>(host);
         rectangle.setWidth(250);
         rectangle.setHeight(250);
         rectangle.setCornerRadius(20.0);
-        rectangle.setLabel("Substrate");
+        rectangle.setLabel("Board");
         rectangle.setColor("#1f1f1e"); // #f7f7f7
         rectangle.setOutlineThickness(1);
-        addShape(rectangle);
+        hostImage.addShape(rectangle);
 
         // Headers
         final double headerWidth = 6.0 * (2.54 * 3);
@@ -72,7 +335,7 @@ public class HostImage extends PortableImage {
         rectangle.setRotation(0);
         rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
-        addShape(rectangle);
+        hostImage.addShape(rectangle);
 
         rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 2"); // or index 2 (right)
@@ -80,7 +343,7 @@ public class HostImage extends PortableImage {
         rectangle.setRotation(90);
         rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
-        addShape(rectangle);
+        hostImage.addShape(rectangle);
 
         rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 3"); // or index 3 (bottom)
@@ -88,7 +351,7 @@ public class HostImage extends PortableImage {
         rectangle.setRotation(0);
         rectangle.setColor("#404040"); // #3b3b3b
         rectangle.setOutlineThickness(0);
-        addShape(rectangle);
+        hostImage.addShape(rectangle);
 
         rectangle = new Rectangle(headerWidth, 14);
         rectangle.setLabel("Header 4"); // or index 4 (left)
@@ -96,9 +359,11 @@ public class HostImage extends PortableImage {
         rectangle.setRotation(90);
         rectangle.setColor("#404040");
         rectangle.setOutlineThickness(0);
-        addShape(rectangle);
+        hostImage.addShape(rectangle);
 
         final double contactSeparation = 6.0 * 2.54;
+
+        List<Vertex> headerContactPositions = new ArrayList<>();
 
         headerContactPositions.add(new Vertex(new Transform(-contactSeparation, 132)));
         headerContactPositions.add(new Vertex(new Transform(0, 132)));
@@ -117,7 +382,7 @@ public class HostImage extends PortableImage {
         headerContactPositions.add(new Vertex(new Transform(-132, contactSeparation)));
 
         for (int i = 0; i < headerContactPositions.size(); i++) {
-            addShape(headerContactPositions.get(i));
+            hostImage.addShape(headerContactPositions.get(i));
         }
 
         // Lights
@@ -155,7 +420,7 @@ public class HostImage extends PortableImage {
             rectangle.setRotation(lightRotations.get(i));
             rectangle.setCornerRadius(3.0);
             rectangle.setLabel("LED " + (i + 1));
-            addShape(rectangle);
+            hostImage.addShape(rectangle);
         }
 
         // Mounting Holes
@@ -175,8 +440,8 @@ public class HostImage extends PortableImage {
             circle.setLabel("Mount " + (i + 1));
             circle.setColor("#ffffff");
             circle.setOutlineThickness(0);
-//            circle.getVisibility().setReference(getShapes("Substrate").getVisibility());
-            addShape(circle);
+//            circle.getVisibility().setReference(getShapes("Board").getVisibility());
+            hostImage.addShape(circle);
         }
 
         // Setup Ports
@@ -194,10 +459,10 @@ public class HostImage extends PortableImage {
         portCirclePositions.add(new Transform(-200, 0));
         portCirclePositions.add(new Transform(-200, 90));
 
-        for (int i = 0; i < getPortable().getPorts().size(); i++) {
+        for (int i = 0; i < host.getPorts().size(); i++) {
 
             // Circle
-            circle = new Circle<>(getHost().getPort(i));
+            circle = new Circle<>(host.getPort(i));
             circle.setLabel("Port " + (i + 1));
             circle.setPosition(portCirclePositions.get(i));
             circle.setRadius(40);
@@ -205,7 +470,7 @@ public class HostImage extends PortableImage {
             circle.setColor("#efefef");
             circle.setOutlineThickness(0);
             circle.setVisibility(Visibility.INVISIBLE);
-            addShape(circle);
+            hostImage.addShape(circle);
 
             if (i < 3) {
                 circle.setRotation(0);
@@ -293,17 +558,17 @@ public class HostImage extends PortableImage {
                                             return;
                                         }
 
-                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Substrate")) {
+                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
 
                                             if (action.isDragging()) {
 
                                                 // Update position of prototype Extension
-                                                space.setExtensionPrototypePosition(event.getPosition());
+                                                Space.getSpace().setExtensionPrototypePosition(event.getPosition());
 
                                                 getPortShapes().setVisibility(Visibility.INVISIBLE);
                                                 setPathVisibility(Visibility.INVISIBLE);
 
-                                                space.setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
                                             } else if (action.isHolding()) {
 
@@ -320,14 +585,14 @@ public class HostImage extends PortableImage {
                                             if (action.isDragging()) {
 
                                                 // Prototype Path Visibility
-                                                space.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                                space.setPathPrototypeDestinationPosition(event.getPosition());
-                                                space.setPathPrototypeVisibility(Visibility.VISIBLE);
+                                                Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                Space.getSpace().setPathPrototypeDestinationPosition(event.getPosition());
+                                                Space.getSpace().setPathPrototypeVisibility(Visibility.VISIBLE);
 
                                                 // Prototype Extension Visibility
                                                 boolean isCreateExtensionAction = true;
-                                                //Group<Image> imageGroup = space.getImages(Host.class, Extension.class);
-                                                Group<Image> imageGroup = space.getEntities().filterType2(Host.class, Extension.class).getImages();
+                                                //Group<Image> imageGroup = Space.getSpace().getImages(Host.class, Extension.class);
+                                                Group<Image> imageGroup = Entity.Manager.filterType2(Host.class, Extension.class).getImages();
                                                 for (int i = 0; i < imageGroup.size(); i++) {
                                                     Image otherImage = imageGroup.get(i);
 
@@ -346,11 +611,11 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 if (isCreateExtensionAction) {
-                                                    space.setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                                                    space.setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                                    space.setExtensionPrototypePosition(event.getPosition());
+                                                    Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                                                    Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                                    Space.getSpace().setExtensionPrototypePosition(event.getPosition());
                                                 } else {
-                                                    space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                                    Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
                                                 }
 
                                                 // Show Ports of nearby Hosts and Extensions
@@ -424,7 +689,7 @@ public class HostImage extends PortableImage {
                                         }
                                         // </HACK>
 
-                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Substrate")) {
+                                        if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
 
                                             if (action.isTap()) {
 
@@ -442,8 +707,8 @@ public class HostImage extends PortableImage {
                                                         Path path = paths.get(j);
 
                                                         // Show source and target ports in path
-                                                        space.getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                                        space.getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                                        Space.getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                                        Space.getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                                         // Show Path connection
                                                         path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
@@ -454,7 +719,7 @@ public class HostImage extends PortableImage {
                                                 camera.setFocus(getHost());
 
                                                 if (getHost().getExtensions().size() > 0) {
-//                                                    space.getImages(getHost().getExtensions()).setTransparency(1.0);
+//                                                    Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
                                                     getHost().getExtensions().setTransparency(0.1);
 
                                                     // <HACK>
@@ -465,8 +730,8 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 // Title
-                                                space.setTitleText("Host");
-                                                space.setTitleVisibility(Visibility.VISIBLE);
+                                                Space.getSpace().setTitleText("Host");
+                                                Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
 
                                             } else {
 
@@ -494,9 +759,9 @@ public class HostImage extends PortableImage {
                                             }
 
                                             // Check if connecting to a extension
-                                            if (space.getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                                            if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
-                                                space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                                                 // Get cached extension profiles (and retrieve additional from Internet store)
                                                 List<Profile> profiles = Application.getView().getClay().getProfiles();
@@ -595,7 +860,7 @@ public class HostImage extends PortableImage {
 
                                                         }
 
-                                                        space.setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                        Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
                                                     }
 
                                                 } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
@@ -612,19 +877,18 @@ public class HostImage extends PortableImage {
                                                         Port sourcePort = (Port) sourcePortShape.getEntity();
                                                         Port targetPort = null;
 
-                                                        Shape targetPortShape = space.getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
+                                                        Shape targetPortShape = Space.getSpace().getShapes(Port.class).remove(sourcePortShape).filterContains(event.getPosition()).get(0);
                                                         targetPort = (Port) targetPortShape.getEntity();
 
                                                         Log.v("Events", "D.1");
 
                                                         // Create and configure new Path
-                                                        Path path = new Path(sourcePort, targetPort);
-
-                                                        space.addEntity(path);
+                                                        UUID pathUuid = Clay.createPathEntity(sourcePort, targetPort);
+                                                        Path path = (Path) Entity.getEntity(pathUuid);
 
                                                         event.getActor().getCamera().setFocus(path.getExtension());
 
-                                                        space.setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                        Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
 
                                                     }
 
@@ -632,11 +896,11 @@ public class HostImage extends PortableImage {
 
                                             } else if (action.getLastEvent().getTargetShape() == null
                                                     // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
-                                                    && action.getLastEvent().getTargetImage() == space) {
+                                                    && action.getLastEvent().getTargetImage() == Space.getSpace()) {
 
                                                 // (Host.Port, ..., Space) Action Pattern
 
-                                                if (space.getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                                                if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
                                                     Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
                                                     Port hostPort = (Port) hostPortShape.getEntity();
@@ -649,8 +913,8 @@ public class HostImage extends PortableImage {
                                                 }
 
                                                 // Update Image
-                                                space.setPathPrototypeVisibility(Visibility.INVISIBLE);
-                                                space.setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                                Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                                             }
                                         }
@@ -677,32 +941,16 @@ public class HostImage extends PortableImage {
 
         //Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
-        // Create the Extension
-        // TODO: Extension extension = new Extension(Profile); with Profile without UUID?
-        Extension extension = new Extension();
-
         // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
 
-        // Create Ports and add them to the Extension
-        int defaultPortCount = 1;
-        for (int j = 0; j < defaultPortCount; j++) {
-            Port port = new Port();
-            port.setIndex(j);
-            extension.addPort(port);
-        }
+        // Create Extension Entity
+        UUID extensionUuid = Clay.createExtensionEntity();
+        Extension extension = (Extension) Entity.Manager.get(extensionUuid);
 
         // Set the initial position of the Extension
         extension.getComponent(Transform.class).set(initialPosition);
 
-        // <REFACTOR>
-        // Update the Extension Image position and rotation
-//        int headerIndex = getHeaderIndex(initialPosition);
-//        updateExtensionLayout(extensionImage)
-        // </REFACTOR>
-
         // Configure Host's Port (i.e., the Path's source Port)
-//        Port hostPort = (Port) hostPortShape.getEntity();
-
         if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
             hostPort.setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
             hostPort.setDirection(Port.Direction.BOTH);
@@ -714,18 +962,21 @@ public class HostImage extends PortableImage {
         extensionPort.setType(hostPort.getType());
 
         // Create Path from Host to Extension
-        Path path = new Path(hostPort, extensionPort);
+        // Create and configure new Path
+        UUID pathUuid = Clay.createPathEntity(hostPort, extensionPort);
+        Path path = (Path) Entity.getEntity(pathUuid);
+
         path.setType(Path.Type.ELECTRONIC);
 
         // Add Extension to Space
-        space.addEntity(extension);
+//        Space.getSpace().addEntity(extension);
 
         // Add Path to Space
-        space.addEntity(path);
+//        Space.getSpace().addEntity(path);
 
         // Remove focus from other Hosts and their Ports
 //        Group<Image> hostImages = getSpace().getImages(Host.class);
-        Group<Image> hostImages = getSpace().getEntities().filterType2(Host.class).getImages();
+        Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
         for (int i = 0; i < hostImages.size(); i++) {
             HostImage hostImage = (HostImage) hostImages.get(i);
             hostImage.setTransparency(0.05f);
@@ -740,9 +991,9 @@ public class HostImage extends PortableImage {
             pathPorts.addAll(paths.get(i).getPorts());
         }
 
-//        space.getShapes(pathPorts).setImageVisibility(Visibility.VISIBLE);
+//        Space.getSpace().getShapes(pathPorts).setImageVisibility(Visibility.VISIBLE);
 //        paths.getPorts().setVisibilityMapper(Visibility.VISIBLE);
-//        space.getImages(paths).setImageVisibility(Visibility.VISIBLE);
+//        Space.getSpace().getImages(paths).setImageVisibility(Visibility.VISIBLE);
         pathPorts.setVisibility(Visibility.VISIBLE);
         paths.getImages().setVisibility(Visibility.VISIBLE);
 
@@ -763,9 +1014,6 @@ public class HostImage extends PortableImage {
 
         // Create the Extension
         final Extension extension = new Extension(profile);
-
-        // Add Extension to Space
-        space.addEntity(extension);
 
         // Get the just-created Extension Image
         //ExtensionImage extensionImage = (ExtensionImage) space.getImages(extension);
@@ -807,10 +1055,10 @@ public class HostImage extends PortableImage {
             selectedHostPort.setDirection(profile.getPorts().get(i).getDirection());
 
             // Create Path from Extension Port to Host Port
-            Path path = new Path(selectedHostPort, extension.getPorts().get(i));
-            path.setType(Path.Type.ELECTRONIC);
+            UUID pathUuid = Clay.createPathEntity(selectedHostPort, extension.getPorts().get(i));
+            Path path = (Path) Entity.getEntity(pathUuid);
 
-            space.addEntity(path);
+            path.setType(Path.Type.ELECTRONIC);
         }
 
         updateExtensionLayout();
@@ -826,7 +1074,7 @@ public class HostImage extends PortableImage {
             indexCounts[i] = 0;
         }
 
-        Shape boardShape = getShape("Substrate");
+        Shape boardShape = getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
         Group<Port> extensionPorts = extension.getPorts();
@@ -839,7 +1087,7 @@ public class HostImage extends PortableImage {
             }
 
             Port hostPort = extensionPort.getPaths().get(0).getHostPort(); // HACK b/c using index 0
-            Transform hostPortPosition = space.getShape(hostPort).getPosition();
+            Transform hostPortPosition = Space.getSpace().getShape(hostPort).getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected Host)
@@ -886,7 +1134,7 @@ public class HostImage extends PortableImage {
         // Update Port and LED shape styles
         for (int i = 0; i < getEntity().getPorts().size(); i++) {
             Port port = getEntity().getPorts().get(i);
-            Shape portShape = getShape(port);
+            Shape portShape = getShape(port.getLabel()); // Shape portShape = getShape(port);
 
             // Update color of Port shape based on type
             portShape.setColor(camp.computer.clay.util.Color.getColor(port.getType()));

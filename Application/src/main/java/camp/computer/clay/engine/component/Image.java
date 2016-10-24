@@ -20,11 +20,6 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Image<T extends Entity> extends Component {
 
-    /**
-     * The parent {@code Space} containing this {@code Image}.
-     */
-    protected Space space = null;
-
     protected T entity = null;
 
     protected List<Shape> shapes = new LinkedList<>();
@@ -48,7 +43,7 @@ public class Image<T extends Entity> extends Component {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-        space.updateLayers();
+        Space.getSpace().updateLayers();
     }
 
     /**
@@ -104,14 +99,6 @@ public class Image<T extends Entity> extends Component {
 
     public T getEntity() {
         return this.entity;
-    }
-
-    public void setSpace(Space space) {
-        this.space = space;
-    }
-
-    public Space getSpace() {
-        return this.space;
     }
 
     public boolean isVisible() {

@@ -18,6 +18,12 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.entity.Camera;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Extension;
+import camp.computer.clay.engine.entity.Host;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
@@ -172,6 +178,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void drawOverlay() {
+
+        int linePosition = 0;
+
         // <FPS_LABEL>
         canvas.save();
         paint.setColor(Color.RED);
@@ -181,17 +190,89 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         String fpsText = "FPS: " + (int) displayOutput.getFramesPerSecond();
         Rect fpsTextBounds = new Rect();
         paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        canvas.drawText(fpsText, 25, 25 + fpsTextBounds.height(), paint);
+        linePosition += 25 + fpsTextBounds.height();
+        canvas.drawText(fpsText, 25, linePosition, paint);
         canvas.restore();
         // </FPS_LABEL>
+
+        // <ENTITY_STATISTICS>
+        canvas.save();
+        int entityCount = Entity.Manager.size();
+        int hostCount = Entity.Manager.filterType2(Host.class).size();
+        int portCount = Entity.Manager.filterType2(Port.class).size();
+        int extensionCount = Entity.Manager.filterType2(Extension.class).size();
+        int pathCount = Entity.Manager.filterType2(Path.class).size();
+
+        // Entities
+        String text = "Entities: " + entityCount;
+        Rect textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Hosts
+        canvas.save();
+        text = "Hosts: " + hostCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Ports
+        canvas.save();
+        text = "Ports: " + portCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Extensions
+        canvas.save();
+        text = "Extensions: " + extensionCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Paths
+        canvas.save();
+        text = "Paths: " + pathCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+        // </ENTITY_STATISTICS>
     }
 
     /**
      * Adjust the perspective
      */
     private void adjustCamera() {
-        canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCamera().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCamera().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
-        canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
+//        canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCamera().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCamera().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
+//        canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
+        Camera camera = getCamera();
+        canvas.translate(
+                (float) originPosition.x + (float) camera.getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
+                (float) originPosition.y + (float) camera.getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
+        );
+        canvas.scale(
+                (float) camera.getScale(),
+                (float) camera.getScale()
+        );
+    }
+
+    /**
+     * Returns {@code Camera} {@code Entity}.
+     * @return
+     */
+    private Camera getCamera() {
+        Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
+        return camera;
     }
 
     /**
@@ -240,8 +321,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-        space.getEntity().getActor(0).getCamera().setWidth(screenWidth);
-        space.getEntity().getActor(0).getCamera().setHeight(screenHeight);
+//        space.getEntity().getActor(0).getCamera().setWidth(screenWidth);
+//        space.getEntity().getActor(0).getCamera().setHeight(screenHeight);
+        Camera camera = getCamera();
+        camera.setWidth(screenWidth);
+        camera.setHeight(screenHeight);
     }
 
     public Space getSpace() {
@@ -272,7 +356,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         final int pointerCount = motionEvent.getPointerCount();
 
         // Get active actor
-        Actor actor = space.getEntity().getActor(0);
+        Actor actor = space.getActor();
 
         // Create pointerCoordinates event
         Event event = new Event();

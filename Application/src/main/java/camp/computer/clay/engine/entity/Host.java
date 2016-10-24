@@ -3,6 +3,7 @@ package camp.computer.clay.engine.entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.space.image.HostImage;
 
 public class Host extends Portable {
 
@@ -22,7 +23,8 @@ public class Host extends Portable {
 
     private void setupComponents() {
         // TODO: InputComponent/ControllerComponent/ActorComponent
-        setComponent(new Transform()); // addComponent(new Transform());
+//        setComponent(new Transform()); // addComponent(new Transform());
+//        setComponent(new HostImage(this));
         // addComponent(new Image());
     }
 

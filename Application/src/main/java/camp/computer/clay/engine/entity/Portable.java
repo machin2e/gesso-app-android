@@ -41,6 +41,15 @@ public class Portable extends Entity {
         return this.ports.get(index);
     }
 
+    public Port getPort(String label) {
+        for (int i = 0; i < ports.size(); i++) {
+            if (ports.get(i).getLabel().equals(label)) {
+                return ports.get(i);
+            }
+        }
+        return null;
+    }
+
     public Group<Port> getPorts() {
         return this.ports;
     }

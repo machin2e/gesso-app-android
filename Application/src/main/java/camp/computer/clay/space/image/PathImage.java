@@ -14,6 +14,7 @@ import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 
 public class PathImage extends Image<Path> {
@@ -124,8 +125,8 @@ public class PathImage extends Image<Path> {
 
         Path path = getPath();
 
-        Shape sourcePortShape = getSpace().getShape(path.getSource());
-        Shape targetPortShape = getSpace().getShape(path.getTarget());
+        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
+        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
 
         // Show target port
         targetPortShape.setVisibility(Visibility.VISIBLE);
@@ -160,8 +161,8 @@ public class PathImage extends Image<Path> {
         Paint paint = display.paint;
 
         Path path = getPath();
-        Shape sourcePortShape = getSpace().getShape(path.getSource());
-        Shape targetPortShape = getSpace().getShape(path.getTarget());
+        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
+        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
 
         if (sourcePortShape != null && targetPortShape != null) {
 

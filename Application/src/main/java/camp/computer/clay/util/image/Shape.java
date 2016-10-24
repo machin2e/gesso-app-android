@@ -66,6 +66,10 @@ public abstract class Shape<T extends Entity> extends Groupable {
         this.position.set(position);
     }
 
+    public void setEntity(T entity) {
+        this.entity = entity;
+    }
+
     public T getEntity() {
         return this.entity;
     }

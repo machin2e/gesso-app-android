@@ -275,18 +275,18 @@ public class Group<E extends Groupable> implements List<E> {
      */
     public <E extends Groupable> Group<E> filterType2(Class<? extends Groupable>... entityTypes) {
 
-        Group<E> imageGroup = new Group<>();
+        Group<E> group = new Group<>();
 
         for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < entityTypes.length; j++) {
                 Class<?> type = entityTypes[j];
                 if (this.elements.get(i).getClass() == type) {
-                    imageGroup.add((E) this.elements.get(i));
+                    group.add((E) this.elements.get(i));
                 }
             }
         }
 
-        return imageGroup;
+        return group;
     }
 
     /**

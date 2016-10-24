@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.entity.Extension;
+import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
@@ -22,6 +25,9 @@ import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
+import camp.computer.clay.space.image.ExtensionImage;
+import camp.computer.clay.space.image.HostImage;
+import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.util.image.Space;
 
 public class Clay {
@@ -75,11 +81,11 @@ public class Clay {
         Application.getView().getDisplay().setSpace(space);
 
         // <TEST>
-        addVirtualHost();
-        addVirtualHost();
-        addVirtualHost();
-        addVirtualHost();
-        addVirtualHost();
+        createHostEntity();
+        createHostEntity();
+        createHostEntity();
+        createHostEntity();
+        createHostEntity();
         // </TEST>
 
     }
@@ -100,23 +106,67 @@ public class Clay {
      * Adds a <em>virtual</em> {@code Host} that can be configured and later assigned to a physical
      * host.
      */
-    private void addVirtualHost() {
+    public static UUID createHostEntity() {
 
-        // <HOST_CONFIGURATION>
-        // TODO: Read this from the device (or look up from host UUID). It will be encoded on
-        // TODO: (cont'd) the device.
-        final int PORT_COUNT = 12;
-        // </HOST_CONFIGURATION>
-
+        // Create Entity
         Host host = new Host();
 
+        // Portable Component (Image Component depends on this)
+        final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
             Port port = new Port();
+            port.setLabel("Port " + (j + 1));
             port.setIndex(j);
             host.addPort(port);
         }
 
-        space.addEntity(host);
+        // Add Transform Component
+        host.setComponent(new Transform()); // addComponent(new Transform());
+
+        // Add Image Component
+        host.setComponent(new HostImage(host));
+
+        // Load geometry from file into Image Component
+        // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
+
+        // <HACK>
+        Space.getSpace().adjustLayout();
+        // </HACK>
+
+        return host.getUuid();
+    }
+
+    public static UUID createExtensionEntity() {
+
+        // Create Entity
+        Extension extension = new Extension();
+
+        // <PORTABLE_COMPONENT>
+        // Create Ports and add them to the Extension
+        int defaultPortCount = 1;
+        for (int j = 0; j < defaultPortCount; j++) {
+            Port port = new Port();
+            port.setIndex(j);
+            extension.addPort(port);
+        }
+        // </PORTABLE_COMPONENT>
+
+        // Add Components
+        extension.setComponent(new Transform());
+        extension.setComponent(new ExtensionImage(extension));
+
+        // Load geometry from file into Image Component
+        // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
+
+        return extension.getUuid();
+    }
+
+    public static UUID createPathEntity(Port sourcePort, Port targetPort) {
+        Path path = new Path(sourcePort, targetPort);
+        PathImage pathImage = new PathImage(path); // Create Path Image
+        path.setComponent(pathImage); // Assign Image to Entity
+
+        return path.getUuid();
     }
 
     /*
@@ -202,7 +252,7 @@ public class Clay {
             return null;
         }
 
-        addVirtualHost();
+        createHostEntity();
 
         return null;
     }

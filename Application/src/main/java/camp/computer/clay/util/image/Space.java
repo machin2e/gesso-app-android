@@ -49,6 +49,7 @@ public class Space extends Image<Model> {
     }
 
     private void setup() {
+        Space.space = this;
         setupActions();
     }
 
@@ -100,7 +101,7 @@ public class Space extends Image<Model> {
                         setTitleVisibility(Visibility.INVISIBLE);
 
                         // Camera
-                        camera.setFocus(getSpace());
+                        camera.setFocus(Space.getSpace());
                     }
 //                    }
                 }
@@ -108,81 +109,9 @@ public class Space extends Image<Model> {
         });
     }
 
-    public Model getModel() {
-        return getEntity();
-    }
-
-    // TODO: Replace with Entity.Manager
-//    private Group<Entity> entities = new Group<>();
-
-    public Group<Entity> getEntities() {
-        return this.getModel().getEntities();
-    }
-
-    public <T extends Entity> void addEntity(T entity) {
-
-        if (!getEntities().contains(entity)) {
-            getEntities().add(entity);
-        }
-
-        if (entity instanceof Host) {
-
-            Host host = (Host) entity;
-
-            // Create Host Image
-            HostImage hostImage = new HostImage(host);
-            hostImage.setSpace(this);
-
-            // Assign Image to Entity
-            host.setComponent(hostImage);
-
-            // Create Port Shapes for each of the PhoneHost's Ports
-            for (int i = 0; i < host.getPorts().size(); i++) {
-                Port port = host.getPorts().get(i);
-                addEntity(port);
-            }
-
-            // Add Host Image to Space
-//            addImage(hostImage);
-
-            // Position the Image
-            adjustLayout();
-
-        } else if (entity instanceof Extension) {
-
-            Extension extension = (Extension) entity;
-
-            // Create Extension Image
-            ExtensionImage extensionImage = new ExtensionImage(extension);
-            extensionImage.setSpace(this);
-
-            // Assign Image to Entity
-            extension.setComponent(extensionImage);
-
-            // Create Port Shapes for each of the Extension's Ports
-            for (int i = 0; i < extension.getPorts().size(); i++) {
-                Port port = extension.getPorts().get(i);
-                addEntity(port);
-            }
-
-            // Add Extension Image to Space
-//            addImage(extensionImage);
-
-        } else if (entity instanceof Port) {
-
-//            Port port = (Port) entity;
-
-        } else if (entity instanceof Path) {
-
-            Path path = (Path) entity;
-
-            // Create Path Image
-            PathImage pathImage = new PathImage(path);
-            pathImage.setSpace(this);
-
-            // Assign Image to Entity
-            path.setComponent(pathImage);
-        }
+    private static Space space = null;
+    public static Space getSpace() {
+        return Space.space;
     }
 
     public void addActor(Actor actor) {
@@ -197,7 +126,7 @@ public class Space extends Image<Model> {
     @Override
     public void updateLayers() {
 
-        Group<Image> images = getEntities().getImages();
+        Group<Image> images = Entity.Manager.getImages();
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {
@@ -221,19 +150,19 @@ public class Space extends Image<Model> {
         */
     }
 
-    @Override
-    public Space getSpace() {
-        return this;
-    }
+//    @Override
+//    public Space getSpace() {
+//        return this;
+//    }
 
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
 
     /**
      * Automatically determines and assigns a valid position for all {@code Host} {@code Image}s.
      */
-    private void adjustLayout() {
+    public void adjustLayout() {
 
-        Group<Image> hostImages = getEntities().filterType2(Host.class).getImages();
+        Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
 
         // Set position on grid layout
         if (hostImages.size() == 1) {
@@ -260,15 +189,22 @@ public class Space extends Image<Model> {
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
+    // TODO: Remove this!
     public Model getEntity() {
         return this.entity;
     }
+
+    // <HACK>
+    public Actor getActor() {
+        return this.entity.getActor(0);
+    }
+    // </HACK>
 
     // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
     public ShapeGroup getShapes() {
 //        return getImages().getShapes();
         ShapeGroup shapes = new ShapeGroup();
-        Group<Image> images = getEntities().getImages();
+        Group<Image> images = Entity.Manager.getImages();
         for (int i = 0; i < images.size(); i++) {
             shapes.addAll(images.get(i).getShapes());
         }
@@ -278,7 +214,7 @@ public class Space extends Image<Model> {
     // TODO: Refactor to be cleaner and leverage other classes...
     public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
         ShapeGroup shapeGroup = new ShapeGroup();
-        Group<Image> imageList = getEntities().getImages();
+        Group<Image> imageList = Entity.Manager.getImages();
 
         for (int i = 0; i < imageList.size(); i++) {
             shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
@@ -288,7 +224,7 @@ public class Space extends Image<Model> {
     }
 
     public Shape getShape(Entity entity) {
-        Group<Image> images = getEntities().getImages();
+        Group<Image> images = Entity.Manager.getImages();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
             Shape shape = image.getShape(entity);
@@ -308,9 +244,9 @@ public class Space extends Image<Model> {
         }
 
         // Update Images
-        for (int i = 0; i < getEntities().size(); i++) {
-            if (getEntities().get(i).hasComponent(Image.class)) {
-                Image image = getEntities().get(i).getComponent(Image.class);
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).hasComponent(Image.class)) {
+                Image image = Entity.Manager.get(i).getComponent(Image.class);
 
                 // Update bounding box of Image
                 // TODO:
@@ -321,7 +257,8 @@ public class Space extends Image<Model> {
         }
 
         // Update Camera(s)
-        getEntity().getActor(0).getCamera().update();
+        Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
+        camera.update();
 
 
 //        // Sandbox
@@ -338,9 +275,9 @@ public class Space extends Image<Model> {
         display.canvas.save();
 
         // Draw Entities
-        for (int i = 0; i < getEntities().size(); i++) {
-            if (getEntities().get(i).hasComponent(Image.class)) {
-                getEntities().get(i).getComponent(Image.class).draw(display);
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).hasComponent(Image.class)) {
+                Entity.Manager.get(i).getComponent(Image.class).draw(display);
             }
         }
 
@@ -445,7 +382,7 @@ public class Space extends Image<Model> {
     public void setPortableSeparation(double distance) {
         // <HACK>
         // TODO: Replace ASAP. This is shit.
-        Group<Image> extensionImages = getEntities().filterType2(Extension.class).getImages();
+        Group<Image> extensionImages = Entity.Manager.filterType2(Extension.class).getImages();
         for (int i = 0; i < extensionImages.size(); i++) {
             ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
 
@@ -462,7 +399,7 @@ public class Space extends Image<Model> {
     public void hideAllPorts() {
         // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
 
-        Group<Image> portableImages = getEntities().filterType2(Host.class, Extension.class).getImages();
+        Group<Image> portableImages = Entity.Manager.filterType2(Host.class, Extension.class).getImages();
 //        ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
             PortableImage portableImage = (PortableImage) portableImages.get(i);

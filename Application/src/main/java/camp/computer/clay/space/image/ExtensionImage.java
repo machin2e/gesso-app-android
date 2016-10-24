@@ -111,8 +111,8 @@ public class ExtensionImage extends PortableImage {
                                     Path path = paths.get(j);
 
                                     // Show ports
-                                    getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                    getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                    Space.getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
+                                    Space.getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
 
                                     // Show path
                                     path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
@@ -123,8 +123,8 @@ public class ExtensionImage extends PortableImage {
                             event.getActor().getCamera().setFocus(getExtension());
 
                             // Title
-                            space.setTitleText("Extension");
-                            space.setTitleVisibility(Visibility.VISIBLE);
+                            Space.getSpace().setTitleText("Extension");
+                            Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
                         }
                     }
                 }

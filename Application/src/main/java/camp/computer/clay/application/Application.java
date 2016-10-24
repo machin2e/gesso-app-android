@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +41,7 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
 import camp.computer.clay.engine.entity.Extension;
@@ -47,6 +49,9 @@ import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.util.geometry.Circle;
+import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Vertex;
 
 public class Application extends FragmentActivity implements DisplayHostInterface {
 
@@ -289,6 +294,132 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         return hosts;
+    }
+
+    // TODO: Make this into a static method of Image (or maybe better, add it to an ImageSystem?)
+    public void restoreGeometry(Image image, String filename) {
+
+        // Check for valid Image component.
+        if (image == null) {
+            Log.e("Application", "Error. restoreGeometry(): Image component is null.");
+            return;
+        }
+
+        // Open specified JSON file.
+        String jsonString = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open(filename);
+            int fileSize = inputStream.available();
+            byte[] fileBuffer = new byte[fileSize];
+            inputStream.read(fileBuffer);
+            inputStream.close();
+            jsonString = new String(fileBuffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create JSON object from file contents for parsing content.
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+
+            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
+            String hostTitle = hostObject.getString("title"); // Handle to Host's title
+
+            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
+
+            // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
+            double scaleFactor = 6.0;
+
+            for (int i = 0; i < geometryArray.length(); i++) {
+                JSONObject shape = geometryArray.getJSONObject(i);
+                JSONObject position = shape.getJSONObject("position");
+
+                JSONObject style = null;
+                if (shape.has("style")) {
+                    style = shape.getJSONObject("style");
+                }
+
+                // Description
+                String label = shape.getString("label");
+                String type = shape.getString("type");
+
+                // Geometry
+                double x = position.getDouble("x") * scaleFactor;
+                double y = position.getDouble("y") * scaleFactor;
+                double rotation = shape.getDouble("rotation");
+
+                // Style
+                String color = "#ffffff";
+                String outlineColor = "#000000";
+                double outlineThickness = 0.0;
+
+                if (style != null) {
+                    if (style.has("color")) {
+                        color = style.getString("color");
+                    }
+                    if (style.has("outlineColor")) {
+                        outlineColor = style.getString("outlineColor");
+                    }
+                    if (style.has("outlineThickness")) {
+                        outlineThickness = style.getDouble("outlineThickness") * scaleFactor;
+                    }
+                }
+
+                if (type.equals("Point")) {
+
+                    // NOTE: Geometry N/A
+
+                    Vertex vertex = new Vertex();
+                    vertex.setLabel(label);
+                    vertex.setPosition(x, y);
+                    vertex.setRotation(rotation);
+                    vertex.setColor(color);
+                    vertex.setOutlineColor(outlineColor);
+                    vertex.setOutlineThickness(outlineThickness);
+
+                    image.addShape(vertex);
+
+                } else if (type.equals("Rectangle")) {
+
+                    double width = shape.getDouble("width") * scaleFactor;
+                    double height = shape.getDouble("height") * scaleFactor;
+                    double cornerRadius = shape.getDouble("cornerRadius") * scaleFactor;
+
+                    Rectangle rectangle = new Rectangle(width, height);
+                    rectangle.setLabel(label);
+                    rectangle.setCornerRadius(cornerRadius);
+                    rectangle.setPosition(x, y);
+                    rectangle.setRotation(rotation);
+                    rectangle.setColor(color);
+                    rectangle.setOutlineColor(outlineColor);
+                    rectangle.setOutlineThickness(outlineThickness);
+
+                    image.addShape(rectangle);
+
+                } else if (type.equals("Circle")) {
+
+                    double radius = shape.getDouble("radius") * scaleFactor;
+
+                    Circle circle = new Circle(radius);
+                    circle.setLabel(label);
+                    circle.setPosition(x, y);
+                    circle.setRotation(rotation);
+                    circle.setColor(color);
+                    circle.setOutlineColor(outlineColor);
+                    circle.setOutlineThickness(outlineThickness);
+
+                    image.addShape(circle);
+                }
+            }
+
+            // Host host = new Host();
+
+            Log.v("Configuration", "reading JSON name: " + hostTitle);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -606,6 +737,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                new RedisSubThread(this.jedis)
 //        ).start();
         // </REDIS>
+
+//        restoreGeometry("Geometry.json");
     }
 
     public void hideChat() {

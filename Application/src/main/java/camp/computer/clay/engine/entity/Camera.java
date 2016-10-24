@@ -131,7 +131,7 @@ public class Camera extends Entity {
     public void adjustPosition() {
         //Transform centerPosition = getSpace().getImages().filterType2(Host.class, Extension.class).getCenterPoint();
         //Transform centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
-        Transform centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getCenterPoint();
+        Transform centerPosition = Entity.Manager.filterType2(Host.class, Extension.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
@@ -169,7 +169,7 @@ public class Camera extends Entity {
 
     public void adjustScale(double duration) {
         //Rectangle boundingBox = getSpace().getImages().filterType2(Host.class, Extension.class).getBoundingBox();
-        Rectangle boundingBox = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getBoundingBox();
+        Rectangle boundingBox = Entity.Manager.filterType2(Host.class, Extension.class).getImages().getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
         }
@@ -254,7 +254,7 @@ public class Camera extends Entity {
 //        otherPortableImages.setTransparency(0.1);
 
         // TODO: Group<Portable> otherPortables = getSpace().getEntities();
-        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.filterType, Host.class, Extension.class);
+        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Extension.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(host);
         otherPortables.setTransparency(0.1);
@@ -303,7 +303,7 @@ public class Camera extends Entity {
 //        otherPortableImages.setTransparency(0.1);
 
         // TODO: Group<Portable> otherPortables = getSpace().getEntities();
-        Group<Entity> otherPortables = getSpace().getEntities().filter(Group.Filters.filterType, Host.class, Extension.class);
+        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Extension.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(extension);
         otherPortables.setTransparency(0.1);

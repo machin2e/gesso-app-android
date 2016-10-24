@@ -92,9 +92,10 @@ public abstract class Entity extends Groupable {
 
 
     // <TEMPORARY_COMPONENTS_REFERENCES>
-    // TODO: Store these in the Entity.components Group.
-    protected Transform transform = null; // new Transform(0, 0); // TODO: Eventually, put this in the list of components.
-    protected Image image = null; // TODO: Eventually, put this in the list of components.
+    // TODO: Eventually, put this in the list of components.
+    // TODO: i.e., Store these in the Entity.components Group.
+    protected Transform transform = null;
+    protected Image image = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
