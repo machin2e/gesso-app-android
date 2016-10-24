@@ -18,7 +18,6 @@ import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.entity.Host;
-import camp.computer.clay.model.Model;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.old_model.Cache;
@@ -37,8 +36,6 @@ public class Clay {
     private Internet internet = null;
 
     private Cache cache = null;
-
-    private Model model;
 
     private Space space;
 
@@ -62,11 +59,8 @@ public class Clay {
 
         this.internet = new Internet(this); // Start the networking systems
 
-        // Model
-        this.model = new Model();
-
         // Space
-        this.space = new Space(model);
+        this.space = new Space();
 
         // Create actor and setAbsolute perspective
         Actor actor = new Actor();
@@ -76,7 +70,7 @@ public class Clay {
         actor.getCamera().setSpace(space);
 
         // Add actor to model
-        model.addActor(actor);
+        space.addActor(actor);
 
         Application.getView().getDisplay().setSpace(space);
 
@@ -92,10 +86,6 @@ public class Clay {
 
     private Clay getClay() {
         return this;
-    }
-
-    public Model getModel() {
-        return this.model;
     }
 
     public Space getSpace() {

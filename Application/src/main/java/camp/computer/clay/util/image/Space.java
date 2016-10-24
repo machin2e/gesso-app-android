@@ -14,23 +14,19 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
-import camp.computer.clay.model.Model;
-import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
-import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 // TODO: DO NOT extend Image. Remove this class!
-public class Space extends Image<Model> {
+public class Space extends Image {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
@@ -43,8 +39,8 @@ public class Space extends Image<Model> {
 
     private List<Actor> actors = new LinkedList<>();
 
-    public Space(Model model) {
-        super(model);
+    public Space() {
+        super();
         setup();
     }
 
@@ -189,14 +185,9 @@ public class Space extends Image<Model> {
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    // TODO: Remove this!
-    public Model getEntity() {
-        return this.entity;
-    }
-
     // <HACK>
     public Actor getActor() {
-        return this.entity.getActor(0);
+        return this.actors.get(0);
     }
     // </HACK>
 
@@ -211,17 +202,17 @@ public class Space extends Image<Model> {
         return shapes;
     }
 
-    // TODO: Refactor to be cleaner and leverage other classes...
-    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
-        ShapeGroup shapeGroup = new ShapeGroup();
-        Group<Image> imageList = Entity.Manager.getImages();
-
-        for (int i = 0; i < imageList.size(); i++) {
-            shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
-        }
-
-        return shapeGroup.filterType(entityTypes);
-    }
+//    // TODO: Refactor to be cleaner and leverage other classes...
+//    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
+//        ShapeGroup shapeGroup = new ShapeGroup();
+//        Group<Image> imageList = Entity.Manager.getImages();
+//
+//        for (int i = 0; i < imageList.size(); i++) {
+//            shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
+//        }
+//
+//        return shapeGroup.filterType(entityTypes);
+//    }
 
     public Shape getShape(Entity entity) {
         Group<Image> images = Entity.Manager.getImages();
