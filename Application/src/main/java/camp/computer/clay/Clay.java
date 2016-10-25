@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
+import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Path;
@@ -19,6 +20,8 @@ import camp.computer.clay.host.MessengerInterface;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.model.action.Action;
+import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
@@ -127,7 +130,7 @@ public class Clay {
         }
 
         // Add Transform Component
-        host.setComponent(new Transform()); // addComponent(new Transform());
+        host.setComponent(new Transform());
 
         // Add Image Component
         host.setComponent(new HostImage(host));
@@ -137,7 +140,11 @@ public class Clay {
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
-        host.setupActionListener();
+//        host.setupActionListener();
+
+        ActionListenerComponent actionListener = new ActionListenerComponent();
+        actionListener.setOnActionListener(host.getActionListener());
+        host.setComponent(actionListener);
         // </HACK>
 
         return host.getUuid();
@@ -167,7 +174,11 @@ public class Clay {
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
-        extension.setupActionListener();
+//        extension.setupActionListener();
+
+        ActionListenerComponent actionListener = new ActionListenerComponent();
+        actionListener.setOnActionListener(extension.getActionListener());
+        extension.setComponent(actionListener);
         // </HACK>
 
         return extension.getUuid();
@@ -181,7 +192,11 @@ public class Clay {
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
-        path.setupActionListener();
+//        path.setupActionListener();
+
+        ActionListenerComponent actionListener = new ActionListenerComponent();
+        actionListener.setOnActionListener(path.getActionListener());
+        path.setComponent(actionListener);
         // </HACK>
 
         return path.getUuid();

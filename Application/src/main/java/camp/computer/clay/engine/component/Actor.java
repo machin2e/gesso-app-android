@@ -155,7 +155,7 @@ public class Actor extends Component {
                 if (targetImage.getClass() == Space.class) {
                     ((Space) targetImage).processAction(action);
                 } else {
-                    targetImage.getEntity().processAction(action);
+                    targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
                 // </HACK>
 
@@ -180,7 +180,7 @@ public class Actor extends Component {
                 if (targetImage.getClass() == Space.class) {
                     ((Space) targetImage).processAction(action);
                 } else {
-                    targetImage.getEntity().processAction(action);
+                    targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
                 // </HACK>
 
@@ -208,7 +208,7 @@ public class Actor extends Component {
                     if (firstImage.getClass() == Space.class) {
                         ((Space) firstImage).processAction(action);
                     } else {
-                        firstImage.getEntity().processAction(action);
+                        firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                     }
                     // </HACK>
                 }
@@ -238,7 +238,7 @@ public class Actor extends Component {
                 if (firstImage.getClass() == Space.class) {
                     ((Space) firstImage).processAction(action);
                 } else {
-                    firstImage.getEntity().processAction(action);
+                    firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
                 // </HACK>
 

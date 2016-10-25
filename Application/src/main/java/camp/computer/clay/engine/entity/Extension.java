@@ -63,13 +63,13 @@ public class Extension extends Portable {
         return hostGroup;
     }
 
-    public void setupActionListener() {
+    public ActionListener getActionListener() {
 
         final Extension extension = this;
 
         final ExtensionImage extensionImage = (ExtensionImage) extension.getComponent(Image.class);
 
-        setOnActionListener(new ActionListener() {
+        return new ActionListener() {
             @Override
             public void onAction(Action action) {
 
@@ -137,6 +137,6 @@ public class Extension extends Portable {
                     }
                 }
             }
-        });
+        };
     }
 }

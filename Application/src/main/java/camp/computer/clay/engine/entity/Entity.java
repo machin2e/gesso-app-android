@@ -3,6 +3,7 @@ package camp.computer.clay.engine.entity;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
+import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
@@ -99,6 +100,7 @@ public abstract class Entity extends Groupable {
     // TODO: i.e., Store these in the Entity.components Group.
     protected Transform transform = null;
     protected Image image = null;
+    protected ActionListenerComponent actionListener = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -108,6 +110,8 @@ public abstract class Entity extends Groupable {
             this.transform = (Transform) component;
         } else if (component instanceof Image) {
             this.image = (Image) component;
+        } else if (component instanceof ActionListenerComponent) {
+            this.actionListener = (ActionListenerComponent) component;
         }
     }
 
@@ -120,11 +124,38 @@ public abstract class Entity extends Groupable {
             return type.cast(this.transform);
         } else if (type == Image.class) {
             return type.cast(this.image);
+        } else if (type == ActionListenerComponent.class) {
+            return type.cast(this.actionListener);
         } else {
             return null;
         }
     }
     // </TEMPORARY_COMPONENT_INTERFACE>
+
+
+
+    // <INPUT_COMPONENT>
+//    public void setOnActionListener(ActionListener actionListener) {
+//        this.actionListener = actionListener;
+//    }
+
+//    public ActionListener getActionListener() {
+//        return this.actionListener;
+//    }
+
+//    public void processAction(Action action) {
+//        // <HACK>
+//        // TODO: Remove this after moving ActionListener into Entity.
+//        if (getClass() == Host.class || getClass() == Extension.class) {
+//            getActionListener().onAction(action);
+//        }
+//
+////        if (getClass() == Space.class) {
+////            ((Space) this).actionListener.onAction(action);
+////        }
+//        // </HACK>
+//    }
+    // </INPUT_COMPONENT>
 
 
     // <GENERIC_COMPONENT_INTERFACE>
@@ -153,33 +184,6 @@ public abstract class Entity extends Groupable {
         return components.contains(uuid);
     }
     // </GENERIC_COMPONENT_INTERFACE>
-
-
-
-    // <INPUT_COMPONENT>
-    protected ActionListener actionListener;
-
-    public void setOnActionListener(ActionListener actionListener) {
-        this.actionListener = actionListener;
-    }
-
-    public ActionListener getActionListener() {
-        return this.actionListener;
-    }
-
-    public void processAction(Action action) {
-        // <HACK>
-        // TODO: Remove this after moving ActionListener into Entity.
-        if (getClass() == Host.class || getClass() == Extension.class) {
-            getActionListener().onAction(action);
-        }
-
-//        if (getClass() == Space.class) {
-//            ((Space) this).actionListener.onAction(action);
-//        }
-        // </HACK>
-    }
-    // </INPUT_COMPONENT>
 
 
 

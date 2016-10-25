@@ -193,8 +193,8 @@ public class Path extends Entity {
         }
     }
 
-    public void setupActionListener() {
-        setOnActionListener(new ActionListener() {
+    public ActionListener getActionListener() {
+        return new ActionListener() {
             @Override
             public void onAction(Action action) {
 
@@ -212,6 +212,6 @@ public class Path extends Entity {
 
                 }
             }
-        });
+        };
     }
 }
