@@ -3,7 +3,10 @@ package camp.computer.clay.engine.entity;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.model.profile.Profile;
+import camp.computer.clay.space.image.ExtensionImage;
+import camp.computer.clay.space.image.HostImage;
 
 /**
  * {@code Extension} represents a device connected to a {@code Host}.
@@ -42,5 +45,11 @@ public class Extension extends Portable {
         }
 
         return hostGroup;
+    }
+
+    @Override
+    public void update() {
+        ExtensionImage extensionImage = (ExtensionImage) getComponent(Image.class);
+        extensionImage.update();
     }
 }

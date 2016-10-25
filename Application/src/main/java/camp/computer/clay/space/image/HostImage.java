@@ -727,7 +727,7 @@ public class HostImage extends PortableImage {
         return (Host) getEntity();
     }
 
-    ShapeGroup lightShapeGroup = null;
+    public ShapeGroup lightShapeGroup = null;
 
     public void update() {
 

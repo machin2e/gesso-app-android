@@ -8,9 +8,6 @@ import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.util.image.Space;
 
 public abstract class Entity extends Groupable {
 
@@ -18,7 +15,7 @@ public abstract class Entity extends Groupable {
     // TODO: public static Group<Entity> Manager = new Group<>();
     public static Group<Entity> Manager = new Group<>();
 
-    public static void addEntity2(Entity entity) {
+    public static void addEntity(Entity entity) {
         Manager.add(entity);
     }
 
@@ -64,7 +61,7 @@ public abstract class Entity extends Groupable {
     private void setup() {
 
         // Add Entity to Manager
-        Entity.addEntity2(this);
+        Entity.addEntity(this);
 
         // Create list of Components
         components = new Group<>();
@@ -80,6 +77,11 @@ public abstract class Entity extends Groupable {
     public Entity getParent() {
         return this.parent;
     }
+
+
+
+    public abstract void update();
+
 
 
     // <TAG_COMPONENT>

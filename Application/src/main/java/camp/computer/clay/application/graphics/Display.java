@@ -442,11 +442,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     public void updateEntities() {
         for (int i = 0; i < Entity.Manager.size(); i++) {
             Entity entity = Entity.Manager.get(i);
-            Image image = entity.getComponent(Image.class);
-            if (image != null) {
-//                image.draw(this);
-                image.update();
-            }
+//            Image image = entity.getComponent(Image.class);
+//            if (image != null) {
+////                image.draw(this);
+//                image.update();
+//            }
+            entity.update();
         }
     }
 

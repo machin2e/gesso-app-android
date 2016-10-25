@@ -59,6 +59,10 @@ public class Port extends Entity {
         }
     }
 
+    @Override
+    public void update() {
+    }
+
     /**
      * The {@code index} is a unique number that uniquely identifies the {@code Port}. Concretely,
      * the {@code index} identifier is equal to the pin number defined for a particular I/O pin on

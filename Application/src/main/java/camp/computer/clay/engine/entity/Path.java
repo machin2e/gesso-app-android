@@ -82,6 +82,10 @@ public class Path extends Entity {
         // TODO: Path.connectPath(source, destination) and do what the following constructor does... auto-configure Ports and Path
     }
 
+    @Override
+    public void update() {
+    }
+
     public Type getType() {
         return this.type;
     }

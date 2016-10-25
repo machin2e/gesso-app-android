@@ -34,4 +34,9 @@ public class Host extends Portable {
     }
 
     // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)
+
+    public void update() {
+        HostImage hostImage = (HostImage) getComponent(Image.class);
+        hostImage.update();
+    }
 }

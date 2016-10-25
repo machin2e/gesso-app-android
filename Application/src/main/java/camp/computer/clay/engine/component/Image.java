@@ -201,7 +201,7 @@ public class Image<T extends Entity> extends Component {
         updateGeometry();
     }
 
-    protected void updateGeometry() {
+    public void updateGeometry() {
 
         // Update Shapes
         for (int i = 0; i < this.shapes.size(); i++) {

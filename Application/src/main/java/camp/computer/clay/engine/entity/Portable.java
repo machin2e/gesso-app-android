@@ -14,6 +14,10 @@ public class Portable extends Entity {
         super();
     }
 
+    @Override
+    public void update() {
+    }
+
     public Portable(Profile profile) {
         super();
 
