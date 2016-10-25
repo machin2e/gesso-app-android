@@ -26,7 +26,7 @@ import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.space.image.PathImage;
+import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
@@ -35,7 +35,9 @@ import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Triangle;
+import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.Visibility;
 
 public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -488,25 +490,129 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         } else if (entity.getClass() == Path.class) {
 
-            PathImage image = (PathImage) entity.getComponent(Image.class);
+            Image image = entity.getComponent(Image.class);
 
             if (image.isVisible()) {
-                Path path = image.getPath();
+                Path path = (Path) image.getEntity();
                 if (path.getType() == Path.Type.MESH) {
                     // Draw Path between Ports
-                    image.drawTrianglePath(this);
+                    drawTrianglePath(path, this);
                 } else if (path.getType() == Path.Type.ELECTRONIC) {
-                    image.drawLinePath(this);
+                    drawLinePath(path, this);
                 }
             } else {
                 Path path = (Path) entity; // image.getPath();
                 if (path.getType() == Path.Type.ELECTRONIC) {
-                    image.drawPhysicalPath(this);
+                    drawPhysicalPath(path, this);
                 }
             }
 
         }
     }
+
+    // <PATH_IMAGE_HELPERS>
+    private double triangleWidth = 20;
+    private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
+    private double triangleSpacing = 35;
+
+    public void drawTrianglePath(Path path, Display display) {
+
+        Paint paint = display.paint;
+
+        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
+        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
+
+        // Show target port
+        targetPortShape.setVisibility(Visibility.VISIBLE);
+        //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
+
+        // Color
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(15.0f);
+        paint.setColor(Color.parseColor(sourcePortShape.getColor()));
+
+        double pathRotation = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
+        Transform sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
+        Transform targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
+
+        display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
+    }
+
+    public void drawLinePath(Path path, Display display) {
+
+        Paint paint = display.paint;
+
+        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
+        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
+
+        if (sourcePortShape != null && targetPortShape != null) {
+
+            // Show target port
+            targetPortShape.setVisibility(Visibility.VISIBLE);
+            //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
+
+            // Color
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(15.0f);
+            paint.setColor(Color.parseColor(sourcePortShape.getColor()));
+
+            double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+
+//            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
+
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+//            double pathRotation = getSpace().getImages(getPath().getHosts()).getRotation();
+
+            Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
+            segment.setOutlineThickness(15.0);
+            segment.setOutlineColor(sourcePortShape.getColor());
+
+            segment.setSource(pathStartCoordinate);
+            segment.setTarget(pathStopCoordinate);
+
+            display.drawSegment(segment);
+        }
+    }
+
+    public void drawPhysicalPath(Path path, Display display) {
+
+        // Get Host and Extension Ports
+        Port hostPort = path.getSource();
+        Port extensionPort = path.getTarget();
+
+        // Draw the connection to the Host's Port
+
+        PortableImage hostImage = (PortableImage) hostPort.getPortable().getComponent(Image.class);
+        PortableImage extensionImage = (PortableImage) extensionPort.getPortable().getComponent(Image.class);
+
+        if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
+            Transform hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();
+            Transform extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex()).getPosition();
+
+            // Draw connection between Ports
+            display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
+            display.paint.setStrokeWidth(10.0f);
+//            display.drawSegment(hostConnectorPosition, extensionConnectorPosition);
+
+//            Polyline polyline = new Polyline();
+//            polyline.addVertex(hostConnectorPosition);
+//            polyline.addVertex(extensionConnectorPosition);
+//            display.drawPolyline(polyline);
+
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+            Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
+            segment.setOutlineThickness(10.0);
+            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getType()));
+
+            segment.setSource(hostConnectorPosition);
+            segment.setTarget(extensionConnectorPosition);
+
+            display.drawSegment(segment);
+        }
+    }
+    // </PATH_IMAGE_HELPERS>
 
     public void drawSegment(Transform source, Transform target) {
         canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);

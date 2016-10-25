@@ -69,7 +69,7 @@ public class PortableImage extends Image {
     public boolean hasVisiblePaths(int portIndex) {
         Group<Image> pathImages = getPathImages(portIndex);
         for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
+            Image pathImage = pathImages.get(i);
             if (pathImage.isVisible()) {
                 return true;
             }
@@ -95,7 +95,7 @@ public class PortableImage extends Image {
         Group<Image> pathImages = new Group<>();
         for (int i = 0; i < port.getPaths().size(); i++) {
             Path path = port.getPaths().get(i);
-            PathImage pathImage = (PathImage) path.getComponent(Image.class);
+            Image pathImage = path.getComponent(Image.class);
             pathImages.add(pathImage);
         }
         return pathImages;
@@ -116,7 +116,7 @@ public class PortableImage extends Image {
     public void setPathVisibility(Port port, Visibility visibility) {
         Group<Image> pathImages = getPathImages(port);
         for (int i = 0; i < pathImages.size(); i++) {
-            PathImage pathImage = (PathImage) pathImages.get(i);
+            Image pathImage = pathImages.get(i);
 
             // Update visibility
             if (visibility == Visibility.VISIBLE) {
@@ -128,7 +128,8 @@ public class PortableImage extends Image {
             }
 
             // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
-            Port targetPort = pathImage.getPath().getTarget();
+            Path path = (Path) pathImage.getEntity();
+            Port targetPort = path.getTarget();
             Portable targetPortable = (Portable) targetPort.getParent();
             PortableImage targetPortableImage = (PortableImage) targetPortable.getComponent(Image.class);
             if (targetPortableImage != this) { // HACK

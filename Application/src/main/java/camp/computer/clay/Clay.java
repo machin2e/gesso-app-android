@@ -34,10 +34,10 @@ import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
-import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -231,7 +231,21 @@ public class Clay {
 
     private static UUID createPathEntity() {
         Path path = new Path();
-        PathImage pathImage = new PathImage(path); // Create Path Image
+
+        Image pathImage = new Image(path); // Create Path Image
+
+        // <SETUP_PATH_IMAGE_GEOMETRY>
+        Segment segment;
+
+        // Board
+        segment = new Segment<>();
+        segment.setOutlineThickness(2.0);
+        segment.setLabel("Path");
+        segment.setColor("#1f1f1e"); // #f7f7f7
+        segment.setOutlineThickness(1);
+        pathImage.addShape(segment);
+        // </SETUP_PATH_IMAGE_GEOMETRY>
+
         path.setComponent(new Transform());
         path.setComponent(pathImage); // Assign Image to Entity
 
