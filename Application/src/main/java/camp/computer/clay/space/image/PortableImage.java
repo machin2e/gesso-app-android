@@ -13,7 +13,7 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public abstract class PortableImage extends Image {
+public class PortableImage extends Image {
 
     public List<Vertex> headerContactPositions = new ArrayList<>();
 

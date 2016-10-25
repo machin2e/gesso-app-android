@@ -35,7 +35,6 @@ import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.space.image.ExtensionImage;
-import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
@@ -145,10 +144,22 @@ public class Clay {
         host.setComponent(new Transform());
 
         // Add Image Component
-        host.setComponent(new HostImage(host));
+        host.setComponent(new PortableImage(host));
 
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
+        Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
+
+        // <HACK>
+        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
+        for (int i = 0; i < shapes.size(); i++) {
+            if (shapes.get(i).getLabel().startsWith("Port")) {
+                String label = shapes.get(i).getLabel();
+                Port port = host.getPort(label);
+                shapes.get(i).setEntity(port);
+            }
+        }
+        // </HACK>
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
@@ -216,7 +227,7 @@ public class Clay {
 
     public static ActionListener getHostActionListener(final Host host) {
 
-        final HostImage hostImage = (HostImage) host.getComponent(Image.class);
+        final PortableImage hostImage = (PortableImage) host.getComponent(Image.class);
 
         return new ActionListener() {
             @Override
@@ -417,10 +428,10 @@ public class Clay {
 
                             // TODO: Release longer than tap!
 
-                            if (event.getTargetImage() instanceof HostImage) {
+                            if (event.getTargetImage().getEntity() instanceof Host) {
 
                                 // If getFirstEvent queueEvent was on the same form, then respond
-                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage() instanceof HostImage) {
+                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity() instanceof Host) {
 
                                     // Host
 //                                                        event.getTargetImage().queueEvent(action);

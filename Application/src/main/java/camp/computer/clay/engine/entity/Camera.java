@@ -5,7 +5,6 @@ import android.util.Log;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.space.image.ExtensionImage;
-import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -246,7 +245,7 @@ public class Camera extends Entity {
         Log.v("SetFocus", "setFocus(Host)");
 
         // <REFACTOR>
-        HostImage hostImage = (HostImage) host.getComponent(Image.class);
+//        HostImage hostImage = (HostImage) host.getComponent(Image.class);
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
 //        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
@@ -261,7 +260,7 @@ public class Camera extends Entity {
 
         // Get ports along every Path connected to the Ports on the touched PhoneHost
         Group<Port> basePathPorts = new Group<>();
-        Group<Port> hostPorts = hostImage.getHost().getPorts();
+        Group<Port> hostPorts = host.getPorts();
         for (int i = 0; i < hostPorts.size(); i++) {
             Port port = hostPorts.get(i);
 

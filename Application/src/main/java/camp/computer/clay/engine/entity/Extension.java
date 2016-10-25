@@ -6,7 +6,6 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.space.image.ExtensionImage;
-import camp.computer.clay.space.image.HostImage;
 
 /**
  * {@code Extension} represents a device connected to a {@code Host}.

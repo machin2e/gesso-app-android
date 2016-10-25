@@ -9,11 +9,12 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.space.image.HostImage;
+import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
+import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Host extends Portable {
 
@@ -32,9 +33,35 @@ public class Host extends Portable {
     // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)
 
     public void update() {
-        HostImage hostImage = (HostImage) getComponent(Image.class);
-        hostImage.update();
+        updateImage();
     }
+
+    // <HACK>
+    public void updateImage() {
+
+        ShapeGroup lightShapeGroup = null;
+
+        // Get LED shapes
+        if (lightShapeGroup == null) {
+            lightShapeGroup = getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
+        }
+
+        // Update Port and LED shape styles
+        for (int i = 0; i < getPorts().size(); i++) {
+            Port port = getPorts().get(i);
+            Shape portShape = getComponent(Image.class).getShape(port.getLabel()); // Shape portShape = getShape(port);
+
+            // Update color of Port shape based on type
+            portShape.setColor(camp.computer.clay.util.Color.getColor(port.getType()));
+
+            // Update color of LED based on corresponding Port's type
+            lightShapeGroup.get(i).setColor(portShape.getColor());
+        }
+
+        // Call this so Portable.update() will be called to update Geometry
+        getComponent(Image.class).update();
+    }
+    // </HACK>
 
 
 
@@ -87,7 +114,7 @@ public class Host extends Portable {
         // Remove focus from other Hosts and their Ports
         Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
         for (int i = 0; i < hostImages.size(); i++) {
-            HostImage hostImage = (HostImage) hostImages.get(i);
+            PortableImage hostImage = (PortableImage) hostImages.get(i);
             hostImage.setTransparency(0.05f);
             hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
             hostImage.setPathVisibility(Visibility.INVISIBLE);
@@ -167,7 +194,7 @@ public class Host extends Portable {
         for (int j = 0; j < getPorts().size(); j++) {
             if (getPorts().get(j).getType() == Port.Type.NONE) {
 
-                HostImage hostImage = (HostImage) getComponent(Image.class);
+                PortableImage hostImage = (PortableImage) getComponent(Image.class);
 
                 double distanceToPort = Geometry.distance(
                         hostImage.getPortShapes().filterEntity(getPorts().get(j)).get(0).getPosition(),

@@ -19,7 +19,6 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.space.image.ExtensionImage;
-import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
