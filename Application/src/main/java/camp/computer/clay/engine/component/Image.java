@@ -22,9 +22,9 @@ import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class Image<T extends Entity> extends Component {
+public class Image extends Component {
 
-    protected T entity = null;
+    protected Entity entity = null;
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -95,11 +95,11 @@ public class Image<T extends Entity> extends Component {
         super();
     }
 
-    public Image(T entity) {
+    public Image(Entity entity) {
         this.entity = entity;
     }
 
-    public T getEntity() {
+    public Entity getEntity() {
         return this.entity;
     }
 

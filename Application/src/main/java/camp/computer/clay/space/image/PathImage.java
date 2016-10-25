@@ -17,7 +17,7 @@ import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 
-public class PathImage extends Image<Path> {
+public class PathImage extends Image {
 
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
@@ -46,7 +46,7 @@ public class PathImage extends Image<Path> {
     }
 
     public Path getPath() {
-        return getEntity();
+        return (Path) getEntity();
     }
 
     public void drawTrianglePath(Display display) {

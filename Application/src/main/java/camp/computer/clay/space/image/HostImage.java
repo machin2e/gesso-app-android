@@ -737,8 +737,8 @@ public class HostImage extends PortableImage {
         }
 
         // Update Port and LED shape styles
-        for (int i = 0; i < getEntity().getPorts().size(); i++) {
-            Port port = getEntity().getPorts().get(i);
+        for (int i = 0; i < getHost().getPorts().size(); i++) {
+            Port port = getHost().getPorts().get(i);
             Shape portShape = getShape(port.getLabel()); // Shape portShape = getShape(port);
 
             // Update color of Port shape based on type
