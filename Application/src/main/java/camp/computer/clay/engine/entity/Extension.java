@@ -6,7 +6,7 @@ import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.geometry.Vertex;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -150,9 +150,9 @@ public class Extension extends Portable {
             if (i < headerContactPositions.size()) {
                 headerContactPositions.get(i).getImagePosition().x = x;
             } else {
-                Vertex vertex = new Vertex(new Transform(x, 107));
-                headerContactPositions.add(vertex);
-                portableImage.addShape(vertex);
+                Point point = new Point(new Transform(x, 107));
+                headerContactPositions.add(point);
+                portableImage.addShape(point);
             }
         }
     }

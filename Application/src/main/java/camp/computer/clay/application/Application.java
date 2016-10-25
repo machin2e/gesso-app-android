@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -51,7 +50,7 @@ import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.geometry.Vertex;
+import camp.computer.clay.util.geometry.Point;
 
 public class Application extends FragmentActivity implements DisplayHostInterface {
 
@@ -370,15 +369,15 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
                     // NOTE: Geometry N/A
 
-                    Vertex vertex = new Vertex();
-                    vertex.setLabel(label);
-                    vertex.setPosition(x, y);
-                    vertex.setRotation(rotation);
-                    vertex.setColor(color);
-                    vertex.setOutlineColor(outlineColor);
-                    vertex.setOutlineThickness(outlineThickness);
+                    Point point = new Point();
+                    point.setLabel(label);
+                    point.setPosition(x, y);
+                    point.setRotation(rotation);
+                    point.setColor(color);
+                    point.setOutlineColor(outlineColor);
+                    point.setOutlineThickness(outlineThickness);
 
-                    image.addShape(vertex);
+                    image.addShape(point);
 
                 } else if (type.equals("Rectangle")) {
 
@@ -687,7 +686,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                                                     RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
 
                                                     // TODO: Compute relative to dependant sprite position
-                                                    Point originPoint = new Point(959, 1655);
+                                                    android.graphics.Point originPoint = new android.graphics.Point(959, 1655);
 
 //                    Animation animation = new Animation();
 //                    animation.moveToPoint(relativeLayout, originPoint, 300);
@@ -786,7 +785,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         messageKeyboardLayout.invalidate();
     }
 
-    public Transform convertToVisiblePosition(Point point) {
+    public Transform convertToVisiblePosition(android.graphics.Point point) {
         Transform visiblePosition = new Transform();
         return visiblePosition;
     }

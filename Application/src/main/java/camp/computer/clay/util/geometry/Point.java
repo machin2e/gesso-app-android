@@ -9,18 +9,18 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
-public class Vertex<T extends Entity> extends Shape<T> {
+public class Point<T extends Entity> extends Shape<T> {
 
-    public Vertex() {
+    public Point() {
         setup();
     }
 
-    public Vertex(Transform position) {
+    public Point(Transform position) {
         super(position);
         setup();
     }
 
-    public Vertex(T entity) {
+    public Point(T entity) {
         this.entity = entity;
         setup();
     }

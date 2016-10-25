@@ -8,7 +8,7 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.util.geometry.Vertex;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
@@ -130,7 +130,7 @@ public class Portable extends Entity {
     // </EXTENSION>
 
     // <PORTABLE_IMAGE>
-    public List<Vertex> headerContactPositions = new ArrayList<>();
+    public List<Point> headerContactPositions = new ArrayList<>();
     // </PORTABLE_IMAGE>
 
     // <PORTABLE_IMAGE_HELPERS>
