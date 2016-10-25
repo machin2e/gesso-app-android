@@ -133,31 +133,6 @@ public abstract class Entity extends Groupable {
     // </TEMPORARY_COMPONENT_INTERFACE>
 
 
-
-    // <INPUT_COMPONENT>
-//    public void setOnActionListener(ActionListener actionListener) {
-//        this.actionListener = actionListener;
-//    }
-
-//    public ActionListener getActionListener() {
-//        return this.actionListener;
-//    }
-
-//    public void processAction(Action action) {
-//        // <HACK>
-//        // TODO: Remove this after moving ActionListener into Entity.
-//        if (getClass() == Host.class || getClass() == Extension.class) {
-//            getActionListener().onAction(action);
-//        }
-//
-////        if (getClass() == Space.class) {
-////            ((Space) this).actionListener.onAction(action);
-////        }
-//        // </HACK>
-//    }
-    // </INPUT_COMPONENT>
-
-
     // <GENERIC_COMPONENT_INTERFACE>
     public boolean addComponent(Component component) {
         this.components.add(component);

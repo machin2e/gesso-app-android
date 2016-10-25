@@ -192,26 +192,4 @@ public class Path extends Entity {
             return false;
         }
     }
-
-    public ActionListener getActionListener() {
-        return new ActionListener() {
-            @Override
-            public void onAction(Action action) {
-
-                Event event = action.getLastEvent();
-
-                if (event.getType() == Event.Type.NONE) {
-
-                } else if (event.getType() == Event.Type.SELECT) {
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                }
-            }
-        };
-    }
 }
