@@ -18,7 +18,6 @@ import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -346,10 +345,10 @@ public class Space extends Image {
         // TODO: Replace ASAP. This is shit.
         Group<Image> extensionImages = Entity.Manager.filterType2(Extension.class).getImages();
         for (int i = 0; i < extensionImages.size(); i++) {
-            ExtensionImage extensionImage = (ExtensionImage) extensionImages.get(i);
+            PortableImage extensionImage = (PortableImage) extensionImages.get(i);
 
-            if (extensionImage.getExtension().getHosts().size() > 0) {
-                Host host = extensionImage.getExtension().getHosts().get(0);
+            if (extensionImage.getPortable().getHosts().size() > 0) {
+                Host host = extensionImage.getPortable().getHosts().get(0);
                 host.setExtensionDistance(distance);
             }
         }

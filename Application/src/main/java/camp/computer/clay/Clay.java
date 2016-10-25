@@ -34,10 +34,10 @@ import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
-import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
@@ -190,7 +190,29 @@ public class Clay {
 
         // Add Components
         extension.setComponent(new Transform());
-        extension.setComponent(new ExtensionImage(extension));
+        extension.setComponent(new PortableImage(extension));
+
+        // <LOAD_GEOMETRY_FROM_FILE>
+        Rectangle rectangle;
+
+        // Create Shapes for Image
+        rectangle = new Rectangle(extension);
+        rectangle.setWidth(200);
+        rectangle.setHeight(200);
+        rectangle.setLabel("Board");
+        rectangle.setColor("#ff53BA5D"); // Gray: #f7f7f7, Greens: #32CD32
+        rectangle.setOutlineThickness(0);
+        extension.getComponent(Image.class).addShape(rectangle);
+
+        // Headers
+        rectangle = new Rectangle(50, 14);
+        rectangle.setLabel("Header");
+        rectangle.setPosition(0, 107);
+        rectangle.setRotation(0);
+        rectangle.setColor("#3b3b3b");
+        rectangle.setOutlineThickness(0);
+        extension.getComponent(Image.class).addShape(rectangle);
+        // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
@@ -329,7 +351,7 @@ public class Clay {
 
                                     // Add additional Port to Extension if it has no more available Ports
                                     if (portableImage.getPortable().getProfile() == null) {
-                                        if (portableImage instanceof ExtensionImage) {
+                                        if (portableImage.getPortable() instanceof Extension) {
                                             Portable extensionPortable = portableImage.getPortable();
 
                                             boolean addPrototypePort = true;
@@ -615,9 +637,9 @@ public class Clay {
         };
     }
 
-    public static ActionListener getExtensionActionListener(Extension extension) {
+    public static ActionListener getExtensionActionListener(final Extension extension) {
 
-        final ExtensionImage extensionImage = (ExtensionImage) extension.getComponent(Image.class);
+        final PortableImage extensionImage = (PortableImage) extension.getComponent(Image.class);
 
         return new ActionListener() {
             @Override
@@ -634,7 +656,7 @@ public class Clay {
                 } else if (event.getType() == Event.Type.HOLD) {
 
                     Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
-                    extensionImage.createProfile();
+                    extensionImage.createProfile(extension);
 
                 } else if (event.getType() == Event.Type.MOVE) {
 
@@ -642,11 +664,11 @@ public class Clay {
 
                     // Previous Action targeted also this Extension
                     // TODO: Refactor
-                    if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == extensionImage.getExtension()) {
+                    if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == extensionImage.getEntity()) {
 
                         if (action.isTap()) {
                             // TODO: Replace with script editor/timeline
-                            Application.getView().openActionEditor(extensionImage.getExtension());
+                            Application.getView().openActionEditor((Extension) extensionImage.getEntity());
                         }
 
                     } else {
@@ -678,7 +700,7 @@ public class Clay {
                             }
 
                             // Camera
-                            event.getActor().getCamera().setFocus(extensionImage.getExtension());
+                            event.getActor().getCamera().setFocus((Extension) extensionImage.getEntity());
 
                             // Title
                             Space.getSpace().setTitleText("Extension");

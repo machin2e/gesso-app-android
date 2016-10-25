@@ -3,11 +3,15 @@ package camp.computer.clay.space.image;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.engine.entity.Portable;
+import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Vertex;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Visibility;
@@ -161,4 +165,41 @@ public class PortableImage extends Image {
 //    }
 
     // </REFACTOR>
+
+
+    //--------------
+    // ExtensionImage
+
+    // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
+    public void createProfile(final Extension extension) {
+        if (!extension.hasProfile()) {
+
+            // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated Profile)
+            Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
+                @Override
+                public void onComplete(String text) {
+                    // Create Extension Profile
+                    Profile profile = new Profile(extension);
+                    profile.setLabel(text);
+
+                    // Assign the Profile to the Extension
+                    extension.setProfile(profile);
+
+                    // Cache the new Extension Profile
+                    Application.getView().getClay().getProfiles().add(profile);
+
+                    // TODO: Persist the profile in the user's private store (either local or online)
+
+                    // TODO: Persist the profile in the global store online
+                }
+            });
+        } else {
+            Application.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener() {
+                @Override
+                public void onComplete(Object result) {
+
+                }
+            });
+        }
+    }
 }

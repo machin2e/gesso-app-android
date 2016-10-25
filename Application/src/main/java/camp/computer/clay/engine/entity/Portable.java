@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.entity;
 
+import java.util.List;
+
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
@@ -95,4 +97,29 @@ public class Portable extends Entity {
     }
 
     // TODO: getHeaders()/getPortNodes()
+
+    // <EXTENSION>
+
+
+    // HACK: Assumes Extension
+    public Group<Host> getHosts() {
+        return getHosts((Extension) this);
+    }
+
+    private Group<Host> getHosts(Extension extension) {
+
+        List<Host> hosts = Entity.Manager.filterType2(Host.class);
+
+        Group<Host> hostGroup = new Group<>();
+        for (int i = 0; i < hosts.size(); i++) {
+            if (hosts.get(i).getExtensions().contains(extension)) {
+                if (!hostGroup.contains(hosts.get(i))) {
+                    hostGroup.add(hosts.get(i));
+                }
+            }
+        }
+
+        return hostGroup;
+    }
+    // </EXTENSION>
 }
