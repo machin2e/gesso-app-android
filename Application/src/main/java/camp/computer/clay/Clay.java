@@ -405,7 +405,7 @@ public class Clay {
                                 // <HACK>
                                 // TODO: Replace ASAP. This is shit.
                                 // TODO: Use "rectangle" or "circular" extension layout algorithms
-                                hostImage.setExtensionDistance(500);
+                                host.setExtensionDistance(500);
                                 // </HACK>
                             }
 
@@ -460,7 +460,7 @@ public class Clay {
                                     public void onComplete(Profile profile) {
 
                                         // Add Extension from Profile
-                                        Extension extension = hostImage.restoreExtension(profile, event.getPosition());
+                                        Extension extension = host.restoreExtension(profile, event.getPosition());
 
                                         // Update Camera
                                         camera.setFocus(extension);
@@ -587,7 +587,7 @@ public class Clay {
                                 Port hostPort = (Port) hostPortShape.getEntity();
 
                                 // Create new Extension from scratch (for manual configuration/construction)
-                                Extension extension = hostImage.createExtension(hostPort, event.getPosition());
+                                Extension extension = host.createExtension(hostPort, event.getPosition());
 
                                 // Update Camera
                                 camera.setFocus(extension);

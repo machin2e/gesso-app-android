@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
 
+import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -289,6 +290,24 @@ public class Group<E extends Groupable> implements List<E> {
         return group;
     }
 
+    // HACK: Assumes Group<Entity>
+    public <E extends Groupable, C extends Component> Group<E> filterWithComponent(Class<C>... componentTypes) {
+
+        Group<E> group = new Group<>();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+            for (int j = 0; j < componentTypes.length; j++) {
+                Class<C> type = componentTypes[j];
+                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+                if (entity.hasComponent(type)) {
+                    group.add((E) this.elements.get(i));
+                }
+            }
+        }
+
+        return group;
+    }
+
     /**
      * Filters elements that fall within the area defined by {@code shape}.
      *
@@ -319,7 +338,6 @@ public class Group<E extends Groupable> implements List<E> {
     /**
      * Finds and returns the nearest <em>visible</em> <code>Image</code>.
      *
-     * @param position
      * @return
      */
 //    // HACK: Expects Group<Image>

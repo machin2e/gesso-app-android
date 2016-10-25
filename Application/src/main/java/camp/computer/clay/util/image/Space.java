@@ -351,8 +351,7 @@ public class Space extends Image {
 
             if (extensionImage.getExtension().getHosts().size() > 0) {
                 Host host = extensionImage.getExtension().getHosts().get(0);
-                HostImage hostImage = (HostImage) host.getComponent(Image.class);
-                hostImage.setExtensionDistance(distance);
+                host.setExtensionDistance(distance);
             }
         }
         // </HACK>
