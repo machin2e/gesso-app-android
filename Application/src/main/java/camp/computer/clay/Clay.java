@@ -131,6 +131,9 @@ public class Clay {
         // Create Entity
         Host host = new Host();
 
+        // Add Portable Component (so can add Ports)
+        host.setComponent(new Portable(host));
+
         // PortableEntity Component (Image Component depends on this)
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
@@ -177,6 +180,9 @@ public class Clay {
 
         // Create Entity
         Extension extension = new Extension();
+
+        // Add Portable Component (so can add Ports)
+        extension.setComponent(new Portable(extension));
 
         // <PORTABLE_COMPONENT>
         // Create Ports and add them to the Extension
@@ -292,8 +298,8 @@ public class Clay {
                             // Update position of prototype Extension
                             Space.getSpace().setExtensionPrototypePosition(event.getPosition());
 
-                            host.getPortShapes().setVisibility(Visibility.INVISIBLE);
-                            host.setPathVisibility(Visibility.INVISIBLE);
+                            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+                            host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 
                             Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
@@ -362,7 +368,7 @@ public class Clay {
                                     Image nearbyImage = portableImage;
                                     PortableEntity nearbyPortableEntity = (PortableEntity) nearbyImage.getEntity();
                                     nearbyImage.setTransparency(1.0f);
-                                    nearbyPortableEntity.getPortShapes().setVisibility(Visibility.VISIBLE);
+                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
 
                                     // Add additional Port to Extension if it has no more available Ports
                                     PortableEntity portableEntity = (PortableEntity) portableImage.getEntity();
@@ -394,7 +400,7 @@ public class Clay {
                                     Image nearbyImage = portableImage;
                                     PortableEntity nearbyPortableEntity = (PortableEntity) portableImage.getEntity();
                                     nearbyImage.setTransparency(0.1f);
-                                    nearbyPortableEntity.getPortShapes().setVisibility(Visibility.INVISIBLE);
+                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
 
                                 }
                             }
@@ -424,8 +430,8 @@ public class Clay {
                         if (action.isTap()) {
 
                             // Focus on touched form
-                            host.setPathVisibility(Visibility.VISIBLE);
-                            host.getPortShapes().setVisibility(Visibility.VISIBLE);
+                            host.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+                            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
 
                             hostImage.setTransparency(1.0);
 
@@ -448,9 +454,9 @@ public class Clay {
                             // Camera
                             camera.setFocus(host);
 
-                            if (host.getExtensions().size() > 0) {
+                            if (host.getComponent(Portable.class).getExtensions().size() > 0) {
 //                                                    Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
-                                host.getExtensions().setTransparency(0.1);
+                                host.getComponent(Portable.class).getExtensions().setTransparency(0.1);
 
                                 // <HACK>
                                 // TODO: Replace ASAP. This is shit.
@@ -558,7 +564,7 @@ public class Clay {
                                         }
                                         port.setType(nextType);
 
-                                    } else if (host.hasVisiblePaths(portIndex)) {
+                                    } else if (host.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
 
                                         // Change Path Type. Updates each Port in the Path.
 
@@ -673,7 +679,7 @@ public class Clay {
                 } else if (event.getType() == Event.Type.HOLD) {
 
                     Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
-                    extension.createProfile(extension);
+                    extension.getComponent(Portable.class).createProfile(extension);
 
                 } else if (event.getType() == Event.Type.MOVE) {
 
@@ -693,12 +699,12 @@ public class Clay {
                         if (action.isTap()) {
 
                             // Focus on touched base
-                            extension.setPathVisibility(Visibility.VISIBLE);
-                            extension.getPortShapes().setVisibility(Visibility.VISIBLE);
+                            extension.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+                            extension.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
                             extensionImage.setTransparency(1.0);
 
                             // Show ports and paths of touched form
-                            ShapeGroup portShapes = extension.getPortShapes();
+                            ShapeGroup portShapes = extension.getComponent(Portable.class).getPortShapes();
                             for (int i = 0; i < portShapes.size(); i++) {
                                 Shape portShape = portShapes.get(i);
                                 Port port = (Port) portShape.getEntity();

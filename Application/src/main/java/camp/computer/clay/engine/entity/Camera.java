@@ -323,7 +323,7 @@ public class Camera extends Entity {
         // </REFACTOR>
 
         // Increase distance between Host and Extension
-        Host host = extension.getHosts().get(0);
+        Host host = extension.getComponent(Portable.class).getHosts().get(0);
         host.setExtensionDistance(500);
 
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);

@@ -10,6 +10,7 @@ import java.util.List;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
@@ -348,8 +349,8 @@ public class Space extends Image {
             Image extensionImage = extensionImages.get(i);
 
             PortableEntity extension = (PortableEntity) extensionImage.getEntity();
-            if (extension.getHosts().size() > 0) {
-                Host host = extension.getHosts().get(0);
+            if (extension.getComponent(Portable.class).getHosts().size() > 0) {
+                Host host = extension.getComponent(Portable.class).getHosts().get(0);
                 host.setExtensionDistance(distance);
             }
         }
@@ -365,8 +366,8 @@ public class Space extends Image {
         for (int i = 0; i < portableImages.size(); i++) {
             Image portableImage = portableImages.get(i);
             PortableEntity portableEntity = (PortableEntity) portableImage.getEntity();
-            portableEntity.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            portableEntity.setPathVisibility(Visibility.INVISIBLE);
+            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }

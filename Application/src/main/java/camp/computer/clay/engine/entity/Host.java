@@ -117,8 +117,8 @@ public class Host extends PortableEntity {
             Image hostImage = hostImages.get(i);
             PortableEntity host = (PortableEntity) hostImage.getEntity();
             hostImage.setTransparency(0.05f);
-            host.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            host.setPathVisibility(Visibility.INVISIBLE);
+            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+            host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
         }
 
         // Show Path and all contained Ports
@@ -204,7 +204,7 @@ public class Host extends PortableEntity {
                 PortableEntity host = (PortableEntity) hostImage.getEntity();
 
                 double distanceToPort = Geometry.distance(
-                        host.getPortShapes().filterEntity(getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),
+                        host.getComponent(Portable.class).getPortShapes().filterEntity(getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),
                         extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
                 );
 
@@ -281,7 +281,7 @@ public class Host extends PortableEntity {
     public void updateExtensionLayout() {
 
         // Get Extensions connected to the Host.
-        Group<Extension> extensions = getExtensions();
+        Group<Extension> extensions = getComponent(Portable.class).getExtensions();
 
         // Reset current layout in preparation for updating it in the presently-running update step.
         for (int i = 0; i < headerExtensions.size(); i++) {
@@ -353,7 +353,7 @@ public class Host extends PortableEntity {
 
     // TODO: Refactor this... it's really dumb right now.
     public void updateExtensionHeaderIndex(Extension extension) {
-        if (extension.getComponent(Image.class) == null || extension.getHosts().size() == 0) {
+        if (extension.getComponent(Image.class) == null || extension.getComponent(Portable.class).getHosts().size() == 0) {
             return;
         }
         int segmentIndex = getHeaderIndex(extension);

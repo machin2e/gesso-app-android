@@ -141,11 +141,11 @@ public class Extension extends PortableEntity {
         // Update Contact Positions for Header
         for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
             double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-            if (i < headerContactPositions.size()) {
-                headerContactPositions.get(i).getImagePosition().x = x;
+            if (i < getComponent(Portable.class).headerContactPositions.size()) {
+                getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
             } else {
                 Point point = new Point(new Transform(x, 107));
-                headerContactPositions.add(point);
+                getComponent(Portable.class).headerContactPositions.add(point);
                 portableImage.addShape(point);
             }
         }

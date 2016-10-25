@@ -19,6 +19,7 @@ import java.util.List;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
@@ -590,9 +591,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         PortableEntity host = (PortableEntity) hostImage.getEntity();
         PortableEntity extension = (PortableEntity) extensionImage.getEntity();
 
-        if (host.headerContactPositions.size() > hostPort.getIndex() && extension.headerContactPositions.size() > extensionPort.getIndex()) {
-            Transform hostConnectorPosition = host.headerContactPositions.get(hostPort.getIndex()).getPosition();
-            Transform extensionConnectorPosition = extension.headerContactPositions.get(extensionPort.getIndex()).getPosition();
+        if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getIndex()
+                && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPort.getIndex()) {
+
+            Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPort.getIndex()).getPosition();
+            Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPort.getIndex()).getPosition();
 
             // Draw connection between Ports
             display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
