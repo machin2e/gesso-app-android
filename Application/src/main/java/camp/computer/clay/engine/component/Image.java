@@ -1,19 +1,12 @@
 package camp.computer.clay.engine.component;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.entity.Extension;
-import camp.computer.clay.engine.entity.Host;
-import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -23,8 +16,6 @@ import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Image extends Component {
-
-    protected Entity entity = null;
 
     protected List<Shape> shapes = new LinkedList<>();
 
@@ -91,16 +82,8 @@ public class Image extends Component {
         }
     }
 
-    public Image() {
-        super();
-    }
-
     public Image(Entity entity) {
-        this.entity = entity;
-    }
-
-    public Entity getEntity() {
-        return this.entity;
+        super(entity);
     }
 
     public boolean isVisible() {

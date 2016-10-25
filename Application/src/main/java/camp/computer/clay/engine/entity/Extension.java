@@ -1,8 +1,8 @@
 package camp.computer.clay.engine.entity;
 
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -15,16 +15,10 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 /**
  * {@code Extension} represents a device connected to a {@code Host}.
  */
-public class Extension extends Portable {
+public class Extension extends PortableEntity {
 
     public Extension() {
         super();
-        setup();
-    }
-
-    // TODO: Remove this! Create the Extension using the static method Clay.createExtensionEntity()
-    public Extension(Profile profile) {
-        super(profile);
         setup();
     }
 
@@ -76,22 +70,22 @@ public class Extension extends Portable {
         ShapeGroup portShapes = image.getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);
-            if (!getPorts().contains(portShape.getEntity())) {
+            if (!getComponent(Portable.class).getPorts().contains(portShape.getEntity())) {
                 portShapes.remove(portShape);
                 image.invalidate();
             }
         }
 
         // Create Port shapes for each of Extension's Ports if they don't already exist
-        for (int i = 0; i < getPorts().size(); i++) {
-            Port port = getPorts().get(i);
+        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getComponent(Portable.class).getPorts().get(i);
 
             if (image.getShape(port) == null) {
 
                 // Ports
                 Circle<Port> circle = new Circle<>(port);
                 circle.setRadius(40);
-                circle.setLabel("Port " + (getPorts().size() + 1));
+                circle.setLabel("Port " + (getComponent(Portable.class).getPorts().size() + 1));
                 circle.setPosition(-90, 175);
                 // circle.setRotation(0);
 
@@ -107,13 +101,13 @@ public class Extension extends Portable {
         }
 
         // Update Port positions based on the index of ports
-        for (int i = 0; i < getPorts().size(); i++) {
-            Port port = getPorts().get(i);
+        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getComponent(Portable.class).getPorts().get(i);
             Circle portShape = (Circle) image.getShape(port);
 
             if (portShape != null) {
                 double portSpacing = 100;
-                portShape.getImagePosition().x = (i * portSpacing) - (((getPorts().size() - 1) * portSpacing) / 2.0);
+                portShape.getImagePosition().x = (i * portSpacing) - (((getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
                 // TODO: Also update y coordinate
             }
         }
@@ -125,7 +119,7 @@ public class Extension extends Portable {
         // References:
         // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
 
-        final int contactCount = getPorts().size();
+        final int contactCount = getComponent(Portable.class).getPorts().size();
         final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
         final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
 
@@ -145,7 +139,7 @@ public class Extension extends Portable {
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
-        for (int i = 0; i < getPorts().size(); i++) {
+        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
             double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < headerContactPositions.size()) {
                 headerContactPositions.get(i).getImagePosition().x = x;
@@ -163,8 +157,8 @@ public class Extension extends Portable {
 
     private void updatePortStyle() {
         // Update Port style
-        for (int i = 0; i < getPorts().size(); i++) {
-            Port port = getPorts().get(i);
+        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getComponent(Portable.class).getPorts().get(i);
             Shape portShape = image.getShape(port);
 
             // Update color of Port shape based on type

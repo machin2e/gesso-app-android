@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.Portable;
+import camp.computer.clay.engine.entity.PortableEntity;
 
 public class Profile {
     private UUID uuid = null;
@@ -19,9 +20,9 @@ public class Profile {
     public Profile() {
     }
 
-    public Profile(Portable portable) {
-        for (int i = 0; i < portable.getPorts().size(); i++) {
-            Port port = portable.getPorts().get(i);
+    public Profile(PortableEntity portableEntity) {
+        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = portableEntity.getComponent(Portable.class).getPorts().get(i);
             PortProfile portProfile = new PortProfile(port);
             addPort(portProfile);
         }

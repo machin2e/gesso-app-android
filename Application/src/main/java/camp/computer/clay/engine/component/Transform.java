@@ -41,11 +41,21 @@ public class Transform extends Component {
      * @param otherPoint The {@code Transform} to set.
      */
     public Transform(Transform otherPoint) {
+
+        // <HACK>
+        super(null);
+        // </HACK>
+
         this.x = otherPoint.x;
         this.y = otherPoint.y;
     }
 
     public Transform(double x, double y) {
+
+        // <HACK>
+        super(null);
+        // </HACK>
+
         this.x = x;
         this.y = y;
     }

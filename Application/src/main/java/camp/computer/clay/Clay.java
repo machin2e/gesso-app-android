@@ -14,12 +14,13 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.Portable;
+import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
@@ -77,7 +78,7 @@ public class Clay {
         space.setupActionListener();
 
         // Create actor and setAbsolute perspective
-        Actor actor = new Actor();
+        Actor actor = new Actor(null);
         this.space.addActor(actor);
 
         // Camera
@@ -130,13 +131,13 @@ public class Clay {
         // Create Entity
         Host host = new Host();
 
-        // Portable Component (Image Component depends on this)
+        // PortableEntity Component (Image Component depends on this)
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
             Port port = new Port();
             port.setLabel("Port " + (j + 1));
             port.setIndex(j);
-            host.addPort(port);
+            host.getComponent(Portable.class).addPort(port);
         }
 
         // Add Transform Component
@@ -154,7 +155,7 @@ public class Clay {
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).getLabel().startsWith("Port")) {
                 String label = shapes.get(i).getLabel();
-                Port port = host.getPort(label);
+                Port port = host.getComponent(Portable.class).getPort(label);
                 shapes.get(i).setEntity(port);
             }
         }
@@ -164,7 +165,7 @@ public class Clay {
         // NOTE: This has to be done after adding an ImageComponent
 //        host.setupActionListener();
 
-        ActionListenerComponent actionListener = new ActionListenerComponent();
+        ActionListenerComponent actionListener = new ActionListenerComponent(host);
         actionListener.setOnActionListener(getHostActionListener(host));
         host.setComponent(actionListener);
         // </HACK>
@@ -183,7 +184,7 @@ public class Clay {
         for (int j = 0; j < defaultPortCount; j++) {
             Port port = new Port();
             port.setIndex(j);
-            extension.addPort(port);
+            extension.getComponent(Portable.class).addPort(port);
         }
         // </PORTABLE_COMPONENT>
 
@@ -220,7 +221,7 @@ public class Clay {
         // NOTE: This has to be done after adding an ImageComponent
 //        extension.setupActionListener();
 
-        ActionListenerComponent actionListener = new ActionListenerComponent();
+        ActionListenerComponent actionListener = new ActionListenerComponent(extension);
         actionListener.setOnActionListener(getExtensionActionListener(extension));
         extension.setComponent(actionListener);
         // </HACK>
@@ -252,7 +253,7 @@ public class Clay {
         // NOTE: This has to be done after adding an ImageComponent
 //        path.setupActionListener();
 
-        ActionListenerComponent actionListener = new ActionListenerComponent();
+        ActionListenerComponent actionListener = new ActionListenerComponent(path);
         actionListener.setOnActionListener(getPathActionListener(path));
         path.setComponent(actionListener);
         // </HACK>
@@ -359,19 +360,19 @@ public class Clay {
 
 //                                                        // <HACK>
                                     Image nearbyImage = portableImage;
-                                    Portable nearbyPortable = (Portable) nearbyImage.getEntity();
+                                    PortableEntity nearbyPortableEntity = (PortableEntity) nearbyImage.getEntity();
                                     nearbyImage.setTransparency(1.0f);
-                                    nearbyPortable.getPortShapes().setVisibility(Visibility.VISIBLE);
+                                    nearbyPortableEntity.getPortShapes().setVisibility(Visibility.VISIBLE);
 
                                     // Add additional Port to Extension if it has no more available Ports
-                                    Portable portable = (Portable) portableImage.getEntity();
-                                    if (portable.getProfile() == null) {
+                                    PortableEntity portableEntity = (PortableEntity) portableImage.getEntity();
+                                    if (portableEntity.getProfile() == null) {
                                         if (portableImage.getEntity() instanceof Extension) {
-                                            Portable extensionPortable = (Portable) portableImage.getEntity();
+                                            PortableEntity extensionPortableEntity = (PortableEntity) portableImage.getEntity();
 
                                             boolean addPrototypePort = true;
-                                            for (int j = 0; j < extensionPortable.getPorts().size(); j++) {
-                                                Port existingPort = extensionPortable.getPorts().get(j);
+                                            for (int j = 0; j < extensionPortableEntity.getComponent(Portable.class).getPorts().size(); j++) {
+                                                Port existingPort = extensionPortableEntity.getComponent(Portable.class).getPorts().get(j);
                                                 if (existingPort.getType() == Port.Type.NONE) {
                                                     addPrototypePort = false;
                                                     break;
@@ -380,8 +381,8 @@ public class Clay {
 
                                             if (addPrototypePort) {
                                                 Port port = new Port();
-                                                port.setIndex(extensionPortable.getPorts().size());
-                                                extensionPortable.addPort(port);
+                                                port.setIndex(extensionPortableEntity.getComponent(Portable.class).getPorts().size());
+                                                extensionPortableEntity.getComponent(Portable.class).addPort(port);
                                             }
                                         }
                                     }
@@ -391,9 +392,9 @@ public class Clay {
                                 } else {
 
                                     Image nearbyImage = portableImage;
-                                    Portable nearbyPortable = (Portable) portableImage.getEntity();
+                                    PortableEntity nearbyPortableEntity = (PortableEntity) portableImage.getEntity();
                                     nearbyImage.setTransparency(0.1f);
-                                    nearbyPortable.getPortShapes().setVisibility(Visibility.INVISIBLE);
+                                    nearbyPortableEntity.getPortShapes().setVisibility(Visibility.INVISIBLE);
 
                                 }
                             }
@@ -429,8 +430,8 @@ public class Clay {
                             hostImage.setTransparency(1.0);
 
                             // Show ports and paths of touched form
-                            for (int i = 0; i < host.getPorts().size(); i++) {
-                                Group<Path> paths = host.getPort(i).getPaths();
+                            for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
+                                Group<Path> paths = host.getComponent(Portable.class).getPort(i).getPaths();
 
                                 for (int j = 0; j < paths.size(); j++) {
                                     Path path = paths.get(j);
@@ -532,7 +533,7 @@ public class Clay {
 
                                 // Get port associated with the touched port shape
                                 Port port = (Port) action.getFirstEvent().getTargetShape().getEntity();
-                                int portIndex = host.getPorts().indexOf(port);
+                                int portIndex = host.getComponent(Portable.class).getPorts().indexOf(port);
 
                                 if (port.getExtension() == null || port.getExtension().getProfile() == null) {
 

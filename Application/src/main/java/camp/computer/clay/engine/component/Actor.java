@@ -25,7 +25,8 @@ public class Actor extends Component {
 
     private List<Action> actions = new LinkedList<>();
 
-    public Actor() {
+    public Actor(Entity entity) {
+        super(entity);
         setup();
     }
 

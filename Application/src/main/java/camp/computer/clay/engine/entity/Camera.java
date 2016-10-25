@@ -4,6 +4,7 @@ import android.util.Log;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -225,7 +226,7 @@ public class Camera extends Entity {
 //        Image nearestHostImage = getSpace().getImages().filterType2(Host.class).getNearestImage(targetPosition);
 //        if (nearestHostImage != null) {
 //
-//            Portable sourcePortable = sourcePort.getPortable();
+//            PortableEntity sourcePortable = sourcePort.getPortable();
 //            PortableImage sourcePortableImage = (PortableImage) sourcePortable.getImage();
 //
 //            double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
@@ -250,7 +251,7 @@ public class Camera extends Entity {
 //        otherPortableImages.remove(hostImage);
 //        otherPortableImages.setTransparency(0.1);
 
-        // TODO: Group<Portable> otherPortables = getSpace().getEntities();
+        // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
         Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Extension.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(host);
@@ -258,7 +259,7 @@ public class Camera extends Entity {
 
         // Get ports along every Path connected to the Ports on the touched PhoneHost
         Group<Port> basePathPorts = new Group<>();
-        Group<Port> hostPorts = host.getPorts();
+        Group<Port> hostPorts = host.getComponent(Portable.class).getPorts();
         for (int i = 0; i < hostPorts.size(); i++) {
             Port port = hostPorts.get(i);
 
@@ -292,7 +293,7 @@ public class Camera extends Entity {
         Log.v("SetFocus", "setFocus(Extension)");
 
         // <REFACTOR>
-        // TODO: Group<Portable> otherPortables = getSpace().getEntities();
+        // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
         Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Extension.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(extension);
@@ -300,7 +301,7 @@ public class Camera extends Entity {
 
         // Get ports along every Path connected to the Ports on the selected Host
         Group<Port> hostPathPorts = new Group<>();
-        Group<Port> extensionPorts = extension.getPorts();
+        Group<Port> extensionPorts = extension.getComponent(Portable.class).getPorts();
         for (int i = 0; i < extensionPorts.size(); i++) {
             Port port = extensionPorts.get(i);
 

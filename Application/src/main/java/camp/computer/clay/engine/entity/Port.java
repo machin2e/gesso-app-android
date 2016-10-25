@@ -80,8 +80,8 @@ public class Port extends Entity {
 
     protected Direction direction = Direction.NONE;
 
-    public Portable getPortable() {
-        return (Portable) getParent();
+    public PortableEntity getPortable() {
+        return (PortableEntity) getParent();
     }
 
     public int getIndex() {

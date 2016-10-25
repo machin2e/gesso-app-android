@@ -7,73 +7,53 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class Portable extends Entity {
+public class PortableEntity extends Entity {
 
     private Profile profile = null;
 
-    protected Group<Port> ports = new Group<>();
-
-    public Portable() {
+    public PortableEntity() {
         super();
+        setComponent(new Portable(this));
     }
 
     @Override
     public void update() {
     }
 
-    public Portable(Profile profile) {
-        super();
+//    public void addPort(Port port) {
+//        if (!this.ports.contains(port)) {
+//            this.ports.add(port);
+//            port.setParent(this);
+//        }
+//    }
+//
+//    public Port getPort(int index) {
+//        return this.ports.get(index);
+//    }
+//
+//    public Port getPort(String label) {
+//        for (int i = 0; i < ports.size(); i++) {
+//            if (ports.get(i).getLabel().equals(label)) {
+//                return ports.get(i);
+//            }
+//        }
+//        return null;
+//    }
 
-        // Set the Profile used to configure the Extension
-        this.profile = profile;
-
-        // Create Ports to match the Profile
-        for (int i = 0; i < profile.getPorts().size(); i++) {
-            Port port = new Port();
-            port.setIndex(i);
-            port.setType(profile.getPorts().get(i).getType());
-            port.setDirection(profile.getPorts().get(i).getDirection());
-            addPort(port);
-        }
-    }
-
-    public void addPort(Port port) {
-        if (!this.ports.contains(port)) {
-            this.ports.add(port);
-            port.setParent(this);
-        }
-    }
-
-    public Port getPort(int index) {
-        return this.ports.get(index);
-    }
-
-    public Port getPort(String label) {
-        for (int i = 0; i < ports.size(); i++) {
-            if (ports.get(i).getLabel().equals(label)) {
-                return ports.get(i);
-            }
-        }
-        return null;
-    }
-
-    public Group<Port> getPorts() {
-        return this.ports;
-    }
-
-    public Group<Path> getPaths() {
-        Group<Path> paths = new Group<>();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
-            paths.addAll(port.getPaths());
-        }
-        return paths;
-    }
+//    public Group<Path> getPaths() {
+//        Group<Path> paths = new Group<>();
+//        for (int i = 0; i < ports.size(); i++) {
+//            Port port = ports.get(i);
+//            paths.addAll(port.getPaths());
+//        }
+//        return paths;
+//    }
 
     public Profile getProfile() {
         return this.profile;
@@ -84,13 +64,23 @@ public class Portable extends Entity {
     }
 
     public void setProfile(Profile profile) {
+        // Set the Profile used to configure the Extension
         this.profile = profile;
+
+        // Create Ports to match the Profile
+        for (int i = 0; i < profile.getPorts().size(); i++) {
+            Port port = new Port();
+            port.setIndex(i);
+            port.setType(profile.getPorts().get(i).getType());
+            port.setDirection(profile.getPorts().get(i).getDirection());
+            getComponent(Portable.class).addPort(port);
+        }
     }
 
     public Group<Extension> getExtensions() {
         Group<Extension> extensions = new Group<>();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
+        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getComponent(Portable.class).getPorts().get(i);
 
             Extension extension = port.getExtension();
 
@@ -136,14 +126,14 @@ public class Portable extends Entity {
     // <PORTABLE_IMAGE_HELPERS>
 
     public ShapeGroup getPortShapes() {
-        return getComponent(Image.class).getShapes(getPorts());
+        return getComponent(Image.class).getShapes(getComponent(Portable.class).getPorts());
     }
 
     // <REFACTOR>
 
     // TODO: Move into Port? something (inner class? custom PortShape?)
     public boolean hasVisiblePaths(int portIndex) {
-        Group<Image> pathImages = getPort(portIndex).getPaths().getImages();
+        Group<Image> pathImages = getComponent(Portable.class).getPort(portIndex).getPaths().getImages();
         for (int i = 0; i < pathImages.size(); i++) {
             Image pathImage = pathImages.get(i);
             if (pathImage.isVisible()) {
@@ -166,7 +156,7 @@ public class Portable extends Entity {
 
     // TODO: Move into PathImage
     public void setPathVisibility(Visibility visibility) {
-        Group<Port> ports = getPorts();
+        Group<Port> ports = getComponent(Portable.class).getPorts();
         for (int i = 0; i < ports.size(); i++) {
             Port port = ports.get(i);
 
@@ -193,10 +183,10 @@ public class Portable extends Entity {
             // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
             Path path = (Path) pathImage.getEntity();
             Port targetPort = path.getTarget();
-            Portable targetPortable = (Portable) targetPort.getParent();
-            Image targetPortableImage = targetPortable.getComponent(Image.class);
+            PortableEntity targetPortableEntity = (PortableEntity) targetPort.getParent();
+            Image targetPortableImage = targetPortableEntity.getComponent(Image.class);
             if (targetPortableImage != getComponent(Image.class)) { // HACK //if (targetPortableImage != this) { // HACK
-                targetPortable.setPathVisibility(targetPort, visibility);
+                targetPortableEntity.setPathVisibility(targetPort, visibility);
             }
         }
     }

@@ -6,6 +6,7 @@ import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 
@@ -103,6 +104,7 @@ public abstract class Entity extends Groupable {
     protected Transform transform = null;
     protected Image image = null;
     protected ActionListenerComponent actionListener = null;
+    protected Portable portable = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -114,6 +116,8 @@ public abstract class Entity extends Groupable {
             this.image = (Image) component;
         } else if (component instanceof ActionListenerComponent) {
             this.actionListener = (ActionListenerComponent) component;
+        } else if (component instanceof Portable) {
+            this.portable = (Portable) component;
         }
     }
 
@@ -128,6 +132,8 @@ public abstract class Entity extends Groupable {
             return type.cast(this.image);
         } else if (type == ActionListenerComponent.class) {
             return type.cast(this.actionListener);
+        } else if (type == Portable.class) {
+            return type.cast(this.portable);
         } else {
             return null;
         }

@@ -25,7 +25,7 @@ import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.Portable;
+import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
@@ -587,8 +587,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Image hostImage = hostPort.getPortable().getComponent(Image.class);
         Image extensionImage = extensionPort.getPortable().getComponent(Image.class);
 
-        Portable host = (Portable) hostImage.getEntity();
-        Portable extension = (Portable) extensionImage.getEntity();
+        PortableEntity host = (PortableEntity) hostImage.getEntity();
+        PortableEntity extension = (PortableEntity) extensionImage.getEntity();
 
         if (host.headerContactPositions.size() > hostPort.getIndex() && extension.headerContactPositions.size() > extensionPort.getIndex()) {
             Transform hostConnectorPosition = host.headerContactPositions.get(hostPort.getIndex()).getPosition();

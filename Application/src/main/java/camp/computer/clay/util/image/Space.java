@@ -14,7 +14,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
-import camp.computer.clay.engine.entity.Portable;
+import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.engine.entity.Camera;
@@ -39,7 +39,7 @@ public class Space extends Image {
     private List<Actor> actors = new LinkedList<>();
 
     public Space() {
-        super();
+        super(null);
         setup();
     }
 
@@ -347,7 +347,7 @@ public class Space extends Image {
         for (int i = 0; i < extensionImages.size(); i++) {
             Image extensionImage = extensionImages.get(i);
 
-            Portable extension = (Portable) extensionImage.getEntity();
+            PortableEntity extension = (PortableEntity) extensionImage.getEntity();
             if (extension.getHosts().size() > 0) {
                 Host host = extension.getHosts().get(0);
                 host.setExtensionDistance(distance);
@@ -364,9 +364,9 @@ public class Space extends Image {
 //        ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
             Image portableImage = portableImages.get(i);
-            Portable portable = (Portable) portableImage.getEntity();
-            portable.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            portable.setPathVisibility(Visibility.INVISIBLE);
+            PortableEntity portableEntity = (PortableEntity) portableImage.getEntity();
+            portableEntity.getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableEntity.setPathVisibility(Visibility.INVISIBLE);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }

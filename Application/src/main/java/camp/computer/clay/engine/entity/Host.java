@@ -7,6 +7,7 @@ import java.util.UUID;
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
@@ -15,7 +16,7 @@ import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class Host extends Portable {
+public class Host extends PortableEntity {
 
     public Host() {
         super();
@@ -46,8 +47,8 @@ public class Host extends Portable {
         }
 
         // Update Port and LED shape styles
-        for (int i = 0; i < getPorts().size(); i++) {
-            Port port = getPorts().get(i);
+        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getComponent(Portable.class).getPorts().get(i);
             Shape portShape = getComponent(Image.class).getShape(port.getLabel()); // Shape portShape = getShape(port);
 
             // Update color of Port shape based on type
@@ -57,7 +58,7 @@ public class Host extends Portable {
             lightShapeGroup.get(i).setColor(portShape.getColor());
         }
 
-        // Call this so Portable.update() will be called to update Geometry
+        // Call this so PortableEntity.update() will be called to update Geometry
         getComponent(Image.class).update();
     }
     // </HACK>
@@ -101,7 +102,7 @@ public class Host extends Portable {
         }
 
         // Configure Extension's Ports (i.e., the Path's target Port)
-        Port extensionPort = extension.getPorts().get(0);
+        Port extensionPort = extension.getComponent(Portable.class).getPorts().get(0);
         extensionPort.setDirection(Port.Direction.INPUT);
         extensionPort.setType(hostPort.getType());
 
@@ -114,7 +115,7 @@ public class Host extends Portable {
         Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
         for (int i = 0; i < hostImages.size(); i++) {
             Image hostImage = hostImages.get(i);
-            Portable host = (Portable) hostImage.getEntity();
+            PortableEntity host = (PortableEntity) hostImage.getEntity();
             hostImage.setTransparency(0.05f);
             host.getPortShapes().setVisibility(Visibility.INVISIBLE);
             host.setPathVisibility(Visibility.INVISIBLE);
@@ -149,7 +150,12 @@ public class Host extends Portable {
         // Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
         // Create the Extension
-        Extension extension = new Extension(profile);
+        Extension extension = new Extension();
+
+        // <HACK>
+        // TODO: Remove references to Profile in Portables. Remove Profile altogether!?
+        extension.setProfile(profile);
+        // </HACK>
 
         // Update Extension Position
         extension.getComponent(Transform.class).set(initialPosition);
@@ -167,19 +173,19 @@ public class Host extends Portable {
     private boolean autoConnectToHost(Extension extension) {
 
         // Automatically select, connect paths to, and configure the Host's Ports
-        for (int i = 0; i < extension.getPorts().size(); i++) {
+        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
 
             // Select an available Host Port
             Port selectedHostPort = autoSelectNearestAvailableHostPort(extension);
 
             // Configure Host's Port
-            selectedHostPort.setType(extension.getPorts().get(i).getType());
-            selectedHostPort.setDirection(extension.getPorts().get(i).getDirection());
+            selectedHostPort.setType(extension.getComponent(Portable.class).getPorts().get(i).getType());
+            selectedHostPort.setDirection(extension.getComponent(Portable.class).getPorts().get(i).getDirection());
 
             // Create Path from Extension Port to Host Port
             UUID pathUuid = Clay.createEntity(Path.class);
             Path path = (Path) Entity.getEntity(pathUuid);
-            path.set(selectedHostPort, extension.getPorts().get(i));
+            path.set(selectedHostPort, extension.getComponent(Portable.class).getPorts().get(i));
 
             path.setType(Path.Type.ELECTRONIC);
         }
@@ -191,20 +197,20 @@ public class Host extends Portable {
         // Select an available Host Port
         Port selectedHostPort = null;
         double distanceToSelectedPort = Double.MAX_VALUE;
-        for (int j = 0; j < getPorts().size(); j++) {
-            if (getPorts().get(j).getType() == Port.Type.NONE) {
+        for (int j = 0; j < getComponent(Portable.class).getPorts().size(); j++) {
+            if (getComponent(Portable.class).getPorts().get(j).getType() == Port.Type.NONE) {
 
                 Image hostImage = getComponent(Image.class);
-                Portable host = (Portable) hostImage.getEntity();
+                PortableEntity host = (PortableEntity) hostImage.getEntity();
 
                 double distanceToPort = Geometry.distance(
-                        host.getPortShapes().filterEntity(getPorts().get(j)).get(0).getPosition(),
+                        host.getPortShapes().filterEntity(getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),
                         extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
                 );
 
                 // Check if the port is the nearest
                 if (distanceToPort < distanceToSelectedPort) {
-                    selectedHostPort = getPorts().get(j);
+                    selectedHostPort = getComponent(Portable.class).getPorts().get(j);
                     distanceToSelectedPort = distanceToPort;
                 }
             }
@@ -224,7 +230,7 @@ public class Host extends Portable {
         Shape boardShape = getComponent(Image.class).getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
-        Group<Port> extensionPorts = extension.getPorts();
+        Group<Port> extensionPorts = extension.getComponent(Portable.class).getPorts();
         for (int j = 0; j < extensionPorts.size(); j++) {
 
             Port extensionPort = extensionPorts.get(j);

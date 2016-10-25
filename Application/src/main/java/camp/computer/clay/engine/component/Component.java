@@ -1,12 +1,18 @@
 package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.Groupable;
+import camp.computer.clay.engine.entity.Entity;
 
 public abstract class Component extends Groupable {
 
-    public enum Type {
-        Transform, // i.e., Position
-        Geometry // i.e., Image
+    private Entity entity = null;
+
+    public Component(Entity entity) {
+        this.entity = entity;
+    }
+
+    public Entity getEntity() {
+        return this.entity;
     }
 
     // TODO: PortableComponent
