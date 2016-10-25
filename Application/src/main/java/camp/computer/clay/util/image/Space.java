@@ -14,11 +14,11 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
+import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.util.ShapeGroup;
@@ -345,10 +345,11 @@ public class Space extends Image {
         // TODO: Replace ASAP. This is shit.
         Group<Image> extensionImages = Entity.Manager.filterType2(Extension.class).getImages();
         for (int i = 0; i < extensionImages.size(); i++) {
-            PortableImage extensionImage = (PortableImage) extensionImages.get(i);
+            Image extensionImage = extensionImages.get(i);
 
-            if (extensionImage.getPortable().getHosts().size() > 0) {
-                Host host = extensionImage.getPortable().getHosts().get(0);
+            Portable extension = (Portable) extensionImage.getEntity();
+            if (extension.getHosts().size() > 0) {
+                Host host = extension.getHosts().get(0);
                 host.setExtensionDistance(distance);
             }
         }
@@ -362,9 +363,10 @@ public class Space extends Image {
         Group<Image> portableImages = Entity.Manager.filterType2(Host.class, Extension.class).getImages();
 //        ImageGroup portableImages = getImages(Host.class, Extension.class);
         for (int i = 0; i < portableImages.size(); i++) {
-            PortableImage portableImage = (PortableImage) portableImages.get(i);
-            portableImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            portableImage.setPathVisibility(Visibility.INVISIBLE);
+            Image portableImage = portableImages.get(i);
+            Portable portable = (Portable) portableImage.getEntity();
+            portable.getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portable.setPathVisibility(Visibility.INVISIBLE);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }

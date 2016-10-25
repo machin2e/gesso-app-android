@@ -25,8 +25,8 @@ import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
@@ -584,12 +584,15 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Draw the connection to the Host's Port
 
-        PortableImage hostImage = (PortableImage) hostPort.getPortable().getComponent(Image.class);
-        PortableImage extensionImage = (PortableImage) extensionPort.getPortable().getComponent(Image.class);
+        Image hostImage = hostPort.getPortable().getComponent(Image.class);
+        Image extensionImage = extensionPort.getPortable().getComponent(Image.class);
 
-        if (hostImage.headerContactPositions.size() > hostPort.getIndex() && extensionImage.headerContactPositions.size() > extensionPort.getIndex()) {
-            Transform hostConnectorPosition = hostImage.headerContactPositions.get(hostPort.getIndex()).getPosition();
-            Transform extensionConnectorPosition = extensionImage.headerContactPositions.get(extensionPort.getIndex()).getPosition();
+        Portable host = (Portable) hostImage.getEntity();
+        Portable extension = (Portable) extensionImage.getEntity();
+
+        if (host.headerContactPositions.size() > hostPort.getIndex() && extension.headerContactPositions.size() > extensionPort.getIndex()) {
+            Transform hostConnectorPosition = host.headerContactPositions.get(hostPort.getIndex()).getPosition();
+            Transform extensionConnectorPosition = extension.headerContactPositions.get(extensionPort.getIndex()).getPosition();
 
             // Draw connection between Ports
             display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));

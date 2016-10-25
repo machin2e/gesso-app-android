@@ -34,7 +34,6 @@ import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
-import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Segment;
@@ -144,7 +143,7 @@ public class Clay {
         host.setComponent(new Transform());
 
         // Add Image Component
-        host.setComponent(new PortableImage(host));
+        host.setComponent(new Image(host));
 
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
@@ -190,7 +189,7 @@ public class Clay {
 
         // Add Components
         extension.setComponent(new Transform());
-        extension.setComponent(new PortableImage(extension));
+        extension.setComponent(new Image(extension));
 
         // <LOAD_GEOMETRY_FROM_FILE>
         Rectangle rectangle;
@@ -263,7 +262,7 @@ public class Clay {
 
     public static ActionListener getHostActionListener(final Host host) {
 
-        final PortableImage hostImage = (PortableImage) host.getComponent(Image.class);
+        final Image hostImage = host.getComponent(Image.class);
 
         return new ActionListener() {
             @Override
@@ -292,8 +291,8 @@ public class Clay {
                             // Update position of prototype Extension
                             Space.getSpace().setExtensionPrototypePosition(event.getPosition());
 
-                            hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-                            hostImage.setPathVisibility(Visibility.INVISIBLE);
+                            host.getPortShapes().setVisibility(Visibility.INVISIBLE);
+                            host.setPathVisibility(Visibility.INVISIBLE);
 
                             Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
@@ -354,19 +353,21 @@ public class Clay {
                             Group<Image> nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
 
                             for (int i = 0; i < imageGroup.size(); i++) {
-                                PortableImage portableImage = (PortableImage) imageGroup.get(i);
+                                Image portableImage = imageGroup.get(i);
 
-                                if (portableImage.getPortable() == sourcePort.getPortable() || nearbyPortableImages.contains(portableImage)) {
+                                if (portableImage.getEntity() == sourcePort.getPortable() || nearbyPortableImages.contains(portableImage)) {
 
 //                                                        // <HACK>
-                                    PortableImage nearbyImage = portableImage;
+                                    Image nearbyImage = portableImage;
+                                    Portable nearbyPortable = (Portable) nearbyImage.getEntity();
                                     nearbyImage.setTransparency(1.0f);
-                                    nearbyImage.getPortShapes().setVisibility(Visibility.VISIBLE);
+                                    nearbyPortable.getPortShapes().setVisibility(Visibility.VISIBLE);
 
                                     // Add additional Port to Extension if it has no more available Ports
-                                    if (portableImage.getPortable().getProfile() == null) {
-                                        if (portableImage.getPortable() instanceof Extension) {
-                                            Portable extensionPortable = portableImage.getPortable();
+                                    Portable portable = (Portable) portableImage.getEntity();
+                                    if (portable.getProfile() == null) {
+                                        if (portableImage.getEntity() instanceof Extension) {
+                                            Portable extensionPortable = (Portable) portableImage.getEntity();
 
                                             boolean addPrototypePort = true;
                                             for (int j = 0; j < extensionPortable.getPorts().size(); j++) {
@@ -389,9 +390,10 @@ public class Clay {
 
                                 } else {
 
-                                    PortableImage nearbyFigure = portableImage;
-                                    nearbyFigure.setTransparency(0.1f);
-                                    nearbyFigure.getPortShapes().setVisibility(Visibility.INVISIBLE);
+                                    Image nearbyImage = portableImage;
+                                    Portable nearbyPortable = (Portable) portableImage.getEntity();
+                                    nearbyImage.setTransparency(0.1f);
+                                    nearbyPortable.getPortShapes().setVisibility(Visibility.INVISIBLE);
 
                                 }
                             }
@@ -421,8 +423,8 @@ public class Clay {
                         if (action.isTap()) {
 
                             // Focus on touched form
-                            hostImage.setPathVisibility(Visibility.VISIBLE);
-                            hostImage.getPortShapes().setVisibility(Visibility.VISIBLE);
+                            host.setPathVisibility(Visibility.VISIBLE);
+                            host.getPortShapes().setVisibility(Visibility.VISIBLE);
 
                             hostImage.setTransparency(1.0);
 
@@ -555,7 +557,7 @@ public class Clay {
                                         }
                                         port.setType(nextType);
 
-                                    } else if (hostImage.hasVisiblePaths(portIndex)) {
+                                    } else if (host.hasVisiblePaths(portIndex)) {
 
                                         // Change Path Type. Updates each Port in the Path.
 
@@ -653,7 +655,7 @@ public class Clay {
 
     public static ActionListener getExtensionActionListener(final Extension extension) {
 
-        final PortableImage extensionImage = (PortableImage) extension.getComponent(Image.class);
+        final Image extensionImage = extension.getComponent(Image.class);
 
         return new ActionListener() {
             @Override
@@ -670,7 +672,7 @@ public class Clay {
                 } else if (event.getType() == Event.Type.HOLD) {
 
                     Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
-                    extensionImage.createProfile(extension);
+                    extension.createProfile(extension);
 
                 } else if (event.getType() == Event.Type.MOVE) {
 
@@ -690,12 +692,12 @@ public class Clay {
                         if (action.isTap()) {
 
                             // Focus on touched base
-                            extensionImage.setPathVisibility(Visibility.VISIBLE);
-                            extensionImage.getPortShapes().setVisibility(Visibility.VISIBLE);
+                            extension.setPathVisibility(Visibility.VISIBLE);
+                            extension.getPortShapes().setVisibility(Visibility.VISIBLE);
                             extensionImage.setTransparency(1.0);
 
                             // Show ports and paths of touched form
-                            ShapeGroup portShapes = extensionImage.getPortShapes();
+                            ShapeGroup portShapes = extension.getPortShapes();
                             for (int i = 0; i < portShapes.size(); i++) {
                                 Shape portShape = portShapes.get(i);
                                 Port port = (Port) portShape.getEntity();

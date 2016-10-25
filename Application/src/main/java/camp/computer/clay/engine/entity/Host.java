@@ -9,7 +9,6 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
@@ -114,10 +113,11 @@ public class Host extends Portable {
         // Remove focus from other Hosts and their Ports
         Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
         for (int i = 0; i < hostImages.size(); i++) {
-            PortableImage hostImage = (PortableImage) hostImages.get(i);
+            Image hostImage = hostImages.get(i);
+            Portable host = (Portable) hostImage.getEntity();
             hostImage.setTransparency(0.05f);
-            hostImage.getPortShapes().setVisibility(Visibility.INVISIBLE);
-            hostImage.setPathVisibility(Visibility.INVISIBLE);
+            host.getPortShapes().setVisibility(Visibility.INVISIBLE);
+            host.setPathVisibility(Visibility.INVISIBLE);
         }
 
         // Show Path and all contained Ports
@@ -194,10 +194,11 @@ public class Host extends Portable {
         for (int j = 0; j < getPorts().size(); j++) {
             if (getPorts().get(j).getType() == Port.Type.NONE) {
 
-                PortableImage hostImage = (PortableImage) getComponent(Image.class);
+                Image hostImage = getComponent(Image.class);
+                Portable host = (Portable) hostImage.getEntity();
 
                 double distanceToPort = Geometry.distance(
-                        hostImage.getPortShapes().filterEntity(getPorts().get(j)).get(0).getPosition(),
+                        host.getPortShapes().filterEntity(getPorts().get(j)).get(0).getPosition(),
                         extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
                 );
 

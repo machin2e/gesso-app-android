@@ -3,7 +3,6 @@ package camp.computer.clay.engine.entity;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.space.image.PortableImage;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Rectangle;
@@ -138,22 +137,22 @@ public class Extension extends Portable {
         double contactSeparation = 2.54; // Measure in millimeters (mm)
         // </FACTOR_OUT>
 
-        PortableImage image = (PortableImage) getComponent(Image.class);
+        Image portableImage = getComponent(Image.class);
 
         // Update Headers Geometry to match the corresponding Extension Profile
-        Rectangle header = (Rectangle) image.getShape("Header");
+        Rectangle header = (Rectangle) portableImage.getShape("Header");
         double headerWidth = Space.PIXEL_PER_MILLIMETER * A;
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
         for (int i = 0; i < getPorts().size(); i++) {
             double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-            if (i < image.headerContactPositions.size()) {
-                image.headerContactPositions.get(i).getImagePosition().x = x;
+            if (i < headerContactPositions.size()) {
+                headerContactPositions.get(i).getImagePosition().x = x;
             } else {
                 Vertex vertex = new Vertex(new Transform(x, 107));
-                image.headerContactPositions.add(vertex);
-                image.addShape(vertex);
+                headerContactPositions.add(vertex);
+                portableImage.addShape(vertex);
             }
         }
     }
