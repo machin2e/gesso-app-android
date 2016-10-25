@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.component;
 
+import android.util.Log;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -8,6 +10,8 @@ import java.util.regex.Pattern;
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.entity.Extension;
+import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.util.Color;
@@ -29,8 +33,6 @@ public class Image<T extends Entity> extends Component {
     protected double targetTransparency = 1.0;
 
     protected double transparency = targetTransparency;
-
-    protected ActionListener actionListener;
 
     // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
@@ -240,18 +242,6 @@ public class Image<T extends Entity> extends Component {
         return Geometry.getBoundingBox(shapeBoundaries);
     }
     // </COLLISION_COMPONENT>
-
-    // <INPUT_COMPONENT>
-    public void setOnActionListener(ActionListener actionListener) {
-        this.actionListener = actionListener;
-    }
-
-    public void processAction(Action action) {
-        if (actionListener != null) {
-            actionListener.onAction(action);
-        }
-    }
-    // </INPUT_COMPONENT>
 
     // <STYLE_COMPONENT?>
     // TODO: Delete?

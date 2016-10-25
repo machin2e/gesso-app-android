@@ -61,6 +61,7 @@ public class Clay {
 
         // Space
         this.space = new Space();
+        space.setupActionListener();
 
         // Create actor and setAbsolute perspective
         Actor actor = new Actor();
@@ -134,6 +135,11 @@ public class Clay {
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
 
+        // <HACK>
+        // NOTE: This has to be done after adding an ImageComponent
+        host.setupActionListener();
+        // </HACK>
+
         return host.getUuid();
     }
 
@@ -159,6 +165,11 @@ public class Clay {
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
 
+        // <HACK>
+        // NOTE: This has to be done after adding an ImageComponent
+        extension.setupActionListener();
+        // </HACK>
+
         return extension.getUuid();
     }
 
@@ -167,6 +178,11 @@ public class Clay {
         PathImage pathImage = new PathImage(path); // Create Path Image
         path.setComponent(new Transform());
         path.setComponent(pathImage); // Assign Image to Entity
+
+        // <HACK>
+        // NOTE: This has to be done after adding an ImageComponent
+        path.setupActionListener();
+        // </HACK>
 
         return path.getUuid();
     }

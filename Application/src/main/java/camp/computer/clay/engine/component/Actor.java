@@ -9,6 +9,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 
 /**
@@ -150,7 +151,13 @@ public class Actor extends Component {
                 event.setTargetShape(targetShape);
 
                 // Action the event
-                event.getTargetImage().processAction(action);
+                // <HACK>
+                if (targetImage.getClass() == Space.class) {
+                    ((Space) targetImage).processAction(action);
+                } else {
+                    targetImage.getEntity().processAction(action);
+                }
+                // </HACK>
 
                 break;
             }
@@ -167,7 +174,15 @@ public class Actor extends Component {
                 event.setTargetShape(targetShape);
 
                 // Action the event
-                event.getTargetImage().processAction(action);
+//                event.getTargetImage().getEntity().processAction(action);
+                // Action the event
+                // <HACK>
+                if (targetImage.getClass() == Space.class) {
+                    ((Space) targetImage).processAction(action);
+                } else {
+                    targetImage.getEntity().processAction(action);
+                }
+                // </HACK>
 
                 break;
             }
@@ -186,7 +201,16 @@ public class Actor extends Component {
                     Shape targetShape = targetImage.getShape(event.getPosition());
                     event.setTargetShape(targetShape);
 
-                    action.getFirstEvent().getTargetImage().processAction(action);
+//                    action.getFirstEvent().getTargetImage().getEntity().processAction(action);
+                    // Action the event
+                    // <HACK>
+                    Image firstImage = action.getFirstEvent().getTargetImage();
+                    if (firstImage.getClass() == Space.class) {
+                        ((Space) firstImage).processAction(action);
+                    } else {
+                        firstImage.getEntity().processAction(action);
+                    }
+                    // </HACK>
                 }
 
                 break;
@@ -207,7 +231,16 @@ public class Actor extends Component {
                 event.setTargetShape(targetShape);
 
                 //event.getTargetImage().queueEvent(action);
-                action.getFirstEvent().getTargetImage().processAction(action);
+//                action.getFirstEvent().getTargetImage().getEntity().processAction(action);
+                // Action the event
+                // <HACK>
+                Image firstImage = action.getFirstEvent().getTargetImage();
+                if (firstImage.getClass() == Space.class) {
+                    ((Space) firstImage).processAction(action);
+                } else {
+                    firstImage.getEntity().processAction(action);
+                }
+                // </HACK>
 
                 break;
             }

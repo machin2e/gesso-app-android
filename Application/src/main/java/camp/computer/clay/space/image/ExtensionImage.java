@@ -33,7 +33,7 @@ public class ExtensionImage extends PortableImage {
 
     private void setup() {
         setupShapes();
-        setupActions();
+//        setupActions();
     }
 
     private void setupShapes() {
@@ -59,81 +59,8 @@ public class ExtensionImage extends PortableImage {
         addShape(rectangle);
     }
 
-    private void setupActions() {
-
-        setOnActionListener(new ActionListener() {
-            @Override
-            public void onAction(Action action) {
-
-                Log.v("ExtensionImage", "onAction " + action.getLastEvent().getType());
-
-                Event event = action.getLastEvent();
-
-                if (event.getType() == Event.Type.NONE) {
-
-                } else if (event.getType() == Event.Type.SELECT) {
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                    Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
-                    createProfile();
-
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                    // Previous Action targeted also this Extension
-                    // TODO: Refactor
-                    if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getExtension()) {
-
-                        if (action.isTap()) {
-                            // TODO: Replace with script editor/timeline
-                            Application.getView().openActionEditor(getExtension());
-                        }
-
-                    } else {
-
-                        if (action.isTap()) {
-
-                            // Focus on touched base
-                            setPathVisibility(Visibility.VISIBLE);
-                            getPortShapes().setVisibility(Visibility.VISIBLE);
-                            setTransparency(1.0);
-
-                            // Show ports and paths of touched form
-                            ShapeGroup portShapes = getPortShapes();
-                            for (int i = 0; i < portShapes.size(); i++) {
-                                Shape portShape = portShapes.get(i);
-                                Port port = (Port) portShape.getEntity();
-
-                                Group<Path> paths = port.getPaths();
-                                for (int j = 0; j < paths.size(); j++) {
-                                    Path path = paths.get(j);
-
-                                    // Show ports
-                                    Space.getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                    Space.getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
-
-                                    // Show path
-                                    path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                                }
-                            }
-
-                            // Camera
-                            event.getActor().getCamera().setFocus(getExtension());
-
-                            // Title
-                            Space.getSpace().setTitleText("Extension");
-                            Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
     // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    private void createProfile() {
+    public void createProfile() {
         if (!getExtension().hasProfile()) {
 
             // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated Profile)

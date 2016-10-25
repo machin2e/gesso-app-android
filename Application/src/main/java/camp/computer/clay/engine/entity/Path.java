@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.model.action.Action;
+import camp.computer.clay.model.action.ActionListener;
+import camp.computer.clay.model.action.Event;
 
 public class Path extends Entity {
 
@@ -188,5 +191,27 @@ public class Path extends Entity {
         } else {
             return false;
         }
+    }
+
+    public void setupActionListener() {
+        setOnActionListener(new ActionListener() {
+            @Override
+            public void onAction(Action action) {
+
+                Event event = action.getLastEvent();
+
+                if (event.getType() == Event.Type.NONE) {
+
+                } else if (event.getType() == Event.Type.SELECT) {
+
+                } else if (event.getType() == Event.Type.HOLD) {
+
+                } else if (event.getType() == Event.Type.MOVE) {
+
+                } else if (event.getType() == Event.Type.UNSELECT) {
+
+                }
+            }
+        });
     }
 }

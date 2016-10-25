@@ -26,7 +26,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 // TODO: DO NOT extend Image. Try to remove Space class. If cannot, then consider making it an
-// TODO: (...) Entity and adding a ActionListenerComponent.
+// TODO: (...) Entity and adding a HostActionListenerComponent.
 public class Space extends Image {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
@@ -47,10 +47,23 @@ public class Space extends Image {
 
     private void setup() {
         Space.space = this;
-        setupActions();
+//        setupActions();
     }
 
-    private void setupActions() {
+
+    private ActionListener actionListener;
+
+    public void setOnActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
+    }
+
+    public void processAction(Action action) {
+        // <HACK>
+        actionListener.onAction(action);
+        // </HACK>
+    }
+
+    public void setupActionListener() {
         setOnActionListener(new ActionListener() {
             @Override
             public void onAction(Action action) {
@@ -107,6 +120,7 @@ public class Space extends Image {
     }
 
     private static Space space = null;
+
     public static Space getSpace() {
         return Space.space;
     }

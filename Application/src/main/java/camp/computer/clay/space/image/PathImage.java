@@ -34,7 +34,6 @@ public class PathImage extends Image<Path> {
 
     private void setup() {
         setupGeometry();
-        setupActions();
         layerIndex = -10;
     }
 
@@ -48,28 +47,6 @@ public class PathImage extends Image<Path> {
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
         addShape(segment);
-    }
-
-    private void setupActions() {
-        setOnActionListener(new ActionListener() {
-            @Override
-            public void onAction(Action action) {
-
-                Event event = action.getLastEvent();
-
-                if (event.getType() == Event.Type.NONE) {
-
-                } else if (event.getType() == Event.Type.SELECT) {
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                }
-            }
-        });
     }
 
     public Path getPath() {

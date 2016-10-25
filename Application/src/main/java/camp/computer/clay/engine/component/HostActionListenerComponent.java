@@ -1,4 +1,4 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
 import android.util.Log;
 
@@ -9,12 +9,20 @@ import camp.computer.clay.Clay;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.entity.Camera;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Extension;
+import camp.computer.clay.engine.entity.Host;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.engine.entity.Portable;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.space.image.ExtensionImage;
 import camp.computer.clay.space.image.HostImage;
 import camp.computer.clay.space.image.PortableImage;
@@ -23,36 +31,21 @@ import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 
-public class Host extends Portable {
+public class HostActionListenerComponent extends Component {
 
-    public Host() {
-        super();
-        setup();
+    protected ActionListener actionListener;
+
+    public HostActionListenerComponent(Host host) {
+        setup(host);
     }
 
-//    public Host(Profile profile) {
-//        super(profile);
-//        setup();
-//    }
-
-    private void setup() {
-        setupComponents();
+    private void setup(Host host) {
+        setupActionListener(host);
     }
 
-    private void setupComponents() {
-        // TODO: InputComponent/ControllerComponent/ActorComponent
-//        setComponent(new Transform()); // addComponent(new Transform());
-//        setComponent(new HostImage(this));
-        // addComponent(new Image());
-    }
+    private void setupActionListener(final Host host) {
 
-    // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)
-
-    public void setupActionListener() {
-
-        final Host host = this;
-
-        final HostImage hostImage = (HostImage) getComponent(Image.class);
+        final HostImage hostImage = (HostImage) host.getComponent(Image.class);
 
         setOnActionListener(new ActionListener() {
                                 @Override
@@ -89,7 +82,7 @@ public class Host extends Portable {
                                             } else if (action.isHolding()) {
 
                                                 // Update position of Host image
-                                                getComponent(Transform.class).set(event.getPosition());
+                                                hostImage.getEntity().getComponent(Transform.class).set(event.getPosition());
 
                                                 // Camera
                                                 camera.setFocus(host);
@@ -440,5 +433,9 @@ public class Host extends Portable {
                             }
 
         );
+    }
+
+    public void setOnActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 }

@@ -7,6 +7,9 @@ import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.model.action.Action;
+import camp.computer.clay.model.action.ActionListener;
+import camp.computer.clay.util.image.Space;
 
 public abstract class Entity extends Groupable {
 
@@ -150,6 +153,34 @@ public abstract class Entity extends Groupable {
         return components.contains(uuid);
     }
     // </GENERIC_COMPONENT_INTERFACE>
+
+
+
+    // <INPUT_COMPONENT>
+    protected ActionListener actionListener;
+
+    public void setOnActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
+    }
+
+    public ActionListener getActionListener() {
+        return this.actionListener;
+    }
+
+    public void processAction(Action action) {
+        // <HACK>
+        // TODO: Remove this after moving ActionListener into Entity.
+        if (getClass() == Host.class || getClass() == Extension.class) {
+            getActionListener().onAction(action);
+        }
+
+//        if (getClass() == Space.class) {
+//            ((Space) this).actionListener.onAction(action);
+//        }
+        // </HACK>
+    }
+    // </INPUT_COMPONENT>
+
 
 
     // <TRANSFORM_COMPONENT>
