@@ -244,38 +244,5 @@ public class ExtensionImage extends PortableImage {
 
         // TODO: Animate movement of Extensions when "extension halo" expands or contracts (breathes)
     }
-
-    public void draw(Display display) {
-        if (isVisible()) {
-
-            display.canvas.save();
-
-            // <HACK>
-            /*
-            if (getPosition().getReferencePoint() != null) {
-                canvas.translate(
-                        (float) getPosition().getReferencePoint().x,
-                        (float) getPosition().getReferencePoint().y
-                );
-
-                canvas.rotate((float) getPosition().getReferencePoint().rotation);
-            }
-            */
-            // </HACK>
-
-//            canvas.translate(
-//                    (float) getPosition().x,
-//                    (float) getPosition().y
-//            );
-//
-//            canvas.rotate((float) getPosition().rotation);
-
-            for (int i = 0; i < shapes.size(); i++) {
-                shapes.get(i).draw(display);
-            }
-
-            display.canvas.restore();
-        }
-    }
 }
 

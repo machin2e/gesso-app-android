@@ -241,59 +241,16 @@ public class Space extends Image {
         return null;
     }
 
-    @Override
-    public void update() {
-
-        // Update Actors
-        for (int i = 0; i < actors.size(); i++) {
-            this.actors.get(i).update();
-        }
-
-        // Update Images
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            if (Entity.Manager.get(i).hasComponent(Image.class)) {
-                Image image = Entity.Manager.get(i).getComponent(Image.class);
-
-                // Update bounding box of Image
-                // TODO:
-
-                // Update the Image
-                image.update();
-            }
-        }
-
-        // Update Camera(s)
-        Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
-        camera.update();
-
-
-//        // Sandbox
-//        Line line = new Line();
-//        line.setRotation(45);
-//        for (int i = -100; i <= 100; i += 10) {
-//            Transform linePoint = line.getPoint(i);
-//        }
-    }
-
-    @Override
-    public void draw(Display display) {
+    // TODO: Rename doDraw to draw after Space no longer extends Image.
+    public void doDraw(Display display) {
 
         display.canvas.save();
-
-        // Draw Entities
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            if (Entity.Manager.get(i).hasComponent(Image.class)) {
-                Entity.Manager.get(i).getComponent(Image.class).draw(display);
-            }
-        }
 
         // Draw any prototype Paths and Extensions
         drawPathPrototype(display);
         drawExtensionPrototype(display);
 
         display.canvas.restore();
-
-//        getEntity().getActor(0).getCamera().setFocus(this);
     }
 
 

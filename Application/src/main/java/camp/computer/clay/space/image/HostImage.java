@@ -839,18 +839,5 @@ public class HostImage extends PortableImage {
         int segmentIndex = getHeaderIndex(extension);
         headerExtensions.get(segmentIndex).add(extension);
     }
-
-    public void draw(Display display) {
-        if (isVisible()) {
-
-            display.canvas.save();
-
-            for (int i = 0; i < shapes.size(); i++) {
-                shapes.get(i).draw(display);
-            }
-
-            display.canvas.restore();
-        }
-    }
 }
 

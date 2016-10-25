@@ -212,8 +212,8 @@ public class Image<T extends Entity> extends Component {
         }
     }
 
-    public void draw(Display display) {
-    }
+//    public void draw(Display display) {
+//    }
 
     // <COLLISION_COMPONENT>
     /**

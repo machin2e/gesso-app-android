@@ -18,6 +18,7 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Extension;
@@ -25,6 +26,7 @@ import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Event;
+import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
@@ -160,7 +162,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         canvas.save();
         adjustCamera();
         canvas.drawColor(Color.WHITE); // Draw the background
-        getSpace().draw(this); // Space
+
+        getSpace().doDraw(this); // Space
+        drawEntities();
+
         canvas.restore();
 
         drawOverlay();
@@ -294,8 +299,21 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             if (canvas != null) {
                 synchronized (holder) {
 
+
+                    // <UPDATE>
+
+                    // Update Actors
+                    space.getActor().update(); // HACK
+
                     // Update
-                    space.update();
+                    updateEntities();
+
+                    // Update Camera(s)
+                    Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
+                    camera.update();
+                    // </UPDATE>
+
+
 
                     // Draw
                     doDraw(canvas);
@@ -418,6 +436,75 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         return true;
+    }
+
+    // TODO: Remove reference to Image. WTF.
+    public void updateEntities() {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            Entity entity = Entity.Manager.get(i);
+            Image image = entity.getComponent(Image.class);
+            if (image != null) {
+//                image.draw(this);
+                image.update();
+            }
+        }
+    }
+
+    public void drawEntities() {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            Entity entity = Entity.Manager.get(i);
+            Image image = entity.getComponent(Image.class);
+            if (image != null) {
+//                image.draw(this);
+                drawEntity(entity);
+            }
+        }
+    }
+
+    public void drawEntity(Entity entity) {
+
+        if (entity.getClass() == Host.class) {
+
+            Image image = entity.getComponent(Image.class);
+            if (image.isVisible()) {
+                canvas.save();
+                for (int i = 0; i < image.getShapes().size(); i++) {
+                    image.getShapes().get(i).draw(this);
+                }
+                canvas.restore();
+            }
+
+        } else if (entity.getClass() == Extension.class) {
+
+            Image image = entity.getComponent(Image.class);
+            if (image.isVisible()) {
+                canvas.save();
+                for (int i = 0; i < image.getShapes().size(); i++) {
+                    image.getShapes().get(i).draw(this);
+                }
+                canvas.restore();
+            }
+
+        } else if (entity.getClass() == Path.class) {
+
+            PathImage image = (PathImage) entity.getComponent(Image.class);
+
+            if (image.isVisible()) {
+                Path path = image.getPath();
+                if (path.getType() == Path.Type.MESH) {
+                    // Draw Path between Ports
+                    image.drawTrianglePath(this);
+                } else if (path.getType() == Path.Type.ELECTRONIC) {
+                    image.drawLinePath(this);
+                }
+            } else {
+                Path path = (Path) entity; // image.getPath();
+                if (path.getType() == Path.Type.ELECTRONIC) {
+                    image.drawPhysicalPath(this);
+                }
+            }
+
+        }
     }
 
     public void drawSegment(Transform source, Transform target) {

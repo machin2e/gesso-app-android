@@ -266,7 +266,6 @@ public class Actor extends Component {
     }
 
     public void update() {
-
         dequeueEvents();
     }
 

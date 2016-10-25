@@ -26,11 +26,6 @@ public abstract class PortableImage extends Image<Portable> {
         super.update();
     }
 
-    @Override
-    public void draw(Display display) {
-
-    }
-
     public Portable getPortable() {
         return getEntity();
     }

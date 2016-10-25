@@ -19,10 +19,6 @@ import camp.computer.clay.util.image.Visibility;
 
 public class PathImage extends Image<Path> {
 
-    // A single PathImage is created to represent all Paths between a Host and an Extension.
-
-//    private Visibility dockVisibility = Visibility.VISIBLE;
-
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
@@ -53,49 +49,6 @@ public class PathImage extends Image<Path> {
         return getEntity();
     }
 
-    public void draw(Display display) {
-
-        if (isVisible()) {
-            Path path = getPath();
-            if (path.getType() == Path.Type.MESH) {
-                // Draw Path between Ports
-                drawTrianglePath(display);
-            } else if (path.getType() == Path.Type.ELECTRONIC) {
-                drawLinePath(display);
-            }
-        } else {
-            Path path = getPath();
-            if (path.getType() == Path.Type.ELECTRONIC) {
-                drawPhysicalPath(display);
-            }
-        }
-
-        /*
-        // Bounding Box
-        display.paint.setColor(Color.RED);
-        display.paint.setStrokeWidth(2.0f);
-        display.paint.setStyle(Paint.Style.STROKE);
-        Rectangle boundingBox = getBoundingBox();
-        Log.v("PathImage", "x: " + boundingBox.getPosition().x + ", y: " + boundingBox.getPosition().y + ", rot: " + boundingBox.getRotation() + ", width: " + boundingBox.getWidth() + ", height: " + boundingBox.getHeight());
-        display.drawRectangle(boundingBox);
-
-        // Center Transform
-        display.canvas.drawCircle(0, 0, 5, display.paint);
-        */
-    }
-
-//    public void setDockVisibility(Visibility visibility) {
-//        this.dockVisibility = visibility;
-//    }
-
-//    public Visibility getDockVisibility() {
-//        return this.dockVisibility;
-//    }
-
-//    public boolean isDockVisible() {
-//        return this.dockVisibility == Visibility.VISIBLE;
-//    }
-
     public void drawTrianglePath(Display display) {
 
         Paint paint = display.paint;
@@ -115,25 +68,13 @@ public class PathImage extends Image<Path> {
         paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
         double pathRotation = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-        double triangleRotation = pathRotation + 90.0f;
         Transform sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
         Transform targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
-//        if (dockVisibility == Visibility.VISIBLE) {
-//
-//            paint.setStyle(Paint.Style.FILL);
-//            display.drawTriangle(sourcePoint, triangleRotation, triangleWidth, triangleHeight);
-//
-//            paint.setStyle(Paint.Style.FILL);
-//            display.drawTriangle(targetPoint, triangleRotation, triangleWidth, triangleHeight);
-//
-//        } else {
-
-            display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
-//        }
+        display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
     }
 
-    private void drawLinePath(Display display) {
+    public void drawLinePath(Display display) {
 
         Paint paint = display.paint;
 
@@ -172,7 +113,7 @@ public class PathImage extends Image<Path> {
         }
     }
 
-    private void drawPhysicalPath(Display display) {
+    public void drawPhysicalPath(Display display) {
 
         Path path = getPath();
 
