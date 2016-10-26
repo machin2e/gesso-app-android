@@ -21,7 +21,6 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;

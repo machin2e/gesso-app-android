@@ -7,7 +7,6 @@ import java.util.UUID;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.PortableEntity;
 
 public class Profile {
     private UUID uuid = null;

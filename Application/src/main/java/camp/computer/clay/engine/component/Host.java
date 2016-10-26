@@ -9,7 +9,6 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
@@ -203,7 +202,7 @@ public class Host extends Component {
             if (getEntity().getComponent(Portable.class).getPorts().get(j).getType() == Port.Type.NONE) {
 
                 Image hostImage = getEntity().getComponent(Image.class);
-                PortableEntity host = (PortableEntity) hostImage.getEntity();
+                Entity host = hostImage.getEntity();
 
                 double distanceToPort = Geometry.distance(
                         host.getComponent(Portable.class).getPortShapes().filterEntity(getEntity().getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),

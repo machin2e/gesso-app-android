@@ -26,7 +26,6 @@ import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
