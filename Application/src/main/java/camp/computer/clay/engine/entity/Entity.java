@@ -6,11 +6,12 @@ import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 
-public abstract class Entity extends Groupable {
+public class Entity extends Groupable {
 
     // <ENTITY_MANAGEMENT>
     // TODO: public static Group<Entity> Manager = new Group<>();
@@ -81,7 +82,15 @@ public abstract class Entity extends Groupable {
 
 
 
-    public abstract void update();
+    public void update() {
+
+        // <HACK>
+        if (hasComponent(Extension.class)) {
+            getComponent(Extension.class).update();
+        }
+        // </HACK>
+
+    }
 
 
 
@@ -105,6 +114,7 @@ public abstract class Entity extends Groupable {
     protected Image image = null;
     protected ActionListenerComponent actionListener = null;
     protected Portable portable = null;
+    protected Extension extension = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -118,6 +128,8 @@ public abstract class Entity extends Groupable {
             this.actionListener = (ActionListenerComponent) component;
         } else if (component instanceof Portable) {
             this.portable = (Portable) component;
+        } else if (component instanceof Extension) {
+            this.extension = (Extension) component;
         }
     }
 
@@ -134,6 +146,8 @@ public abstract class Entity extends Groupable {
             return type.cast(this.actionListener);
         } else if (type == Portable.class) {
             return type.cast(this.portable);
+        } else if (type == Extension.class) {
+            return type.cast(this.extension);
         } else {
             return null;
         }

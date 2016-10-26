@@ -17,6 +17,6 @@ public interface DisplayHostInterface {
 
     public void refreshListViewFromData(PhoneHost phoneHost);
 
-    // TODO: removeTimelineView (Extension unit);
-    // TODO: hideTimelineView (Extension unit);
+    // TODO: removeTimelineView (ExtensionEntity unit);
+    // TODO: hideTimelineView (ExtensionEntity unit);
 }

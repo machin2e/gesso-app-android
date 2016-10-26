@@ -8,11 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.PortableEntity;
@@ -87,7 +87,7 @@ public class Space extends Image {
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-//                    // Previous Action targeted also this Extension
+//                    // Previous Action targeted also this ExtensionEntity
 //                    if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
 //
 //                        if (action.isTap()) {
@@ -344,11 +344,12 @@ public class Space extends Image {
     public void setPortableSeparation(double distance) {
         // <HACK>
         // TODO: Replace ASAP. This is shit.
-        Group<Image> extensionImages = Entity.Manager.filterType2(Extension.class).getImages();
+//        Group<Image> extensionImages = Entity.Manager.filterType2(ExtensionEntity.class).getImages();
+        Group<Image> extensionImages = Entity.Manager.filterWithComponent(Extension.class).getImages();
         for (int i = 0; i < extensionImages.size(); i++) {
             Image extensionImage = extensionImages.get(i);
 
-            PortableEntity extension = (PortableEntity) extensionImage.getEntity();
+            Entity extension = extensionImage.getEntity();
             if (extension.getComponent(Portable.class).getHosts().size() > 0) {
                 Host host = extension.getComponent(Portable.class).getHosts().get(0);
                 host.setExtensionDistance(distance);
@@ -361,11 +362,14 @@ public class Space extends Image {
     public void hideAllPorts() {
         // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
 
-        Group<Image> portableImages = Entity.Manager.filterType2(Host.class, Extension.class).getImages();
-//        ImageGroup portableImages = getImages(Host.class, Extension.class);
+//        Group<Image> portableImages = Entity.Manager.filterType2(Host.class, ExtensionEntity.class).getImages();
+        Group<Image> portableImages = Entity.Manager.filterType2(Host.class).getImages();
+        portableImages.addAll(Entity.Manager.filterWithComponent(Extension.class).getImages()); // HACK
+
+//        ImageGroup portableImages = getImages(Host.class, ExtensionEntity.class);
         for (int i = 0; i < portableImages.size(); i++) {
             Image portableImage = portableImages.get(i);
-            PortableEntity portableEntity = (PortableEntity) portableImage.getEntity();
+            Entity portableEntity = portableImage.getEntity();
             portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
             portableEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);

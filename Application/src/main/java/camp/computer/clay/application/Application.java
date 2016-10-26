@@ -41,9 +41,9 @@ import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
-import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
@@ -113,7 +113,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return this.prompt;
     }
 
-    public void openActionEditor(Extension extension) {
+    public void openActionEditor(Entity extensionEntity) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

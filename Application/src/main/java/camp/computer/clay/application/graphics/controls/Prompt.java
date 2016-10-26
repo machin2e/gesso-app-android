@@ -53,7 +53,7 @@ public class Prompt {
 
     public void promptInputText(final OnActionListener onActionListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(application.getView());
-        builder.setTitle("Create Extension");
+        builder.setTitle("Create ExtensionEntity");
 
         // Set up the input
         final EditText input = new EditText(application.getView());

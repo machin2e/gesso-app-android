@@ -3,10 +3,7 @@ package camp.computer.clay.engine.entity;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.model.action.Event;
+import camp.computer.clay.engine.component.Extension;
 
 public class Path extends Entity {
 
@@ -171,11 +168,11 @@ public class Path extends Entity {
         return null;
     }
 
-    public Extension getExtension() {
-        if (getSource().getPortable().getClass() == Extension.class) {
-            return (Extension) getSource().getPortable();
-        } else if (getTarget().getPortable().getClass() == Extension.class) {
-            return (Extension) getTarget().getPortable();
+    public Entity getExtension() {
+        if (getSource().getPortable().hasComponent(Extension.class)) {
+            return getSource().getPortable();
+        } else if (getTarget().getPortable().hasComponent(Extension.class)) {
+            return getTarget().getPortable();
         }
         return null;
     }

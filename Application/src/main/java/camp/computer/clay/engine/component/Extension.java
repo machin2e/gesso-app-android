@@ -1,33 +1,27 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
-import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-/**
- * {@code Extension} represents a device connected to a {@code Host}.
- */
-public class Extension extends PortableEntity {
+public class Extension extends Component {
 
-    public Extension() {
-        super();
-        setup();
+    public Extension(Entity entity) {
+        super(entity);
     }
 
-    private void setup() {
-    }
+    // <FROM_EXTENSION_ENTITY>
 
-    @Override
     public void update() {
-        Image extensionImage = getComponent(Image.class);
+        Image extensionImage = getEntity().getComponent(Image.class);
         extensionImage.update();
 
         updateExtensionImage();
@@ -44,7 +38,7 @@ public class Extension extends PortableEntity {
         // </HACK>
 
         // Call this so PortableImage.update() is called and Geometry is updated!
-        getComponent(Image.class).update();
+        getEntity().getComponent(Image.class).update();
     }
 
     /**
@@ -60,32 +54,32 @@ public class Extension extends PortableEntity {
     }
 
     /**
-     * Add or remove {@code Shape}'s for each of the {@code Extension}'s {@code Port}s.
+     * Add or remove {@code Shape}'s for each of the {@code ExtensionEntity}'s {@code Port}s.
      */
     private void updatePortGeometry() {
 
-        Image image = getComponent(Image.class);
+        Image image = getEntity().getComponent(Image.class);
 
         // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
         ShapeGroup portShapes = image.getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);
-            if (!getComponent(Portable.class).getPorts().contains(portShape.getEntity())) {
+            if (!getEntity().getComponent(Portable.class).getPorts().contains(portShape.getEntity())) {
                 portShapes.remove(portShape);
                 image.invalidate();
             }
         }
 
-        // Create Port shapes for each of Extension's Ports if they don't already exist
-        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getComponent(Portable.class).getPorts().get(i);
+        // Create Port shapes for each of ExtensionEntity's Ports if they don't already exist
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
 
             if (image.getShape(port) == null) {
 
                 // Ports
                 Circle<Port> circle = new Circle<>(port);
                 circle.setRadius(40);
-                circle.setLabel("Port " + (getComponent(Portable.class).getPorts().size() + 1));
+                circle.setLabel("Port " + (getEntity().getComponent(Portable.class).getPorts().size() + 1));
                 circle.setPosition(-90, 175);
                 // circle.setRotation(0);
 
@@ -101,13 +95,13 @@ public class Extension extends PortableEntity {
         }
 
         // Update Port positions based on the index of ports
-        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getComponent(Portable.class).getPorts().get(i);
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
             Circle portShape = (Circle) image.getShape(port);
 
             if (portShape != null) {
                 double portSpacing = 100;
-                portShape.getImagePosition().x = (i * portSpacing) - (((getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+                portShape.getImagePosition().x = (i * portSpacing) - (((getEntity().getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
                 // TODO: Also update y coordinate
             }
         }
@@ -119,7 +113,7 @@ public class Extension extends PortableEntity {
         // References:
         // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
 
-        final int contactCount = getComponent(Portable.class).getPorts().size();
+        final int contactCount = getEntity().getComponent(Portable.class).getPorts().size();
         final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
         final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
 
@@ -131,21 +125,21 @@ public class Extension extends PortableEntity {
         double contactSeparation = 2.54; // Measure in millimeters (mm)
         // </FACTOR_OUT>
 
-        Image portableImage = getComponent(Image.class);
+        Image portableImage = getEntity().getComponent(Image.class);
 
-        // Update Headers Geometry to match the corresponding Extension Profile
+        // Update Headers Geometry to match the corresponding ExtensionEntity Profile
         Rectangle header = (Rectangle) portableImage.getShape("Header");
         double headerWidth = Space.PIXEL_PER_MILLIMETER * A;
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
-        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
             double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-            if (i < getComponent(Portable.class).headerContactPositions.size()) {
-                getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
+            if (i < getEntity().getComponent(Portable.class).headerContactPositions.size()) {
+                getEntity().getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
             } else {
                 Point point = new Point(new Transform(x, 107));
-                getComponent(Portable.class).headerContactPositions.add(point);
+                getEntity().getComponent(Portable.class).headerContactPositions.add(point);
                 portableImage.addShape(point);
             }
         }
@@ -157,9 +151,9 @@ public class Extension extends PortableEntity {
 
     private void updatePortStyle() {
         // Update Port style
-        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getComponent(Portable.class).getPorts().get(i);
-            Shape portShape = image.getShape(port);
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
+            Shape portShape = getEntity().getComponent(Image.class).getShape(port);
 
             // Update color of Port shape based on type
             if (portShape != null) {
@@ -178,7 +172,7 @@ public class Extension extends PortableEntity {
 
         // TODO: !!!!!!!!!!!! Start Thursday by adding corner/turtle turn "nodes" that extend straight out from
 
-        // TODO: only route paths with turtle graphics maneuvers... so paths are square btwn Host and Extension
+        // TODO: only route paths with turtle graphics maneuvers... so paths are square btwn Host and ExtensionEntity
 
         // TODO: Goal: implement Ben's demo (input on one Host to analog output on another Host, with diff components)
 
@@ -186,4 +180,32 @@ public class Extension extends PortableEntity {
 
         // TODO: Animate movement of Extensions when "extension halo" expands or contracts (breathes)
     }
+
+
+
+    private Profile profile = null;
+
+    public Profile getProfile() {
+        return this.profile;
+    }
+
+    public boolean hasProfile() {
+        return this.profile != null;
+    }
+
+    public void setProfile(Profile profile) {
+        // Set the Profile used to configure the ExtensionEntity
+        this.profile = profile;
+
+        // Create Ports to match the Profile
+        for (int i = 0; i < profile.getPorts().size(); i++) {
+            Port port = new Port();
+            port.setIndex(i);
+            port.setType(profile.getPorts().get(i).getType());
+            port.setDirection(profile.getPorts().get(i).getDirection());
+            getEntity().getComponent(Portable.class).addPort(port);
+        }
+    }
+
+    // </FROM_EXTENSION_ENTITY>
 }

@@ -1,6 +1,7 @@
 package camp.computer.clay.engine.entity;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Extension;
 
 public class Port extends Entity {
 
@@ -80,8 +81,8 @@ public class Port extends Entity {
 
     protected Direction direction = Direction.NONE;
 
-    public PortableEntity getPortable() {
-        return (PortableEntity) getParent();
+    public Entity getPortable() {
+        return getParent();
     }
 
     public int getIndex() {
@@ -147,15 +148,15 @@ public class Port extends Entity {
     }
 
     // <HACK>
-    public Extension getExtension() {
+    public Entity getExtension() {
         Group<Path> paths = getPaths();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
             if (path.getSource() == this || path.getTarget() == this) {
-                if (path.getSource().getPortable() instanceof Extension) {
-                    return (Extension) path.getSource().getPortable();
-                } else if (path.getTarget().getPortable() instanceof Extension) {
-                    return (Extension) path.getTarget().getPortable();
+                if (path.getSource().getPortable().hasComponent(Extension.class)) {
+                    return path.getSource().getPortable();
+                } else if (path.getTarget().getPortable().hasComponent(Extension.class)) {
+                    return path.getTarget().getPortable();
                 }
             }
         }

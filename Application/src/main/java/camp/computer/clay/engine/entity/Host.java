@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
@@ -24,10 +25,10 @@ public class Host extends PortableEntity {
     }
 
     private void setup() {
-        headerExtensions.add(new ArrayList<Extension>());
-        headerExtensions.add(new ArrayList<Extension>());
-        headerExtensions.add(new ArrayList<Extension>());
-        headerExtensions.add(new ArrayList<Extension>());
+        headerExtensions.add(new ArrayList<Entity>());
+        headerExtensions.add(new ArrayList<Entity>());
+        headerExtensions.add(new ArrayList<Entity>());
+        headerExtensions.add(new ArrayList<Entity>());
     }
 
     // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)
@@ -68,32 +69,32 @@ public class Host extends PortableEntity {
 
     //----------------------
 
-    public List<List<Extension>> headerExtensions = new ArrayList<>();
+    public List<List<Entity>> headerExtensions = new ArrayList<>();
 
     /**
-     * Creates a new {@code Extension} connected to {@hostPort}.
+     * Creates a new {@code ExtensionEntity} connected to {@hostPort}.
      *
      * @param hostPort
      */
-    public Extension createExtension(Port hostPort, Transform initialPosition) {
+    public Entity createExtension(Port hostPort, Transform initialPosition) {
 
         // TODO: Remove initialPosition... find the position by analyzing the geometry of the HostImage
 
-        //Log.v("Extension", "Creating Extension from Port");
+        //Log.v("ExtensionEntity", "Creating ExtensionEntity from Port");
 
         //Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
 //        Shape hostPortShape = getShapes(hostPort);
 
-        //Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+        //Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
-        // TODO: Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
+        // TODO: Prompt to select extensionEntity to use! Then use that profile to create and configure ports for the extensionEntity.
 
-        // Create Extension Entity
-        UUID extensionUuid = Clay.createEntity(Extension.class);
-        Extension extension = (Extension) Entity.Manager.get(extensionUuid);
+        // Create ExtensionEntity Entity
+        UUID extensionUuid = Clay.createEntity(Extension.class); // HACK: Because Extension is a Component
+        Entity extensionEntity = Entity.Manager.get(extensionUuid);
 
-        // Set the initial position of the Extension
-        extension.getComponent(Transform.class).set(initialPosition);
+        // Set the initial position of the ExtensionEntity
+        extensionEntity.getComponent(Transform.class).set(initialPosition);
 
         // Configure Host's Port (i.e., the Path's source Port)
         if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
@@ -101,12 +102,12 @@ public class Host extends PortableEntity {
             hostPort.setDirection(Port.Direction.BOTH);
         }
 
-        // Configure Extension's Ports (i.e., the Path's target Port)
-        Port extensionPort = extension.getComponent(Portable.class).getPorts().get(0);
+        // Configure ExtensionEntity's Ports (i.e., the Path's target Port)
+        Port extensionPort = extensionEntity.getComponent(Portable.class).getPorts().get(0);
         extensionPort.setDirection(Port.Direction.INPUT);
         extensionPort.setType(hostPort.getType());
 
-        // Create Path from Host to Extension and configure the new Path
+        // Create Path from Host to ExtensionEntity and configure the new Path
         UUID pathUuid = Clay.createEntity(Path.class);
         Path path = (Path) Entity.getEntity(pathUuid);
         path.set(hostPort, extensionPort);
@@ -134,58 +135,61 @@ public class Host extends PortableEntity {
         // Update layout
         updateExtensionLayout();
 
-        return extension;
+        return extensionEntity;
     }
 
     /**
-     * Adds and existing {@code Extension}.
+     * Adds and existing {@code ExtensionEntity}.
      *
      * @param profile
      * @param initialPosition
      * @return
      */
-    public Extension restoreExtension(Profile profile, Transform initialPosition) {
+    public Entity restoreExtension(Profile profile, Transform initialPosition) {
         // NOTE: Previously called fetchExtension(...)
 
-        // Log.v("IASM", "(1) touch extension to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
+        // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
-        // Create the Extension
-        Extension extension = new Extension();
+        // Create the ExtensionEntity
+        Entity extensionEntity = new Entity();
+
+        // Add Extension Component (for type identification)
+        extensionEntity.setComponent(new Extension(extensionEntity));
 
         // <HACK>
         // TODO: Remove references to Profile in Portables. Remove Profile altogether!?
-        extension.setProfile(profile);
+        extensionEntity.getComponent(Extension.class).setProfile(profile);
         // </HACK>
 
-        // Update Extension Position
-        extension.getComponent(Transform.class).set(initialPosition);
+        // Update ExtensionEntity Position
+        extensionEntity.getComponent(Transform.class).set(initialPosition);
 
         // Automatically select and connect all Paths to Host
-        autoConnectToHost(extension);
+        autoConnectToHost(extensionEntity);
 
         // TODO: Start IASM based on automatically configured Paths to Host.
 
         updateExtensionLayout();
 
-        return extension;
+        return extensionEntity;
     }
 
-    private boolean autoConnectToHost(Extension extension) {
+    private boolean autoConnectToHost(Entity extensionEntity) {
 
         // Automatically select, connect paths to, and configure the Host's Ports
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
+        for (int i = 0; i < extensionEntity.getComponent(Portable.class).getPorts().size(); i++) {
 
             // Select an available Host Port
-            Port selectedHostPort = autoSelectNearestAvailableHostPort(extension);
+            Port selectedHostPort = autoSelectNearestAvailableHostPort(extensionEntity);
 
             // Configure Host's Port
-            selectedHostPort.setType(extension.getComponent(Portable.class).getPorts().get(i).getType());
-            selectedHostPort.setDirection(extension.getComponent(Portable.class).getPorts().get(i).getDirection());
+            selectedHostPort.setType(extensionEntity.getComponent(Portable.class).getPorts().get(i).getType());
+            selectedHostPort.setDirection(extensionEntity.getComponent(Portable.class).getPorts().get(i).getDirection());
 
-            // Create Path from Extension Port to Host Port
+            // Create Path from ExtensionEntity Port to Host Port
             UUID pathUuid = Clay.createEntity(Path.class);
             Path path = (Path) Entity.getEntity(pathUuid);
-            path.set(selectedHostPort, extension.getComponent(Portable.class).getPorts().get(i));
+            path.set(selectedHostPort, extensionEntity.getComponent(Portable.class).getPorts().get(i));
 
             path.setType(Path.Type.ELECTRONIC);
         }
@@ -193,7 +197,7 @@ public class Host extends PortableEntity {
         return true;
     }
 
-    private Port autoSelectNearestAvailableHostPort(Extension extension) {
+    private Port autoSelectNearestAvailableHostPort(Entity extensionEntity) {
         // Select an available Host Port
         Port selectedHostPort = null;
         double distanceToSelectedPort = Double.MAX_VALUE;
@@ -205,7 +209,7 @@ public class Host extends PortableEntity {
 
                 double distanceToPort = Geometry.distance(
                         host.getComponent(Portable.class).getPortShapes().filterEntity(getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),
-                        extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
+                        extensionEntity.getComponent(Image.class).getEntity().getComponent(Transform.class)
                 );
 
                 // Check if the port is the nearest
@@ -220,7 +224,7 @@ public class Host extends PortableEntity {
     }
 
     // TODO: Remove this?
-    public int getHeaderIndex(Extension extension) {
+    public int getHeaderIndex(Entity extensionEntity) {
 
         int[] indexCounts = new int[4];
         for (int i = 0; i < indexCounts.length; i++) {
@@ -230,7 +234,7 @@ public class Host extends PortableEntity {
         Shape boardShape = getComponent(Image.class).getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
-        Group<Port> extensionPorts = extension.getComponent(Portable.class).getPorts();
+        Group<Port> extensionPorts = extensionEntity.getComponent(Portable.class).getPorts();
         for (int j = 0; j < extensionPorts.size(); j++) {
 
             Port extensionPort = extensionPorts.get(j);
@@ -281,7 +285,7 @@ public class Host extends PortableEntity {
     public void updateExtensionLayout() {
 
         // Get Extensions connected to the Host.
-        Group<Extension> extensions = getComponent(Portable.class).getExtensions();
+        Group<Entity> extensionEntities = getComponent(Portable.class).getExtensions();
 
         // Reset current layout in preparation for updating it in the presently-running update step.
         for (int i = 0; i < headerExtensions.size(); i++) {
@@ -289,74 +293,74 @@ public class Host extends PortableEntity {
         }
 
         // Assign the Extensions connected to this Host to the most-strongly-connected Header.
-        // This can be thought of as the "high level layout" of Extension relative to the Host.
-        for (int i = 0; i < extensions.size(); i++) {
-            Extension extension = extensions.get(i);
-            updateExtensionHeaderIndex(extension);
+        // This can be thought of as the "high level layout" of ExtensionEntity relative to the Host.
+        for (int i = 0; i < extensionEntities.size(); i++) {
+            Entity extensionEntity = extensionEntities.get(i);
+            updateExtensionHeaderIndex(extensionEntity);
         }
 
-        // Update each Extension's placement, relative to the connected Host.
+        // Update each ExtensionEntity's placement, relative to the connected Host.
         for (int headerIndex = 0; headerIndex < headerExtensions.size(); headerIndex++) {
             for (int extensionIndex = 0; extensionIndex < headerExtensions.get(headerIndex).size(); extensionIndex++) {
 
-                Extension extension = headerExtensions.get(headerIndex).get(extensionIndex);
+                Entity extensionEntity = headerExtensions.get(headerIndex).get(extensionIndex);
 
                 final double extensionSeparationDistance = 25.0;
                 double extensionWidth = 200;
                 int extensionCount = headerExtensions.get(headerIndex).size();
                 double offset = extensionIndex * 250 - (((extensionCount - 1) * (extensionWidth + extensionSeparationDistance)) / 2.0);
 
-                // Update the Extension's position.
+                // Update the ExtensionEntity's position.
                 if (headerIndex == 0) {
-                    extension.getComponent(Transform.class).set(
+                    extensionEntity.getComponent(Transform.class).set(
                             0 + offset,
                             -distanceToExtensions,
                             getComponent(Transform.class)
                     );
                 } else if (headerIndex == 1) {
-                    extension.getComponent(Transform.class).set(
+                    extensionEntity.getComponent(Transform.class).set(
                             distanceToExtensions,
                             0 + offset,
                             getComponent(Transform.class)
                     );
                 } else if (headerIndex == 2) {
-                    extension.getComponent(Transform.class).set(
+                    extensionEntity.getComponent(Transform.class).set(
                             0 + offset,
                             distanceToExtensions,
                             getComponent(Transform.class)
                     );
                 } else if (headerIndex == 3) {
-                    extension.getComponent(Transform.class).set(
+                    extensionEntity.getComponent(Transform.class).set(
                             -distanceToExtensions,
                             0 + offset,
                             getComponent(Transform.class)
                     );
                 }
 
-                // Update the Extension's rotation.
+                // Update the ExtensionEntity's rotation.
                 double hostEntityRotation = getComponent(Transform.class).getRotation();
                 if (headerIndex == 0) {
-                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 0);
+                    extensionEntity.getComponent(Transform.class).setRotation(hostEntityRotation + 0);
                 } else if (headerIndex == 1) {
-                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 90);
+                    extensionEntity.getComponent(Transform.class).setRotation(hostEntityRotation + 90);
                 } else if (headerIndex == 2) {
-                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 180);
+                    extensionEntity.getComponent(Transform.class).setRotation(hostEntityRotation + 180);
                 } else if (headerIndex == 3) {
-                    extension.getComponent(Transform.class).setRotation(hostEntityRotation + 270);
+                    extensionEntity.getComponent(Transform.class).setRotation(hostEntityRotation + 270);
                 }
 
                 // Invalidate Image Component so its geometry (i.e., shapes) will be updated.
-                extension.getComponent(Image.class).invalidate();
+                extensionEntity.getComponent(Image.class).invalidate();
             }
         }
     }
 
     // TODO: Refactor this... it's really dumb right now.
-    public void updateExtensionHeaderIndex(Extension extension) {
-        if (extension.getComponent(Image.class) == null || extension.getComponent(Portable.class).getHosts().size() == 0) {
+    public void updateExtensionHeaderIndex(Entity extensionEntity) {
+        if (extensionEntity.getComponent(Image.class) == null || extensionEntity.getComponent(Portable.class).getHosts().size() == 0) {
             return;
         }
-        int segmentIndex = getHeaderIndex(extension);
-        headerExtensions.get(segmentIndex).add(extension);
+        int segmentIndex = getHeaderIndex(extensionEntity);
+        headerExtensions.get(segmentIndex).add(extensionEntity);
     }
 }

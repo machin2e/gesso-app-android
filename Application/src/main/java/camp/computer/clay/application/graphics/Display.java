@@ -18,11 +18,11 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
@@ -208,7 +208,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int entityCount = Entity.Manager.size();
         int hostCount = Entity.Manager.filterType2(Host.class).size();
         int portCount = Entity.Manager.filterType2(Port.class).size();
-        int extensionCount = Entity.Manager.filterType2(Extension.class).size();
+//        int extensionCount = Entity.Manager.filterType2(ExtensionEntity.class).size();
+        int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
         int pathCount = Entity.Manager.filterType2(Path.class).size();
 
         // Entities
@@ -478,7 +479,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 canvas.restore();
             }
 
-        } else if (entity.getClass() == Extension.class) {
+        } else if (entity.hasComponent(Extension.class)) {
 
             Image image = entity.getComponent(Image.class);
             if (image.isVisible()) {
@@ -579,7 +580,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawPhysicalPath(Path path, Display display) {
 
-        // Get Host and Extension Ports
+        // Get Host and ExtensionEntity Ports
         Port hostPort = path.getSource();
         Port extensionPort = path.getTarget();
 
@@ -589,7 +590,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Image extensionImage = extensionPort.getPortable().getComponent(Image.class);
 
         PortableEntity host = (PortableEntity) hostImage.getEntity();
-        PortableEntity extension = (PortableEntity) extensionImage.getEntity();
+        Entity extension = extensionImage.getEntity();
 
         if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getIndex()
                 && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPort.getIndex()) {

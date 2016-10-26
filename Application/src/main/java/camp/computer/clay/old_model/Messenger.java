@@ -205,7 +205,7 @@ public class Messenger {
                     getClay().addDevice(deviceUuid, unitAddress);
 
                 } else {
-//                    Log.v("Clay", "Updating state of existing Extension with address " + unitAddress);
+//                    Log.v("Clay", "Updating state of existing ExtensionEntity with address " + unitAddress);
 
                     UUID deviceUuid = UUID.fromString(unitUuid);
                     PhoneHost phoneHost = getClay().getDeviceByUuid(deviceUuid);

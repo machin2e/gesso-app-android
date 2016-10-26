@@ -127,9 +127,10 @@ public class Camera extends Entity {
     }
 
     public void adjustPosition() {
-        //Transform centerPosition = getSpace().getImages().filterType2(Host.class, Extension.class).getCenterPoint();
-        //Transform centerPosition = getSpace().getEntities().filterType2(Host.class, Extension.class).getImages().getCenterPoint();
-        Transform centerPosition = Entity.Manager.filterType2(Host.class, Extension.class).getCenterPoint();
+        //Transform centerPosition = getSpace().getImages().filterType2(Host.class, ExtensionEntity.class).getCenterPoint();
+        //Transform centerPosition = getSpace().getEntities().filterType2(Host.class, ExtensionEntity.class).getImages().getCenterPoint();
+        //Transform centerPosition = Entity.Manager.filterType2(Host.class, ExtensionEntity.class).getCenterPoint();
+        Transform centerPosition = Entity.Manager.filterType2(Host.class, Entity.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
@@ -166,8 +167,9 @@ public class Camera extends Entity {
     }
 
     public void adjustScale(double duration) {
-        //Rectangle boundingBox = getSpace().getImages().filterType2(Host.class, Extension.class).getBoundingBox();
-        Rectangle boundingBox = Entity.Manager.filterType2(Host.class, Extension.class).getImages().getBoundingBox();
+        //Rectangle boundingBox = getSpace().getImages().filterType2(Host.class, ExtensionEntity.class).getBoundingBox();
+//        Rectangle boundingBox = Entity.Manager.filterType2(Host.class, ExtensionEntity.class).getImages().getBoundingBox();
+        Rectangle boundingBox = Entity.Manager.filterType2(Host.class, Entity.class).getImages().getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
         }
@@ -247,12 +249,13 @@ public class Camera extends Entity {
 //        HostImage hostImage = (HostImage) host.getComponent(Image.class);
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
-//        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, Extension.class);
+//        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, ExtensionEntity.class);
 //        otherPortableImages.remove(hostImage);
 //        otherPortableImages.setTransparency(0.1);
 
         // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
-        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Extension.class);
+//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, ExtensionEntity.class);
+        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Entity.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
         otherPortables.remove(host);
         otherPortables.setTransparency(0.1);
@@ -288,20 +291,21 @@ public class Camera extends Entity {
         setPosition(boundingBox.getPosition());
     }
 
-    public void setFocus(Extension extension) {
+    public void setFocus(Entity extensionEntity) {
 
-        Log.v("SetFocus", "setFocus(Extension)");
+        Log.v("SetFocus", "setFocus(ExtensionEntity)");
 
         // <REFACTOR>
         // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
-        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Extension.class);
+//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, ExtensionEntity.class);
+        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Entity.class);
         Log.v("Entities", "otherPortables.size: " + otherPortables.size());
-        otherPortables.remove(extension);
+        otherPortables.remove(extensionEntity);
         otherPortables.setTransparency(0.1);
 
         // Get ports along every Path connected to the Ports on the selected Host
         Group<Port> hostPathPorts = new Group<>();
-        Group<Port> extensionPorts = extension.getComponent(Portable.class).getPorts();
+        Group<Port> extensionPorts = extensionEntity.getComponent(Portable.class).getPorts();
         for (int i = 0; i < extensionPorts.size(); i++) {
             Port port = extensionPorts.get(i);
 
@@ -322,8 +326,8 @@ public class Camera extends Entity {
         }
         // </REFACTOR>
 
-        // Increase distance between Host and Extension
-        Host host = extension.getComponent(Portable.class).getHosts().get(0);
+        // Increase distance between Host and ExtensionEntity
+        Host host = extensionEntity.getComponent(Portable.class).getHosts().get(0);
         host.setExtensionDistance(500);
 
         ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);

@@ -7,7 +7,6 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Extension;
 import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
@@ -50,34 +49,34 @@ public class Portable extends Component {
     }
 
 
-    public Group<Extension> getExtensions() {
-        Group<Extension> extensions = new Group<>();
+    public Group<Entity> getExtensions() {
+        Group<Entity> extensionEntities = new Group<>();
         for (int i = 0; i < getPorts().size(); i++) {
             Port port = getPorts().get(i);
 
-            Extension extension = port.getExtension();
+            Entity extensionEntity = port.getExtension();
 
-            if (extension != null && !extensions.contains(extension)) {
-                extensions.add(extension);
+            if (extensionEntity != null && !extensionEntities.contains(extensionEntity)) {
+                extensionEntities.add(extensionEntity);
             }
 
         }
-        return extensions;
+        return extensionEntities;
     }
 
     // <EXTENSION>
-    // HACK: Assumes Extension
+    // HACK: Assumes ExtensionEntity
     public Group<Host> getHosts() {
-        return getHosts((Extension) getEntity());
+        return getHosts(getEntity());
     }
 
-    private Group<Host> getHosts(Extension extension) {
+    private Group<Host> getHosts(Entity extensionEntity) {
 
         List<Host> hosts = Entity.Manager.filterType2(Host.class);
 
         Group<Host> hostGroup = new Group<>();
         for (int i = 0; i < hosts.size(); i++) {
-            if (hosts.get(i).getComponent(Portable.class).getExtensions().contains(extension)) {
+            if (hosts.get(i).getComponent(Portable.class).getExtensions().contains(extensionEntity)) {
                 if (!hostGroup.contains(hosts.get(i))) {
                     hostGroup.add(hosts.get(i));
                 }
@@ -159,7 +158,7 @@ public class Portable extends Component {
             // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
             Path path = (Path) pathImage.getEntity();
             Port targetPort = path.getTarget();
-            PortableEntity targetPortableEntity = (PortableEntity) targetPort.getParent();
+            Entity targetPortableEntity = targetPort.getParent();
             Image targetPortableImage = targetPortableEntity.getComponent(Image.class);
             if (targetPortableImage != getEntity().getComponent(Image.class)) { // HACK //if (targetPortableImage != this) { // HACK
                 targetPortableEntity.getComponent(Portable.class).setPathVisibility(targetPort, visibility);
@@ -172,21 +171,21 @@ public class Portable extends Component {
 
     // <EXTENSION_IMAGE_HELPERS>
     // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    public void createProfile(final Extension extension) {
-        if (!extension.hasProfile()) {
+    public void createProfile(final Entity extensionEntity) {
+        if (!extensionEntity.getComponent(Extension.class).hasProfile()) {
 
-            // TODO: Only call promptInputText if the extension is a draft (i.e., does not have an associated Profile)
+            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Profile)
             Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
-                    // Create Extension Profile
-                    Profile profile = new Profile(extension);
+                    // Create ExtensionEntity Profile
+                    Profile profile = new Profile(extensionEntity);
                     profile.setLabel(text);
 
-                    // Assign the Profile to the Extension
-                    extension.setProfile(profile);
+                    // Assign the Profile to the ExtensionEntity
+                    extensionEntity.getComponent(Extension.class).setProfile(profile);
 
-                    // Cache the new Extension Profile
+                    // Cache the new ExtensionEntity Profile
                     Application.getView().getClay().getProfiles().add(profile);
 
                     // TODO: Persist the profile in the user's private store (either local or online)
