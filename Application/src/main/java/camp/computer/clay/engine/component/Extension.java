@@ -164,7 +164,7 @@ public class Extension extends Component {
 
     private void updatePathRoutes() {
 
-        // TODO: Get position around "halo" around Host based on rect (a surrounding/containing rectangle) or circular (a surrounding/containing circle) layout algo and set so they don't overlap. Mostly set X to prevent overlap, then run the router and push back the halo distance for that side of the Host, if/as necessary
+        // TODO: Get position around "halo" around HostEntity based on rect (a surrounding/containing rectangle) or circular (a surrounding/containing circle) layout algo and set so they don't overlap. Mostly set X to prevent overlap, then run the router and push back the halo distance for that side of the HostEntity, if/as necessary
 
         // <HACK>
 //        updateExtensionLayout();
@@ -172,9 +172,9 @@ public class Extension extends Component {
 
         // TODO: !!!!!!!!!!!! Start Thursday by adding corner/turtle turn "nodes" that extend straight out from
 
-        // TODO: only route paths with turtle graphics maneuvers... so paths are square btwn Host and ExtensionEntity
+        // TODO: only route paths with turtle graphics maneuvers... so paths are square btwn HostEntity and ExtensionEntity
 
-        // TODO: Goal: implement Ben's demo (input on one Host to analog output on another Host, with diff components)
+        // TODO: Goal: implement Ben's demo (input on one HostEntity to analog output on another HostEntity, with diff components)
 
         ///// TODO: Add label/title to Path, too. ADD OPTION TO FLAG ENTITIES WITH A QUESTION, OR JUST ASK QUESTION/ADD TODO DIRECTLY THERE! ANNOTATE STRUCTURE WITH DESCRIPTIVE/CONTEXTUAL METADATA.
 

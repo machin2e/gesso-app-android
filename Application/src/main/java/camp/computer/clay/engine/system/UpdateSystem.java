@@ -1,4 +1,4 @@
 package camp.computer.clay.engine.system;
 
-public class ExtensionHelper {
+public class UpdateSystem {
 }

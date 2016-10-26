@@ -14,6 +14,7 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
@@ -25,7 +26,6 @@ import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
 import camp.computer.clay.engine.component.Actor;
-import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
@@ -111,7 +111,7 @@ public class Clay {
     }
 
     public static UUID createEntity(Class<?> entityType) {
-        if (entityType == Host.class) {
+        if (entityType == Host.class) { // HACK (because Host is a Component)
             return createHostEntity();
         } else if (entityType == Extension.class) { // HACK (because Extension is a Component)
             return createExtensionEntity();
@@ -123,16 +123,23 @@ public class Clay {
     }
 
     /**
-     * Adds a <em>virtual</em> {@code Host} that can be configured and later assigned to a physical
+     * Adds a <em>virtual</em> {@code HostEntity} that can be configured and later assigned to a physical
      * host.
      */
     private static UUID createHostEntity() {
 
         // Create Entity
-        Host host = new Host();
+        Entity hostEntity = new Entity();
+
+        // Add Extension Component (for type identification)
+        hostEntity.setComponent(new Host(hostEntity));
+
+        // <HACK>
+        hostEntity.getComponent(Host.class).setupHeaderExtensions();
+        // </HACK>
 
         // Add Portable Component (so can add Ports)
-        host.setComponent(new Portable(host));
+        hostEntity.setComponent(new Portable(hostEntity));
 
         // PortableEntity Component (Image Component depends on this)
         final int PORT_COUNT = 12;
@@ -140,25 +147,25 @@ public class Clay {
             Port port = new Port();
             port.setLabel("Port " + (j + 1));
             port.setIndex(j);
-            host.getComponent(Portable.class).addPort(port);
+            hostEntity.getComponent(Portable.class).addPort(port);
         }
 
         // Add Transform Component
-        host.setComponent(new Transform());
+        hostEntity.setComponent(new Transform());
 
         // Add Image Component
-        host.setComponent(new Image(host));
+        hostEntity.setComponent(new Image(hostEntity));
 
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
-        Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
+        Application.getView().restoreGeometry(hostEntity.getComponent(Image.class), "Geometry.json");
 
         // <HACK>
-        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
+        Group<Shape> shapes = hostEntity.getComponent(Image.class).getShapes();
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).getLabel().startsWith("Port")) {
                 String label = shapes.get(i).getLabel();
-                Port port = host.getComponent(Portable.class).getPort(label);
+                Port port = hostEntity.getComponent(Portable.class).getPort(label);
                 shapes.get(i).setEntity(port);
             }
         }
@@ -166,14 +173,14 @@ public class Clay {
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
-//        host.setupActionListener();
+//        hostEntity.setupActionListener();
 
-        ActionListenerComponent actionListener = new ActionListenerComponent(host);
-        actionListener.setOnActionListener(getHostActionListener(host));
-        host.setComponent(actionListener);
+        ActionListenerComponent actionListener = new ActionListenerComponent(hostEntity);
+        actionListener.setOnActionListener(getHostActionListener(hostEntity));
+        hostEntity.setComponent(actionListener);
         // </HACK>
 
-        return host.getUuid();
+        return hostEntity.getUuid();
     }
 
     private static UUID createExtensionEntity() {
@@ -270,9 +277,9 @@ public class Clay {
         return path.getUuid();
     }
 
-    public static ActionListener getHostActionListener(final Host host) {
+    public static ActionListener getHostActionListener(final Entity hostEntity) {
 
-        final Image hostImage = host.getComponent(Image.class);
+        final Image hostImage = hostEntity.getComponent(Image.class);
 
         return new ActionListener() {
             @Override
@@ -301,18 +308,18 @@ public class Clay {
                             // Update position of prototype ExtensionEntity
                             Space.getSpace().setExtensionPrototypePosition(event.getPosition());
 
-                            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                            host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
+                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+                            hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 
                             Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
                         } else if (action.isHolding()) {
 
-                            // Update position of Host image
-                            host.getComponent(Transform.class).set(event.getPosition());
+                            // Update position of HostEntity image
+                            hostEntity.getComponent(Transform.class).set(event.getPosition());
 
                             // Camera
-                            camera.setFocus(host);
+                            camera.setFocus(hostEntity);
 
                         }
 
@@ -329,9 +336,10 @@ public class Clay {
                             boolean isCreateExtensionAction = true;
 
                             // <HACK>
-                            //Group<Image> imageGroup = Space.getSpace().getImages(Host.class, ExtensionEntity.class);
-                            Group<Image> imageGroup = Entity.Manager.filterType2(Host.class).getImages();
-                            imageGroup.addAll(Entity.Manager.filterWithComponent(Extension.class).getImages());
+                            //Group<Image> imageGroup = Space.getSpace().getImages(HostEntity.class, ExtensionEntity.class);
+//                            Group<Image> imageGroup = Entity.Manager.filterType2(HostEntity.class).getImages();
+//                            imageGroup.addAll(Entity.Manager.filterWithComponent(Extension.class).getImages());
+                            Group<Image> imageGroup = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages();
                             // </HACK>
 
                             for (int i = 0; i < imageGroup.size(); i++) {
@@ -409,7 +417,7 @@ public class Clay {
                                 } else {
 
                                     Image nearbyImage = portableImage;
-                                    PortableEntity nearbyPortableEntity = (PortableEntity) portableImage.getEntity();
+                                    Entity nearbyPortableEntity = portableImage.getEntity();
                                     nearbyImage.setTransparency(0.1f);
                                     nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
 
@@ -441,14 +449,14 @@ public class Clay {
                         if (action.isTap()) {
 
                             // Focus on touched form
-                            host.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
-                            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
+                            hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
 
                             hostImage.setTransparency(1.0);
 
                             // Show ports and paths of touched form
-                            for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
-                                Group<Path> paths = host.getComponent(Portable.class).getPort(i).getPaths();
+                            for (int i = 0; i < hostEntity.getComponent(Portable.class).getPorts().size(); i++) {
+                                Group<Path> paths = hostEntity.getComponent(Portable.class).getPort(i).getPaths();
 
                                 for (int j = 0; j < paths.size(); j++) {
                                     Path path = paths.get(j);
@@ -463,33 +471,35 @@ public class Clay {
                             }
 
                             // Camera
-                            camera.setFocus(host);
+                            camera.setFocus(hostEntity);
 
-                            if (host.getComponent(Portable.class).getExtensions().size() > 0) {
+                            if (hostEntity.getComponent(Portable.class).getExtensions().size() > 0) {
 //                                                    Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
-                                host.getComponent(Portable.class).getExtensions().setTransparency(0.1);
+                                hostEntity.getComponent(Portable.class).getExtensions().setTransparency(0.1);
 
                                 // <HACK>
                                 // TODO: Replace ASAP. This is shit.
                                 // TODO: Use "rectangle" or "circular" extension layout algorithms
-                                host.setExtensionDistance(500);
+                                hostEntity.getComponent(Host.class).setExtensionDistance(500);
                                 // </HACK>
                             }
 
                             // Title
-                            Space.getSpace().setTitleText("Host");
+                            Space.getSpace().setTitleText("HostEntity");
                             Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
 
                         } else {
 
                             // TODO: Release longer than tap!
 
-                            if (event.getTargetImage().getEntity() instanceof Host) {
+                            //if (event.getTargetImage().getEntity() instanceof HostEntity) {
+                            if (event.getTargetImage().getEntity().hasComponent(Host.class)) {
 
                                 // If getFirstEvent queueEvent was on the same form, then respond
-                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity() instanceof Host) {
+//                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity() instanceof HostEntity) {
+                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity().hasComponent(Host.class)) {
 
-                                    // Host
+                                    // HostEntity
 //                                                        event.getTargetImage().queueEvent(action);
 
                                     // Camera
@@ -498,7 +508,7 @@ public class Clay {
 
                             } else if (event.getTargetImage() instanceof Space) {
 
-                                // Host
+                                // HostEntity
 //                                                        action.getFirstEvent().getTargetImage().queueEvent(action);
 
                             }
@@ -527,7 +537,7 @@ public class Clay {
                                     public void onComplete(Profile profile) {
 
                                         // Add ExtensionEntity from Profile
-                                        Entity extensionEntity = host.restoreExtension(profile, event.getPosition());
+                                        Entity extensionEntity = hostEntity.getComponent(Host.class).restoreExtension(profile, event.getPosition());
 
                                         // Update Camera
                                         camera.setFocus(extensionEntity);
@@ -541,16 +551,16 @@ public class Clay {
 
                         if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
 
-                            // (Host.Port, ..., Host.Port) Action Pattern
+                            // (HostEntity.Port, ..., HostEntity.Port) Action Pattern
 
                             if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape() && action.isTap()) { // if (action.isTap()) {
 
-                                // (Host.Port A, ..., Host.Port A) Action Pattern
+                                // (HostEntity.Port A, ..., HostEntity.Port A) Action Pattern
                                 // i.e., The action's first and last events address the same port. Therefore, it must be either a tap or a hold.
 
                                 // Get port associated with the touched port shape
                                 Port port = (Port) action.getFirstEvent().getTargetShape().getEntity();
-                                int portIndex = host.getComponent(Portable.class).getPorts().indexOf(port);
+                                int portIndex = hostEntity.getComponent(Portable.class).getPorts().indexOf(port);
 
                                 if (port.getExtension() == null || port.getExtension().getComponent(Extension.class).getProfile() == null) {
 
@@ -575,7 +585,7 @@ public class Clay {
                                         }
                                         port.setType(nextType);
 
-                                    } else if (host.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
+                                    } else if (hostEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
 
                                         // Change Path Type. Updates each Port in the Path.
 
@@ -612,7 +622,7 @@ public class Clay {
 
                             } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
 
-                                // (Host.Port A, ..., Host.Port B) Action Pattern
+                                // (HostEntity.Port A, ..., HostEntity.Port B) Action Pattern
                                 // i.e., The Action's first and last Events address different Ports.
 
                                 Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
@@ -646,7 +656,7 @@ public class Clay {
                                 // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
                                 && action.getLastEvent().getTargetImage() == Space.getSpace()) {
 
-                            // (Host.Port, ..., Space) Action Pattern
+                            // (HostEntity.Port, ..., Space) Action Pattern
 
                             if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
@@ -654,7 +664,7 @@ public class Clay {
                                 Port hostPort = (Port) hostPortShape.getEntity();
 
                                 // Create new ExtensionEntity from scratch (for manual configuration/construction)
-                                Entity extensionEntity = host.createExtension(hostPort, event.getPosition());
+                                Entity extensionEntity = hostEntity.getComponent(Host.class).createExtension(hostPort, event.getPosition());
 
                                 // Update Camera
                                 camera.setFocus(extensionEntity);

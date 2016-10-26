@@ -44,7 +44,6 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
-import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.engine.component.Transform;
@@ -257,13 +256,13 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 //    }
 
-    public List<Host> restoreHosts(String filename) {
+    public List<Entity> restoreHosts(String filename) {
 
         // e.g., filename = "Hosts.json"
 
-        List<Host> hosts = new ArrayList<>();
+        List<Entity> hostEntities = new ArrayList<>();
 
-        // Open specified file Host profiles
+        // Open specified file HostEntity profiles
         String jsonString = null;
         try {
             InputStream inputStream = getContext().getAssets().open(filename);
@@ -284,7 +283,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             JSONObject hostObject = jsonObject.getJSONObject("host");
             String hostTitle = hostObject.getString("title");
 
-            // Host host = new Host();
+            // HostEntity host = new HostEntity();
 
             Log.v("Configuration", "reading JSON name: " + hostTitle);
 
@@ -292,7 +291,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
             e.printStackTrace();
         }
 
-        return hosts;
+        return hostEntities;
     }
 
     // TODO: Make this into a static method of Image (or maybe better, add it to an ImageSystem?)
@@ -322,8 +321,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         try {
             jsonObject = new JSONObject(jsonString);
 
-            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
-            String hostTitle = hostObject.getString("title"); // Handle to Host's title
+            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to HostEntity
+            String hostTitle = hostObject.getString("title"); // Handle to HostEntity's title
 
             JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
 
@@ -412,7 +411,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 }
             }
 
-            // Host host = new Host();
+            // HostEntity host = new HostEntity();
 
             Log.v("Configuration", "reading JSON name: " + hostTitle);
 

@@ -1,4 +1,4 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,10 +6,10 @@ import java.util.UUID;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Path;
+import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
@@ -17,21 +17,18 @@ import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class Host extends PortableEntity {
+public class Host extends Component {
 
-    public Host() {
-        super();
-        setup();
+    public Host(Entity entity) {
+        super(entity);
     }
 
-    private void setup() {
+    public void setupHeaderExtensions() {
         headerExtensions.add(new ArrayList<Entity>());
         headerExtensions.add(new ArrayList<Entity>());
         headerExtensions.add(new ArrayList<Entity>());
         headerExtensions.add(new ArrayList<Entity>());
     }
-
-    // has Script/is Scriptable/ScriptableComponent (i.e., Host runs a Script)
 
     public void update() {
         updateImage();
@@ -44,13 +41,13 @@ public class Host extends PortableEntity {
 
         // Get LED shapes
         if (lightShapeGroup == null) {
-            lightShapeGroup = getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
+            lightShapeGroup = getEntity().getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
         }
 
         // Update Port and LED shape styles
-        for (int i = 0; i < getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getComponent(Portable.class).getPorts().get(i);
-            Shape portShape = getComponent(Image.class).getShape(port.getLabel()); // Shape portShape = getShape(port);
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
+            Shape portShape = getEntity().getComponent(Image.class).getShape(port.getLabel()); // Shape portShape = getShape(port);
 
             // Update color of Port shape based on type
             portShape.setColor(camp.computer.clay.util.Color.getColor(port.getType()));
@@ -60,7 +57,7 @@ public class Host extends PortableEntity {
         }
 
         // Call this so PortableEntity.update() will be called to update Geometry
-        getComponent(Image.class).update();
+        getEntity().getComponent(Image.class).update();
     }
     // </HACK>
 
@@ -96,7 +93,7 @@ public class Host extends PortableEntity {
         // Set the initial position of the ExtensionEntity
         extensionEntity.getComponent(Transform.class).set(initialPosition);
 
-        // Configure Host's Port (i.e., the Path's source Port)
+        // Configure HostEntity's Port (i.e., the Path's source Port)
         if (hostPort.getType() == Port.Type.NONE || hostPort.getDirection() == Port.Direction.NONE) {
             hostPort.setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
             hostPort.setDirection(Port.Direction.BOTH);
@@ -107,16 +104,17 @@ public class Host extends PortableEntity {
         extensionPort.setDirection(Port.Direction.INPUT);
         extensionPort.setType(hostPort.getType());
 
-        // Create Path from Host to ExtensionEntity and configure the new Path
+        // Create Path from HostEntity to ExtensionEntity and configure the new Path
         UUID pathUuid = Clay.createEntity(Path.class);
         Path path = (Path) Entity.getEntity(pathUuid);
         path.set(hostPort, extensionPort);
 
         // Remove focus from other Hosts and their Ports
-        Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
+//        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
+        Group<Image> hostImages = Entity.Manager.filterWithComponent(Host.class).getImages();
         for (int i = 0; i < hostImages.size(); i++) {
             Image hostImage = hostImages.get(i);
-            PortableEntity host = (PortableEntity) hostImage.getEntity();
+            Entity host = hostImage.getEntity();
             hostImage.setTransparency(0.05f);
             host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
             host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
@@ -164,10 +162,10 @@ public class Host extends PortableEntity {
         // Update ExtensionEntity Position
         extensionEntity.getComponent(Transform.class).set(initialPosition);
 
-        // Automatically select and connect all Paths to Host
+        // Automatically select and connect all Paths to HostEntity
         autoConnectToHost(extensionEntity);
 
-        // TODO: Start IASM based on automatically configured Paths to Host.
+        // TODO: Start IASM based on automatically configured Paths to HostEntity.
 
         updateExtensionLayout();
 
@@ -176,17 +174,17 @@ public class Host extends PortableEntity {
 
     private boolean autoConnectToHost(Entity extensionEntity) {
 
-        // Automatically select, connect paths to, and configure the Host's Ports
+        // Automatically select, connect paths to, and configure the HostEntity's Ports
         for (int i = 0; i < extensionEntity.getComponent(Portable.class).getPorts().size(); i++) {
 
-            // Select an available Host Port
+            // Select an available HostEntity Port
             Port selectedHostPort = autoSelectNearestAvailableHostPort(extensionEntity);
 
-            // Configure Host's Port
+            // Configure HostEntity's Port
             selectedHostPort.setType(extensionEntity.getComponent(Portable.class).getPorts().get(i).getType());
             selectedHostPort.setDirection(extensionEntity.getComponent(Portable.class).getPorts().get(i).getDirection());
 
-            // Create Path from ExtensionEntity Port to Host Port
+            // Create Path from ExtensionEntity Port to HostEntity Port
             UUID pathUuid = Clay.createEntity(Path.class);
             Path path = (Path) Entity.getEntity(pathUuid);
             path.set(selectedHostPort, extensionEntity.getComponent(Portable.class).getPorts().get(i));
@@ -198,23 +196,23 @@ public class Host extends PortableEntity {
     }
 
     private Port autoSelectNearestAvailableHostPort(Entity extensionEntity) {
-        // Select an available Host Port
+        // Select an available HostEntity Port
         Port selectedHostPort = null;
         double distanceToSelectedPort = Double.MAX_VALUE;
-        for (int j = 0; j < getComponent(Portable.class).getPorts().size(); j++) {
-            if (getComponent(Portable.class).getPorts().get(j).getType() == Port.Type.NONE) {
+        for (int j = 0; j < getEntity().getComponent(Portable.class).getPorts().size(); j++) {
+            if (getEntity().getComponent(Portable.class).getPorts().get(j).getType() == Port.Type.NONE) {
 
-                Image hostImage = getComponent(Image.class);
+                Image hostImage = getEntity().getComponent(Image.class);
                 PortableEntity host = (PortableEntity) hostImage.getEntity();
 
                 double distanceToPort = Geometry.distance(
-                        host.getComponent(Portable.class).getPortShapes().filterEntity(getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),
+                        host.getComponent(Portable.class).getPortShapes().filterEntity(getEntity().getComponent(Portable.class).getPorts().get(j)).get(0).getPosition(),
                         extensionEntity.getComponent(Image.class).getEntity().getComponent(Transform.class)
                 );
 
                 // Check if the port is the nearest
                 if (distanceToPort < distanceToSelectedPort) {
-                    selectedHostPort = getComponent(Portable.class).getPorts().get(j);
+                    selectedHostPort = getEntity().getComponent(Portable.class).getPorts().get(j);
                     distanceToSelectedPort = distanceToPort;
                 }
             }
@@ -231,7 +229,7 @@ public class Host extends PortableEntity {
             indexCounts[i] = 0;
         }
 
-        Shape boardShape = getComponent(Image.class).getShape("Board");
+        Shape boardShape = getEntity().getComponent(Image.class).getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
         Group<Port> extensionPorts = extensionEntity.getComponent(Portable.class).getPorts();
@@ -247,7 +245,7 @@ public class Host extends PortableEntity {
             Transform hostPortPosition = Space.getSpace().getShape(hostPort).getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
-            int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected Host)
+            int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
             for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
 
                 Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
@@ -284,22 +282,22 @@ public class Host extends PortableEntity {
 
     public void updateExtensionLayout() {
 
-        // Get Extensions connected to the Host.
-        Group<Entity> extensionEntities = getComponent(Portable.class).getExtensions();
+        // Get Extensions connected to the HostEntity.
+        Group<Entity> extensionEntities = getEntity().getComponent(Portable.class).getExtensions();
 
         // Reset current layout in preparation for updating it in the presently-running update step.
         for (int i = 0; i < headerExtensions.size(); i++) {
             headerExtensions.get(i).clear();
         }
 
-        // Assign the Extensions connected to this Host to the most-strongly-connected Header.
-        // This can be thought of as the "high level layout" of ExtensionEntity relative to the Host.
+        // Assign the Extensions connected to this HostEntity to the most-strongly-connected Header.
+        // This can be thought of as the "high level layout" of ExtensionEntity relative to the HostEntity.
         for (int i = 0; i < extensionEntities.size(); i++) {
             Entity extensionEntity = extensionEntities.get(i);
             updateExtensionHeaderIndex(extensionEntity);
         }
 
-        // Update each ExtensionEntity's placement, relative to the connected Host.
+        // Update each ExtensionEntity's placement, relative to the connected HostEntity.
         for (int headerIndex = 0; headerIndex < headerExtensions.size(); headerIndex++) {
             for (int extensionIndex = 0; extensionIndex < headerExtensions.get(headerIndex).size(); extensionIndex++) {
 
@@ -315,30 +313,30 @@ public class Host extends PortableEntity {
                     extensionEntity.getComponent(Transform.class).set(
                             0 + offset,
                             -distanceToExtensions,
-                            getComponent(Transform.class)
+                            getEntity().getComponent(Transform.class)
                     );
                 } else if (headerIndex == 1) {
                     extensionEntity.getComponent(Transform.class).set(
                             distanceToExtensions,
                             0 + offset,
-                            getComponent(Transform.class)
+                            getEntity().getComponent(Transform.class)
                     );
                 } else if (headerIndex == 2) {
                     extensionEntity.getComponent(Transform.class).set(
                             0 + offset,
                             distanceToExtensions,
-                            getComponent(Transform.class)
+                            getEntity().getComponent(Transform.class)
                     );
                 } else if (headerIndex == 3) {
                     extensionEntity.getComponent(Transform.class).set(
                             -distanceToExtensions,
                             0 + offset,
-                            getComponent(Transform.class)
+                            getEntity().getComponent(Transform.class)
                     );
                 }
 
                 // Update the ExtensionEntity's rotation.
-                double hostEntityRotation = getComponent(Transform.class).getRotation();
+                double hostEntityRotation = getEntity().getComponent(Transform.class).getRotation();
                 if (headerIndex == 0) {
                     extensionEntity.getComponent(Transform.class).setRotation(hostEntityRotation + 0);
                 } else if (headerIndex == 1) {

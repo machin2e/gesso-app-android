@@ -7,10 +7,8 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
-import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Visibility;
@@ -66,24 +64,25 @@ public class Portable extends Component {
 
     // <EXTENSION>
     // HACK: Assumes ExtensionEntity
-    public Group<Host> getHosts() {
+    public Group<Entity> getHosts() {
         return getHosts(getEntity());
     }
 
-    private Group<Host> getHosts(Entity extensionEntity) {
+    private Group<Entity> getHosts(Entity extensionEntity) {
 
-        List<Host> hosts = Entity.Manager.filterType2(Host.class);
+//        List<Entity> hostEntities = Entity.Manager.filterType2(HostEntity.class);
+        List<Entity> hostEntities = Entity.Manager.filterWithComponent(Host.class);
 
-        Group<Host> hostGroup = new Group<>();
-        for (int i = 0; i < hosts.size(); i++) {
-            if (hosts.get(i).getComponent(Portable.class).getExtensions().contains(extensionEntity)) {
-                if (!hostGroup.contains(hosts.get(i))) {
-                    hostGroup.add(hosts.get(i));
+        Group<Entity> hostEntityGroup = new Group<>();
+        for (int i = 0; i < hostEntities.size(); i++) {
+            if (hostEntities.get(i).getComponent(Portable.class).getExtensions().contains(extensionEntity)) {
+                if (!hostEntityGroup.contains(hostEntities.get(i))) {
+                    hostEntityGroup.add(hostEntities.get(i));
                 }
             }
         }
 
-        return hostGroup;
+        return hostEntityGroup;
     }
     // </EXTENSION>
 

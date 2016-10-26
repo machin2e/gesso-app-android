@@ -7,6 +7,7 @@ import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
@@ -81,17 +82,17 @@ public class Entity extends Groupable {
     }
 
 
-
     public void update() {
 
         // <HACK>
         if (hasComponent(Extension.class)) {
             getComponent(Extension.class).update();
+        } else if (hasComponent(Host.class)) {
+            getComponent(Host.class).update();
         }
         // </HACK>
 
     }
-
 
 
     // <TAG_COMPONENT>
@@ -115,6 +116,7 @@ public class Entity extends Groupable {
     protected ActionListenerComponent actionListener = null;
     protected Portable portable = null;
     protected Extension extension = null;
+    protected Host host = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -130,10 +132,12 @@ public class Entity extends Groupable {
             this.portable = (Portable) component;
         } else if (component instanceof Extension) {
             this.extension = (Extension) component;
+        } else if (component instanceof Host) {
+            this.host = (Host) component;
         }
     }
 
-    public <C extends Component> boolean hasComponent(Class<C> type) {
+    public boolean hasComponent(Class<? extends Component> type) {
         return getComponent(type) != null;
     }
 
@@ -148,6 +152,8 @@ public class Entity extends Groupable {
             return type.cast(this.portable);
         } else if (type == Extension.class) {
             return type.cast(this.extension);
+        } else if (type == Host.class) {
+            return type.cast(this.host);
         } else {
             return null;
         }
@@ -181,7 +187,6 @@ public class Entity extends Groupable {
         return components.contains(uuid);
     }
     // </GENERIC_COMPONENT_INTERFACE>
-
 
 
     // <TRANSFORM_COMPONENT>

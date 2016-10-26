@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
 
 public class Path extends Entity {
 
@@ -159,11 +160,11 @@ public class Path extends Entity {
         return ports;
     }
 
-    public Host getHost() {
-        if (getSource().getPortable().getClass() == Host.class) {
-            return (Host) getSource().getPortable();
-        } else if (getTarget().getPortable().getClass() == Host.class) {
-            return (Host) getTarget().getPortable();
+    public Entity getHost() {
+        if (getSource().getPortable().hasComponent(Host.class)) {
+            return getSource().getPortable();
+        } else if (getTarget().getPortable().hasComponent(Host.class)) {
+            return getTarget().getPortable();
         }
         return null;
     }
@@ -178,9 +179,9 @@ public class Path extends Entity {
     }
 
     public Port getHostPort() {
-        if (getSource().getPortable().getClass() == Host.class) {
+        if (getSource().getPortable().hasComponent(Host.class)) {
             return getSource();
-        } else if (getTarget().getPortable().getClass() == Host.class) {
+        } else if (getTarget().getPortable().hasComponent(Host.class)) {
             return getTarget();
         }
         return null;

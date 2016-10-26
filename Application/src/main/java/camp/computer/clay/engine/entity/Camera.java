@@ -4,6 +4,8 @@ import android.util.Log;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -127,10 +129,11 @@ public class Camera extends Entity {
     }
 
     public void adjustPosition() {
-        //Transform centerPosition = getSpace().getImages().filterType2(Host.class, ExtensionEntity.class).getCenterPoint();
-        //Transform centerPosition = getSpace().getEntities().filterType2(Host.class, ExtensionEntity.class).getImages().getCenterPoint();
-        //Transform centerPosition = Entity.Manager.filterType2(Host.class, ExtensionEntity.class).getCenterPoint();
-        Transform centerPosition = Entity.Manager.filterType2(Host.class, Entity.class).getCenterPoint();
+        //Transform centerPosition = getSpace().getImages().filterType2(HostEntity.class, ExtensionEntity.class).getCenterPoint();
+        //Transform centerPosition = getSpace().getEntities().filterType2(HostEntity.class, ExtensionEntity.class).getImages().getCenterPoint();
+        //Transform centerPosition = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getCenterPoint();
+//        Transform centerPosition = Entity.Manager.filterType2(HostEntity.class, Entity.class).getCenterPoint();
+        Transform centerPosition = Entity.Manager.filterWithComponent(Host.class, Extension.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
@@ -167,9 +170,10 @@ public class Camera extends Entity {
     }
 
     public void adjustScale(double duration) {
-        //Rectangle boundingBox = getSpace().getImages().filterType2(Host.class, ExtensionEntity.class).getBoundingBox();
-//        Rectangle boundingBox = Entity.Manager.filterType2(Host.class, ExtensionEntity.class).getImages().getBoundingBox();
-        Rectangle boundingBox = Entity.Manager.filterType2(Host.class, Entity.class).getImages().getBoundingBox();
+        //Rectangle boundingBox = getSpace().getImages().filterType2(HostEntity.class, ExtensionEntity.class).getBoundingBox();
+//        Rectangle boundingBox = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages().getBoundingBox();
+//        Rectangle boundingBox = Entity.Manager.filterType2(HostEntity.class, Entity.class).getImages().getBoundingBox();
+        Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages().getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
         }
@@ -224,8 +228,8 @@ public class Camera extends Entity {
 
         Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
 
-//        // Check if a Host Image is nearby
-//        Image nearestHostImage = getSpace().getImages().filterType2(Host.class).getNearestImage(targetPosition);
+//        // Check if a HostEntity Image is nearby
+//        Image nearestHostImage = getSpace().getImages().filterType2(HostEntity.class).getNearestImage(targetPosition);
 //        if (nearestHostImage != null) {
 //
 //            PortableEntity sourcePortable = sourcePort.getPortable();
@@ -241,101 +245,106 @@ public class Camera extends Entity {
 //        }
     }
 
-    public void setFocus(Host host) {
+    public void setFocus(Entity entity) {
 
-        Log.v("SetFocus", "setFocus(Host)");
+        if (entity.hasComponent(Host.class)) {
 
-        // <REFACTOR>
-//        HostImage hostImage = (HostImage) host.getComponent(Image.class);
+            Log.v("SetFocus", "setFocus(HostEntity)");
+
+            // <REFACTOR>
+//        HostImage hostImage = (HostImage) hostEntity.getComponent(Image.class);
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
-//        ImageGroup otherPortableImages = getSpace().getImages().filterType(Host.class, ExtensionEntity.class);
+//        ImageGroup otherPortableImages = getSpace().getImages().filterType(HostEntity.class, ExtensionEntity.class);
 //        otherPortableImages.remove(hostImage);
 //        otherPortableImages.setTransparency(0.1);
 
-        // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
-//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, ExtensionEntity.class);
-        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Entity.class);
-        Log.v("Entities", "otherPortables.size: " + otherPortables.size());
-        otherPortables.remove(host);
-        otherPortables.setTransparency(0.1);
+            // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
+//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, ExtensionEntity.class);
+//            Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, Entity.class);
+            Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class);
+            Log.v("Entities", "otherPortables.size: " + otherPortables.size());
+            otherPortables.remove(entity);
+            otherPortables.setTransparency(0.1);
 
-        // Get ports along every Path connected to the Ports on the touched PhoneHost
-        Group<Port> basePathPorts = new Group<>();
-        Group<Port> hostPorts = host.getComponent(Portable.class).getPorts();
-        for (int i = 0; i < hostPorts.size(); i++) {
-            Port port = hostPorts.get(i);
+            // Get ports along every Path connected to the Ports on the touched PhoneHost
+            Group<Port> basePathPorts = new Group<>();
+            Group<Port> hostPorts = entity.getComponent(Portable.class).getPorts();
+            for (int i = 0; i < hostPorts.size(); i++) {
+                Port port = hostPorts.get(i);
 
-            if (!basePathPorts.contains(port)) {
-                basePathPorts.add(port);
-            }
-
-            Group<Path> portPaths = port.getPaths();
-            for (int j = 0; j < portPaths.size(); j++) {
-                Path path = portPaths.get(j);
-                if (!basePathPorts.contains(path.getSource())) {
-                    basePathPorts.add(path.getSource());
+                if (!basePathPorts.contains(port)) {
+                    basePathPorts.add(port);
                 }
-                if (!basePathPorts.contains(path.getTarget())) {
-                    basePathPorts.add(path.getTarget());
+
+                Group<Path> portPaths = port.getPaths();
+                for (int j = 0; j < portPaths.size(); j++) {
+                    Path path = portPaths.get(j);
+                    if (!basePathPorts.contains(path.getSource())) {
+                        basePathPorts.add(path.getSource());
+                    }
+                    if (!basePathPorts.contains(path.getTarget())) {
+                        basePathPorts.add(path.getTarget());
+                    }
                 }
             }
+            // </REFACTOR>
+
+            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
+            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
+
+            // Update scale and position
+            adjustScale(boundingBox);
+            setPosition(boundingBox.getPosition());
+
+        } else if (entity.hasComponent(Extension.class)) {
+
+            Log.v("SetFocus", "setFocus(ExtensionEntity)");
+
+            // <REFACTOR>
+            // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
+//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, ExtensionEntity.class);
+//            Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, Entity.class);
+            Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class);
+            Log.v("Entities", "otherPortables.size: " + otherPortables.size());
+            otherPortables.remove(entity);
+            otherPortables.setTransparency(0.1);
+
+            // Get ports along every Path connected to the Ports on the selected HostEntity
+            Group<Port> hostPathPorts = new Group<>();
+            Group<Port> extensionPorts = entity.getComponent(Portable.class).getPorts();
+            for (int i = 0; i < extensionPorts.size(); i++) {
+                Port port = extensionPorts.get(i);
+
+                if (!hostPathPorts.contains(port)) {
+                    hostPathPorts.add(port);
+                }
+
+                Group<Path> portPaths = port.getPaths();
+                for (int j = 0; j < portPaths.size(); j++) {
+                    Path path = portPaths.get(j);
+                    if (!hostPathPorts.contains(path.getSource())) {
+                        hostPathPorts.add(path.getSource());
+                    }
+                    if (!hostPathPorts.contains(path.getTarget())) {
+                        hostPathPorts.add(path.getTarget());
+                    }
+                }
+            }
+            // </REFACTOR>
+
+            // Increase distance between HostEntity and ExtensionEntity
+            Entity hostEntity = entity.getComponent(Portable.class).getHosts().get(0);
+            hostEntity.getComponent(Host.class).setExtensionDistance(500);
+
+            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);
+            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
+
+            // Update scale and position
+            adjustScale(boundingBox);
+            setPosition(boundingBox.getPosition());
+
         }
-        // </REFACTOR>
-
-        ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
-        Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
-
-        // Update scale and position
-        adjustScale(boundingBox);
-        setPosition(boundingBox.getPosition());
-    }
-
-    public void setFocus(Entity extensionEntity) {
-
-        Log.v("SetFocus", "setFocus(ExtensionEntity)");
-
-        // <REFACTOR>
-        // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
-//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, ExtensionEntity.class);
-        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, Host.class, Entity.class);
-        Log.v("Entities", "otherPortables.size: " + otherPortables.size());
-        otherPortables.remove(extensionEntity);
-        otherPortables.setTransparency(0.1);
-
-        // Get ports along every Path connected to the Ports on the selected Host
-        Group<Port> hostPathPorts = new Group<>();
-        Group<Port> extensionPorts = extensionEntity.getComponent(Portable.class).getPorts();
-        for (int i = 0; i < extensionPorts.size(); i++) {
-            Port port = extensionPorts.get(i);
-
-            if (!hostPathPorts.contains(port)) {
-                hostPathPorts.add(port);
-            }
-
-            Group<Path> portPaths = port.getPaths();
-            for (int j = 0; j < portPaths.size(); j++) {
-                Path path = portPaths.get(j);
-                if (!hostPathPorts.contains(path.getSource())) {
-                    hostPathPorts.add(path.getSource());
-                }
-                if (!hostPathPorts.contains(path.getTarget())) {
-                    hostPathPorts.add(path.getTarget());
-                }
-            }
-        }
-        // </REFACTOR>
-
-        // Increase distance between Host and ExtensionEntity
-        Host host = extensionEntity.getComponent(Portable.class).getHosts().get(0);
-        host.setExtensionDistance(500);
-
-        ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);
-        Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
-
-        // Update scale and position
-        adjustScale(boundingBox);
-        setPosition(boundingBox.getPosition());
     }
 
 //    /**

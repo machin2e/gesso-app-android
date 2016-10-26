@@ -19,11 +19,11 @@ import java.util.List;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Host;
 import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.engine.entity.PortableEntity;
@@ -206,7 +206,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // <ENTITY_STATISTICS>
         canvas.save();
         int entityCount = Entity.Manager.size();
-        int hostCount = Entity.Manager.filterType2(Host.class).size();
+//        int hostCount = Entity.Manager.filterType2(HostEntity.class).size();
+        int hostCount = Entity.Manager.filterWithComponent(Host.class).size();
         int portCount = Entity.Manager.filterType2(Port.class).size();
 //        int extensionCount = Entity.Manager.filterType2(ExtensionEntity.class).size();
         int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
@@ -468,7 +469,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawEntity(Entity entity) {
 
-        if (entity.getClass() == Host.class) {
+        if (entity.hasComponent(Host.class)) {
 
             Image image = entity.getComponent(Image.class);
             if (image.isVisible()) {
@@ -580,16 +581,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     public void drawPhysicalPath(Path path, Display display) {
 
-        // Get Host and ExtensionEntity Ports
+        // Get HostEntity and ExtensionEntity Ports
         Port hostPort = path.getSource();
         Port extensionPort = path.getTarget();
 
-        // Draw the connection to the Host's Port
+        // Draw the connection to the HostEntity's Port
 
         Image hostImage = hostPort.getPortable().getComponent(Image.class);
         Image extensionImage = extensionPort.getPortable().getComponent(Image.class);
 
-        PortableEntity host = (PortableEntity) hostImage.getEntity();
+        Entity host = hostImage.getEntity();
         Entity extension = extensionImage.getEntity();
 
         if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getIndex()

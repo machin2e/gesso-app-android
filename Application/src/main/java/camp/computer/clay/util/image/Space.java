@@ -9,13 +9,12 @@ import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.entity.Host;
-import camp.computer.clay.engine.entity.PortableEntity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.engine.entity.Camera;
@@ -168,11 +167,12 @@ public class Space extends Image {
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
 
     /**
-     * Automatically determines and assigns a valid position for all {@code Host} {@code Image}s.
+     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Image}s.
      */
     public void adjustLayout() {
 
-        Group<Image> hostImages = Entity.Manager.filterType2(Host.class).getImages();
+//        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
+        Group<Image> hostImages = Entity.Manager.filterWithComponent(Host.class).getImages();
 
         // Set position on grid layout
         if (hostImages.size() == 1) {
@@ -351,8 +351,8 @@ public class Space extends Image {
 
             Entity extension = extensionImage.getEntity();
             if (extension.getComponent(Portable.class).getHosts().size() > 0) {
-                Host host = extension.getComponent(Portable.class).getHosts().get(0);
-                host.setExtensionDistance(distance);
+                Entity hostEntity = extension.getComponent(Portable.class).getHosts().get(0);
+                hostEntity.getComponent(Host.class).setExtensionDistance(distance);
             }
         }
         // </HACK>
@@ -362,11 +362,11 @@ public class Space extends Image {
     public void hideAllPorts() {
         // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
 
-//        Group<Image> portableImages = Entity.Manager.filterType2(Host.class, ExtensionEntity.class).getImages();
-        Group<Image> portableImages = Entity.Manager.filterType2(Host.class).getImages();
-        portableImages.addAll(Entity.Manager.filterWithComponent(Extension.class).getImages()); // HACK
+//        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages();
+//        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class).getImages();
+        Group<Image> portableImages = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages(); // HACK
 
-//        ImageGroup portableImages = getImages(Host.class, ExtensionEntity.class);
+//        ImageGroup portableImages = getImages(HostEntity.class, ExtensionEntity.class);
         for (int i = 0; i < portableImages.size(); i++) {
             Image portableImage = portableImages.get(i);
             Entity portableEntity = portableImage.getEntity();

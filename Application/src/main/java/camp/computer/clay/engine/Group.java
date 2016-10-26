@@ -183,7 +183,7 @@ public class Group<E extends Groupable> implements List<E> {
         public static Mapper setTransparency = new Mapper<Entity, Entity, Double>() {
             @Override
             public Entity map(Entity entity, Double transparency) {
-//                if (entity instanceof Host) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == Host.getTypeUuid()
+//                if (entity instanceof HostEntity) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == HostEntity.getTypeUuid()
                 if (entity.getComponent(Image.class) != null) {
                     entity.getComponent(Image.class).setTransparency(transparency);
                 }
@@ -293,13 +293,13 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     // HACK: Assumes Group<Entity>
-    public <E extends Groupable, C extends Component> Group<E> filterWithComponent(Class<C>... componentTypes) {
+    public <E extends Groupable> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
 
         Group<E> group = new Group<>();
 
         for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < componentTypes.length; j++) {
-                Class<C> type = componentTypes[j];
+                Class<? extends Component> type = componentTypes[j];
                 Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
                 if (entity.hasComponent(type)) {
                     group.add((E) this.elements.get(i));
