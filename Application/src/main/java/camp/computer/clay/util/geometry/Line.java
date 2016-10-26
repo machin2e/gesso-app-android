@@ -1,69 +1,60 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Line<T extends Entity> extends Shape<T> {
 
-    protected Point source = new Point();
-    protected Point target = new Point();
-
     public Line() {
+        super();
+        setup();
     }
 
-    public Line(T entity) {
-        this.entity = entity;
+//    public Line(T entity) {
+//        super(entity);
+//        setup();
+//    }
+
+    public Line(Transform position, double rotation) {
+        setup();
+        position.set(position);
+        position.setRotation(rotation);
+    }
+
+    private void setup() {
+        setupGeometry();
+    }
+
+    private void setupGeometry() {
     }
 
     @Override
-    public List<Point> getVertices() {
-        List<Point> vertices = new ArrayList<>();
-        vertices.add(getSource());
-        vertices.add(getTarget());
+    protected List<Transform> getVertices() {
+        List<Transform> vertices = new LinkedList<>();
+//        vertices.add(new Transform(source));
+//        vertices.add(new Transform(target));
         return vertices;
-    }
-
-    @Override
-    public List<Line> getSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        segments.add(new Line(getSource(), getTarget()));
-        return segments;
     }
 
     @Override
     public void draw(Display display) {
         if (isVisible()) {
-            display.drawLine(this);
+//            display.drawSegment(this);
         }
     }
 
-    public Line(Point source, Point target) {
-        this.source = source;
-        this.target = target;
-    }
-
-    public Point getSource() {
-        return this.source;
-    }
-
-    public void setSource(Point source) {
-        this.source.set(source);
-    }
-
-    public Point getTarget() {
-        return this.target;
-    }
-
-    public void setTarget(Point target) {
-        //this.target = target;
-        this.target.set(target);
-    }
-
-    public Point getMidpoint() {
-        return Geometry.midpoint(source, target);
+    /**
+     * Returns a {@code Transform} on the {@code Line} offset from {@code position} by {@code offset}.
+     *
+     * @param offset
+     * @return
+     */
+    public Transform getPoint(double offset) {
+        return Geometry.getRotateTranslatePoint(position, position.rotation, offset);
     }
 }

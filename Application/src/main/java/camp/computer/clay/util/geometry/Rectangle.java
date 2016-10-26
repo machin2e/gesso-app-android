@@ -1,10 +1,12 @@
 package camp.computer.clay.util.geometry;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Rectangle<T extends Entity> extends Shape<T> {
@@ -15,128 +17,82 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public double cornerRadius = 0.0;
 
-    // <CACHED_OBJECTS>
-    // TODO: Move caching framework into superclass
-    // Cached descriptive {@code Point} geometry for the {@code Shape}.
-    protected Point topLeft = new Point(getRelativeLeft(), getRelativeTop(), position);
-    protected Point topRight = new Point(getRelativeRight(), getRelativeTop(), position);
-    protected Point bottomRight = new Point(getRelativeRight(), getRelativeBottom(), position);
-    protected Point bottomLeft = new Point(getRelativeLeft(), getRelativeBottom(), position);
-
-    List<Point> vertices = new ArrayList<>();
-
-    ArrayList<Line> segments = new ArrayList<>();
-    // </CACHED_OBJECTS>
+    private ArrayList<Segment> segments = new ArrayList<>();
 
     public Rectangle(T entity) {
         this.entity = entity;
-
-        updateCache();
+        setup();
     }
 
     public Rectangle(double width, double height) {
         super();
         this.width = width;
         this.height = height;
-
-        updateCache();
-    }
-
-    public Rectangle(Point position, double width, double height) {
-        super(position);
-        this.width = width;
-        this.height = height;
-
-        updateCache();
+        setup();
     }
 
     public Rectangle(double left, double top, double right, double bottom) {
-        super(new Point((right + left) / 2.0, (top + bottom) / 2.0));
-        this.width = (right - left);
-        this.height = (bottom - top);
+        position.x = (right + left) / 2.0;
+        position.y = (top + bottom) / 2.0;
+        width = (right - left);
+        height = (bottom - top);
 
-        // TODO: Needed? Probably.
-//        updateCache();
+        setup();
+        updateBoundary(); // TODO: Replace with updateGeometry(this.position)
     }
 
-    protected void updateCache() {
-
-        // Update vertices
-        if (vertices.size() == 0) {
-            vertices.add(getTopLeft());
-            vertices.add(getTopRight());
-            vertices.add(getBottomRight());
-            vertices.add(getBottomLeft());
-        } else {
-            vertices.set(0, getTopLeft());
-            vertices.set(1, getTopRight());
-            vertices.set(2, getBottomRight());
-            vertices.set(3, getBottomLeft());
-        }
-
-        // Update segments
-        if (segments.size() == 0) {
-            segments.add(new Line(topLeft, topRight));
-            segments.add(new Line(topRight, bottomRight));
-            segments.add(new Line(bottomRight, bottomLeft));
-            segments.add(new Line(bottomLeft, topLeft));
-        }
+    protected void setup() {
+        setupGeometry();
     }
 
-    public List<Point> getVertices() {
-        return vertices;
-    }
+    private void setupGeometry() {
 
-    public List<Line> getSegments() {
-        return segments;
-    }
+        // Create vertex Points (relative to the Shape)
+        Transform topLeft = new Transform(0 - (width / 2.0), 0 - (height / 2.0));
+        Transform topRight = new Transform(0 + (width / 2.0), 0 - (height / 2.0));
+        Transform bottomRight = new Transform(0 + (width / 2.0), 0 + (height / 2.0));
+        Transform bottomLeft = new Transform(0 - (width / 2.0), 0 + (height / 2.0));
 
-//    public Line getNearestSegment(Point point) {
-//        double nearestDistance = Double.MAX_VALUE;
-//        Line nearestSegment = null;
-//
-//        List<Line> segments = getSegments();
-//        for (int i = 0; i < segments.size(); i++) {
-//            double distanceToSegment = 0;
-//            if (i < (segments.size() - 1)) {
-//                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(i + 1).getTarget());
-//            } else {
-//                distanceToSegment = Geometry.calculateDistance(point, segments.get(i).getSource()) + Geometry.calculateDistance(point, segments.get(0).getTarget());
-//            }
-//            if (distanceToSegment < nearestDistance) {
-//                nearestDistance = distanceToSegment;
-//                nearestSegment = segments.get(i);
-//            }
-//        }
-//
-//        return nearestSegment;
-//    }
+        boundary.add(topLeft);
+        boundary.add(topRight);
+        boundary.add(bottomRight);
+        boundary.add(bottomLeft);
+
+        // Create segment Lines (relative to the Shape)
+        Segment top = new Segment(topLeft, topRight);
+        Segment right = new Segment(topRight, bottomRight);
+        Segment bottom = new Segment(bottomRight, bottomLeft);
+        Segment left = new Segment(bottomLeft, topLeft);
+
+        segments.add(top);
+        segments.add(right);
+        segments.add(bottom);
+        segments.add(left);
+    }
 
     @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawRectangle(this);
-        }
-    }
+    protected List<Transform> getVertices() {
 
-    public double getWidth() {
-        return this.width;
-    }
+        List<Transform> vertices = new LinkedList<>();
 
-    public void setWidth(double width) {
-        this.width = width;
+        vertices.add(new Transform(
+                0 - (width / 2.0),
+                0 - (height / 2.0)
+        ));
+        vertices.add(new Transform(
+                0 + (width / 2.0),
+                0 - (height / 2.0)
+        ));
+        vertices.add(new Transform(
+                0 + (width / 2.0),
+                0 + (height / 2.0)
+        ));
+        vertices.add(new Transform(
+                0 - (width / 2.0),
+                0 + (height / 2.0)
+        ));
 
-        updateCache();
-    }
-
-    public double getHeight() {
-        return this.height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-
-        updateCache();
+        return vertices;
     }
 
     public double getCornerRadius() {
@@ -145,93 +101,39 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     public void setCornerRadius(double cornerRadius) {
         this.cornerRadius = cornerRadius;
-
-        updateCache();
+        invalidate();
     }
 
-//    public Line getTop() {
-//        return new Line(getTopLeft(), getTopRight());
-//    }
-//
-//    public Line getRight() {
-//        return new Line(getTopRight(), getBottomRight());
-//    }
-//
-//    public Line getBottom() {
-//        return new Line(getBottomRight(), getBottomLeft());
-//    }
-//
-//    public Line getLeft() {
-//        return new Line(getBottomLeft(), getTopLeft());
-//    }
-//
-//    public double getLeft() {
-//        return position.getAbsoluteX() - (width / 2.0f);
-//    }
-//
-//    public double getTop() {
-//        return position.getAbsoluteY() - (height / 2.0f);
-//    }
-//
-//    public double getRight() {
-//        return position.getAbsoluteX() + (width / 2.0f);
-//    }
-//
-//    public double getBottom() {
-//        return position.getAbsoluteY() + (height / 2.0f);
-//    }
-
-    // TODO: Return a Number that updates when the Point coordinates update
-    public double getRelativeLeft() {
-        return 0 - (width / 2.0f);
+    public double getWidth() {
+        return this.width;
     }
 
-    // TODO: Return a Number that updates when the Point coordinates update
-    public double getRelativeTop() {
-        return 0 - (height / 2.0f);
+    public void setWidth(double width) {
+        this.width = width;
+        invalidate();
     }
 
-    public double getRelativeRight() {
-        // TODO: Return a Number that updates when the Point coordinates update
-//        return this.position.getX() + (width / 2.0f);
-        return 0 + (width / 2.0f);
+    public double getHeight() {
+        return this.height;
     }
 
-    public double getRelativeBottom() {
-        // TODO: Return a Number that updates when the Point coordinates update
-//        return this.position.getY() + (height / 2.0f);
-        return 0 + (height / 2.0f);
+    public void setHeight(double height) {
+        this.height = height;
+        invalidate();
     }
 
-    public Point getTopLeft() {
-        topLeft.set(
-                0 - (width / 2.0), // getRelativeLeft(),
-                0 - (height / 2.0) // getRelativeTop()
-        );
-        return topLeft;
-    }
+    @Override
+    public void draw(Display display) {
+        if (isVisible()) {
+            display.drawRectangle(this);
 
-    public Point getTopRight() {
-        topRight.set(
-                0 + (width / 2.0), // getRelativeRight(),
-                0 - (height / 2.0) // getRelativeTop()
-        );
-        return topRight;
-    }
-
-    public Point getBottomRight() {
-        bottomRight.set(
-                0 + (width / 2.0), // getRelativeRight(),
-                0 + (height / 2.0) // getRelativeBottom()
-        );
-        return bottomRight;
-    }
-
-    public Point getBottomLeft() {
-        bottomLeft.set(
-                0 - (width / 2.0), // getRelativeLeft(),
-                0 + (height / 2.0) // getRelativeBottom()
-        );
-        return bottomLeft;
+            /*
+            // Draw bounding box!
+            display.paint.setColor(Color.GREEN);
+            display.paint.setStyle(Paint.Style.STROKE);
+            display.paint.setStrokeWidth(2.0f);
+            display.drawPolygon(getBoundingBox());
+            */
+        }
     }
 }

@@ -1,48 +1,34 @@
-package camp.computer.clay.util.image;
+package camp.computer.clay.engine.component;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
-import camp.computer.clay.model.Group;
-import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.ActionListener;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public abstract class Image<T extends Entity> {
-
-    /**
-     * The parent {@code Space} containing this {@code Image}.
-     */
-    protected Space parentSpace = null;
-
-    protected T entity = null;
+public class Image extends Component {
 
     protected List<Shape> shapes = new LinkedList<>();
 
-    protected Point position = new Point(0, 0);
-
-    protected double scale = 1.0;
-
-    protected Visibility visibility = new Visibility(Visibility.Value.VISIBLE);
+    protected Visibility visibility = Visibility.VISIBLE;
 
     protected double targetTransparency = 1.0;
 
     protected double transparency = targetTransparency;
 
-    protected ActionListener actionListener;
-
     // <LAYER>
     public static final int DEFAULT_LAYER_INDEX = 0;
 
-    protected int layerIndex = DEFAULT_LAYER_INDEX;
+    public int layerIndex = DEFAULT_LAYER_INDEX;
 
     public int getLayerIndex() {
         return this.layerIndex;
@@ -50,12 +36,13 @@ public abstract class Image<T extends Entity> {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-
-        parentSpace.sortImagesByLayer();
+        Space.getSpace().updateLayers();
     }
 
-    // TODO: Rename to sortLayers
-    public void sortShapesByLayer() {
+    /**
+     * Sorts {@code Shapes}s in the {@code Image} by layer.
+     */
+    public void updateLayers() {
 
         for (int i = 0; i < shapes.size() - 1; i++) {
             for (int j = i + 1; j < shapes.size(); j++) {
@@ -80,56 +67,31 @@ public abstract class Image<T extends Entity> {
     }
     // </LAYER>
 
-    public Image(T entity) {
-        this.entity = entity;
+    /**
+     * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * <p>
+     * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
+     * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
+     * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
+     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     */
+    public void invalidate() {
+        for (int i = 0; i < shapes.size(); i++) {
+            shapes.get(i).invalidate();
+        }
     }
 
-    public T getEntity() {
-        return this.entity;
-    }
-
-    public void setSpace(Space space) {
-        this.parentSpace = space;
-    }
-
-    public Space getSpace() {
-        return this.parentSpace;
-    }
-
-    public Point getPosition() {
-        return this.position;
-    }
-
-    public double getRotation() {
-        return this.position.rotation;
-    }
-
-    public double getScale() {
-        return this.scale;
-    }
-
-    public void setPosition(double x, double y) {
-        this.position.set(x, y);
-    }
-
-    public void setPosition(Point position) {
-        this.position.set(position.x, position.y);
-    }
-
-    public void setRotation(double angle) {
-        this.position.rotation = angle;
-    }
-
-    public void setScale(double scale) {
-        this.scale = scale;
+    public Image(Entity entity) {
+        super(entity);
     }
 
     public boolean isVisible() {
-        return visibility.getValue() == Visibility.Value.VISIBLE;
+        return visibility == Visibility.VISIBLE;
     }
 
-    public void setVisibility(Visibility.Value visibility) {
-        this.visibility.setValue(visibility);
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
     public Visibility getVisibility() {
@@ -137,20 +99,11 @@ public abstract class Image<T extends Entity> {
     }
 
     public <T extends Shape> void addShape(T shape) {
-        shape.setImage(this);
-        shape.getPosition().setReferencePoint(getPosition());
-        this.shapes.add(shape);
-    }
+        shape.setImagePosition(shape.getPosition());
+        shapes.add(shape);
 
-//    public <T extends Shape> void addShape(T shape, String label) {
-//        shape.setImage(this);
-//        shape.setLabel(label);
-//        shape.getPosition().setReferencePoint(getPosition());
-//        shapes.add(shape);
-//    }
-
-    public Shape getShape(int index) {
-        return shapes.get(index);
+        updateLayers(); // Update layer ordering
+        shape.invalidate(); // Invalidate Shape
     }
 
     public Shape getShape(String label) {
@@ -173,7 +126,7 @@ public abstract class Image<T extends Entity> {
         return null;
     }
 
-    public Shape getShape(Point point) {
+    public Shape getShape(Transform point) {
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.contains(point)) {
@@ -228,20 +181,32 @@ public abstract class Image<T extends Entity> {
     }
 
     public void update() {
+        updateGeometry();
+    }
 
+    public void updateGeometry() {
+
+        // Update Shapes
         for (int i = 0; i < this.shapes.size(); i++) {
+            Shape shape = this.shapes.get(i);
 
-            // Update position of shapes
-//            this.shapes.get(i).getPosition().setAbsoluteX(this.shapes.get(i).getPosition().getAbsoluteX2());
-//            this.shapes.get(i).getPosition().setAbsoluteY(this.shapes.get(i).getPosition().getAbsoluteY2());
-
-            this.shapes.get(i).update();
+            // Update the Shape
+            shape.update(getEntity().getComponent(Transform.class));
         }
     }
 
-    public abstract void draw(Display display);
+//    public void draw(Display display) {
+//    }
 
-    public boolean contains(Point point) {
+    // <COLLISION_COMPONENT>
+    /**
+     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+     * {@code point}.
+     *
+     * @param point
+     * @return
+     */
+    public boolean contains(Transform point) {
         if (isVisible()) {
             for (int i = 0; i < shapes.size(); i++) {
                 if (shapes.get(i).contains(point)) {
@@ -252,16 +217,16 @@ public abstract class Image<T extends Entity> {
         return false;
     }
 
-    public void setOnActionListener(ActionListener actionListener) {
-        this.actionListener = actionListener;
-    }
-
-    public void processAction(Action action) {
-        if (actionListener != null) {
-            actionListener.onAction(action);
+    public Rectangle getBoundingBox() {
+        List<Transform> shapeBoundaries = new LinkedList<>();
+        for (int i = 0; i < shapes.size(); i++) {
+            shapeBoundaries.addAll(shapes.get(i).getBoundary());
         }
+        return Geometry.getBoundingBox(shapeBoundaries);
     }
+    // </COLLISION_COMPONENT>
 
+    // <STYLE_COMPONENT?>
     // TODO: Delete?
     public void setTransparency(final double transparency) {
         this.targetTransparency = transparency;
@@ -283,44 +248,5 @@ public abstract class Image<T extends Entity> {
 
         this.transparency = this.targetTransparency;
     }
-
-    public List<Point> getVertices() {
-        List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            positions.addAll(shape.getVertices());
-        }
-        return positions;
-    }
-
-    // Refactor to NOT use absolute and TO cache vertices... and NOT allocate arrays and Points every update
-    public Rectangle getBoundingBox() {
-
-        List<Point> boundingBoxVertices = new LinkedList<>();
-
-        for (int i = 0; i < shapes.size(); i++) {
-
-            Shape shape = shapes.get(i);
-            List<Point> shapeVertices = shape.getVertices();
-
-            for (int j = 0; j < shapeVertices.size(); j++) {
-                boundingBoxVertices.add(shapeVertices.get(j));
-            }
-        }
-
-        return Geometry.getBoundingBox(boundingBoxVertices);
-    }
-
-    public double getRelativeAngle(Point point) {
-
-        double relativeAngle = Geometry.getAngle(position, point);
-        if (relativeAngle < 0) {
-            relativeAngle += 360.0;
-        }
-        relativeAngle = (relativeAngle - getRotation());
-        if (relativeAngle < 0) {
-            relativeAngle += 360.0;
-        }
-        return relativeAngle;
-    }
+    // </STYLE_COMPONENT?>
 }

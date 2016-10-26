@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -25,11 +24,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.application.communication.UDPHost;
@@ -38,16 +40,20 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
+import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.Internet;
-import camp.computer.clay.model.Extension;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.util.geometry.Circle;
+import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Point;
 
-public class Application extends FragmentActivity implements DisplayHostInterface { // was Application
-    // rename Application to Setup? to provide analog to "setup" functions in classes?
+public class Application extends FragmentActivity implements DisplayHostInterface {
 
-    // <Settings>
+    // <SETTINGS>
     private static final boolean ENABLE_TONE_OUTPUT = false;
     private static final boolean ENABLE_SPEECH_OUTPUT = false;
     private static final boolean ENABLE_MOTION_INPUT = true;
@@ -61,7 +67,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
      * during debugging.
      */
     private static final boolean ENABLE_FULLSCREEN = true;
-    // </Settings>
+    // </SETTINGS>
 
     public Display display;
 
@@ -106,9 +112,14 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return this.prompt;
     }
 
-    public void openActionEditor(Extension extension) {
-        final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
-        pathEditor.setVisibility(View.VISIBLE);
+    public void openActionEditor(Entity extensionEntity) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
+                pathEditor.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     // References:
@@ -203,7 +214,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                titleEditor.setVisibility(View.GONE);
+                titleEditor.setImageVisibility(View.GONE);
             }
 
             @Override
@@ -244,6 +255,170 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 //        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 //    }
+
+    public List<Entity> restoreHosts(String filename) {
+
+        // e.g., filename = "Hosts.json"
+
+        List<Entity> hostEntities = new ArrayList<>();
+
+        // Open specified file HostEntity profiles
+        String jsonString = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open(filename);
+            int fileSize = inputStream.available();
+            byte[] fileBuffer = new byte[fileSize];
+            inputStream.read(fileBuffer);
+            inputStream.close();
+            jsonString = new String(fileBuffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create JSON object from file contents
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+
+            JSONObject hostObject = jsonObject.getJSONObject("host");
+            String hostTitle = hostObject.getString("title");
+
+            // HostEntity host = new HostEntity();
+
+            Log.v("Configuration", "reading JSON name: " + hostTitle);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return hostEntities;
+    }
+
+    // TODO: Make this into a static method of Image (or maybe better, add it to an ImageSystem?)
+    public void restoreGeometry(Image image, String filename) {
+
+        // Check for valid Image component.
+        if (image == null) {
+            Log.e("Application", "Error. restoreGeometry(): Image component is null.");
+            return;
+        }
+
+        // Open specified JSON file.
+        String jsonString = null;
+        try {
+            InputStream inputStream = getContext().getAssets().open(filename);
+            int fileSize = inputStream.available();
+            byte[] fileBuffer = new byte[fileSize];
+            inputStream.read(fileBuffer);
+            inputStream.close();
+            jsonString = new String(fileBuffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create JSON object from file contents for parsing content.
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+
+            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to HostEntity
+            String hostTitle = hostObject.getString("title"); // Handle to HostEntity's title
+
+            JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
+
+            // TODO: Replace with default unit and ability to specify units. Convert with device's screen characteristics.
+            double scaleFactor = 6.0;
+
+            for (int i = 0; i < geometryArray.length(); i++) {
+                JSONObject shape = geometryArray.getJSONObject(i);
+                JSONObject position = shape.getJSONObject("position");
+
+                JSONObject style = null;
+                if (shape.has("style")) {
+                    style = shape.getJSONObject("style");
+                }
+
+                // Description
+                String label = shape.getString("label");
+                String type = shape.getString("type");
+
+                // Geometry
+                double x = position.getDouble("x") * scaleFactor;
+                double y = position.getDouble("y") * scaleFactor;
+                double rotation = shape.getDouble("rotation");
+
+                // Style
+                String color = "#ffffff";
+                String outlineColor = "#000000";
+                double outlineThickness = 0.0;
+
+                if (style != null) {
+                    if (style.has("color")) {
+                        color = style.getString("color");
+                    }
+                    if (style.has("outlineColor")) {
+                        outlineColor = style.getString("outlineColor");
+                    }
+                    if (style.has("outlineThickness")) {
+                        outlineThickness = style.getDouble("outlineThickness") * scaleFactor;
+                    }
+                }
+
+                if (type.equals("Point")) {
+
+                    // NOTE: Geometry N/A
+
+                    Point point = new Point();
+                    point.setLabel(label);
+                    point.setPosition(x, y);
+                    point.setRotation(rotation);
+                    point.setColor(color);
+                    point.setOutlineColor(outlineColor);
+                    point.setOutlineThickness(outlineThickness);
+
+                    image.addShape(point);
+
+                } else if (type.equals("Rectangle")) {
+
+                    double width = shape.getDouble("width") * scaleFactor;
+                    double height = shape.getDouble("height") * scaleFactor;
+                    double cornerRadius = shape.getDouble("cornerRadius") * scaleFactor;
+
+                    Rectangle rectangle = new Rectangle(width, height);
+                    rectangle.setLabel(label);
+                    rectangle.setCornerRadius(cornerRadius);
+                    rectangle.setPosition(x, y);
+                    rectangle.setRotation(rotation);
+                    rectangle.setColor(color);
+                    rectangle.setOutlineColor(outlineColor);
+                    rectangle.setOutlineThickness(outlineThickness);
+
+                    image.addShape(rectangle);
+
+                } else if (type.equals("Circle")) {
+
+                    double radius = shape.getDouble("radius") * scaleFactor;
+
+                    Circle circle = new Circle(radius);
+                    circle.setLabel(label);
+                    circle.setPosition(x, y);
+                    circle.setRotation(rotation);
+                    circle.setColor(color);
+                    circle.setOutlineColor(outlineColor);
+                    circle.setOutlineThickness(outlineThickness);
+
+                    image.addShape(circle);
+                }
+            }
+
+            // HostEntity host = new HostEntity();
+
+            Log.v("Configuration", "reading JSON name: " + hostTitle);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Called when the activity is getFirstEvent created.
@@ -343,68 +518,20 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // <Cache>
         // </Cache>
 
-        // Read default form profiles
-        String jsonString = null;
-        try
-
-        {
-            InputStream inputStream = getContext().getAssets().open("Hosts.json");
-            int fileSize = inputStream.available();
-            byte[] fileBuffer = new byte[fileSize];
-            inputStream.read(fileBuffer);
-            inputStream.close();
-            jsonString = new String(fileBuffer, "UTF-8");
-
-        } catch (
-                IOException e
-                )
-
-        {
-            e.printStackTrace();
-        }
-
-        // Create JSON object
-        JSONObject jsonObject = null;
-        try
-
-        {
-            jsonObject = new JSONObject(jsonString);
-
-            JSONObject formObject = jsonObject.getJSONObject("form");
-
-            String formName = formObject.getString("name");
-
-            Log.v("Configuration", "reading JSON name: " + formName);
-
-        } catch (
-                JSONException e
-                )
-
-        {
-            e.printStackTrace();
-        }
-
-
         // Clay
-        clay = new
-
-                Clay();
+        clay = new Clay();
 
         clay.addDisplay(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
-        if (UDPHost == null)
-
-        {
+        if (UDPHost == null) {
             UDPHost = new UDPHost("udp");
             clay.addHost(this.UDPHost);
             UDPHost.startServer();
         }
 
         // Internet Network Interface
-        if (networkResource == null)
-
-        {
+        if (networkResource == null) {
             networkResource = new Internet();
             clay.addResource(this.networkResource);
         }
@@ -423,11 +550,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         */
 
         // Prevent on-screen keyboard from pushing up content
-        getWindow()
-
-                .
-
-                        setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 
         // <CHAT_AND_CONTEXT_SCOPE>
         final RelativeLayout messageContentLayout = (RelativeLayout) findViewById(R.id.message_content_layout);
@@ -562,7 +685,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                                                     RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
 
                                                     // TODO: Compute relative to dependant sprite position
-                                                    Point originPoint = new Point(959, 1655);
+                                                    android.graphics.Point originPoint = new android.graphics.Point(959, 1655);
 
 //                    Animation animation = new Animation();
 //                    animation.moveToPoint(relativeLayout, originPoint, 300);
@@ -612,6 +735,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                new RedisSubThread(this.jedis)
 //        ).start();
         // </REDIS>
+
+//        restoreGeometry("Geometry.json");
     }
 
     public void hideChat() {
@@ -659,8 +784,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         messageKeyboardLayout.invalidate();
     }
 
-    public camp.computer.clay.util.geometry.Point convertToVisiblePosition(Point point) {
-        camp.computer.clay.util.geometry.Point visiblePosition = new camp.computer.clay.util.geometry.Point();
+    public Transform convertToVisiblePosition(android.graphics.Point point) {
+        Transform visiblePosition = new Transform();
         return visiblePosition;
     }
 
@@ -773,17 +898,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 //                contextScope.setText("✓");
 //                contextScope.setText("☉");
                 //contextScope.setText("☌"); // When dragging to connect path
-                //contextScope.setText("☍"); // Just after connected path
-                // ☉ // Just after tapping a node
-                // ☐ // Just after tapping machine
-                // ☊
-                // ☋
-                // ☝
-                // ☜
-                // ☞
-                // ☟
-                // ☺ // Smile
-                // ☹ // Frown
             }
         });
 

@@ -1,175 +1,58 @@
 package camp.computer.clay.util.geometry;
 
-public class Point {
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-    /**
-     * The {@code Point} relative to which this point will be positioned.
-     */
-    protected Point referencePoint = null;
+import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.util.image.Shape;
 
-    /**
-     * The x coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
-     * {@code null} then this is equivalent to an absolute position.
-     */
-    public double x = 0;
+public class Point<T extends Entity> extends Shape<T> {
 
-    /**
-     * The y coordinate's position relative to {@code referencePoint}. If {@code referencePoint} is
-     * {@code null} then this is equivalent to an absolute position.
-     */
-    public double y = 0;
-
-    /**
-     * Relative rotation of the coordinate with which points referencing this one will be
-     * rotated.
-     */
-    public double rotation = 0;
-
-    /**
-     * Rotation rotation in degrees
-     */
     public Point() {
-        this(0, 0);
+        setup();
     }
 
-    /**
-     * Copy constructor. Creates a new {@code Point} object with properties identical to those of
-     * {@code otherPoint}.
-     *
-     * @param otherPoint The {@code Point} to set.
-     */
-    public Point(Point otherPoint) {
-        this.x = otherPoint.x;
-        this.y = otherPoint.y;
+    public Point(Transform position) {
+        super(position);
+        setup();
     }
 
-    public Point(double x, double y) {
-        this.x = x;
-        this.y = y;
+    public Point(T entity) {
+        this.entity = entity;
+        setup();
     }
 
-    /**
-     * Creates a new {@code Point} positioned relative to {@code referencePoint}.
-     *
-     * @param x              The x coordinate of this {@code Point} relative to {@code referencePoint}.
-     * @param y              The y coordinate of this {@code Point} relative to {@code referencePoint}.
-     * @param referencePoint
-     */
-    public Point(double x, double y, Point referencePoint) {
-        setReferencePoint(referencePoint);
-        setX(x);
-        setY(y);
+    private void setup() {
+        setupGeometry();
     }
 
-    public Point getReferencePoint() {
-        return referencePoint;
+    private void setupGeometry() {
+        boundary = new ArrayList<>();
+        boundary.add(new Transform());
     }
 
-    public void setReferencePoint(Point referencePoint) {
-        this.referencePoint = referencePoint;
+    @Override
+    protected List<Transform> getVertices() {
+        List<Transform> vertices = new LinkedList<>();
+        vertices.add(new Transform(imagePosition));
+        return vertices;
     }
 
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public void set(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    /**
-     * @param point Absolute position. Converted to relative position internally.
-     */
-    public void set(Point point) {
-        x = point.x;
-        y = point.y;
-
-        rotation = point.rotation;
-
-        setReferencePoint(point.getReferencePoint());
-    }
-
-    /**
-     * @param dx Offset along x axis from current x position.
-     * @param dy Offset along y axis from current y position.
-     */
-    public void offset(double dx, double dy) {
-        this.x = this.x + dx;
-        this.y = this.y + dy;
-    }
-
-    public double getRotation() {
-        return this.rotation;
-    }
-
-    public void setRotation(double rotation) {
-        this.rotation = rotation;
-    }
-
-    /**
-     * @return Absolute x coordinate.
-     */
-    public double getAbsoluteX() {
-        if (referencePoint != null) {
-            double absoluteX = Geometry.calculateDistance(0, 0, x, y) * Math.cos(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.getAngle(0, 0, x, y)));
-            return referencePoint.getAbsoluteX() + absoluteX;
-        } else {
-            return this.x;
+    @Override
+    public void draw(Display display) {
+        if (isVisible()) {
+            // display.drawVertex(this);
         }
-    }
 
-    /**
-     * @param x Absolute x coordinate. Converted to a relative x position internally.
-     */
-    public void setAbsoluteX(double x) {
-        if (referencePoint != null) {
-            this.x = x - referencePoint.getAbsoluteX();
-        } else {
-            this.x = x;
-        }
-    }
-
-    /**
-     * @return Absolute y coordinate.
-     */
-    public double getAbsoluteY() {
-        if (referencePoint != null) {
-            double absoluteY = Geometry.calculateDistance(0, 0, x, y) * Math.sin(Math.toRadians(referencePoint.getAbsoluteRotation() + Geometry.getAngle(0, 0, x, y)));
-            return referencePoint.getAbsoluteY() + absoluteY;
-        } else {
-            return this.y;
-        }
-    }
-
-    /**
-     * @param y Absolute y coordinate. Converted to a relative y position internally.
-     */
-    public void setAbsoluteY(double y) {
-        if (referencePoint != null) {
-            this.y = y - referencePoint.getAbsoluteY();
-        } else {
-            this.y = y;
-        }
-    }
-
-    public double getAbsoluteRotation() {
-        if (referencePoint != null) {
-            return referencePoint.getAbsoluteRotation() + this.rotation;
-        } else {
-            return this.rotation;
-        }
+        /*
+        // Draw bounding box!
+        display.paint.setColor(Color.GREEN);
+        display.paint.setStyle(Paint.Style.STROKE);
+        display.paint.setStrokeWidth(2.0f);
+        display.canvas.drawSegment((float) position.x - 10, (float) position.y - 10, (float) position.x + 10, (float) position.y + 10, display.paint);
+        */
     }
 }

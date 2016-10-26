@@ -2,7 +2,7 @@ package camp.computer.clay.model.profile;
 
 import java.util.UUID;
 
-import camp.computer.clay.model.Port;
+import camp.computer.clay.engine.entity.Port;
 
 public class PortProfile {
     private UUID uuid = null;

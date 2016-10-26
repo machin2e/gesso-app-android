@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import camp.computer.clay.model.Entity;
-import camp.computer.clay.model.Group;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
@@ -45,7 +45,6 @@ public class ShapeGroup extends Group<Shape> {
 
                 boolean isMatch = matcher.matches();
 
-//                if (this.elements.get(i).getLabel().equals(labels[j])) {
                 if (isMatch) {
                     shapeGroup.add(this.elements.get(i));
                 }
@@ -112,26 +111,26 @@ public class ShapeGroup extends Group<Shape> {
      * @param distance
      * @return
      */
-    public ShapeGroup filterArea(Point point, double distance) {
+//    public ShapeGroup filterArea(Transform point, double distance) {
+//
+//        ShapeGroup shapeGroup = new ShapeGroup();
+//
+//        for (int i = 0; i < elements.size(); i++) {
+//            Shape shape = elements.get(i);
+//
+//            double distanceToShape = Geometry.distance(point, shape.getPosition());
+//
+//            if (distanceToShape < distance) {
+//                shapeGroup.add(shape);
+//            }
+//
+//        }
+//
+//        return shapeGroup;
+//
+//    }
 
-        ShapeGroup shapeGroup = new ShapeGroup();
-
-        for (int i = 0; i < elements.size(); i++) {
-            Shape shape = elements.get(i);
-
-            double distanceToShape = Geometry.calculateDistance(point, shape.getPosition());
-
-            if (distanceToShape < distance) {
-                shapeGroup.add(shape);
-            }
-
-        }
-
-        return shapeGroup;
-
-    }
-
-    public ShapeGroup filterContains(Point point) {
+    public ShapeGroup filterContains(Transform point) {
 
         ShapeGroup shapeGroup = new ShapeGroup();
 
@@ -186,31 +185,22 @@ public class ShapeGroup extends Group<Shape> {
         return elements;
     }
 
-    public List<Point> getPositions() {
-        List<Point> positions = new LinkedList<>();
+//    public List<Transform> getPositions() {
+//        List<Transform> positions = new LinkedList<>();
+//        for (int i = 0; i < elements.size(); i++) {
+//            Shape shape = elements.get(i);
+//            positions.add(new Transform(shape.getPosition().x, shape.getPosition().y));
+//        }
+//        return positions;
+//    }
+
+    public List<Transform> getVertices() {
+        List<Transform> positions = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
-            positions.add(new Point(shape.getPosition().getAbsoluteX(), shape.getPosition().getAbsoluteY()));
+            positions.addAll(shape.getBoundary());
         }
         return positions;
-    }
-
-    public List<Point> getVertices() {
-        List<Point> positions = new LinkedList<>();
-        for (int i = 0; i < elements.size(); i++) {
-            Shape shape = elements.get(i);
-            positions.addAll(shape.getVertices());
-        }
-        return positions;
-    }
-
-    public Point getCenterPosition() {
-        return Geometry.getCenterPoint(getPositions());
-    }
-
-
-    public Point getCentroidPosition() {
-        return Geometry.getCentroidPoint(getPositions());
     }
 
     public Rectangle getBoundingBox() {
@@ -223,7 +213,7 @@ public class ShapeGroup extends Group<Shape> {
      * @param position
      * @return
      */
-    public Shape getNearest(Point position) {
+    public Shape getNearest(Transform position) {
 
         double shortestDistance = Float.MAX_VALUE;
         Shape nearestShape = null;
@@ -231,7 +221,7 @@ public class ShapeGroup extends Group<Shape> {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
 
-            double currentDistance = Geometry.calculateDistance(position, shape.getPosition());
+            double currentDistance = Geometry.distance(position, shape.getPosition());
 
             if (currentDistance < shortestDistance) {
                 shortestDistance = currentDistance;
@@ -249,7 +239,7 @@ public class ShapeGroup extends Group<Shape> {
         }
     }
 
-    public void setVisibility(Visibility.Value visibility) {
+    public void setVisibility(Visibility visibility) {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = elements.get(i);
             shape.setVisibility(visibility);

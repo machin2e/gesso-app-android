@@ -1,26 +1,20 @@
 package camp.computer.clay.model.action;
 
-import android.os.Handler;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.model.Actor;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.engine.component.Transform;
 
 /**
  * An Action is a sequence of one or more events.
  */
 public class Action {
 
-    // TODO: Entity this with a "pointerCoordinates thisAction envelope" or "thisAction envelope".
-    // TODO: Entity voice thisAction in the same way. Generify to Action<T> or subclass.
-    // TODO: (?) Entity data transmissions as events in the same way?
-
-    protected Actor actor = null;
+    private Actor actor = null;
 
     public void setActor(Actor actor) {
         this.actor = actor;
@@ -32,6 +26,9 @@ public class Action {
 
     private List<Event> events = new LinkedList<>();
 
+    // "Event Future"
+//    private List<Event> eventQueue = new LinkedList<>();
+
     // TODO: Classify these! Every time an Event is added!
     // TODO: (cont'd) Note can have multiple sequences per finger in an thisAction,
     // TODO: (cont'd) so consider remodeling as per-finger thisAction and treat each finger
@@ -41,29 +38,29 @@ public class Action {
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
     // TODO: private double[] touchPressure = new double[Event.MAXIMUM_POINT_COUNT]; // Reference: http://stackoverflow.com/questions/17540058/android-detect-touch-pressure-on-capacitive-touch-screen
 
-    public Handler timerHandler = new Handler();
-
-    public Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-
-            int pointerIndex = 0;
-
-            if (getFirstEvent().isPointing[pointerIndex]) {
-                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
-
-                    Event event = new Event();
-                    event.setType(Event.Type.HOLD);
-                    event.pointerIndex = getFirstEvent().pointerIndex;
-                    event.pointerCoordinates[0] = new Point(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
-                    getFirstEvent().getActor().processAction(event);
-
-                    isHolding[pointerIndex] = true;
-
-                }
-            }
-        }
-    };
+//    public Handler timerHandler = new Handler();
+//
+//    public Runnable timerRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//
+//            int pointerIndex = 0;
+//
+//            if (getFirstEvent().isPointing[pointerIndex]) {
+//                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
+//
+//                    Event event = new Event();
+//                    event.setType(Event.Type.HOLD);
+//                    event.pointerIndex = getFirstEvent().pointerIndex;
+//                    event.pointerCoordinates[0] = new Transform(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
+//                    getFirstEvent().getActor().queueEvent(event);
+//
+//                    isHolding[pointerIndex] = true;
+//
+//                }
+//            }
+//        }
+//    };
 
     public Action() {
         setup();
@@ -99,18 +96,20 @@ public class Action {
 
         event.setAction(this);
 
-        events.add(event);
+        if (events.size() == 0) {
 
-        if (events.size() == 1) {
+            events.add(event);
 
             // Start timer to check for hold
-            timerHandler.removeCallbacks(timerRunnable);
-            timerHandler.postDelayed(timerRunnable, Event.MINIMUM_HOLD_DURATION);
+//            timerHandler.removeCallbacks(timerRunnable);
+//            timerHandler.postDelayed(timerRunnable, Event.MINIMUM_HOLD_DURATION);
 
-        } else if (events.size() > 1) {
+        } else if (events.size() > 0) {
+
+            events.add(event);
 
             // Calculate drag distance
-            this.dragDistance[event.pointerIndex] = Geometry.calculateDistance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
+            this.dragDistance[event.pointerIndex] = Geometry.distance(event.getPosition(), getFirstEvent().pointerCoordinates[event.pointerIndex]);
 
             if (getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
                 isDragging[event.pointerIndex] = true;
@@ -184,8 +183,8 @@ public class Action {
         return getLastEvent().getTimestamp() - getFirstEvent().getTimestamp();
     }
 
-    public ArrayList<Point> getTouchPath() {
-        ArrayList<Point> touchCoordinates = new ArrayList<>();
+    public ArrayList<Transform> getTouchPath() {
+        ArrayList<Transform> touchCoordinates = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
             touchCoordinates.add(events.get(i).getPosition());
         }
@@ -211,12 +210,12 @@ public class Action {
     /**
      * Returns point-to-point distance between getFirstEvent and getLastEvent action positions.
      *
-     * @return Point-to-point distance between the getFirstEvent and getLastEvent events' positions.
+     * @return Transform-to-point distance between the getFirstEvent and getLastEvent events' positions.
      */
     public double getDistance() {
         Event firstEvent = getFirstEvent();
         Event lastEvent = getLastEvent();
-        double distance = Geometry.calculateDistance(
+        double distance = Geometry.distance(
                 firstEvent.getPosition(),
                 lastEvent.getPosition()
         );
@@ -235,15 +234,15 @@ public class Action {
         return (getLastEvent() == event);
     }
 
-    protected Point offset = new Point();
+    protected Transform offset = new Transform();
 
-//    public Point getOffset() {
-//        this.offset.setAbsolute(
-//                getLastEvent().getPosition().getAbsoluteX() - getFirstEvent().getPosition().getAbsoluteX(),
-//                getLastEvent().getPosition().getAbsoluteY() - getFirstEvent().getPosition().getAbsoluteY()
-//        );
-//        return offset;
-//    }
+    public Transform getOffset() {
+        this.offset.set(
+                getLastEvent().getPosition().x - getFirstEvent().getPosition().x,
+                getLastEvent().getPosition().y - getFirstEvent().getPosition().y
+        );
+        return offset;
+    }
 
 //    // in handlers (e.g., in Images), use this to check for match, if match, then use/get/setValue on the action's events to get inputs for the routine operation
 //    public boolean matches(Event... events) {

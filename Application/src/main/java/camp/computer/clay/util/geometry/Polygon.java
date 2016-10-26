@@ -4,43 +4,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Polygon<T extends Entity> extends Shape<T> {
 
-    private List<Point> vertices = new ArrayList<>();
+    protected List<Transform> vertices = new ArrayList<>();
 
     public Polygon(T entity) {
         this.entity = entity;
+        setup();
     }
 
-    public Polygon(Point position, List<Point> vertices) {
+    public Polygon(Transform position, List<Transform> vertices) {
         super(position);
         this.vertices.addAll(vertices);
+        setup();
     }
 
-    public Point getVertex(int index) {
-        return vertices.get(index);
-    }
-
-    public void setVertices(List<Point> vertices) {
-        this.vertices.clear();
+    public Polygon(List<Transform> vertices) {
+        super();
         this.vertices.addAll(vertices);
+        setup();
+    }
+
+    private void setup() {
+        setupGeometry();
+    }
+
+    private void setupGeometry() {
+
     }
 
     @Override
-    public List<Point> getVertices() {
+    protected List<Transform> getVertices() {
         return vertices;
-    }
-
-    @Override
-    public List<Line> getSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        for (int i = 0; i < vertices.size() - 1; i++) {
-            segments.add(new Line(vertices.get(i), vertices.get(i + 1)));
-        }
-        return segments;
     }
 
     @Override

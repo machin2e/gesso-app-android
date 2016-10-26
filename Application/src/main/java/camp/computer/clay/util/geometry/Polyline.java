@@ -4,51 +4,53 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
 
 public class Polyline<T extends Entity> extends Shape<T> {
 
-    private List<Point> vertices = new ArrayList<>();
+    private List<Transform> vertices = new ArrayList<>();
 
     public Polyline() {
         super();
+        setup();
     }
 
     public Polyline(T entity) {
         this.entity = entity;
+        setup();
     }
 
-    public Polyline(Point position, List<Point> vertices) {
+    public Polyline(Transform position, List<Transform> vertices) {
         super(position);
+        setup();
+        setVertices(vertices);
+    }
+
+    private void setup() {
+        setupGeometry();
+    }
+
+    private void setupGeometry() {
         this.vertices.addAll(vertices);
     }
 
-    public void addVertex(Point point) {
+    public void setVertices(List<Transform> vertices) {
+        this.vertices.addAll(vertices);
+    }
+
+    public void addVertex(Transform point) {
         this.vertices.add(point);
     }
 
-    public Point getVertex(int index) {
-        return vertices.get(index);
-    }
-
-    public void setVertices(List<Point> vertices) {
-        this.vertices.clear();
-        this.vertices.addAll(vertices);
-    }
-
     @Override
-    public List<Point> getVertices() {
+    protected List<Transform> getVertices() {
         return vertices;
     }
 
-    @Override
-    public List<Line> getSegments() {
-        ArrayList<Line> segments = new ArrayList<>();
-        for (int i = 0; i < vertices.size() - 1; i++) {
-            segments.add(new Line(vertices.get(i), vertices.get(i + 1)));
-        }
-        return segments;
+    public List<Transform> getPoints() {
+        return vertices;
     }
 
     @Override

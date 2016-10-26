@@ -2,78 +2,66 @@ package camp.computer.clay.util.image;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
-import camp.computer.clay.application.Application;
+import java.util.LinkedList;
+import java.util.List;
+
 import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.model.Entity;
-import camp.computer.clay.model.Extension;
-import camp.computer.clay.model.Group;
-import camp.computer.clay.model.Host;
-import camp.computer.clay.model.Model;
-import camp.computer.clay.model.Path;
-import camp.computer.clay.model.Port;
+import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.model.action.Camera;
+import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.space.image.ExtensionImage;
-import camp.computer.clay.space.image.HostImage;
-import camp.computer.clay.space.image.PathImage;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.util.ImageGroup;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
-public class Space extends Image<Model> {
+// TODO: DO NOT extend Image. Try to remove Space class. If cannot, then consider making it an
+// TODO: (...) Entity and adding a ActionListenerComponent.
+public class Space extends Image {
 
-    protected ImageGroup images = new ImageGroup();
+    public static double PIXEL_PER_MILLIMETER = 6.0;
 
-    protected Visibility extensionPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
-    protected Point extensionPrototypePosition = new Point();
+    protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
+    protected Transform extensionPrototypePosition = new Transform();
 
-    protected Visibility pathPrototypeVisibility = new Visibility(Visibility.Value.INVISIBLE);
-    protected Point pathPrototypeSourcePosition = new Point(0, 0);
-    protected Point pathPrototypeDestinationCoordinate = new Point(0, 0);
+    protected Visibility pathPrototypeVisibility = Visibility.INVISIBLE;
+    protected Transform pathPrototypeSourcePosition = new Transform(0, 0);
+    protected Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
-    public Space(Model model) {
-        super(model);
+    private List<Actor> actors = new LinkedList<>();
+
+    public Space() {
+        super(null);
         setup();
     }
 
     private void setup() {
-        setupActions();
+        Space.space = this;
+//        setupActions();
     }
 
-    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visibility titleVisibility = new Visibility(Visibility.Value.INVISIBLE);
-    protected String titleText = "Project";
 
-    public void setTitleText(String text) {
-        this.titleText = text;
+    private ActionListener actionListener;
+
+    public void setOnActionListener(ActionListener actionListener) {
+        this.actionListener = actionListener;
     }
 
-    public String getTitleText() {
-        return this.titleText;
+    public void processAction(Action action) {
+        // <HACK>
+        actionListener.onAction(action);
+        // </HACK>
     }
 
-    public void setTitleVisibility(Visibility.Value visibility) {
-        if (titleVisibility.getValue() == Visibility.Value.INVISIBLE && visibility == Visibility.Value.VISIBLE) {
-            Application.getView().openTitleEditor(getTitleText());
-            this.titleVisibility.setValue(visibility);
-        } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.VISIBLE) {
-            Application.getView().setTitleEditor(getTitleText());
-        } else if (titleVisibility.getValue() == Visibility.Value.VISIBLE && visibility == Visibility.Value.INVISIBLE) {
-            Application.getView().closeTitleEditor();
-            this.titleVisibility.setValue(visibility);
-        }
-    }
-
-    public Visibility getTitleVisibility() {
-        return this.titleVisibility;
-    }
-
-    private void setupActions() {
-        // Setup interactivity
+    public void setupActionListener() {
         setOnActionListener(new ActionListener() {
             @Override
             public void onAction(Action action) {
@@ -82,108 +70,72 @@ public class Space extends Image<Model> {
                 Camera camera = event.getActor().getCamera();
 
                 if (event.getType() == Event.Type.NONE) {
+
                 } else if (event.getType() == Event.Type.SELECT) {
 
                 } else if (event.getType() == Event.Type.HOLD) {
 
                 } else if (event.getType() == Event.Type.MOVE) {
-//                    if (action.isHolding()) {
-//                        // Space
-//                        //lastEvent.getTargetImage().processAction(action);
-//                    } else if (action.isDragging()) {
-                    // Camera
-                    if (action.getSize() > 1) {
-                        camera.setOffset(event.getPosition().x - action.getFirstEvent().getPosition().x, event.getPosition().y - action.getFirstEvent().getPosition().y);
+
+                    Log.v("Space_Action", "MOVE");
+
+                    if (action.isDragging()) {
+                        Log.v("Space_Action", "DRAG");
+                        camera.setOffset(action.getOffset());
                     }
 
-//                    camera.setOffset(action.getOffset().getAbsoluteX(), action.getOffset().getAbsoluteY());
-//                    }
                 } else if (event.getType() == Event.Type.UNSELECT) {
 
-                    // Previous Action targeted also this Extension
-                    // TODO: Refactor
-                    if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
+//                    // Previous Action targeted also this ExtensionEntity
+//                    if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
+//
+//                        if (action.isTap()) {
+//
+//                            Log.v("Space_Action", "UNSELECT 2");
+//
+//                            // Title
+//                            setTitleText("Project");
+//                            setTitleVisibility(Visibility.VISIBLE);
+//                        }
+//
+//                    } else {
 
-                        if (action.isTap()) {
+                    // NOT a repeat tap on this Image
 
-                            // Title
-                            setTitleText("Project");
-                            setTitleVisibility(Visibility.Value.VISIBLE);
-                        }
+                    if (action.isTap()) {
+                        Log.v("Space_Action", "UNSELECT 1");
 
-                    } else {
+                        // Title
+                        setTitleVisibility(Visibility.INVISIBLE);
 
-                        // NOT a repeat tap on this Image
-
-                        if (action.isTap()) {
-
-                            // Title
-                            setTitleVisibility(Visibility.Value.INVISIBLE);
-
-                            // Camera
-                            camera.setFocus(getSpace());
-                        }
+                        // Camera
+                        camera.setFocus(Space.getSpace());
                     }
+//                    }
                 }
             }
         });
     }
 
-    public Model getModel() {
-        return getEntity();
+    private static Space space = null;
+
+    public static Space getSpace() {
+        return Space.space;
     }
 
-    public <T extends Entity> void addEntity(T entity) {
-        if (entity instanceof Host) {
-
-            Host host = (Host) entity;
-
-            // Create PhoneHost Image
-            HostImage hostImage = new HostImage(host);
-
-            // Create Port Shapes for each of the PhoneHost's Ports
-            for (int i = 0; i < host.getPorts().size(); i++) {
-                Port port = host.getPorts().get(i);
-                addEntity(port);
-            }
-
-            // Add PhoneHost Image to Space
-            addImage(hostImage);
-
-        } else if (entity instanceof Extension) {
-
-            Extension extension = (Extension) entity;
-
-            // Create Extension Image
-            ExtensionImage extensionImage = new ExtensionImage(extension);
-
-            // Create Port Shapes for each of the Extension's Ports
-            for (int i = 0; i < extension.getPorts().size(); i++) {
-                Port port = extension.getPorts().get(i);
-                addEntity(port);
-            }
-
-            // Add Extension Image to Space
-            addImage(extensionImage);
-
-        } else if (entity instanceof Port) {
-
-//            Port port = (Port) entity;
-
-        } else if (entity instanceof Path) {
-
-            Path path = (Path) entity;
-
-            // Create Path Image
-            PathImage pathImage = new PathImage(path);
-
-            // Add Path Image to Space
-            addImage(pathImage);
+    public void addActor(Actor actor) {
+        if (!this.actors.contains(actor)) {
+            this.actors.add(actor);
         }
     }
 
-    // TODO: Rename to sortLayers
-    protected void sortImagesByLayer() {
+    /**
+     * Sorts {@code Image}s by layer.
+     */
+    @Override
+    public void updateLayers() {
+
+        Group<Image> images = Entity.Manager.getImages();
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {
@@ -207,114 +159,77 @@ public class Space extends Image<Model> {
         */
     }
 
-    // TODO: Remove Image parameter. Create that and return it.
-    private <T extends Image> void addImage(T image) {
-
-        // Add Image
-        image.setSpace(this);
-        if (!images.contains(image)) {
-            images.add(image);
-            sortImagesByLayer();
-        }
-
-        // Position the Image
-        if (image instanceof HostImage) {
-            adjustLayout();
-        }
-
-        // Update Camera
-        getEntity().getActor(0).getCamera().setFocus(getSpace());
-    }
+//    @Override
+//    public Space getSpace() {
+//        return this;
+//    }
 
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
 
     /**
-     * Automatically determines and assigns a valid position for all {@code Host} {@code Image}s.
+     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Image}s.
      */
-    private void adjustLayout() {
+    public void adjustLayout() {
 
-        ImageGroup hostImages = getImages().filterType(Host.class);
+//        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
+        Group<Image> hostImages = Entity.Manager.filterWithComponent(Host.class).getImages();
 
-        // Set position
+        // Set position on grid layout
         if (hostImages.size() == 1) {
-            hostImages.get(0).setPosition(0, 0);
+            hostImages.get(0).getEntity().getComponent(Transform.class).set(0, 0);
         } else if (hostImages.size() == 2) {
-            hostImages.get(0).setPosition(-300, 0);
-            hostImages.get(1).setPosition(300, 0);
+            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, 0);
+            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, 0);
         } else if (hostImages.size() == 5) {
-            hostImages.get(0).setPosition(-300, -600);
-            hostImages.get(0).setRotation(0);
-            hostImages.get(1).setPosition(300, -600);
-            hostImages.get(1).setRotation(20);
-            hostImages.get(2).setPosition(-300, 0);
-            hostImages.get(2).setRotation(40);
-            hostImages.get(3).setPosition(300, 0);
-            hostImages.get(3).setRotation(60);
-            hostImages.get(4).setPosition(-300, 600);
-            hostImages.get(4).setRotation(80);
+            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, -600);
+            hostImages.get(0).getEntity().getComponent(Transform.class).setRotation(0);
+            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, -600);
+            hostImages.get(1).getEntity().getComponent(Transform.class).setRotation(20);
+            hostImages.get(2).getEntity().getComponent(Transform.class).set(-300, 0);
+            hostImages.get(2).getEntity().getComponent(Transform.class).setRotation(40);
+            hostImages.get(3).getEntity().getComponent(Transform.class).set(300, 0);
+            hostImages.get(3).getEntity().getComponent(Transform.class).setRotation(60);
+            hostImages.get(4).getEntity().getComponent(Transform.class).set(-300, 600);
+            hostImages.get(4).getEntity().getComponent(Transform.class).setRotation(80);
         }
+
+        // TODO: Set position on "scatter" layout
 
         // Set rotation
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
 
-    /**
-     * Returns {@code true} if the {@code Space} contains a {@code Image} corresponding to the
-     * specified {@code Entity}.
-     *
-     * @param entity The {@code Entity} for which the corresponding {@code Image} will be
-     *               returned, if any.
-     * @return The {@code Image} corresponding to the specified {@code Entity}, if one is
-     * present. If one is not present, this method returns {@code null}.
-     */
-    public boolean contains(Entity entity) {
-        return images.filterEntity(entity).size() > 0;
+    // <HACK>
+    public Actor getActor() {
+        return this.actors.get(0);
     }
+    // </HACK>
 
-    public Image getImage(Entity entity) {
-        return images.filterEntity(entity).get(0);
-    }
-
-    public <T extends Entity> ImageGroup getImages(Group<T> entities) {
-        return images.filterEntity(entities);
-    }
-
-    public ImageGroup getImages() {
-        return images;
-    }
-
-    public <T extends Entity> ImageGroup getImages(Class<?>... entityTypes) {
-        return images.filterType(entityTypes);
-    }
-
-    // TODO: Delete. Replace with ImageGroup.filterPosition(Point)
-    public Image getImage(Point point) {
-        ImageGroup image = images.filterVisibility(Visibility.Value.VISIBLE).filterContains(point);
-        if (image.size() > 0) {
-            return image.get(0);
-        } else {
-            return this;
-        }
-    }
-
+    // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
     public ShapeGroup getShapes() {
-        return images.getShapes();
-    }
-
-    // TODO: Refactor to be cleaner and leverage other classes...
-    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
-        ShapeGroup shapeGroup = new ShapeGroup();
-        ImageGroup imageList = getImages();
-
-        for (int i = 0; i < imageList.size(); i++) {
-            shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
+//        return getImages().getShapes();
+        ShapeGroup shapes = new ShapeGroup();
+        Group<Image> images = Entity.Manager.getImages();
+        for (int i = 0; i < images.size(); i++) {
+            shapes.addAll(images.get(i).getShapes());
         }
-
-        return shapeGroup.filterType(entityTypes);
+        return shapes;
     }
+
+//    // TODO: Refactor to be cleaner and leverage other classes...
+//    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
+//        ShapeGroup shapeGroup = new ShapeGroup();
+//        Group<Image> imageList = Entity.Manager.getImages();
+//
+//        for (int i = 0; i < imageList.size(); i++) {
+//            shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
+//        }
+//
+//        return shapeGroup.filterType(entityTypes);
+//    }
 
     public Shape getShape(Entity entity) {
-        ImageGroup images = getImages();
+        Group<Image> images = Entity.Manager.getImages();
         for (int i = 0; i < images.size(); i++) {
             Image image = images.get(i);
             Shape shape = image.getShape(entity);
@@ -325,31 +240,10 @@ public class Space extends Image<Model> {
         return null;
     }
 
-    public Model getEntity() {
-        return this.entity;
-    }
-
-    @Override
-    public void update() {
-
-        // Update Images
-        for (int i = 0; i < images.size(); i++) {
-            images.get(i).update();
-        }
-
-        // Update Camera
-        getEntity().getActor(0).getCamera().update();
-    }
-
-    @Override
-    public void draw(Display display) {
+    // TODO: Rename doDraw to draw after Space no longer extends Image.
+    public void doDraw(Display display) {
 
         display.canvas.save();
-
-        // Draw
-        for (int i = 0; i < images.size(); i++) {
-            images.get(i).draw(display);
-        }
 
         // Draw any prototype Paths and Extensions
         drawPathPrototype(display);
@@ -358,8 +252,10 @@ public class Space extends Image<Model> {
         display.canvas.restore();
     }
 
+
+    // <EXTENSION_PROTOTYPE>
     private void drawExtensionPrototype(Display display) {
-        if (extensionPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
+        if (extensionPrototypeVisibility == Visibility.VISIBLE) {
 
             Paint paint = display.paint;
 
@@ -374,7 +270,7 @@ public class Space extends Image<Model> {
 
     // TODO: Make this into a shape and put this on a separate layerIndex!
     public void drawPathPrototype(Display display) {
-        if (pathPrototypeVisibility.getValue() == Visibility.Value.VISIBLE) {
+        if (pathPrototypeVisibility == Visibility.VISIBLE) {
 
             Paint paint = display.paint;
 
@@ -392,13 +288,13 @@ public class Space extends Image<Model> {
                     pathPrototypeDestinationCoordinate
             );
 
-            Point pathStartCoordinate = Geometry.rotateTranslatePoint(
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
                     pathPrototypeSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
-            Point pathStopCoordinate = Geometry.rotateTranslatePoint(
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
                     pathPrototypeDestinationCoordinate,
                     pathRotationAngle + 180,
                     2 * triangleSpacing
@@ -415,31 +311,100 @@ public class Space extends Image<Model> {
         }
     }
 
-    public void setPathPrototypeVisibility(Visibility.Value visibility) {
-        pathPrototypeVisibility.setValue(visibility);
+    public void setPathPrototypeVisibility(Visibility visibility) {
+        pathPrototypeVisibility = visibility;
     }
 
     public Visibility getPathPrototypeVisibility() {
         return pathPrototypeVisibility;
     }
 
-    public void setPathPrototypeSourcePosition(Point position) {
+    public void setPathPrototypeSourcePosition(Transform position) {
         this.pathPrototypeSourcePosition.set(position);
     }
 
-    public void setPathPrototypeDestinationPosition(Point position) {
+    public void setPathPrototypeDestinationPosition(Transform position) {
         this.pathPrototypeDestinationCoordinate.set(position);
     }
 
-    public void setExtensionPrototypePosition(Point position) {
+    public void setExtensionPrototypePosition(Transform position) {
         this.extensionPrototypePosition.set(position);
     }
 
-    public void setExtensionPrototypeVisibility(Visibility.Value visibility) {
-        extensionPrototypeVisibility.setValue(visibility);
+    public void setExtensionPrototypeVisibility(Visibility visibility) {
+        extensionPrototypeVisibility = visibility;
     }
 
     public Visibility getExtensionPrototypeVisibility() {
         return extensionPrototypeVisibility;
     }
+    // </EXTENSION_PROTOTYPE>
+
+
+    public void setPortableSeparation(double distance) {
+        // <HACK>
+        // TODO: Replace ASAP. This is shit.
+//        Group<Image> extensionImages = Entity.Manager.filterType2(ExtensionEntity.class).getImages();
+        Group<Image> extensionImages = Entity.Manager.filterWithComponent(Extension.class).getImages();
+        for (int i = 0; i < extensionImages.size(); i++) {
+            Image extensionImage = extensionImages.get(i);
+
+            Entity extension = extensionImage.getEntity();
+            if (extension.getComponent(Portable.class).getHosts().size() > 0) {
+                Entity hostEntity = extension.getComponent(Portable.class).getHosts().get(0);
+                hostEntity.getComponent(Host.class).setExtensionDistance(distance);
+            }
+        }
+        // </HACK>
+    }
+
+
+    public void hideAllPorts() {
+        // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
+
+//        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages();
+//        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class).getImages();
+        Group<Image> portableImages = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages(); // HACK
+
+//        ImageGroup portableImages = getImages(HostEntity.class, ExtensionEntity.class);
+        for (int i = 0; i < portableImages.size(); i++) {
+            Image portableImage = portableImages.get(i);
+            Entity portableEntity = portableImage.getEntity();
+            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
+//            portableImage.setDockVisibility(Visibility.VISIBLE);
+            portableImage.setTransparency(1.0);
+        }
+    }
+
+
+    // <TITLE>
+    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
+    protected Visibility titleVisibility = Visibility.INVISIBLE;
+    protected String titleText = "Project";
+
+    public void setTitleText(String text) {
+        this.titleText = text;
+    }
+
+    public String getTitleText() {
+        return this.titleText;
+    }
+
+    public void setTitleVisibility(Visibility visibility) {
+        if (titleVisibility == Visibility.INVISIBLE && visibility == Visibility.VISIBLE) {
+//            Application.getView().openTitleEditor(getTitleText());
+            this.titleVisibility = visibility;
+        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.VISIBLE) {
+//            Application.getView().setTitleEditor(getTitleText());
+        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.INVISIBLE) {
+//            Application.getView().closeTitleEditor();
+            this.titleVisibility = visibility;
+        }
+    }
+
+    public Visibility getTitleVisibility() {
+        return this.titleVisibility;
+    }
+    // </TITLE>
 }

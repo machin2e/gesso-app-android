@@ -3,8 +3,8 @@ package camp.computer.clay.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import camp.computer.clay.model.Entity;
-import camp.computer.clay.model.Port;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Port;
 
 public abstract class Color {
 
@@ -22,7 +22,7 @@ public abstract class Color {
             android.graphics.Color.parseColor("#36D7B7"),
             android.graphics.Color.parseColor("#EC644B")
     };
-    private static HashMap<Entity, Integer> colorMap = new HashMap<Entity, Integer>();
+    private static HashMap<Entity, Integer> colorMap = new HashMap<>();
 
     public static int getUniqueColor(Entity entity) {
 
@@ -66,12 +66,12 @@ public abstract class Color {
     // Color palette generated with i want hue.
     // Reference: http://tools.medialab.sciences-po.fr/iwanthue/index.php
     public static String PORT_COLOR_OFF = "#ffefefef";
-    public static String PORT_COLOR_SWITCH = "#ffd35238";
-    public static String PORT_COLOR_PULSE = "#ff75b441";
-    public static String PORT_COLOR_WAVE = "#ff6573c8";
-    public static String PORT_COLOR_REFERENCE = "#ffd1a33c";
-    public static String PORT_COLOR_CMOS = "#ffd35238";
-    public static String PORT_COLOR_TTL = "#ffc65d6b";
+    public static String PORT_COLOR_SWITCH = "#ff4CA73D"; // Greens: #6aa84f
+    public static String PORT_COLOR_PULSE = "#ffF9E805"; // Yellows: #ff9900, #E5C700
+    public static String PORT_COLOR_WAVE = "#ff0070FF"; // Blues: #3c78d8
+    public static String PORT_COLOR_REFERENCE = "#ff883C00"; // Blacks: #0D1410, Browns: #883C00, #783f04
+    public static String PORT_COLOR_CMOS = "#ffFF4300"; // Reds: #cc0000, #E41900
+    public static String PORT_COLOR_TTL = "#ffFF1493";
 
     public static String getColor(Port.Type portType) {
         if (portType == Port.Type.NONE) {

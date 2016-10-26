@@ -4,24 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.model.Port;
-import camp.computer.clay.model.Portable;
+import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Port;
 
-public class PortableProfile {
+public class Profile {
     private UUID uuid = null;
 
     private String label = "";
 
     private List<PortProfile> portProfiles = new ArrayList<>();
 
-    // TODO: Add geometry points or UUID to Image
+    // TODO: Add geometry endpoints or UUID to Image
 
-    public PortableProfile() {
+    public Profile() {
     }
 
-    public PortableProfile(Portable portable) {
-        for (int i = 0; i < portable.getPorts().size(); i++) {
-            Port port = portable.getPorts().get(i);
+    public Profile(Entity portableEntity) {
+        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPorts().size(); i++) {
+            Port port = portableEntity.getComponent(Portable.class).getPorts().get(i);
             PortProfile portProfile = new PortProfile(port);
             addPort(portProfile);
         }
