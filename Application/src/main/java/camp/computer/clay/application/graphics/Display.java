@@ -26,6 +26,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.UpdateSystem;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
@@ -295,6 +296,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return cameraEntity;
     }
 
+    UpdateSystem updateSystem = new UpdateSystem();
+
     /**
      * The function run in background thread, not UI thread.
      */
@@ -316,16 +319,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
 
                     // <UPDATE>
-
-                    // Update Actors
-                    space.getActor().update(); // HACK
-
-                    // Update
-                    updateEntities();
-
-                    // Update CameraEntity(s)
-                    Entity cameraEntity = getCamera();
-                    cameraEntity.update();
+                    updateSystem.update(space);
                     // </UPDATE>
 
 
@@ -455,18 +449,18 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    // TODO: Remove reference to Image. WTF.
-    public void updateEntities() {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            Entity entity = Entity.Manager.get(i);
-//            Image image = entity.getComponent(Image.class);
-//            if (image != null) {
-////                image.draw(this);
-//                image.update();
-//            }
-            entity.update();
-        }
-    }
+//    // TODO: Remove reference to Image. WTF.
+//    public void updateEntities() {
+//        for (int i = 0; i < Entity.Manager.size(); i++) {
+//            Entity entity = Entity.Manager.get(i);
+////            Image image = entity.getComponent(Image.class);
+////            if (image != null) {
+//////                image.draw(this);
+////                image.update();
+////            }
+//            entity.update();
+//        }
+//    }
 
     public void drawEntities() {
         for (int i = 0; i < Entity.Manager.size(); i++) {

@@ -85,21 +85,6 @@ public final class Entity extends Groupable {
     }
 
 
-    public void update() {
-
-        // <HACK>
-        if (hasComponent(Extension.class)) {
-            getComponent(Extension.class).update();
-        } else if (hasComponent(Host.class)) {
-            getComponent(Host.class).update();
-        } else if (hasComponent(Camera.class)) {
-            getComponent(Camera.class).update();
-        }
-        // </HACK>
-
-    }
-
-
     // <TAG_COMPONENT>
     protected String label = "";
 
