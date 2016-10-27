@@ -6,6 +6,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -221,18 +222,18 @@ public class Camera extends Entity {
     /**
      * Adjusts the focus for the prototype {@code Path} being created.
      *
-     * @param sourcePort
+     * @param sourcePortEntity
      * @param targetPosition
      */
-    public void setFocus(Port sourcePort, Transform targetPosition) {
+    public void setFocus(Entity sourcePortEntity, Transform targetPosition) {
 
-        Log.v("SetFocus", "setFocus(sourcePort, targetPosition)");
+        Log.v("SetFocus", "setFocus(sourcePortEntity, targetPosition)");
 
 //        // Check if a HostEntity Image is nearby
 //        Image nearestHostImage = getSpace().getImages().filterType2(HostEntity.class).getNearestImage(targetPosition);
 //        if (nearestHostImage != null) {
 //
-//            PortableEntity sourcePortable = sourcePort.getPortable();
+//            PortableEntity sourcePortable = sourcePortEntity.getPortable();
 //            PortableImage sourcePortableImage = (PortableImage) sourcePortable.getImage();
 //
 //            double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
@@ -267,30 +268,30 @@ public class Camera extends Entity {
             otherPortables.remove(entity);
             otherPortables.setTransparency(0.1);
 
-            // Get ports along every Path connected to the Ports on the touched PhoneHost
-            Group<Port> basePathPorts = new Group<>();
-            Group<Port> hostPorts = entity.getComponent(Portable.class).getPorts();
-            for (int i = 0; i < hostPorts.size(); i++) {
-                Port port = hostPorts.get(i);
+            // Get portEntities along every Path connected to the Ports on the touched PhoneHost
+            Group<Entity> basePathPortEntities = new Group<>();
+            Group<Entity> hostPortEntities = entity.getComponent(Portable.class).getPortEntities();
+            for (int i = 0; i < hostPortEntities.size(); i++) {
+                Entity portEntity = hostPortEntities.get(i);
 
-                if (!basePathPorts.contains(port)) {
-                    basePathPorts.add(port);
+                if (!basePathPortEntities.contains(portEntity)) {
+                    basePathPortEntities.add(portEntity);
                 }
 
-                Group<Path> portPaths = port.getPaths();
+                Group<Path> portPaths = portEntity.getComponent(Port.class).getPaths();
                 for (int j = 0; j < portPaths.size(); j++) {
                     Path path = portPaths.get(j);
-                    if (!basePathPorts.contains(path.getSource())) {
-                        basePathPorts.add(path.getSource());
+                    if (!basePathPortEntities.contains(path.getSource())) {
+                        basePathPortEntities.add(path.getSource());
                     }
-                    if (!basePathPorts.contains(path.getTarget())) {
-                        basePathPorts.add(path.getTarget());
+                    if (!basePathPortEntities.contains(path.getTarget())) {
+                        basePathPortEntities.add(path.getTarget());
                     }
                 }
             }
             // </REFACTOR>
 
-            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPorts);
+            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPortEntities);
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
             // Update scale and position
@@ -310,24 +311,24 @@ public class Camera extends Entity {
             otherPortables.remove(entity);
             otherPortables.setTransparency(0.1);
 
-            // Get ports along every Path connected to the Ports on the selected HostEntity
-            Group<Port> hostPathPorts = new Group<>();
-            Group<Port> extensionPorts = entity.getComponent(Portable.class).getPorts();
-            for (int i = 0; i < extensionPorts.size(); i++) {
-                Port port = extensionPorts.get(i);
+            // Get portEntities along every Path connected to the Ports on the selected HostEntity
+            Group<Entity> hostPathPortEntities = new Group<>();
+            Group<Entity> extensionPortEntities = entity.getComponent(Portable.class).getPortEntities();
+            for (int i = 0; i < extensionPortEntities.size(); i++) {
+                Entity portEntity = extensionPortEntities.get(i);
 
-                if (!hostPathPorts.contains(port)) {
-                    hostPathPorts.add(port);
+                if (!hostPathPortEntities.contains(portEntity)) {
+                    hostPathPortEntities.add(portEntity);
                 }
 
-                Group<Path> portPaths = port.getPaths();
+                Group<Path> portPaths = portEntity.getComponent(Port.class).getPaths();
                 for (int j = 0; j < portPaths.size(); j++) {
                     Path path = portPaths.get(j);
-                    if (!hostPathPorts.contains(path.getSource())) {
-                        hostPathPorts.add(path.getSource());
+                    if (!hostPathPortEntities.contains(path.getSource())) {
+                        hostPathPortEntities.add(path.getSource());
                     }
-                    if (!hostPathPorts.contains(path.getTarget())) {
-                        hostPathPorts.add(path.getTarget());
+                    if (!hostPathPortEntities.contains(path.getTarget())) {
+                        hostPathPortEntities.add(path.getTarget());
                     }
                 }
             }
@@ -337,7 +338,7 @@ public class Camera extends Entity {
             Entity hostEntity = entity.getComponent(Portable.class).getHosts().get(0);
             hostEntity.getComponent(Host.class).setExtensionDistance(500);
 
-            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPorts);
+            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPortEntities);
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
             // Update scale and position
@@ -357,7 +358,7 @@ public class Camera extends Entity {
 //        Log.v("SetFocus", "setFocus(PathGroup)");
 //
 //        // Get bounding box around the Ports in the specified Paths
-//        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
+//        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPortEntities());
 //        List<Transform> portPositions = pathPortShapes.getPositions();
 //        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
 //

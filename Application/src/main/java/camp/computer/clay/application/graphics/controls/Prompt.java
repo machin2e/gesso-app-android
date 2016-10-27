@@ -146,7 +146,7 @@ public class Prompt {
                 // Add Ports based on Profile
                 onActionListener.onComplete(selection);
 //                while (selection.getPortCount() < position + 1) {
-//                    selection.addPort(new Port());
+//                    selection.addPort(new PortEntity());
 //                }
 
                 // Response

@@ -8,6 +8,7 @@ import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
@@ -117,6 +118,7 @@ public class Entity extends Groupable {
     protected Portable portable = null;
     protected Extension extension = null;
     protected Host host = null;
+    protected Port port = null; // Only used by Ports (DUH)
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -134,6 +136,8 @@ public class Entity extends Groupable {
             this.extension = (Extension) component;
         } else if (component instanceof Host) {
             this.host = (Host) component;
+        } else if (component instanceof Port) {
+            this.port = (Port) component;
         }
     }
 
@@ -154,6 +158,8 @@ public class Entity extends Groupable {
             return type.cast(this.extension);
         } else if (type == Host.class) {
             return type.cast(this.host);
+        } else if (type == Port.class) {
+            return type.cast(this.port);
         } else {
             return null;
         }

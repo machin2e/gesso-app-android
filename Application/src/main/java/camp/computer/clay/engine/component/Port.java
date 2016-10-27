@@ -1,11 +1,10 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.Path;
 
-public class Port extends Entity {
-
-//    public static Group<Port> Manager = new Group<>();
+public class Port extends Component {
 
     public enum Direction {
         NONE("none"),
@@ -53,27 +52,20 @@ public class Port extends Entity {
         }
     }
 
-    public Port() {
-        // Add to Manager
-        if (!Manager.contains(this)) {
-            Manager.add(this);
-        }
-    }
-
-    @Override
-    public void update() {
+    public Port(Entity entity) {
+        super(entity);
     }
 
     /**
-     * The {@code index} is a unique number that uniquely identifies the {@code Port}. Concretely,
+     * The {@code index} is a unique number that uniquely identifies the {@code PortEntity}. Concretely,
      * the {@code index} identifier is equal to the pin number defined for a particular I/O pin on
      * the physical device (if any).
      * <p>
      * The {@code index} is assumed to be zero-indexed, so the corresponding I/O pin number may be
      * offset by a value of one. (Note that this may changed to be one-indexed.)
      * <p>
-     * The {@code Port}'s {@code index} can be used complementary to the {@code Port}'s
-     * {@code label} to refer to a specific {@code Port}.
+     * The {@code PortEntity}'s {@code index} can be used complementary to the {@code PortEntity}'s
+     * {@code label} to refer to a specific {@code PortEntity}.
      */
     protected int index = 0;
 
@@ -81,9 +73,11 @@ public class Port extends Entity {
 
     protected Direction direction = Direction.NONE;
 
+    // <DELETE>
     public Entity getPortable() {
-        return getParent();
+        return getEntity();
     }
+    // </DELETE>
 
     public int getIndex() {
         return this.index;
@@ -115,7 +109,7 @@ public class Port extends Entity {
         Group<Path> pathGroup = Entity.Manager.filterType2(Path.class);
         for (int i = 0; i < pathGroup.size(); i++) {
             Path path = pathGroup.get(i);
-            if (path.contains(this)) {
+            if (path.contains(getEntity())) {
                 return true;
             }
         }
@@ -140,7 +134,7 @@ public class Port extends Entity {
         Group<Path> paths = new Group<>();
         for (int i = 0; i < pathGroup.size(); i++) {
             Path path = pathGroup.get(i);
-            if (path.contains(this)) {
+            if (path.contains(getEntity())) {
                 paths.add(path);
             }
         }
@@ -152,11 +146,13 @@ public class Port extends Entity {
         Group<Path> paths = getPaths();
         for (int i = 0; i < paths.size(); i++) {
             Path path = paths.get(i);
-            if (path.getSource() == this || path.getTarget() == this) {
-                if (path.getSource().getPortable().hasComponent(Extension.class)) {
-                    return path.getSource().getPortable();
-                } else if (path.getTarget().getPortable().hasComponent(Extension.class)) {
-                    return path.getTarget().getPortable();
+            if (path.getSource() == getEntity() || path.getTarget() == getEntity()) {
+                //if (path.getSource().getPortable().hasComponent(Extension.class)) {
+                // WRONG: if (path.getSource().getComponent(Port.class).getPortable().hasComponent(Extension.class)) {
+                if (path.getSource().getParent().hasComponent(Extension.class)) {
+                    return path.getSource().getParent(); //return path.getSource().getComponent(Port.class).getPortable();
+                } else if (path.getTarget().getParent().hasComponent(Extension.class)) {
+                    return path.getTarget().getParent();
                 }
             }
         }

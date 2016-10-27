@@ -913,7 +913,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private void addPathExtensionAction() {
 
         final TextView actionConstruct = new TextView(getContext());
-        actionConstruct.setText("Event (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
+        actionConstruct.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
         int horizontalPadding = (int) convertDipToPx(20);
         int verticalPadding = (int) convertDipToPx(10);
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);

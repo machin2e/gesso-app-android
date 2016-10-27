@@ -8,39 +8,40 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Point;
+import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Portable extends Component {
 
-    protected Group<Port> ports = new Group<>();
+    protected Group<Entity> portEntities = new Group<>();
 
     public Portable(Entity entity) {
         super(entity);
     }
 
-    public Group<Port> getPorts() {
-        return this.ports;
+    public Group<Entity> getPortEntities() {
+        return this.portEntities;
     }
 
-    public void addPort(Port port) {
-        if (!this.ports.contains(port)) {
-            this.ports.add(port);
-            port.setParent(getEntity());
+    //public void addPort(PortEntity portEntity) {
+    public void addPort(Entity portEntity) {
+        if (!this.portEntities.contains(portEntity)) {
+            this.portEntities.add(portEntity);
+            portEntity.setParent(getEntity());
         }
     }
 
-    public Port getPort(int index) {
-        return this.ports.get(index);
+    public Entity getPort(int index) {
+        return this.portEntities.get(index);
     }
 
-    public Port getPort(String label) {
-        for (int i = 0; i < ports.size(); i++) {
-            if (ports.get(i).getLabel().equals(label)) {
-                return ports.get(i);
+    public Entity getPort(String label) {
+        for (int i = 0; i < portEntities.size(); i++) {
+            if (portEntities.get(i).getLabel().equals(label)) {
+                return portEntities.get(i);
             }
         }
         return null;
@@ -49,10 +50,10 @@ public class Portable extends Component {
 
     public Group<Entity> getExtensions() {
         Group<Entity> extensionEntities = new Group<>();
-        for (int i = 0; i < getPorts().size(); i++) {
-            Port port = getPorts().get(i);
+        for (int i = 0; i < getPortEntities().size(); i++) {
+            Entity portEntity = getPortEntities().get(i);
 
-            Entity extensionEntity = port.getExtension();
+            Entity extensionEntity = portEntity.getComponent(Port.class).getExtension();
 
             if (extensionEntity != null && !extensionEntities.contains(extensionEntity)) {
                 extensionEntities.add(extensionEntity);
@@ -97,16 +98,16 @@ public class Portable extends Component {
 
     // <PORTABLE_IMAGE_HELPERS>
 
-    public ShapeGroup getPortShapes() {
-        Group<Port> ports = getEntity().getComponent(Portable.class).getPorts();
-        return getEntity().getComponent(Image.class).getShapes(ports);
+    public Group<Shape> getPortShapes() {
+        Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPortEntities();
+        return getEntity().getComponent(Image.class).getShapes(portEntities);
     }
 
     // <REFACTOR>
 
-    // TODO: Move into Port? something (inner class? custom PortShape?)
+    // TODO: Move into PortEntity? something (inner class? custom PortShape?)
     public boolean hasVisiblePaths(int portIndex) {
-        Group<Image> pathImages = getEntity().getComponent(Portable.class).getPort(portIndex).getPaths().getImages();
+        Group<Image> pathImages = getEntity().getComponent(Portable.class).getPort(portIndex).getComponent(Port.class).getPaths().getImages();
         for (int i = 0; i < pathImages.size(); i++) {
             Image pathImage = pathImages.get(i);
             if (pathImage.isVisible()) {
@@ -116,11 +117,11 @@ public class Portable extends Component {
         return false;
     }
 
-    // TODO: Move into Port? something (inner class? custom PortShape?)
-    public Group<Image> getPathImages(Port port) {
+    // TODO: Move into PortEntity? something (inner class? custom PortShape?)
+    public Group<Image> getPathImages(Entity portEntity) {
         Group<Image> pathImages = new Group<>();
-        for (int i = 0; i < port.getPaths().size(); i++) {
-            Path path = port.getPaths().get(i);
+        for (int i = 0; i < portEntity.getComponent(Port.class).getPaths().size(); i++) {
+            Path path = portEntity.getComponent(Port.class).getPaths().get(i);
             Image pathImage = path.getComponent(Image.class);
             pathImages.add(pathImage);
         }
@@ -130,18 +131,18 @@ public class Portable extends Component {
     // <VISIBILITY_COMPONENT>
     // TODO: Move into PathImage
     public void setPathVisibility(Visibility visibility) {
-        Group<Port> ports = getEntity().getComponent(Portable.class).getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Port port = ports.get(i);
+        Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPortEntities();
+        for (int i = 0; i < portEntities.size(); i++) {
+            Entity portEntity = portEntities.get(i);
 
-            setPathVisibility(port, visibility);
+            setPathVisibility(portEntity, visibility);
         }
     }
 
     // TODO: Move into PathImage
     // TODO: Replace with ImageGroup.filter().setImageVisibility()
-    public void setPathVisibility(Port port, Visibility visibility) {
-        Group<Image> pathImages = getPathImages(port);
+    public void setPathVisibility(Entity portEntity, Visibility visibility) {
+        Group<Image> pathImages = getPathImages(portEntity);
         for (int i = 0; i < pathImages.size(); i++) {
             Image pathImage = pathImages.get(i);
 
@@ -156,11 +157,11 @@ public class Portable extends Component {
 
             // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
             Path path = (Path) pathImage.getEntity();
-            Port targetPort = path.getTarget();
-            Entity targetPortableEntity = targetPort.getParent();
+            Entity targetPortEntity = path.getTarget();
+            Entity targetPortableEntity = targetPortEntity.getParent();
             Image targetPortableImage = targetPortableEntity.getComponent(Image.class);
             if (targetPortableImage != getEntity().getComponent(Image.class)) { // HACK //if (targetPortableImage != this) { // HACK
-                targetPortableEntity.getComponent(Portable.class).setPathVisibility(targetPort, visibility);
+                targetPortableEntity.getComponent(Portable.class).setPathVisibility(targetPortEntity, visibility);
             }
         }
     }

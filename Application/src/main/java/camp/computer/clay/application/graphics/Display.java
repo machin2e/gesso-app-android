@@ -21,11 +21,11 @@ import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
@@ -207,7 +207,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int entityCount = Entity.Manager.size();
 //        int hostCount = Entity.Manager.filterType2(HostEntity.class).size();
         int hostCount = Entity.Manager.filterWithComponent(Host.class).size();
-        int portCount = Entity.Manager.filterType2(Port.class).size();
+        int portCount = Entity.Manager.filterWithComponent(Port.class).size(); // int portCount = Entity.Manager.filterType2(PortEntity.class).size();
 //        int extensionCount = Entity.Manager.filterType2(ExtensionEntity.class).size();
         int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
         int pathCount = Entity.Manager.filterType2(Path.class).size();
@@ -581,25 +581,27 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     public void drawPhysicalPath(Path path, Display display) {
 
         // Get HostEntity and ExtensionEntity Ports
-        Port hostPort = path.getSource();
-        Port extensionPort = path.getTarget();
+        Entity hostPortEntity = path.getSource();
+        Entity extensionPortEntity = path.getTarget();
 
-        // Draw the connection to the HostEntity's Port
+        // Draw the connection to the HostEntity's PortEntity
 
-        Image hostImage = hostPort.getPortable().getComponent(Image.class);
-        Image extensionImage = extensionPort.getPortable().getComponent(Image.class);
+//        Image hostImage = hostPortEntity.getComponent(Port.class).getPortable().getComponent(Image.class);
+        Image hostImage = hostPortEntity.getParent().getComponent(Image.class);
+//        Image extensionImage = extensionPortEntity.getComponent(Port.class).getPortable().getComponent(Image.class);
+        Image extensionImage = extensionPortEntity.getParent().getComponent(Image.class);
 
         Entity host = hostImage.getEntity();
         Entity extension = extensionImage.getEntity();
 
-        if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getIndex()
-                && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPort.getIndex()) {
+        if (host.getComponent(Portable.class).headerContactPositions.size() > hostPortEntity.getComponent(Port.class).getIndex()
+                && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPortEntity.getComponent(Port.class).getIndex()) {
 
-            Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPort.getIndex()).getPosition();
-            Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPort.getIndex()).getPosition();
+            Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPortEntity.getComponent(Port.class).getIndex()).getPosition();
+            Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortEntity.getComponent(Port.class).getIndex()).getPosition();
 
             // Draw connection between Ports
-            display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
+            display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType())));
             display.paint.setStrokeWidth(10.0f);
 //            display.drawSegment(hostConnectorPosition, extensionConnectorPosition);
 
@@ -611,7 +613,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
             Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
             segment.setOutlineThickness(10.0);
-            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getType()));
+            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType()));
 
             segment.setSource(hostConnectorPosition);
             segment.setTarget(extensionConnectorPosition);

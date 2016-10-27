@@ -1,7 +1,7 @@
 package camp.computer.clay.engine.component;
 
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Circle;
@@ -10,7 +10,6 @@ import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Extension extends Component {
 
@@ -50,36 +49,36 @@ public class Extension extends Component {
         updatePortGeometry();
         updateHeaderGeometry();
 
-        // TODO: Clean up/delete images/shapes for any removed ports...
+        // TODO: Clean up/delete images/shapes for any removed portEntities...
     }
 
     /**
-     * Add or remove {@code Shape}'s for each of the {@code ExtensionEntity}'s {@code Port}s.
+     * Add or remove {@code Shape}'s for each of the {@code ExtensionEntity}'s {@code PortEntity}s.
      */
     private void updatePortGeometry() {
 
         Image image = getEntity().getComponent(Image.class);
 
-        // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
-        ShapeGroup portShapes = image.getShapes(Port.class);
+        // Remove PortEntity shapes from the Image that do not have a corresponding PortEntity in the Entity
+        Group<Shape> portShapes = image.getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);
-            if (!getEntity().getComponent(Portable.class).getPorts().contains(portShape.getEntity())) {
+            if (!getEntity().getComponent(Portable.class).getPortEntities().contains(portShape.getEntity())) {
                 portShapes.remove(portShape);
                 image.invalidate();
             }
         }
 
-        // Create Port shapes for each of ExtensionEntity's Ports if they don't already exist
-        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
+        // Create PortEntity shapes for each of ExtensionEntity's Ports if they don't already exist
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPortEntities().size(); i++) {
+            Entity portEntity = getEntity().getComponent(Portable.class).getPortEntities().get(i);
 
-            if (image.getShape(port) == null) {
+            if (image.getShape(portEntity) == null) {
 
                 // Ports
-                Circle<Port> circle = new Circle<>(port);
+                Circle<Entity> circle = new Circle<>(portEntity);
                 circle.setRadius(40);
-                circle.setLabel("Port " + (getEntity().getComponent(Portable.class).getPorts().size() + 1));
+                circle.setLabel("PortEntity " + (getEntity().getComponent(Portable.class).getPortEntities().size() + 1));
                 circle.setPosition(-90, 175);
                 // circle.setRotation(0);
 
@@ -94,14 +93,14 @@ public class Extension extends Component {
             }
         }
 
-        // Update Port positions based on the index of ports
-        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
-            Circle portShape = (Circle) image.getShape(port);
+        // Update PortEntity positions based on the index of portEntities
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPortEntities().size(); i++) {
+            Entity portEntity = getEntity().getComponent(Portable.class).getPortEntities().get(i);
+            Circle portShape = (Circle) image.getShape(portEntity);
 
             if (portShape != null) {
                 double portSpacing = 100;
-                portShape.getImagePosition().x = (i * portSpacing) - (((getEntity().getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+                portShape.getImagePosition().x = (i * portSpacing) - (((getEntity().getComponent(Portable.class).getPortEntities().size() - 1) * portSpacing) / 2.0);
                 // TODO: Also update y coordinate
             }
         }
@@ -113,7 +112,7 @@ public class Extension extends Component {
         // References:
         // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
 
-        final int contactCount = getEntity().getComponent(Portable.class).getPorts().size();
+        final int contactCount = getEntity().getComponent(Portable.class).getPortEntities().size();
         final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
         final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
 
@@ -133,7 +132,7 @@ public class Extension extends Component {
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
-        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPortEntities().size(); i++) {
             double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < getEntity().getComponent(Portable.class).headerContactPositions.size()) {
                 getEntity().getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
@@ -150,14 +149,14 @@ public class Extension extends Component {
     }
 
     private void updatePortStyle() {
-        // Update Port style
-        for (int i = 0; i < getEntity().getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = getEntity().getComponent(Portable.class).getPorts().get(i);
-            Shape portShape = getEntity().getComponent(Image.class).getShape(port);
+        // Update PortEntity style
+        for (int i = 0; i < getEntity().getComponent(Portable.class).getPortEntities().size(); i++) {
+            Entity portEntity = getEntity().getComponent(Portable.class).getPortEntities().get(i);
+            Shape portShape = getEntity().getComponent(Image.class).getShape(portEntity);
 
-            // Update color of Port shape based on type
+            // Update color of PortEntity shape based on type
             if (portShape != null) {
-                portShape.setColor(Color.getColor(port.getType()));
+                portShape.setColor(Color.getColor(portEntity.getComponent(Port.class).getType()));
             }
         }
     }
@@ -199,11 +198,14 @@ public class Extension extends Component {
 
         // Create Ports to match the Profile
         for (int i = 0; i < profile.getPorts().size(); i++) {
-            Port port = new Port();
-            port.setIndex(i);
-            port.setType(profile.getPorts().get(i).getType());
-            port.setDirection(profile.getPorts().get(i).getDirection());
-            getEntity().getComponent(Portable.class).addPort(port);
+            Entity portEntity = new Entity();
+
+            portEntity.setComponent(new Port(portEntity));
+
+            portEntity.getComponent(Port.class).setIndex(i);
+            portEntity.getComponent(Port.class).setType(profile.getPorts().get(i).getType());
+            portEntity.getComponent(Port.class).setDirection(profile.getPorts().get(i).getDirection());
+            getEntity().getComponent(Portable.class).addPort(portEntity);
         }
     }
 

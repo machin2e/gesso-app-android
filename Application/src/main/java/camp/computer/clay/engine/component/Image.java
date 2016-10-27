@@ -17,7 +17,8 @@ import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Image extends Component {
 
-    protected List<Shape> shapes = new LinkedList<>();
+//    protected List<Shape> shapes = new LinkedList<>();
+    protected Group<Shape> shapes = new Group<>();
 
     protected Visibility visibility = Visibility.VISIBLE;
 
@@ -136,18 +137,64 @@ public class Image extends Component {
         return null;
     }
 
-    public ShapeGroup getShapes() {
-        ShapeGroup shapeGroup = new ShapeGroup();
+    public Group<Shape> getShapes() {
+        // TODO: Don't create a new Group. Will that work?
+        Group<Shape> shapeGroup = new Group<>();
         shapeGroup.addAll(this.shapes);
         return shapeGroup;
     }
 
-    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
-        return getShapes().filterType(entityTypes);
+//    public <T extends Entity> Group<Shape> getShapes(Class<? extends Entity>... entityTypes) {
+//        Group<Shape> shapeGroup = new Group<>();
+//        for (int i = 0; i < this.shapes.size(); i++) {
+//            for (int j = 0; j < entityTypes.length; j++) {
+//                if (this.shapes.get(i).getEntity() != null && this.shapes.get(i).getEntity().getClass() == entityTypes[j]) {
+//                    shapeGroup.add(this.shapes.get(i));
+//                }
+//            }
+//        }
+//        return shapeGroup;
+//    }
+
+    // Gets Shapes in the Image associated with Entities with the specified Component (confusing... refactor that shit)
+    public <T extends Entity> Group<Shape> getShapes(Class<? extends Component>... componentTypes) {
+        Group<Shape> shapeGroup = new Group<>();
+        for (int i = 0; i < this.shapes.size(); i++) {
+            for (int j = 0; j < componentTypes.length; j++) {
+                if (this.shapes.get(i).getEntity() != null
+                        && this.shapes.get(i).getEntity().hasComponent(componentTypes[j])) {
+                    shapeGroup.add(this.shapes.get(i));
+                }
+            }
+        }
+        return shapeGroup;
     }
 
-    public <T extends Entity> ShapeGroup getShapes(Group<T> entities) {
-        return getShapes().filterEntity(entities);
+//    public <T extends Entity> ShapeGroup getShapes(Group<T> entities) {
+//        return getShapes().filterEntity(entities);
+//    }
+
+    // Returns all Shapes in the Image with an Entity in {@code entities}.
+    public <T extends Entity> Group<Shape> getShapes(Group<T> entities) {
+
+        // TODO: get shapes in this image, then filter out all shapes except those with the specified entities... do it with Group<Shape> (already hae it!)
+        // TODO: - should be easy to do since already have a list of shapes.
+        // TODO: - ...with this shape list, just remove all except those that don't have getEntity() equal to one of the specified entities
+
+        // TODO: [ ] Start by just creating a new Group<Shape> adding elements of this.shapes that have a specified Entity
+        Group<Shape> shapeGroup = new Group<>();
+        for (int i = 0; i < this.shapes.size(); i++) {
+            for (int j = 0; j < entities.size(); j++) {
+                if (this.shapes.get(i).getEntity() == entities.get(j)) {
+                    shapeGroup.add(this.shapes.get(i));
+                }
+            }
+        }
+        return shapeGroup;
+
+        // TODO: [ ] Then make a Group.filter to do it!
+
+        // TODO: - Finally, take a pass through your codebase to clean it up, including redundant calls to Entity.getComponent(...)
     }
 
     /**

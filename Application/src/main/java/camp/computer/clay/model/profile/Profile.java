@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Port;
 
 public class Profile {
     private UUID uuid = null;
@@ -21,9 +20,9 @@ public class Profile {
     }
 
     public Profile(Entity portableEntity) {
-        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPorts().size(); i++) {
-            Port port = portableEntity.getComponent(Portable.class).getPorts().get(i);
-            PortProfile portProfile = new PortProfile(port);
+        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPortEntities().size(); i++) {
+            Entity portEntity = portableEntity.getComponent(Portable.class).getPortEntities().get(i);
+            PortProfile portProfile = new PortProfile(portEntity);
             addPort(portProfile);
         }
     }

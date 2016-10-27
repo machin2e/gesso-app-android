@@ -360,7 +360,7 @@ public class Space extends Image {
 
 
     public void hideAllPorts() {
-        // TODO: getEntities().filterType2(Port.class).getShapes().setVisibility(Visibility.INVISIBLE);
+        // TODO: getEntities().filterType2(PortEntity.class).getShapes().setVisibility(Visibility.INVISIBLE);
 
 //        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages();
 //        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class).getImages();

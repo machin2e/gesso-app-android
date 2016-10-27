@@ -166,7 +166,7 @@
                 android:paddingTop="12dp"
                 android:text="Browse Actions for Ext/Port Config" />
 
-            <!-- Automatically insert this based on the types of ports/protocols/segmentExtensions. Then either (1) setAbsolute any needed values manually or (2) select source from another port or from an action process/pipeline. -->
+            <!-- Automatically insert this based on the types of portEntities/protocols/segmentExtensions. Then either (1) setAbsolute any needed values manually or (2) select source from another portEntity or from an action process/pipeline. -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

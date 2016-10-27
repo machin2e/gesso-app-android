@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.entity.Entity;
@@ -48,6 +50,16 @@ public class Group<E extends Groupable> implements List<E> {
         E element = get(uuid);
         remove(element);
         return element;
+    }
+
+    public Group<E> remove(E entity) {
+        Group<E> group = new Group<>();
+        for (int i = 0; i < this.elements.size(); i++) {
+            if (this.elements.get(i) != entity) {
+                group.add(this.elements.get(i));
+            }
+        }
+        return group;
     }
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
@@ -256,6 +268,7 @@ public class Group<E extends Groupable> implements List<E> {
         map(Mappers.setVisibilityGeneric, visibility);
     }
 
+    // Assumes Group<Entity>
     public Group<Image> getImages() {
         return map(Mappers.getImage, null);
     }
@@ -268,6 +281,37 @@ public class Group<E extends Groupable> implements List<E> {
             // Assumes Group<Entity>
             return map(Mappers.getPosition, null);
         }
+    }
+
+    /**
+     * Removes elements <em>that do not match</em> the regular expressions defined in
+     * {@code labels}.
+     *
+     * @param labels The list of {@code Shape} objects matching the regular expressions list.
+     * @return A list of {@code Shape} objects.
+     */
+    public Group<Shape> filterLabel(String... labels) {
+
+        // HACK: Assumes Group<Shape>
+
+        Group<Shape> shapeGroup = new Group<>();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+            for (int j = 0; j < labels.length; j++) {
+
+                Pattern pattern = Pattern.compile(labels[j]);
+                Shape shape = (Shape) this.elements.get(i); // HACK: Forcing typecast to Shape. TODO: Make this safe...
+                Matcher matcher = pattern.matcher(shape.getLabel());
+
+                boolean isMatch = matcher.matches();
+
+                if (isMatch) {
+                    shapeGroup.add((Shape) this.elements.get(i)); // HACK: Forced type to be Shape
+                }
+            }
+        }
+
+        return shapeGroup;
     }
 
     /**
