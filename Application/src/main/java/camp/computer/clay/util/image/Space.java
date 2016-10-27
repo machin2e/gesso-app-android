@@ -21,7 +21,6 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 // TODO: DO NOT extend Image. Try to remove Space class. If cannot, then consider making it an
 // TODO: (...) Entity and adding a ActionListenerComponent.
@@ -206,9 +205,9 @@ public class Space extends Image {
     // </HACK>
 
     // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
-    public ShapeGroup getShapes() {
+    public Group<Shape> getShapes() {
 //        return getImages().getShapes();
-        ShapeGroup shapes = new ShapeGroup();
+        Group<Shape> shapes = new Group<>();
         Group<Image> images = Entity.Manager.getImages();
         for (int i = 0; i < images.size(); i++) {
             shapes.addAll(images.get(i).getShapes());

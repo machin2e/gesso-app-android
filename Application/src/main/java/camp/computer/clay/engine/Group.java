@@ -22,7 +22,6 @@ import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Group<E extends Groupable> implements List<E> {
 
@@ -238,6 +237,7 @@ public class Group<E extends Groupable> implements List<E> {
 //            }
 //        };
 
+        // Assumes Group<Entity>
         public static Mapper getImage = new Mapper<Entity, Image, Void>() {
             @Override
             public Image map(Entity entity, Void data) {
@@ -273,14 +273,25 @@ public class Group<E extends Groupable> implements List<E> {
         return map(Mappers.getImage, null);
     }
 
+    // Assumes Group<Image>
+    public Group<Shape> getShapes() {
+        Group<Shape> shapes = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            Image image = (Image) elements.get(i);
+            shapes.addAll(image.getShapes());
+        }
+        return shapes;
+    }
+
+    // TODO: Update to handle Shape
     public Group<Transform> getPositions() {
         Log.v("Reflect", "E: " + this.getClass());
-        if (this.getClass() == ShapeGroup.class) { // HACK
-            return map(Mappers.getShapePosition, null);
-        } else {
+//        if (this.getClass() == ShapeGroup.class) { // HACK
+//            return map(Mappers.getShapePosition, null);
+//        } else {
             // Assumes Group<Entity>
             return map(Mappers.getPosition, null);
-        }
+//        }
     }
 
     /**
@@ -417,6 +428,16 @@ public class Group<E extends Groupable> implements List<E> {
 //    public Transform getCentroidPosition() {
 //        return Geometry.getCentroidPoint(getPositions());
 //    }
+
+    // HACK: Assumes Group<Shape>
+    public Group<Transform> getVertices() {
+        Group<Transform> positions = new Group<>();
+        for (int i = 0; i < elements.size(); i++) {
+            Shape shape = (Shape) elements.get(i);
+            positions.addAll(shape.getBoundary());
+        }
+        return positions;
+    }
 
     // HACK: Expects Group<Image>
     public Rectangle getBoundingBox() {

@@ -7,8 +7,8 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Clock;
 
 public class Camera extends Component {
@@ -289,12 +289,13 @@ public class Camera extends Component {
             }
             // </REFACTOR>
 
-            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(basePathPortEntities);
+            Group<Shape> hostPathPortShapes = basePathPortEntities.getImages().getShapes();
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
             // Update scale and position
             adjustScale(boundingBox);
-            setPosition(boundingBox.getPosition());
+//            setPosition(boundingBox.getPosition());
+            setPosition(entity.getComponent(Transform.class));
 
         } else if (entity.hasComponent(Extension.class)) {
 
@@ -336,8 +337,11 @@ public class Camera extends Component {
             Entity hostEntity = entity.getComponent(Portable.class).getHosts().get(0);
             hostEntity.getComponent(Host.class).setExtensionDistance(500);
 
-            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPortEntities);
-            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
+//            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPortEntities);
+//            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
+
+            Group<Shape> hostPathPortShapes = hostPathPortEntities.getImages().getShapes();
+            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
             // Update scale and position
             adjustScale(boundingBox);

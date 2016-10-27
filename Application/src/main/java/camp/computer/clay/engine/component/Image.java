@@ -13,7 +13,6 @@ import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Image extends Component {
 
@@ -204,9 +203,9 @@ public class Image extends Component {
      * @param labelPatterns The list of {@code Shape} objects matching the regular expressions list.
      * @return A list of {@code Shape} objects.
      */
-    public ShapeGroup getShapes(String... labelPatterns) {
+    public Group getShapes(String... labelPatterns) {
 
-        ShapeGroup shapeGroup = new ShapeGroup();
+        Group<Shape> shapeGroup = new Group<>();
 
         for (int i = 0; i < this.shapes.size(); i++) {
             for (int j = 0; j < labelPatterns.length; j++) {
