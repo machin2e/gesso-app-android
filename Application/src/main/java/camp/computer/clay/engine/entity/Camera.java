@@ -6,6 +6,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.util.geometry.Geometry;
@@ -220,7 +221,7 @@ public class Camera extends Entity {
     }
 
     /**
-     * Adjusts the focus for the prototype {@code Path} being created.
+     * Adjusts the focus for the prototype {@code PathEntity} being created.
      *
      * @param sourcePortEntity
      * @param targetPosition
@@ -268,7 +269,7 @@ public class Camera extends Entity {
             otherPortables.remove(entity);
             otherPortables.setTransparency(0.1);
 
-            // Get portEntities along every Path connected to the Ports on the touched PhoneHost
+            // Get portEntities along every PathEntity connected to the Ports on the touched PhoneHost
             Group<Entity> basePathPortEntities = new Group<>();
             Group<Entity> hostPortEntities = entity.getComponent(Portable.class).getPortEntities();
             for (int i = 0; i < hostPortEntities.size(); i++) {
@@ -278,14 +279,14 @@ public class Camera extends Entity {
                     basePathPortEntities.add(portEntity);
                 }
 
-                Group<Path> portPaths = portEntity.getComponent(Port.class).getPaths();
-                for (int j = 0; j < portPaths.size(); j++) {
-                    Path path = portPaths.get(j);
-                    if (!basePathPortEntities.contains(path.getSource())) {
-                        basePathPortEntities.add(path.getSource());
+                Group<Entity> portPathEntities = portEntity.getComponent(Port.class).getPaths();
+                for (int j = 0; j < portPathEntities.size(); j++) {
+                    Entity pathEntity = portPathEntities.get(j);
+                    if (!basePathPortEntities.contains(pathEntity.getComponent(Path.class).getSource())) {
+                        basePathPortEntities.add(pathEntity.getComponent(Path.class).getSource());
                     }
-                    if (!basePathPortEntities.contains(path.getTarget())) {
-                        basePathPortEntities.add(path.getTarget());
+                    if (!basePathPortEntities.contains(pathEntity.getComponent(Path.class).getTarget())) {
+                        basePathPortEntities.add(pathEntity.getComponent(Path.class).getTarget());
                     }
                 }
             }
@@ -311,7 +312,7 @@ public class Camera extends Entity {
             otherPortables.remove(entity);
             otherPortables.setTransparency(0.1);
 
-            // Get portEntities along every Path connected to the Ports on the selected HostEntity
+            // Get portEntities along every PathEntity connected to the Ports on the selected HostEntity
             Group<Entity> hostPathPortEntities = new Group<>();
             Group<Entity> extensionPortEntities = entity.getComponent(Portable.class).getPortEntities();
             for (int i = 0; i < extensionPortEntities.size(); i++) {
@@ -321,14 +322,14 @@ public class Camera extends Entity {
                     hostPathPortEntities.add(portEntity);
                 }
 
-                Group<Path> portPaths = portEntity.getComponent(Port.class).getPaths();
-                for (int j = 0; j < portPaths.size(); j++) {
-                    Path path = portPaths.get(j);
-                    if (!hostPathPortEntities.contains(path.getSource())) {
-                        hostPathPortEntities.add(path.getSource());
+                Group<Entity> portPathEntities = portEntity.getComponent(Port.class).getPaths();
+                for (int j = 0; j < portPathEntities.size(); j++) {
+                    Entity pathEntity = portPathEntities.get(j);
+                    if (!hostPathPortEntities.contains(pathEntity.getComponent(Path.class).getSource())) {
+                        hostPathPortEntities.add(pathEntity.getComponent(Path.class).getSource());
                     }
-                    if (!hostPathPortEntities.contains(path.getTarget())) {
-                        hostPathPortEntities.add(path.getTarget());
+                    if (!hostPathPortEntities.contains(pathEntity.getComponent(Path.class).getTarget())) {
+                        hostPathPortEntities.add(pathEntity.getComponent(Path.class).getTarget());
                     }
                 }
             }
@@ -349,7 +350,7 @@ public class Camera extends Entity {
     }
 
 //    /**
-//     * Adjusts the focus so the {@code Path}s in {@code paths} are in view.
+//     * Adjusts the focus so the {@code PathEntity}s in {@code paths} are in view.
 //     *
 //     * @param paths
 //     */

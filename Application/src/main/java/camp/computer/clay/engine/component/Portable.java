@@ -7,12 +7,10 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Portable extends Component {
 
@@ -121,8 +119,8 @@ public class Portable extends Component {
     public Group<Image> getPathImages(Entity portEntity) {
         Group<Image> pathImages = new Group<>();
         for (int i = 0; i < portEntity.getComponent(Port.class).getPaths().size(); i++) {
-            Path path = portEntity.getComponent(Port.class).getPaths().get(i);
-            Image pathImage = path.getComponent(Image.class);
+            Entity pathEntity = portEntity.getComponent(Port.class).getPaths().get(i);
+            Image pathImage = pathEntity.getComponent(Image.class);
             pathImages.add(pathImage);
         }
         return pathImages;
@@ -155,9 +153,9 @@ public class Portable extends Component {
                 // pathImage.setDockVisibility(Visibility.VISIBLE);
             }
 
-            // Recursively traverse Ports in descendant Paths and setValue their Path image visibility
-            Path path = (Path) pathImage.getEntity();
-            Entity targetPortEntity = path.getTarget();
+            // Recursively traverse Ports in descendant Paths and setValue their PathEntity image visibility
+            Entity pathEntity = pathImage.getEntity();
+            Entity targetPortEntity = pathEntity.getComponent(Path.class).getTarget();
             Entity targetPortableEntity = targetPortEntity.getParent();
             Image targetPortableImage = targetPortableEntity.getComponent(Image.class);
             if (targetPortableImage != getEntity().getComponent(Image.class)) { // HACK //if (targetPortableImage != this) { // HACK

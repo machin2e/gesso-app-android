@@ -175,7 +175,7 @@ public class Extension extends Component {
 
         // TODO: Goal: implement Ben's demo (input on one HostEntity to analog output on another HostEntity, with diff components)
 
-        ///// TODO: Add label/title to Path, too. ADD OPTION TO FLAG ENTITIES WITH A QUESTION, OR JUST ASK QUESTION/ADD TODO DIRECTLY THERE! ANNOTATE STRUCTURE WITH DESCRIPTIVE/CONTEXTUAL METADATA.
+        ///// TODO: Add label/title to PathEntity, too. ADD OPTION TO FLAG ENTITIES WITH A QUESTION, OR JUST ASK QUESTION/ADD TODO DIRECTLY THERE! ANNOTATE STRUCTURE WITH DESCRIPTIVE/CONTEXTUAL METADATA.
 
         // TODO: Animate movement of Extensions when "extension halo" expands or contracts (breathes)
     }

@@ -7,13 +7,11 @@ import java.util.UUID;
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Host extends Component {
 
@@ -91,21 +89,21 @@ public class Host extends Component {
         // Set the initial position of the ExtensionEntity
         extensionEntity.getComponent(Transform.class).set(initialPosition);
 
-        // Configure HostEntity's PortEntity (i.e., the Path's source PortEntity)
+        // Configure HostEntity's PortEntity (i.e., the PathEntity's source PortEntity)
         if (hostPortEntity.getComponent(Port.class).getType() == Port.Type.NONE || hostPortEntity.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
             hostPortEntity.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
             hostPortEntity.getComponent(Port.class).setDirection(Port.Direction.BOTH);
         }
 
-        // Configure ExtensionEntity's Ports (i.e., the Path's target PortEntity)
+        // Configure ExtensionEntity's Ports (i.e., the PathEntity's target PortEntity)
         Entity extensionPortEntity = extensionEntity.getComponent(Portable.class).getPortEntities().get(0);
         extensionPortEntity.getComponent(Port.class).setDirection(Port.Direction.INPUT);
         extensionPortEntity.getComponent(Port.class).setType(hostPortEntity.getComponent(Port.class).getType());
 
-        // Create Path from HostEntity to ExtensionEntity and configure the new Path
+        // Create PathEntity from HostEntity to ExtensionEntity and configure the new PathEntity
         UUID pathUuid = Clay.createEntity(Path.class);
-        Path path = (Path) Entity.getEntity(pathUuid);
-        path.set(hostPortEntity, extensionPortEntity);
+        Entity pathEntity = Entity.getEntity(pathUuid);
+        pathEntity.getComponent(Path.class).set(hostPortEntity, extensionPortEntity);
 
         // Remove focus from other Hosts and their Ports
 //        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
@@ -118,15 +116,15 @@ public class Host extends Component {
             host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
         }
 
-        // Show Path and all contained Ports
-        Group<Path> paths = hostPortEntity.getComponent(Port.class).getPaths();
+        // Show PathEntity and all contained Ports
+        Group<Entity> pathEntities = hostPortEntity.getComponent(Port.class).getPaths();
         Group<Entity> pathPortEntities = new Group<>();
-        for (int i = 0; i < paths.size(); i++) {
-            pathPortEntities.addAll(paths.get(i).getPorts());
+        for (int i = 0; i < pathEntities.size(); i++) {
+            pathPortEntities.addAll(pathEntities.get(i).getComponent(Path.class).getPorts());
         }
 
         pathPortEntities.setVisibility(Visibility.VISIBLE);
-        paths.getImages().setVisibility(Visibility.VISIBLE);
+        pathEntities.getImages().setVisibility(Visibility.VISIBLE);
 
         // Update layout
         updateExtensionLayout();
@@ -182,12 +180,12 @@ public class Host extends Component {
             selectedHostPortEntity.getComponent(Port.class).setType(extensionEntity.getComponent(Portable.class).getPortEntities().get(i).getComponent(Port.class).getType());
             selectedHostPortEntity.getComponent(Port.class).setDirection(extensionEntity.getComponent(Portable.class).getPortEntities().get(i).getComponent(Port.class).getDirection());
 
-            // Create Path from ExtensionEntity PortEntity to HostEntity PortEntity
+            // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
             UUID pathUuid = Clay.createEntity(Path.class);
-            Path path = (Path) Entity.getEntity(pathUuid);
-            path.set(selectedHostPortEntity, extensionEntity.getComponent(Portable.class).getPortEntities().get(i));
+            Entity pathEntity = Entity.getEntity(pathUuid);
+            pathEntity.getComponent(Path.class).set(selectedHostPortEntity, extensionEntity.getComponent(Portable.class).getPortEntities().get(i));
 
-            path.setType(Path.Type.ELECTRONIC);
+            pathEntity.getComponent(Path.class).setType(Path.Type.ELECTRONIC);
         }
 
         return true;
@@ -243,7 +241,7 @@ public class Host extends Component {
                 continue;
             }
 
-            Entity hostPortEntity = extensionPortEntity.getComponent(Port.class).getPaths().get(0).getHostPort(); // HACK b/c using index 0
+            Entity hostPortEntity = extensionPortEntity.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK b/c using index 0
             Transform hostPortPosition = Space.getSpace().getShape(hostPortEntity).getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment

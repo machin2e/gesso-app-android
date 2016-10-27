@@ -21,11 +21,11 @@ import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
@@ -210,7 +210,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int portCount = Entity.Manager.filterWithComponent(Port.class).size(); // int portCount = Entity.Manager.filterType2(PortEntity.class).size();
 //        int extensionCount = Entity.Manager.filterType2(ExtensionEntity.class).size();
         int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
-        int pathCount = Entity.Manager.filterType2(Path.class).size();
+        //int pathCount = Entity.Manager.filterType2(PathEntity.class).size();
+        int pathCount = Entity.Manager.filterWithComponent(Path.class).size();
 
         // Entities
         String text = "Entities: " + entityCount;
@@ -490,22 +491,23 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 canvas.restore();
             }
 
-        } else if (entity.getClass() == Path.class) {
+        //} else if (entity.getClass() == PathEntity.class) {
+        } else if (entity.hasComponent(Path.class)) {
 
             Image image = entity.getComponent(Image.class);
 
             if (image.isVisible()) {
-                Path path = (Path) image.getEntity();
-                if (path.getType() == Path.Type.MESH) {
-                    // Draw Path between Ports
-                    drawTrianglePath(path, this);
-                } else if (path.getType() == Path.Type.ELECTRONIC) {
-                    drawLinePath(path, this);
+                Entity pathEntity = image.getEntity();
+                if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
+                    // Draw PathEntity between Ports
+                    drawTrianglePath(pathEntity, this);
+                } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
+                    drawLinePath(pathEntity, this);
                 }
             } else {
-                Path path = (Path) entity; // image.getPath();
-                if (path.getType() == Path.Type.ELECTRONIC) {
-                    drawPhysicalPath(path, this);
+                Entity pathEntity = entity; // image.getPath();
+                if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
+                    drawPhysicalPath(pathEntity, this);
                 }
             }
 
@@ -517,12 +519,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
 
-    public void drawTrianglePath(Path path, Display display) {
+    public void drawTrianglePath(Entity pathEntity, Display display) {
 
         Paint paint = display.paint;
 
-        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
-        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
+        Shape sourcePortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource());
+        Shape targetPortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget());
 
         // Show target port
         targetPortShape.setVisibility(Visibility.VISIBLE);
@@ -540,12 +542,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
     }
 
-    public void drawLinePath(Path path, Display display) {
+    public void drawLinePath(Entity pathEntity, Display display) {
 
         Paint paint = display.paint;
 
-        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
-        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
+        Shape sourcePortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource());
+        Shape targetPortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget());
 
         if (sourcePortShape != null && targetPortShape != null) {
 
@@ -567,7 +569,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 //            double pathRotation = getSpace().getImages(getPath().getHosts()).getRotation();
 
-            Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
+            Segment segment = (Segment) pathEntity.getComponent(Image.class).getShape("PathEntity");
             segment.setOutlineThickness(15.0);
             segment.setOutlineColor(sourcePortShape.getColor());
 
@@ -578,11 +580,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void drawPhysicalPath(Path path, Display display) {
+    public void drawPhysicalPath(Entity pathEntity, Display display) {
 
         // Get HostEntity and ExtensionEntity Ports
-        Entity hostPortEntity = path.getSource();
-        Entity extensionPortEntity = path.getTarget();
+        Entity hostPortEntity = pathEntity.getComponent(Path.class).getSource();
+        Entity extensionPortEntity = pathEntity.getComponent(Path.class).getTarget();
 
         // Draw the connection to the HostEntity's PortEntity
 
@@ -611,7 +613,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 //            display.drawPolyline(polyline);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
+            Segment segment = (Segment) pathEntity.getComponent(Image.class).getShape("PathEntity");
             segment.setOutlineThickness(10.0);
             segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType()));
 

@@ -1,13 +1,11 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
 import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.entity.Entity;
 
-public class Path extends Entity {
+public class Path extends Component {
 
     public enum Direction {
 
@@ -53,36 +51,20 @@ public class Path extends Entity {
 
     private Direction direction = Direction.NONE;
 
-    // TODO: (?) Entity sourcePort;
     private UUID source;
 
     private UUID target;
 
-    public Path() {
-        super();
+    public Path(Entity entity) {
+        super(entity);
         setup();
     }
-
-//    public Path(PortEntity sourcePort, PortEntity targetPort) {
-//        super();
-//
-//        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
-//        this.direction = Direction.BOTH; // Default to BOTH
-//
-//        set(sourcePort, targetPort);
-//
-//        setup();
-//    }
 
     private void setup() {
         this.type = Type.ELECTRONIC; // Default to ELECTRONIC
         this.direction = Direction.BOTH; // Default to BOTH
 
-        // TODO: Path.connectPath(source, destination) and do what the following constructor does... auto-configure Ports and Path
-    }
-
-    @Override
-    public void update() {
+        // TODO: PathEntity.connectPath(source, destination) and do what the following constructor does... auto-configure Ports and PathEntity
     }
 
     public Type getType() {
@@ -94,9 +76,9 @@ public class Path extends Entity {
     }
 
     public void setMode(Port.Type type) {
-        // Update type of Ports in Path (BUT NOT DIRECTION)
+        // Update type of Ports in PathEntity (BUT NOT DIRECTION)
         // <FILTER>
-        // TODO: Make Path.Filter
+        // TODO: Make PathEntity.Filter
         Group<Entity> portEntities = getPorts();
         for (int i = 0; i < portEntities.size(); i++) {
             Entity portEntity = portEntities.get(i);
@@ -162,11 +144,6 @@ public class Path extends Entity {
     }
 
     public Entity getHost() {
-//        if (getSource().getComponent(Port.class).getPortable().hasComponent(Host.class)) {
-//            return getSource().getComponent(Port.class).getPortable();
-//        } else if (getTarget().getComponent(Port.class).getPortable().hasComponent(Host.class)) {
-//            return getTarget().getComponent(Port.class).getPortable();
-//        }
         if (getSource().getParent().hasComponent(Host.class)) {
             return getSource().getParent();
         } else if (getTarget().getParent().hasComponent(Host.class)) {
@@ -176,11 +153,6 @@ public class Path extends Entity {
     }
 
     public Entity getExtension() {
-//        if (getSource().getComponent(Port.class).getPortable().hasComponent(Extension.class)) {
-//            return getSource().getComponent(Port.class).getPortable();
-//        } else if (getTarget().getComponent(Port.class).getPortable().hasComponent(Extension.class)) {
-//            return getTarget().getComponent(Port.class).getPortable();
-//        }
         if (getSource().getParent().hasComponent(Extension.class)) {
             return getSource().getParent();
         } else if (getTarget().getParent().hasComponent(Extension.class)) {
@@ -190,11 +162,6 @@ public class Path extends Entity {
     }
 
     public Entity getHostPort() {
-//        if (getSource().getComponent(Port.class).getPortable().hasComponent(Host.class)) {
-//            return getSource();
-//        } else if (getTarget().getComponent(Port.class).getPortable().hasComponent(Host.class)) {
-//            return getTarget();
-//        }
         if (getSource().getParent().hasComponent(Host.class)) {
             return getSource();
         } else if (getTarget().getParent().hasComponent(Host.class)) {

@@ -471,7 +471,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
 
-        // Path Editor
+        // PathEntity Editor
         final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
         pathEditor.setOnTouchListener(new View.OnTouchListener() {
             @Override

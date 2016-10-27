@@ -16,12 +16,12 @@ import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Path;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
@@ -40,7 +40,6 @@ import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
 
 public class Clay {
 
@@ -255,9 +254,12 @@ public class Clay {
     }
 
     private static UUID createPathEntity() {
-        Path path = new Path();
+        Entity pathEntity = new Entity();
 
-        Image pathImage = new Image(path); // Create Path Image
+        // Add Path Component (for type identification)
+        pathEntity.setComponent(new Path(pathEntity));
+
+        Image pathImage = new Image(pathEntity); // Create PathEntity Image
 
         // <SETUP_PATH_IMAGE_GEOMETRY>
         Segment segment;
@@ -265,25 +267,25 @@ public class Clay {
         // Board
         segment = new Segment<>();
         segment.setOutlineThickness(2.0);
-        segment.setLabel("Path");
+        segment.setLabel("PathEntity");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
         pathImage.addShape(segment);
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
-        path.setComponent(new Transform());
-        path.setComponent(pathImage); // Assign Image to Entity
+        pathEntity.setComponent(new Transform());
+        pathEntity.setComponent(pathImage); // Assign Image to Entity
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
-//        path.setupActionListener();
+//        pathEntity.setupActionListener();
 
-        ActionListenerComponent actionListener = new ActionListenerComponent(path);
-        actionListener.setOnActionListener(getPathActionListener(path));
-        path.setComponent(actionListener);
+        ActionListenerComponent actionListener = new ActionListenerComponent(pathEntity);
+        actionListener.setOnActionListener(getPathActionListener(pathEntity));
+        pathEntity.setComponent(actionListener);
         // </HACK>
 
-        return path.getUuid();
+        return pathEntity.getUuid();
     }
 
     private static UUID createPortEntity() {
@@ -340,7 +342,7 @@ public class Clay {
 
                         if (action.isDragging()) {
 
-                            // Prototype Path Visibility
+                            // Prototype PathEntity Visibility
                             Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
                             Space.getSpace().setPathPrototypeDestinationPosition(event.getPosition());
                             Space.getSpace().setPathPrototypeVisibility(Visibility.VISIBLE);
@@ -473,17 +475,17 @@ public class Clay {
 
                             // Show portEntities and paths of touched form
                             for (int i = 0; i < hostEntity.getComponent(Portable.class).getPortEntities().size(); i++) {
-                                Group<Path> paths = hostEntity.getComponent(Portable.class).getPort(i).getComponent(Port.class).getPaths();
+                                Group<Entity> pathEntities = hostEntity.getComponent(Portable.class).getPort(i).getComponent(Port.class).getPaths();
 
-                                for (int j = 0; j < paths.size(); j++) {
-                                    Path path = paths.get(j);
+                                for (int j = 0; j < pathEntities.size(); j++) {
+                                    Entity pathEntity = pathEntities.get(j);
 
-                                    // Show source and target portEntities in path
-                                    Space.getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                    Space.getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                    // Show source and target portEntities in pathEntity
+                                    Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
+                                    Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
 
-                                    // Show Path connection
-                                    path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                                    // Show PathEntity connection
+                                    pathEntity.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
                                 }
                             }
 
@@ -604,7 +606,7 @@ public class Clay {
 
                                     } else if (hostEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
 
-                                        // Change Path Type. Updates each PortEntity in the Path.
+                                        // Change PathEntity Type. Updates each PortEntity in the PathEntity.
 
                                         Log.v("TouchPort", "-D");
 
@@ -618,13 +620,13 @@ public class Clay {
 
                                         // <FILTER>
                                         // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
-                                        Group<Path> paths = portEntity.getComponent(Port.class).getPaths();
-                                        for (int i = 0; i < paths.size(); i++) {
-                                            Path path = paths.get(i);
+                                        Group<Entity> pathEntities = portEntity.getComponent(Port.class).getPaths();
+                                        for (int i = 0; i < pathEntities.size(); i++) {
+                                            Entity pathEntity = pathEntities.get(i);
 
                                             // <FILTER>
                                             // TODO: Make Filter/Editor
-                                            Group<Entity> portEntities = path.getPorts();
+                                            Group<Entity> portEntities = pathEntity.getComponent(Path.class).getPorts();
                                             for (int j = 0; j < portEntities.size(); j++) {
                                                 portEntities.get(j).getComponent(Port.class).setType(nextType);
                                             }
@@ -662,12 +664,12 @@ public class Clay {
 
                                     Log.v("Events", "D.1");
 
-                                    // Create and configure new Path
+                                    // Create and configure new PathEntity
                                     UUID pathUuid = Clay.createEntity(Path.class);
-                                    Path path = (Path) Entity.getEntity(pathUuid);
-                                    path.set(sourcePortEntity, targetPortEntity);
+                                    Entity pathEntity = Entity.getEntity(pathUuid);
+                                    pathEntity.getComponent(Path.class).set(sourcePortEntity, targetPortEntity);
 
-                                    event.getActor().getCamera().setFocus(path.getExtension());
+                                    event.getActor().getCamera().setFocus(pathEntity.getComponent(Path.class).getExtension());
 
                                     Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
 
@@ -753,16 +755,16 @@ public class Clay {
                                 Shape portShape = portShapes.get(i);
                                 Entity portEntity = portShape.getEntity();
 
-                                Group<Path> paths = portEntity.getComponent(Port.class).getPaths();
-                                for (int j = 0; j < paths.size(); j++) {
-                                    Path path = paths.get(j);
+                                Group<Entity> pathEntities = portEntity.getComponent(Port.class).getPaths();
+                                for (int j = 0; j < pathEntities.size(); j++) {
+                                    Entity pathEntity = pathEntities.get(j);
 
                                     // Show portEntities
-                                    Space.getSpace().getShape(path.getSource()).setVisibility(Visibility.VISIBLE);
-                                    Space.getSpace().getShape(path.getTarget()).setVisibility(Visibility.VISIBLE);
+                                    Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
+                                    Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
 
-                                    // Show path
-                                    path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                                    // Show pathEntity
+                                    pathEntity.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
                                 }
                             }
 
@@ -779,7 +781,7 @@ public class Clay {
         };
     }
 
-    public static ActionListener getPathActionListener(Path path) {
+    public static ActionListener getPathActionListener(Entity pathEntity) {
         return new ActionListener() {
             @Override
             public void onAction(Action action) {
@@ -802,8 +804,8 @@ public class Clay {
     }
 
 //    private static UUID createPathEntity(PortEntity sourcePort, PortEntity targetPort) {
-//        Path path = new Path(sourcePort, targetPort);
-//        PathImage pathImage = new PathImage(path); // Create Path Image
+//        PathEntity path = new PathEntity(sourcePort, targetPort);
+//        PathImage pathImage = new PathImage(path); // Create PathEntity Image
 //        path.setComponent(pathImage); // Assign Image to Entity
 //
 //        return path.getUuid();

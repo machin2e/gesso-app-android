@@ -2,7 +2,6 @@ package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Path;
 
 public class Port extends Component {
 
@@ -94,7 +93,7 @@ public class Port extends Component {
     public void setType(Type type) {
         this.type = type;
 
-        // TODO: Update all other Ports in the connected Path
+        // TODO: Update all other Ports in the connected PathEntity
     }
 
     public Direction getDirection() {
@@ -106,18 +105,19 @@ public class Port extends Component {
     }
 
     public boolean hasPath() {
-        Group<Path> pathGroup = Entity.Manager.filterType2(Path.class);
-        for (int i = 0; i < pathGroup.size(); i++) {
-            Path path = pathGroup.get(i);
-            if (path.contains(getEntity())) {
+        //Group<Entity> pathEntityGroup = Entity.Manager.filterType2(PathEntity.class);
+        Group<Entity> pathEntityGroup = Entity.Manager.filterWithComponent(Path.class);
+        for (int i = 0; i < pathEntityGroup.size(); i++) {
+            Entity pathEntity = pathEntityGroup.get(i);
+            if (pathEntity.getComponent(Path.class).contains(getEntity())) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean hasPath(Path path) {
-        return Path.Manager.contains(path.getUuid());
+    public boolean hasPath(Entity pathEntity) {
+        return Entity.Manager.contains(pathEntity.getUuid());
     }
 
     /**
@@ -126,33 +126,34 @@ public class Port extends Component {
      *
      * @return List of paths in the graph containing the port.
      */
-    public Group<Path> getPaths() {
+    public Group<Entity> getPaths() {
 
-        Group<Path> pathGroup = Entity.Manager.filterType2(Path.class);
+        //Group<Entity> pathEntityGroup = Entity.Manager.filterType2(PathEntity.class);
+        Group<Entity> pathEntityGroup = Entity.Manager.filterWithComponent(Path.class);
 
         // TODO: Make into Filter
-        Group<Path> paths = new Group<>();
-        for (int i = 0; i < pathGroup.size(); i++) {
-            Path path = pathGroup.get(i);
-            if (path.contains(getEntity())) {
-                paths.add(path);
+        Group<Entity> pathEntities = new Group<>();
+        for (int i = 0; i < pathEntityGroup.size(); i++) {
+            Entity pathEntity = pathEntityGroup.get(i);
+            if (pathEntity.getComponent(Path.class).contains(getEntity())) {
+                pathEntities.add(pathEntity);
             }
         }
-        return paths;
+        return pathEntities;
     }
 
     // <HACK>
     public Entity getExtension() {
-        Group<Path> paths = getPaths();
-        for (int i = 0; i < paths.size(); i++) {
-            Path path = paths.get(i);
-            if (path.getSource() == getEntity() || path.getTarget() == getEntity()) {
-                //if (path.getSource().getPortable().hasComponent(Extension.class)) {
-                // WRONG: if (path.getSource().getComponent(Port.class).getPortable().hasComponent(Extension.class)) {
-                if (path.getSource().getParent().hasComponent(Extension.class)) {
-                    return path.getSource().getParent(); //return path.getSource().getComponent(Port.class).getPortable();
-                } else if (path.getTarget().getParent().hasComponent(Extension.class)) {
-                    return path.getTarget().getParent();
+        Group<Entity> pathEntities = getPaths();
+        for (int i = 0; i < pathEntities.size(); i++) {
+            Entity pathEntity = pathEntities.get(i);
+            if (pathEntity.getComponent(Path.class).getSource() == getEntity() || pathEntity.getComponent(Path.class).getTarget() == getEntity()) {
+                //if (pathEntity.getSource().getPortable().hasComponent(Extension.class)) {
+                // WRONG: if (pathEntity.getSource().getComponent(Port.class).getPortable().hasComponent(Extension.class)) {
+                if (pathEntity.getComponent(Path.class).getSource().getParent().hasComponent(Extension.class)) {
+                    return pathEntity.getComponent(Path.class).getSource().getParent(); //return pathEntity.getSource().getComponent(Port.class).getPortable();
+                } else if (pathEntity.getComponent(Path.class).getTarget().getParent().hasComponent(Extension.class)) {
+                    return pathEntity.getComponent(Path.class).getTarget().getParent();
                 }
             }
         }
