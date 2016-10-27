@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -17,7 +18,6 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -67,7 +67,7 @@ public class Space extends Image {
             public void onAction(Action action) {
 
                 Event event = action.getLastEvent();
-                Camera camera = event.getActor().getCamera();
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
                 if (event.getType() == Event.Type.NONE) {
 
@@ -81,7 +81,7 @@ public class Space extends Image {
 
                     if (action.isDragging()) {
                         Log.v("Space_Action", "DRAG");
-                        camera.setOffset(action.getOffset());
+                        cameraEntity.getComponent(Camera.class).setOffset(action.getOffset());
                     }
 
                 } else if (event.getType() == Event.Type.UNSELECT) {
@@ -108,8 +108,8 @@ public class Space extends Image {
                         // Title
                         setTitleVisibility(Visibility.INVISIBLE);
 
-                        // Camera
-                        camera.setFocus(Space.getSpace());
+                        // CameraEntity
+                        cameraEntity.getComponent(Camera.class).setFocus(Space.getSpace());
                     }
 //                    }
                 }

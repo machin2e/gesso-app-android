@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
@@ -19,7 +18,7 @@ import camp.computer.clay.util.image.Visibility;
  */
 public class Actor extends Component {
 
-    private Camera camera = null;
+//    private CameraEntity cameraEntity = null;
 
     private List<Event> incomingEvents = new LinkedList<>();
 
@@ -31,29 +30,24 @@ public class Actor extends Component {
     }
 
     private void setup() {
-        Camera camera = new Camera();
-        setCamera(camera);
-    }
-
-    /**
-     * Sets the {@code Camera} that defines the {@code Actor}'s viewing area onto the {@code Space}.
-     *
-     * @param camera The {@code Camera} to use to define the viewing area onto the {@code Space}.
-     */
-    // TODO: Remove?
-    public void setCamera(Camera camera) {
-        this.camera = camera;
+//        CameraEntity cameraEntity = new CameraEntity();
+//        setCameraEntity(cameraEntity);
     }
 
     // TODO: Remove?
-    public boolean hasCamera() {
-        return camera != null;
-    }
-
-    // TODO: Remove?
-    public Camera getCamera() {
-        return this.camera;
-    }
+//    public void setCameraEntity(CameraEntity cameraEntity) {
+//        this.cameraEntity = cameraEntity;
+//    }
+//
+//    // TODO: Remove?
+//    public boolean hasCamera() {
+//        return cameraEntity != null;
+//    }
+//
+//    // TODO: Remove?
+//    public CameraEntity getCameraEntity() {
+//        return this.cameraEntity;
+//    }
 
     public void queueEvent(Event event) {
         incomingEvents.add(event);
@@ -142,9 +136,11 @@ public class Actor extends Component {
 
             case SELECT: {
 
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
                 // Set the target image
                 Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // getImage(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -165,9 +161,11 @@ public class Actor extends Component {
 
             case HOLD: {
 
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
                 // Set the target image
                 Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // Image targetImage = getCameraEntity().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -190,12 +188,14 @@ public class Actor extends Component {
 
             case MOVE: {
 
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
                 // Classify/Callback
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
                     Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                    Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                    Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // Image targetImage = getCameraEntity().getSpace().getImage(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     // Set the target shape
@@ -219,12 +219,14 @@ public class Actor extends Component {
 
             case UNSELECT: {
 
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
                 // Stop listening for a hold event
 //                action.timerHandler.removeCallbacks(action.timerRunnable);
 
                 // Set the target image
                 Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : getCamera().getSpace(); // Image targetImage = getCamera().getSpace().getImage(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // Image targetImage = getCameraEntity().getSpace().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.component.ActionListenerComponent;
+import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
@@ -14,7 +15,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 
-public class Entity extends Groupable {
+public final class Entity extends Groupable {
 
     // <ENTITY_MANAGEMENT>
     // TODO: public static Group<Entity> Manager = new Group<>();
@@ -91,6 +92,8 @@ public class Entity extends Groupable {
             getComponent(Extension.class).update();
         } else if (hasComponent(Host.class)) {
             getComponent(Host.class).update();
+        } else if (hasComponent(Camera.class)) {
+            getComponent(Camera.class).update();
         }
         // </HACK>
 
@@ -121,6 +124,7 @@ public class Entity extends Groupable {
     protected Host host = null;
     protected Port port = null; // Only used by Ports (DUH)
     protected Path path = null;
+    protected Camera camera = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -142,6 +146,8 @@ public class Entity extends Groupable {
             this.port = (Port) component;
         } else if (component instanceof Path) {
             this.path = (Path) component;
+        } else if (component instanceof Camera) {
+            this.camera = (Camera) component;
         }
     }
 
@@ -166,6 +172,8 @@ public class Entity extends Groupable {
             return type.cast(this.port);
         } else if (type == Path.class) {
             return type.cast(this.path);
+        } else if (type == Camera.class) {
+            return type.cast(this.camera);
         } else {
             return null;
         }

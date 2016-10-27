@@ -337,7 +337,7 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     // HACK: Assumes Group<Entity>
-    public <E extends Groupable> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
+    public <E extends Entity> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
 
         Group<E> group = new Group<>();
 

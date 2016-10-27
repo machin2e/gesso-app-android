@@ -13,6 +13,7 @@ import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.ActionListenerComponent;
+import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -20,7 +21,6 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
@@ -75,12 +75,17 @@ public class Clay {
         this.space = new Space();
         space.setupActionListener();
 
+        // Create Camera
+        createEntity(Camera.class);
+
         // Create actor and setAbsolute perspective
         Actor actor = new Actor(null);
         this.space.addActor(actor);
 
-        // Camera
-        actor.getCamera().setSpace(space);
+        Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
+        // CameraEntity
+        cameraEntity.getComponent(Camera.class).setSpace(space);
 
         // Add actor to model
         space.addActor(actor);
@@ -117,6 +122,8 @@ public class Clay {
             return createPathEntity();
         } else if (entityType == Port.class) { // HACK (because Extension is a Component)
             return createPortEntity();
+        } else if (entityType == Camera.class) {
+            return createCameraEntity();
         } else {
             return null;
         }
@@ -292,6 +299,28 @@ public class Clay {
         return null;
     }
 
+    private static UUID createCameraEntity() {
+
+        Entity cameraEntity = new Entity();
+
+        // Add Path Component (for type identification)
+        cameraEntity.setComponent(new Camera(cameraEntity));
+
+        // Add Transform Component
+        cameraEntity.setComponent(new Transform());
+
+//        // <HACK>
+//        // NOTE: This has to be done after adding an ImageComponent
+////        pathEntity.setupActionListener();
+//
+//        ActionListenerComponent actionListener = new ActionListenerComponent(cameraEntity);
+//        actionListener.setOnActionListener(getPathActionListener(cameraEntity));
+//        cameraEntity.setComponent(actionListener);
+//        // </HACK>
+
+        return cameraEntity.getUuid();
+    }
+
     public static ActionListener getHostActionListener(final Entity hostEntity) {
 
         final Image hostImage = hostEntity.getComponent(Image.class);
@@ -302,7 +331,7 @@ public class Clay {
 
                 final Event event = action.getLastEvent();
 
-                final Camera camera = event.getActor().getCamera();
+                final Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
                 if (event.getType() == Event.Type.NONE) {
 
@@ -333,8 +362,8 @@ public class Clay {
                             // Update position of HostEntity image
                             hostEntity.getComponent(Transform.class).set(event.getPosition());
 
-                            // Camera
-                            camera.setFocus(hostEntity);
+                            // CameraEntity
+                            cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
 
                         }
 
@@ -443,8 +472,8 @@ public class Clay {
                                 }
                             }
 
-                            // Camera
-                            camera.setFocus(sourcePortEntity, event.getPosition());
+                            // CameraEntity
+                            cameraEntity.getComponent(Camera.class).setFocus(sourcePortEntity, event.getPosition());
 
                         } else if (action.isHolding()) {
 
@@ -489,8 +518,8 @@ public class Clay {
                                 }
                             }
 
-                            // Camera
-                            camera.setFocus(hostEntity);
+                            // CameraEntity
+                            cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
 
                             if (hostEntity.getComponent(Portable.class).getExtensions().size() > 0) {
 //                                                    Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
@@ -521,8 +550,8 @@ public class Clay {
                                     // HostEntity
 //                                                        event.getTargetImage().queueEvent(action);
 
-                                    // Camera
-//                                                        camera.setFocus();
+                                    // CameraEntity
+//                                                        cameraEntity.setFocus();
                                 }
 
                             } else if (event.getTargetImage() instanceof Space) {
@@ -558,8 +587,8 @@ public class Clay {
                                         // Add ExtensionEntity from Profile
                                         Entity extensionEntity = hostEntity.getComponent(Host.class).restoreExtension(profile, event.getPosition());
 
-                                        // Update Camera
-                                        camera.setFocus(extensionEntity);
+                                        // Update CameraEntity
+                                        cameraEntity.getComponent(Camera.class).setFocus(extensionEntity);
                                     }
                                 });
                                 // Application.getView().promptTasks();
@@ -669,7 +698,7 @@ public class Clay {
                                     Entity pathEntity = Entity.getEntity(pathUuid);
                                     pathEntity.getComponent(Path.class).set(sourcePortEntity, targetPortEntity);
 
-                                    event.getActor().getCamera().setFocus(pathEntity.getComponent(Path.class).getExtension());
+                                    cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
 
                                     Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
 
@@ -691,8 +720,8 @@ public class Clay {
                                 // Create new ExtensionEntity from scratch (for manual configuration/construction)
                                 Entity extensionEntity = hostEntity.getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
 
-                                // Update Camera
-//                                camera.setFocus(extensionEntity);
+                                // Update CameraEntity
+//                                cameraEntity.setFocus(extensionEntity);
                             }
 
                             // Update Image
@@ -768,8 +797,9 @@ public class Clay {
                                 }
                             }
 
-                            // Camera
-                            event.getActor().getCamera().setFocus(extensionImage.getEntity());
+                            // CameraEntity
+                            Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+                            cameraEntity.getComponent(Camera.class).setFocus(extensionImage.getEntity());
 
                             // Title
                             Space.getSpace().setTitleText("ExtensionEntity");

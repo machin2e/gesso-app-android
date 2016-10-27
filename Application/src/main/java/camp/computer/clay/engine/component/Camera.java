@@ -1,24 +1,19 @@
-package camp.computer.clay.engine.entity;
+package camp.computer.clay.engine.component;
 
 import android.util.Log;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.util.ShapeGroup;
 import camp.computer.clay.util.time.Clock;
 
-public class Camera extends Entity {
+public class Camera extends Component {
 
-    // TODO: Caption generation for each Perspective/Camera
+    // TODO: Caption generation for each Perspective/CameraEntity
 
     public static final int DEFAULT_SCALE_PERIOD = 200;
 
@@ -51,13 +46,13 @@ public class Camera extends Entity {
     // Position
     protected final Transform DEFAULT_POSITION = new Transform(0, 0);
     protected Transform targetPosition = DEFAULT_POSITION;
-    protected Transform position = new Transform(targetPosition.x, targetPosition.y);
+    protected Transform position = new Transform(targetPosition.x, targetPosition.y); // TODO: Remove this! Because already has a Transform component in the Entity... DUH!!!
     protected int positionFrameIndex = 0;
     protected int positionFrameLimit = 0;
     protected Transform originalPosition = new Transform();
 
-    public Camera() {
-        super();
+    public Camera(Entity entity) {
+        super(entity);
     }
 
     public void setSpace(Space space) {
@@ -84,10 +79,12 @@ public class Camera extends Entity {
         return this.height;
     }
 
+    // TODO: Delete. Replace calls to this with calls to cameraEntity.getComponent(Transform.class)
     public Transform getPosition() {
         return this.position;
     }
 
+    // TODO: Delete. Replace calls to this with calls to cameraEntity.getComponent(Transform.class).set(...)
     public void setPosition(Transform position) {
         setPosition(position.x, position.y, DEFAULT_ADJUSTMENT_PERIOD);
     }
@@ -182,7 +179,7 @@ public class Camera extends Entity {
     }
 
     /**
-     * Adjusts the {@code Camera} to fit the bounding box {@code boundingBox}. This sets the
+     * Adjusts the {@code CameraEntity} to fit the bounding box {@code boundingBox}. This sets the
      * duration of the scale adjustment to the default value {@code DEFAULT_SCALE_PERIOD}.
      *
      * @param boundingBox The bounding box to fit into the display area.
@@ -192,7 +189,7 @@ public class Camera extends Entity {
     }
 
     /**
-     * Adjusts the {@code Camera} to fit the bounding box {@code boundingBox}.
+     * Adjusts the {@code CameraEntity} to fit the bounding box {@code boundingBox}.
      *
      * @param boundingBox The bounding box to fit into the display area.
      * @param duration    The duration of the scale adjustment.

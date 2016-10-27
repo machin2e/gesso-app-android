@@ -623,7 +623,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                                                     }
 
 //            @Override
-//            public boolean onTouch(Camera v, MotionEvent event) {
+//            public boolean onTouch(CameraEntity v, MotionEvent event) {
 //                int inType = timelineButton.getInputType(); // backup the input type
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler

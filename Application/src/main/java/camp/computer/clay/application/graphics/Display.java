@@ -18,13 +18,13 @@ import java.util.List;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
@@ -160,7 +160,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             return;
         }
 
-        // Adjust the Camera
+        // Adjust the CameraEntity
         canvas.save();
         adjustCamera();
         canvas.drawColor(Color.WHITE); // Draw the background
@@ -212,6 +212,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
         //int pathCount = Entity.Manager.filterType2(PathEntity.class).size();
         int pathCount = Entity.Manager.filterWithComponent(Path.class).size();
+        int cameraCount = Entity.Manager.filterWithComponent(Camera.class).size();
 
         // Entities
         String text = "Entities: " + entityCount;
@@ -256,6 +257,15 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         linePosition += 25 + textBounds.height();
         canvas.drawText(text, 25, linePosition, paint);
         canvas.restore();
+
+        // Cameras
+        canvas.save();
+        text = "Cameras: " + cameraCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
         // </ENTITY_STATISTICS>
     }
 
@@ -263,26 +273,26 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
      * Adjust the perspective
      */
     private void adjustCamera() {
-//        canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCamera().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCamera().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
-//        canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
-        Camera camera = getCamera();
+//        canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCameraEntity().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCameraEntity().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
+//        canvas.scale((float) space.getEntity().getActor(0).getCameraEntity().getScale(), (float) space.getEntity().getActor(0).getCameraEntity().getScale());
+        Entity cameraEntity = getCamera();
         canvas.translate(
-                (float) originPosition.x + (float) camera.getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
-                (float) originPosition.y + (float) camera.getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
+                (float) originPosition.x + (float) cameraEntity.getComponent(Camera.class).getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
+                (float) originPosition.y + (float) cameraEntity.getComponent(Camera.class).getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
         );
         canvas.scale(
-                (float) camera.getScale(),
-                (float) camera.getScale()
+                (float) cameraEntity.getComponent(Camera.class).getScale(),
+                (float) cameraEntity.getComponent(Camera.class).getScale()
         );
     }
 
     /**
-     * Returns {@code Camera} {@code Entity}.
+     * Returns {@code CameraEntity} {@code Entity}.
      * @return
      */
-    private Camera getCamera() {
-        Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
-        return camera;
+    private Entity getCamera() {
+        Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        return cameraEntity;
     }
 
     /**
@@ -313,9 +323,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                     // Update
                     updateEntities();
 
-                    // Update Camera(s)
-                    Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
-                    camera.update();
+                    // Update CameraEntity(s)
+                    Entity cameraEntity = getCamera();
+                    cameraEntity.update();
                     // </UPDATE>
 
 
@@ -344,11 +354,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-//        space.getEntity().getActor(0).getCamera().setWidth(screenWidth);
-//        space.getEntity().getActor(0).getCamera().setHeight(screenHeight);
-        Camera camera = getCamera();
-        camera.setWidth(screenWidth);
-        camera.setHeight(screenHeight);
+//        space.getEntity().getActor(0).getCameraEntity().setWidth(screenWidth);
+//        space.getEntity().getActor(0).getCameraEntity().setHeight(screenHeight);
+        Entity cameraEntity = getCamera();
+        cameraEntity.getComponent(Camera.class).setWidth(screenWidth);
+        cameraEntity.getComponent(Camera.class).setHeight(screenHeight);
     }
 
     public Space getSpace() {
@@ -387,12 +397,14 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Transform perspectivePosition = actor.getCamera().getPosition();
-                    double perspectiveScale = actor.getCamera().getScale();
+                    Transform perspectivePosition = cameraEntity.getComponent(Camera.class).getPosition();
+                    double perspectiveScale = cameraEntity.getComponent(Camera.class).getScale();
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
