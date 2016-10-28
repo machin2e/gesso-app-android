@@ -3,11 +3,11 @@ package camp.computer.clay.application.graphics;
 import camp.computer.clay.util.time.Clock;
 
 /**
- * DisplayOutput is a background thread that periodically updates the space state
+ * PlatformRenderer is a background thread that periodically updates the space state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
  * space's state then re-rendering it.
  */
-public class DisplayOutput extends Thread {
+public class PlatformRenderer extends Thread {
 
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FRAMES_PER_SECOND = 30;
@@ -21,13 +21,13 @@ public class DisplayOutput extends Thread {
     private int targetFramesPerSecond = DEFAULT_TARGET_FRAMES_PER_SECOND;
     // </SETTINGS>
 
-    private Display display;
+    private PlatformRenderSurface platformRenderSurface;
 
     private boolean isRunning = false;
 
-    DisplayOutput(Display display) {
+    PlatformRenderer(PlatformRenderSurface platformRenderSurface) {
         super();
-        this.display = display;
+        this.platformRenderSurface = platformRenderSurface;
     }
 
     public void setRunning(boolean isRunning) {
@@ -54,7 +54,7 @@ public class DisplayOutput extends Thread {
             frameStartTime = Clock.getCurrentTime();
 
             // Advance the space state
-            display.update();
+            platformRenderSurface.update();
 
             frameStopTime = Clock.getCurrentTime();
 

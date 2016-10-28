@@ -56,7 +56,7 @@ public class Clock {
 
     // Call this from the Time/Clock Thread
     private void tick() {
-        // TODO: Call "update" method for (subscribing?) Entities in Simulation
+        // TODO: Call "updateImage" method for (subscribing?) Entities in Simulation
     }
 
     public long getFrameTime() {
@@ -64,7 +64,7 @@ public class Clock {
     }
 
     /**
-     * Returns the units of time since the last frame. Used to update the simulation state
+     * Returns the units of time since the last frame. Used to updateImage the simulation state
      * independent of drawing to the frame.
      *
      * This allows the simulation to run independently. It helps address issues that can arise

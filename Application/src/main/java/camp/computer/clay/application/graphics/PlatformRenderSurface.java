@@ -40,7 +40,7 @@ import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
 import camp.computer.clay.util.image.Visibility;
 
-public class Display extends SurfaceView implements SurfaceHolder.Callback {
+public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
     // Space Rendering Context
     private Bitmap canvasBitmap = null;
@@ -50,10 +50,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Matrix identityMatrix;
 
-    // Space DisplayOutput
+    // Space PlatformRenderer
     private SurfaceHolder surfaceHolder;
 
-    private DisplayOutput displayOutput;
+    private PlatformRenderer platformRenderer;
 
     // Coordinate System (Grid)
     private Transform originPosition = new Transform();
@@ -61,16 +61,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     // Space
     private Space space;
 
-    public Display(Context context) {
+    public PlatformRenderSurface(Context context) {
         super(context);
         setFocusable(true);
     }
 
-    public Display(Context context, AttributeSet attrs) {
+    public PlatformRenderSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public Display(Context context, AttributeSet attrs, int defStyle) {
+    public PlatformRenderSurface(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -105,10 +105,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         /*
         // Kill the background Thread
         boolean retry = true;
-        // displayOutput.setRunning (false);
+        // platformRenderer.setRunning (false);
         while (retry) {
             try {
-                displayOutput.join ();
+                platformRenderer.join ();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace ();
@@ -123,9 +123,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
 
         // Create and start background Thread
-        displayOutput = new DisplayOutput(this);
-        displayOutput.setRunning(true);
-        displayOutput.start();
+        platformRenderer = new PlatformRenderer(this);
+        platformRenderer.setRunning(true);
+        platformRenderer.start();
 
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
@@ -143,11 +143,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Kill the background Thread
         boolean retry = true;
-        displayOutput.setRunning(false);
+        platformRenderer.setRunning(false);
 
         while (retry) {
             try {
-                displayOutput.join();
+                platformRenderer.join();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -162,12 +162,13 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             return;
         }
 
-        // Adjust the CameraEntity
+        // Adjust the Camera
         canvas.save();
         adjustCamera();
         canvas.drawColor(Color.WHITE); // Draw the background
 
-        getSpace().doDraw(this); // Space
+        drawPrototypes();
+
         drawEntities();
 
         canvas.restore();
@@ -196,7 +197,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(35);
 
-        String fpsText = "FPS: " + (int) displayOutput.getFramesPerSecond();
+        String fpsText = "FPS: " + (int) platformRenderer.getFramesPerSecond();
         Rect fpsTextBounds = new Rect();
         paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
         linePosition += 25 + fpsTextBounds.height();
@@ -337,8 +338,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         doDraw(canvas);
     }
 
-    public DisplayOutput getDisplayOutput() {
-        return this.displayOutput;
+    public PlatformRenderer getPlatformRenderer() {
+        return this.platformRenderer;
     }
 
     public void setSpace(Space space) {
@@ -450,6 +451,72 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
+    public void drawPrototypes() {
+        canvas.save();
+
+        // Draw any prototype Paths and Extensions
+        drawPathPrototype();
+        drawExtensionPrototype();
+
+        canvas.restore();
+    }
+
+    // TODO: Make this into a shape and put this on a separate layerIndex!
+    public void drawPathPrototype() {
+        if (space.pathPrototypeVisibility == Visibility.VISIBLE) {
+
+            double triangleWidth = 20;
+            double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
+            double triangleSpacing = 35;
+
+            // Color
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(15.0f);
+//            paint.setColor(this.getUniqueColor());
+
+            double pathRotationAngle = Geometry.getAngle(
+                    space.pathPrototypeSourcePosition,
+                    space.pathPrototypeDestinationCoordinate
+            );
+
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
+                    space.pathPrototypeSourcePosition,
+                    pathRotationAngle,
+                    2 * triangleSpacing
+            );
+
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
+                    space.pathPrototypeDestinationCoordinate,
+                    pathRotationAngle + 180,
+                    2 * triangleSpacing
+            );
+
+            paint.setColor(Color.parseColor("#efefef"));
+            drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight);
+
+            // Color
+            paint.setStyle(Paint.Style.FILL);
+//            paint.setColor(Color.parseColor("#efefef"));
+            double shapeRadius = 40.0;
+            drawCircle(space.pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
+        }
+    }
+
+    public void drawExtensionPrototype() {
+        if (space.extensionPrototypeVisibility == Visibility.VISIBLE) {
+
+            double pathRotationAngle = Geometry.getAngle(
+                    space.pathPrototypeSourcePosition,
+                    space.extensionPrototypePosition
+            );
+
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.parseColor("#fff7f7f7"));
+
+            drawRectangle(space.extensionPrototypePosition, pathRotationAngle + 180, 200, 200);
+        }
+    }
+
     public void drawEntities() {
         for (int i = 0; i < Entity.Manager.size(); i++) {
             Entity entity = Entity.Manager.get(i);
@@ -471,6 +538,17 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             }
 
         } else if (entity.hasComponent(Extension.class)) {
+
+            Image image = entity.getComponent(Image.class);
+            if (image.isVisible()) {
+                canvas.save();
+                for (int i = 0; i < image.getShapes().size(); i++) {
+                    image.getShapes().get(i).draw(this);
+                }
+                canvas.restore();
+            }
+
+        } else if (entity.hasComponent(Port.class)) {
 
             Image image = entity.getComponent(Image.class);
             if (image.isVisible()) {
@@ -508,9 +586,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
 
-    public void drawTrianglePath(Entity pathEntity, Display display) {
+    public void drawTrianglePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
-        Paint paint = display.paint;
+        Paint paint = platformRenderSurface.paint;
 
         Shape sourcePortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource());
         Shape targetPortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget());
@@ -528,12 +606,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Transform sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
         Transform targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
-        display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
+        platformRenderSurface.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
     }
 
-    public void drawLinePath(Entity pathEntity, Display display) {
+    public void drawLinePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
-        Paint paint = display.paint;
+        Paint paint = platformRenderSurface.paint;
 
         Shape sourcePortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource());
         Shape targetPortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget());
@@ -565,11 +643,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             segment.setSource(pathStartCoordinate);
             segment.setTarget(pathStopCoordinate);
 
-            display.drawSegment(segment);
+            platformRenderSurface.drawSegment(segment);
         }
     }
 
-    public void drawPhysicalPath(Entity pathEntity, Display display) {
+    public void drawPhysicalPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
         // Get HostEntity and ExtensionEntity Ports
         Entity hostPortEntity = pathEntity.getComponent(Path.class).getSource();
@@ -592,8 +670,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortEntity.getComponent(Port.class).getIndex()).getPosition();
 
             // Draw connection between Ports
-            display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType())));
-            display.paint.setStrokeWidth(10.0f);
+            platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType())));
+            platformRenderSurface.paint.setStrokeWidth(10.0f);
 //            display.drawSegment(hostConnectorPosition, extensionConnectorPosition);
 
 //            Polyline polyline = new Polyline();
@@ -609,7 +687,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
             segment.setSource(hostConnectorPosition);
             segment.setTarget(extensionConnectorPosition);
 
-            display.drawSegment(segment);
+            platformRenderSurface.drawSegment(segment);
         }
     }
     // </PATH_IMAGE_HELPERS>

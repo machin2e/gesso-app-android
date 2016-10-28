@@ -3,7 +3,7 @@ package camp.computer.clay.util.geometry;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.image.Shape;
@@ -46,9 +46,9 @@ public class Segment<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    public void draw(Display display) {
+    public void draw(PlatformRenderSurface platformRenderSurface) {
         if (isVisible()) {
-            display.drawSegment(this);
+            platformRenderSurface.drawSegment(this);
         }
     }
 

@@ -3,7 +3,7 @@ package camp.computer.clay.util.image;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
@@ -33,12 +33,12 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     /**
      * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
-     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code updateImage()}.
      * <p>
      * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
      * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
      * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
-     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     * in the first call to {@code updateImage()} following the call to {@code invalidate()}.
      */
     public void invalidate() {
         this.isValid = false;
@@ -120,7 +120,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     protected abstract List<Transform> getVertices();
 
-    public abstract void draw(Display display);
+    public abstract void draw(PlatformRenderSurface platformRenderSurface);
 
     public List<Transform> getBoundary() {
         return this.boundary;
@@ -223,7 +223,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         if (!isValid) {
             updatePosition(referencePoint); // Update the position
             updateRotation(referencePoint); // Update rotation
-            updateBoundary(); // Update the bounds (using the results from the update position and rotation)
+            updateBoundary(); // Update the bounds (using the results from the updateImage position and rotation)
             isValid = true;
         }
     }

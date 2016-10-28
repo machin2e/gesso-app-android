@@ -1,13 +1,10 @@
 package camp.computer.clay.util.image;
 
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -19,7 +16,6 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 
 // TODO: DO NOT extend Image. Try to remove Space class. If cannot, then consider making it an
@@ -31,12 +27,12 @@ public class Space extends Image {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
-    protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
-    protected Transform extensionPrototypePosition = new Transform();
+    public Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
+    public Transform extensionPrototypePosition = new Transform();
 
-    protected Visibility pathPrototypeVisibility = Visibility.INVISIBLE;
-    protected Transform pathPrototypeSourcePosition = new Transform(0, 0);
-    protected Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
+    public Visibility pathPrototypeVisibility = Visibility.INVISIBLE;
+    public Transform pathPrototypeSourcePosition = new Transform(0, 0);
+    public Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
     private List<Actor> actors = new LinkedList<>();
 
@@ -229,77 +225,8 @@ public class Space extends Image {
         return null;
     }
 
-    // TODO: Rename doDraw to draw after Space no longer extends Image.
-    public void doDraw(Display display) {
-
-        display.canvas.save();
-
-        // Draw any prototype Paths and Extensions
-        drawPathPrototype(display);
-        drawExtensionPrototype(display);
-
-        display.canvas.restore();
-    }
-
 
     // <EXTENSION_PROTOTYPE>
-    private void drawExtensionPrototype(Display display) {
-        if (extensionPrototypeVisibility == Visibility.VISIBLE) {
-
-            Paint paint = display.paint;
-
-            double pathRotationAngle = Geometry.getAngle(pathPrototypeSourcePosition, extensionPrototypePosition);
-
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.parseColor("#fff7f7f7"));
-
-            display.drawRectangle(extensionPrototypePosition, pathRotationAngle + 180, 200, 200);
-        }
-    }
-
-    // TODO: Make this into a shape and put this on a separate layerIndex!
-    public void drawPathPrototype(Display display) {
-        if (pathPrototypeVisibility == Visibility.VISIBLE) {
-
-            Paint paint = display.paint;
-
-            double triangleWidth = 20;
-            double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
-            double triangleSpacing = 35;
-
-            // Color
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(15.0f);
-//            paint.setColor(this.getUniqueColor());
-
-            double pathRotationAngle = Geometry.getAngle(
-                    pathPrototypeSourcePosition,
-                    pathPrototypeDestinationCoordinate
-            );
-
-            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
-                    pathPrototypeSourcePosition,
-                    pathRotationAngle,
-                    2 * triangleSpacing
-            );
-
-            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
-                    pathPrototypeDestinationCoordinate,
-                    pathRotationAngle + 180,
-                    2 * triangleSpacing
-            );
-
-            paint.setColor(Color.parseColor("#efefef"));
-            display.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight);
-
-            // Color
-            paint.setStyle(Paint.Style.FILL);
-//            paint.setColor(Color.parseColor("#efefef"));
-            double shapeRadius = 40.0;
-            display.drawCircle(pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
-        }
-    }
-
     public void setPathPrototypeVisibility(Visibility visibility) {
         pathPrototypeVisibility = visibility;
     }
@@ -359,7 +286,8 @@ public class Space extends Image {
         for (int i = 0; i < portableImages.size(); i++) {
             Image portableImage = portableImages.get(i);
             Entity portableEntity = portableImage.getEntity();
-            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+//            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+            portableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
             portableEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);

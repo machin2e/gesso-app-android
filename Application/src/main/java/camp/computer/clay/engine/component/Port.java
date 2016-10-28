@@ -160,4 +160,15 @@ public class Port extends Component {
         return null;
     }
     // </HACK>
+
+    public boolean hasVisiblePaths() {
+        Group<Image> pathImages = getPaths().getImages();
+        for (int i = 0; i < pathImages.size(); i++) {
+            Image pathImage = pathImages.get(i);
+            if (pathImage.isVisible()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

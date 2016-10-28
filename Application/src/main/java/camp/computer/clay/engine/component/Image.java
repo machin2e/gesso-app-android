@@ -69,12 +69,12 @@ public class Image extends Component {
 
     /**
      * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
-     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code updateImage()}.
      * <p>
      * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
      * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
      * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
-     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     * in the first call to {@code updateImage()} following the call to {@code invalidate()}.
      */
     public void invalidate() {
         for (int i = 0; i < shapes.size(); i++) {
@@ -225,24 +225,6 @@ public class Image extends Component {
     public Shape removeShape(int index) {
         return shapes.remove(index);
     }
-
-    public void update() {
-        updateGeometry();
-    }
-
-    public void updateGeometry() {
-
-        // Update Shapes
-        for (int i = 0; i < this.shapes.size(); i++) {
-            Shape shape = this.shapes.get(i);
-
-            // Update the Shape
-            shape.update(getEntity().getComponent(Transform.class));
-        }
-    }
-
-//    public void draw(Display display) {
-//    }
 
     // <COLLISION_COMPONENT>
     /**

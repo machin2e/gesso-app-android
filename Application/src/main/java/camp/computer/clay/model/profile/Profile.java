@@ -20,8 +20,8 @@ public class Profile {
     }
 
     public Profile(Entity portableEntity) {
-        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPortEntities().size(); i++) {
-            Entity portEntity = portableEntity.getComponent(Portable.class).getPortEntities().get(i);
+        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPorts().size(); i++) {
+            Entity portEntity = portableEntity.getComponent(Portable.class).getPorts().get(i);
             PortProfile portProfile = new PortProfile(portEntity);
             addPort(portProfile);
         }

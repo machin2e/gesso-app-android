@@ -268,7 +268,7 @@ public class Camera extends Component {
 
             // Get portEntities along every PathEntity connected to the Ports on the touched PhoneHost
             Group<Entity> basePathPortEntities = new Group<>();
-            Group<Entity> hostPortEntities = entity.getComponent(Portable.class).getPortEntities();
+            Group<Entity> hostPortEntities = entity.getComponent(Portable.class).getPorts();
             for (int i = 0; i < hostPortEntities.size(); i++) {
                 Entity portEntity = hostPortEntities.get(i);
 
@@ -312,7 +312,7 @@ public class Camera extends Component {
 
             // Get portEntities along every PathEntity connected to the Ports on the selected HostEntity
             Group<Entity> hostPathPortEntities = new Group<>();
-            Group<Entity> extensionPortEntities = entity.getComponent(Portable.class).getPortEntities();
+            Group<Entity> extensionPortEntities = entity.getComponent(Portable.class).getPorts();
             for (int i = 0; i < extensionPortEntities.size(); i++) {
                 Entity portEntity = extensionPortEntities.get(i);
 
@@ -360,7 +360,7 @@ public class Camera extends Component {
 //        Log.v("SetFocus", "setFocus(PathGroup)");
 //
 //        // Get bounding box around the Ports in the specified Paths
-//        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPortEntities());
+//        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
 //        List<Transform> portPositions = pathPortShapes.getPositions();
 //        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
 //

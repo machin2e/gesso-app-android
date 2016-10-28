@@ -115,7 +115,7 @@ public class Messenger {
         return incomingMessages.remove(0);
     }
 
-    // TODO: Unify queues and rename to "queueEvent()" or "update()"
+    // TODO: Unify queues and rename to "queueEvent()" or "updateImage()"
     public void processIncomingMessages() {
 //        Log.v ("UDP_Processing", "<<< processIncomingQueue");
         // Dequeue and queueEvent the next message on the incoming message queue.
@@ -342,7 +342,7 @@ public class Messenger {
         }
 
 //        if (this.datagramServer != null) {
-//            datagramServer.update (outgoingMessage);
+//            datagramServer.updateImage (outgoingMessage);
 //        }
 
     }

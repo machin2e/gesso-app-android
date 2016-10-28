@@ -35,7 +35,7 @@ import java.util.List;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.application.communication.UDPHost;
-import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
@@ -69,7 +69,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_FULLSCREEN = true;
     // </SETTINGS>
 
-    public Display display;
+    public PlatformRenderSurface platformRenderSurface;
 
     private SpeechOutput speechOutput;
 
@@ -465,8 +465,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         setContentView(R.layout.activity_main);
 
         // Space Surface
-        display = (Display) findViewById(R.id.app_surface_view);
-        display.onResume();
+        platformRenderSurface = (PlatformRenderSurface) findViewById(R.id.app_surface_view);
+        platformRenderSurface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
@@ -996,7 +996,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onPause();
 
         // <VISUALIZATION>
-        display.onPause();
+        platformRenderSurface.onPause();
         // </VISUALIZATION>
     }
 
@@ -1012,7 +1012,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // <VISUALIZATION>
-        display.onResume();
+        platformRenderSurface.onResume();
         // </VISUALIZATION>
     }
 
@@ -1071,12 +1071,12 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return Application.applicationView;
     }
 
-    public Display getDisplay() {
-        return this.display;
+    public PlatformRenderSurface getPlatformRenderSurface() {
+        return this.platformRenderSurface;
     }
 
     public double getFramesPerSecond() {
-        return getDisplay().getDisplayOutput().getFramesPerSecond();
+        return getPlatformRenderSurface().getPlatformRenderer().getFramesPerSecond();
     }
 
     public SpeechOutput getSpeechOutput() {

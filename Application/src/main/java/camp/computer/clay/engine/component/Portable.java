@@ -9,7 +9,6 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Visibility;
 
 public class Portable extends Component {
@@ -20,7 +19,7 @@ public class Portable extends Component {
         super();
     }
 
-    public Group<Entity> getPortEntities() {
+    public Group<Entity> getPorts() {
         return this.portEntities;
     }
 
@@ -48,8 +47,8 @@ public class Portable extends Component {
 
     public Group<Entity> getExtensions() {
         Group<Entity> extensionEntities = new Group<>();
-        for (int i = 0; i < getPortEntities().size(); i++) {
-            Entity portEntity = getPortEntities().get(i);
+        for (int i = 0; i < getPorts().size(); i++) {
+            Entity portEntity = getPorts().get(i);
 
             Entity extensionEntity = portEntity.getComponent(Port.class).getExtension();
 
@@ -96,24 +95,24 @@ public class Portable extends Component {
 
     // <PORTABLE_IMAGE_HELPERS>
 
-    public Group<Shape> getPortShapes() {
-        Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPortEntities();
-        return getEntity().getComponent(Image.class).getShapes(portEntities);
-    }
+//    public Group<Shape> getPortShapes() {
+//        Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPorts();
+//        return getEntity().getComponent(Image.class).getShapes(portEntities);
+//    }
 
     // <REFACTOR>
 
-    // TODO: Move into PortEntity? something (inner class? custom PortShape?)
-    public boolean hasVisiblePaths(int portIndex) {
-        Group<Image> pathImages = getEntity().getComponent(Portable.class).getPort(portIndex).getComponent(Port.class).getPaths().getImages();
-        for (int i = 0; i < pathImages.size(); i++) {
-            Image pathImage = pathImages.get(i);
-            if (pathImage.isVisible()) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    // TODO: Move into PortEntity? something (inner class? custom PortShape?)
+//    public boolean hasVisiblePaths(int portIndex) {
+//        Group<Image> pathImages = getEntity().getComponent(Portable.class).getPort(portIndex).getComponent(Port.class).getPaths().getImages();
+//        for (int i = 0; i < pathImages.size(); i++) {
+//            Image pathImage = pathImages.get(i);
+//            if (pathImage.isVisible()) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     // TODO: Move into PortEntity? something (inner class? custom PortShape?)
     public Group<Image> getPathImages(Entity portEntity) {
@@ -129,7 +128,7 @@ public class Portable extends Component {
     // <VISIBILITY_COMPONENT>
     // TODO: Move into PathImage
     public void setPathVisibility(Visibility visibility) {
-        Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPortEntities();
+        Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPorts();
         for (int i = 0; i < portEntities.size(); i++) {
             Entity portEntity = portEntities.get(i);
 

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context="camp.computer.clay.application.Application">
 
-    <camp.computer.clay.application.graphics.Display
+    <camp.computer.clay.application.graphics.PlatformRenderSurface
         android:id="@+id/app_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

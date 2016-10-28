@@ -191,6 +191,174 @@
         "rotation": 270.0
       },
       {
+        "label": "Port 1",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": -19.0,
+          "y": 40.0
+        },
+        "rotation": 0.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 2",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 0.0,
+          "y": 40.0
+        },
+        "rotation": 0.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 3",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 19.0,
+          "y": 40.0
+        },
+        "rotation": 0.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 4",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 40.0,
+          "y": 19.0
+        },
+        "rotation": 90.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 5",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 40.0,
+          "y": 0.0
+        },
+        "rotation": 90.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 6",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 40.0,
+          "y": -19.0
+        },
+        "rotation": 90.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 7",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 19.0,
+          "y": -40.0
+        },
+        "rotation": 180.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 8",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": 0.0,
+          "y": -40.0
+        },
+        "rotation": 180.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 9",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": -19.0,
+          "y": -40.0
+        },
+        "rotation": 180.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 10",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": -40.0,
+          "y": -19.0
+        },
+        "rotation": 270.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 11",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": -40.0,
+          "y": 0.0
+        },
+        "rotation": 270.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
+        "label": "Port 12",
+        "type": "Circle",
+        "radius": 8.33,
+        "position": {
+          "x": -40.0,
+          "y": 19.0
+        },
+        "rotation": 270.0,
+        "style": {
+          "color": "#efefef",
+          "outlineThickness": 0.0
+        }
+      },
+      {
         "label": "LED 1",
         "type": "Rectangle",
         "width": 2.0,
