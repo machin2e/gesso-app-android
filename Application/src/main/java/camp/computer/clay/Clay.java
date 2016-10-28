@@ -139,22 +139,21 @@ public class Clay {
         Entity hostEntity = new Entity();
 
         // Add Extension Component (for type identification)
-        hostEntity.setComponent(new Host(hostEntity));
+        hostEntity.addComponent(new Host(hostEntity));
 
         // <HACK>
         hostEntity.getComponent(Host.class).setupHeaderExtensions();
         // </HACK>
 
         // Add Portable Component (so can add Ports)
-        hostEntity.setComponent(new Portable(hostEntity));
+        hostEntity.addComponent(new Portable(hostEntity));
 
         // PortableEntity Component (Image Component depends on this)
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
-            //PortEntity portEntity = new PortEntity();
-            Entity portEntity = new Entity();
 
-            portEntity.setComponent(new Port(portEntity));
+            UUID portUuid = Clay.createEntity(Port.class);
+            Entity portEntity = Entity.getEntity(portUuid);
 
             portEntity.setLabel("Port " + (j + 1));
             portEntity.getComponent(Port.class).setIndex(j);
@@ -163,10 +162,10 @@ public class Clay {
         }
 
         // Add Transform Component
-        hostEntity.setComponent(new Transform());
+        hostEntity.addComponent(new Transform());
 
         // Add Image Component
-        hostEntity.setComponent(new Image(hostEntity));
+        hostEntity.addComponent(new Image(hostEntity));
 
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
@@ -189,7 +188,7 @@ public class Clay {
 
         ActionListenerComponent actionListener = new ActionListenerComponent(hostEntity);
         actionListener.setOnActionListener(getHostActionListener(hostEntity));
-        hostEntity.setComponent(actionListener);
+        hostEntity.addComponent(actionListener);
         // </HACK>
 
         return hostEntity.getUuid();
@@ -201,18 +200,18 @@ public class Clay {
         Entity extensionEntity = new Entity();
 
         // Add Extension Component (for type identification)
-        extensionEntity.setComponent(new Extension(extensionEntity));
+        extensionEntity.addComponent(new Extension(extensionEntity));
 
         // Add Portable Component (so can add Ports)
-        extensionEntity.setComponent(new Portable(extensionEntity));
+        extensionEntity.addComponent(new Portable(extensionEntity));
 
         // <PORTABLE_COMPONENT>
         // Create Ports and add them to the ExtensionEntity
         int defaultPortCount = 1;
         for (int j = 0; j < defaultPortCount; j++) {
-            Entity portEntity = new Entity();
 
-            portEntity.setComponent(new Port(portEntity));
+            UUID portUuid = Clay.createEntity(Port.class);
+            Entity portEntity = Entity.getEntity(portUuid);
 
             portEntity.getComponent(Port.class).setIndex(j);
             extensionEntity.getComponent(Portable.class).addPort(portEntity);
@@ -220,8 +219,8 @@ public class Clay {
         // </PORTABLE_COMPONENT>
 
         // Add Components
-        extensionEntity.setComponent(new Transform());
-        extensionEntity.setComponent(new Image(extensionEntity));
+        extensionEntity.addComponent(new Transform());
+        extensionEntity.addComponent(new Image(extensionEntity));
 
         // <LOAD_GEOMETRY_FROM_FILE>
         Rectangle rectangle;
@@ -254,7 +253,7 @@ public class Clay {
 
         ActionListenerComponent actionListener = new ActionListenerComponent(extensionEntity);
         actionListener.setOnActionListener(getExtensionActionListener(extensionEntity));
-        extensionEntity.setComponent(actionListener);
+        extensionEntity.addComponent(actionListener);
         // </HACK>
 
         return extensionEntity.getUuid();
@@ -264,7 +263,7 @@ public class Clay {
         Entity pathEntity = new Entity();
 
         // Add Path Component (for type identification)
-        pathEntity.setComponent(new Path(pathEntity));
+        pathEntity.addComponent(new Path(pathEntity));
 
         Image pathImage = new Image(pathEntity); // Create PathEntity Image
 
@@ -280,8 +279,8 @@ public class Clay {
         pathImage.addShape(segment);
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
-        pathEntity.setComponent(new Transform());
-        pathEntity.setComponent(pathImage); // Assign Image to Entity
+        pathEntity.addComponent(new Transform());
+        pathEntity.addComponent(pathImage); // Assign Image to Entity
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
@@ -289,14 +288,25 @@ public class Clay {
 
         ActionListenerComponent actionListener = new ActionListenerComponent(pathEntity);
         actionListener.setOnActionListener(getPathActionListener(pathEntity));
-        pathEntity.setComponent(actionListener);
+        pathEntity.addComponent(actionListener);
         // </HACK>
 
         return pathEntity.getUuid();
     }
 
     private static UUID createPortEntity() {
-        return null;
+
+        Entity port = new Entity();
+
+        // Add Port Component so Entity is identifiable as a Port
+        port.addComponent(new Port(port));
+
+        // Add Components
+        port.addComponent(new Transform());
+        port.addComponent(new Image(port));
+
+        return port.getUuid();
+
     }
 
     private static UUID createCameraEntity() {
@@ -304,10 +314,10 @@ public class Clay {
         Entity cameraEntity = new Entity();
 
         // Add Path Component (for type identification)
-        cameraEntity.setComponent(new Camera(cameraEntity));
+        cameraEntity.addComponent(new Camera(cameraEntity));
 
         // Add Transform Component
-        cameraEntity.setComponent(new Transform());
+        cameraEntity.addComponent(new Transform());
 
 //        // <HACK>
 //        // NOTE: This has to be done after adding an ImageComponent
@@ -315,7 +325,7 @@ public class Clay {
 //
 //        ActionListenerComponent actionListener = new ActionListenerComponent(cameraEntity);
 //        actionListener.setOnActionListener(getPathActionListener(cameraEntity));
-//        cameraEntity.setComponent(actionListener);
+//        cameraEntity.addComponent(actionListener);
 //        // </HACK>
 
         return cameraEntity.getUuid();
@@ -436,7 +446,6 @@ public class Clay {
 
                                     if (portableEntity.hasComponent(Extension.class)) { // HACK
                                         if (portableEntity.getComponent(Extension.class).getProfile() == null) {
-//                                            if (portableImage.getEntity() instanceof ExtensionEntity) {
                                             Entity extensionPortableEntity = portableImage.getEntity();
 
                                             boolean addPrototypePort = true;
@@ -449,14 +458,13 @@ public class Clay {
                                             }
 
                                             if (addPrototypePort) {
-                                                Entity portEntity = new Entity();
 
-                                                portEntity.setComponent(new Port(portEntity));
+                                                UUID portUuid = Clay.createEntity(Port.class);
+                                                Entity portEntity = Entity.getEntity(portUuid);
 
                                                 portEntity.getComponent(Port.class).setIndex(extensionPortableEntity.getComponent(Portable.class).getPortEntities().size());
                                                 extensionPortableEntity.getComponent(Portable.class).addPort(portEntity);
                                             }
-//                                            }
                                         }
                                     }
 
@@ -836,7 +844,7 @@ public class Clay {
 //    private static UUID createPathEntity(PortEntity sourcePort, PortEntity targetPort) {
 //        PathEntity path = new PathEntity(sourcePort, targetPort);
 //        PathImage pathImage = new PathImage(path); // Create PathEntity Image
-//        path.setComponent(pathImage); // Assign Image to Entity
+//        path.addComponent(pathImage); // Assign Image to Entity
 //
 //        return path.getUuid();
 //    }

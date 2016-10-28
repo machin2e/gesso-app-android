@@ -15,6 +15,8 @@ import camp.computer.clay.util.image.Visibility;
 
 public class Host extends Component {
 
+    public List<List<Entity>> headerExtensions = new ArrayList<>();
+
     public Host(Entity entity) {
         super(entity);
     }
@@ -26,43 +28,7 @@ public class Host extends Component {
         headerExtensions.add(new ArrayList<Entity>());
     }
 
-    public void update() {
-        updateImage();
-    }
-
-    // <HACK>
-    public void updateImage() {
-
-        Group<Shape> lightShapeGroup = null;
-
-        // Get LED shapes
-        if (lightShapeGroup == null) {
-            lightShapeGroup = getEntity().getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
-        }
-
-        // Update PortEntity and LED shape styles
-        for (int i = 0; i < getEntity().getComponent(Portable.class).getPortEntities().size(); i++) {
-            Entity portEntity = getEntity().getComponent(Portable.class).getPortEntities().get(i);
-            Shape portShape = getEntity().getComponent(Image.class).getShape(portEntity.getLabel()); // Shape portShape = getShape(portEntity);
-
-            // Update color of PortEntity shape based on type
-            portShape.setColor(camp.computer.clay.util.Color.getColor(portEntity.getComponent(Port.class).getType()));
-
-            // Update color of LED based on corresponding PortEntity's type
-            lightShapeGroup.get(i).setColor(portShape.getColor());
-        }
-
-        // Call this so PortableEntity.update() will be called to update Geometry
-        getEntity().getComponent(Image.class).update();
-    }
-    // </HACK>
-
-
-
-
     //----------------------
-
-    public List<List<Entity>> headerExtensions = new ArrayList<>();
 
     /**
      * Creates a new {@code ExtensionEntity} connected to {@hostPort}.
@@ -148,7 +114,7 @@ public class Host extends Component {
         Entity extensionEntity = new Entity();
 
         // Add Extension Component (for type identification)
-        extensionEntity.setComponent(new Extension(extensionEntity));
+        extensionEntity.addComponent(new Extension(extensionEntity));
 
         // <HACK>
         // TODO: Remove references to Profile in Portables. Remove Profile altogether!?

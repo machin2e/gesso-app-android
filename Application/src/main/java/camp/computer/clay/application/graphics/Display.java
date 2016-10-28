@@ -52,6 +52,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
     // Space DisplayOutput
     private SurfaceHolder surfaceHolder;
+
     private DisplayOutput displayOutput;
 
     // Coordinate System (Grid)
@@ -316,16 +317,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
             if (canvas != null) {
                 synchronized (holder) {
-
-
-                    // <UPDATE>
-                    updateSystem.update(space);
-                    // </UPDATE>
-
-
-
-                    // Draw
-                    doDraw(canvas);
+                    doUpdate(canvas);
                 }
             }
         } finally {
@@ -333,6 +325,16 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 holder.unlockCanvasAndPost(canvas);
             }
         }
+    }
+
+    public void doUpdate(Canvas canvas) {
+
+        // <UPDATE>
+        updateSystem.update(space);
+        // </UPDATE>
+
+        // Draw
+        doDraw(canvas);
     }
 
     public DisplayOutput getDisplayOutput() {
@@ -348,11 +350,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int screenWidth = metrics.widthPixels;
         int screenHeight = metrics.heightPixels;
 
-//        space.getEntity().getActor(0).getCameraEntity().setWidth(screenWidth);
-//        space.getEntity().getActor(0).getCameraEntity().setHeight(screenHeight);
-        Entity cameraEntity = getCamera();
-        cameraEntity.getComponent(Camera.class).setWidth(screenWidth);
-        cameraEntity.getComponent(Camera.class).setHeight(screenHeight);
+        // Set camera viewport dimensions
+        Entity camera = getCamera();
+        camera.getComponent(Camera.class).setWidth(screenWidth);
+        camera.getComponent(Camera.class).setHeight(screenHeight);
     }
 
     public Space getSpace() {
@@ -448,19 +449,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         return true;
     }
-
-//    // TODO: Remove reference to Image. WTF.
-//    public void updateEntities() {
-//        for (int i = 0; i < Entity.Manager.size(); i++) {
-//            Entity entity = Entity.Manager.get(i);
-////            Image image = entity.getComponent(Image.class);
-////            if (image != null) {
-//////                image.draw(this);
-////                image.update();
-////            }
-//            entity.update();
-//        }
-//    }
 
     public void drawEntities() {
         for (int i = 0; i < Entity.Manager.size(); i++) {

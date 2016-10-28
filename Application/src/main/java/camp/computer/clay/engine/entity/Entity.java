@@ -114,7 +114,7 @@ public final class Entity extends Groupable {
 
 
     // <TEMPORARY_COMPONENT_INTERFACE>
-    public <C extends Component> void setComponent(C component) {
+    public <C extends Component> void addComponent(C component) {
         if (component instanceof Transform) {
             this.transform = (Transform) component;
         } else if (component instanceof Image) {
@@ -163,10 +163,19 @@ public final class Entity extends Groupable {
             return null;
         }
     }
+
+    public <C extends Component> C removeComponent(Class<C> type) {
+        C component = getComponent(type);
+        if (component != null) {
+            components.remove(component);
+        }
+        return component;
+    }
     // </TEMPORARY_COMPONENT_INTERFACE>
 
 
     // <GENERIC_COMPONENT_INTERFACE>
+    /*
     public boolean addComponent(Component component) {
         this.components.add(component);
         return true;
@@ -183,43 +192,17 @@ public final class Entity extends Groupable {
     public Component getComponent(UUID uuid) {
         return components.get(uuid);
     }
+    */
 
+    /*
+    // TODO?
     public Component getComponent(UUID entityUuid, UUID componentUuid) {
         return null;
     }
+    */
 
     public boolean hasComponent(UUID uuid) {
         return components.contains(uuid);
     }
     // </GENERIC_COMPONENT_INTERFACE>
-
-
-    // <TRANSFORM_COMPONENT>
-//    public Transform getPosition() {
-//        return transform;
-//    }
-
-//    public boolean hasTransform() {
-//        return (this.transform != null);
-//    }
-
-//    public void setPosition(Transform transform) {
-//        this.transform = transform;
-//    }
-    // </TRANSFORM_COMPONENT>
-
-
-    // <IMAGE_COMPONENT>
-//    public boolean hasImage() {
-//        return hasComponent(Image.class);
-//    }
-
-//    public Image getImage() {
-//        return getComponent(Image.class);
-//    }
-
-//    public void setImage(Image image) {
-//        setComponent(image);
-//    }
-    // </IMAGE_COMPONENT>
 }
