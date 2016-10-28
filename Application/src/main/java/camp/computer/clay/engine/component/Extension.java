@@ -16,8 +16,8 @@ import camp.computer.clay.util.image.Visibility;
 
 public class Extension extends Component {
 
-    public Extension(Entity entity) {
-        super(entity);
+    public Extension() {
+        super();
     }
 
     // <FROM_EXTENSION_ENTITY>
@@ -202,8 +202,7 @@ public class Extension extends Component {
         // Create Ports to match the Profile
         for (int i = 0; i < profile.getPorts().size(); i++) {
 
-            UUID portUuid = Clay.createEntity(Port.class);
-            Entity portEntity = Entity.getEntity(portUuid);
+            Entity portEntity = Clay.createEntity(Port.class);
 
             portEntity.getComponent(Port.class).setIndex(i);
             portEntity.getComponent(Port.class).setType(profile.getPorts().get(i).getType());

@@ -115,6 +115,8 @@ public final class Entity extends Groupable {
 
     // <TEMPORARY_COMPONENT_INTERFACE>
     public <C extends Component> void addComponent(C component) {
+
+        // Add to Entity
         if (component instanceof Transform) {
             this.transform = (Transform) component;
         } else if (component instanceof Image) {
@@ -134,6 +136,9 @@ public final class Entity extends Groupable {
         } else if (component instanceof Camera) {
             this.camera = (Camera) component;
         }
+
+        // Associate with Entity
+        component.setEntity(this);
     }
 
     public boolean hasComponent(Class<? extends Component> type) {

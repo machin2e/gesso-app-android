@@ -17,8 +17,8 @@ public class Host extends Component {
 
     public List<List<Entity>> headerExtensions = new ArrayList<>();
 
-    public Host(Entity entity) {
-        super(entity);
+    public Host() {
+        super();
     }
 
     public void setupHeaderExtensions() {
@@ -49,8 +49,7 @@ public class Host extends Component {
         // TODO: Prompt to select extensionEntity to use! Then use that profile to create and configure portEntities for the extensionEntity.
 
         // Create ExtensionEntity Entity
-        UUID extensionUuid = Clay.createEntity(Extension.class); // HACK: Because Extension is a Component
-        Entity extensionEntity = Entity.Manager.get(extensionUuid);
+        Entity extensionEntity = Clay.createEntity(Extension.class); // HACK: Because Extension is a Component
 
         // Set the initial position of the ExtensionEntity
         extensionEntity.getComponent(Transform.class).set(initialPosition);
@@ -67,8 +66,7 @@ public class Host extends Component {
         extensionPortEntity.getComponent(Port.class).setType(hostPortEntity.getComponent(Port.class).getType());
 
         // Create PathEntity from HostEntity to ExtensionEntity and configure the new PathEntity
-        UUID pathUuid = Clay.createEntity(Path.class);
-        Entity pathEntity = Entity.getEntity(pathUuid);
+        Entity pathEntity = Clay.createEntity(Path.class);
         pathEntity.getComponent(Path.class).set(hostPortEntity, extensionPortEntity);
 
         // Remove focus from other Hosts and their Ports
@@ -114,7 +112,7 @@ public class Host extends Component {
         Entity extensionEntity = new Entity();
 
         // Add Extension Component (for type identification)
-        extensionEntity.addComponent(new Extension(extensionEntity));
+        extensionEntity.addComponent(new Extension());
 
         // <HACK>
         // TODO: Remove references to Profile in Portables. Remove Profile altogether!?
@@ -147,8 +145,7 @@ public class Host extends Component {
             selectedHostPortEntity.getComponent(Port.class).setDirection(extensionEntity.getComponent(Portable.class).getPortEntities().get(i).getComponent(Port.class).getDirection());
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
-            UUID pathUuid = Clay.createEntity(Path.class);
-            Entity pathEntity = Entity.getEntity(pathUuid);
+            Entity pathEntity = Clay.createEntity(Path.class);
             pathEntity.getComponent(Path.class).set(selectedHostPortEntity, extensionEntity.getComponent(Portable.class).getPortEntities().get(i));
 
             pathEntity.getComponent(Path.class).setType(Path.Type.ELECTRONIC);

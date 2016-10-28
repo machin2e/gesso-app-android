@@ -16,8 +16,8 @@ public class Portable extends Component {
 
     protected Group<Entity> portEntities = new Group<>();
 
-    public Portable(Entity entity) {
-        super(entity);
+    public Portable() {
+        super();
     }
 
     public Group<Entity> getPortEntities() {

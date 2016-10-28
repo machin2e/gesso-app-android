@@ -43,7 +43,7 @@ public class Transform extends Component {
     public Transform(Transform otherPoint) {
 
         // <HACK>
-        super(null);
+        super();
         // </HACK>
 
         this.x = otherPoint.x;
@@ -53,7 +53,7 @@ public class Transform extends Component {
     public Transform(double x, double y) {
 
         // <HACK>
-        super(null);
+        super();
         // </HACK>
 
         this.x = x;

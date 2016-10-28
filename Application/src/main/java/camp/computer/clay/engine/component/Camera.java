@@ -51,8 +51,8 @@ public class Camera extends Component {
     protected int positionFrameLimit = 0;
     protected Transform originalPosition = new Transform();
 
-    public Camera(Entity entity) {
-        super(entity);
+    public Camera() {
+        super();
     }
 
     public void setSpace(Space space) {

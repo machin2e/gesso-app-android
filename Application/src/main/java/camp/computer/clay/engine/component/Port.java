@@ -51,8 +51,8 @@ public class Port extends Component {
         }
     }
 
-    public Port(Entity entity) {
-        super(entity);
+    public Port() {
+        super();
     }
 
     /**

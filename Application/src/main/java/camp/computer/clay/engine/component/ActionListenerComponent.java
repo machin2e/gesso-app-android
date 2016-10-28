@@ -8,8 +8,8 @@ public class ActionListenerComponent extends Component {
 
     private ActionListener actionListener = null;
 
-    public ActionListenerComponent(Entity entity) {
-        super(entity);
+    public ActionListenerComponent() {
+        super();
     }
 
     public void setOnActionListener(ActionListener actionListener) {

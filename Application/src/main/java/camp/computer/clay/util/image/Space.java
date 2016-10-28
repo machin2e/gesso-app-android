@@ -38,7 +38,7 @@ public class Space extends Image {
     private List<Actor> actors = new LinkedList<>();
 
     public Space() {
-        super(null);
+        super();
         setup();
     }
 

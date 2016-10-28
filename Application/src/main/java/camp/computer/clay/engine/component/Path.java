@@ -55,8 +55,8 @@ public class Path extends Component {
 
     private UUID target;
 
-    public Path(Entity entity) {
-        super(entity);
+    public Path() {
+        super();
         setup();
     }
 

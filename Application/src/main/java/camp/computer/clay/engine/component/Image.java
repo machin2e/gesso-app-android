@@ -82,8 +82,8 @@ public class Image extends Component {
         }
     }
 
-    public Image(Entity entity) {
-        super(entity);
+    public Image() {
+        super();
     }
 
     public boolean isVisible() {

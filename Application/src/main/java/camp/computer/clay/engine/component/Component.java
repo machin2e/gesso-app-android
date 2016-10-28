@@ -7,7 +7,11 @@ public abstract class Component extends Groupable {
 
     private Entity entity = null;
 
-    public Component(Entity entity) {
+    public Component() {
+        this.entity = null;
+    }
+
+    public void setEntity(Entity entity) {
         this.entity = entity;
     }
 
