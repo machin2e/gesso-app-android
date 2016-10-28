@@ -453,11 +453,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
     public void drawEntities() {
         for (int i = 0; i < Entity.Manager.size(); i++) {
             Entity entity = Entity.Manager.get(i);
-            Image image = entity.getComponent(Image.class);
-            if (image != null) {
-//                image.draw(this);
-                drawEntity(entity);
-            }
+            drawEntity(entity);
         }
     }
 
@@ -485,7 +481,6 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
                 canvas.restore();
             }
 
-        //} else if (entity.getClass() == PathEntity.class) {
         } else if (entity.hasComponent(Path.class)) {
 
             Image image = entity.getComponent(Image.class);

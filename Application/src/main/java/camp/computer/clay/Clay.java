@@ -35,6 +35,7 @@ import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.image.Shape;
@@ -182,6 +183,19 @@ public class Clay {
         // </HACK>
 
         // <HACK>
+        Group<Shape> pinContactPoints = hostEntity.getComponent(Image.class).getShapes();
+        for (int i = 0; i < pinContactPoints.size(); i++) {
+            if (pinContactPoints.get(i).getLabel().startsWith("Pin")) {
+                String label = pinContactPoints.get(i).getLabel();
+//                Entity portEntity = hostEntity.getComponent(Portable.class).getPort(label);
+//                pinContactPoints.get(i).setEntity(portEntity);
+                Point contactPointShape = (Point) pinContactPoints.get(i);
+                hostEntity.getComponent(Portable.class).headerContactPositions.add(contactPointShape);
+            }
+        }
+        // </HACK>
+
+        // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
 //        hostEntity.setupActionListener();
 
@@ -299,9 +313,9 @@ public class Clay {
         // Add Port Component so Entity is identifiable as a Port
         port.addComponent(new Port());
 
-        // Add Components
-        port.addComponent(new Transform());
-        port.addComponent(new Image());
+//        // Add Components
+//        port.addComponent(new Transform());
+//        port.addComponent(new Image());
 
         return port;
 
@@ -403,7 +417,7 @@ public class Clay {
                                         otherImage.getEntity().getComponent(Transform.class)
                                 );
 
-                                if (distanceToHostImage < 375) { // 500
+                                if (distanceToHostImage < 375) { // 375, 500
                                     isCreateExtensionAction = false;
                                     break;
                                 }
@@ -507,14 +521,14 @@ public class Clay {
 
                             hostImage.setTransparency(1.0);
 
-                            // Show portEntities and paths of touched form
+                            // Show Ports and Paths of touched Host
                             for (int i = 0; i < hostEntity.getComponent(Portable.class).getPortEntities().size(); i++) {
                                 Group<Entity> pathEntities = hostEntity.getComponent(Portable.class).getPort(i).getComponent(Port.class).getPaths();
 
                                 for (int j = 0; j < pathEntities.size(); j++) {
                                     Entity pathEntity = pathEntities.get(j);
 
-                                    // Show source and target portEntities in pathEntity
+                                    // Show source and target Ports in Paths
                                     Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
                                     Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
 
@@ -523,29 +537,28 @@ public class Clay {
                                 }
                             }
 
-                            // CameraEntity
+                            // Camera
                             cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
 
                             if (hostEntity.getComponent(Portable.class).getExtensions().size() > 0) {
-//                                                    Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
+//                                Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
                                 hostEntity.getComponent(Portable.class).getExtensions().setTransparency(0.1);
 
                                 // <HACK>
                                 // TODO: Replace ASAP. This is shit.
                                 // TODO: Use "rectangle" or "circular" extension layout algorithms
-                                hostEntity.getComponent(Host.class).setExtensionDistance(500);
+                                hostEntity.getComponent(Host.class).setExtensionDistance(Space.HOST_TO_EXTENSION_LONG_DISTANCE);
                                 // </HACK>
                             }
 
                             // Title
-                            Space.getSpace().setTitleText("HostEntity");
+                            Space.getSpace().setTitleText("Host");
                             Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
 
                         } else {
 
                             // TODO: Release longer than tap!
 
-                            //if (event.getTargetImage().getEntity() instanceof HostEntity) {
                             if (event.getTargetImage().getEntity().hasComponent(Host.class)) {
 
                                 // If getFirstEvent queueEvent was on the same form, then respond
@@ -553,22 +566,21 @@ public class Clay {
                                 if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity().hasComponent(Host.class)) {
 
                                     // HostEntity
-//                                                        event.getTargetImage().queueEvent(action);
+//                                    event.getTargetImage().queueEvent(action);
 
                                     // CameraEntity
-//                                                        cameraEntity.setFocus();
+//                                    cameraEntity.setFocus();
                                 }
 
                             } else if (event.getTargetImage() instanceof Space) {
 
                                 // HostEntity
-//                                                        action.getFirstEvent().getTargetImage().queueEvent(action);
+//                                action.getFirstEvent().getTargetImage().queueEvent(action);
 
                             }
-
                         }
 
-                        // Check if connecting to a extension
+                        // Check if connecting to a Extension
                         if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
                             Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
@@ -615,28 +627,30 @@ public class Clay {
                                 Entity portEntity = action.getFirstEvent().getTargetShape().getEntity();
                                 int portIndex = hostEntity.getComponent(Portable.class).getPortEntities().indexOf(portEntity);
 
-                                if (portEntity.getComponent(Port.class).getExtension() == null || portEntity.getComponent(Port.class).getExtension().getComponent(Extension.class).getProfile() == null) {
+                                Port portComponent = portEntity.getComponent(Port.class);
 
-                                    if (portEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
+                                if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
+
+                                    if (portComponent.getType() == Port.Type.NONE) {
 
                                         // Set initial PortEntity Type
 
                                         Log.v("TouchPort", "-A");
 
-                                        portEntity.getComponent(Port.class).setDirection(Port.Direction.INPUT);
-                                        portEntity.getComponent(Port.class).setType(Port.Type.next(portEntity.getComponent(Port.class).getType()));
+                                        portComponent.setDirection(Port.Direction.INPUT);
+                                        portComponent.setType(Port.Type.next(portComponent.getType()));
 
-                                    } else if (!portEntity.getComponent(Port.class).hasPath()) {
+                                    } else if (!portComponent.hasPath()) {
 
                                         // Change PortEntity Type
 
                                         Log.v("TouchPort", "-B");
 
-                                        Port.Type nextType = portEntity.getComponent(Port.class).getType();
-                                        while ((nextType == Port.Type.NONE) || (nextType == portEntity.getComponent(Port.class).getType())) {
+                                        Port.Type nextType = portComponent.getType();
+                                        while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
                                             nextType = Port.Type.next(nextType);
                                         }
-                                        portEntity.getComponent(Port.class).setType(nextType);
+                                        portComponent.setType(nextType);
 
                                     } else if (hostEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
 
@@ -647,14 +661,14 @@ public class Clay {
                                         // Paths are being shown. Touching a portEntity changes the portEntity type. This will also
                                         // updates the corresponding path requirement.
 
-                                        Port.Type nextType = portEntity.getComponent(Port.class).getType();
-                                        while ((nextType == Port.Type.NONE) || (nextType == portEntity.getComponent(Port.class).getType())) {
+                                        Port.Type nextType = portComponent.getType();
+                                        while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
                                             nextType = Port.Type.next(nextType);
                                         }
 
                                         // <FILTER>
                                         // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
-                                        Group<Entity> pathEntities = portEntity.getComponent(Port.class).getPaths();
+                                        Group<Entity> pathEntities = portComponent.getPaths();
                                         for (int i = 0; i < pathEntities.size(); i++) {
                                             Entity pathEntity = pathEntities.get(i);
 

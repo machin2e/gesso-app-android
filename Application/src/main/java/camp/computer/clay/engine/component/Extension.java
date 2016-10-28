@@ -1,7 +1,5 @@
 package camp.computer.clay.engine.component;
 
-import java.util.UUID;
-
 import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
@@ -47,7 +45,6 @@ public class Extension extends Component {
      * Update the {@code Image} to match the state of the corresponding {@code Entity}.
      */
     public void updateGeometry() {
-//        super.updateGeometry();
 
         updatePortGeometry();
         updateHeaderGeometry();
@@ -80,8 +77,8 @@ public class Extension extends Component {
 
                 // Ports
                 Circle<Entity> circle = new Circle<>(portEntity);
-                circle.setRadius(40);
-                circle.setLabel("PortEntity " + (getEntity().getComponent(Portable.class).getPortEntities().size() + 1));
+                circle.setRadius(50);
+                circle.setLabel("Port " + (getEntity().getComponent(Portable.class).getPortEntities().size() + 1));
                 circle.setPosition(-90, 175);
                 // circle.setRotation(0);
 

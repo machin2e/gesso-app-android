@@ -335,7 +335,7 @@ public class Camera extends Component {
 
             // Increase distance between HostEntity and ExtensionEntity
             Entity hostEntity = entity.getComponent(Portable.class).getHosts().get(0);
-            hostEntity.getComponent(Host.class).setExtensionDistance(500);
+            hostEntity.getComponent(Host.class).setExtensionDistance(Space.HOST_TO_EXTENSION_LONG_DISTANCE);
 
 //            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPortEntities);
 //            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
@@ -377,7 +377,7 @@ public class Camera extends Component {
         space.hideAllPorts();
 
         // Update distance between Hosts and Extensions
-        space.setPortableSeparation(300);
+        space.setPortableSeparation(Space.HOST_TO_EXTENSION_SHORT_DISTANCE);
 
         // Update scale and position
         adjustScale();

@@ -33,9 +33,9 @@ public class Host extends Component {
     /**
      * Creates a new {@code ExtensionEntity} connected to {@hostPort}.
      *
-     * @param hostPortEntity
+     * @param hostPort
      */
-    public Entity createExtension(Entity hostPortEntity, Transform initialPosition) {
+    public Entity createExtension(Entity hostPort, Transform initialPosition) {
 
         // TODO: Remove initialPosition... find the position by analyzing the geometry of the HostImage
 
@@ -48,29 +48,28 @@ public class Host extends Component {
 
         // TODO: Prompt to select extensionEntity to use! Then use that profile to create and configure portEntities for the extensionEntity.
 
-        // Create ExtensionEntity Entity
+        // Create Extension Entity
         Entity extensionEntity = Clay.createEntity(Extension.class); // HACK: Because Extension is a Component
 
-        // Set the initial position of the ExtensionEntity
+        // Set the initial position of the Extension
         extensionEntity.getComponent(Transform.class).set(initialPosition);
 
-        // Configure HostEntity's PortEntity (i.e., the PathEntity's source PortEntity)
-        if (hostPortEntity.getComponent(Port.class).getType() == Port.Type.NONE || hostPortEntity.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
-            hostPortEntity.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
-            hostPortEntity.getComponent(Port.class).setDirection(Port.Direction.BOTH);
+        // Configure Host's Port (i.e., the Path's source Port)
+        if (hostPort.getComponent(Port.class).getType() == Port.Type.NONE || hostPort.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
+            hostPort.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
+            hostPort.getComponent(Port.class).setDirection(Port.Direction.BOTH);
         }
 
-        // Configure ExtensionEntity's Ports (i.e., the PathEntity's target PortEntity)
+        // Configure Extension's Ports (i.e., the Path's target Port)
         Entity extensionPortEntity = extensionEntity.getComponent(Portable.class).getPortEntities().get(0);
         extensionPortEntity.getComponent(Port.class).setDirection(Port.Direction.INPUT);
-        extensionPortEntity.getComponent(Port.class).setType(hostPortEntity.getComponent(Port.class).getType());
+        extensionPortEntity.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
 
-        // Create PathEntity from HostEntity to ExtensionEntity and configure the new PathEntity
+        // Create Path from Host to Extension and configure the new Path
         Entity pathEntity = Clay.createEntity(Path.class);
-        pathEntity.getComponent(Path.class).set(hostPortEntity, extensionPortEntity);
+        pathEntity.getComponent(Path.class).set(hostPort, extensionPortEntity);
 
         // Remove focus from other Hosts and their Ports
-//        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
         Group<Image> hostImages = Entity.Manager.filterWithComponent(Host.class).getImages();
         for (int i = 0; i < hostImages.size(); i++) {
             Image hostImage = hostImages.get(i);
@@ -80,15 +79,17 @@ public class Host extends Component {
             host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
         }
 
-        // Show PathEntity and all contained Ports
-        Group<Entity> pathEntities = hostPortEntity.getComponent(Port.class).getPaths();
-        Group<Entity> pathPortEntities = new Group<>();
-        for (int i = 0; i < pathEntities.size(); i++) {
-            pathPortEntities.addAll(pathEntities.get(i).getComponent(Path.class).getPorts());
+        // Get all Ports in all Paths from the Host
+        Group<Entity> hostPaths = hostPort.getComponent(Port.class).getPaths();
+        Group<Entity> hostPorts = new Group<>();
+        for (int i = 0; i < hostPaths.size(); i++) {
+            Group<Entity> pathPorts = hostPaths.get(i).getComponent(Path.class).getPorts();
+            hostPorts.addAll(pathPorts);
         }
 
-        pathPortEntities.setVisibility(Visibility.VISIBLE);
-        pathEntities.getImages().setVisibility(Visibility.VISIBLE);
+        // Show all of Host's Paths and all Ports contained in those Paths
+        hostPaths.getImages().setVisibility(Visibility.VISIBLE);
+        hostPorts.setVisibility(Visibility.VISIBLE);
 
         // Update layout
         updateExtensionLayout();

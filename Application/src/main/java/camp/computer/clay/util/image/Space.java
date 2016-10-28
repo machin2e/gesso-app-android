@@ -26,6 +26,9 @@ import camp.computer.clay.engine.component.Transform;
 // TODO: (...) Entity and adding a ActionListenerComponent.
 public class Space extends Image {
 
+    public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 400;
+    public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
+
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
     protected Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
@@ -206,7 +209,6 @@ public class Space extends Image {
 
     // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
     public Group<Shape> getShapes() {
-//        return getImages().getShapes();
         Group<Shape> shapes = new Group<>();
         Group<Image> images = Entity.Manager.getImages();
         for (int i = 0; i < images.size(); i++) {
@@ -214,18 +216,6 @@ public class Space extends Image {
         }
         return shapes;
     }
-
-//    // TODO: Refactor to be cleaner and leverage other classes...
-//    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
-//        ShapeGroup shapeGroup = new ShapeGroup();
-//        Group<Image> imageList = Entity.Manager.getImages();
-//
-//        for (int i = 0; i < imageList.size(); i++) {
-//            shapeGroup.addAll(imageList.get(i).getShapes(entityTypes));
-//        }
-//
-//        return shapeGroup.filterType(entityTypes);
-//    }
 
     public Shape getShape(Entity entity) {
         Group<Image> images = Entity.Manager.getImages();

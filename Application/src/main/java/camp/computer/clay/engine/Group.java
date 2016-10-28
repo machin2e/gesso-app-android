@@ -164,10 +164,8 @@ public class Group<E extends Groupable> implements List<E> {
         public static Mapper setVisibilityGeneric = new Mapper<Groupable, Groupable, Visibility>() {
             @Override
             public Image map(Groupable entity, Visibility visibility) {
-//                if (entity.getClass() == Shape.class) { // HACK
                 if (entity instanceof Shape) { // HACK
                     ((Shape) entity).setVisibility(visibility);
-                //} else if (entity.getClass() == Image.class) { // HACK
                 } else if (entity instanceof Image) { // HACK
                     ((Image) entity).setVisibility(visibility);
                 }

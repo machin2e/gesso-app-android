@@ -321,8 +321,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         try {
             jsonObject = new JSONObject(jsonString);
 
-            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to HostEntity
-            String hostTitle = hostObject.getString("title"); // Handle to HostEntity's title
+            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
+            String hostTitle = hostObject.getString("title"); // Handle to Host's title
 
             JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
 
