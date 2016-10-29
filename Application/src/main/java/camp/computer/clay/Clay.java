@@ -340,7 +340,7 @@ public class Clay {
         // Create Shapes for Image
         circle = new Circle(port);
         circle.setRadius(50.0);
-        circle.setLabel("Port <X>"); // TODO: Give proper name...
+        circle.setLabel("Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
         port.getComponent(Image.class).addShape(circle);

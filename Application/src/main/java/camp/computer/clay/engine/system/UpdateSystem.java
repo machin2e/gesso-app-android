@@ -99,18 +99,13 @@ public class UpdateSystem extends System {
             lightShapeGroup = host.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
         }
 
-        // Update PortEntity and LED shape styles
+        // Update Port LED color
         for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
-            Entity portEntity = host.getComponent(Portable.class).getPorts().get(i);
-            /*
-            Shape portShape = hostEntity.getComponent(Image.class).getShape(portEntity.getLabel()); // Shape portShape = getShape(portEntity);
 
-            // Update color of PortEntity shape based on type
-            portShape.setColor(camp.computer.clay.util.Color.getColor(portEntity.getComponent(Port.class).getType()));
-
-            // Update color of LED based on corresponding PortEntity's type
-            lightShapeGroup.get(i).setColor(portShape.getColor());
-            */
+            // Update color of LED based on corresponding Port's type
+            Entity port = host.getComponent(Portable.class).getPorts().get(i);
+            String portColor = camp.computer.clay.util.Color.getColor(port.getComponent(Port.class).getType());
+            lightShapeGroup.get(i).setColor(portColor);
         }
 
         // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
@@ -300,6 +295,12 @@ public class UpdateSystem extends System {
 //            lightShapeGroup.get(i).setColor(portShape.getColor());
 //            */
 //        }
+
+        // Update color of PortEntity shape based on type
+        port.getComponent(Image.class).getShape("Port").setColor(camp.computer.clay.util.Color.getColor(port.getComponent(Port.class).getType()));
+
+        // Update color of LED based on corresponding PortEntity's type
+//        lightShapeGroup.get(i).setColor(portShape.getColor());
 
         // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
 //        port.getComponent(Image.class).updateImage();
