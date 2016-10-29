@@ -261,7 +261,7 @@ public class Host extends Component {
             updateExtensionHeaderIndex(extensionEntity);
         }
 
-        // Update each ExtensionEntity's placement, relative to the connected HostEntity.
+        // Update each Extension's placement, relative to the connected Host.
         for (int headerIndex = 0; headerIndex < headerExtensions.size(); headerIndex++) {
             for (int extensionIndex = 0; extensionIndex < headerExtensions.get(headerIndex).size(); extensionIndex++) {
 

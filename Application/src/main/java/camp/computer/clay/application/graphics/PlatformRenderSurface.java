@@ -155,123 +155,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
 
-    protected void doDraw(Canvas canvas) {
-        this.canvas = canvas;
-
-        if (this.space == null || this.canvas == null) {
-            return;
-        }
-
-        // Adjust the Camera
-        canvas.save();
-        adjustCamera();
-        canvas.drawColor(Color.WHITE); // Draw the background
-
-        drawPrototypes();
-
-        drawEntities();
-
-        canvas.restore();
-
-        drawOverlay();
-
-        // Paint the bitmap to the "primary" canvas.
-        canvas.drawBitmap(canvasBitmap, identityMatrix, null);
-
-        /*
-        // Alternative to the above
-        canvas.save();
-        canvas.concat(identityMatrix);
-        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
-        canvas.restore();
-        */
-    }
-
-    private void drawOverlay() {
-
-        int linePosition = 0;
-
-        // <FPS_LABEL>
-        canvas.save();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(35);
-
-        String fpsText = "FPS: " + (int) platformRenderer.getFramesPerSecond();
-        Rect fpsTextBounds = new Rect();
-        paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        linePosition += 25 + fpsTextBounds.height();
-        canvas.drawText(fpsText, 25, linePosition, paint);
-        canvas.restore();
-        // </FPS_LABEL>
-
-        // <ENTITY_STATISTICS>
-        canvas.save();
-        int entityCount = Entity.Manager.size();
-//        int hostCount = Entity.Manager.filterType2(HostEntity.class).size();
-        int hostCount = Entity.Manager.filterWithComponent(Host.class).size();
-        int portCount = Entity.Manager.filterWithComponent(Port.class).size(); // int portCount = Entity.Manager.filterType2(PortEntity.class).size();
-//        int extensionCount = Entity.Manager.filterType2(ExtensionEntity.class).size();
-        int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
-        //int pathCount = Entity.Manager.filterType2(PathEntity.class).size();
-        int pathCount = Entity.Manager.filterWithComponent(Path.class).size();
-        int cameraCount = Entity.Manager.filterWithComponent(Camera.class).size();
-
-        // Entities
-        String text = "Entities: " + entityCount;
-        Rect textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Hosts
-        canvas.save();
-        text = "Hosts: " + hostCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Ports
-        canvas.save();
-        text = "Ports: " + portCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Extensions
-        canvas.save();
-        text = "Extensions: " + extensionCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Paths
-        canvas.save();
-        text = "Paths: " + pathCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Cameras
-        canvas.save();
-        text = "Cameras: " + cameraCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-        // </ENTITY_STATISTICS>
-    }
-
     /**
      * Adjust the perspective
      */
@@ -291,6 +174,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     /**
      * Returns {@code CameraEntity} {@code Entity}.
+     *
      * @return
      */
     private Entity getCamera() {
@@ -310,12 +194,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
 
         Canvas canvas = null;
-
         SurfaceHolder holder = getHolder();
 
         try {
             canvas = holder.lockCanvas();
-
             if (canvas != null) {
                 synchronized (holder) {
                     doUpdate(canvas);
@@ -338,117 +220,35 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         doDraw(canvas);
     }
 
-    public PlatformRenderer getPlatformRenderer() {
-        return this.platformRenderer;
-    }
+    protected void doDraw(Canvas canvas) {
+        this.canvas = canvas;
 
-    public void setSpace(Space space) {
-        this.space = space;
-
-        // Get screen width and height of the device
-        DisplayMetrics metrics = new DisplayMetrics();
-        Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-
-        // Set camera viewport dimensions
-        Entity camera = getCamera();
-        camera.getComponent(Camera.class).setWidth(screenWidth);
-        camera.getComponent(Camera.class).setHeight(screenHeight);
-    }
-
-    public Space getSpace() {
-        return this.space;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-
-        if (this.space == null) {
-            return false;
+        if (this.space == null || this.canvas == null) {
+            return;
         }
 
-        // - Motion events contain information about all of the pointers that are currently active
-        //   even if some of them have not moved since the getLastEvent event was delivered.
-        //
-        // - The index of pointers only ever changes by one as individual pointers go up and down,
-        //   except when the gesture is canceled.
-        //
-        // - Use the getPointerId(int) method to obtain the pointer id of a pointer to track it
-        //   across all subsequent motion events in a gesture. Then for successive motion events,
-        //   use the findPointerIndex(int) method to obtain the pointer index for a given pointer
-        //   id in that motion event.
+        // Adjust the Camera
+        canvas.save();
+        adjustCamera();
+        canvas.drawColor(Color.WHITE); // Draw the background
 
-        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
-        int pointerId = motionEvent.getPointerId(pointerIndex);
-        int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-        final int pointerCount = motionEvent.getPointerCount();
+        drawPrototypes();
+        drawEntities();
 
-        // Get active actor
-        Actor actor = space.getActor();
+        canvas.restore();
 
-        // Create pointerCoordinates event
-        Event event = new Event();
+        drawOverlay();
 
-        if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
-            if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
+        // Paint the bitmap to the "primary" canvas.
+        canvas.drawBitmap(canvasBitmap, identityMatrix, null);
 
-                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
-
-                // Current
-                // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
-                for (int i = 0; i < pointerCount; i++) {
-                    int id = motionEvent.getPointerId(i);
-                    Transform perspectivePosition = cameraEntity.getComponent(Camera.class).getPosition();
-                    double perspectiveScale = cameraEntity.getComponent(Camera.class).getScale();
-                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-                }
-
-                // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
-                // starts the gesture. The pointer data for this pointer is always at index 0 in
-                // the MotionEvent.
-                //
-                // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
-                // the getFirstEvent. The pointer data for this pointer is at the index returned by
-                // getActionIndex().
-                //
-                // ACTION_MOVE is sent when a change has happened during a press gesture for any
-                // pointer.
-                //
-                // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
-                //
-                // ACTION_UP is sent when the getLastEvent pointer leaves the screen.
-                //
-                // REFERENCES:
-                // - https://developer.android.com/training/gestures/multi.html
-
-                // Update the state of the touched object based on the current pointerCoordinates event state.
-                if (touchInteractionType == MotionEvent.ACTION_DOWN) {
-                    event.setType(Event.Type.SELECT);
-                    event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
-                } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
-                    // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
-                } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
-                    event.setType(Event.Type.MOVE);
-                    event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
-                } else if (touchInteractionType == MotionEvent.ACTION_UP) {
-                    event.setType(Event.Type.UNSELECT);
-                    event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
-                } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
-                    // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
-                } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
-                    // TODO:
-                } else {
-                    // TODO:
-                }
-            }
-        }
-
-        return true;
+        /*
+        // Alternative to the above
+        canvas.save();
+        canvas.concat(identityMatrix);
+        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
+        canvas.restore();
+        */
     }
 
     public void drawPrototypes() {
@@ -579,6 +379,201 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             }
 
         }
+    }
+
+    private void drawOverlay() {
+
+        int linePosition = 0;
+
+        // <FPS_LABEL>
+        canvas.save();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(35);
+
+        String fpsText = "FPS: " + (int) platformRenderer.getFramesPerSecond();
+        Rect fpsTextBounds = new Rect();
+        paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
+        linePosition += 25 + fpsTextBounds.height();
+        canvas.drawText(fpsText, 25, linePosition, paint);
+        canvas.restore();
+        // </FPS_LABEL>
+
+        // <ENTITY_STATISTICS>
+        canvas.save();
+        int entityCount = Entity.Manager.size();
+        int hostCount = Entity.Manager.filterWithComponent(Host.class).size();
+        int portCount = Entity.Manager.filterWithComponent(Port.class).size();
+        int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
+        int pathCount = Entity.Manager.filterWithComponent(Path.class).size();
+        int cameraCount = Entity.Manager.filterWithComponent(Camera.class).size();
+
+        // Entities
+        String text = "Entities: " + entityCount;
+        Rect textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Hosts
+        canvas.save();
+        text = "Hosts: " + hostCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Ports
+        canvas.save();
+        text = "Ports: " + portCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Extensions
+        canvas.save();
+        text = "Extensions: " + extensionCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Paths
+        canvas.save();
+        text = "Paths: " + pathCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+
+        // Cameras
+        canvas.save();
+        text = "Cameras: " + cameraCount;
+        textBounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textBounds);
+        linePosition += 25 + textBounds.height();
+        canvas.drawText(text, 25, linePosition, paint);
+        canvas.restore();
+        // </ENTITY_STATISTICS>
+    }
+
+    public PlatformRenderer getPlatformRenderer() {
+        return this.platformRenderer;
+    }
+
+    public void setSpace(Space space) {
+        this.space = space;
+
+        // Get screen width and height of the device
+        DisplayMetrics metrics = new DisplayMetrics();
+        Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
+
+        // Set camera viewport dimensions
+        Entity camera = getCamera();
+        camera.getComponent(Camera.class).setWidth(screenWidth);
+        camera.getComponent(Camera.class).setHeight(screenHeight);
+    }
+
+    public Space getSpace() {
+        return this.space;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+
+        if (this.space == null) {
+            return false;
+        }
+
+        // - Motion events contain information about all of the pointers that are currently active
+        //   even if some of them have not moved since the getLastEvent event was delivered.
+        //
+        // - The index of pointers only ever changes by one as individual pointers go up and down,
+        //   except when the gesture is canceled.
+        //
+        // - Use the getPointerId(int) method to obtain the pointer id of a pointer to track it
+        //   across all subsequent motion events in a gesture. Then for successive motion events,
+        //   use the findPointerIndex(int) method to obtain the pointer index for a given pointer
+        //   id in that motion event.
+
+        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
+        int pointerId = motionEvent.getPointerId(pointerIndex);
+        int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+        final int pointerCount = motionEvent.getPointerCount();
+
+        // Get active actor
+        Actor actor = space.getActor();
+
+        // Create pointerCoordinates event
+        Event event = new Event();
+
+        if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
+            if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
+
+                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
+                // Current
+                // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
+                for (int i = 0; i < pointerCount; i++) {
+                    int id = motionEvent.getPointerId(i);
+                    Transform perspectivePosition = cameraEntity.getComponent(Camera.class).getPosition();
+                    double perspectiveScale = cameraEntity.getComponent(Camera.class).getScale();
+                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                }
+
+                // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
+                // starts the gesture. The pointer data for this pointer is always at index 0 in
+                // the MotionEvent.
+                //
+                // ACTION_POINTER_DOWN is called for extra pointers that enter the screen beyond
+                // the getFirstEvent. The pointer data for this pointer is at the index returned by
+                // getActionIndex().
+                //
+                // ACTION_MOVE is sent when a change has happened during a press gesture for any
+                // pointer.
+                //
+                // ACTION_POINTER_UP is sent when a non-primary pointer goes up.
+                //
+                // ACTION_UP is sent when the getLastEvent pointer leaves the screen.
+                //
+                // REFERENCES:
+                // - https://developer.android.com/training/gestures/multi.html
+
+                // Update the state of the touched object based on the current pointerCoordinates event state.
+                if (touchInteractionType == MotionEvent.ACTION_DOWN) {
+                    event.setType(Event.Type.SELECT);
+                    event.pointerIndex = pointerId;
+                    actor.queueEvent(event);
+                } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
+                } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
+                    event.setType(Event.Type.MOVE);
+                    event.pointerIndex = pointerId;
+                    actor.queueEvent(event);
+                } else if (touchInteractionType == MotionEvent.ACTION_UP) {
+                    event.setType(Event.Type.UNSELECT);
+                    event.pointerIndex = pointerId;
+                    actor.queueEvent(event);
+                } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
+                } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+            }
+        }
+
+        return true;
     }
 
     // <PATH_IMAGE_HELPERS>

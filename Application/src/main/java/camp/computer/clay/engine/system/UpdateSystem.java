@@ -10,13 +10,11 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.Visibility;
 
 public class UpdateSystem extends System {
 
@@ -148,7 +146,8 @@ public class UpdateSystem extends System {
 
         Image image = extension.getComponent(Image.class);
 
-        // Remove PortEntity shapes from the Image that do not have a corresponding PortEntity in the Entity
+        // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
+        /*
         Group<Shape> portShapes = image.getShapes(Port.class);
         for (int i = 0; i < portShapes.size(); i++) {
             Shape portShape = portShapes.get(i);
@@ -157,11 +156,15 @@ public class UpdateSystem extends System {
                 image.invalidate();
             }
         }
+        */
 
-        // Create PortEntity shapes for each of ExtensionEntity's Ports if they don't already exist
+        // Create Port shapes for each of Extension's Ports if they don't already exist
         for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
             Entity portEntity = extension.getComponent(Portable.class).getPorts().get(i);
 
+//            portEntity.getComponent(Transform.class).set(-90, 175);
+
+            /*
             if (image.getShape(portEntity) == null) {
 
                 // Ports
@@ -180,18 +183,24 @@ public class UpdateSystem extends System {
 
                 image.invalidate();
             }
+            */
         }
 
-        // Update PortEntity positions based on the index of portEntities
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
-            Entity portEntity = extension.getComponent(Portable.class).getPorts().get(i);
-            Circle portShape = (Circle) image.getShape(portEntity);
+        // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
 
-            if (portShape != null) {
-                double portSpacing = 100;
-                portShape.getImagePosition().x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+        // Update Port positions based on the index of Port
+        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
+            Entity port = extension.getComponent(Portable.class).getPorts().get(i);
+//            Circle portShape = (Circle) image.getShape(portEntity);
+
+//            if (portShape != null) {
+                double portSpacing = 115;
+//                portShape.getImagePosition().x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+            port.getComponent(Transform.class).x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+            port.getComponent(Transform.class).y = 175; // i.e., Distance from board
+            port.getComponent(Image.class).invalidate();
                 // TODO: Also updateImage y coordinate
-            }
+//            }
         }
     }
 
@@ -296,8 +305,10 @@ public class UpdateSystem extends System {
 //            */
 //        }
 
-        // Update color of PortEntity shape based on type
-        port.getComponent(Image.class).getShape("Port").setColor(camp.computer.clay.util.Color.getColor(port.getComponent(Port.class).getType()));
+        // Update color of Port shape based on its type
+        Port.Type portType = port.getComponent(Port.class).getType();
+        String portColor = camp.computer.clay.util.Color.getColor(portType);
+        port.getComponent(Image.class).getShape("Port").setColor(portColor);
 
         // Update color of LED based on corresponding PortEntity's type
 //        lightShapeGroup.get(i).setColor(portShape.getColor());
