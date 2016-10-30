@@ -9,6 +9,7 @@ import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -52,7 +53,7 @@ public final class Entity extends Groupable {
     }
     // </ENTITY_MANAGEMENT>
 
-    protected Group<Component> components = null;
+    private Group<Component> components = null;
 
     public Entity() {
         super();
@@ -71,6 +72,10 @@ public final class Entity extends Groupable {
 
         // Create list of Components
         components = new Group<>();
+
+        // <HACK>
+        addComponent(new Label());
+        // </HACK>
     }
 
     protected Entity parent; // TODO: Delete!
@@ -85,17 +90,17 @@ public final class Entity extends Groupable {
     }
 
 
-    // <TAG_COMPONENT>
-    protected String label = "";
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return this.label;
-    }
-    // </TAG_COMPONENT>
+//    // <TAG_COMPONENT>
+//    protected String label = "";
+//
+//    public void setLabel(String label) {
+//        this.label = label;
+//    }
+//
+//    public String getLabel() {
+//        return this.label;
+//    }
+//    // </TAG_COMPONENT>
 
 
     // <TEMPORARY_COMPONENTS_REFERENCES>
@@ -110,6 +115,7 @@ public final class Entity extends Groupable {
     protected Port port = null; // Only used by Ports (DUH)
     protected Path path = null;
     protected Camera camera = null;
+    protected Label label = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -135,6 +141,8 @@ public final class Entity extends Groupable {
             this.path = (Path) component;
         } else if (component instanceof Camera) {
             this.camera = (Camera) component;
+        } else if (component instanceof Label) {
+            this.label = (Label) component;
         }
 
         // Associate with Entity
@@ -164,6 +172,8 @@ public final class Entity extends Groupable {
             return type.cast(this.path);
         } else if (type == Camera.class) {
             return type.cast(this.camera);
+        } else if (type == Label.class) {
+            return type.cast(this.label);
         } else {
             return null;
         }

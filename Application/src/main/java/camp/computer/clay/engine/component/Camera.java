@@ -128,10 +128,6 @@ public class Camera extends Component {
     }
 
     public void adjustPosition() {
-        //Transform centerPosition = getSpace().getImages().filterType2(HostEntity.class, ExtensionEntity.class).getCenterPoint();
-        //Transform centerPosition = getSpace().getEntities().filterType2(HostEntity.class, ExtensionEntity.class).getImages().getCenterPoint();
-        //Transform centerPosition = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getCenterPoint();
-//        Transform centerPosition = Entity.Manager.filterType2(HostEntity.class, Entity.class).getCenterPoint();
         Transform centerPosition = Entity.Manager.filterWithComponent(Host.class, Extension.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
         setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
@@ -169,9 +165,6 @@ public class Camera extends Component {
     }
 
     public void adjustScale(double duration) {
-        //Rectangle boundingBox = getSpace().getImages().filterType2(HostEntity.class, ExtensionEntity.class).getBoundingBox();
-//        Rectangle boundingBox = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages().getBoundingBox();
-//        Rectangle boundingBox = Entity.Manager.filterType2(HostEntity.class, Entity.class).getImages().getBoundingBox();
         Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages().getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);

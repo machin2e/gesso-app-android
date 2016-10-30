@@ -30,7 +30,6 @@ public class UpdateSystem extends System {
     }
 
 
-
     // <ENTITY>
     public void updateEntities(Group<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
@@ -41,13 +40,13 @@ public class UpdateSystem extends System {
 
             // <HACK>
             if (entity.hasComponent(Extension.class)) {
-                updateExtensionImage(entity); // entity.getComponent(Extension.class).updateImage();
+                updateExtensionImage(entity);
             } else if (entity.hasComponent(Host.class)) {
-                updateHostImage(entity); // entity.getComponent(Host.class).updateImage();
+                updateHostImage(entity);
             } else if (entity.hasComponent(Port.class)) {
                 updatePortImage(entity);
             } else if (entity.hasComponent(Camera.class)) {
-                entity.getComponent(Camera.class).update();
+                entity.getComponent(Camera.class).update(); // TODO: Bring Camera update code into this file/system.
             }
             // </HACK>
         }
@@ -55,47 +54,27 @@ public class UpdateSystem extends System {
     // </ENTITY>
 
 
-
     // <IMAGE>
 
     // Previously: Image.update()
-    public void updateImage(Entity entity) {
-        updateImageGeometry(entity);
-    }
-
-    // Previously: Image.updateGeometry()
     // Required Components: Image, Transform
-    public void updateImageGeometry(Entity entity) {
-
+    public void updateImage(Entity entity) {
         Image image = entity.getComponent(Image.class);
 
         // Update Shapes
         for (int i = 0; i < image.getShapes().size(); i++) {
             Shape shape = image.getShapes().get(i);
-
-//            // <HACK>
-//            if (getEntity().hasComponent(Port.class)) {
-//                getEntity().getComponent(Transform.class).set(getEntity().getParent().getComponent(Transform.class));
-//            }
-//            // </HACK>
-
-            // Update the Shape
             shape.update(image.getEntity().getComponent(Transform.class));
         }
     }
     // </IMAGE>
 
 
-
     // <HOST>
     public void updateHostImage(Entity host) {
 
-        Group<Shape> lightShapeGroup = null;
-
         // Get LED shapes
-        if (lightShapeGroup == null) {
-            lightShapeGroup = host.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
-        }
+        Group<Shape> lightShapeGroup = host.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
 
         // Update Port LED color
         for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
@@ -107,10 +86,9 @@ public class UpdateSystem extends System {
         }
 
         // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
-//        host.getComponent(Image.class).updateImage();
         updateImage(host);
     }
-    // </
+    // </HOST>
 
     // <EXTENSION>
     private void updateExtensionImage(Entity extension) {
@@ -123,8 +101,6 @@ public class UpdateSystem extends System {
         updateExtensionPathRoutes(extension);
         // </HACK>
 
-        // Call this so PortableImage.updateImage() is called and Geometry is updated!
-//        extension.getComponent(Image.class).updateImage();
         updateImage(extension);
     }
 
@@ -133,78 +109,32 @@ public class UpdateSystem extends System {
      */
     public void updateExtensionGeometry(Entity extension) {
 
-        updatePortGeometry(extension);
-        updateHeaderGeometry(extension);
-
         // TODO: Clean up/delete images/shapes for any removed portEntities...
+
+        updateExtensionPortGeometry(extension);
+        updateExtensionHeaderGeometry(extension);
     }
 
     /**
      * Add or remove {@code Shape}'s for each of the {@code ExtensionEntity}'s {@code PortEntity}s.
      */
-    private void updatePortGeometry(Entity extension) {
-
-        Image image = extension.getComponent(Image.class);
-
-        // Remove Port shapes from the Image that do not have a corresponding Port in the Entity
-        /*
-        Group<Shape> portShapes = image.getShapes(Port.class);
-        for (int i = 0; i < portShapes.size(); i++) {
-            Shape portShape = portShapes.get(i);
-            if (!extension.getComponent(Portable.class).getPorts().contains(portShape.getEntity())) {
-                portShapes.remove(portShape);
-                image.invalidate();
-            }
-        }
-        */
-
-        // Create Port shapes for each of Extension's Ports if they don't already exist
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
-            Entity portEntity = extension.getComponent(Portable.class).getPorts().get(i);
-
-//            portEntity.getComponent(Transform.class).set(-90, 175);
-
-            /*
-            if (image.getShape(portEntity) == null) {
-
-                // Ports
-                Circle<Entity> circle = new Circle<>(portEntity);
-                circle.setRadius(50);
-                circle.setLabel("Port " + (extension.getComponent(Portable.class).getPorts().size() + 1));
-                circle.setPosition(-90, 175);
-                // circle.setRotation(0);
-
-                circle.setColor("#efefef");
-                circle.setOutlineThickness(0);
-
-                circle.setVisibility(Visibility.INVISIBLE);
-
-                image.addShape(circle);
-
-                image.invalidate();
-            }
-            */
-        }
+    private void updateExtensionPortGeometry(Entity extension) {
 
         // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
 
         // Update Port positions based on the index of Port
         for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
             Entity port = extension.getComponent(Portable.class).getPorts().get(i);
-//            Circle portShape = (Circle) image.getShape(portEntity);
 
-//            if (portShape != null) {
-                double portSpacing = 115;
-//                portShape.getImagePosition().x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+            double portSpacing = 115;
             port.getComponent(Transform.class).x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
             port.getComponent(Transform.class).y = 175; // i.e., Distance from board
+
             port.getComponent(Image.class).invalidate();
-                // TODO: Also updateImage y coordinate
-//            }
         }
     }
 
-    private void updateHeaderGeometry(Entity extension) {
+    private void updateExtensionHeaderGeometry(Entity extension) {
 
         // <FACTOR_OUT>
         // References:
@@ -247,12 +177,12 @@ public class UpdateSystem extends System {
     }
 
     private void updateExtensionPortStyle(Entity extension) {
-        // Update PortEntity style
+        // Update Port style
         for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
             Entity portEntity = extension.getComponent(Portable.class).getPorts().get(i);
             Shape portShape = extension.getComponent(Image.class).getShape(portEntity);
 
-            // Update color of PortEntity shape based on type
+            // Update color of Port shape based on type
             if (portShape != null) {
                 portShape.setColor(Color.getColor(portEntity.getComponent(Port.class).getType()));
             }
@@ -260,62 +190,20 @@ public class UpdateSystem extends System {
     }
 
     private void updateExtensionPathRoutes(Entity extension) {
-
-        // TODO: Get position around "halo" around HostEntity based on rect (a surrounding/containing rectangle) or circular (a surrounding/containing circle) layout algo and set so they don't overlap. Mostly set X to prevent overlap, then run the router and push back the halo distance for that side of the HostEntity, if/as necessary
-
-        // <HACK>
-//        updateExtensionLayout();
-        // </HACK>
-
-        // TODO: !!!!!!!!!!!! Start Thursday by adding corner/turtle turn "nodes" that extend straight out from
-
-        // TODO: only route paths with turtle graphics maneuvers... so paths are square btwn HostEntity and ExtensionEntity
-
-        // TODO: Goal: implement Ben's demo (input on one HostEntity to analog output on another HostEntity, with diff components)
-
-        ///// TODO: Add label/title to PathEntity, too. ADD OPTION TO FLAG ENTITIES WITH A QUESTION, OR JUST ASK QUESTION/ADD TODO DIRECTLY THERE! ANNOTATE STRUCTURE WITH DESCRIPTIVE/CONTEXTUAL METADATA.
-
-        // TODO: Animate movement of Extensions when "extension halo" expands or contracts (breathes)
+        // TODO: Create routes between extension and host.
     }
     // </EXTENSION>
 
 
-
     // <PORT>
     public void updatePortImage(Entity port) {
-
-//        Group<Shape> lightShapeGroup = null;
-//
-//        // Get LED shapes
-//        if (lightShapeGroup == null) {
-//            lightShapeGroup = port.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
-//        }
-//
-//        // Update PortEntity and LED shape styles
-//        for (int i = 0; i < port.getComponent(Portable.class).getPorts().size(); i++) {
-//            Entity portEntity = port.getComponent(Portable.class).getPorts().get(i);
-//            /*
-//            Shape portShape = hostEntity.getComponent(Image.class).getShape(portEntity.getLabel()); // Shape portShape = getShape(portEntity);
-//
-//            // Update color of PortEntity shape based on type
-//            portShape.setColor(camp.computer.clay.util.Color.getColor(portEntity.getComponent(Port.class).getType()));
-//
-//            // Update color of LED based on corresponding PortEntity's type
-//            lightShapeGroup.get(i).setColor(portShape.getColor());
-//            */
-//        }
 
         // Update color of Port shape based on its type
         Port.Type portType = port.getComponent(Port.class).getType();
         String portColor = camp.computer.clay.util.Color.getColor(portType);
         port.getComponent(Image.class).getShape("Port").setColor(portColor);
 
-        // Update color of LED based on corresponding PortEntity's type
-//        lightShapeGroup.get(i).setColor(portShape.getColor());
-
         // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
-//        port.getComponent(Image.class).updateImage();
-//        updateImage(port);
         updatePortImageGeometry(port);
     }
 
@@ -327,37 +215,16 @@ public class UpdateSystem extends System {
         for (int i = 0; i < image.getShapes().size(); i++) {
             Shape shape = image.getShapes().get(i);
 
-//            // <HACK>
-//            if (getEntity().hasComponent(Port.class)) {
-//                getEntity().getComponent(Transform.class).set(getEntity().getParent().getComponent(Transform.class));
-//            }
-//            // </HACK>
-
-            // Update the Shape
-
-//            image.getEntity().getComponent(Transform.class).x += image.getEntity().getParent().getComponent(Transform.class).x;
-//            image.getEntity().getComponent(Transform.class).y += image.getEntity().getParent().getComponent(Transform.class).y;
+            // <HACK>
             Transform imagePosition = image.getEntity().getComponent(Transform.class);
             Transform referencePoint = image.getEntity().getParent().getComponent(Transform.class);
-            Transform transformedPoint  = new Transform();
+            Transform transformedPoint = new Transform();
             transformedPoint.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
             transformedPoint.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+            // </HACK>
 
             shape.update(transformedPoint);
-
-            //shape.update(image.getEntity().getComponent(Transform.class));
-
-//            shape.update(image.getEntity().getParent().getComponent(Transform.class)); // Note the call to getParent() here!
         }
     }
-
-//    public void transformPosition(Transform point, Transform referencePoint) {
-//        point.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-//        point.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-//    }
-//
-//    public void transformRotation(Transform referencePoint) {
-//        this.position.rotation = referencePoint.rotation + imagePosition.rotation;
-//    }
     // </PORT>
 }

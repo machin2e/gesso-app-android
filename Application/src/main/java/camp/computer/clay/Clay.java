@@ -17,6 +17,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -154,7 +155,7 @@ public class Clay {
 
             Entity port = Clay.createEntity(Port.class);
 
-            port.setLabel("Port " + (j + 1));
+            port.getComponent(Label.class).setLabel("Port " + (j + 1));
             port.getComponent(Port.class).setIndex(j);
 
             host.getComponent(Portable.class).addPort(port);

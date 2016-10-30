@@ -37,7 +37,7 @@ public class Portable extends Component {
 
     public Entity getPort(String label) {
         for (int i = 0; i < portEntities.size(); i++) {
-            if (portEntities.get(i).getLabel().equals(label)) {
+            if (portEntities.get(i).getComponent(Label.class).getLabel().equals(label)) {
                 return portEntities.get(i);
             }
         }
@@ -45,7 +45,7 @@ public class Portable extends Component {
     }
 
 
-    public Group<Entity> getExtensions() {
+    public Group<Entity> getExtensions() {cd 
         Group<Entity> extensionEntities = new Group<>();
         for (int i = 0; i < getPorts().size(); i++) {
             Entity portEntity = getPorts().get(i);
