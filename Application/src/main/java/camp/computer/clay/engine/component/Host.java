@@ -9,7 +9,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
 public class Host extends Component {
@@ -206,7 +206,7 @@ public class Host extends Component {
             }
 
             Entity hostPortEntity = extensionPortEntity.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK b/c using index 0
-            Transform hostPortPosition = Space.getSpace().getShape(hostPortEntity).getPosition();
+            Transform hostPortPosition = World.getWorld().getShape(hostPortEntity).getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)

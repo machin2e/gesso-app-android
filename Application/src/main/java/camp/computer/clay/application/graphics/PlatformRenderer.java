@@ -3,9 +3,9 @@ package camp.computer.clay.application.graphics;
 import camp.computer.clay.util.time.Clock;
 
 /**
- * PlatformRenderer is a background thread that periodically updates the space state
+ * PlatformRenderer is a background thread that periodically updates the world state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
- * space's state then re-rendering it.
+ * world's state then re-rendering it.
  */
 public class PlatformRenderer extends Thread {
 
@@ -53,7 +53,7 @@ public class PlatformRenderer extends Thread {
 
             frameStartTime = Clock.getCurrentTime();
 
-            // Advance the space state
+            // Advance the world state
             platformRenderSurface.update();
 
             frameStopTime = Clock.getCurrentTime();

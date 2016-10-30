@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Camera;
@@ -38,7 +37,7 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 
 public class Clay {
 
@@ -48,7 +47,7 @@ public class Clay {
 
     private Cache cache = null;
 
-    private Space space;
+    private World world;
 
     // Group of discovered touchscreen phoneHosts
     private List<DisplayHostInterface> displays = new ArrayList<>();
@@ -70,26 +69,26 @@ public class Clay {
 
         this.internet = new Internet(this); // Start the networking systems
 
-        // Space
-        this.space = new Space();
-        space.setupActionListener();
+        // World
+        this.world = new World();
+        world.setupActionListener();
 
         // Create Camera
         createEntity(Camera.class);
 
         // Create actor and setAbsolute perspective
         Actor actor = new Actor();
-        this.space.addActor(actor);
+        this.world.addActor(actor);
 
         Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
         // CameraEntity
-        cameraEntity.getComponent(Camera.class).setSpace(space);
+        cameraEntity.getComponent(Camera.class).setWorld(world);
 
         // Add actor to model
-        space.addActor(actor);
+        world.addActor(actor);
 
-        Application.getView().getPlatformRenderSurface().setSpace(space);
+        Application.getView().getPlatformRenderSurface().setWorld(world);
 
         // <TEST>
         createEntity(Host.class);
@@ -100,7 +99,7 @@ public class Clay {
         // </TEST>
 
         // <HACK>
-        Space.getSpace().adjustLayout();
+        World.getWorld().adjustLayout();
         // </HACK>
     }
 
@@ -108,8 +107,8 @@ public class Clay {
         return this;
     }
 
-    public Space getSpace() {
-        return this.space;
+    public World getWorld() {
+        return this.world;
     }
 
     public static Entity createEntity(Class<?> entityType) {
@@ -274,8 +273,6 @@ public class Clay {
 
         // <HACK>
         // NOTE: This has to be done after adding an ImageComponent
-//        extensionEntity.setupActionListener();
-
         ActionListenerComponent actionListener = new ActionListenerComponent();
         actionListener.setOnActionListener(ActionListenerSystem.getExtensionActionListener(extensionEntity));
         extensionEntity.addComponent(actionListener);
@@ -327,6 +324,7 @@ public class Clay {
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
         port.addComponent(new Image());
+        port.addComponent(new Label());
 
         // <LOAD_GEOMETRY_FROM_FILE>
         Circle circle;

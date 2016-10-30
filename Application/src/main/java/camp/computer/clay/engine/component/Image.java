@@ -11,12 +11,11 @@ import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
 public class Image extends Component {
 
-//    protected List<Shape> shapes = new LinkedList<>();
     protected Group<Shape> shapes = new Group<>();
 
     protected Visibility visibility = Visibility.VISIBLE;
@@ -36,7 +35,7 @@ public class Image extends Component {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-        Space.getSpace().updateLayers();
+        World.getWorld().updateLayers();
     }
 
     /**

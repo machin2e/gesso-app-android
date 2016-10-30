@@ -8,12 +8,10 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.time.Clock;
 
 public class Camera extends Component {
-
-    // TODO: Caption generation for each Perspective/CameraEntity
 
     public static final int DEFAULT_SCALE_PERIOD = 200;
 
@@ -32,9 +30,9 @@ public class Camera extends Component {
     protected double height;
 
     /**
-     * The {@code Space} displayed from this perspective
+     * The {@code World} displayed from this perspective
      */
-    protected Space space = null;
+    protected World world = null;
 
     // Scale
     protected final double DEFAULT_SCALE = 1.0f;
@@ -55,12 +53,12 @@ public class Camera extends Component {
         super();
     }
 
-    public void setSpace(Space space) {
-        this.space = space;
+    public void setWorld(World world) {
+        this.world = world;
     }
 
-    public Space getSpace() {
-        return this.space;
+    public World getWorld() {
+        return this.world;
     }
 
     public void setWidth(double width) {
@@ -221,7 +219,7 @@ public class Camera extends Component {
         Log.v("SetFocus", "setFocus(sourcePortEntity, targetPosition)");
 
 //        // Check if a HostEntity Image is nearby
-//        Image nearestHostImage = getSpace().getImages().filterType2(HostEntity.class).getNearestImage(targetPosition);
+//        Image nearestHostImage = getWorld().getImages().filterType2(HostEntity.class).getNearestImage(targetPosition);
 //        if (nearestHostImage != null) {
 //
 //            PortableEntity sourcePortable = sourcePortEntity.getPortable();
@@ -247,11 +245,11 @@ public class Camera extends Component {
 //        HostImage hostImage = (HostImage) hostEntity.getComponent(Image.class);
 
 //        // Reduce transparency of other all Portables (not electrically connected to the PhoneHost)
-//        ImageGroup otherPortableImages = getSpace().getImages().filterType(HostEntity.class, ExtensionEntity.class);
+//        ImageGroup otherPortableImages = getWorld().getImages().filterType(HostEntity.class, ExtensionEntity.class);
 //        otherPortableImages.remove(hostImage);
 //        otherPortableImages.setTransparency(0.1);
 
-            // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
+            // TODO: Group<PortableEntity> otherPortables = getWorld().getEntities();
 //        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, ExtensionEntity.class);
 //            Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, Entity.class);
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class);
@@ -295,7 +293,7 @@ public class Camera extends Component {
             Log.v("SetFocus", "setFocus(ExtensionEntity)");
 
             // <REFACTOR>
-            // TODO: Group<PortableEntity> otherPortables = getSpace().getEntities();
+            // TODO: Group<PortableEntity> otherPortables = getWorld().getEntities();
 //        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, ExtensionEntity.class);
 //            Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, Entity.class);
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class);
@@ -328,9 +326,9 @@ public class Camera extends Component {
 
             // Increase distance between HostEntity and ExtensionEntity
             Entity hostEntity = entity.getComponent(Portable.class).getHosts().get(0);
-            hostEntity.getComponent(Host.class).setExtensionDistance(Space.HOST_TO_EXTENSION_LONG_DISTANCE);
+            hostEntity.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-//            ShapeGroup hostPathPortShapes = getSpace().getShapes().filterEntity(hostPathPortEntities);
+//            ShapeGroup hostPathPortShapes = getWorld().getShapes().filterEntity(hostPathPortEntities);
 //            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
 
             Group<Shape> hostPathPortShapes = hostPathPortEntities.getImages().getShapes();
@@ -353,7 +351,7 @@ public class Camera extends Component {
 //        Log.v("SetFocus", "setFocus(PathGroup)");
 //
 //        // Get bounding box around the Ports in the specified Paths
-//        ShapeGroup pathPortShapes = getSpace().getShapes(paths.getPorts());
+//        ShapeGroup pathPortShapes = getWorld().getShapes(paths.getPorts());
 //        List<Transform> portPositions = pathPortShapes.getPositions();
 //        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
 //
@@ -362,15 +360,15 @@ public class Camera extends Component {
 //        setPosition(Geometry.getCenterPoint(portPositions));
 //    }
 
-    public void setFocus(Space space) {
+    public void setFocus(World world) {
 
-        Log.v("SetFocus", "setFocus(Space)");
+        Log.v("SetFocus", "setFocus(World)");
 
         // Hide Portables' Ports.
-        space.hideAllPorts();
+        world.hideAllPorts();
 
         // Update distance between Hosts and Extensions
-        space.setPortableSeparation(Space.HOST_TO_EXTENSION_SHORT_DISTANCE);
+        world.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
 
         // Update scale and position
         adjustScale();

@@ -8,7 +8,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
 /**
@@ -30,24 +30,7 @@ public class Actor extends Component {
     }
 
     private void setup() {
-//        CameraEntity cameraEntity = new CameraEntity();
-//        setCameraEntity(cameraEntity);
     }
-
-    // TODO: Remove?
-//    public void setCameraEntity(CameraEntity cameraEntity) {
-//        this.cameraEntity = cameraEntity;
-//    }
-//
-//    // TODO: Remove?
-//    public boolean hasCamera() {
-//        return cameraEntity != null;
-//    }
-//
-//    // TODO: Remove?
-//    public CameraEntity getCameraEntity() {
-//        return this.cameraEntity;
-//    }
 
     public void queueEvent(Event event) {
         incomingEvents.add(event);
@@ -140,7 +123,7 @@ public class Actor extends Component {
 
                 // Set the target image
                 Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // getImage(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -149,8 +132,8 @@ public class Actor extends Component {
 
                 // Action the event
                 // <HACK>
-                if (targetImage.getClass() == Space.class) {
-                    ((Space) targetImage).processAction(action);
+                if (targetImage.getClass() == World.class) {
+                    ((World) targetImage).processAction(action);
                 } else {
                     targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
@@ -165,7 +148,7 @@ public class Actor extends Component {
 
                 // Set the target image
                 Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // Image targetImage = getCameraEntity().getSpace().getImage(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -176,8 +159,8 @@ public class Actor extends Component {
 //                event.getTargetImage().getEntity().processAction(action);
                 // Action the event
                 // <HACK>
-                if (targetImage.getClass() == Space.class) {
-                    ((Space) targetImage).processAction(action);
+                if (targetImage.getClass() == World.class) {
+                    ((World) targetImage).processAction(action);
                 } else {
                     targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
@@ -195,7 +178,7 @@ public class Actor extends Component {
 
                     // Set the target image
                     Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                    Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // Image targetImage = getCameraEntity().getSpace().getImage(event.getPosition());
+                    Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
                     event.setTargetImage(targetImage);
 
                     // Set the target shape
@@ -206,8 +189,8 @@ public class Actor extends Component {
                     // Action the event
                     // <HACK>
                     Image firstImage = action.getFirstEvent().getTargetImage();
-                    if (firstImage.getClass() == Space.class) {
-                        ((Space) firstImage).processAction(action);
+                    if (firstImage.getClass() == World.class) {
+                        ((World) firstImage).processAction(action);
                     } else {
                         firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                     }
@@ -226,7 +209,7 @@ public class Actor extends Component {
 
                 // Set the target image
                 Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(Visibility.VISIBLE).filterContains(event.getPosition());
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getSpace(); // Image targetImage = getCameraEntity().getSpace().getImage(event.getPosition());
+                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
                 // Set the target shape
@@ -238,8 +221,8 @@ public class Actor extends Component {
                 // Action the event
                 // <HACK>
                 Image firstImage = action.getFirstEvent().getTargetImage();
-                if (firstImage.getClass() == Space.class) {
-                    ((Space) firstImage).processAction(action);
+                if (firstImage.getClass() == World.class) {
+                    ((World) firstImage).processAction(action);
                 } else {
                     firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }

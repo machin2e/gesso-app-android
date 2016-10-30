@@ -18,9 +18,9 @@ import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.engine.component.Transform;
 
-// TODO: DO NOT extend Image. Try to remove Space class. If cannot, then consider making it an
+// TODO: DO NOT extend Image. Try to remove World class. If cannot, then consider making it an
 // TODO: (...) Entity and adding a ActionListenerComponent.
-public class Space extends Image {
+public class World extends Image {
 
     public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 400;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
@@ -36,13 +36,13 @@ public class Space extends Image {
 
     private List<Actor> actors = new LinkedList<>();
 
-    public Space() {
+    public World() {
         super();
         setup();
     }
 
     private void setup() {
-        Space.space = this;
+        World.world = this;
 //        setupActions();
     }
 
@@ -107,7 +107,7 @@ public class Space extends Image {
                         setTitleVisibility(Visibility.INVISIBLE);
 
                         // CameraEntity
-                        cameraEntity.getComponent(Camera.class).setFocus(Space.getSpace());
+                        cameraEntity.getComponent(Camera.class).setFocus(World.getWorld());
                     }
 //                    }
                 }
@@ -115,10 +115,10 @@ public class Space extends Image {
         });
     }
 
-    private static Space space = null;
+    private static World world = null;
 
-    public static Space getSpace() {
-        return Space.space;
+    public static World getWorld() {
+        return World.world;
     }
 
     public void addActor(Actor actor) {
@@ -158,7 +158,7 @@ public class Space extends Image {
     }
 
 //    @Override
-//    public Space getSpace() {
+//    public World getWorld() {
 //        return this;
 //    }
 

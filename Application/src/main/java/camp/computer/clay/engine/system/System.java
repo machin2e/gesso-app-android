@@ -1,7 +1,7 @@
 package camp.computer.clay.engine.system;
 
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 
 public abstract class System {
-    public abstract boolean update(Space space);
+    public abstract boolean update(World world);
 }

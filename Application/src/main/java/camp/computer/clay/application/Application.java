@@ -251,11 +251,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-//    public static void hideSoftKeyboard(Activity activity) {
-//        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-//        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
-//    }
-
     public List<Entity> restoreHosts(String filename) {
 
         // e.g., filename = "Hosts.json"
@@ -464,7 +459,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         setContentView(R.layout.activity_main);
 
-        // Space Surface
+        // World Surface
         platformRenderSurface = (PlatformRenderSurface) findViewById(R.id.app_surface_view);
         platformRenderSurface.onResume();
 

@@ -23,13 +23,13 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
 public class ActionListenerSystem extends System {
 
     @Override
-    public boolean update(Space space) {
+    public boolean update(World world) {
         return false;
     }
 
@@ -62,12 +62,12 @@ public class ActionListenerSystem extends System {
                         if (action.isDragging()) {
 
                             // Update position of prototype ExtensionEntity
-                            Space.getSpace().setExtensionPrototypePosition(event.getPosition());
+                            World.getWorld().setExtensionPrototypePosition(event.getPosition());
 
 //                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
                             hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 
-                            Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                            World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
                         } else if (action.isHolding()) {
 
@@ -84,15 +84,15 @@ public class ActionListenerSystem extends System {
                         if (action.isDragging()) {
 
                             // Prototype PathEntity Visibility
-                            Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                            Space.getSpace().setPathPrototypeDestinationPosition(event.getPosition());
-                            Space.getSpace().setPathPrototypeVisibility(Visibility.VISIBLE);
+                            World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                            World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
+                            World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
 
                             // Prototype ExtensionEntity Visibility
                             boolean isCreateExtensionAction = true;
 
                             // <HACK>
-                            //Group<Image> imageGroup = Space.getSpace().getImages(HostEntity.class, ExtensionEntity.class);
+                            //Group<Image> imageGroup = World.getWorld().getImages(HostEntity.class, ExtensionEntity.class);
 //                            Group<Image> imageGroup = Entity.Manager.filterType2(HostEntity.class).getImages();
 //                            imageGroup.addAll(Entity.Manager.filterWithComponent(Extension.class).getImages());
                             Group<Image> imageGroup = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages();
@@ -116,11 +116,11 @@ public class ActionListenerSystem extends System {
                             }
 
                             if (isCreateExtensionAction) {
-                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                                Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                Space.getSpace().setExtensionPrototypePosition(event.getPosition());
+                                World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                                World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                World.getWorld().setExtensionPrototypePosition(event.getPosition());
                             } else {
-                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
                             }
 
                             // Show Ports of nearby Hosts and Extensions
@@ -224,8 +224,8 @@ public class ActionListenerSystem extends System {
                                     Entity pathEntity = pathEntities.get(j);
 
                                     // Show source and target Ports in Paths
-//                                    Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
-//                                    Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
+//                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
+//                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
                                     pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
                                     pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
 
@@ -238,19 +238,19 @@ public class ActionListenerSystem extends System {
                             cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
 
                             if (hostEntity.getComponent(Portable.class).getExtensions().size() > 0) {
-//                                Space.getSpace().getImages(getHost().getExtensions()).setTransparency(1.0);
+//                                World.getWorld().getImages(getHost().getExtensions()).setTransparency(1.0);
                                 hostEntity.getComponent(Portable.class).getExtensions().setTransparency(0.1);
 
                                 // <HACK>
                                 // TODO: Replace ASAP. This is shit.
                                 // TODO: Use "rectangle" or "circular" extension layout algorithms
-                                hostEntity.getComponent(Host.class).setExtensionDistance(Space.HOST_TO_EXTENSION_LONG_DISTANCE);
+                                hostEntity.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
                                 // </HACK>
                             }
 
                             // Title
-                            Space.getSpace().setTitleText("Host");
-                            Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
+                            World.getWorld().setTitleText("Host");
+                            World.getWorld().setTitleVisibility(Visibility.VISIBLE);
 
                         } else {
 
@@ -269,7 +269,7 @@ public class ActionListenerSystem extends System {
 //                                    cameraEntity.setFocus();
                                 }
 
-                            } else if (event.getTargetImage() instanceof Space) {
+                            } else if (event.getTargetImage() instanceof World) {
 
                                 // HostEntity
 //                                action.getFirstEvent().getTargetImage().queueEvent(action);
@@ -278,9 +278,9 @@ public class ActionListenerSystem extends System {
                         }
 
                         // Check if connecting to a Extension
-                        if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                        if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
-                            Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                            World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                             // Get cached extension profiles (and retrieve additional from Internet store)
                             List<Profile> profiles = Application.getView().getClay().getProfiles();
@@ -382,7 +382,7 @@ public class ActionListenerSystem extends System {
 
                                     }
 
-                                    Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
                                 }
 
                             } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
@@ -400,7 +400,7 @@ public class ActionListenerSystem extends System {
                                     Entity targetPortEntity = null;
 
                                     Shape targetPortShape = event.getTargetShape();
-//                                            Space.getSpace()
+//                                            World.getWorld()
 //                                                    .getShapes(PortEntity.class)
 //                                                    .remove(sourcePortShape)
 //                                                    .filterContains(event.getPosition())
@@ -416,19 +416,19 @@ public class ActionListenerSystem extends System {
 
                                     cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
 
-                                    Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
 
                                 }
 
                             }
 
                         } else if (action.getLastEvent().getTargetShape() == null
-                                // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
-                                && action.getLastEvent().getTargetImage() == Space.getSpace()) {
+                                // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("World")) {
+                                && action.getLastEvent().getTargetImage() == World.getWorld()) {
 
-                            // (HostEntity.PortEntity, ..., Space) Action Pattern
+                            // (HostEntity.PortEntity, ..., World) Action Pattern
 
-                            if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                            if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
                                 Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
                                 Entity hostPortEntity = hostPortShape.getEntity();
@@ -441,8 +441,8 @@ public class ActionListenerSystem extends System {
                             }
 
                             // Update Image
-                            Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
-                            Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                            World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                            World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                         }
                     }
@@ -506,8 +506,8 @@ public class ActionListenerSystem extends System {
                                     Entity path = paths.get(j);
 
                                     // Show Ports
-//                                    Space.getSpace().getShape(path.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
-//                                    Space.getSpace().getShape(path.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
+//                                    World.getWorld().getShape(path.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
+//                                    World.getWorld().getShape(path.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
                                     Entity sourcePort = path.getComponent(Path.class).getSource();
                                     Entity targetPort = path.getComponent(Path.class).getTarget();
                                     sourcePort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
@@ -525,8 +525,8 @@ public class ActionListenerSystem extends System {
                             cameraEntity.getComponent(Camera.class).setFocus(extensionImage.getEntity());
 
                             // Title
-                            Space.getSpace().setTitleText("ExtensionEntity");
-                            Space.getSpace().setTitleVisibility(Visibility.VISIBLE);
+                            World.getWorld().setTitleText("ExtensionEntity");
+                            World.getWorld().setTitleVisibility(Visibility.VISIBLE);
                         }
                     }
                 }
@@ -561,9 +561,9 @@ public class ActionListenerSystem extends System {
                         if (action.isDragging()) {
 
                             // Prototype Path Visibility
-                            Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                            Space.getSpace().setPathPrototypeDestinationPosition(event.getPosition());
-                            Space.getSpace().setPathPrototypeVisibility(Visibility.VISIBLE);
+                            World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                            World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
+                            World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
 
                             // Prototype Extension Visibility
                             boolean isCreateExtensionAction = true;
@@ -589,11 +589,11 @@ public class ActionListenerSystem extends System {
                             }
 
                             if (isCreateExtensionAction) {
-                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                                Space.getSpace().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                Space.getSpace().setExtensionPrototypePosition(event.getPosition());
+                                World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                                World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                                World.getWorld().setExtensionPrototypePosition(event.getPosition());
                             } else {
-                                Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                                World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
                             }
 
                             // Show Ports of nearby Hosts and Extensions
@@ -751,7 +751,7 @@ public class ActionListenerSystem extends System {
 
                                     }
 
-                                    Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
                                 }
 
                             } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
@@ -769,7 +769,7 @@ public class ActionListenerSystem extends System {
                                     Entity targetPortEntity = null;
 
                                     Shape targetPortShape = event.getTargetShape();
-//                                            Space.getSpace()
+//                                            World.getWorld()
 //                                                    .getShapes(PortEntity.class)
 //                                                    .remove(sourcePortShape)
 //                                                    .filterContains(event.getPosition())
@@ -785,19 +785,19 @@ public class ActionListenerSystem extends System {
 
                                     cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
 
-                                    Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
 
                                 }
 
                             }
 
                         } else if (action.getLastEvent().getTargetShape() == null
-                                // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("Space")) {
-                                && action.getLastEvent().getTargetImage() == Space.getSpace()) {
+                                // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("World")) {
+                                && action.getLastEvent().getTargetImage() == World.getWorld()) {
 
-                            // (HostEntity.PortEntity, ..., Space) Action Pattern
+                            // (HostEntity.PortEntity, ..., World) Action Pattern
 
-                            if (Space.getSpace().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                            if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
                                 Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
                                 Entity hostPortEntity = hostPortShape.getEntity();
@@ -811,8 +811,8 @@ public class ActionListenerSystem extends System {
                             }
 
                             // Update Image
-                            Space.getSpace().setPathPrototypeVisibility(Visibility.INVISIBLE);
-                            Space.getSpace().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                            World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                            World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
 
                         }
                     }

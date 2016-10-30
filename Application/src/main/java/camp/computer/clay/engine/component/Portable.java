@@ -23,7 +23,6 @@ public class Portable extends Component {
         return this.portEntities;
     }
 
-    //public void addPort(PortEntity portEntity) {
     public void addPort(Entity portEntity) {
         if (!this.portEntities.contains(portEntity)) {
             this.portEntities.add(portEntity);
@@ -45,7 +44,7 @@ public class Portable extends Component {
     }
 
 
-    public Group<Entity> getExtensions() {cd 
+    public Group<Entity> getExtensions() {
         Group<Entity> extensionEntities = new Group<>();
         for (int i = 0; i < getPorts().size(); i++) {
             Entity portEntity = getPorts().get(i);
@@ -61,14 +60,14 @@ public class Portable extends Component {
     }
 
     // <EXTENSION>
-    // HACK: Assumes ExtensionEntity
+    // HACK: Assumes Extension
     public Group<Entity> getHosts() {
         return getHosts(getEntity());
     }
 
+    // HACK: Assumes Extension
     private Group<Entity> getHosts(Entity extensionEntity) {
 
-//        List<Entity> hostEntities = Entity.Manager.filterType2(HostEntity.class);
         List<Entity> hostEntities = Entity.Manager.filterWithComponent(Host.class);
 
         Group<Entity> hostEntityGroup = new Group<>();

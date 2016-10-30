@@ -72,11 +72,9 @@ public final class Entity extends Groupable {
 
         // Create list of Components
         components = new Group<>();
-
-        // <HACK>
-        addComponent(new Label());
-        // </HACK>
     }
+
+
 
     protected Entity parent; // TODO: Delete!
 
@@ -89,18 +87,6 @@ public final class Entity extends Groupable {
         return this.parent;
     }
 
-
-//    // <TAG_COMPONENT>
-//    protected String label = "";
-//
-//    public void setLabel(String label) {
-//        this.label = label;
-//    }
-//
-//    public String getLabel() {
-//        return this.label;
-//    }
-//    // </TAG_COMPONENT>
 
 
     // <TEMPORARY_COMPONENTS_REFERENCES>

@@ -36,12 +36,12 @@ import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Triangle;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
-    // Space Rendering Context
+    // World Rendering Context
     public Bitmap canvasBitmap = null;
     public Canvas canvas = null;
     private int canvasWidth;
@@ -49,7 +49,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     public Matrix identityMatrix;
 
-    // Space PlatformRenderer
+    // World PlatformRenderer
     private SurfaceHolder surfaceHolder;
 
     public PlatformRenderer platformRenderer;
@@ -57,8 +57,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     // Coordinate System (Grid)
     public Transform originPosition = new Transform();
 
-    // Space
-    public Space space;
+    // World
+    public World world;
 
     public PlatformRenderSurface(Context context) {
         super(context);
@@ -88,7 +88,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         // Create Identity Matrix
         identityMatrix = new Matrix();
 
-        // Center the space coordinate system
+        // Center the world coordinate system
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
@@ -157,7 +157,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
-        if (this.space == null) {
+        if (this.world == null) {
             return false;
         }
 
@@ -178,7 +178,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         final int pointerCount = motionEvent.getPointerCount();
 
         // Get active actor
-        Actor actor = space.getActor();
+        Actor actor = world.getActor();
 
         // Create pointerCoordinates event
         Event event = new Event();
@@ -249,7 +249,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
      */
     public void update() {
 
-        if (space == null) {
+        if (world == null) {
             return;
         }
 
@@ -275,16 +275,16 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     public void updateSystems(Canvas canvas) {
 
-        updateSystem.update(space);
-        renderSystem.update(this, space, canvas);
+        updateSystem.update(world);
+        renderSystem.update(this, world, canvas);
     }
 
     public PlatformRenderer getPlatformRenderer() {
         return this.platformRenderer;
     }
 
-    public void setSpace(Space space) {
-        this.space = space;
+    public void setWorld(World world) {
+        this.world = world;
 
         // Get screen width and height of the device
         DisplayMetrics metrics = new DisplayMetrics();
@@ -298,8 +298,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         camera.getComponent(Camera.class).setHeight(screenHeight);
     }
 
-    public Space getSpace() {
-        return this.space;
+    public World getWorld() {
+        return this.world;
     }
 
     // <PATH_IMAGE_HELPERS>
@@ -311,8 +311,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         Paint paint = platformRenderSurface.paint;
 
-        Shape sourcePortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource());
-        Shape targetPortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget());
+        Shape sourcePortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource());
+        Shape targetPortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget());
 
         // Show target port
         targetPortShape.setVisibility(Visibility.VISIBLE);
@@ -334,8 +334,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         Paint paint = platformRenderSurface.paint;
 
-        Shape sourcePortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getSource());
-        Shape targetPortShape = Space.getSpace().getShape(pathEntity.getComponent(Path.class).getTarget());
+        Shape sourcePortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource());
+        Shape targetPortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget());
 
         if (sourcePortShape != null && targetPortShape != null) {
 
@@ -355,7 +355,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-//            double pathRotation = getSpace().getImages(getPath().getHosts()).getRotation();
+//            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
 
             Segment segment = (Segment) pathEntity.getComponent(Image.class).getShape("PathEntity");
             segment.setOutlineThickness(15.0);

@@ -17,23 +17,23 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
 public class RenderSystem extends System {
 
     @Override
-    public boolean update(Space space) {
+    public boolean update(World world) {
         return true;
     }
 
-    public boolean update(PlatformRenderSurface platformRenderSurface, Space space, Canvas canvas) {
+    public boolean update(PlatformRenderSurface platformRenderSurface, World world, Canvas canvas) {
 
         platformRenderSurface.canvas = canvas;
         Bitmap canvasBitmap = platformRenderSurface.canvasBitmap;
         Matrix identityMatrix = platformRenderSurface.identityMatrix;
 
-        if (platformRenderSurface.space == null || platformRenderSurface.canvas == null) {
+        if (platformRenderSurface.world == null || platformRenderSurface.canvas == null) {
             return false;
         }
 
@@ -80,7 +80,7 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        Space space = platformRenderSurface.getSpace();
+        World world = platformRenderSurface.getWorld();
 
         canvas.save();
 
@@ -96,10 +96,10 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        Space space = platformRenderSurface.getSpace();
+        World world = platformRenderSurface.getWorld();
 
 
-        if (space.pathPrototypeVisibility == Visibility.VISIBLE) {
+        if (world.pathPrototypeVisibility == Visibility.VISIBLE) {
 
             double triangleWidth = 20;
             double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
@@ -111,18 +111,18 @@ public class RenderSystem extends System {
 //            paint.setColor(this.getUniqueColor());
 
             double pathRotationAngle = Geometry.getAngle(
-                    space.pathPrototypeSourcePosition,
-                    space.pathPrototypeDestinationCoordinate
+                    world.pathPrototypeSourcePosition,
+                    world.pathPrototypeDestinationCoordinate
             );
 
             Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
-                    space.pathPrototypeSourcePosition,
+                    world.pathPrototypeSourcePosition,
                     pathRotationAngle,
                     2 * triangleSpacing
             );
 
             Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
-                    space.pathPrototypeDestinationCoordinate,
+                    world.pathPrototypeDestinationCoordinate,
                     pathRotationAngle + 180,
                     2 * triangleSpacing
             );
@@ -134,7 +134,7 @@ public class RenderSystem extends System {
             paint.setStyle(Paint.Style.FILL);
 //            paint.setColor(Color.parseColor("#efefef"));
             double shapeRadius = 40.0;
-            platformRenderSurface.drawCircle(space.pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
+            platformRenderSurface.drawCircle(world.pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
         }
     }
 
@@ -142,19 +142,19 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        Space space = platformRenderSurface.getSpace();
+        World world = platformRenderSurface.getWorld();
 
-        if (space.extensionPrototypeVisibility == Visibility.VISIBLE) {
+        if (world.extensionPrototypeVisibility == Visibility.VISIBLE) {
 
             double pathRotationAngle = Geometry.getAngle(
-                    space.pathPrototypeSourcePosition,
-                    space.extensionPrototypePosition
+                    world.pathPrototypeSourcePosition,
+                    world.extensionPrototypePosition
             );
 
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#fff7f7f7"));
 
-            platformRenderSurface.drawRectangle(space.extensionPrototypePosition, pathRotationAngle + 180, 200, 200);
+            platformRenderSurface.drawRectangle(world.extensionPrototypePosition, pathRotationAngle + 180, 200, 200);
         }
     }
 
@@ -169,7 +169,7 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        Space space = platformRenderSurface.getSpace();
+        World world = platformRenderSurface.getWorld();
 
         if (entity.hasComponent(Host.class)) {
 
@@ -230,7 +230,7 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        Space space = platformRenderSurface.getSpace();
+        World world = platformRenderSurface.getWorld();
 
         int linePosition = 0;
 

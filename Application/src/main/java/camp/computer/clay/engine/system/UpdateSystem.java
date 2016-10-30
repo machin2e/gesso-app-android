@@ -14,15 +14,15 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
+import camp.computer.clay.util.image.World;
 
 public class UpdateSystem extends System {
 
     @Override
-    public boolean update(Space space) {
+    public boolean update(World world) {
 
         // Update Actors
-        space.getActor().update(); // HACK
+        world.getActor().update(); // HACK
 
         updateEntities(Entity.Manager);
 
@@ -156,12 +156,12 @@ public class UpdateSystem extends System {
 
         // Update Headers Geometry to match the corresponding ExtensionEntity Profile
         Rectangle header = (Rectangle) portableImage.getShape("Header");
-        double headerWidth = Space.PIXEL_PER_MILLIMETER * A;
+        double headerWidth = World.PIXEL_PER_MILLIMETER * A;
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
         for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
-            double x = Space.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
+            double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < extension.getComponent(Portable.class).headerContactPositions.size()) {
                 extension.getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
             } else {
