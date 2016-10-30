@@ -18,7 +18,6 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.ActionListener;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
@@ -30,816 +29,795 @@ public class ActionListenerSystem extends System {
 
     @Override
     public boolean update(World world) {
+
+        // TODO: Dequeue actions and apply them to the targeted Entity (calling one of the below functions)
+
         return false;
     }
 
-    public static ActionListener getHostActionListener(final Entity hostEntity) {
+    public static void handleHostAction(final Entity hostEntity, Action action) {
 
         final Image hostImage = hostEntity.getComponent(Image.class);
 
-        return new ActionListener() {
-            @Override
-            public void onAction(Action action) {
+        final Event event = action.getLastEvent();
 
-                final Event event = action.getLastEvent();
+        final Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
-                final Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        if (event.getType() == Event.Type.NONE) {
 
-                if (event.getType() == Event.Type.NONE) {
+        } else if (event.getType() == Event.Type.SELECT) {
 
-                } else if (event.getType() == Event.Type.SELECT) {
+        } else if (event.getType() == Event.Type.HOLD) {
 
-                } else if (event.getType() == Event.Type.HOLD) {
+        } else if (event.getType() == Event.Type.MOVE) {
 
-                } else if (event.getType() == Event.Type.MOVE) {
+            if (action.getFirstEvent().getTargetShape() == null) {
+                return;
+            }
 
-                    if (action.getFirstEvent().getTargetShape() == null) {
-                        return;
-                    }
+            if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
 
-                    if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
+                if (action.isDragging()) {
 
-                        if (action.isDragging()) {
-
-                            // Update position of prototype ExtensionEntity
-                            World.getWorld().setExtensionPrototypePosition(event.getPosition());
+                    // Update position of prototype ExtensionEntity
+                    World.getWorld().setExtensionPrototypePosition(event.getPosition());
 
 //                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                            hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
+                    hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
 
-                            World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                    World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
-                        } else if (action.isHolding()) {
+                } else if (action.isHolding()) {
 
-                            // Update position of HostEntity image
-                            hostEntity.getComponent(Transform.class).set(event.getPosition());
+                    // Update position of HostEntity image
+                    hostEntity.getComponent(Transform.class).set(event.getPosition());
 
-                            // CameraEntity
-                            cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
+                    // CameraEntity
+                    cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
 
-                        }
+                }
 
-                    } else if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
+            } else if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
 
-                        if (action.isDragging()) {
+                if (action.isDragging()) {
 
-                            // Prototype PathEntity Visibility
-                            World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                            World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
-                            World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
+                    // Prototype PathEntity Visibility
+                    World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                    World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
+                    World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
 
-                            // Prototype ExtensionEntity Visibility
-                            boolean isCreateExtensionAction = true;
+                    // Prototype ExtensionEntity Visibility
+                    boolean isCreateExtensionAction = true;
 
-                            // <HACK>
-                            //Group<Image> imageGroup = World.getWorld().getImages(HostEntity.class, ExtensionEntity.class);
+                    // <HACK>
+                    //Group<Image> imageGroup = World.getWorld().getImages(HostEntity.class, ExtensionEntity.class);
 //                            Group<Image> imageGroup = Entity.Manager.filterType2(HostEntity.class).getImages();
 //                            imageGroup.addAll(Entity.Manager.filterWithComponent(Extension.class).getImages());
-                            Group<Image> imageGroup = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages();
-                            // </HACK>
+                    Group<Image> imageGroup = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages();
+                    // </HACK>
 
-                            for (int i = 0; i < imageGroup.size(); i++) {
-                                Image otherImage = imageGroup.get(i);
+                    for (int i = 0; i < imageGroup.size(); i++) {
+                        Image otherImage = imageGroup.get(i);
 
-                                // Update style of nearby Hosts
-                                double distanceToHostImage = Geometry.distance(
-                                        event.getPosition(),
-                                        otherImage.getEntity().getComponent(Transform.class)
-                                );
+                        // Update style of nearby Hosts
+                        double distanceToHostImage = Geometry.distance(
+                                event.getPosition(),
+                                otherImage.getEntity().getComponent(Transform.class)
+                        );
 
-                                if (distanceToHostImage < 375) { // 375, 500
-                                    isCreateExtensionAction = false;
-                                    break;
-                                }
+                        if (distanceToHostImage < 375) { // 375, 500
+                            isCreateExtensionAction = false;
+                            break;
+                        }
 
-                                // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
-                            }
+                        // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
+                    }
 
-                            if (isCreateExtensionAction) {
-                                World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                                World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                World.getWorld().setExtensionPrototypePosition(event.getPosition());
-                            } else {
-                                World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
-                            }
+                    if (isCreateExtensionAction) {
+                        World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                        World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                        World.getWorld().setExtensionPrototypePosition(event.getPosition());
+                    } else {
+                        World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                    }
 
-                            // Show Ports of nearby Hosts and Extensions
-                            Entity sourcePortEntity = action.getFirstEvent().getTargetShape().getEntity();
-                            Event lastEvent = action.getLastEvent();
+                    // Show Ports of nearby Hosts and Extensions
+                    Entity sourcePortEntity = action.getFirstEvent().getTargetShape().getEntity();
+                    Event lastEvent = action.getLastEvent();
 
-                            // Show Ports of nearby Hosts and Extensions
-                            double nearbyRadiusThreshold = 200 + 60;
-                            Group<Image> nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
+                    // Show Ports of nearby Hosts and Extensions
+                    double nearbyRadiusThreshold = 200 + 60;
+                    Group<Image> nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
 
-                            for (int i = 0; i < imageGroup.size(); i++) {
-                                Image portableImage = imageGroup.get(i);
+                    for (int i = 0; i < imageGroup.size(); i++) {
+                        Image portableImage = imageGroup.get(i);
 
-                                //if (portableImage.getEntity() == sourcePortEntity.getComponent(Port.class).getPortable() || nearbyPortableImages.contains(portableImage)) {
-                                if (portableImage.getEntity() == sourcePortEntity.getParent() || nearbyPortableImages.contains(portableImage)) {
+                        //if (portableImage.getEntity() == sourcePortEntity.getComponent(Port.class).getPortable() || nearbyPortableImages.contains(portableImage)) {
+                        if (portableImage.getEntity() == sourcePortEntity.getParent() || nearbyPortableImages.contains(portableImage)) {
 
 //                                                        // <HACK>
-                                    Image nearbyImage = portableImage;
-                                    Entity nearbyPortableEntity = nearbyImage.getEntity();
-                                    nearbyImage.setTransparency(1.0f);
+                            Image nearbyImage = portableImage;
+                            Entity nearbyPortableEntity = nearbyImage.getEntity();
+                            nearbyImage.setTransparency(1.0f);
 //                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                                    nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
 
-                                    // Add additional PortEntity to ExtensionEntity if it has no more available Ports
-                                    Entity portableEntity = portableImage.getEntity();
+                            // Add additional PortEntity to ExtensionEntity if it has no more available Ports
+                            Entity portableEntity = portableImage.getEntity();
 
-                                    if (portableEntity.hasComponent(Extension.class)) { // HACK
-                                        if (portableEntity.getComponent(Extension.class).getProfile() == null) {
-                                            Entity extensionPortableEntity = portableImage.getEntity();
+                            if (portableEntity.hasComponent(Extension.class)) { // HACK
+                                if (portableEntity.getComponent(Extension.class).getProfile() == null) {
+                                    Entity extensionPortableEntity = portableImage.getEntity();
 
-                                            boolean addPrototypePort = true;
-                                            for (int j = 0; j < extensionPortableEntity.getComponent(Portable.class).getPorts().size(); j++) {
-                                                Entity existingPortEntity = extensionPortableEntity.getComponent(Portable.class).getPorts().get(j);
-                                                if (existingPortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
-                                                    addPrototypePort = false;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (addPrototypePort) {
-
-                                                Entity portEntity = Clay.createEntity(Port.class);
-
-                                                portEntity.getComponent(Port.class).setIndex(extensionPortableEntity.getComponent(Portable.class).getPorts().size());
-                                                extensionPortableEntity.getComponent(Portable.class).addPort(portEntity);
-                                            }
+                                    boolean addPrototypePort = true;
+                                    for (int j = 0; j < extensionPortableEntity.getComponent(Portable.class).getPorts().size(); j++) {
+                                        Entity existingPortEntity = extensionPortableEntity.getComponent(Portable.class).getPorts().get(j);
+                                        if (existingPortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
+                                            addPrototypePort = false;
+                                            break;
                                         }
                                     }
 
-                                    // </HACK>
+                                    if (addPrototypePort) {
 
-                                } else {
+                                        Entity portEntity = Clay.createEntity(Port.class);
 
-                                    Image nearbyImage = portableImage;
-                                    Entity nearbyPortableEntity = portableImage.getEntity();
-                                    nearbyImage.setTransparency(0.1f);
-                                    //nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                    nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
-
+                                        portEntity.getComponent(Port.class).setIndex(extensionPortableEntity.getComponent(Portable.class).getPorts().size());
+                                        extensionPortableEntity.getComponent(Portable.class).addPort(portEntity);
+                                    }
                                 }
                             }
 
-                            // CameraEntity
-                            cameraEntity.getComponent(Camera.class).setFocus(sourcePortEntity, event.getPosition());
-
-                        } else if (action.isHolding()) {
-
-//                                                // Holding and dragging
-
-                        }
-
-                    }
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                    // <HACK>
-                    // TODO: Refactor so this doesn't have to be here! It's messy this way... standardize the way "null shapes" are handled
-                    if (action.getFirstEvent().getTargetShape() == null) {
-                        return;
-                    }
-                    // </HACK>
-
-                    if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
-
-                        if (action.isTap()) {
-
-                            // Focus on touched form
-                            hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
-
-//                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                            hostEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
-                            hostEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
-
-                            hostImage.setTransparency(1.0);
-
-                            // Show Ports and Paths of touched Host
-                            for (int i = 0; i < hostEntity.getComponent(Portable.class).getPorts().size(); i++) {
-                                Group<Entity> pathEntities = hostEntity.getComponent(Portable.class).getPort(i).getComponent(Port.class).getPaths();
-
-                                for (int j = 0; j < pathEntities.size(); j++) {
-                                    Entity pathEntity = pathEntities.get(j);
-
-                                    // Show source and target Ports in Paths
-//                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
-//                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
-                                    pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                                    pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-
-                                    // Show Path connection
-                                    pathEntity.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                                }
-                            }
-
-                            // Camera
-                            cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
-
-                            if (hostEntity.getComponent(Portable.class).getExtensions().size() > 0) {
-//                                World.getWorld().getImages(getHost().getExtensions()).setTransparency(1.0);
-                                hostEntity.getComponent(Portable.class).getExtensions().setTransparency(0.1);
-
-                                // <HACK>
-                                // TODO: Replace ASAP. This is shit.
-                                // TODO: Use "rectangle" or "circular" extension layout algorithms
-                                hostEntity.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
-                                // </HACK>
-                            }
-
-                            // Title
-                            World.getWorld().setTitleText("Host");
-                            World.getWorld().setTitleVisibility(Visibility.VISIBLE);
+                            // </HACK>
 
                         } else {
 
-                            // TODO: Release longer than tap!
-
-                            if (event.getTargetImage().getEntity().hasComponent(Host.class)) {
-
-                                // If getFirstEvent queueEvent was on the same form, then respond
-//                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity() instanceof HostEntity) {
-                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity().hasComponent(Host.class)) {
-
-                                    // HostEntity
-//                                    event.getTargetImage().queueEvent(action);
-
-                                    // CameraEntity
-//                                    cameraEntity.setFocus();
-                                }
-
-                            } else if (event.getTargetImage() instanceof World) {
-
-                                // HostEntity
-//                                action.getFirstEvent().getTargetImage().queueEvent(action);
-
-                            }
-                        }
-
-                        // Check if connecting to a Extension
-                        if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
-
-                            World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
-
-                            // Get cached extension profiles (and retrieve additional from Internet store)
-                            List<Profile> profiles = Application.getView().getClay().getProfiles();
-
-
-                            if (profiles.size() == 0) {
-
-                                // Show "default" DIY extension builder (or info about there being no headerExtensions)
-
-                            } else if (profiles.size() > 0) {
-
-                                // Prompt User to select an ExtensionEntity from the Store
-                                // i.e., Prompt to select extension to use! Then use that profile to create and configure portEntities for the extension.
-                                Application.getView().getActionPrompts().promptSelection(profiles, new Prompt.OnActionListener<Profile>() {
-                                    @Override
-                                    public void onComplete(Profile profile) {
-
-                                        // Add ExtensionEntity from Profile
-                                        Entity extensionEntity = hostEntity.getComponent(Host.class).restoreExtension(profile, event.getPosition());
-
-                                        // Update CameraEntity
-                                        cameraEntity.getComponent(Camera.class).setFocus(extensionEntity);
-                                    }
-                                });
-                                // Application.getView().promptTasks();
-                            }
-                        }
-
-                    } else if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
-
-                        if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
-
-                            // (HostEntity.PortEntity, ..., HostEntity.PortEntity) Action Pattern
-
-                            if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape() && action.isTap()) { // if (action.isTap()) {
-
-                                // (HostEntity.PortEntity A, ..., HostEntity.PortEntity A) Action Pattern
-                                // i.e., The action's first and last events address the same portEntity. Therefore, it must be either a tap or a hold.
-
-                                // Get portEntity associated with the touched portEntity shape
-                                Entity portEntity = action.getFirstEvent().getTargetShape().getEntity();
-                                int portIndex = hostEntity.getComponent(Portable.class).getPorts().indexOf(portEntity);
-
-                                Port portComponent = portEntity.getComponent(Port.class);
-
-                                if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
-
-                                    if (portComponent.getType() == Port.Type.NONE) {
-
-                                        // Set initial PortEntity Type
-
-                                        Log.v("TouchPort", "-A");
-
-                                        portComponent.setDirection(Port.Direction.INPUT);
-                                        portComponent.setType(Port.Type.next(portComponent.getType()));
-
-                                    } else if (!portComponent.hasPath()) {
-
-                                        // Change PortEntity Type
-
-                                        Log.v("TouchPort", "-B");
-
-                                        Port.Type nextType = portComponent.getType();
-                                        while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
-                                            nextType = Port.Type.next(nextType);
-                                        }
-                                        portComponent.setType(nextType);
-
-                                        //} else if (hostEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
-                                    } else if (hostEntity.getComponent(Portable.class).getPort(portIndex).getComponent(Port.class).hasVisiblePaths()) {
-
-                                        // Change PathEntity Type. Updates each PortEntity in the PathEntity.
-
-                                        Log.v("TouchPort", "-D");
-
-                                        // Paths are being shown. Touching a portEntity changes the portEntity type. This will also
-                                        // updates the corresponding path requirement.
-
-                                        Port.Type nextType = portComponent.getType();
-                                        while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
-                                            nextType = Port.Type.next(nextType);
-                                        }
-
-                                        // <FILTER>
-                                        // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
-                                        Group<Entity> pathEntities = portComponent.getPaths();
-                                        for (int i = 0; i < pathEntities.size(); i++) {
-                                            Entity pathEntity = pathEntities.get(i);
-
-                                            // <FILTER>
-                                            // TODO: Make Filter/Editor
-                                            Group<Entity> portEntities = pathEntity.getComponent(Path.class).getPorts();
-                                            for (int j = 0; j < portEntities.size(); j++) {
-                                                portEntities.get(j).getComponent(Port.class).setType(nextType);
-                                            }
-                                            // </FILTER>
-                                        }
-                                        // </FILTER>
-
-                                    }
-
-                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
-                                }
-
-                            } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
-
-                                // (HostEntity.PortEntity A, ..., HostEntity.PortEntity B) Action Pattern
-                                // i.e., The Action's first and last Events address different Ports.
-
-                                Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
-
-                                if (action.isDragging()) {
-
-                                    Log.v("Events", "B.1");
-
-                                    Entity sourcePortEntity = sourcePortShape.getEntity();
-                                    Entity targetPortEntity = null;
-
-                                    Shape targetPortShape = event.getTargetShape();
-//                                            World.getWorld()
-//                                                    .getShapes(PortEntity.class)
-//                                                    .remove(sourcePortShape)
-//                                                    .filterContains(event.getPosition())
-//                                                    .get(0);
-//                                    Entity.Manager.filterWithComponent(Port.class).getImages().filter
-                                    targetPortEntity = targetPortShape.getEntity();
-
-                                    Log.v("Events", "D.1");
-
-                                    // Create and configure new PathEntity
-                                    Entity pathEntity = Clay.createEntity(Path.class);
-                                    pathEntity.getComponent(Path.class).set(sourcePortEntity, targetPortEntity);
-
-                                    cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
-
-                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
-
-                                }
-
-                            }
-
-                        } else if (action.getLastEvent().getTargetShape() == null
-                                // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("World")) {
-                                && action.getLastEvent().getTargetImage() == World.getWorld()) {
-
-                            // (HostEntity.PortEntity, ..., World) Action Pattern
-
-                            if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
-
-                                Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
-                                Entity hostPortEntity = hostPortShape.getEntity();
-
-                                // Create new ExtensionEntity from scratch (for manual configuration/construction)
-                                Entity extensionEntity = hostEntity.getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
-
-                                // Update CameraEntity
-//                                cameraEntity.setFocus(extensionEntity);
-                            }
-
-                            // Update Image
-                            World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
-                            World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                            Image nearbyImage = portableImage;
+                            Entity nearbyPortableEntity = portableImage.getEntity();
+                            nearbyImage.setTransparency(0.1f);
+                            //nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
 
                         }
                     }
-                }
-            }
-        };
-    }
 
-    public static ActionListener getExtensionActionListener(final Entity extensionEntity) {
+                    // CameraEntity
+                    cameraEntity.getComponent(Camera.class).setFocus(sourcePortEntity, event.getPosition());
 
-        final Image extensionImage = extensionEntity.getComponent(Image.class);
-
-        return new ActionListener() {
-            @Override
-            public void onAction(Action action) {
-
-                Log.v("ExtensionImage", "onAction " + action.getLastEvent().getType());
-
-                Event event = action.getLastEvent();
-
-                if (event.getType() == Event.Type.NONE) {
-
-                } else if (event.getType() == Event.Type.SELECT) {
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                    Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
-                    extensionEntity.getComponent(Portable.class).createProfile(extensionEntity);
-
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                    // Previous Action targeted also this ExtensionEntity
-                    // TODO: Refactor
-                    if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == extensionImage.getEntity()) {
-
-                        if (action.isTap()) {
-                            // TODO: Replace with script editor/timeline
-                            Application.getView().openActionEditor(extensionImage.getEntity());
-                        }
-
-                    } else {
-
-                        if (action.isTap()) {
-
-                            // Focus on touched base
-                            extensionEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
-//                            extensionEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                            extensionEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
-                            extensionImage.setTransparency(1.0);
-
-                            // Show Ports and Paths for selected Host
-//                            Group<Shape> portShapes = extensionEntity.getComponent(Portable.class).getPortShapes();
-                            for (int i = 0; i < extensionEntity.getComponent(Portable.class).getPorts().size(); i++) {
-//                                Shape portShape = portShapes.get(i);
-                                Entity portEntity = extensionEntity.getComponent(Portable.class).getPorts().get(i);
-
-                                Group<Entity> paths = portEntity.getComponent(Port.class).getPaths();
-                                for (int j = 0; j < paths.size(); j++) {
-                                    Entity path = paths.get(j);
-
-                                    // Show Ports
-//                                    World.getWorld().getShape(path.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
-//                                    World.getWorld().getShape(path.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
-                                    Entity sourcePort = path.getComponent(Path.class).getSource();
-                                    Entity targetPort = path.getComponent(Path.class).getTarget();
-                                    sourcePort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                                    targetPort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-
-
-                                    // Show Path
-                                    path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                                }
-                            }
-                            // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
-
-                            // CameraEntity
-                            Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
-                            cameraEntity.getComponent(Camera.class).setFocus(extensionImage.getEntity());
-
-                            // Title
-                            World.getWorld().setTitleText("ExtensionEntity");
-                            World.getWorld().setTitleVisibility(Visibility.VISIBLE);
-                        }
-                    }
-                }
-            }
-        };
-    }
-
-    public static ActionListener getPortActionListener(final Entity portEntity) {
-
-        return new ActionListener() {
-            @Override
-            public void onAction(Action action) {
-
-                final Event event = action.getLastEvent();
-
-                final Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
-
-                if (event.getType() == Event.Type.NONE) {
-
-                } else if (event.getType() == Event.Type.SELECT) {
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                    if (action.getFirstEvent().getTargetShape() == null) {
-                        return;
-                    }
-
-                    if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
-
-                        if (action.isDragging()) {
-
-                            // Prototype Path Visibility
-                            World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                            World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
-                            World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
-
-                            // Prototype Extension Visibility
-                            boolean isCreateExtensionAction = true;
-
-                            // <HACK>
-                            Group<Image> imageGroup = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages();
-
-                            for (int i = 0; i < imageGroup.size(); i++) {
-                                Image otherImage = imageGroup.get(i);
-
-                                // Update style of nearby Hosts
-                                double distanceToHostImage = Geometry.distance(
-                                        event.getPosition(),
-                                        otherImage.getEntity().getComponent(Transform.class)
-                                );
-
-                                if (distanceToHostImage < 375) { // 375, 500
-                                    isCreateExtensionAction = false;
-                                    break;
-                                }
-
-                                // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
-                            }
-
-                            if (isCreateExtensionAction) {
-                                World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                                World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
-                                World.getWorld().setExtensionPrototypePosition(event.getPosition());
-                            } else {
-                                World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
-                            }
-
-                            // Show Ports of nearby Hosts and Extensions
-                            Entity sourcePortEntity = action.getFirstEvent().getTargetShape().getEntity();
-                            Event lastEvent = action.getLastEvent();
-
-                            // Show Ports of nearby Hosts and Extensions
-                            double nearbyRadiusThreshold = 200 + 60;
-                            Group<Image> nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
-
-                            for (int i = 0; i < imageGroup.size(); i++) {
-                                Image portableImage = imageGroup.get(i);
-
-                                //if (portableImage.getEntity() == sourcePortEntity.getComponent(Port.class).getPortable() || nearbyPortableImages.contains(portableImage)) {
-                                if (portableImage.getEntity() == sourcePortEntity.getParent() || nearbyPortableImages.contains(portableImage)) {
-
-//                                                        // <HACK>
-                                    Image nearbyImage = portableImage;
-                                    Entity nearbyPortableEntity = nearbyImage.getEntity();
-                                    nearbyImage.setTransparency(1.0f);
-//                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                                    nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
-
-                                    // Add additional PortEntity to ExtensionEntity if it has no more available Ports
-                                    Entity portableEntity = portableImage.getEntity();
-
-                                    if (portableEntity.hasComponent(Extension.class)) { // HACK
-                                        if (portableEntity.getComponent(Extension.class).getProfile() == null) {
-                                            Entity extensionPortableEntity = portableImage.getEntity();
-
-                                            boolean addPrototypePort = true;
-                                            for (int j = 0; j < extensionPortableEntity.getComponent(Portable.class).getPorts().size(); j++) {
-                                                Entity existingPortEntity = extensionPortableEntity.getComponent(Portable.class).getPorts().get(j);
-                                                if (existingPortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
-                                                    addPrototypePort = false;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (addPrototypePort) {
-
-                                                Entity portEntity = Clay.createEntity(Port.class);
-
-                                                portEntity.getComponent(Port.class).setIndex(extensionPortableEntity.getComponent(Portable.class).getPorts().size());
-
-                                                extensionPortableEntity.getComponent(Portable.class).addPort(portEntity);
-                                            }
-                                        }
-                                    }
-
-                                    // </HACK>
-
-                                } else {
-
-                                    Image nearbyImage = portableImage;
-                                    Entity nearbyPortableEntity = portableImage.getEntity();
-                                    nearbyImage.setTransparency(0.1f);
-                                    //nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                                    nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
-
-                                }
-                            }
-
-                            // CameraEntity
-                            cameraEntity.getComponent(Camera.class).setFocus(sourcePortEntity, event.getPosition());
-
-                        } else if (action.isHolding()) {
+                } else if (action.isHolding()) {
 
 //                                                // Holding and dragging
 
+                }
+
+            }
+
+        } else if (event.getType() == Event.Type.UNSELECT) {
+
+            // <HACK>
+            // TODO: Refactor so this doesn't have to be here! It's messy this way... standardize the way "null shapes" are handled
+            if (action.getFirstEvent().getTargetShape() == null) {
+                return;
+            }
+            // </HACK>
+
+            if (action.getFirstEvent().getTargetShape().getLabel().equals("Board")) {
+
+                if (action.isTap()) {
+
+                    // Focus on touched form
+                    hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+
+//                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
+                    hostEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                    hostEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+
+                    hostImage.setTransparency(1.0);
+
+                    // Show Ports and Paths of touched Host
+                    for (int i = 0; i < hostEntity.getComponent(Portable.class).getPorts().size(); i++) {
+                        Group<Entity> pathEntities = hostEntity.getComponent(Portable.class).getPort(i).getComponent(Port.class).getPaths();
+
+                        for (int j = 0; j < pathEntities.size(); j++) {
+                            Entity pathEntity = pathEntities.get(j);
+
+                            // Show source and target Ports in Paths
+//                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
+//                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
+                            pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                            pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+
+                            // Show Path connection
+                            pathEntity.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                        }
+                    }
+
+                    // Camera
+                    cameraEntity.getComponent(Camera.class).setFocus(hostEntity);
+
+                    if (hostEntity.getComponent(Portable.class).getExtensions().size() > 0) {
+//                                World.getWorld().getImages(getHost().getExtensions()).setTransparency(1.0);
+                        hostEntity.getComponent(Portable.class).getExtensions().setTransparency(0.1);
+
+                        // <HACK>
+                        // TODO: Replace ASAP. This is shit.
+                        // TODO: Use "rectangle" or "circular" extension layout algorithms
+                        hostEntity.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
+                        // </HACK>
+                    }
+
+                    // Title
+                    World.getWorld().setTitleText("Host");
+                    World.getWorld().setTitleVisibility(Visibility.VISIBLE);
+
+                } else {
+
+                    // TODO: Release longer than tap!
+
+                    if (event.getTargetImage().getEntity().hasComponent(Host.class)) {
+
+                        // If getFirstEvent queueEvent was on the same form, then respond
+//                                if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity() instanceof HostEntity) {
+                        if (action.getFirstEvent().isPointing() && action.getFirstEvent().getTargetImage().getEntity().hasComponent(Host.class)) {
+
+                            // HostEntity
+//                                    event.getTargetImage().queueEvent(action);
+
+                            // CameraEntity
+//                                    cameraEntity.setFocus();
                         }
 
+                    } else if (event.getTargetImage() instanceof World) {
+
+                        // HostEntity
+//                                action.getFirstEvent().getTargetImage().queueEvent(action);
+
                     }
+                }
 
-                } else if (event.getType() == Event.Type.UNSELECT) {
+                // Check if connecting to a Extension
+                if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 
-                    // <HACK>
-                    // TODO: Refactor so this doesn't have to be here! It's messy this way... standardize the way "null shapes" are handled
-                    if (action.getFirstEvent().getTargetShape() == null) {
-                        return;
+                    World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+
+                    // Get cached extension profiles (and retrieve additional from Internet store)
+                    List<Profile> profiles = Application.getView().getClay().getProfiles();
+
+
+                    if (profiles.size() == 0) {
+
+                        // Show "default" DIY extension builder (or info about there being no headerExtensions)
+
+                    } else if (profiles.size() > 0) {
+
+                        // Prompt User to select an ExtensionEntity from the Store
+                        // i.e., Prompt to select extension to use! Then use that profile to create and configure portEntities for the extension.
+                        Application.getView().getActionPrompts().promptSelection(profiles, new Prompt.OnActionListener<Profile>() {
+                            @Override
+                            public void onComplete(Profile profile) {
+
+                                // Add ExtensionEntity from Profile
+                                Entity extensionEntity = hostEntity.getComponent(Host.class).restoreExtension(profile, event.getPosition());
+
+                                // Update CameraEntity
+                                cameraEntity.getComponent(Camera.class).setFocus(extensionEntity);
+                            }
+                        });
+                        // Application.getView().promptTasks();
                     }
-                    // </HACK>
+                }
 
-                    if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
+            } else if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
 
-                        if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
+                if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
 
-                            // (HostEntity.PortEntity, ..., HostEntity.PortEntity) Action Pattern
+                    // (HostEntity.PortEntity, ..., HostEntity.PortEntity) Action Pattern
 
-                            if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape() && action.isTap()) { // if (action.isTap()) {
+                    if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape() && action.isTap()) { // if (action.isTap()) {
 
-                                // (HostEntity.PortEntity A, ..., HostEntity.PortEntity A) Action Pattern
-                                // i.e., The action's first and last events address the same portEntity. Therefore, it must be either a tap or a hold.
+                        // (HostEntity.PortEntity A, ..., HostEntity.PortEntity A) Action Pattern
+                        // i.e., The action's first and last events address the same portEntity. Therefore, it must be either a tap or a hold.
 
-                                // Get portEntity associated with the touched portEntity shape
-                                Entity portEntity = action.getFirstEvent().getTargetShape().getEntity();
-//                                int portIndex = portEntity.getComponent(Portable.class).getPorts().indexOf(portEntity);
-                                int portIndex = portEntity.getComponent(Port.class).getIndex();
+                        // Get portEntity associated with the touched portEntity shape
+                        Entity portEntity = action.getFirstEvent().getTargetShape().getEntity();
+                        int portIndex = hostEntity.getComponent(Portable.class).getPorts().indexOf(portEntity);
 
-                                Port portComponent = portEntity.getComponent(Port.class);
+                        Port portComponent = portEntity.getComponent(Port.class);
 
-                                if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
+                        if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
 
-                                    if (portComponent.getType() == Port.Type.NONE) {
+                            if (portComponent.getType() == Port.Type.NONE) {
 
-                                        // Set initial PortEntity Type
+                                // Set initial PortEntity Type
 
-                                        Log.v("TouchPort", "-A");
+                                Log.v("TouchPort", "-A");
 
-                                        portComponent.setDirection(Port.Direction.INPUT);
-                                        portComponent.setType(Port.Type.next(portComponent.getType()));
+                                portComponent.setDirection(Port.Direction.INPUT);
+                                portComponent.setType(Port.Type.next(portComponent.getType()));
 
-                                    } else if (!portComponent.hasPath()) {
+                            } else if (!portComponent.hasPath()) {
 
-                                        // Change PortEntity Type
+                                // Change PortEntity Type
 
-                                        Log.v("TouchPort", "-B");
+                                Log.v("TouchPort", "-B");
 
-                                        Port.Type nextType = portComponent.getType();
-                                        while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
-                                            nextType = Port.Type.next(nextType);
-                                        }
-                                        portComponent.setType(nextType);
+                                Port.Type nextType = portComponent.getType();
+                                while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
+                                    nextType = Port.Type.next(nextType);
+                                }
+                                portComponent.setType(nextType);
 
-//                                    } else if (portEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
-                                    } else if (portEntity.getComponent(Port.class).hasVisiblePaths()) {
+                                //} else if (hostEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
+                            } else if (hostEntity.getComponent(Portable.class).getPort(portIndex).getComponent(Port.class).hasVisiblePaths()) {
 
-                                        // Change PathEntity Type. Updates each PortEntity in the PathEntity.
+                                // Change PathEntity Type. Updates each PortEntity in the PathEntity.
 
-                                        Log.v("TouchPort", "-D");
+                                Log.v("TouchPort", "-D");
 
-                                        // Paths are being shown. Touching a portEntity changes the portEntity type. This will also
-                                        // updates the corresponding path requirement.
+                                // Paths are being shown. Touching a portEntity changes the portEntity type. This will also
+                                // updates the corresponding path requirement.
 
-                                        Port.Type nextType = portComponent.getType();
-                                        while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
-                                            nextType = Port.Type.next(nextType);
-                                        }
-
-                                        // <FILTER>
-                                        // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
-                                        Group<Entity> pathEntities = portComponent.getPaths();
-                                        for (int i = 0; i < pathEntities.size(); i++) {
-                                            Entity pathEntity = pathEntities.get(i);
-
-                                            // <FILTER>
-                                            // TODO: Make Filter/Editor
-                                            Group<Entity> portEntities = pathEntity.getComponent(Path.class).getPorts();
-                                            for (int j = 0; j < portEntities.size(); j++) {
-                                                portEntities.get(j).getComponent(Port.class).setType(nextType);
-                                            }
-                                            // </FILTER>
-                                        }
-                                        // </FILTER>
-
-                                    }
-
-                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                                Port.Type nextType = portComponent.getType();
+                                while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
+                                    nextType = Port.Type.next(nextType);
                                 }
 
-                            } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
+                                // <FILTER>
+                                // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
+                                Group<Entity> pathEntities = portComponent.getPaths();
+                                for (int i = 0; i < pathEntities.size(); i++) {
+                                    Entity pathEntity = pathEntities.get(i);
 
-                                // (HostEntity.PortEntity A, ..., HostEntity.PortEntity B) Action Pattern
-                                // i.e., The Action's first and last Events address different Ports.
+                                    // <FILTER>
+                                    // TODO: Make Filter/Editor
+                                    Group<Entity> portEntities = pathEntity.getComponent(Path.class).getPorts();
+                                    for (int j = 0; j < portEntities.size(); j++) {
+                                        portEntities.get(j).getComponent(Port.class).setType(nextType);
+                                    }
+                                    // </FILTER>
+                                }
+                                // </FILTER>
 
-                                Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
+                            }
 
-                                if (action.isDragging()) {
+                            World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                        }
 
-                                    Log.v("Events", "B.1");
+                    } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
 
-                                    Entity sourcePortEntity = sourcePortShape.getEntity();
-                                    Entity targetPortEntity = null;
+                        // (HostEntity.PortEntity A, ..., HostEntity.PortEntity B) Action Pattern
+                        // i.e., The Action's first and last Events address different Ports.
 
-                                    Shape targetPortShape = event.getTargetShape();
+                        Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
+
+                        if (action.isDragging()) {
+
+                            Log.v("Events", "B.1");
+
+                            Entity sourcePortEntity = sourcePortShape.getEntity();
+                            Entity targetPortEntity = null;
+
+                            Shape targetPortShape = event.getTargetShape();
 //                                            World.getWorld()
 //                                                    .getShapes(PortEntity.class)
 //                                                    .remove(sourcePortShape)
 //                                                    .filterContains(event.getPosition())
 //                                                    .get(0);
 //                                    Entity.Manager.filterWithComponent(Port.class).getImages().filter
-                                    targetPortEntity = targetPortShape.getEntity();
+                            targetPortEntity = targetPortShape.getEntity();
 
-                                    Log.v("Events", "D.1");
+                            Log.v("Events", "D.1");
 
-                                    // Create and configure new PathEntity
-                                    Entity pathEntity = Clay.createEntity(Path.class);
-                                    pathEntity.getComponent(Path.class).set(sourcePortEntity, targetPortEntity);
+                            // Create and configure new PathEntity
+                            Entity pathEntity = Clay.createEntity(Path.class);
+                            pathEntity.getComponent(Path.class).set(sourcePortEntity, targetPortEntity);
 
-                                    cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
+                            cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
 
-                                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
-
-                                }
-
-                            }
-
-                        } else if (action.getLastEvent().getTargetShape() == null
-                                // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("World")) {
-                                && action.getLastEvent().getTargetImage() == World.getWorld()) {
-
-                            // (HostEntity.PortEntity, ..., World) Action Pattern
-
-                            if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
-
-                                Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
-                                Entity hostPortEntity = hostPortShape.getEntity();
-
-                                // Create new ExtensionEntity from scratch (for manual configuration/construction)
-//                                Entity extensionEntity = portEntity.getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
-                                Entity extensionEntity = portEntity.getParent().getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
-
-                                // Update CameraEntity
-//                                cameraEntity.setFocus(extensionEntity);
-                            }
-
-                            // Update Image
                             World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
-                            World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+
+                        }
+
+                    }
+
+                } else if (action.getLastEvent().getTargetShape() == null
+                        // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("World")) {
+                        && action.getLastEvent().getTargetImage() == World.getWorld()) {
+
+                    // (HostEntity.PortEntity, ..., World) Action Pattern
+
+                    if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+
+                        Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
+                        Entity hostPortEntity = hostPortShape.getEntity();
+
+                        // Create new ExtensionEntity from scratch (for manual configuration/construction)
+                        Entity extensionEntity = hostEntity.getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
+
+                        // Update CameraEntity
+//                                cameraEntity.setFocus(extensionEntity);
+                    }
+
+                    // Update Image
+                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                    World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+
+                }
+            }
+        }
+    }
+
+    public static void handleExtensionAction(final Entity extensionEntity, Action action) {
+
+        final Image extensionImage = extensionEntity.getComponent(Image.class);
+
+        Log.v("ExtensionImage", "onAction " + action.getLastEvent().getType());
+
+        Event event = action.getLastEvent();
+
+        if (event.getType() == Event.Type.NONE) {
+
+        } else if (event.getType() == Event.Type.SELECT) {
+
+        } else if (event.getType() == Event.Type.HOLD) {
+
+            Log.v("ExtensionImage", "ExtensionImage.HOLD / createProfile()");
+            extensionEntity.getComponent(Portable.class).createProfile(extensionEntity);
+
+        } else if (event.getType() == Event.Type.MOVE) {
+
+        } else if (event.getType() == Event.Type.UNSELECT) {
+
+            // Previous Action targeted also this ExtensionEntity
+            // TODO: Refactor
+            if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == extensionImage.getEntity()) {
+
+                if (action.isTap()) {
+                    // TODO: Replace with script editor/timeline
+                    Application.getView().openActionEditor(extensionImage.getEntity());
+                }
+
+            } else {
+
+                if (action.isTap()) {
+
+                    // Focus on touched base
+                    extensionEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+//                            extensionEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
+                    extensionEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                    extensionImage.setTransparency(1.0);
+
+                    // Show Ports and Paths for selected Host
+//                            Group<Shape> portShapes = extensionEntity.getComponent(Portable.class).getPortShapes();
+                    for (int i = 0; i < extensionEntity.getComponent(Portable.class).getPorts().size(); i++) {
+//                                Shape portShape = portShapes.get(i);
+                        Entity portEntity = extensionEntity.getComponent(Portable.class).getPorts().get(i);
+
+                        Group<Entity> paths = portEntity.getComponent(Port.class).getPaths();
+                        for (int j = 0; j < paths.size(); j++) {
+                            Entity path = paths.get(j);
+
+                            // Show Ports
+//                                    World.getWorld().getShape(path.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
+//                                    World.getWorld().getShape(path.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
+                            Entity sourcePort = path.getComponent(Path.class).getSource();
+                            Entity targetPort = path.getComponent(Path.class).getTarget();
+                            sourcePort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                            targetPort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+
+
+                            // Show Path
+                            path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                        }
+                    }
+                    // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+
+                    // CameraEntity
+                    Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+                    cameraEntity.getComponent(Camera.class).setFocus(extensionImage.getEntity());
+
+                    // Title
+                    World.getWorld().setTitleText("ExtensionEntity");
+                    World.getWorld().setTitleVisibility(Visibility.VISIBLE);
+                }
+            }
+        }
+    }
+
+    public static void handlePortAction(final Entity portEntity2, Action action) {
+
+        final Event event = action.getLastEvent();
+
+        final Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
+        if (event.getType() == Event.Type.NONE) {
+
+        } else if (event.getType() == Event.Type.SELECT) {
+
+        } else if (event.getType() == Event.Type.HOLD) {
+
+        } else if (event.getType() == Event.Type.MOVE) {
+
+            if (action.getFirstEvent().getTargetShape() == null) {
+                return;
+            }
+
+            if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
+
+                if (action.isDragging()) {
+
+                    // Prototype Path Visibility
+                    World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                    World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
+                    World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
+
+                    // Prototype Extension Visibility
+                    boolean isCreateExtensionAction = true;
+
+                    // <HACK>
+                    Group<Image> imageGroup = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages();
+
+                    for (int i = 0; i < imageGroup.size(); i++) {
+                        Image otherImage = imageGroup.get(i);
+
+                        // Update style of nearby Hosts
+                        double distanceToHostImage = Geometry.distance(
+                                event.getPosition(),
+                                otherImage.getEntity().getComponent(Transform.class)
+                        );
+
+                        if (distanceToHostImage < 375) { // 375, 500
+                            isCreateExtensionAction = false;
+                            break;
+                        }
+
+                        // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
+                    }
+
+                    if (isCreateExtensionAction) {
+                        World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                        World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetShape().getPosition());
+                        World.getWorld().setExtensionPrototypePosition(event.getPosition());
+                    } else {
+                        World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                    }
+
+                    // Show Ports of nearby Hosts and Extensions
+                    Entity sourcePortEntity = action.getFirstEvent().getTargetShape().getEntity();
+                    Event lastEvent = action.getLastEvent();
+
+                    // Show Ports of nearby Hosts and Extensions
+                    double nearbyRadiusThreshold = 200 + 60;
+                    Group<Image> nearbyPortableImages = imageGroup.filterArea(lastEvent.getPosition(), nearbyRadiusThreshold);
+
+                    for (int i = 0; i < imageGroup.size(); i++) {
+                        Image portableImage = imageGroup.get(i);
+
+                        //if (portableImage.getEntity() == sourcePortEntity.getComponent(Port.class).getPortable() || nearbyPortableImages.contains(portableImage)) {
+                        if (portableImage.getEntity() == sourcePortEntity.getParent() || nearbyPortableImages.contains(portableImage)) {
+
+//                                                        // <HACK>
+                            Image nearbyImage = portableImage;
+                            Entity nearbyPortableEntity = nearbyImage.getEntity();
+                            nearbyImage.setTransparency(1.0f);
+//                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+
+                            // Add additional PortEntity to ExtensionEntity if it has no more available Ports
+                            Entity portableEntity = portableImage.getEntity();
+
+                            if (portableEntity.hasComponent(Extension.class)) { // HACK
+                                if (portableEntity.getComponent(Extension.class).getProfile() == null) {
+                                    Entity extensionPortableEntity = portableImage.getEntity();
+
+                                    boolean addPrototypePort = true;
+                                    for (int j = 0; j < extensionPortableEntity.getComponent(Portable.class).getPorts().size(); j++) {
+                                        Entity existingPortEntity = extensionPortableEntity.getComponent(Portable.class).getPorts().get(j);
+                                        if (existingPortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
+                                            addPrototypePort = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (addPrototypePort) {
+
+                                        Entity portEntity = Clay.createEntity(Port.class);
+
+                                        portEntity.getComponent(Port.class).setIndex(extensionPortableEntity.getComponent(Portable.class).getPorts().size());
+
+                                        extensionPortableEntity.getComponent(Portable.class).addPort(portEntity);
+                                    }
+                                }
+                            }
+
+                            // </HACK>
+
+                        } else {
+
+                            Image nearbyImage = portableImage;
+                            Entity nearbyPortableEntity = portableImage.getEntity();
+                            nearbyImage.setTransparency(0.1f);
+                            //nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
 
                         }
                     }
+
+                    // CameraEntity
+                    cameraEntity.getComponent(Camera.class).setFocus(sourcePortEntity, event.getPosition());
+
+                } else if (action.isHolding()) {
+
+//                                                // Holding and dragging
+
+                }
+
+            }
+
+        } else if (event.getType() == Event.Type.UNSELECT) {
+
+            // <HACK>
+            // TODO: Refactor so this doesn't have to be here! It's messy this way... standardize the way "null shapes" are handled
+            if (action.getFirstEvent().getTargetShape() == null) {
+                return;
+            }
+            // </HACK>
+
+            if (action.getFirstEvent().getTargetShape().getLabel().startsWith("Port")) {
+
+                if (action.getLastEvent().getTargetShape() != null && action.getLastEvent().getTargetShape().getLabel().startsWith("Port")) {
+
+                    // (HostEntity.PortEntity, ..., HostEntity.PortEntity) Action Pattern
+
+                    if (action.getFirstEvent().getTargetShape() == action.getLastEvent().getTargetShape() && action.isTap()) { // if (action.isTap()) {
+
+                        // (HostEntity.PortEntity A, ..., HostEntity.PortEntity A) Action Pattern
+                        // i.e., The action's first and last events address the same portEntity. Therefore, it must be either a tap or a hold.
+
+                        // Get portEntity associated with the touched portEntity shape
+                        Entity portEntity = action.getFirstEvent().getTargetShape().getEntity();
+//                                int portIndex = portEntity.getComponent(Portable.class).getPorts().indexOf(portEntity);
+                        int portIndex = portEntity.getComponent(Port.class).getIndex();
+
+                        Port portComponent = portEntity.getComponent(Port.class);
+
+                        if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
+
+                            if (portComponent.getType() == Port.Type.NONE) {
+
+                                // Set initial PortEntity Type
+
+                                Log.v("TouchPort", "-A");
+
+                                portComponent.setDirection(Port.Direction.INPUT);
+                                portComponent.setType(Port.Type.next(portComponent.getType()));
+
+                            } else if (!portComponent.hasPath()) {
+
+                                // Change PortEntity Type
+
+                                Log.v("TouchPort", "-B");
+
+                                Port.Type nextType = portComponent.getType();
+                                while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
+                                    nextType = Port.Type.next(nextType);
+                                }
+                                portComponent.setType(nextType);
+
+//                                    } else if (portEntity.getComponent(Portable.class).hasVisiblePaths(portIndex)) {
+                            } else if (portEntity.getComponent(Port.class).hasVisiblePaths()) {
+
+                                // Change PathEntity Type. Updates each PortEntity in the PathEntity.
+
+                                Log.v("TouchPort", "-D");
+
+                                // Paths are being shown. Touching a portEntity changes the portEntity type. This will also
+                                // updates the corresponding path requirement.
+
+                                Port.Type nextType = portComponent.getType();
+                                while ((nextType == Port.Type.NONE) || (nextType == portComponent.getType())) {
+                                    nextType = Port.Type.next(nextType);
+                                }
+
+                                // <FILTER>
+                                // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
+                                Group<Entity> pathEntities = portComponent.getPaths();
+                                for (int i = 0; i < pathEntities.size(); i++) {
+                                    Entity pathEntity = pathEntities.get(i);
+
+                                    // <FILTER>
+                                    // TODO: Make Filter/Editor
+                                    Group<Entity> portEntities = pathEntity.getComponent(Path.class).getPorts();
+                                    for (int j = 0; j < portEntities.size(); j++) {
+                                        portEntities.get(j).getComponent(Port.class).setType(nextType);
+                                    }
+                                    // </FILTER>
+                                }
+                                // </FILTER>
+
+                            }
+
+                            World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                        }
+
+                    } else if (action.getFirstEvent().getTargetShape() != action.getLastEvent().getTargetShape()) {
+
+                        // (HostEntity.PortEntity A, ..., HostEntity.PortEntity B) Action Pattern
+                        // i.e., The Action's first and last Events address different Ports.
+
+                        Shape sourcePortShape = event.getAction().getFirstEvent().getTargetShape();
+
+                        if (action.isDragging()) {
+
+                            Log.v("Events", "B.1");
+
+                            Entity sourcePortEntity = sourcePortShape.getEntity();
+                            Entity targetPortEntity = null;
+
+                            Shape targetPortShape = event.getTargetShape();
+//                                            World.getWorld()
+//                                                    .getShapes(PortEntity.class)
+//                                                    .remove(sourcePortShape)
+//                                                    .filterContains(event.getPosition())
+//                                                    .get(0);
+//                                    Entity.Manager.filterWithComponent(Port.class).getImages().filter
+                            targetPortEntity = targetPortShape.getEntity();
+
+                            Log.v("Events", "D.1");
+
+                            // Create and configure new PathEntity
+                            Entity pathEntity = Clay.createEntity(Path.class);
+                            pathEntity.getComponent(Path.class).set(sourcePortEntity, targetPortEntity);
+
+                            cameraEntity.getComponent(Camera.class).setFocus(pathEntity.getComponent(Path.class).getExtension());
+
+                            World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+
+                        }
+
+                    }
+
+                } else if (action.getLastEvent().getTargetShape() == null
+                        // TODO: && action.getLastEvent().getTargetImage().getLabel().startsWith("World")) {
+                        && action.getLastEvent().getTargetImage() == World.getWorld()) {
+
+                    // (HostEntity.PortEntity, ..., World) Action Pattern
+
+                    if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+
+                        Shape hostPortShape = event.getAction().getFirstEvent().getTargetShape();
+                        Entity hostPortEntity = hostPortShape.getEntity();
+
+                        // Create new ExtensionEntity from scratch (for manual configuration/construction)
+//                                Entity extensionEntity = portEntity.getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
+                        Entity extensionEntity = portEntity2.getParent().getComponent(Host.class).createExtension(hostPortEntity, event.getPosition());
+
+                        // Update CameraEntity
+//                                cameraEntity.setFocus(extensionEntity);
+                    }
+
+                    // Update Image
+                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                    World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+
                 }
             }
-        };
+        }
     }
 
-    public static ActionListener getPathActionListener(Entity pathEntity) {
-        return new ActionListener() {
-            @Override
-            public void onAction(Action action) {
+    public static void handlePathAction(final Entity pathEntity, Action action) {
+        Event event = action.getLastEvent();
 
-                Event event = action.getLastEvent();
+        if (event.getType() == Event.Type.NONE) {
 
-                if (event.getType() == Event.Type.NONE) {
+        } else if (event.getType() == Event.Type.SELECT) {
 
-                } else if (event.getType() == Event.Type.SELECT) {
+        } else if (event.getType() == Event.Type.HOLD) {
 
-                } else if (event.getType() == Event.Type.HOLD) {
+        } else if (event.getType() == Event.Type.MOVE) {
 
-                } else if (event.getType() == Event.Type.MOVE) {
+        } else if (event.getType() == Event.Type.UNSELECT) {
 
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-                }
-            }
-        };
+        }
     }
 }

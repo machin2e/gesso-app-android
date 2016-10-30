@@ -5,6 +5,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.ActionListenerSystem;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.Shape;
@@ -134,6 +135,18 @@ public class Actor extends Component {
                 // <HACK>
                 if (targetImage.getClass() == World.class) {
                     ((World) targetImage).processAction(action);
+                } else if (targetImage.getEntity().hasComponent(Host.class)) {
+                    Entity hostEntity = targetImage.getEntity();
+                    ActionListenerSystem.handleHostAction(hostEntity, action);
+                } else if (targetImage.getEntity().hasComponent(Extension.class)) {
+                    Entity extensionEntity = targetImage.getEntity();
+                    ActionListenerSystem.handleExtensionAction(extensionEntity, action);
+                } else if (targetImage.getEntity().hasComponent(Port.class)) {
+                    Entity portEntity = targetImage.getEntity();
+                    ActionListenerSystem.handlePortAction(portEntity, action);
+                } else if (targetImage.getEntity().hasComponent(Path.class)) {
+                    Entity pathEntity = targetImage.getEntity();
+                    ActionListenerSystem.handlePathAction(pathEntity, action);
                 } else {
                     targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
@@ -161,6 +174,18 @@ public class Actor extends Component {
                 // <HACK>
                 if (targetImage.getClass() == World.class) {
                     ((World) targetImage).processAction(action);
+                } else if (targetImage.getEntity().hasComponent(Host.class)) {
+                    Entity hostEntity = targetImage.getEntity();
+                    ActionListenerSystem.handleHostAction(hostEntity, action);
+                } else if (targetImage.getEntity().hasComponent(Extension.class)) {
+                    Entity extensionEntity = targetImage.getEntity();
+                    ActionListenerSystem.handleExtensionAction(extensionEntity, action);
+                } else if (targetImage.getEntity().hasComponent(Port.class)) {
+                    Entity portEntity = targetImage.getEntity();
+                    ActionListenerSystem.handlePortAction(portEntity, action);
+                } else if (targetImage.getEntity().hasComponent(Path.class)) {
+                    Entity pathEntity = targetImage.getEntity();
+                    ActionListenerSystem.handlePathAction(pathEntity, action);
                 } else {
                     targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
@@ -191,6 +216,18 @@ public class Actor extends Component {
                     Image firstImage = action.getFirstEvent().getTargetImage();
                     if (firstImage.getClass() == World.class) {
                         ((World) firstImage).processAction(action);
+                    } else if (firstImage.getEntity().hasComponent(Host.class)) {
+                        Entity hostEntity = firstImage.getEntity();
+                        ActionListenerSystem.handleHostAction(hostEntity, action);
+                    } else if (firstImage.getEntity().hasComponent(Extension.class)) {
+                        Entity extensionEntity = firstImage.getEntity();
+                        ActionListenerSystem.handleExtensionAction(extensionEntity, action);
+                    } else if (firstImage.getEntity().hasComponent(Port.class)) {
+                        Entity portEntity = firstImage.getEntity();
+                        ActionListenerSystem.handlePortAction(portEntity, action);
+                    } else if (firstImage.getEntity().hasComponent(Port.class)) {
+                        Entity pathEntity = firstImage.getEntity();
+                        ActionListenerSystem.handlePathAction(pathEntity, action);
                     } else {
                         firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                     }
@@ -223,6 +260,18 @@ public class Actor extends Component {
                 Image firstImage = action.getFirstEvent().getTargetImage();
                 if (firstImage.getClass() == World.class) {
                     ((World) firstImage).processAction(action);
+                } else if (firstImage.getEntity().hasComponent(Host.class)) {
+                    Entity hostEntity = firstImage.getEntity();
+                    ActionListenerSystem.handleHostAction(hostEntity, action);
+                } else if (firstImage.getEntity().hasComponent(Extension.class)) {
+                    Entity extensionEntity = firstImage.getEntity();
+                    ActionListenerSystem.handleExtensionAction(extensionEntity, action);
+                } else if (firstImage.getEntity().hasComponent(Port.class)) {
+                    Entity portEntity = firstImage.getEntity();
+                    ActionListenerSystem.handlePortAction(portEntity, action);
+                } else if (firstImage.getEntity().hasComponent(Path.class)) {
+                    Entity pathEntity = firstImage.getEntity();
+                    ActionListenerSystem.handlePathAction(pathEntity, action);
                 } else {
                     firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }

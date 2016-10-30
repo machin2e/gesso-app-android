@@ -209,15 +209,6 @@ public class Clay {
         }
         // </HACK>
 
-        // <HACK>
-        // NOTE: This has to be done after adding an ImageComponent
-//        hostEntity.setupActionListener();
-
-        ActionListenerComponent actionListener = new ActionListenerComponent();
-        actionListener.setOnActionListener(ActionListenerSystem.getHostActionListener(host));
-        host.addComponent(actionListener);
-        // </HACK>
-
         return host;
     }
 
@@ -271,13 +262,6 @@ public class Clay {
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
 
-        // <HACK>
-        // NOTE: This has to be done after adding an ImageComponent
-        ActionListenerComponent actionListener = new ActionListenerComponent();
-        actionListener.setOnActionListener(ActionListenerSystem.getExtensionActionListener(extensionEntity));
-        extensionEntity.addComponent(actionListener);
-        // </HACK>
-
         return extensionEntity;
     }
 
@@ -304,15 +288,6 @@ public class Clay {
         pathEntity.addComponent(new Transform());
         pathEntity.addComponent(pathImage); // Assign Image to Entity
 
-        // <HACK>
-        // NOTE: This has to be done after adding an ImageComponent
-//        pathEntity.setupActionListener();
-
-        ActionListenerComponent actionListener = new ActionListenerComponent();
-        actionListener.setOnActionListener(ActionListenerSystem.getPathActionListener(pathEntity));
-        pathEntity.addComponent(actionListener);
-        // </HACK>
-
         return pathEntity;
     }
 
@@ -338,15 +313,6 @@ public class Clay {
         port.getComponent(Image.class).addShape(circle);
         // </LOAD_GEOMETRY_FROM_FILE>
 
-        // <HACK>
-        // NOTE: This has to be done after adding an ImageComponent
-//        hostEntity.setupActionListener();
-
-        ActionListenerComponent actionListener = new ActionListenerComponent();
-        actionListener.setOnActionListener(ActionListenerSystem.getPortActionListener(port));
-        port.addComponent(actionListener);
-        // </HACK>
-
         return port;
 
     }
@@ -360,15 +326,6 @@ public class Clay {
 
         // Add Transform Component
         cameraEntity.addComponent(new Transform());
-
-//        // <HACK>
-//        // NOTE: This has to be done after adding an ImageComponent
-////        pathEntity.setupActionListener();
-//
-//        ActionListenerComponent actionListener = new ActionListenerComponent(cameraEntity);
-//        actionListener.setOnActionListener(getPathActionListener(cameraEntity));
-//        cameraEntity.addComponent(actionListener);
-//        // </HACK>
 
         return cameraEntity;
     }
