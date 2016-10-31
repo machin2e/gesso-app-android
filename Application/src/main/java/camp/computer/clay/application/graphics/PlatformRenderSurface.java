@@ -315,7 +315,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         Shape targetPortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget());
 
         // Show target port
-        targetPortShape.setVisibility(Visibility.VISIBLE);
+//        targetPortShape.setVisibility(Visibility.VISIBLE);
         //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
         // Color
@@ -340,7 +340,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         if (sourcePortShape != null && targetPortShape != null) {
 
             // Show target port
-            targetPortShape.setVisibility(Visibility.VISIBLE);
+//            targetPortShape.setVisibility(Visibility.VISIBLE);
             //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
 
             // Color

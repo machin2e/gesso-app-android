@@ -1,11 +1,8 @@
 package camp.computer.clay.util.image;
 
-import android.util.Log;
-
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -13,9 +10,6 @@ import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.model.action.Action;
-import camp.computer.clay.model.action.ActionListener;
-import camp.computer.clay.model.action.Event;
 import camp.computer.clay.engine.component.Transform;
 
 // TODO: DO NOT extend Image. Try to remove World class. If cannot, then consider making it an
@@ -42,90 +36,30 @@ public class World extends Image {
     }
 
     private void setup() {
+        // <TODO: DELETE>
         World.world = this;
-//        setupActions();
+        // </TODO: DELETE>
     }
 
-
-    private ActionListener actionListener;
-
-    public void setOnActionListener(ActionListener actionListener) {
-        this.actionListener = actionListener;
-    }
-
-    public void processAction(Action action) {
-        // <HACK>
-        actionListener.onAction(action);
-        // </HACK>
-    }
-
-    public void setupActionListener() {
-        setOnActionListener(new ActionListener() {
-            @Override
-            public void onAction(Action action) {
-
-                Event event = action.getLastEvent();
-                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
-
-                if (event.getType() == Event.Type.NONE) {
-
-                } else if (event.getType() == Event.Type.SELECT) {
-
-                } else if (event.getType() == Event.Type.HOLD) {
-
-                } else if (event.getType() == Event.Type.MOVE) {
-
-                    Log.v("Space_Action", "MOVE");
-
-                    if (action.isDragging()) {
-                        Log.v("Space_Action", "DRAG");
-                        cameraEntity.getComponent(Camera.class).setOffset(action.getOffset());
-                    }
-
-                } else if (event.getType() == Event.Type.UNSELECT) {
-
-//                    // Previous Action targeted also this ExtensionEntity
-//                    if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
-//
-//                        if (action.isTap()) {
-//
-//                            Log.v("Space_Action", "UNSELECT 2");
-//
-//                            // Title
-//                            setTitleText("Project");
-//                            setTitleVisibility(Visibility.VISIBLE);
-//                        }
-//
-//                    } else {
-
-                    // NOT a repeat tap on this Image
-
-                    if (action.isTap()) {
-                        Log.v("Space_Action", "UNSELECT 1");
-
-                        // Title
-                        setTitleVisibility(Visibility.INVISIBLE);
-
-                        // CameraEntity
-                        cameraEntity.getComponent(Camera.class).setFocus(World.getWorld());
-                    }
-//                    }
-                }
-            }
-        });
-    }
-
+    // <TODO: DELETE>
     private static World world = null;
 
     public static World getWorld() {
         return World.world;
     }
+    // </TODO: DELETE>
 
     public void addActor(Actor actor) {
         if (!this.actors.contains(actor)) {
             this.actors.add(actor);
         }
     }
+
+    // <HACK>
+    public Actor getActor() {
+        return this.actors.get(0);
+    }
+    // </HACK>
 
     /**
      * Sorts {@code Image}s by layer.
@@ -156,11 +90,6 @@ public class World extends Image {
         });
         */
     }
-
-//    @Override
-//    public World getWorld() {
-//        return this;
-//    }
 
     // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
 
@@ -196,12 +125,6 @@ public class World extends Image {
         // Set rotation
         // image.setRotation(Probability.getRandomGenerator().nextInt(360));
     }
-
-    // <HACK>
-    public Actor getActor() {
-        return this.actors.get(0);
-    }
-    // </HACK>
 
     // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
     public Group<Shape> getShapes() {
@@ -287,8 +210,9 @@ public class World extends Image {
             Image portableImage = portableImages.get(i);
             Entity portableEntity = portableImage.getEntity();
 //            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-            portableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
-            portableEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
+//            portableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
+            portableEntity.getComponent(Portable.class).getPorts().setVisibility(false);
+            portableEntity.getComponent(Portable.class).setPathVisibility(false);
 //            portableImage.setDockVisibility(Visibility.VISIBLE);
             portableImage.setTransparency(1.0);
         }

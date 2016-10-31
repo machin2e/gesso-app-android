@@ -18,7 +18,7 @@ public class Image extends Component {
 
     protected Group<Shape> shapes = new Group<>();
 
-    protected Visibility visibility = Visibility.VISIBLE;
+//    protected Visibility visibility = Visibility.VISIBLE;
 
     protected double targetTransparency = 1.0;
 
@@ -85,17 +85,17 @@ public class Image extends Component {
         super();
     }
 
-    public boolean isVisible() {
-        return visibility == Visibility.VISIBLE;
-    }
-
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
-
-    public Visibility getVisibility() {
-        return visibility;
-    }
+//    public boolean isVisible() {
+//        return visibility == Visibility.VISIBLE;
+//    }
+//
+//    public void setVisibility(Visibility visibility) {
+//        this.visibility = visibility;
+//    }
+//
+//    public Visibility getVisibility() {
+//        return visibility;
+//    }
 
     public <T extends Shape> void addShape(T shape) {
         shape.setImagePosition(shape.getPosition());
@@ -234,13 +234,13 @@ public class Image extends Component {
      * @return
      */
     public boolean contains(Transform point) {
-        if (isVisible()) {
+//        if (isVisible()) {
             for (int i = 0; i < shapes.size(); i++) {
                 if (shapes.get(i).contains(point)) {
                     return true;
                 }
             }
-        }
+//        }
         return false;
     }
 

@@ -3,6 +3,7 @@ package camp.computer.clay.model.action;
 import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.time.Clock;
 
@@ -124,6 +125,16 @@ public class Event {
 
     public boolean isPointing() { // was isTouching
         return isPointing(0);
+    }
+
+    private Entity targetEntity = null;
+
+    public void setTargetEntity(Entity entity) {
+        this.targetEntity = entity;
+    }
+
+    public Entity getTargetEntity() {
+        return this.targetEntity;
     }
 
     public void setTargetImage(int pointerIndex, Image image) {

@@ -173,8 +173,9 @@ public class RenderSystem extends System {
 
         if (entity.hasComponent(Host.class)) {
 
-            Image image = entity.getComponent(Image.class);
-            if (image.isVisible()) {
+            camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+            if (visibility != null && visibility.isVisible) {
+                Image image = entity.getComponent(Image.class);
                 canvas.save();
                 for (int i = 0; i < image.getShapes().size(); i++) {
                     image.getShapes().get(i).draw(platformRenderSurface);
@@ -184,8 +185,18 @@ public class RenderSystem extends System {
 
         } else if (entity.hasComponent(Extension.class)) {
 
-            Image image = entity.getComponent(Image.class);
-            if (image.isVisible()) {
+//            Image image = entity.getComponent(Image.class);
+//            if (image.isVisible()) {
+//                canvas.save();
+//                for (int i = 0; i < image.getShapes().size(); i++) {
+//                    image.getShapes().get(i).draw(platformRenderSurface);
+//                }
+//                canvas.restore();
+//            }
+
+            camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+            if (visibility != null && visibility.isVisible) {
+                Image image = entity.getComponent(Image.class);
                 canvas.save();
                 for (int i = 0; i < image.getShapes().size(); i++) {
                     image.getShapes().get(i).draw(platformRenderSurface);
@@ -195,8 +206,18 @@ public class RenderSystem extends System {
 
         } else if (entity.hasComponent(Port.class)) {
 
-            Image image = entity.getComponent(Image.class);
-            if (image.isVisible()) {
+//            Image image = entity.getComponent(Image.class);
+//            if (image.isVisible()) {
+//                canvas.save();
+//                for (int i = 0; i < image.getShapes().size(); i++) {
+//                    image.getShapes().get(i).draw(platformRenderSurface);
+//                }
+//                canvas.restore();
+//            }
+
+            camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+            if (visibility != null && visibility.isVisible) {
+                Image image = entity.getComponent(Image.class);
                 canvas.save();
                 for (int i = 0; i < image.getShapes().size(); i++) {
                     image.getShapes().get(i).draw(platformRenderSurface);
@@ -208,7 +229,23 @@ public class RenderSystem extends System {
 
             Image image = entity.getComponent(Image.class);
 
-            if (image.isVisible()) {
+//            if (image.isVisible()) {
+//                Entity pathEntity = image.getEntity();
+//                if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
+//                    // Draw PathEntity between Ports
+//                    platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
+//                } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
+//                    platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
+//                }
+//            } else {
+//                Entity pathEntity = entity; // image.getPath();
+//                if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
+//                    platformRenderSurface.drawPhysicalPath(pathEntity, platformRenderSurface);
+//                }
+//            }
+
+            camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+            if (visibility != null && visibility.isVisible) {
                 Entity pathEntity = image.getEntity();
                 if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
                     // Draw PathEntity between Ports
@@ -216,7 +253,7 @@ public class RenderSystem extends System {
                 } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
                     platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
                 }
-            } else {
+            } else if (visibility != null && !visibility.isVisible) {
                 Entity pathEntity = entity; // image.getPath();
                 if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
                     platformRenderSurface.drawPhysicalPath(pathEntity, platformRenderSurface);

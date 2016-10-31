@@ -15,11 +15,11 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Visibility;
 
 public final class Entity extends Groupable {
 
     // <ENTITY_MANAGEMENT>
-    // TODO: public static Group<Entity> Manager = new Group<>();
     public static Group<Entity> Manager = new Group<>();
 
     public static void addEntity(Entity entity) {
@@ -102,6 +102,7 @@ public final class Entity extends Groupable {
     protected Path path = null;
     protected Camera camera = null;
     protected Label label = null;
+    protected Visibility visibility = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -129,6 +130,8 @@ public final class Entity extends Groupable {
             this.camera = (Camera) component;
         } else if (component instanceof Label) {
             this.label = (Label) component;
+        } else if (component instanceof Visibility) {
+            this.visibility = (Visibility) component;
         }
 
         // Associate with Entity
@@ -160,6 +163,8 @@ public final class Entity extends Groupable {
             return type.cast(this.camera);
         } else if (type == Label.class) {
             return type.cast(this.label);
+        } else if (type == Visibility.class) {
+            return type.cast(this.visibility);
         } else {
             return null;
         }

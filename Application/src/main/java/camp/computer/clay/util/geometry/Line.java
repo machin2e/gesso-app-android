@@ -43,9 +43,9 @@ public class Line<T extends Entity> extends Shape<T> {
 
     @Override
     public void draw(PlatformRenderSurface platformRenderSurface) {
-        if (isVisible()) {
+//        if (isVisible()) {
 //            display.drawSegment(this);
-        }
+//        }
     }
 
     /**

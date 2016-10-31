@@ -21,6 +21,8 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.ActionListenerSystem;
 import camp.computer.clay.host.DisplayHostInterface;
@@ -71,7 +73,6 @@ public class Clay {
 
         // World
         this.world = new World();
-        world.setupActionListener();
 
         // Create Camera
         createEntity(Camera.class);
@@ -82,13 +83,15 @@ public class Clay {
 
         Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
-        // CameraEntity
+        // Camera
         cameraEntity.getComponent(Camera.class).setWorld(world);
 
         // Add actor to model
         world.addActor(actor);
 
         Application.getView().getPlatformRenderSurface().setWorld(world);
+
+        createEntity(Workspace.class);
 
         // <TEST>
         createEntity(Host.class);
@@ -122,9 +125,21 @@ public class Clay {
             return createPortEntity();
         } else if (entityType == Camera.class) {
             return createCameraEntity();
+        } else if (entityType == Workspace.class) {
+            return createWorkspaceEntity();
         } else {
             return null;
         }
+    }
+
+    public static Entity createWorkspaceEntity() {
+
+        Entity workspace = new Entity();
+
+        // Add Components
+        workspace.addComponent(new Workspace()); // Unique to Workspace
+
+        return workspace;
     }
 
     /**
@@ -147,6 +162,7 @@ public class Clay {
         host.addComponent(new Portable()); // Add Portable Component (so can add Ports)
         host.addComponent(new Transform());
         host.addComponent(new Image());
+        host.addComponent(new Visibility());
 
         // Portable Component (Image Component depends on this)
         final int PORT_COUNT = 12;
@@ -236,6 +252,7 @@ public class Clay {
         // Add Components
         extensionEntity.addComponent(new Transform());
         extensionEntity.addComponent(new Image());
+        extensionEntity.addComponent(new Visibility());
 
         // <LOAD_GEOMETRY_FROM_FILE>
         Rectangle rectangle;
@@ -287,6 +304,7 @@ public class Clay {
 
         pathEntity.addComponent(new Transform());
         pathEntity.addComponent(pathImage); // Assign Image to Entity
+        pathEntity.addComponent(new Visibility());
 
         return pathEntity;
     }
@@ -299,6 +317,7 @@ public class Clay {
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
         port.addComponent(new Image());
+        port.addComponent(new Visibility());
         port.addComponent(new Label());
 
         // <LOAD_GEOMETRY_FROM_FILE>

@@ -76,7 +76,7 @@ public class Circle<T extends Entity> extends Shape<T> {
 
     @Override
     public void draw(PlatformRenderSurface platformRenderSurface) {
-        if (isVisible()) {
+//        if (isVisible()) {
             platformRenderSurface.drawCircle(this);
 
             /*
@@ -86,6 +86,6 @@ public class Circle<T extends Entity> extends Shape<T> {
             display.paint.setStrokeWidth(2.0f);
             display.drawPolygon(getBoundingBox());
             */
-        }
+//        }
     }
 }

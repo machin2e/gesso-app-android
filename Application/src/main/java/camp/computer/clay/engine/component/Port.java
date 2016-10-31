@@ -162,13 +162,22 @@ public class Port extends Component {
     // </HACK>
 
     public boolean hasVisiblePaths() {
-        Group<Image> pathImages = getPaths().getImages();
-        for (int i = 0; i < pathImages.size(); i++) {
-            Image pathImage = pathImages.get(i);
-            if (pathImage.isVisible()) {
+//        Group<Image> pathImages = getPaths().getImages();
+//        for (int i = 0; i < pathImages.size(); i++) {
+//            Image pathImage = pathImages.get(i);
+//            if (pathImage.isVisible()) {
+//                return true;
+//            }
+//        }
+
+        Group<Entity> paths = getPaths();
+        for (int i = 0; i < paths.size(); i++) {
+            Entity path = paths.get(i);
+            if (path.getComponent(Visibility.class).isVisible) {
                 return true;
             }
         }
+
         return false;
     }
 }

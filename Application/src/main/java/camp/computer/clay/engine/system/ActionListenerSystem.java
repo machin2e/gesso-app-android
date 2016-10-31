@@ -35,6 +35,56 @@ public class ActionListenerSystem extends System {
         return false;
     }
 
+    // TODO: Make World an Entity?
+    public static void handleWorldAction(final World world, Action action) {
+
+        Event event = action.getLastEvent();
+        Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
+        if (event.getType() == Event.Type.NONE) {
+
+        } else if (event.getType() == Event.Type.SELECT) {
+
+        } else if (event.getType() == Event.Type.HOLD) {
+
+        } else if (event.getType() == Event.Type.MOVE) {
+
+            if (action.isDragging()) {
+                cameraEntity.getComponent(Camera.class).setOffset(action.getOffset());
+            }
+
+        } else if (event.getType() == Event.Type.UNSELECT) {
+
+            /*
+            // Previous Action targeted also this ExtensionEntity
+            if (action.getPrevious() != null && action.getPrevious().getFirstEvent().getTargetImage().getEntity() == getEntity()) {
+
+                if (action.isTap()) {
+
+                    Log.v("Space_Action", "UNSELECT 2");
+
+                    // Title
+                    setTitleText("Project");
+                    setTitleVisibility(Visibility.VISIBLE);
+                }
+
+            } else {
+            */
+
+            // NOT a repeat tap on this Image
+
+            if (action.isTap()) {
+
+                // Title
+                world.setTitleVisibility(Visibility.INVISIBLE);
+
+                // Camera
+                cameraEntity.getComponent(Camera.class).setFocus(World.getWorld());
+            }
+
+        }
+    }
+
     public static void handleHostAction(final Entity hostEntity, Action action) {
 
         final Image hostImage = hostEntity.getComponent(Image.class);
@@ -63,7 +113,7 @@ public class ActionListenerSystem extends System {
                     World.getWorld().setExtensionPrototypePosition(event.getPosition());
 
 //                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                    hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
+                    hostEntity.getComponent(Portable.class).setPathVisibility(false);
 
                     World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
 
@@ -140,7 +190,7 @@ public class ActionListenerSystem extends System {
                             Entity nearbyPortableEntity = nearbyImage.getEntity();
                             nearbyImage.setTransparency(1.0f);
 //                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().setVisibility(true);
 
                             // Add additional PortEntity to ExtensionEntity if it has no more available Ports
                             Entity portableEntity = portableImage.getEntity();
@@ -176,7 +226,7 @@ public class ActionListenerSystem extends System {
                             Entity nearbyPortableEntity = portableImage.getEntity();
                             nearbyImage.setTransparency(0.1f);
                             //nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().setVisibility(false);
 
                         }
                     }
@@ -206,11 +256,11 @@ public class ActionListenerSystem extends System {
                 if (action.isTap()) {
 
                     // Focus on touched form
-                    hostEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+                    hostEntity.getComponent(Portable.class).setPathVisibility(true);
 
 //                            hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                    hostEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
-                    hostEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                    hostEntity.getComponent(Portable.class).getPorts().setVisibility(true);
+                    hostEntity.getComponent(Portable.class).getPorts().setVisibility(true);
 
                     hostImage.setTransparency(1.0);
 
@@ -224,11 +274,14 @@ public class ActionListenerSystem extends System {
                             // Show source and target Ports in Paths
 //                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource()).setVisibility(Visibility.VISIBLE);
 //                                    World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
-                            pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                            pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+//                            pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+//                            pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                            pathEntity.getComponent(Path.class).getSource().getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
+                            pathEntity.getComponent(Path.class).getTarget().getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
 
                             // Show Path connection
-                            pathEntity.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+//                            pathEntity.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                            pathEntity.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
                         }
                     }
 
@@ -482,9 +535,9 @@ public class ActionListenerSystem extends System {
                 if (action.isTap()) {
 
                     // Focus on touched base
-                    extensionEntity.getComponent(Portable.class).setPathVisibility(Visibility.VISIBLE);
+                    extensionEntity.getComponent(Portable.class).setPathVisibility(true);
 //                            extensionEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                    extensionEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                    extensionEntity.getComponent(Portable.class).getPorts().setVisibility(true);
                     extensionImage.setTransparency(1.0);
 
                     // Show Ports and Paths for selected Host
@@ -502,12 +555,12 @@ public class ActionListenerSystem extends System {
 //                                    World.getWorld().getShape(path.getComponent(Path.class).getTarget()).setVisibility(Visibility.VISIBLE);
                             Entity sourcePort = path.getComponent(Path.class).getSource();
                             Entity targetPort = path.getComponent(Path.class).getTarget();
-                            sourcePort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
-                            targetPort.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                            sourcePort.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
+                            targetPort.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
 
 
                             // Show Path
-                            path.getComponent(Image.class).setVisibility(Visibility.VISIBLE);
+                            path.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
                         }
                     }
                     // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
@@ -601,7 +654,7 @@ public class ActionListenerSystem extends System {
                             Entity nearbyPortableEntity = nearbyImage.getEntity();
                             nearbyImage.setTransparency(1.0f);
 //                                    nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.VISIBLE);
-                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().setVisibility(true);
 
                             // Add additional PortEntity to ExtensionEntity if it has no more available Ports
                             Entity portableEntity = portableImage.getEntity();
@@ -638,7 +691,7 @@ public class ActionListenerSystem extends System {
                             Entity nearbyPortableEntity = portableImage.getEntity();
                             nearbyImage.setTransparency(0.1f);
                             //nearbyPortableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-                            nearbyPortableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
+                            nearbyPortableEntity.getComponent(Portable.class).getPorts().setVisibility(false);
 
                         }
                     }

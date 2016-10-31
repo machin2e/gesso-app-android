@@ -124,7 +124,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     @Override
     public void draw(PlatformRenderSurface platformRenderSurface) {
-        if (isVisible()) {
+//        if (isVisible()) {
             platformRenderSurface.drawRectangle(this);
 
             /*
@@ -134,6 +134,6 @@ public class Rectangle<T extends Entity> extends Shape<T> {
             display.paint.setStrokeWidth(2.0f);
             display.drawPolygon(getBoundingBox());
             */
-        }
+//        }
     }
 }

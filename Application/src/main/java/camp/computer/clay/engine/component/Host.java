@@ -75,8 +75,8 @@ public class Host extends Component {
             Entity host = hostImage.getEntity();
             hostImage.setTransparency(0.05f);
 //            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-            host.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
-            host.getComponent(Portable.class).setPathVisibility(Visibility.INVISIBLE);
+            host.getComponent(Portable.class).getPorts().setVisibility(false);
+            host.getComponent(Portable.class).setPathVisibility(false);
         }
 
         // Get all Ports in all Paths from the Host
@@ -88,8 +88,8 @@ public class Host extends Component {
         }
 
         // Show all of Host's Paths and all Ports contained in those Paths
-        hostPaths.getImages().setVisibility(Visibility.VISIBLE);
-        hostPorts.setVisibility(Visibility.VISIBLE);
+        hostPaths.setVisibility(true);
+        hostPorts.setVisibility(true);
 
         // Update layout
         updateExtensionLayout();

@@ -101,11 +101,11 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-        public static Filter filterVisibility = new Filter<Image, Visibility>() {
+        public static Filter filterVisibility = new Filter<Entity, Boolean>() {
             @Override
-            public boolean filter(Image entity, Visibility... visibilities) {
-                //if (entity.getImage().getVisibility() == visibilities[0]) {
-                if (entity.getVisibility() == visibilities[0]) {
+            public boolean filter(Entity entity, Boolean... data) {
+                camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+                if (visibility != null && visibility.isVisible) {
                     return true;
                 } else {
                     return false;
@@ -113,10 +113,21 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-        public static Filter filterContains = new Filter<Image, Transform>() {
+//        public static Filter filterContains = new Filter<Image, Transform>() {
+//            @Override
+//            public boolean filter(Image entity, Transform... points) {
+//                if (entity.contains(points[0])) {
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            }
+//        };
+
+        public static Filter filterContains = new Filter<Entity, Transform>() {
             @Override
-            public boolean filter(Image entity, Transform... points) {
-                if (entity.contains(points[0])) {
+            public boolean filter(Entity entity, Transform... points) {
+                if (entity.getComponent(Image.class).contains(points[0])) {
                     return true;
                 } else {
                     return false;
@@ -161,16 +172,24 @@ public class Group<E extends Groupable> implements List<E> {
 //        };
 
         // HACK:
-        public static Mapper setVisibilityGeneric = new Mapper<Groupable, Groupable, Visibility>() {
+        public static Mapper setVisibilityGeneric = new Mapper<Entity, Entity, Boolean>() {
             @Override
-            public Image map(Groupable entity, Visibility visibility) {
-                if (entity instanceof Shape) { // HACK
-                    ((Shape) entity).setVisibility(visibility);
-                } else if (entity instanceof Image) { // HACK
-                    ((Image) entity).setVisibility(visibility);
+            public Entity map(Entity entity, Boolean isVisible) {
+                camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+                if (visibility != null) {
+                    visibility.isVisible = isVisible;
                 }
                 return null;
             }
+//            @Override
+//            public Image map(Groupable entity, Visibility visibility) {
+//                if (entity instanceof Shape) { // HACK
+//                    ((Shape) entity).setVisibility(visibility);
+//                } else if (entity instanceof Image) { // HACK
+//                    ((Image) entity).setVisibility(visibility);
+//                }
+//                return null;
+//            }
         };
 
 //        public static Mapper setImageVisibility = new Mapper<Image, Image, Visibility>() {
@@ -248,11 +267,12 @@ public class Group<E extends Groupable> implements List<E> {
         };
     }
 
-    // TODO: Convert to Filter and restrict to Image types
-    public Group<E> filterVisibility(Visibility visibility) {
-        return filter(Filters.filterVisibility, visibility); // OR: Mappers.setImageVisibility.filter(this);
+    // Assumes Group<Entity>
+    public Group<E> filterVisibility(boolean isVisible) {
+        return filter(Filters.filterVisibility, isVisible); // OR: Mappers.setImageVisibility.filter(this);
     }
 
+    // Assumes Group<Entity>
     public Group<E> filterContains(Transform point) {
         return filter(Filters.filterContains, point);
     }
@@ -261,9 +281,8 @@ public class Group<E extends Groupable> implements List<E> {
         map(Mappers.setTransparency, transparency);
     }
 
-    public void setVisibility(Visibility visibility) {
-        Log.v("Reflect", "E: " + this.getClass());
-        map(Mappers.setVisibilityGeneric, visibility);
+    public void setVisibility(boolean isVisible) {
+        map(Mappers.setVisibilityGeneric, isVisible);
     }
 
     // Assumes Group<Entity>
@@ -323,27 +342,27 @@ public class Group<E extends Groupable> implements List<E> {
         return shapeGroup;
     }
 
-    /**
-     * Removes all elements except those with the specified type.
-     *
-     * @param entityTypes
-     * @return
-     */
-    public <E extends Groupable> Group<E> filterType2(Class<? extends Groupable>... entityTypes) {
-
-        Group<E> group = new Group<>();
-
-        for (int i = 0; i < this.elements.size(); i++) {
-            for (int j = 0; j < entityTypes.length; j++) {
-                Class<?> type = entityTypes[j];
-                if (this.elements.get(i).getClass() == type) {
-                    group.add((E) this.elements.get(i));
-                }
-            }
-        }
-
-        return group;
-    }
+//    /**
+//     * Removes all elements except those with the specified type.
+//     *
+//     * @param entityTypes
+//     * @return
+//     */
+//    public <E extends Groupable> Group<E> filterType2(Class<? extends Groupable>... entityTypes) {
+//
+//        Group<E> group = new Group<>();
+//
+//        for (int i = 0; i < this.elements.size(); i++) {
+//            for (int j = 0; j < entityTypes.length; j++) {
+//                Class<?> type = entityTypes[j];
+//                if (this.elements.get(i).getClass() == type) {
+//                    group.add((E) this.elements.get(i));
+//                }
+//            }
+//        }
+//
+//        return group;
+//    }
 
     // HACK: Assumes Group<Entity>
     public <E extends Entity> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {

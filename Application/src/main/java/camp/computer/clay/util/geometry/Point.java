@@ -43,9 +43,9 @@ public class Point<T extends Entity> extends Shape<T> {
 
     @Override
     public void draw(PlatformRenderSurface platformRenderSurface) {
-        if (isVisible()) {
+//        if (isVisible()) {
             // display.drawVertex(this);
-        }
+//        }
 
         /*
         // Draw bounding box!

@@ -113,6 +113,15 @@ public class Portable extends Component {
 //        return false;
 //    }
 
+    public Group<Entity> getPaths(Entity portEntity) {
+        Group<Entity> paths = new Group<>();
+        for (int i = 0; i < portEntity.getComponent(Port.class).getPaths().size(); i++) {
+            Entity pathEntity = portEntity.getComponent(Port.class).getPaths().get(i);
+            paths.add(pathEntity);
+        }
+        return paths;
+    }
+
     // TODO: Move into PortEntity? something (inner class? custom PortShape?)
     public Group<Image> getPathImages(Entity portEntity) {
         Group<Image> pathImages = new Group<>();
@@ -126,39 +135,39 @@ public class Portable extends Component {
 
     // <VISIBILITY_COMPONENT>
     // TODO: Move into PathImage
-    public void setPathVisibility(Visibility visibility) {
+    //public void setPathVisibility(Visibility visibility) {
+    public void setPathVisibility(boolean isVisible) {
         Group<Entity> portEntities = getEntity().getComponent(Portable.class).getPorts();
         for (int i = 0; i < portEntities.size(); i++) {
             Entity portEntity = portEntities.get(i);
-
-            setPathVisibility(portEntity, visibility);
+            setPathVisibility(portEntity, isVisible);
         }
     }
 
     // TODO: Move into PathImage
     // TODO: Replace with ImageGroup.filter().setImageVisibility()
-    public void setPathVisibility(Entity portEntity, Visibility visibility) {
-        Group<Image> pathImages = getPathImages(portEntity);
-        for (int i = 0; i < pathImages.size(); i++) {
-            Image pathImage = pathImages.get(i);
+    //public void setPathVisibility(Entity portEntity, Visibility visibility) {
+    public void setPathVisibility(Entity portEntity, boolean isVisible) {
+        Group<Entity> paths = getPaths(portEntity);
+        for (int i = 0; i < paths.size(); i++) {
+            Entity path = paths.get(i);
 
             // Update visibility
-            if (visibility == Visibility.VISIBLE) {
-                pathImage.setVisibility(Visibility.VISIBLE);
-                // pathImage.setDockVisibility(Visibility.INVISIBLE);
-            } else if (visibility == Visibility.INVISIBLE) {
-                pathImage.setVisibility(Visibility.INVISIBLE);
-                // pathImage.setDockVisibility(Visibility.VISIBLE);
-            }
+            path.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = isVisible;
 
             // Recursively traverse Ports in descendant Paths and setValue their PathEntity image visibility
-            Entity pathEntity = pathImage.getEntity();
-            Entity targetPortEntity = pathEntity.getComponent(Path.class).getTarget();
+            Entity targetPortEntity = path.getComponent(Path.class).getTarget();
             Entity targetPortableEntity = targetPortEntity.getParent();
-            Image targetPortableImage = targetPortableEntity.getComponent(Image.class);
-            if (targetPortableImage != getEntity().getComponent(Image.class)) { // HACK //if (targetPortableImage != this) { // HACK
-                targetPortableEntity.getComponent(Portable.class).setPathVisibility(targetPortEntity, visibility);
-            }
+
+//            if (targetPortEntity != getEntity()) {
+//                targetPortableEntity.getComponent(Portable.class).setPathVisibility(targetPortEntity, isVisible);
+//            }
+
+//            Entity targetPortableEntity = targetPortEntity.getParent();
+//            Image targetPortableImage = targetPortableEntity.getComponent(Image.class);
+//            if (targetPortableImage != getEntity().getComponent(Image.class)) { // HACK //if (targetPortableImage != this) { // HACK
+//                targetPortableEntity.getComponent(Portable.class).setPathVisibility(targetPortEntity, visibility);
+//            }
         }
     }
     // </VISIBILITY_COMPONENT>
