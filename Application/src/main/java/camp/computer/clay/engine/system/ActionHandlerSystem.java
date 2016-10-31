@@ -179,12 +179,13 @@ public class ActionHandlerSystem extends System {
 //                                    cameraEntity.setFocus();
                     }
 
-                } else if (event.getTargetImage() instanceof World) {
-
-                    // HostEntity
-//                                action.getFirstEvent().getTargetImage().queueEvent(action);
-
                 }
+//                else if (event.getTargetImage() instanceof World) {
+//
+//                    // HostEntity
+////                                action.getFirstEvent().getTargetImage().queueEvent(action);
+//
+//                }
             }
 
             // Check if connecting to a Extension
@@ -246,7 +247,7 @@ public class ActionHandlerSystem extends System {
 
             // Previous Action targeted also this ExtensionEntity
             // TODO: Refactor
-            if (action.getPrevious().getFirstEvent().getTargetImage().getEntity() == extensionImage.getEntity()) {
+            if (action.getPrevious().getFirstEvent().getTargetEntity() == extensionImage.getEntity()) {
 
                 if (action.isTap()) {
                     // TODO: Replace with script editor/timeline
@@ -526,8 +527,8 @@ public class ActionHandlerSystem extends System {
 
                 }
 
-            } else if (action.getLastEvent().getTargetEntity() == null
-                    && action.getLastEvent().getTargetImage() == World.getWorld()) { // TODO: Update this so Image isn't used!
+            } else if (action.getLastEvent().getTargetEntity() == null) {
+//                    && action.getLastEvent().getTargetImage() == World.getWorld()) { // TODO: Update this so Image isn't used!
 
                 // (HostEntity.PortEntity, ..., World) Action Pattern
 

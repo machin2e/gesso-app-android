@@ -138,7 +138,7 @@ public class InputSystem extends System {
                 event.setTargetEntity(targetImage.getEntity());
                 Entity targetEntity = targetImage.getEntity();
 
-                // Action the event
+                // Action the Event
                 // <HACK>
                 if (targetImage.getClass() == World.class) {
                     World world = ((World) targetImage);
@@ -209,23 +209,22 @@ public class InputSystem extends System {
                     // Set the target Entity
                     event.setTargetEntity(targetImage.getEntity());
 
+                    Entity targetEntity = firstImage.getEntity();
+
+                    // Action the Event
+                    // <HACK>
                     if (firstImage.getClass() == World.class) {
                         World world = ((World) targetImage);
+//                        World world = ((World) firstImage);
                         ActionHandlerSystem.handleWorldAction(world, action);
-                    } else if (firstImage.getEntity().hasComponent(Host.class)) {
-                        Entity hostEntity = firstImage.getEntity();
-                        ActionHandlerSystem.handleHostAction(hostEntity, action);
-                    } else if (firstImage.getEntity().hasComponent(Extension.class)) {
-                        Entity extensionEntity = firstImage.getEntity();
-                        ActionHandlerSystem.handleExtensionAction(extensionEntity, action);
-                    } else if (firstImage.getEntity().hasComponent(Port.class)) {
-                        Entity portEntity = firstImage.getEntity();
-                        ActionHandlerSystem.handlePortAction(portEntity, action);
-                    } else if (firstImage.getEntity().hasComponent(Port.class)) {
-                        Entity pathEntity = firstImage.getEntity();
-                        ActionHandlerSystem.handlePathAction(pathEntity, action);
-                    } else {
-                        firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
+                    } else if (targetEntity.hasComponent(Host.class)) {
+                        ActionHandlerSystem.handleHostAction(targetEntity, action);
+                    } else if (targetEntity.hasComponent(Extension.class)) {
+                        ActionHandlerSystem.handleExtensionAction(targetEntity, action);
+                    } else if (targetEntity.hasComponent(Port.class)) {
+                        ActionHandlerSystem.handlePortAction(targetEntity, action);
+                    } else if (targetEntity.hasComponent(Path.class)) {
+                        ActionHandlerSystem.handlePathAction(targetEntity, action);
                     }
                     // </HACK>
                 }
@@ -252,23 +251,22 @@ public class InputSystem extends System {
                 // Set the target Entity
                 event.setTargetEntity(targetImage.getEntity());
 
+                Entity targetEntity = firstImage.getEntity();
+
+                // Action the Event
+                // <HACK>
                 if (firstImage.getClass() == World.class) {
                     World world = ((World) targetImage);
+//                        World world = ((World) firstImage);
                     ActionHandlerSystem.handleWorldAction(world, action);
-                } else if (firstImage.getEntity().hasComponent(Host.class)) {
-                    Entity hostEntity = firstImage.getEntity();
-                    ActionHandlerSystem.handleHostAction(hostEntity, action);
-                } else if (firstImage.getEntity().hasComponent(Extension.class)) {
-                    Entity extensionEntity = firstImage.getEntity();
-                    ActionHandlerSystem.handleExtensionAction(extensionEntity, action);
-                } else if (firstImage.getEntity().hasComponent(Port.class)) {
-                    Entity portEntity = firstImage.getEntity();
-                    ActionHandlerSystem.handlePortAction(portEntity, action);
-                } else if (firstImage.getEntity().hasComponent(Path.class)) {
-                    Entity pathEntity = firstImage.getEntity();
-                    ActionHandlerSystem.handlePathAction(pathEntity, action);
-                } else {
-                    firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
+                } else if (targetEntity.hasComponent(Host.class)) {
+                    ActionHandlerSystem.handleHostAction(targetEntity, action);
+                } else if (targetEntity.hasComponent(Extension.class)) {
+                    ActionHandlerSystem.handleExtensionAction(targetEntity, action);
+                } else if (targetEntity.hasComponent(Port.class)) {
+                    ActionHandlerSystem.handlePortAction(targetEntity, action);
+                } else if (targetEntity.hasComponent(Path.class)) {
+                    ActionHandlerSystem.handlePathAction(targetEntity, action);
                 }
                 // </HACK>
 
