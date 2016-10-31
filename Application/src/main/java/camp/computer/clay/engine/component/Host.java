@@ -3,21 +3,20 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.World;
-import camp.computer.clay.util.image.Visibility;
 
 public class Host extends Component {
 
-    public List<List<Entity>> headerExtensions = new ArrayList<>();
+    private List<List<Entity>> headerExtensions = new ArrayList<>();
 
     public Host() {
         super();
+        setupHeaderExtensions();
     }
 
     public void setupHeaderExtensions() {
@@ -45,10 +44,10 @@ public class Host extends Component {
 
         //Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
-        // TODO: Prompt to select extensionEntity to use! Then use that profile to create and configure portEntities for the extensionEntity.
+        // TODO: Prompt to select extensionEntity to use! Then use that profile to create and configure ports for the extensionEntity.
 
         // Create Extension Entity
-        Entity extensionEntity = Clay.createEntity(Extension.class); // HACK: Because Extension is a Component
+        Entity extensionEntity = World.createEntity(Extension.class); // HACK: Because Extension is a Component
 
         // Set the initial position of the Extension
         extensionEntity.getComponent(Transform.class).set(initialPosition);
@@ -65,7 +64,7 @@ public class Host extends Component {
         extensionPortEntity.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
 
         // Create Path from Host to Extension and configure the new Path
-        Entity pathEntity = Clay.createEntity(Path.class);
+        Entity pathEntity = World.createEntity(Path.class);
         pathEntity.getComponent(Path.class).set(hostPort, extensionPortEntity);
 
         // Remove focus from other Hosts and their Ports
@@ -74,9 +73,8 @@ public class Host extends Component {
             Image hostImage = hostImages.get(i);
             Entity host = hostImage.getEntity();
             hostImage.setTransparency(0.05f);
-//            host.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
             host.getComponent(Portable.class).getPorts().setVisibility(false);
-            host.getComponent(Portable.class).setPathVisibility(false);
+            host.getComponent(Portable.class).getPaths().setVisibility(false);
         }
 
         // Get all Ports in all Paths from the Host
@@ -133,6 +131,7 @@ public class Host extends Component {
         return extensionEntity;
     }
 
+    // TODO: Make PortableLayoutSystem. Iterate through Hosts and lay out Extensions each PortableLayoutSystem.update().
     private boolean autoConnectToHost(Entity extensionEntity) {
 
         // Automatically select, connect paths to, and configure the HostEntity's Ports
@@ -146,7 +145,7 @@ public class Host extends Component {
             selectedHostPortEntity.getComponent(Port.class).setDirection(extensionEntity.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getDirection());
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
-            Entity pathEntity = Clay.createEntity(Path.class);
+            Entity pathEntity = World.createEntity(Path.class);
             pathEntity.getComponent(Path.class).set(selectedHostPortEntity, extensionEntity.getComponent(Portable.class).getPorts().get(i));
 
             pathEntity.getComponent(Path.class).setType(Path.Type.ELECTRONIC);

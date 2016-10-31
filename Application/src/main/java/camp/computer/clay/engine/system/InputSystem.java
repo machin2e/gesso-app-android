@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.system;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
@@ -21,29 +21,37 @@ import camp.computer.clay.util.image.World;
  */
 public class InputSystem extends System {
 
-    private List<Event> incomingEvents = new LinkedList<>();
+    private List<Event> incomingEvents = new ArrayList<>();
 
-    private List<Action> actions = new LinkedList<>();
+    private List<Action> actions = new ArrayList<>();
 
     public InputSystem() {
-        setup();
     }
 
-    private void setup() {
+    public boolean update(World world) {
+
+        while (incomingEvents.size() > 0) {
+            Event event = dequeueEvent();
+            Action action = processEvent(event);
+
+            processAction(action);
+        }
+
+        return true;
     }
 
     public void queueEvent(Event event) {
         incomingEvents.add(event);
     }
 
-    private void dequeueEvents() {
-        while (incomingEvents.size() > 0) {
-            Event event = incomingEvents.remove(0);
-            doAction(event);
+    private Event dequeueEvent() {
+        if (incomingEvents.size() > 0) {
+            return incomingEvents.remove(0);
         }
+        return null;
     }
 
-    private void doAction(Event event) {
+    private Action processEvent(Event event) {
 
         switch (event.getType()) {
 
@@ -64,9 +72,7 @@ public class InputSystem extends System {
                     actions.remove(0);
                 }
 
-                processAction(action, event);
-
-                break;
+                return action;
             }
 
             case HOLD: {
@@ -78,9 +84,7 @@ public class InputSystem extends System {
                 // Add event to action
                 action.addEvent(event);
 
-                processAction(action, event);
-
-                break;
+                return action;
             }
 
             case MOVE: {
@@ -91,9 +95,7 @@ public class InputSystem extends System {
                 // Current
                 event.isPointing[event.pointerIndex] = true;
 
-                processAction(action, event);
-
-                break;
+                return action;
             }
 
             case UNSELECT: {
@@ -104,15 +106,17 @@ public class InputSystem extends System {
                 // Current
                 event.isPointing[event.pointerIndex] = false;
 
-                processAction(action, event);
-
-                break;
+                return action;
             }
         }
+
+        return null;
     }
 
     // TODO: Move to ActionHandlerSystem
-    public void processAction(Action action, Event event) {
+    public void processAction(Action action) {
+
+        Event event = action.getLastEvent();
 
         switch (event.getType()) {
 
@@ -264,11 +268,5 @@ public class InputSystem extends System {
 
     public List<Action> getActions() {
         return this.actions;
-    }
-
-    @Override
-    public boolean update(World world) {
-        dequeueEvents();
-        return true;
     }
 }

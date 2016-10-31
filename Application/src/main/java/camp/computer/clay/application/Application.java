@@ -42,7 +42,7 @@ import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.host.DisplayHostInterface;
+import camp.computer.clay.host.PlatformInterface;
 import camp.computer.clay.host.Internet;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
@@ -51,7 +51,7 @@ import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Point;
 
-public class Application extends FragmentActivity implements DisplayHostInterface {
+public class Application extends FragmentActivity implements PlatformInterface {
 
     // <SETTINGS>
     private static final boolean ENABLE_TONE_OUTPUT = false;
@@ -516,7 +516,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // Clay
         clay = new Clay();
 
-        clay.addDisplay(this); // Add the view provided by the host device.
+        clay.addPlatform(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
         if (UDPHost == null) {
@@ -889,7 +889,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 // Unicode arrow symbols: https://en.wikipedia.org/wiki/Template:Unicode_chart_Arrows
 
                 // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-//                messageContent.addDisplay(messageKey);
+//                messageContent.addPlatform(messageKey);
 //                contextScope.setText("✓");
 //                contextScope.setText("☉");
                 //contextScope.setText("☌"); // When dragging to connect path
@@ -1050,17 +1050,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return this.clay;
     }
 
-    @Override
-    public void addDeviceView(PhoneHost phoneHost) {
-
-    }
-
-    @Override
-    public void refreshListViewFromData(PhoneHost phoneHost) {
-        // TODO: Update the view to reflect the latest state of the object entity
-    }
-
-    // TODO: Rename to something else and make a getView() function specific to the
+    // TODO: Rename to something else and make a getPlatform() function specific to the
     // TODO: (cont'd) display interface.
     public static Application getView() {
         return Application.applicationView;
@@ -1070,6 +1060,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return this.platformRenderSurface;
     }
 
+    // TODO: Delete!
     public double getFramesPerSecond() {
         return getPlatformRenderSurface().getPlatformRenderer().getFramesPerSecond();
     }

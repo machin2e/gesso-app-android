@@ -105,7 +105,7 @@ public class BoundarySystem extends System {
      */
     public void updateExtensionGeometry(Entity extension) {
 
-        // TODO: Clean up/delete images/shapes for any removed portEntities...
+        // TODO: Clean up/delete images/shapes for any removed ports...
 
         updateExtensionPortGeometry(extension);
         updateExtensionHeaderGeometry(extension);

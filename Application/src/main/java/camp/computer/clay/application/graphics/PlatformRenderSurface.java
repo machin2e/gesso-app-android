@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -215,6 +216,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
                 // Update the state of the touched object based on the current pointerCoordinates event state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
+
+                    holdTimerHandler.removeCallbacks(holdTimerRunnable);
+                    holdTimerHandler.postDelayed(holdTimerRunnable, Event.MINIMUM_HOLD_DURATION);
+
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
                     inputSystem.queueEvent(event);
@@ -225,6 +230,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     event.pointerIndex = pointerId;
                     inputSystem.queueEvent(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
+
+                    holdTimerHandler.removeCallbacks(holdTimerRunnable);
+
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
                     inputSystem.queueEvent(event);
@@ -240,6 +248,32 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         return true;
     }
+
+    public Handler holdTimerHandler = new Handler();
+
+    public Runnable holdTimerRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+            int pointerIndex = 0;
+
+//            if (getFirstEvent().isPointing[pointerIndex]) {
+//                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
+
+//            Event event = new Event();
+//            event.setType(Event.Type.HOLD);
+//            event.pointerIndex = getFirstEvent().pointerIndex;
+//            event.pointerCoordinates[0] = new Transform(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
+//            getFirstEvent().getInputSystem().queueEvent(event);
+//
+//            isHolding[pointerIndex] = true;
+
+            Log.v("HoldCallback", "Holding");
+
+//                }
+//            }
+        }
+    };
 
     /**
      * The function run in background thread, not UI thread.
@@ -322,10 +356,15 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         Paint paint = platformRenderSurface.paint;
 
-        Shape sourcePortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource());
-        Shape targetPortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget());
+        Shape sourcePortShape = pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).getShape("Port");
+        Shape targetPortShape = pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).getShape("Port");
 
-        if (sourcePortShape != null && targetPortShape != null) {
+        // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
+        // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
+        Transform sourcePortPositition = sourcePortShape.getPosition();
+        Transform targetPortPositition = targetPortShape.getPosition();
+
+//        if (sourcePortShape != null && targetPortShape != null) {
 
             // Show target port
 //            targetPortShape.setVisibility(Visibility.VISIBLE);
@@ -336,9 +375,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             paint.setStrokeWidth(15.0f);
             paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-            double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
-            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
 
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
@@ -353,7 +392,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             segment.setTarget(pathStopCoordinate);
 
             platformRenderSurface.drawSegment(segment);
-        }
+//        }
     }
 
     public void drawPhysicalPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {

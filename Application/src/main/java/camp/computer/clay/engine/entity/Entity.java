@@ -3,7 +3,6 @@ package camp.computer.clay.engine.entity;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
@@ -21,39 +20,7 @@ import camp.computer.clay.engine.component.Workspace;
 
 public final class Entity extends Groupable {
 
-    // <ENTITY_MANAGEMENT>
     public static Group<Entity> Manager = new Group<>();
-
-    public static void addEntity(Entity entity) {
-        Manager.add(entity);
-    }
-
-    public static boolean hasEntity(UUID uuid) {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Entity getEntity(UUID uuid) {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
-                return Entity.Manager.get(i);
-            }
-        }
-        return null;
-    }
-
-    public static Entity removeEntity(UUID uuid) {
-        Entity entity = getEntity(uuid);
-        if (entity != null) {
-            Entity.Manager.remove(entity);
-        }
-        return entity;
-    }
-    // </ENTITY_MANAGEMENT>
 
     private Group<Component> components = null;
 
@@ -68,19 +35,14 @@ public final class Entity extends Groupable {
     }
 
     private void setup() {
-
-        // Add Entity to Manager
-        Entity.addEntity(this);
-
-        // Create list of Components
-        components = new Group<>();
+        components = new Group<>(); // Create list of Components
+        Entity.Manager.add(this); // Add Entity to Manager
     }
 
 
+    // TODO: <DELETE>
+    private Entity parent;
 
-    protected Entity parent; // TODO: Delete!
-
-    // TODO: DELETE
     public void setParent(Entity parent) {
         this.parent = parent;
     }
@@ -88,29 +50,27 @@ public final class Entity extends Groupable {
     public Entity getParent() {
         return this.parent;
     }
+    // TODO: </DELETE>
 
 
 
-    // <TEMPORARY_COMPONENTS_REFERENCES>
+    // <COMPONENTS>
     // TODO: Eventually, put this in the list of components.
     // TODO: i.e., Store these in the Entity.components Group.
-    protected Transform transform = null;
-    protected Image image = null;
-    protected ActionListenerComponent actionListener = null;
-    protected Portable portable = null;
-    protected Extension extension = null;
-    protected Host host = null;
-    protected Port port = null; // Only used by Ports (DUH)
-    protected Path path = null;
-    protected Camera camera = null;
-    protected Label label = null;
-    protected Visibility visibility = null;
-    protected Workspace workspace = null;
-    protected Boundary boundary = null;
-    // </TEMPORARY_COMPONENTS_REFERENCES>
+    private Transform transform = null;
+    private Image image = null;
+    private Portable portable = null;
+    private Extension extension = null;
+    private Host host = null;
+    private Port port = null; // Only used by Ports (DUH)
+    private Path path = null;
+    private Camera camera = null;
+    private Label label = null;
+    private Visibility visibility = null;
+    private Workspace workspace = null;
+    private Boundary boundary = null;
+    // </COMPONENTS>
 
-
-    // <TEMPORARY_COMPONENT_INTERFACE>
     public <C extends Component> void addComponent(C component) {
 
         // Add to Entity
@@ -118,8 +78,6 @@ public final class Entity extends Groupable {
             this.transform = (Transform) component;
         } else if (component instanceof Image) {
             this.image = (Image) component;
-        } else if (component instanceof ActionListenerComponent) {
-            this.actionListener = (ActionListenerComponent) component;
         } else if (component instanceof Portable) {
             this.portable = (Portable) component;
         } else if (component instanceof Extension) {
@@ -146,17 +104,11 @@ public final class Entity extends Groupable {
         component.setEntity(this);
     }
 
-    public boolean hasComponent(Class<? extends Component> type) {
-        return getComponent(type) != null;
-    }
-
     public <C extends Component> C getComponent(Class<C> type) {
         if (type == Transform.class) {
             return type.cast(this.transform);
         } else if (type == Image.class) {
             return type.cast(this.image);
-        } else if (type == ActionListenerComponent.class) {
-            return type.cast(this.actionListener);
         } else if (type == Portable.class) {
             return type.cast(this.portable);
         } else if (type == Extension.class) {
@@ -182,6 +134,10 @@ public final class Entity extends Groupable {
         }
     }
 
+    public boolean hasComponent(Class<? extends Component> type) {
+        return getComponent(type) != null;
+    }
+
     public <C extends Component> C removeComponent(Class<C> type) {
         C component = getComponent(type);
         if (component != null) {
@@ -189,38 +145,40 @@ public final class Entity extends Groupable {
         }
         return component;
     }
-    // </TEMPORARY_COMPONENT_INTERFACE>
 
 
-    // <GENERIC_COMPONENT_INTERFACE>
-    /*
-    public boolean addComponent(Component component) {
-        this.components.add(component);
-        return true;
-    }
-
-    public Component removeComponent(UUID uuid) {
-        return components.remove(uuid);
-    }
-
-    public Group<Component> getComponents() {
-        return components;
-    }
-
-    public Component getComponent(UUID uuid) {
-        return components.get(uuid);
-    }
-    */
 
     /*
-    // TODO?
-    public Component getComponent(UUID entityUuid, UUID componentUuid) {
+    // <ENTITY_MANAGEMENT>
+    public static void addEntity(Entity entity) {
+        Manager.add(entity);
+    }
+
+    public static boolean hasEntity(UUID uuid) {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Entity getEntity(UUID uuid) {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
+                return Entity.Manager.get(i);
+            }
+        }
         return null;
     }
-    */
 
-    public boolean hasComponent(UUID uuid) {
-        return components.contains(uuid);
+    public static Entity removeEntity(UUID uuid) {
+        Entity entity = Manager.get(uuid);
+        if (entity != null) {
+            Entity.Manager.remove(entity);
+        }
+        return entity;
     }
-    // </GENERIC_COMPONENT_INTERFACE>
+    // </ENTITY_MANAGEMENT>
+    */
 }

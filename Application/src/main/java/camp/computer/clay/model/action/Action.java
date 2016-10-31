@@ -37,9 +37,9 @@ public class Action {
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
     // TODO: private double[] touchPressure = new double[Event.MAXIMUM_POINT_COUNT]; // Reference: http://stackoverflow.com/questions/17540058/android-detect-touch-pressure-on-capacitive-touch-screen
 
-//    public Handler timerHandler = new Handler();
+//    public Handler holdTimerHandler = new Handler();
 //
-//    public Runnable timerRunnable = new Runnable() {
+//    public Runnable holdTimerRunnable = new Runnable() {
 //        @Override
 //        public void run() {
 //
@@ -92,8 +92,8 @@ public class Action {
             events.add(event);
 
             // Start timer to check for hold
-//            timerHandler.removeCallbacks(timerRunnable);
-//            timerHandler.postDelayed(timerRunnable, Event.MINIMUM_HOLD_DURATION);
+//            holdTimerHandler.removeCallbacks(holdTimerRunnable);
+//            holdTimerHandler.postDelayed(holdTimerRunnable, Event.MINIMUM_HOLD_DURATION);
 
         } else if (events.size() > 0) {
 

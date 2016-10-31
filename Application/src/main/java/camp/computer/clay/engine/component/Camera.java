@@ -22,12 +22,12 @@ public class Camera extends Component {
     /**
      * Width of perspective --- actions (e.g., touches) are interpreted relative to this point
      */
-    protected double width;
+    public double width;
 
     /**
      * Height of perspective
      */
-    protected double height;
+    public double height;
 
     // Scale
     protected final double DEFAULT_SCALE = 1.0f;
@@ -236,7 +236,7 @@ public class Camera extends Component {
             otherPortables.remove(entity);
             otherPortables.setTransparency(0.1);
 
-            // Get portEntities along every PathEntity connected to the Ports on the touched PhoneHost
+            // Get ports along every PathEntity connected to the Ports on the touched PhoneHost
             Group<Entity> basePathPortEntities = new Group<>();
             Group<Entity> hostPortEntities = entity.getComponent(Portable.class).getPorts();
             for (int i = 0; i < hostPortEntities.size(); i++) {
