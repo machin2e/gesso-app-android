@@ -17,7 +17,7 @@ import android.view.SurfaceView;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
@@ -37,7 +37,6 @@ import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Triangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.World;
-import camp.computer.clay.util.image.Visibility;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -177,8 +176,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
         final int pointerCount = motionEvent.getPointerCount();
 
-        // Get active actor
-        Actor actor = world.getActor();
+        // Get active inputSystem
+        InputSystem inputSystem = world.getActor();
 
         // Create pointerCoordinates event
         Event event = new Event();
@@ -220,17 +219,17 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
+                    inputSystem.queueEvent(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
                     event.setType(Event.Type.MOVE);
                     event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
+                    inputSystem.queueEvent(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
+                    inputSystem.queueEvent(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {

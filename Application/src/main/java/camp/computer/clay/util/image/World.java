@@ -6,7 +6,7 @@ import java.util.List;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
@@ -28,7 +28,7 @@ public class World extends Image {
     public Transform pathPrototypeSourcePosition = new Transform(0, 0);
     public Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
-    private List<Actor> actors = new LinkedList<>();
+    private List<InputSystem> inputSystems = new LinkedList<>();
 
     public World() {
         super();
@@ -49,15 +49,15 @@ public class World extends Image {
     }
     // </TODO: DELETE>
 
-    public void addActor(Actor actor) {
-        if (!this.actors.contains(actor)) {
-            this.actors.add(actor);
+    public void addActor(InputSystem inputSystem) {
+        if (!this.inputSystems.contains(inputSystem)) {
+            this.inputSystems.add(inputSystem);
         }
     }
 
     // <HACK>
-    public Actor getActor() {
-        return this.actors.get(0);
+    public InputSystem getActor() {
+        return this.inputSystems.get(0);
     }
     // </HACK>
 

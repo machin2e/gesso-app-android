@@ -1,6 +1,6 @@
 package camp.computer.clay.model.action;
 
-import camp.computer.clay.engine.component.Actor;
+import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
@@ -54,7 +54,7 @@ public class Event {
 
     private Type type = null;
 
-    private Actor actor = null;
+    private InputSystem inputSystem = null;
 
     private long timestamp = DEFAULT_TIMESTAMP;
 
@@ -95,12 +95,12 @@ public class Event {
         return this.parentAction;
     }
 
-    public void setActor(Actor actor) {
-        this.actor = actor;
+    public void setInputSystem(InputSystem inputSystem) {
+        this.inputSystem = inputSystem;
     }
 
-    public Actor getActor() {
-        return this.actor;
+    public InputSystem getInputSystem() {
+        return this.inputSystem;
     }
 
     public Type getType() {

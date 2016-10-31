@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Actor;
-import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 
@@ -14,14 +13,14 @@ import camp.computer.clay.engine.component.Transform;
  */
 public class Action {
 
-    private Actor actor = null;
+    private InputSystem inputSystem = null;
 
-    public void setActor(Actor actor) {
-        this.actor = actor;
+    public void setInputSystem(InputSystem inputSystem) {
+        this.inputSystem = inputSystem;
     }
 
-    public Actor getActor() {
-        return this.actor;
+    public InputSystem getInputSystem() {
+        return this.inputSystem;
     }
 
     private List<Event> events = new LinkedList<>();
@@ -32,7 +31,7 @@ public class Action {
     // TODO: Classify these! Every time an Event is added!
     // TODO: (cont'd) Note can have multiple sequences per finger in an thisAction,
     // TODO: (cont'd) so consider remodeling as per-finger thisAction and treat each finger
-    // TODO: (cont'd) as an individual actor.
+    // TODO: (cont'd) as an individual inputSystem.
     private boolean[] isHolding = new boolean[Event.MAXIMUM_POINT_COUNT];
     private boolean[] isDragging = new boolean[Event.MAXIMUM_POINT_COUNT];
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
@@ -53,7 +52,7 @@ public class Action {
 //                    event.setType(Event.Type.HOLD);
 //                    event.pointerIndex = getFirstEvent().pointerIndex;
 //                    event.pointerCoordinates[0] = new Transform(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
-//                    getFirstEvent().getActor().queueEvent(event);
+//                    getFirstEvent().getInputSystem().queueEvent(event);
 //
 //                    isHolding[pointerIndex] = true;
 //
@@ -77,16 +76,16 @@ public class Action {
 //    // TODO: getPreviousAction()
 //    Action previousAction = null;
 //    if (.actions.size() > 1) {
-//        previousAction = actor.actions.get(actor.actions.size() - 2);
+//        previousAction = inputSystem.actions.get(inputSystem.actions.size() - 2);
 //        Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
 //        Log.v("PreviousTouch", "Current: " + event.getTargetImage());
 //    }
 
     public Action getPrevious() {
-        if (actor != null) {
-            if (actor.getActions().size() > 1) {
-                int previousActionIndex = actor.getActions().size() - 2;
-                return actor.getActions().get(previousActionIndex);
+        if (inputSystem != null) {
+            if (inputSystem.getActions().size() > 1) {
+                int previousActionIndex = inputSystem.getActions().size() - 2;
+                return inputSystem.getActions().get(previousActionIndex);
             }
         }
         return null;

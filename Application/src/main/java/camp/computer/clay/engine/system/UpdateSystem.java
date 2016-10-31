@@ -22,7 +22,7 @@ public class UpdateSystem extends System {
     public boolean update(World world) {
 
         // Update Actors
-        world.getActor().update(); // HACK
+        world.getActor().update(world); // HACK
 
         updateEntities(Entity.Manager);
 

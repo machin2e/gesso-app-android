@@ -15,6 +15,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
@@ -26,7 +27,6 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
-import camp.computer.clay.engine.component.Actor;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
@@ -75,17 +75,17 @@ public class Clay {
         // Create Camera
         createEntity(Camera.class);
 
-        // Create actor and setAbsolute perspective
-        Actor actor = new Actor();
-        this.world.addActor(actor);
+        // Create inputSystem and setAbsolute perspective
+        InputSystem inputSystem = new InputSystem();
+        this.world.addActor(inputSystem);
 
         Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
         // Camera
         cameraEntity.getComponent(Camera.class).setWorld(world);
 
-        // Add actor to model
-        world.addActor(actor);
+        // Add inputSystem to model
+        world.addActor(inputSystem);
 
         Application.getView().getPlatformRenderSurface().setWorld(world);
 

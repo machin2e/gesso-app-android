@@ -1,28 +1,33 @@
-package camp.computer.clay.engine.component;
+package camp.computer.clay.engine.system;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.ActionListenerComponent;
+import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.system.ActionHandlerSystem;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.World;
 
 /**
- * {@code Actor} models a user of Clay and performs actions in the simulated world on user's behalf,
+ * {@code InputSystem} models a user of Clay and performs actions in the simulated world on user's behalf,
  * based on the actions recognized on one of the {@code PhoneHost} objects associated with the
- * {@code Actor}.
+ * {@code InputSystem}.
  */
-public class Actor extends Component {
+public class InputSystem extends System {
 
     private List<Event> incomingEvents = new LinkedList<>();
 
     private List<Action> actions = new LinkedList<>();
 
-    public Actor() {
-        super();
+    public InputSystem() {
         setup();
     }
 
@@ -42,7 +47,7 @@ public class Actor extends Component {
 
     private void doAction(Event event) {
 
-        event.setActor(this);
+        event.setInputSystem(this);
 
         switch (event.getType()) {
 
@@ -50,7 +55,7 @@ public class Actor extends Component {
 
                 // Create a new Action
                 Action action = new Action();
-                action.setActor(this);
+                action.setInputSystem(this);
                 actions.add(action);
 
                 // Add Event to Action
@@ -290,8 +295,9 @@ public class Actor extends Component {
         return this.actions;
     }
 
-    public void update() {
+    @Override
+    public boolean update(World world) {
         dequeueEvents();
+        return true;
     }
-
 }
