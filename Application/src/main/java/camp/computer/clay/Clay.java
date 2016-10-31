@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -24,7 +23,6 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.system.ActionListenerSystem;
 import camp.computer.clay.host.DisplayHostInterface;
 import camp.computer.clay.host.InternetInterface;
 import camp.computer.clay.host.MessengerInterface;
@@ -181,14 +179,14 @@ public class Clay {
         Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
 
         // <HACK>
-        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
-        for (int i = 0; i < shapes.size(); i++) {
-            if (shapes.get(i).getLabel().startsWith("Port")) {
-                String label = shapes.get(i).getLabel();
-                Entity portEntity = host.getComponent(Portable.class).getPort(label);
-                shapes.get(i).setEntity(portEntity);
-            }
-        }
+//        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
+//        for (int i = 0; i < shapes.size(); i++) {
+//            if (shapes.get(i).getLabel().startsWith("Port")) {
+//                String label = shapes.get(i).getLabel();
+//                Entity portEntity = host.getComponent(Portable.class).getPort(label);
+//                shapes.get(i).setEntity(portEntity);
+//            }
+//        }
         // </HACK>
 
         // Position Port Images

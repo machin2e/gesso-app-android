@@ -14,8 +14,6 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     protected String label = "";
 
-//    protected Visibility visibility = Visibility.VISIBLE;
-
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
@@ -67,13 +65,13 @@ public abstract class Shape<T extends Entity> extends Groupable {
         this.position.set(position);
     }
 
-    public void setEntity(T entity) {
-        this.entity = entity;
-    }
+//    public void setEntity(T entity) {
+//        this.entity = entity;
+//    }
 
-    public T getEntity() {
-        return this.entity;
-    }
+//    public T getEntity() {
+//        return this.entity;
+//    }
 
     public void setImagePosition(double x, double y) {
         if (imagePosition == null) {
@@ -130,19 +128,6 @@ public abstract class Shape<T extends Entity> extends Groupable {
     public boolean contains(Transform point) {
         return Geometry.contains(getBoundary(), point);
     }
-
-//    public void setVisibility(Visibility visibility) {
-////        this.visibility = visibility;
-//    }
-
-//    public Visibility getVisibility() {
-////        return this.visibility;
-//        return Visibility.VISIBLE;
-//    }
-
-//    public boolean isVisible() {
-//        return visibility == Visibility.VISIBLE;
-//    }
 
     public void setColor(String color) {
         this.color = color;

@@ -139,33 +139,33 @@ public class Action {
     }
 
     // TODO: Remove this? Or make it complement the updated getTargetImage() which returns the Entity that the process targeted.
-    public Entity getSourceEntity() {
-        if (events.size() > 0) {
-            if (getEvent(0).getTargetShape() != null && getEvent(0).getTargetShape().getEntity() != null) {
-                return getEvent(0).getTargetShape().getEntity();
-            } else {
-                return getEvent(0).getTargetImage().getEntity();
-            }
-        }
-        return null;
-    }
-
-    public Entity getTargetEntity() { // getTargetEntity
-//        Event event = getLastEvent();
-//        if (event != null) {
-//            return event.getTargetImage().getEntity();
+//    public Entity getSourceEntity() {
+//        if (events.size() > 0) {
+//            if (getEvent(0).getTargetShape() != null && getEvent(0).getTargetShape().getEntity() != null) {
+//                return getEvent(0).getTargetShape().getEntity();
+//            } else {
+//                return getEvent(0).getTargetImage().getEntity();
+//            }
 //        }
 //        return null;
-        if (events.size() > 0) {
-            Event lastEvent = getLastEvent();
-            if (lastEvent.getTargetShape() != null && lastEvent.getTargetShape().getEntity() != null) {
-                return lastEvent.getTargetShape().getEntity();
-            } else {
-                return lastEvent.getTargetImage().getEntity();
-            }
-        }
-        return null;
-    }
+//    }
+
+//    public Entity getTargetEntity() { // getTargetEntity
+////        Event event = getLastEvent();
+////        if (event != null) {
+////            return event.getTargetImage().getEntity();
+////        }
+////        return null;
+//        if (events.size() > 0) {
+//            Event lastEvent = getLastEvent();
+//            if (lastEvent.getTargetShape() != null && lastEvent.getTargetShape().getEntity() != null) {
+//                return lastEvent.getTargetShape().getEntity();
+//            } else {
+//                return lastEvent.getTargetImage().getEntity();
+//            }
+//        }
+//        return null;
+//    }
 
     public long getStartTime() {
         return getFirstEvent().getTimestamp();

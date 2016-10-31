@@ -206,7 +206,7 @@ public class Host extends Component {
             }
 
             Entity hostPortEntity = extensionPortEntity.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK b/c using index 0
-            Transform hostPortPosition = World.getWorld().getShape(hostPortEntity).getPosition();
+            Transform hostPortPosition = hostPortEntity.getComponent(Image.class).getShape("Port").getPosition(); // World.getWorld().getShape(hostPortEntity).getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
