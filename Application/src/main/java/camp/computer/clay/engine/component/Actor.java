@@ -8,7 +8,6 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.ActionHandlerSystem;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.World;
 
 /**
@@ -134,30 +133,8 @@ public class Actor extends Component {
                 event.setTargetEntity(targetImage.getEntity());
                 Entity targetEntity = targetImage.getEntity();
 
-//                // Set the target shape
-//                Shape targetShape = targetImage.getShape(event.getPosition());
-//                event.setTargetShape(targetShape);
-
                 // Action the event
                 // <HACK>
-//                if (targetImage.getClass() == World.class) {
-//                    World world = ((World) targetImage);
-//                    ActionHandlerSystem.handleWorldAction(world, action);
-//                } else if (targetImage.getEntity().hasComponent(Host.class)) {
-//                    Entity hostEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handleHostAction(hostEntity, action);
-//                } else if (targetImage.getEntity().hasComponent(Extension.class)) {
-//                    Entity extensionEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handleExtensionAction(extensionEntity, action);
-//                } else if (targetImage.getEntity().hasComponent(Port.class)) {
-//                    Entity portEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handlePortAction(portEntity, action);
-//                } else if (targetImage.getEntity().hasComponent(Path.class)) {
-//                    Entity pathEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handlePathAction(pathEntity, action);
-//                } else {
-//                    targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
-//                }
                 if (targetImage.getClass() == World.class) {
                     World world = ((World) targetImage);
                     ActionHandlerSystem.handleWorldAction(world, action);
@@ -189,32 +166,8 @@ public class Actor extends Component {
                 event.setTargetEntity(targetImage.getEntity());
                 Entity targetEntity = targetImage.getEntity();
 
-//                // Set the target shape
-//                Shape targetShape = targetImage.getShape(event.getPosition());
-//                event.setTargetShape(targetShape);
-
-                // Action the event
-//                event.getTargetImage().getEntity().processAction(action);
                 // Action the event
                 // <HACK>
-//                if (targetImage.getClass() == World.class) {
-//                    World world = ((World) targetImage);
-//                    ActionHandlerSystem.handleWorldAction(world, action);
-//                } else if (targetImage.getEntity().hasComponent(Host.class)) {
-//                    Entity hostEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handleHostAction(hostEntity, action);
-//                } else if (targetImage.getEntity().hasComponent(Extension.class)) {
-//                    Entity extensionEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handleExtensionAction(extensionEntity, action);
-//                } else if (targetImage.getEntity().hasComponent(Port.class)) {
-//                    Entity portEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handlePortAction(portEntity, action);
-//                } else if (targetImage.getEntity().hasComponent(Path.class)) {
-//                    Entity pathEntity = targetImage.getEntity();
-//                    ActionHandlerSystem.handlePathAction(pathEntity, action);
-//                } else {
-//                    targetImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
-//                }
                 if (targetImage.getClass() == World.class) {
                     World world = ((World) targetImage);
                     ActionHandlerSystem.handleWorldAction(world, action);
@@ -240,25 +193,16 @@ public class Actor extends Component {
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     // Set the target image
-//                    Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(true).filterContains(event.getPosition());
                     Group<Image> targetImages = Entity.Manager.filterVisibility(true).filterContains(event.getPosition()).getImages();
                     Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
                     event.setTargetImage(targetImage);
 
-//                    // Set the target shape
-//                    Shape targetShape = targetImage.getShape(event.getPosition());
-//                    event.setTargetShape(targetShape);
-
-//                    action.getFirstEvent().getTargetImage().getEntity().processAction(action);
                     // Action the event
                     // <HACK>
                     Image firstImage = action.getFirstEvent().getTargetImage();
 
                     // Set the target Entity
-//                    event.setTargetEntity(firstImage.getEntity());
                     event.setTargetEntity(targetImage.getEntity());
-                    Entity targetEntity = firstImage.getEntity();
-
 
                     if (firstImage.getClass() == World.class) {
                         World world = ((World) targetImage);
@@ -278,18 +222,6 @@ public class Actor extends Component {
                     } else {
                         firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                     }
-//                    if (targetImage.getClass() == World.class) {
-//                        World world = ((World) targetImage);
-//                        ActionHandlerSystem.handleWorldAction(world, action);
-//                    } else if (targetEntity.hasComponent(Host.class)) {
-//                        ActionHandlerSystem.handleHostAction(targetEntity, action);
-//                    } else if (targetEntity.hasComponent(Extension.class)) {
-//                        ActionHandlerSystem.handleExtensionAction(targetEntity, action);
-//                    } else if (targetEntity.hasComponent(Port.class)) {
-//                        ActionHandlerSystem.handlePortAction(targetEntity, action);
-//                    } else if (targetEntity.hasComponent(Path.class)) {
-//                        ActionHandlerSystem.handlePathAction(targetEntity, action);
-//                    }
                     // </HACK>
                 }
 
@@ -304,24 +236,16 @@ public class Actor extends Component {
 //                action.timerHandler.removeCallbacks(action.timerRunnable);
 
                 // Set the target image
-//                Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(true).filterContains(event.getPosition());
                 Group<Image> targetImages = Entity.Manager.filterVisibility(true).filterContains(event.getPosition()).getImages();
                 Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
                 event.setTargetImage(targetImage);
 
-//                // Set the target shape
-//                Shape targetShape = targetImage.getShape(event.getPosition());
-//                event.setTargetShape(targetShape);
-
-                //event.getTargetImage().queueEvent(action);
-//                action.getFirstEvent().getTargetImage().getEntity().processAction(action);
                 // Action the event
                 // <HACK>
                 Image firstImage = action.getFirstEvent().getTargetImage();
 
                 // Set the target Entity
                 event.setTargetEntity(targetImage.getEntity());
-                Entity targetEntity = firstImage.getEntity();
 
                 if (firstImage.getClass() == World.class) {
                     World world = ((World) targetImage);
@@ -341,19 +265,6 @@ public class Actor extends Component {
                 } else {
                     firstImage.getEntity().getComponent(ActionListenerComponent.class).processAction(action);
                 }
-
-//                if (targetImage.getClass() == World.class) {
-//                    World world = ((World) targetImage);
-//                    ActionHandlerSystem.handleWorldAction(world, action);
-//                } else if (targetEntity.hasComponent(Host.class)) {
-//                    ActionHandlerSystem.handleHostAction(targetEntity, action);
-//                } else if (targetEntity.hasComponent(Extension.class)) {
-//                    ActionHandlerSystem.handleExtensionAction(targetEntity, action);
-//                } else if (targetEntity.hasComponent(Port.class)) {
-//                    ActionHandlerSystem.handlePortAction(targetEntity, action);
-//                } else if (targetEntity.hasComponent(Path.class)) {
-//                    ActionHandlerSystem.handlePathAction(targetEntity, action);
-//                }
                 // </HACK>
 
                 break;
