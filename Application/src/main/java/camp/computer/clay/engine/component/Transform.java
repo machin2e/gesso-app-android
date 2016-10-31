@@ -25,7 +25,7 @@ public class Transform extends Component {
     /**
      * Scale for the {@code Transform}.
      */
-    protected double scale = 1.0;
+    public double scale = 1.0;
 
     /**
      * Rotation rotation in degrees

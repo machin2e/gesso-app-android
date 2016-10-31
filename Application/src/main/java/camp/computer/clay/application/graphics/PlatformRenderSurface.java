@@ -189,7 +189,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Transform perspectivePosition = cameraEntity.getComponent(Camera.class).getPosition();
+                    Transform perspectivePosition = cameraEntity.getComponent(Camera.class).getEntity().getComponent(Transform.class);
                     double perspectiveScale = cameraEntity.getComponent(Camera.class).getScale();
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;

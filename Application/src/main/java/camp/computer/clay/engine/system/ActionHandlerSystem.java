@@ -421,7 +421,7 @@ public class ActionHandlerSystem extends System {
 
             } else if (action.isHolding()) {
 
-//                                                // Holding and dragging
+                // Holding and dragging
 
             }
 

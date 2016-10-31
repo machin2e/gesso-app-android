@@ -43,9 +43,10 @@ public class RenderSystem extends System {
         canvas.save();
 
         Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        Transform cameraPosition = camera.getComponent(Transform.class);
         canvas.translate(
-                (float) platformRenderSurface.originPosition.x + (float) camera.getComponent(Camera.class).getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
-                (float) platformRenderSurface.originPosition.y + (float) camera.getComponent(Camera.class).getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
+                (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
+                (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getView().getOrientationInput().getRotationX() */
         );
         canvas.scale(
                 (float) camera.getComponent(Camera.class).getScale(),

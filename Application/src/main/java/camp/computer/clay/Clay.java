@@ -82,9 +82,6 @@ public class Clay {
 
         Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
-        // Camera
-        cameraEntity.getComponent(Camera.class).setWorld(world);
-
         // Add inputSystem to model
 //        world.addActor(inputSystem);
 

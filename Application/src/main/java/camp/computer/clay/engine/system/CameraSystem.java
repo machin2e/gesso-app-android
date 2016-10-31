@@ -34,14 +34,15 @@ public class CameraSystem extends System {
         */
 
         Camera c = camera.getComponent(Camera.class);
+        Transform t = camera.getComponent(Transform.class);
 
         // Scale
-        if (Math.abs(c.scale - c.targetScale) <= c.scaleDelta) {
-            c.scale = c.targetScale;
-        } else if (c.scale > c.targetScale) {
-            c.scale -= c.scaleDelta;
+        if (Math.abs(t.scale - c.targetScale) <= c.scaleDelta) {
+            t.scale = c.targetScale;
+        } else if (t.scale > c.targetScale) {
+            t.scale -= c.scaleDelta;
         } else {
-            c.scale += c.scaleDelta;
+            t.scale += c.scaleDelta;
         }
 
         // Position
@@ -53,17 +54,17 @@ public class CameraSystem extends System {
 
             double currentDistanceTarget = ((((double) (c.positionFrameIndex + 1) / (double) c.positionFrameLimit) * totalDistanceToTarget) / totalDistanceToTarget) /* (1.0 / scale) */;
 
-            c.position.set(
-                    c.scale * (currentDistanceTarget * totalDistanceToTargetX + c.originalPosition.x),
-                    c.scale * (currentDistanceTarget * totalDistanceToTargetY + c.originalPosition.y)
+            c.getEntity().getComponent(Transform.class).set(
+                    t.scale * (currentDistanceTarget * totalDistanceToTargetX + c.originalPosition.x),
+                    t.scale * (currentDistanceTarget * totalDistanceToTargetY + c.originalPosition.y)
             );
 
             c.positionFrameIndex++;
 
         } else { // if (positionFrameIndex >= positionFrameLimit) {
 
-            c.position.x = c.targetPosition.x * c.scale;
-            c.position.y = c.targetPosition.y * c.scale;
+            c.getEntity().getComponent(Transform.class).x = c.targetPosition.x * t.scale;
+            c.getEntity().getComponent(Transform.class).y = c.targetPosition.y * t.scale;
 
         }
     }

@@ -29,22 +29,15 @@ public class Camera extends Component {
      */
     protected double height;
 
-    /**
-     * The {@code World} displayed from this perspective
-     */
-    protected World world = null;
-
     // Scale
     protected final double DEFAULT_SCALE = 1.0f;
     public double targetScale = DEFAULT_SCALE;
-    public double scale = DEFAULT_SCALE;
     protected int scalePeriod = DEFAULT_SCALE_PERIOD;
     public double scaleDelta = 0;
 
     // Position
     protected final Transform DEFAULT_POSITION = new Transform(0, 0);
     public Transform targetPosition = DEFAULT_POSITION;
-    public Transform position = new Transform(targetPosition.x, targetPosition.y); // TODO: Remove this! Because already has a Transform component in the Entity... DUH!!!
     public int positionFrameIndex = 0;
     public int positionFrameLimit = 0;
     public Transform originalPosition = new Transform();
@@ -53,14 +46,8 @@ public class Camera extends Component {
         super();
     }
 
-    public void setWorld(World world) {
-        this.world = world;
-    }
-
-    public World getWorld() {
-        return this.world;
-    }
-
+    // <REFACTOR/DELETE>
+    // TODO: Put into PlatformRenderSurface? Elsewhere? Screen descriptor structure?
     public void setWidth(double width) {
         this.width = width;
     }
@@ -76,32 +63,19 @@ public class Camera extends Component {
     public double getHeight() {
         return this.height;
     }
+    // </REFACTOR/DELETE>
 
-    // TODO: Delete. Replace calls to this with calls to cameraEntity.getComponent(Transform.class)
-    public Transform getPosition() {
-        return this.position;
-    }
+    private void setPosition(Transform position, double duration) {
 
-    // TODO: Delete. Replace calls to this with calls to cameraEntity.getComponent(Transform.class).set(...)
-    public void setPosition(Transform position) {
-        setPosition(position.x, position.y, DEFAULT_ADJUSTMENT_PERIOD);
-    }
-
-    public void setPosition(double x, double y) {
-        setPosition(x, y, DEFAULT_ADJUSTMENT_PERIOD);
-    }
-
-    private void setPosition(double x, double y, double duration) {
-
-//        if (targetPosition.x == position.x && targetPosition.y == position.y) {
-//            return;
-//        }
+        double x = position.x;
+        double y = position.y;
 
         if (duration == 0.0) {
 
             this.targetPosition.set(-x, -y);
             this.originalPosition.set(x, y);
-            this.position.set(x, y);
+            //this.position.set(x, y);
+            getEntity().getComponent(Transform.class).set(x, y);
 
             positionFrameIndex = positionFrameLimit;
 
@@ -116,7 +90,8 @@ public class Camera extends Component {
             this.targetPosition.set(-x, -y);
 
             // <PLAN_ANIMATION>
-            originalPosition.set(position);
+            //originalPosition.set(position);
+            originalPosition.set(getEntity().getComponent(Transform.class));
 
             positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND));
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
@@ -128,13 +103,14 @@ public class Camera extends Component {
     public void adjustPosition() {
         Transform centerPosition = Entity.Manager.filterWithComponent(Host.class, Extension.class).getCenterPoint();
         Log.v("AdjustCenter", "centerPosition.x: " + centerPosition.x + ", y: " + centerPosition.y);
-        setPosition(centerPosition.x, centerPosition.y, DEFAULT_ADJUSTMENT_PERIOD);
+        setPosition(centerPosition, DEFAULT_ADJUSTMENT_PERIOD);
     }
 
     public void setOffset(double dx, double dy) {
         this.targetPosition.offset(dx, dy);
         this.originalPosition.offset(dx, dy);
-        this.position.offset(dx, dy);
+//        this.position.offset(dx, dy);
+        getEntity().getComponent(Transform.class).offset(dx, dy);
     }
 
     public void setOffset(Transform point) {
@@ -145,17 +121,20 @@ public class Camera extends Component {
 
         this.targetScale = scale;
 
+        Transform transform = getEntity().getComponent(Transform.class);
+
         if (duration == 0) {
-            this.scale = scale;
+            transform.scale = scale;
         } else {
             double frameCount = Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND);
             // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
-            scaleDelta = Math.abs(scale - this.scale) / frameCount;
+            scaleDelta = Math.abs(scale - transform.scale) / frameCount;
         }
     }
 
     public double getScale() {
-        return this.scale;
+        Transform transform = getEntity().getComponent(Transform.class);
+        return transform.scale;
     }
 
     public void adjustScale() {
@@ -163,7 +142,6 @@ public class Camera extends Component {
     }
 
     public void adjustScale(double duration) {
-//        Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages().getBoundingBox();
         Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
@@ -286,23 +264,19 @@ public class Camera extends Component {
 
             // Update scale and position
             adjustScale(boundingBox);
-//            setPosition(boundingBox.getPosition());
-            setPosition(entity.getComponent(Transform.class));
+            setPosition(entity.getComponent(Transform.class), DEFAULT_ADJUSTMENT_PERIOD);
 
         } else if (entity.hasComponent(Extension.class)) {
 
             Log.v("SetFocus", "setFocus(ExtensionEntity)");
 
             // <REFACTOR>
-            // TODO: Group<PortableEntity> otherPortables = getWorld().getEntities();
-//        Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, ExtensionEntity.class);
-//            Group<Entity> otherPortables = Entity.Manager.filter(Group.Filters.filterType, HostEntity.class, Entity.class);
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class);
             Log.v("Entities", "otherPortables.size: " + otherPortables.size());
             otherPortables.remove(entity);
             otherPortables.setTransparency(0.1);
 
-            // Get portEntities along every PathEntity connected to the Ports on the selected HostEntity
+            // Get Ports along every Path connected to the Ports on the selected Host
             Group<Entity> hostPathPortEntities = new Group<>();
             Group<Entity> extensionPortEntities = entity.getComponent(Portable.class).getPorts();
             for (int i = 0; i < extensionPortEntities.size(); i++) {
@@ -325,19 +299,16 @@ public class Camera extends Component {
             }
             // </REFACTOR>
 
-            // Increase distance between HostEntity and ExtensionEntity
-            Entity hostEntity = entity.getComponent(Portable.class).getHosts().get(0);
-            hostEntity.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
-
-//            ShapeGroup hostPathPortShapes = getWorld().getShapes().filterEntity(hostPathPortEntities);
-//            Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getPositions());
+            // Increase distance between Host and Extension
+            Entity host = entity.getComponent(Portable.class).getHosts().get(0);
+            host.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
             Group<Shape> hostPathPortShapes = hostPathPortEntities.getImages().getShapes();
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
             // Update scale and position
             adjustScale(boundingBox);
-            setPosition(boundingBox.getPosition());
+            setPosition(boundingBox.getPosition(), DEFAULT_ADJUSTMENT_PERIOD);
 
         }
     }
