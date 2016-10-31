@@ -111,15 +111,15 @@ public class Image extends Component {
         return null;
     }
 
-    public Shape getShape(Transform point) {
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            if (shape.contains(point)) {
-                return shape;
-            }
-        }
-        return null;
-    }
+//    public Shape getShape(Transform point) {
+//        for (int i = 0; i < shapes.size(); i++) {
+//            Shape shape = shapes.get(i);
+//            if (shape.contains(point)) {
+//                return shape;
+//            }
+//        }
+//        return null;
+//    }
 
     public Group<Shape> getShapes() {
         // TODO: Don't create a new Group. Will that work?
@@ -134,30 +134,32 @@ public class Image extends Component {
 
     // <COLLISION_COMPONENT>
 
-    /**
-     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
-     * {@code point}.
-     *
-     * @param point
-     * @return
-     */
-    public boolean contains(Transform point) {
-        for (int i = 0; i < shapes.size(); i++) {
-            if (shapes.get(i).contains(point)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    /**
+//     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+//     * {@code point}.
+//     *
+//     * @param point
+//     * @return
+//     */
+//    public boolean contains(Transform point) {
+//        for (int i = 0; i < shapes.size(); i++) {
+//            //if (shapes.get(i).contains(point)) {
+//            if (Geometry.contains(shapes.get(i).getBoundary(), point)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
-    public Rectangle getBoundingBox() {
-        List<Transform> shapeBoundaries = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            shapeBoundaries.addAll(shapes.get(i).getBoundary());
-        }
-        return Geometry.getBoundingBox(shapeBoundaries);
-    }
-    // </COLLISION_COMPONENT>
+//    // TODO: Delete!
+//    public Rectangle getBoundingBox() {
+//        List<Transform> shapeBoundaries = new LinkedList<>();
+//        for (int i = 0; i < shapes.size(); i++) {
+//            shapeBoundaries.addAll(shapes.get(i).getBoundary());
+//        }
+//        return Geometry.getBoundingBox(shapeBoundaries);
+//    }
+//    // </COLLISION_COMPONENT>
 
     // <STYLE_COMPONENT?>
     // TODO: Delete?

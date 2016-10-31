@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.component.ActionListenerComponent;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
@@ -105,6 +106,7 @@ public final class Entity extends Groupable {
     protected Label label = null;
     protected Visibility visibility = null;
     protected Workspace workspace = null;
+    protected Boundary boundary = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -136,6 +138,8 @@ public final class Entity extends Groupable {
             this.visibility = (Visibility) component;
         } else if (component instanceof Workspace) {
             this.workspace = (Workspace) component;
+        } else if (component instanceof Boundary) {
+            this.boundary = (Boundary) component;
         }
 
         // Associate with Entity
@@ -171,6 +175,8 @@ public final class Entity extends Groupable {
             return type.cast(this.visibility);
         } else if (type == Workspace.class) {
             return type.cast(this.workspace);
+        } else if (type == Boundary.class) {
+            return type.cast(this.boundary);
         } else {
             return null;
         }

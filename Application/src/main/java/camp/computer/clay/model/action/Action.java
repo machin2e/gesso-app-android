@@ -73,14 +73,6 @@ public class Action {
         }
     }
 
-//    // TODO: getPreviousAction()
-//    Action previousAction = null;
-//    if (.actions.size() > 1) {
-//        previousAction = inputSystem.actions.get(inputSystem.actions.size() - 2);
-//        Log.v("PreviousTouch", "Previous: " + previousAction.getFirstEvent().getTargetImage());
-//        Log.v("PreviousTouch", "Current: " + event.getTargetImage());
-//    }
-
     public Action getPrevious() {
         if (inputSystem != null) {
             if (inputSystem.getActions().size() > 1) {
@@ -149,7 +141,7 @@ public class Action {
 //        return null;
 //    }
 
-//    public Entity getTargetEntity() { // getTargetEntity
+//    public Entity getTarget() { // getTarget
 ////        Event event = getLastEvent();
 ////        if (event != null) {
 ////            return event.getTargetImage().getEntity();

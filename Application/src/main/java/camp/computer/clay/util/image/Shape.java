@@ -7,7 +7,6 @@ import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 
 public abstract class Shape<T extends Entity> extends Groupable {
@@ -121,12 +120,9 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     public abstract void draw(PlatformRenderSurface platformRenderSurface);
 
+    // TODO: Delete!
     public List<Transform> getBoundary() {
         return this.boundary;
-    }
-
-    public boolean contains(Transform point) {
-        return Geometry.contains(getBoundary(), point);
     }
 
     public void setColor(String color) {

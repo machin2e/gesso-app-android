@@ -39,21 +39,17 @@ public class RenderSystem extends System {
         Bitmap canvasBitmap = platformRenderSurface.canvasBitmap;
         Matrix identityMatrix = platformRenderSurface.identityMatrix;
 
-        if (platformRenderSurface.world == null || platformRenderSurface.canvas == null) {
-            return false;
-        }
-
         // Adjust the Camera
         canvas.save();
 
-        Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
         canvas.translate(
-                (float) platformRenderSurface.originPosition.x + (float) cameraEntity.getComponent(Camera.class).getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
-                (float) platformRenderSurface.originPosition.y + (float) cameraEntity.getComponent(Camera.class).getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
+                (float) platformRenderSurface.originPosition.x + (float) camera.getComponent(Camera.class).getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
+                (float) platformRenderSurface.originPosition.y + (float) camera.getComponent(Camera.class).getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
         );
         canvas.scale(
-                (float) cameraEntity.getComponent(Camera.class).getScale(),
-                (float) cameraEntity.getComponent(Camera.class).getScale()
+                (float) camera.getComponent(Camera.class).getScale(),
+                (float) camera.getComponent(Camera.class).getScale()
         );
 
 

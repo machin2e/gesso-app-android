@@ -36,18 +36,18 @@ public class Camera extends Component {
 
     // Scale
     protected final double DEFAULT_SCALE = 1.0f;
-    protected double targetScale = DEFAULT_SCALE;
-    protected double scale = DEFAULT_SCALE;
+    public double targetScale = DEFAULT_SCALE;
+    public double scale = DEFAULT_SCALE;
     protected int scalePeriod = DEFAULT_SCALE_PERIOD;
-    protected double scaleDelta = 0;
+    public double scaleDelta = 0;
 
     // Position
     protected final Transform DEFAULT_POSITION = new Transform(0, 0);
-    protected Transform targetPosition = DEFAULT_POSITION;
-    protected Transform position = new Transform(targetPosition.x, targetPosition.y); // TODO: Remove this! Because already has a Transform component in the Entity... DUH!!!
-    protected int positionFrameIndex = 0;
-    protected int positionFrameLimit = 0;
-    protected Transform originalPosition = new Transform();
+    public Transform targetPosition = DEFAULT_POSITION;
+    public Transform position = new Transform(targetPosition.x, targetPosition.y); // TODO: Remove this! Because already has a Transform component in the Entity... DUH!!!
+    public int positionFrameIndex = 0;
+    public int positionFrameLimit = 0;
+    public Transform originalPosition = new Transform();
 
     public Camera() {
         super();
@@ -163,7 +163,8 @@ public class Camera extends Component {
     }
 
     public void adjustScale(double duration) {
-        Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages().getBoundingBox();
+//        Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages().getBoundingBox();
+        Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(boundingBox, duration);
         }
@@ -341,25 +342,6 @@ public class Camera extends Component {
         }
     }
 
-//    /**
-//     * Adjusts the focus so the {@code PathEntity}s in {@code paths} are in view.
-//     *
-//     * @param paths
-//     */
-//    public void setFocus(PathGroup paths) {
-//
-//        Log.v("SetFocus", "setFocus(PathGroup)");
-//
-//        // Get bounding box around the Ports in the specified Paths
-//        ShapeGroup pathPortShapes = getWorld().getShapes(paths.getPorts());
-//        List<Transform> portPositions = pathPortShapes.getPositions();
-//        Rectangle boundingBox = Geometry.getBoundingBox(portPositions);
-//
-//        // Update scale and position
-//        adjustScale(boundingBox);
-//        setPosition(Geometry.getCenterPoint(portPositions));
-//    }
-
     public void setFocus(World world) {
 
         Log.v("SetFocus", "setFocus(World)");
@@ -373,51 +355,5 @@ public class Camera extends Component {
         // Update scale and position
         adjustScale();
         adjustPosition();
-    }
-
-    public void update() {
-
-        /*
-        // Solution 1: This works without per-frame adjustment. It's a starting point for that.
-        scale = this.targetScale;
-
-        position.setAbsoluteX(targetPosition.getAbsoluteX());
-        position.setAbsoluteY(targetPosition.getAbsoluteY());
-
-        position.setAbsoluteX(position.getAbsoluteX() * scale);
-        position.setAbsoluteY(position.getAbsoluteY() * scale);
-        */
-
-        // Scale
-        if (Math.abs(scale - targetScale) <= scaleDelta) {
-            scale = targetScale;
-        } else if (scale > targetScale) {
-            scale -= scaleDelta;
-        } else {
-            scale += scaleDelta;
-        }
-
-        // Position
-        if (positionFrameIndex < positionFrameLimit) {
-
-            double totalDistanceToTarget = Geometry.distance(originalPosition, targetPosition);
-            double totalDistanceToTargetX = targetPosition.x - originalPosition.x;
-            double totalDistanceToTargetY = targetPosition.y - originalPosition.y;
-
-            double currentDistanceTarget = ((((double) (positionFrameIndex + 1) / (double) positionFrameLimit) * totalDistanceToTarget) / totalDistanceToTarget) /* (1.0 / scale) */;
-
-            position.set(
-                    scale * (currentDistanceTarget * totalDistanceToTargetX + originalPosition.x),
-                    scale * (currentDistanceTarget * totalDistanceToTargetY + originalPosition.y)
-            );
-
-            positionFrameIndex++;
-
-        } else { // if (positionFrameIndex >= positionFrameLimit) {
-
-            position.x = targetPosition.x * scale;
-            position.y = targetPosition.y * scale;
-
-        }
     }
 }

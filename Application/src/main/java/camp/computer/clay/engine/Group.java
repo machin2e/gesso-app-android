@@ -1,9 +1,7 @@
 package camp.computer.clay.engine;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,6 +12,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
@@ -21,7 +20,6 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Visibility;
 
 public class Group<E extends Groupable> implements List<E> {
 
@@ -90,16 +88,16 @@ public class Group<E extends Groupable> implements List<E> {
 
     public static class Filters {
 
-        public static Filter filterType = new Filter<Entity, Class<?>>() {
-            @Override
-            public boolean filter(Entity entity, Class<?>... entityTypes) {
-                if (Arrays.asList(entityTypes).contains(entity.getClass())) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
+//        public static Filter filterType = new Filter<Entity, Class<?>>() {
+//            @Override
+//            public boolean filter(Entity entity, Class<?>... entityTypes) {
+//                if (Arrays.asList(entityTypes).contains(entity.getClass())) {
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            }
+//        };
 
         public static Filter filterVisibility = new Filter<Entity, Boolean>() {
             @Override
@@ -113,21 +111,10 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
-//        public static Filter filterContains = new Filter<Image, Transform>() {
-//            @Override
-//            public boolean filter(Image entity, Transform... points) {
-//                if (entity.contains(points[0])) {
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
-//        };
-
         public static Filter filterContains = new Filter<Entity, Transform>() {
             @Override
             public boolean filter(Entity entity, Transform... points) {
-                if (entity.getComponent(Image.class).contains(points[0])) {
+                if (entity.getComponent(Boundary.class).contains(points[0])) {
                     return true;
                 } else {
                     return false;
@@ -161,18 +148,11 @@ public class Group<E extends Groupable> implements List<E> {
         return group;
     }
 
-    public static class Mappers { // was Operations
+    public static class Mappers {
 
-//        public static Mapper setImageVisibility = new Mapper<Entity, Entity, Visibility>() {
-//            @Override
-//            public Entity map(Entity entity, Visibility visibility) {
-//                entity.getImage().setImageVisibility(visibility);
-//                return entity;
-//            }
-//        };
-
-        // HACK:
-        public static Mapper setVisibilityGeneric = new Mapper<Entity, Entity, Boolean>() {
+        // Expects Group<Entity>
+        // Requires components: Visibility
+        public static Mapper setVisibility = new Mapper<Entity, Entity, Boolean>() {
             @Override
             public Entity map(Entity entity, Boolean isVisible) {
                 camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
@@ -181,32 +161,7 @@ public class Group<E extends Groupable> implements List<E> {
                 }
                 return null;
             }
-//            @Override
-//            public Image map(Groupable entity, Visibility visibility) {
-//                if (entity instanceof Shape) { // HACK
-//                    ((Shape) entity).setVisibility(visibility);
-//                } else if (entity instanceof Image) { // HACK
-//                    ((Image) entity).setVisibility(visibility);
-//                }
-//                return null;
-//            }
         };
-
-//        public static Mapper setImageVisibility = new Mapper<Image, Image, Visibility>() {
-//            @Override
-//            public Image map(Image entity, Visibility visibility) {
-//                entity.setVisibility(visibility);
-//                return entity;
-//            }
-//        };
-//
-//        public static Mapper setShapeVisibility = new Mapper<Shape, Shape, Visibility>() {
-//            @Override
-//            public Shape map(Shape entity, Visibility visibility) {
-//                entity.setVisibility(visibility);
-//                return entity;
-//            }
-//        };
 
         public static Mapper setTransparency = new Mapper<Entity, Entity, Double>() {
             @Override
@@ -230,29 +185,6 @@ public class Group<E extends Groupable> implements List<E> {
                 }
             }
         };
-
-        // HACK?
-        public static Mapper getShapePosition = new Mapper<Shape, Transform, Void>() {
-            @Override
-            public Transform map(Shape entity, Void data) {
-                if (entity != null) {
-                    return entity.getPosition();
-                } else {
-                    return null;
-                }
-            }
-        };
-
-//        public static Mapper getPosition = new Mapper<Entity, Transform, Void>() {
-//            @Override
-//            public Transform map(Entity entity, Void data) {
-//                if (entity.getImage() != null) {
-//                    return entity.getImage().getPosition();
-//                } else {
-//                    return null;
-//                }
-//            }
-//        };
 
         // Assumes Group<Entity>
         public static Mapper getImage = new Mapper<Entity, Image, Void>() {
@@ -281,8 +213,9 @@ public class Group<E extends Groupable> implements List<E> {
         map(Mappers.setTransparency, transparency);
     }
 
+    // Assumes Group<Entity>
     public void setVisibility(boolean isVisible) {
-        map(Mappers.setVisibilityGeneric, isVisible);
+        map(Mappers.setVisibility, isVisible);
     }
 
     // Assumes Group<Entity>
@@ -300,15 +233,10 @@ public class Group<E extends Groupable> implements List<E> {
         return shapes;
     }
 
-    // TODO: Update to handle Shape
+    // Assumes Group<Entity>
+    // TODO?: Update to handle Shape
     public Group<Transform> getPositions() {
-        Log.v("Reflect", "E: " + this.getClass());
-//        if (this.getClass() == ShapeGroup.class) { // HACK
-//            return map(Mappers.getShapePosition, null);
-//        } else {
-            // Assumes Group<Entity>
-            return map(Mappers.getPosition, null);
-//        }
+        return map(Mappers.getPosition, null);
     }
 
     /**
@@ -341,28 +269,6 @@ public class Group<E extends Groupable> implements List<E> {
 
         return shapeGroup;
     }
-
-//    /**
-//     * Removes all elements except those with the specified type.
-//     *
-//     * @param entityTypes
-//     * @return
-//     */
-//    public <E extends Groupable> Group<E> filterType2(Class<? extends Groupable>... entityTypes) {
-//
-//        Group<E> group = new Group<>();
-//
-//        for (int i = 0; i < this.elements.size(); i++) {
-//            for (int j = 0; j < entityTypes.length; j++) {
-//                Class<?> type = entityTypes[j];
-//                if (this.elements.get(i).getClass() == type) {
-//                    group.add((E) this.elements.get(i));
-//                }
-//            }
-//        }
-//
-//        return group;
-//    }
 
     // HACK: Assumes Group<Entity>
     public <E extends Entity> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
@@ -440,12 +346,6 @@ public class Group<E extends Groupable> implements List<E> {
         return Geometry.getCenterPoint(getPositions());
     }
 
-//    // HACK: Expects Group<Image>
-//    // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
-//    public Transform getCentroidPosition() {
-//        return Geometry.getCentroidPoint(getPositions());
-//    }
-
     // HACK: Assumes Group<Shape>
     public Group<Transform> getVertices() {
         Group<Transform> positions = new Group<>();
@@ -456,27 +356,18 @@ public class Group<E extends Groupable> implements List<E> {
         return positions;
     }
 
-    // HACK: Expects Group<Image>
+    // Expects Group<Entity>
     public Rectangle getBoundingBox() {
 
         List<Transform> imageBoundaries = new LinkedList<>();
         for (int i = 0; i < elements.size(); i++) {
-            Image image = (Image) elements.get(i);
-            imageBoundaries.addAll(image.getBoundingBox().getBoundary());
+            Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
+            Boundary boundary = entity.getComponent(Boundary.class);
+            imageBoundaries.addAll(boundary.getBoundingBox().getBoundary());
         }
 
         return Geometry.getBoundingBox(imageBoundaries);
     }
-
-//    public Rectangle getBoundingBox() {
-//
-//        List<Transform> imageBoundaries = new LinkedList<>();
-//        for (int i = 0; i < elements.size(); i++) {
-//            imageBoundaries.addAll(elements.get(i).getBoundingBox().getBoundary());
-//        }
-//
-//        return Geometry.getBoundingBox(imageBoundaries);
-//    }
 
     // <LIST_INTERFACE>
 

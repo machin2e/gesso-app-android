@@ -4,10 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Workspace;
@@ -46,8 +44,6 @@ public class InputSystem extends System {
     }
 
     private void doAction(Event event) {
-
-        event.setInputSystem(this);
 
         switch (event.getType()) {
 
@@ -132,7 +128,7 @@ public class InputSystem extends System {
                     Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
                     targetEntity = workspaces.get(0);
                 }
-                event.setTargetEntity(targetEntity);
+                event.setTarget(targetEntity);
 
                 // Action the Event
                 // <HACK>
@@ -162,7 +158,7 @@ public class InputSystem extends System {
                     Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
                     targetEntity = workspaces.get(0);
                 }
-                event.setTargetEntity(targetEntity);
+                event.setTarget(targetEntity);
 
                 // Action the event
                 // <HACK>
@@ -195,9 +191,9 @@ public class InputSystem extends System {
                         Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
                         targetEntity = workspaces.get(0);
                     }
-                    event.setTargetEntity(targetEntity);
+                    event.setTarget(targetEntity);
 
-                    targetEntity = event.getAction().getFirstEvent().getTargetEntity();
+                    targetEntity = event.getAction().getFirstEvent().getTarget();
 
                     // Action the Event
                     // <HACK>
@@ -228,9 +224,9 @@ public class InputSystem extends System {
                     Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
                     targetEntity = workspaces.get(0);
                 }
-                event.setTargetEntity(targetEntity);
+                event.setTarget(targetEntity);
 
-                targetEntity = event.getAction().getFirstEvent().getTargetEntity();
+                targetEntity = event.getAction().getFirstEvent().getTarget();
 
                 // Action the Event
                 // <HACK>

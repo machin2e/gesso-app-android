@@ -1,10 +1,7 @@
 package camp.computer.clay.model.action;
 
-import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.time.Clock;
 
 public class Event {
@@ -48,13 +45,9 @@ public class Event {
     // TODO: Delete this!
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
 
-    private Image[] targetImages = new Image[MAXIMUM_POINT_COUNT];
-
-    private Shape[] targetShapes = new Shape[MAXIMUM_POINT_COUNT];
+    private Entity[] targets = new Entity[MAXIMUM_POINT_COUNT];
 
     private Type type = null;
-
-    private InputSystem inputSystem = null;
 
     private long timestamp = DEFAULT_TIMESTAMP;
 
@@ -68,8 +61,6 @@ public class Event {
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
             pointerCoordinates[i] = new Transform(0, 0);
-            targetImages[i] = null;
-            targetShapes[i] = null;
             isPointing[i] = false;
         }
     }
@@ -95,14 +86,6 @@ public class Event {
         return this.parentAction;
     }
 
-    public void setInputSystem(InputSystem inputSystem) {
-        this.inputSystem = inputSystem;
-    }
-
-    public InputSystem getInputSystem() {
-        return this.inputSystem;
-    }
-
     public Type getType() {
         return this.type;
     }
@@ -120,58 +103,18 @@ public class Event {
     }
 
     public boolean isPointing(int pointerIndex) { // was isTouching
-        return this.targetImages[pointerIndex] != null;
+        return this.targets[pointerIndex] != null;
     }
 
     public boolean isPointing() { // was isTouching
         return isPointing(0);
     }
 
-    private Entity targetEntity = null;
-
-    public void setTargetEntity(Entity entity) {
-        this.targetEntity = entity;
+    public void setTarget(Entity entity) {
+        this.targets[0] = entity;
     }
 
-    public Entity getTargetEntity() {
-        return this.targetEntity;
-    }
-
-    public void setTargetImage(int pointerIndex, Image image) {
-        this.targetImages[pointerIndex] = image;
-    }
-
-    public void setTargetImage(Image image) {
-        setTargetImage(0, image);
-        if (image != null) {
-            isPointing[0] = true;
-        }
-    }
-
-    public Image getTargetImage(int pointerIndex) {
-        return this.targetImages[pointerIndex];
-    }
-
-    public Image getTargetImage() {
-        return getTargetImage(0);
-    }
-
-    public void setTargetShape(int pointerIndex, Shape shape) {
-        this.targetShapes[pointerIndex] = shape;
-    }
-
-    public void setTargetShape(Shape shape) {
-        setTargetShape(0, shape);
-        if (shape != null) {
-            isPointing[0] = true;
-        }
-    }
-
-    public Shape getTargetShape(int pointerIndex) {
-        return this.targetShapes[pointerIndex];
-    }
-
-    public Shape getTargetShape() {
-        return getTargetShape(0);
+    public Entity getTarget() {
+        return this.targets[0];
     }
 }

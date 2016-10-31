@@ -5,10 +5,12 @@ import android.graphics.Canvas;
 import java.util.LinkedList;
 import java.util.List;
 
+import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.system.BoundarySystem;
+import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
@@ -33,6 +35,7 @@ public class World extends Image {
     public Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
     // <WORLD_SYSTEMS>
+    public CameraSystem cameraSystem = new CameraSystem();
     public RenderSystem renderSystem = new RenderSystem();
     public BoundarySystem boundarySystem = new BoundarySystem();
     public InputSystem inputSystem = new InputSystem();
@@ -62,6 +65,7 @@ public class World extends Image {
         world.inputSystem.update(world);
         world.boundarySystem.update(world);
         world.renderSystem.update(world, canvas); // TODO: Remove canvas!
+        world.cameraSystem.update(world);
     }
 
     /**

@@ -43,8 +43,6 @@ public class BoundarySystem extends System {
                 updateHostImage(entity);
             } else if (entity.hasComponent(Port.class)) {
                 updatePortImage(entity);
-            } else if (entity.hasComponent(Camera.class)) {
-                entity.getComponent(Camera.class).update(); // TODO: Bring Camera update code into this file/system.
             }
             // </HACK>
         }
@@ -264,7 +262,7 @@ public class BoundarySystem extends System {
         if (!shape.isValid) {
             updateShapePosition(shape, referencePoint); // Update the position
             updateShapeRotation(shape, referencePoint); // Update rotation
-            BoundarySystem.updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
+            updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
             shape.isValid = true;
         }
     }
