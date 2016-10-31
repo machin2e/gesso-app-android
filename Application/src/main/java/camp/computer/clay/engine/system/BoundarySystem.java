@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.system;
 
+import java.util.List;
+
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -16,27 +18,23 @@ import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.World;
 
-public class UpdateSystem extends System {
+public class BoundarySystem extends System {
 
     @Override
     public boolean update(World world) {
 
-        // Update Actors
-        world.getActor().update(world); // HACK
-
-        updateEntities(Entity.Manager);
+        updateEntityBoundaries(Entity.Manager);
 
         return true;
     }
 
 
+
     // <ENTITY>
-    public void updateEntities(Group<Entity> entities) {
+    public void updateEntityBoundaries(Group<Entity> entities) {
         for (int i = 0; i < entities.size(); i++) {
 
             Entity entity = entities.get(i);
-
-            // entity.updateImage();
 
             // <HACK>
             if (entity.hasComponent(Extension.class)) {
@@ -55,7 +53,6 @@ public class UpdateSystem extends System {
 
 
     // <IMAGE>
-
     // Previously: Image.update()
     // Required Components: Image, Transform
     public void updateImage(Entity entity) {
@@ -64,7 +61,8 @@ public class UpdateSystem extends System {
         // Update Shapes
         for (int i = 0; i < image.getShapes().size(); i++) {
             Shape shape = image.getShapes().get(i);
-            shape.update(image.getEntity().getComponent(Transform.class));
+//            shape.update(image.getEntity().getComponent(Transform.class));
+            BoundarySystem.updateShapeGeometry(shape, image.getEntity().getComponent(Transform.class));
         }
     }
     // </IMAGE>
@@ -223,8 +221,67 @@ public class UpdateSystem extends System {
             transformedPoint.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
             // </HACK>
 
-            shape.update(transformedPoint);
+//            shape.update(transformedPoint);
+            BoundarySystem.updateShapeGeometry(shape, transformedPoint);
         }
     }
     // </PORT>
+
+
+
+
+
+
+
+    ////////////////// SHAPE !!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    /**
+     * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
+     * detection. Hey there, mango bongo.
+     */
+    public static void updateShapeBoundary(Shape shape) {
+
+        List<Transform> vertices = shape.getVertices();
+        List<Transform> boundary = shape.getBoundary();
+
+        // Translate and rotate the boundary about the updated position
+        for (int i = 0; i < vertices.size(); i++) {
+            boundary.get(i).set(vertices.get(i));
+            Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
+            Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape
+        }
+    }
+
+    /**
+     * Updates the {@code Shape}'s geometry. Specifically, computes the absolute positioning,
+     * rotation, and scaling in preparation for drawing and collision detection.
+     *
+     * @param referencePoint Position of the containing {@code Image} relative to which the
+     *                       {@code Shape} will be drawn.
+     */
+    public static void updateShapeGeometry(Shape shape, Transform referencePoint) {
+
+        if (!shape.isValid) {
+            updateShapePosition(shape, referencePoint); // Update the position
+            updateShapeRotation(shape, referencePoint); // Update rotation
+            BoundarySystem.updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
+            shape.isValid = true;
+        }
+    }
+
+    /**
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
+     * the center position of the {@code Shape}. Effectively, this updates the position of the
+     * {@code Shape}.
+     *
+     * @param referencePoint
+     */
+    public static void updateShapePosition(Shape shape, Transform referencePoint) {
+        shape.getPosition().x = referencePoint.x + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+        shape.getPosition().y = referencePoint.y + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+    }
+
+    public static void updateShapeRotation(Shape shape, Transform referencePoint) {
+        shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
+    }
 }

@@ -16,6 +16,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
@@ -36,7 +37,7 @@ public class ActionHandlerSystem extends System {
     }
 
     // TODO: Make World an Entity?
-    public static void handleWorldAction(final World world, Action action) {
+    public static void handleWorldAction(final Entity workspace, Action action) {
 
         Event event = action.getLastEvent();
         Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
@@ -73,7 +74,7 @@ public class ActionHandlerSystem extends System {
             if (action.isTap()) {
 
                 // Title
-                world.setTitleVisibility(Visibility.INVISIBLE);
+                // TODO: workspace.setTitleVisibility(Visibility.INVISIBLE);
 
                 // Camera
                 camera.getComponent(Camera.class).setFocus(World.getWorld());
@@ -318,8 +319,8 @@ public class ActionHandlerSystem extends System {
             if (action.isDragging()) {
 
                 // Prototype Path Visibility
-                World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetEntity().getComponent(Image.class).getShape("Port").getPosition());
                 // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetEntity().getComponent(Transform.class));
+                World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetEntity().getComponent(Image.class).getShape("Port").getPosition());
                 World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
                 World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
 
@@ -348,8 +349,8 @@ public class ActionHandlerSystem extends System {
 
                 if (isCreateExtensionAction) {
                     World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
-                    World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetEntity().getComponent(Image.class).getShape("Port").getPosition());
                     // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetEntity().getComponent(Transform.class));
+                    World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTargetEntity().getComponent(Image.class).getShape("Port").getPosition());
                     World.getWorld().setExtensionPrototypePosition(event.getPosition());
                 } else {
                     World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
@@ -429,11 +430,11 @@ public class ActionHandlerSystem extends System {
 
             if (action.getLastEvent().getTargetEntity() != null && action.getLastEvent().getTargetEntity().hasComponent(Port.class)) {
 
-                // (HostEntity.PortEntity, ..., HostEntity.PortEntity) Action Pattern
+                // (Host.Port, ..., Host.Port) Action Pattern
 
                 if (action.getFirstEvent().getTargetEntity() == action.getLastEvent().getTargetEntity() && action.isTap()) { // if (action.isTap()) {
 
-                    // (HostEntity.PortEntity A, ..., HostEntity.PortEntity A) Action Pattern
+                    // (Host.Port A, ..., Host.Port A) Action Pattern
                     // i.e., The action's first and last events address the same portEntity. Therefore, it must be either a tap or a hold.
 
                     // Get Port associated with the touched Port
@@ -502,7 +503,7 @@ public class ActionHandlerSystem extends System {
 
                 } else if (action.getFirstEvent().getTargetEntity() != action.getLastEvent().getTargetEntity()) {
 
-                    // (HostEntity.PortEntity A, ..., HostEntity.PortEntity B) Action Pattern
+                    // (Host.Port A, ..., Host.Port B) Action Pattern
                     // i.e., The Action's first and last Events address different Ports.
 
                     if (action.isDragging()) {
@@ -527,10 +528,9 @@ public class ActionHandlerSystem extends System {
 
                 }
 
-            } else if (action.getLastEvent().getTargetEntity() == null) {
-//                    && action.getLastEvent().getTargetImage() == World.getWorld()) { // TODO: Update this so Image isn't used!
+            } else if (action.getLastEvent().getTargetEntity().hasComponent(Workspace.class)) {
 
-                // (HostEntity.PortEntity, ..., World) Action Pattern
+                // (Host.Port, ..., World) Action Pattern
 
                 if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
 

@@ -45,7 +45,7 @@ public class Polyline<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         return vertices;
     }
 

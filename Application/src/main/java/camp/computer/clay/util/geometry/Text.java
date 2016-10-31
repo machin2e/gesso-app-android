@@ -14,7 +14,7 @@ public class Text extends Shape {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         return null;
     }
 

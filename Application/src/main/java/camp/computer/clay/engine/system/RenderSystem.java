@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -27,7 +28,12 @@ public class RenderSystem extends System {
         return true;
     }
 
-    public boolean update(PlatformRenderSurface platformRenderSurface, World world, Canvas canvas) {
+    public boolean update(World world, Canvas canvas) {
+
+        // <HACK>
+        PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
+//        Canvas canvas = platformRenderSurface.canvas;
+        // </HACK>
 
         platformRenderSurface.canvas = canvas;
         Bitmap canvasBitmap = platformRenderSurface.canvasBitmap;

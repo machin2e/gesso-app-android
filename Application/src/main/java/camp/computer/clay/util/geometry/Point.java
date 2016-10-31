@@ -35,7 +35,7 @@ public class Point<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         List<Transform> vertices = new LinkedList<>();
         vertices.add(new Transform(imagePosition));
         return vertices;

@@ -4,13 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.ActionListenerComponent;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
@@ -115,6 +115,7 @@ public class InputSystem extends System {
         }
     }
 
+    // TODO: Move to ActionHandlerSystem
     public void processAction(Action action, Event event) {
 
         switch (event.getType()) {
@@ -122,27 +123,21 @@ public class InputSystem extends System {
             case SELECT: {
 
                 // TODO: Add Boundary component.
-                // TODO: Remove targetImage.
-                // TODO: Replace targetImage with targetBoundary (or better, just use Entity)
 
-                Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
-
-                // Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
-
-                // Set the target image
-                Group<Image> targetImages = Entity.Manager.filterVisibility(true).filterContains(event.getPosition()).getImages();
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : camera.getComponent(Camera.class).getWorld(); // getImage(event.getPosition());
-                event.setTargetImage(targetImage);
-
-                // Set the target Entity
-                event.setTargetEntity(targetImage.getEntity());
-                Entity targetEntity = targetImage.getEntity();
+                Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+                Entity targetEntity = null;
+                if (targetEntities.size() > 0) {
+                    targetEntity = targetEntities.get(0);
+                } else {
+                    Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
+                    targetEntity = workspaces.get(0);
+                }
+                event.setTargetEntity(targetEntity);
 
                 // Action the Event
                 // <HACK>
-                if (targetImage.getClass() == World.class) {
-                    World world = ((World) targetImage);
-                    ActionHandlerSystem.handleWorldAction(world, action);
+                if (targetEntity.hasComponent(Workspace.class)) {
+                    ActionHandlerSystem.handleWorldAction(targetEntity, action);
                 } else if (targetEntity.hasComponent(Host.class)) {
                     ActionHandlerSystem.handleHostAction(targetEntity, action);
                 } else if (targetEntity.hasComponent(Extension.class)) {
@@ -159,23 +154,20 @@ public class InputSystem extends System {
 
             case HOLD: {
 
-                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
-
-                // Set the target image
-//                Group<Image> targetImages = Entity.Manager.getImages().filterVisibility(true).filterContains(event.getPosition());
-                Group<Image> targetImages = Entity.Manager.filterVisibility(true).filterContains(event.getPosition()).getImages();
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
-                event.setTargetImage(targetImage);
-
-                // Set the target Entity
-                event.setTargetEntity(targetImage.getEntity());
-                Entity targetEntity = targetImage.getEntity();
+                Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+                Entity targetEntity = null;
+                if (targetEntities.size() > 0) {
+                    targetEntity = targetEntities.get(0);
+                } else {
+                    Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
+                    targetEntity = workspaces.get(0);
+                }
+                event.setTargetEntity(targetEntity);
 
                 // Action the event
                 // <HACK>
-                if (targetImage.getClass() == World.class) {
-                    World world = ((World) targetImage);
-                    ActionHandlerSystem.handleWorldAction(world, action);
+                if (targetEntity.hasComponent(Workspace.class)) {
+                    ActionHandlerSystem.handleWorldAction(targetEntity, action);
                 } else if (targetEntity.hasComponent(Host.class)) {
                     ActionHandlerSystem.handleHostAction(targetEntity, action);
                 } else if (targetEntity.hasComponent(Extension.class)) {
@@ -192,31 +184,25 @@ public class InputSystem extends System {
 
             case MOVE: {
 
-                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
-
                 // Classify/Callback
                 if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
-                    // Set the target image
-                    Group<Image> targetImages = Entity.Manager.filterVisibility(true).filterContains(event.getPosition()).getImages();
-                    Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
-                    event.setTargetImage(targetImage);
+                    Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+                    Entity targetEntity = null;
+                    if (targetEntities.size() > 0) {
+                        targetEntity = targetEntities.get(0);
+                    } else {
+                        Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
+                        targetEntity = workspaces.get(0);
+                    }
+                    event.setTargetEntity(targetEntity);
 
-                    // Action the event
-                    // <HACK>
-                    Image firstImage = action.getFirstEvent().getTargetImage();
-
-                    // Set the target Entity
-                    event.setTargetEntity(targetImage.getEntity());
-
-                    Entity targetEntity = firstImage.getEntity();
+                    targetEntity = event.getAction().getFirstEvent().getTargetEntity();
 
                     // Action the Event
                     // <HACK>
-                    if (firstImage.getClass() == World.class) {
-                        World world = ((World) targetImage);
-//                        World world = ((World) firstImage);
-                        ActionHandlerSystem.handleWorldAction(world, action);
+                    if (targetEntity.hasComponent(Workspace.class)) {
+                        ActionHandlerSystem.handleWorldAction(targetEntity, action);
                     } else if (targetEntity.hasComponent(Host.class)) {
                         ActionHandlerSystem.handleHostAction(targetEntity, action);
                     } else if (targetEntity.hasComponent(Extension.class)) {
@@ -234,31 +220,22 @@ public class InputSystem extends System {
 
             case UNSELECT: {
 
-                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+                Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+                Entity targetEntity = null;
+                if (targetEntities.size() > 0) {
+                    targetEntity = targetEntities.get(0);
+                } else {
+                    Group<Entity> workspaces = Entity.Manager.filterWithComponent(Workspace.class);
+                    targetEntity = workspaces.get(0);
+                }
+                event.setTargetEntity(targetEntity);
 
-                // Stop listening for a hold event
-//                action.timerHandler.removeCallbacks(action.timerRunnable);
-
-                // Set the target image
-                Group<Image> targetImages = Entity.Manager.filterVisibility(true).filterContains(event.getPosition()).getImages();
-                Image targetImage = targetImages.size() > 0 ? targetImages.get(0) : cameraEntity.getComponent(Camera.class).getWorld(); // Image targetImage = getCameraEntity().getWorld().getImage(event.getPosition());
-                event.setTargetImage(targetImage);
-
-                // Action the event
-                // <HACK>
-                Image firstImage = action.getFirstEvent().getTargetImage();
-
-                // Set the target Entity
-                event.setTargetEntity(targetImage.getEntity());
-
-                Entity targetEntity = firstImage.getEntity();
+                targetEntity = event.getAction().getFirstEvent().getTargetEntity();
 
                 // Action the Event
                 // <HACK>
-                if (firstImage.getClass() == World.class) {
-                    World world = ((World) targetImage);
-//                        World world = ((World) firstImage);
-                    ActionHandlerSystem.handleWorldAction(world, action);
+                if (targetEntity.hasComponent(Workspace.class)) {
+                    ActionHandlerSystem.handleWorldAction(targetEntity, action);
                 } else if (targetEntity.hasComponent(Host.class)) {
                     ActionHandlerSystem.handleHostAction(targetEntity, action);
                 } else if (targetEntity.hasComponent(Extension.class)) {

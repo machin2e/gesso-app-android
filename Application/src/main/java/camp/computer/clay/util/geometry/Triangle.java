@@ -38,7 +38,7 @@ public class Triangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         List<Transform> vertices = new LinkedList<>();
         vertices.add(a);
         vertices.add(b);

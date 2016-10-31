@@ -16,6 +16,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.Workspace;
 
 public final class Entity extends Groupable {
 
@@ -103,6 +104,7 @@ public final class Entity extends Groupable {
     protected Camera camera = null;
     protected Label label = null;
     protected Visibility visibility = null;
+    protected Workspace workspace = null;
     // </TEMPORARY_COMPONENTS_REFERENCES>
 
 
@@ -132,6 +134,8 @@ public final class Entity extends Groupable {
             this.label = (Label) component;
         } else if (component instanceof Visibility) {
             this.visibility = (Visibility) component;
+        } else if (component instanceof Workspace) {
+            this.workspace = (Workspace) component;
         }
 
         // Associate with Entity
@@ -165,6 +169,8 @@ public final class Entity extends Groupable {
             return type.cast(this.label);
         } else if (type == Visibility.class) {
             return type.cast(this.visibility);
+        } else if (type == Workspace.class) {
+            return type.cast(this.workspace);
         } else {
             return null;
         }

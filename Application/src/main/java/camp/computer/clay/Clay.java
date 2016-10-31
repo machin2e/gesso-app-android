@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -76,8 +77,8 @@ public class Clay {
         createEntity(Camera.class);
 
         // Create inputSystem and setAbsolute perspective
-        InputSystem inputSystem = new InputSystem();
-        this.world.addActor(inputSystem);
+//        InputSystem inputSystem = new InputSystem();
+//        this.world.addActor(inputSystem);
 
         Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -85,7 +86,7 @@ public class Clay {
         cameraEntity.getComponent(Camera.class).setWorld(world);
 
         // Add inputSystem to model
-        world.addActor(inputSystem);
+//        world.addActor(inputSystem);
 
         Application.getView().getPlatformRenderSurface().setWorld(world);
 
@@ -160,6 +161,7 @@ public class Clay {
         host.addComponent(new Portable()); // Add Portable Component (so can add Ports)
         host.addComponent(new Transform());
         host.addComponent(new Image());
+        host.addComponent(new Boundary());
         host.addComponent(new Visibility());
 
         // Portable Component (Image Component depends on this)
@@ -229,11 +231,11 @@ public class Clay {
     private static Entity createExtensionEntity() {
 
         // Create Entity
-        Entity extensionEntity = new Entity();
+        Entity extension = new Entity();
 
         // Add Components
-        extensionEntity.addComponent(new Extension()); // Unique to Extension
-        extensionEntity.addComponent(new Portable());
+        extension.addComponent(new Extension()); // Unique to Extension
+        extension.addComponent(new Portable());
 
         // <PORTABLE_COMPONENT>
         // Create Ports and add them to the ExtensionEntity
@@ -243,26 +245,27 @@ public class Clay {
             Entity portEntity = Clay.createEntity(Port.class);
 
             portEntity.getComponent(Port.class).setIndex(j);
-            extensionEntity.getComponent(Portable.class).addPort(portEntity);
+            extension.getComponent(Portable.class).addPort(portEntity);
         }
         // </PORTABLE_COMPONENT>
 
         // Add Components
-        extensionEntity.addComponent(new Transform());
-        extensionEntity.addComponent(new Image());
-        extensionEntity.addComponent(new Visibility());
+        extension.addComponent(new Transform());
+        extension.addComponent(new Image());
+        extension.addComponent(new Boundary());
+        extension.addComponent(new Visibility());
 
         // <LOAD_GEOMETRY_FROM_FILE>
         Rectangle rectangle;
 
         // Create Shapes for Image
-        rectangle = new Rectangle(extensionEntity);
+        rectangle = new Rectangle(extension);
         rectangle.setWidth(200);
         rectangle.setHeight(200);
         rectangle.setLabel("Board");
         rectangle.setColor("#ff53BA5D"); // Gray: #f7f7f7, Greens: #32CD32
         rectangle.setOutlineThickness(0);
-        extensionEntity.getComponent(Image.class).addShape(rectangle);
+        extension.getComponent(Image.class).addShape(rectangle);
 
         // Headers
         rectangle = new Rectangle(50, 14);
@@ -271,20 +274,20 @@ public class Clay {
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-        extensionEntity.getComponent(Image.class).addShape(rectangle);
+        extension.getComponent(Image.class).addShape(rectangle);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Image Component
         // TODO: Application.getView().restoreGeometry(this, "Geometry.json");
 
-        return extensionEntity;
+        return extension;
     }
 
     private static Entity createPathEntity() {
-        Entity pathEntity = new Entity();
+        Entity path = new Entity();
 
         // Add Path Component (for type identification)
-        pathEntity.addComponent(new Path());
+        path.addComponent(new Path());
 
         Image pathImage = new Image(); // Create PathEntity Image
 
@@ -300,11 +303,12 @@ public class Clay {
         pathImage.addShape(segment);
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
-        pathEntity.addComponent(new Transform());
-        pathEntity.addComponent(pathImage); // Assign Image to Entity
-        pathEntity.addComponent(new Visibility());
+        path.addComponent(new Transform());
+        path.addComponent(pathImage); // Assign Image to Entity
+        path.addComponent(new Boundary());
+        path.addComponent(new Visibility());
 
-        return pathEntity;
+        return path;
     }
 
     private static Entity createPortEntity() {
@@ -315,6 +319,7 @@ public class Clay {
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
         port.addComponent(new Image());
+        port.addComponent(new Boundary());
         port.addComponent(new Visibility());
         port.addComponent(new Label());
 

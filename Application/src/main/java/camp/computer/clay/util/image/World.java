@@ -1,16 +1,20 @@
 package camp.computer.clay.util.image;
 
+import android.graphics.Canvas;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.system.RenderSystem;
 
 // TODO: DO NOT extend Image. Try to remove World class. If cannot, then consider making it an
 // TODO: (...) Entity and adding a ActionListenerComponent.
@@ -28,7 +32,11 @@ public class World extends Image {
     public Transform pathPrototypeSourcePosition = new Transform(0, 0);
     public Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
-    private List<InputSystem> inputSystems = new LinkedList<>();
+    // <WORLD_SYSTEMS>
+    public RenderSystem renderSystem = new RenderSystem();
+    public BoundarySystem boundarySystem = new BoundarySystem();
+    public InputSystem inputSystem = new InputSystem();
+    // </WORLD_SYSTEMS>
 
     public World() {
         super();
@@ -49,17 +57,12 @@ public class World extends Image {
     }
     // </TODO: DELETE>
 
-    public void addActor(InputSystem inputSystem) {
-        if (!this.inputSystems.contains(inputSystem)) {
-            this.inputSystems.add(inputSystem);
-        }
-    }
+    public void updateSystems(Canvas canvas) {
 
-    // <HACK>
-    public InputSystem getActor() {
-        return this.inputSystems.get(0);
+        world.inputSystem.update(world);
+        world.boundarySystem.update(world);
+        world.renderSystem.update(world, canvas); // TODO: Remove canvas!
     }
-    // </HACK>
 
     /**
      * Sorts {@code Image}s by layer.

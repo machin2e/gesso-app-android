@@ -28,7 +28,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     protected List<Transform> boundary = new ArrayList<>();
 
-    protected boolean isValid = false;
+    public boolean isValid = false;
 
     /**
      * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
@@ -117,7 +117,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         return this.position.rotation;
     }
 
-    protected abstract List<Transform> getVertices();
+    public abstract List<Transform> getVertices();
 
     public abstract void draw(PlatformRenderSurface platformRenderSurface);
 
@@ -192,59 +192,5 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     public String getLabel() {
         return this.label;
-    }
-
-    public void update(Transform referencePoint) {
-        updateGeometry(referencePoint);
-    }
-
-    /**
-     * Updates the {@code Shape}'s geometry. Specifically, computes the absolute positioning,
-     * rotation, and scaling in preparation for drawing and collision detection.
-     *
-     * @param referencePoint Position of the containing {@code Image} relative to which the
-     *                       {@code Shape} will be drawn.
-     */
-    protected void updateGeometry(Transform referencePoint) {
-
-        if (!isValid) {
-            updatePosition(referencePoint); // Update the position
-            updateRotation(referencePoint); // Update rotation
-            updateBoundary(); // Update the bounds (using the results from the updateImage position and rotation)
-            isValid = true;
-        }
-    }
-
-    /**
-     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
-     * the center position of the {@code Shape}. Effectively, this updates the position of the
-     * {@code Shape}.
-     *
-     * @param referencePoint
-     */
-    private void updatePosition(Transform referencePoint) {
-        position.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-        position.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-    }
-
-    private void updateRotation(Transform referencePoint) {
-        this.position.rotation = referencePoint.rotation + imagePosition.rotation;
-    }
-
-    /**
-     * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
-     * detection. Hey there, mango bongo.
-     */
-    protected void updateBoundary() {
-
-        List<Transform> vertices = getVertices();
-        List<Transform> boundary = getBoundary();
-
-        // Translate and rotate the boundary about the updated position
-        for (int i = 0; i < vertices.size(); i++) {
-            boundary.get(i).set(vertices.get(i));
-            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about Image position
-            Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
-        }
     }
 }

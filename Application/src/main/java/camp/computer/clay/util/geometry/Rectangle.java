@@ -7,6 +7,7 @@ import java.util.List;
 import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.util.image.Shape;
 
 public class Rectangle<T extends Entity> extends Shape<T> {
@@ -38,7 +39,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         height = (bottom - top);
 
         setup();
-        updateBoundary(); // TODO: Replace with updateExtensionGeometry(this.position)
+        BoundarySystem.updateShapeBoundary(this); // TODO: Replace with updateExtensionGeometry(this.position)
     }
 
     protected void setup() {
@@ -71,7 +72,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
 
         List<Transform> vertices = new LinkedList<>();
 

@@ -49,7 +49,7 @@ public class Circle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         List<Transform> vertices = new LinkedList<>();
         int segmentCount = BOUNDARY_VERTEX_COUNT - 1;
         for (int i = 0; i < segmentCount; i++) {
