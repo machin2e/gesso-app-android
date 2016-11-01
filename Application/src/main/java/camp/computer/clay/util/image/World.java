@@ -38,6 +38,8 @@ public class World { // extends Image {
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
+    public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
+
     public Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
     public Transform extensionPrototypePosition = new Transform();
 

@@ -1,17 +1,11 @@
 package camp.computer.clay.model.action;
 
-import android.util.Log;
-
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.time.Clock;
 
 public class Event {
-
-    // TODO: Rename "Type" to "Stage" or "Phase". Type should be "Touch", "Sound", "Motion", etc.
-    // TODO: Increase MAXIMUM_POINT_COUNT to 10
-    // TODO: Associate with broader context (e.g., sensor data, including 3D rotation, brightness.
 
     public enum Type {
         NONE,
@@ -54,18 +48,13 @@ public class Event {
     public Event() {
         this.timestamp = Clock.getCurrentTime();
         setup();
-        setupAction();
     }
 
     private void setup() {
         for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
             pointerCoordinates[i] = new Transform(0, 0);
             isPointing[i] = false;
-        }
-    }
 
-    private void setupAction() {
-        for (int i = 0; i < Event.MAXIMUM_POINT_COUNT; i++) {
             isHolding[i] = false;
             isDragging[i] = false;
             dragDistance[i] = 0;

@@ -293,27 +293,19 @@ public class Group<E extends Groupable> implements List<E> {
      * Filters elements that fall within the area defined by {@code shape}.
      *
      * @param point The {@code Shape} covering the area to filter.
-     * @return The {@code ImageGroup} containing the area covered by {@code shape}.
+     * @return {@code Group} of {@code Entity} objects within {@code distance} from {@code point}.
      */
-    // HACK: Expects Group<Image>
-    public Group<Image> filterArea(Transform point, double distance) {
-
-        Group<Image> imageGroup = new Group<>();
-
+    // Expects Group<Entity>
+    public Group<Entity> filterArea(Transform point, double distance) {
+        Group<Entity> entities = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
-
-            Image image = (Image) elements.get(i);
-
-            double distanceToImage = Geometry.distance(point, image.getEntity().getComponent(Transform.class));
-
-            if (distanceToImage < distance) {
-                imageGroup.add(image);
+            Entity entity = (Entity) elements.get(i);
+            double distanceToEntity = Geometry.distance(point, entity.getComponent(Transform.class));
+            if (distanceToEntity < distance) {
+                entities.add(entity);
             }
-
         }
-
-        return imageGroup;
-
+        return entities;
     }
 
     /**
