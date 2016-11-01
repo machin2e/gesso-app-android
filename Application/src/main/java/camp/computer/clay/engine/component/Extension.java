@@ -1,41 +1,20 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.Clay;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.util.image.World;
-
 public class Extension extends Component {
 
     public Extension() {
         super();
     }
 
-    private Profile profile = null;
+    // Flag indicating whether the Extension is stored in a remote database
+    // TODO: Consider replacing with URI or UUID of stored representation.
+    private boolean isPersistent = false;
 
-    public Profile getProfile() {
-        return this.profile;
+    public boolean isPersistent() {
+        return this.isPersistent;
     }
 
-    public boolean hasProfile() {
-        return this.profile != null;
+    public void setPersistent(boolean isPersistent) {
+        this.isPersistent = isPersistent;
     }
-
-    public void setProfile(Profile profile) {
-        // Set the Profile used to configure the ExtensionEntity
-        this.profile = profile;
-
-        // Create Ports to match the Profile
-        for (int i = 0; i < profile.getPorts().size(); i++) {
-
-            Entity portEntity = World.createEntity(Port.class);
-
-            portEntity.getComponent(Port.class).setIndex(i);
-            portEntity.getComponent(Port.class).setType(profile.getPorts().get(i).getType());
-            portEntity.getComponent(Port.class).setDirection(profile.getPorts().get(i).getDirection());
-            getEntity().getComponent(Portable.class).addPort(portEntity);
-        }
-    }
-
-    // </FROM_EXTENSION_ENTITY>
 }

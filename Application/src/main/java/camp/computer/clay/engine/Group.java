@@ -2,10 +2,9 @@ package camp.computer.clay.engine;
 
 import android.support.annotation.NonNull;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.UUID;
@@ -14,7 +13,6 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -24,7 +22,7 @@ import camp.computer.clay.util.image.Shape;
 
 public class Group<E extends Groupable> implements List<E> {
 
-    protected List<E> elements = new LinkedList<>();
+    protected List<E> elements = new ArrayList<>();
 
     public E get(UUID uuid) {
         for (int i = 0; i < elements.size(); i++) {
@@ -44,21 +42,25 @@ public class Group<E extends Groupable> implements List<E> {
         return false;
     }
 
+    // TODO: <BUG>
     public E remove(UUID uuid) {
         E element = get(uuid);
-        remove(element);
+        remove(element); // TODO: BUG. Doesn't actually remove in place!
         return element;
     }
+    // TODO: </BUG>
 
+    // TODO: <BUG>
     public Group<E> remove(E entity) {
         Group<E> group = new Group<>();
         for (int i = 0; i < this.elements.size(); i++) {
-            if (this.elements.get(i) != entity) {
+            if (elements.get(i) != entity) {
                 group.add(this.elements.get(i));
             }
         }
         return group;
     }
+    // TODO: </BUG>
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
@@ -200,16 +202,36 @@ public class Group<E extends Groupable> implements List<E> {
         };
     }
 
-    // Assumes Group<Entity>
+    // Expects Group<Entity>
+    public <E extends Entity> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
+
+        Group<E> group = new Group<>();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+            for (int j = 0; j < componentTypes.length; j++) {
+                Class<? extends Component> type = componentTypes[j];
+                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+                if (entity.hasComponent(type)) {
+                    group.add((E) this.elements.get(i));
+                }
+            }
+        }
+
+        return group;
+    }
+
+    // Expects Group<Entity>
     public Group<E> filterVisibility(boolean isVisible) {
         return filter(Filters.filterVisibility, isVisible); // OR: Mappers.setImageVisibility.filter(this);
     }
 
-    // Assumes Group<Entity>
+    // Expects Group<Entity>
     public Group<E> filterContains(Transform point) {
         return filter(Filters.filterContains, point);
     }
 
+    // Expects Group<Entity>
+    // Requires components: Image
     public void setTransparency(double transparency) {
         map(Mappers.setTransparency, transparency);
     }
@@ -234,12 +256,13 @@ public class Group<E extends Groupable> implements List<E> {
         return shapes;
     }
 
-    // Assumes Group<Entity>
-    // TODO?: Update to handle Shape
+    // Expects Group<Entity>
+    // Requires components: Transform
     public Group<Transform> getPositions() {
         return map(Mappers.getPosition, null);
     }
 
+    // <TODO: REMOVE. REPLACE WITH CALLS TO SHAPES IN IMAGE API.>
     /**
      * Removes elements <em>that do not match</em> the regular expressions defined in
      * {@code labels}.
@@ -270,24 +293,7 @@ public class Group<E extends Groupable> implements List<E> {
 
         return shapeGroup;
     }
-
-    // HACK: Assumes Group<Entity>
-    public <E extends Entity> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
-
-        Group<E> group = new Group<>();
-
-        for (int i = 0; i < this.elements.size(); i++) {
-            for (int j = 0; j < componentTypes.length; j++) {
-                Class<? extends Component> type = componentTypes[j];
-                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
-                if (entity.hasComponent(type)) {
-                    group.add((E) this.elements.get(i));
-                }
-            }
-        }
-
-        return group;
-    }
+    // </TODO: REMOVE. REPLACE WITH CALLS TO SHAPES IN IMAGE API.>
 
     /**
      * Filters elements that fall within the area defined by {@code shape}.
@@ -339,7 +345,7 @@ public class Group<E extends Groupable> implements List<E> {
         return Geometry.getCenterPoint(getPositions());
     }
 
-    // HACK: Assumes Group<Shape>
+    // Expects Group<Shape>
     public Group<Transform> getVertices() {
         Group<Transform> positions = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
@@ -352,7 +358,7 @@ public class Group<E extends Groupable> implements List<E> {
     // Expects Group<Entity>
     public Rectangle getBoundingBox() {
 
-        List<Transform> imageBoundaries = new LinkedList<>();
+        List<Transform> imageBoundaries = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
             Boundary boundary = entity.getComponent(Boundary.class);

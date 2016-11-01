@@ -3,7 +3,6 @@ package camp.computer.clay.engine.system;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -59,7 +58,6 @@ public class BoundarySystem extends System {
         // Update Shapes
         for (int i = 0; i < image.getShapes().size(); i++) {
             Shape shape = image.getShapes().get(i);
-//            shape.update(image.getEntity().getComponent(Transform.class));
             BoundarySystem.updateShapeGeometry(shape, image.getEntity().getComponent(Transform.class));
         }
     }
@@ -232,6 +230,7 @@ public class BoundarySystem extends System {
 
 
     ////////////////// SHAPE !!!!!!!!!!!!!!!!!!!!!!!!!!
+    // TODO: Move into Image API specific to my shape-based Image format.
 
     /**
      * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision

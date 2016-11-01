@@ -135,7 +135,7 @@ public final class Entity extends Groupable {
     public <C extends Component> C removeComponent(Class<C> type) {
         C component = getComponent(type);
         if (component != null) {
-            components.remove(component);
+            components.remove(component); // TODO: FIX THIS BUG! This doesn't actually remove the component in place. It returns a new Group without the element!
         }
         return component;
     }

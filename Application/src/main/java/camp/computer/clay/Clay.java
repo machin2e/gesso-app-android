@@ -14,6 +14,8 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.PlatformInterface;
 import camp.computer.clay.host.InternetInterface;
@@ -33,10 +35,10 @@ public class Clay {
 
     private Cache cache = null;
 
-    // Group of discovered touchscreen phoneHosts
+    // Group of discovered touchscreen PhoneHosts
     private List<PlatformInterface> platforms = new ArrayList<>();
 
-    // Group of discovered phoneHosts
+    // Group of discovered PhoneHosts
     private List<PhoneHost> phoneHosts = new ArrayList<>();
 
     private List<Profile> profiles = new ArrayList<>();
@@ -72,25 +74,48 @@ public class Clay {
         // </TEST>
 
         // <HACK>
+        // TODO: Place in a LayoutSystem
         this.world.adjustLayout();
         // </HACK>
     }
 
     // <EXTENSION_IMAGE_HELPERS>
+    // TODO: Come up with better way to determine if the Extension already exists in the database.
+    // TODO: Make more general for all Portables.
+    public static void configureFromProfile(Entity extension, Profile profile) {
+
+        // Create Ports to match the Profile
+        for (int i = 0; i < profile.getPorts().size(); i++) {
+
+            Entity port = World.createEntity(Port.class);
+
+            port.getComponent(Port.class).setIndex(i);
+            port.getComponent(Port.class).setType(profile.getPorts().get(i).getType());
+            port.getComponent(Port.class).setDirection(profile.getPorts().get(i).getDirection());
+
+            extension.getComponent(Portable.class).addPort(port);
+        }
+
+        // Set persistent to indicate the Extension is stored in a remote database
+        // TODO: Replace with something more useful, like the URI or UUID of stored object in database
+        extension.getComponent(Extension.class).setPersistent(true);
+    }
+
     // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
     public static void createExtensionProfile(final Entity extension) {
-        if (!extension.getComponent(Extension.class).hasProfile()) {
+        if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Profile)
             Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
-                    // Create ExtensionEntity Profile
+
+                    // Create Extension Profile
                     Profile profile = new Profile(extension);
                     profile.setLabel(text);
 
                     // Assign the Profile to the ExtensionEntity
-                    extension.getComponent(Extension.class).setProfile(profile);
+                    Clay.configureFromProfile(extension, profile);
 
                     // Cache the new ExtensionEntity Profile
                     Application.getView().getClay().getProfiles().add(profile);
@@ -111,10 +136,6 @@ public class Clay {
     }
     // </EXTENSION_IMAGE_HELPERS>
 
-    /*
-     * Clay's essential operating system functions.
-     */
-
     public void addHost(MessengerInterface messageManager) {
         this.messenger.addHost(messageManager);
     }
@@ -122,10 +143,6 @@ public class Clay {
     public void addResource(InternetInterface networkResource) {
         this.internet.addHost(networkResource);
     }
-
-    /*
-     * Clay's infrastructure management functions.
-     */
 
     /**
      * Adds a view to Clay. This makes the view available for use in systems built with Clay.

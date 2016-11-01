@@ -196,13 +196,12 @@ public class EventHandlerSystem extends System {
             camera.getComponent(Camera.class).setFocus(host);
 
             if (host.getComponent(Portable.class).getExtensions().size() > 0) {
-//                                World.getWorld().getImages(getHost().getExtensions()).setTransparency(1.0);
                 host.getComponent(Portable.class).getExtensions().setTransparency(0.1);
 
                 // <HACK>
                 // TODO: Replace ASAP. This is shit.
                 // TODO: Use "rectangle" or "circular" extension layout algorithms
-                host.getComponent(Host.class).setExtensionDistance(World.HOST_TO_EXTENSION_LONG_DISTANCE);
+                PortableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
                 // </HACK>
             }
 
@@ -257,7 +256,7 @@ public class EventHandlerSystem extends System {
                         public void onComplete(Profile profile) {
 
                             // Add Extension from Profile
-                            Entity extension = host.getComponent(Host.class).restoreExtension(profile, event.getPosition());
+                            Entity extension = PortableLayoutSystem.restoreExtension(host, profile, event.getPosition());
 
                             // Camera
                             camera.getComponent(Camera.class).setFocus(extension);
@@ -410,7 +409,8 @@ public class EventHandlerSystem extends System {
                     extension.getComponent(Portable.class).getPorts().setVisibility(true);
 
                     if (extension.hasComponent(Extension.class)) { // HACK
-                        if (extension.getComponent(Extension.class).getProfile() == null) {
+                        //if (extension.getComponent(Extension.class).getProfile() == null) {
+                        if (!extension.getComponent(Extension.class).isPersistent()) {
 
                             // Determine if a new Port is required on the custom Extension
                             boolean addNewPort = true;
@@ -468,7 +468,8 @@ public class EventHandlerSystem extends System {
 
                     Port portComponent = portEntity.getComponent(Port.class);
 
-                    if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
+                    //if (portComponent.getExtension() == null || portComponent.getExtension().getComponent(Extension.class).getProfile() == null) {
+                    if (portComponent.getExtension() == null || !portComponent.getExtension().getComponent(Extension.class).isPersistent()) {
 
                         if (portComponent.getType() == Port.Type.NONE) {
 
@@ -552,7 +553,7 @@ public class EventHandlerSystem extends System {
                     Entity hostPort = event.getFirstEvent().getTarget();
 
                     // Create new custom Extension. Custom Extension can be configured manually.
-                    Entity extension = port.getParent().getComponent(Host.class).createExtension(hostPort, event.getPosition());
+                    PortableLayoutSystem.createExtension(hostPort, event.getPosition());
 
                     // Set Camera focus on the Extension
                     // camera.setFocus(extension);

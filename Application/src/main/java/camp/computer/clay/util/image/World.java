@@ -19,6 +19,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Point;
@@ -430,7 +431,7 @@ public class World { // extends Image {
             Entity extension = extensionImage.getEntity();
             if (extension.getComponent(Portable.class).getHosts().size() > 0) {
                 Entity hostEntity = extension.getComponent(Portable.class).getHosts().get(0);
-                hostEntity.getComponent(Host.class).setExtensionDistance(distance);
+                PortableLayoutSystem.setExtensionDistance(hostEntity, distance);
             }
         }
         // </HACK>
