@@ -3,6 +3,7 @@ package camp.computer.clay;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class Clay {
         // </TEST>
 
         // <HACK>
-        World.getWorld().adjustLayout();
+        this.world.adjustLayout();
         // </HACK>
     }
 

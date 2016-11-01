@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.system;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,6 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.action.Action;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.World;
 
@@ -23,7 +24,9 @@ public class InputSystem extends System {
 
     private List<Event> incomingEvents = new ArrayList<>();
 
-    private List<Action> actions = new ArrayList<>();
+//    private List<Action> actions = new ArrayList<>();
+
+    private Event previousEvent = null;
 
     public InputSystem() {
     }
@@ -32,9 +35,9 @@ public class InputSystem extends System {
 
         while (incomingEvents.size() > 0) {
             Event event = dequeueEvent();
-            Action action = processEvent(event);
+            Event processedEvent = processEvent(event);
 
-            processAction(action);
+            processAction(processedEvent);
         }
 
         return true;
@@ -51,62 +54,91 @@ public class InputSystem extends System {
         return null;
     }
 
-    private Action processEvent(Event event) {
+    private Event processEvent(Event event) {
 
         switch (event.getType()) {
 
             case SELECT: {
 
                 // Create a new Action
-                Action action = new Action();
-                action.setInputSystem(this);
-                actions.add(action);
+//                Action action = new Action();
+//                action.setInputSystem(this);
+//                actions.add(action);
+//
+//                // Add Event to Action
+//                action.addEvent(event);
+//
+//                // Record actions on timeline
+//                // TODO: Cache and store the queueEvent actions before deleting them completely! Do it in
+//                // TODO: (cont'd) a background thread.
+//                if (actions.size() > 3) {
+//                    actions.remove(0);
+//                }
 
-                // Add Event to Action
-                action.addEvent(event);
-
-                // Record actions on timeline
-                // TODO: Cache and store the queueEvent actions before deleting them completely! Do it in
-                // TODO: (cont'd) a background thread.
-                if (actions.size() > 3) {
-                    actions.remove(0);
+                previousEvent = null;
+                if (previousEvent != null) {
+                    event.previousEvent = previousEvent;
+                } else {
+                    event.previousEvent = null;
                 }
+                previousEvent = event;
 
-                return action;
+                return event;
             }
 
             case HOLD: {
 
                 // Start a new action
-                Action action = getAction();
-                actions.add(action);
+//                Action action = getAction();
+//                actions.add(action);
+//
+//                // Add event to action
+//                action.addEvent(event);
 
-                // Add event to action
-                action.addEvent(event);
+                if (previousEvent != null) {
+                    event.previousEvent = previousEvent;
+                } else {
+                    event.previousEvent = null;
+                }
+                previousEvent = event;
 
-                return action;
+                return event;
             }
 
             case MOVE: {
 
-                Action action = getAction();
-                action.addEvent(event);
+//                Action action = getAction();
+//                action.addEvent(event);
+//
+//                // Current
+//                event.isPointing[event.pointerIndex] = true;
 
-                // Current
-                event.isPointing[event.pointerIndex] = true;
+                if (previousEvent != null) {
+                    event.previousEvent = previousEvent;
+                } else {
+                    event.previousEvent = null;
+                }
+                previousEvent = event;
 
-                return action;
+                return event;
             }
 
             case UNSELECT: {
 
-                Action action = getAction();
-                action.addEvent(event);
+//                Action action = getAction();
+//                action.addEvent(event);
+//
+//                // Current
+//                event.isPointing[event.pointerIndex] = false;
 
-                // Current
-                event.isPointing[event.pointerIndex] = false;
+                if (previousEvent != null) {
+                    event.previousEvent = previousEvent;
+                } else {
+                    event.previousEvent = null;
+                }
+                previousEvent = event;
 
-                return action;
+                return event;
             }
         }
 
@@ -114,9 +146,9 @@ public class InputSystem extends System {
     }
 
     // TODO: Move to ActionHandlerSystem
-    public void processAction(Action action) {
+    public void processAction(Event event) {
 
-        Event event = action.getLastEvent();
+//        Event event = action.getLastEvent();
 
         switch (event.getType()) {
 
@@ -137,15 +169,15 @@ public class InputSystem extends System {
                 // Action the Event
                 // <HACK>
                 if (targetEntity.hasComponent(Workspace.class)) {
-                    ActionHandlerSystem.handleWorldAction(targetEntity, action);
+                    ActionHandlerSystem.handleWorldAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Host.class)) {
-                    ActionHandlerSystem.handleHostAction(targetEntity, action);
+                    ActionHandlerSystem.handleHostAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Extension.class)) {
-                    ActionHandlerSystem.handleExtensionAction(targetEntity, action);
+                    ActionHandlerSystem.handleExtensionAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Port.class)) {
-                    ActionHandlerSystem.handlePortAction(targetEntity, action);
+                    ActionHandlerSystem.handlePortAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Path.class)) {
-                    ActionHandlerSystem.handlePathAction(targetEntity, action);
+                    ActionHandlerSystem.handlePathAction(targetEntity, event);
                 }
                 // </HACK>
 
@@ -167,15 +199,15 @@ public class InputSystem extends System {
                 // Action the event
                 // <HACK>
                 if (targetEntity.hasComponent(Workspace.class)) {
-                    ActionHandlerSystem.handleWorldAction(targetEntity, action);
+                    ActionHandlerSystem.handleWorldAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Host.class)) {
-                    ActionHandlerSystem.handleHostAction(targetEntity, action);
+                    ActionHandlerSystem.handleHostAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Extension.class)) {
-                    ActionHandlerSystem.handleExtensionAction(targetEntity, action);
+                    ActionHandlerSystem.handleExtensionAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Port.class)) {
-                    ActionHandlerSystem.handlePortAction(targetEntity, action);
+                    ActionHandlerSystem.handlePortAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Path.class)) {
-                    ActionHandlerSystem.handlePathAction(targetEntity, action);
+                    ActionHandlerSystem.handlePathAction(targetEntity, event);
                 }
                 // </HACK>
 
@@ -185,7 +217,7 @@ public class InputSystem extends System {
             case MOVE: {
 
                 // Classify/Callback
-                if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
+//                if (action.getDragDistance() > Event.MINIMUM_DRAG_DISTANCE) {
 
                     Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
                     Entity targetEntity = null;
@@ -197,23 +229,24 @@ public class InputSystem extends System {
                     }
                     event.setTarget(targetEntity);
 
-                    targetEntity = event.getAction().getFirstEvent().getTarget();
+//                    targetEntity = event.getAction().getFirstEvent().getTarget();
+                    targetEntity = event.getFirstEvent().getTarget();
 
                     // Action the Event
                     // <HACK>
                     if (targetEntity.hasComponent(Workspace.class)) {
-                        ActionHandlerSystem.handleWorldAction(targetEntity, action);
+                        ActionHandlerSystem.handleWorldAction(targetEntity, event);
                     } else if (targetEntity.hasComponent(Host.class)) {
-                        ActionHandlerSystem.handleHostAction(targetEntity, action);
+                        ActionHandlerSystem.handleHostAction(targetEntity, event);
                     } else if (targetEntity.hasComponent(Extension.class)) {
-                        ActionHandlerSystem.handleExtensionAction(targetEntity, action);
+                        ActionHandlerSystem.handleExtensionAction(targetEntity, event);
                     } else if (targetEntity.hasComponent(Port.class)) {
-                        ActionHandlerSystem.handlePortAction(targetEntity, action);
+                        ActionHandlerSystem.handlePortAction(targetEntity, event);
                     } else if (targetEntity.hasComponent(Path.class)) {
-                        ActionHandlerSystem.handlePathAction(targetEntity, action);
+                        ActionHandlerSystem.handlePathAction(targetEntity, event);
                     }
                     // </HACK>
-                }
+//                }
 
                 break;
             }
@@ -230,20 +263,21 @@ public class InputSystem extends System {
                 }
                 event.setTarget(targetEntity);
 
-                targetEntity = event.getAction().getFirstEvent().getTarget();
+//                targetEntity = event.getAction().getFirstEvent().getTarget();
+                targetEntity = event.getFirstEvent().getTarget();
 
                 // Action the Event
                 // <HACK>
                 if (targetEntity.hasComponent(Workspace.class)) {
-                    ActionHandlerSystem.handleWorldAction(targetEntity, action);
+                    ActionHandlerSystem.handleWorldAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Host.class)) {
-                    ActionHandlerSystem.handleHostAction(targetEntity, action);
+                    ActionHandlerSystem.handleHostAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Extension.class)) {
-                    ActionHandlerSystem.handleExtensionAction(targetEntity, action);
+                    ActionHandlerSystem.handleExtensionAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Port.class)) {
-                    ActionHandlerSystem.handlePortAction(targetEntity, action);
+                    ActionHandlerSystem.handlePortAction(targetEntity, event);
                 } else if (targetEntity.hasComponent(Path.class)) {
-                    ActionHandlerSystem.handlePathAction(targetEntity, action);
+                    ActionHandlerSystem.handlePathAction(targetEntity, event);
                 }
                 // </HACK>
 
@@ -258,15 +292,15 @@ public class InputSystem extends System {
      *
      * @return The most recent interaction.
      */
-    private Action getAction() {
-        if (actions.size() > 0) {
-            return actions.get(actions.size() - 1);
-        } else {
-            return null;
-        }
-    }
+//    private Action getAction() {
+//        if (actions.size() > 0) {
+//            return actions.get(actions.size() - 1);
+//        } else {
+//            return null;
+//        }
+//    }
 
-    public List<Action> getActions() {
-        return this.actions;
-    }
+//    public List<Action> getActions() {
+//        return this.actions;
+//    }
 }

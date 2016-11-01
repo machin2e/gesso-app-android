@@ -83,7 +83,7 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        World world = platformRenderSurface.getWorld();
+//        World world = platformRenderSurface.getWorld();
 
         canvas.save();
 
