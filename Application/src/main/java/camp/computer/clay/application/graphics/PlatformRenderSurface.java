@@ -16,6 +16,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.system.InputSystem;
@@ -220,6 +222,13 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     holdTimerHandler.removeCallbacks(holdTimerRunnable);
                     holdTimerHandler.postDelayed(holdTimerRunnable, Event.MINIMUM_HOLD_DURATION);
 
+//                    new Timer().schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            // this code will be executed after 2 seconds
+//                        }
+//                    }, 2000);
+
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
                     inputSystem.queueEvent(event);
@@ -268,12 +277,63 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //
 //            isHolding[pointerIndex] = true;
 
-            Log.v("HoldCallback", "Holding");
+            InputSystem inputSystem = world.inputSystem;
+
+            Event event = new Event();
+            // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+            // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+            event.setType(Event.Type.HOLD);
+            event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+            inputSystem.queueEvent(event);
 
 //                }
 //            }
         }
     };
+
+    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
+//                new Timer().schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        // this code will be executed after 2 seconds
+//
+//                        Event event = new Event();
+//                        // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+//                        // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+//                        event.setType(Event.Type.HOLD);
+//                        event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+//                        queueEvent(event);
+//
+//                        Log.v("HoldCallback", "Holding");
+//                    }
+//                }, 1000);
+
+//                final Handler handler = new Handler();
+
+//                Thread thread = new Thread() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            sleep(1000);
+//
+//                            Log.v("HOLD", "WAAAAAAAAAAIT");
+//
+//                            // If needs to run on UI thread.
+//                            /*
+//                            Application.getView().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//                                }
+//                            });
+//                            */
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                };
+//
+//                thread.start();
 
     /**
      * The function run in background thread, not UI thread.

@@ -17,6 +17,7 @@ public class Host extends Component {
         setupHeaderExtensions();
     }
 
+    // TODO: Put this into initialization code that reads HDL from file.
     public void setupHeaderExtensions() {
         headerExtensions.add(new ArrayList<Entity>());
         headerExtensions.add(new ArrayList<Entity>());

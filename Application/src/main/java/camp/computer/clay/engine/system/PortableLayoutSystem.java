@@ -102,11 +102,8 @@ public class PortableLayoutSystem extends System {
 
         // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
-        // Create the ExtensionEntity
-        Entity extension = new Entity();
-
-        // Add Extension Component (for type identification)
-        extension.addComponent(new Extension());
+        // Create the Extension
+        Entity extension = World.createEntity(Extension.class);
 
         // <HACK>
         // TODO: Remove references to Profile in Portables. Remove Profile altogether!?
