@@ -1,5 +1,6 @@
 package camp.computer.clay.engine.system;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
@@ -14,7 +15,6 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
@@ -22,20 +22,72 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.World;
 import camp.computer.clay.util.image.Visibility;
 
-public class ActionHandlerSystem extends System {
+public class EventHandlerSystem extends System {
+
     // TODO: Rename to EventManager, ActionManager, or something like that.
     // TODO: Allow Entities to register for specific Events/Actions.
+
+    private List<Event> incomingEvents = new ArrayList<>();
+
+    public EventHandlerSystem() {
+    }
 
     @Override
     public boolean update(World world) {
 
-        // TODO: Dequeue actions and apply them to the targeted Entity (calling one of the below functions)
+        // Dequeue actions and apply them to the targeted Entity
+        while (incomingEvents.size() > 0) {
+            Event event = dequeueEvent();
+            dispatchEvent(event);
+        }
 
-        return false;
+        return true;
+    }
+
+    public void queueEvent(Event event) {
+        incomingEvents.add(event);
+    }
+
+    private Event dequeueEvent() {
+        if (incomingEvents.size() > 0) {
+            return incomingEvents.remove(0);
+        }
+        return null;
+    }
+
+    private void dispatchEvent(Event event) {
+
+        // Annotate the Event
+        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+        Entity targetEntity = null;
+        if (targetEntities.size() > 0) {
+            targetEntity = targetEntities.get(0);
+        } else {
+            Group<Entity> cameras = Entity.Manager.filterWithComponent(Camera.class);
+            targetEntity = cameras.get(0);
+        }
+        event.setTarget(targetEntity);
+
+        if (event.getType() == Event.Type.MOVE || event.getType() == Event.Type.UNSELECT) {
+            targetEntity = event.getFirstEvent().getTarget();
+        }
+
+        // Dispatch the Event
+        if (targetEntity.hasComponent(Camera.class)) {
+            EventHandlerSystem.handleCameraEvent(targetEntity, event);
+        } else if (targetEntity.hasComponent(Host.class)) {
+            EventHandlerSystem.handleHostEvent(targetEntity, event);
+        } else if (targetEntity.hasComponent(Extension.class)) {
+            EventHandlerSystem.handleExtensionEvent(targetEntity, event);
+        } else if (targetEntity.hasComponent(Port.class)) {
+            EventHandlerSystem.handlePortEvent(targetEntity, event);
+        } else if (targetEntity.hasComponent(Path.class)) {
+            EventHandlerSystem.handlePathEvent(targetEntity, event);
+        }
     }
 
     // TODO: Make World an Entity?
-    public static void handleWorldAction(final Entity workspace, Event event) {
+    public static void handleCameraEvent(final Entity workspace, Event event) {
 
         Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -80,7 +132,7 @@ public class ActionHandlerSystem extends System {
         }
     }
 
-    public static void handleHostAction(final Entity host, final Event event) {
+    public static void handleHostEvent(final Entity host, final Event event) {
 
         final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -219,7 +271,7 @@ public class ActionHandlerSystem extends System {
         }
     }
 
-    public static void handleExtensionAction(final Entity extension, Event event) {
+    public static void handleExtensionEvent(final Entity extension, Event event) {
 
         final Image extensionImage = extension.getComponent(Image.class);
 
@@ -288,7 +340,7 @@ public class ActionHandlerSystem extends System {
 //        }
     }
 
-    public static void handlePortAction(final Entity port, Event event) {
+    public static void handlePortEvent(final Entity port, Event event) {
 
         final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -486,7 +538,7 @@ public class ActionHandlerSystem extends System {
 
                 }
 
-            } else if (event.getTarget().hasComponent(Workspace.class)) {
+            } else if (event.getTarget().hasComponent(Camera.class)) {
 
                 // (Host.Port, ..., World) Action Pattern
 
@@ -508,7 +560,7 @@ public class ActionHandlerSystem extends System {
         }
     }
 
-    public static void handlePathAction(final Entity path, Event event) {
+    public static void handlePathEvent(final Entity path, Event event) {
 
         if (event.getType() == Event.Type.NONE) {
 

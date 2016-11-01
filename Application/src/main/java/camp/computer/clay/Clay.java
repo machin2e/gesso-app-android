@@ -3,7 +3,6 @@ package camp.computer.clay;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Workspace;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.host.PlatformInterface;
 import camp.computer.clay.host.InternetInterface;
@@ -64,8 +62,6 @@ public class Clay {
         World.createEntity(Camera.class);
 
         Application.getView().getPlatformRenderSurface().setWorld(world);
-
-        World.createEntity(Workspace.class);
 
         // <TEST>
         World.createEntity(Host.class);

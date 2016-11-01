@@ -2,10 +2,6 @@ package camp.computer.clay.util.image;
 
 import android.graphics.Canvas;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import camp.computer.clay.Clay;
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -15,7 +11,7 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Workspace;
+import camp.computer.clay.engine.system.EventHandlerSystem;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
@@ -52,6 +48,7 @@ public class World { // extends Image {
     public RenderSystem renderSystem = new RenderSystem();
     public BoundarySystem boundarySystem = new BoundarySystem();
     public InputSystem inputSystem = new InputSystem();
+    public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem();
     // </WORLD_SYSTEMS>
 
     public World() {
@@ -86,21 +83,9 @@ public class World { // extends Image {
             return createPortEntity();
         } else if (entityType == Camera.class) {
             return createCameraEntity();
-        } else if (entityType == Workspace.class) {
-            return createWorkspaceEntity();
         } else {
             return null;
         }
-    }
-
-    public static Entity createWorkspaceEntity() {
-
-        Entity workspace = new Entity();
-
-        // Add Components
-        workspace.addComponent(new Workspace()); // Unique to Workspace
-
-        return workspace;
     }
 
     /**
@@ -310,6 +295,7 @@ public class World { // extends Image {
 
     public void updateSystems(Canvas canvas) {
         world.inputSystem.update(world);
+        world.eventHandlerSystem.update(world);
         world.boundarySystem.update(world);
         world.renderSystem.update(world, canvas); // TODO: Remove canvas!
         world.cameraSystem.update(world);
