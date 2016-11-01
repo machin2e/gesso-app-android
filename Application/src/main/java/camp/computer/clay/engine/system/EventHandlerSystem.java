@@ -68,6 +68,7 @@ public class EventHandlerSystem extends System {
         }
         event.setTarget(targetEntity);
 
+        // Handle special cases for MOVE and UNSELECT actions
         if (event.getType() == Event.Type.MOVE || event.getType() == Event.Type.UNSELECT) {
             targetEntity = event.getFirstEvent().getTarget();
         }

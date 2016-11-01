@@ -29,9 +29,6 @@ public class Event {
     private boolean[] isDragging = new boolean[Event.MAXIMUM_POINT_COUNT];
     private double[] dragDistance = new double[Event.MAXIMUM_POINT_COUNT];
 
-    /**
-     * The pointerCoordinates at which actions were performed (e.g., the touch pointerCoordinates on a touchscreen).
-     */
     public Transform[] pointerCoordinates = new Transform[MAXIMUM_POINT_COUNT];
 
     // TODO: Delete this!
@@ -60,27 +57,6 @@ public class Event {
             dragDistance[i] = 0;
         }
     }
-
-    public boolean hasPoints() { // was hasTouches
-        for (int i = 0; i < MAXIMUM_POINT_COUNT; i++) {
-            if (isPointing[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-//    public boolean hasAction() {
-//        return parentAction != null;
-//    }
-//
-//    public void setAction(Action action) {
-//        this.parentAction = action;
-//    }
-//
-//    public Action getAction() {
-//        return this.parentAction;
-//    }
 
     public Type getType() {
         return this.type;
@@ -114,8 +90,6 @@ public class Event {
         return this.targets[0];
     }
 
-
-
     // <INTEGRATE_WITH_ACTION>
     public Event previousEvent = null;
 
@@ -130,7 +104,6 @@ public class Event {
     }
 
     public long getDuration() {
-//        return getLastEvent().getTimestamp() - getFirstEvent().getTimestamp();
         return getTimestamp() - getFirstEvent().getTimestamp();
     }
 
@@ -139,7 +112,6 @@ public class Event {
     }
 
     public boolean isDragging() {
-//        return isDragging[getLastEvent().pointerIndex];
         return isDragging[pointerIndex];
     }
 
@@ -148,13 +120,11 @@ public class Event {
     }
 
     public double getDragDistance() {
-//        return dragDistance[getLastEvent().pointerIndex];
         return dragDistance[pointerIndex];
     }
 
     public double getDistance() {
         Event firstEvent = getFirstEvent();
-//        Event lastEvent = getLastEvent();
         Event lastEvent = this;
         double distance = Geometry.distance(
                 firstEvent.getPosition(),
