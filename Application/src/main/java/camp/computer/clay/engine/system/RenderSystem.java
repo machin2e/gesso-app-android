@@ -9,19 +9,15 @@ import android.graphics.Rect;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.application.graphics.PlatformRenderSurface;
-import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.image.Visibility2;
 import camp.computer.clay.util.image.World;
 
 public class RenderSystem extends System {
@@ -35,7 +31,7 @@ public class RenderSystem extends System {
 
         // <HACK>
         PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
-//        Canvas canvas = platformRenderSurface.canvas;
+        // Canvas canvas = platformRenderSurface.canvas;
         // </HACK>
 
         platformRenderSurface.canvas = canvas;
@@ -87,100 +83,75 @@ public class RenderSystem extends System {
             Entity entity = Entity.Manager.get(j);
 
             Canvas canvas = platformRenderSurface.canvas;
-            Paint paint = platformRenderSurface.paint;
-            World world = platformRenderSurface.getWorld();
+            // Paint paint = platformRenderSurface.paint;
+            // World world = platformRenderSurface.getWorld();
 
-            if (entity.hasComponent(Host.class)) {
-
-                Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.isVisible) {
-                    Image image = entity.getComponent(Image.class);
-                    canvas.save();
-                    for (int i = 0; i < image.getShapes().size(); i++) {
-                        image.getShapes().get(i).draw(platformRenderSurface);
-                    }
-                    canvas.restore();
-                }
-
-            } else if (entity.hasComponent(Extension.class)) {
-
-//            Image image = entity.getComponent(Image.class);
-//            if (image.isVisible()) {
-//                canvas.save();
-//                for (int i = 0; i < image.getShapes().size(); i++) {
-//                    image.getShapes().get(i).draw(platformRenderSurface);
+//            if (entity.hasComponent(Host.class)) {
+//
+//                Visibility visibility = entity.getComponent(Visibility.class);
+//                if (visibility != null && visibility.isVisible) {
+//                    Image image = entity.getComponent(Image.class);
+//                    canvas.save();
+//                    for (int i = 0; i < image.getShapes().size(); i++) {
+//                        image.getShapes().get(i).draw(platformRenderSurface);
+//                    }
+//                    canvas.restore();
 //                }
-//                canvas.restore();
-//            }
-
-                // TODO: <MOVE_THIS_INTO_PORTABLE_SYSTEM_AND_MAKE_IT_WORK>
+//
+//            } else if (entity.hasComponent(Extension.class)) {
+//
+                // TODO: <MOVE_THIS_INTO_PORTABLE_SYSTEM>
+                /*
                 Group<Entity> ports = entity.getComponent(Portable.class).getPorts();
-                for (int i = 0; i < ports.size(); i++) {
-                    if (ports.get(i).getComponent(Port.class).getExtension() == null) {
+                int size = ports.size();
+                for (int i = 0; i < size; i++) {
+                    Entity port = ports.get(i);
+                    if (port.getComponent(Port.class).getExtension() == null) {
                         // TODO: Remove Port Entity!
-                        ports.remove(ports.get(i).getUuid());
+                        ports.remove(port);
 
-                        Entity.Manager.remove(ports.get(i).getUuid());
+                        Entity.Manager.remove(port);
+
+                        size--;
                     }
                 }
-                // TODO: </MOVE_THIS_INTO_PORTABLE_SYSTEM_AND_MAKE_IT_WORK>
-
-                Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.isVisible) {
-                    Image image = entity.getComponent(Image.class);
-                    canvas.save();
-                    for (int i = 0; i < image.getShapes().size(); i++) {
-                        image.getShapes().get(i).draw(platformRenderSurface);
-                    }
-                    canvas.restore();
-                }
-
-            } else if (entity.hasComponent(Port.class)) {
-
-//            Image image = entity.getComponent(Image.class);
-//            if (image.isVisible()) {
-//                canvas.save();
-//                for (int i = 0; i < image.getShapes().size(); i++) {
-//                    image.getShapes().get(i).draw(platformRenderSurface);
+                */
+                // TODO: </MOVE_THIS_INTO_PORTABLE_SYSTEM>
+//
+//                Visibility visibility = entity.getComponent(Visibility.class);
+//                if (visibility != null && visibility.isVisible) {
+//                    Image image = entity.getComponent(Image.class);
+//                    canvas.save();
+//                    for (int i = 0; i < image.getShapes().size(); i++) {
+//                        image.getShapes().get(i).draw(platformRenderSurface);
+//                    }
+//                    canvas.restore();
 //                }
-//                canvas.restore();
-//            }
+//
+//            } else if (entity.hasComponent(Port.class)) {
+//
+//                Visibility visibility = entity.getComponent(Visibility.class);
+//                if (visibility != null && visibility.isVisible) {
+//                    Image image = entity.getComponent(Image.class);
+//                    canvas.save();
+//                    for (int i = 0; i < image.getShapes().size(); i++) {
+//                        image.getShapes().get(i).draw(platformRenderSurface);
+//                    }
+//                    canvas.restore();
+//                }
+//
+//            } else
 
-                Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.isVisible) {
-                    Image image = entity.getComponent(Image.class);
-                    canvas.save();
-                    for (int i = 0; i < image.getShapes().size(); i++) {
-                        image.getShapes().get(i).draw(platformRenderSurface);
-                    }
-                    canvas.restore();
-                }
-
-            } else if (entity.hasComponent(Path.class)) {
+            if (entity.hasComponent(Path.class)) {
 
                 Image image = entity.getComponent(Image.class);
-
-//            if (image.isVisible()) {
-//                Entity pathEntity = image.getEntity();
-//                if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
-//                    // Draw PathEntity between Ports
-//                    platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
-//                } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
-//                    platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
-//                }
-//            } else {
-//                Entity pathEntity = entity; // image.getPath();
-//                if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
-//                    platformRenderSurface.drawPhysicalPath(pathEntity, platformRenderSurface);
-//                }
-//            }
 
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.isVisible) {
                     Entity pathEntity = image.getEntity();
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
-                        // Draw PathEntity between Ports
-//                        platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
+                        // TODO: Draw Path between wirelessly connected Ports
+                        // platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
                     } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
                         platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
                     }
@@ -191,112 +162,31 @@ public class RenderSystem extends System {
                     }
                 }
 
-            } else if (entity.hasComponent(Image.class)) { // e.g., for Prototype Extension
+            }
+            // TODO: <REFACTOR>
+            // This was added so Prototype Extension/Path would render without Extension/Path components
+            else if (entity.hasComponent(Image.class)) {
 
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.isVisible) {
                     Image image = entity.getComponent(Image.class);
                     canvas.save();
                     for (int i = 0; i < image.getShapes().size(); i++) {
-                        image.getShapes().get(i).draw(platformRenderSurface);
+                        platformRenderSurface.drawShape(image.getShapes().get(i));
                     }
                     canvas.restore();
                 }
 
             }
+            // TODO: </REFACTOR>
         }
     }
-
-//    public void drawPrototypes(PlatformRenderSurface platformRenderSurface) {
-//
-//        Canvas canvas = platformRenderSurface.canvas;
-//        Paint paint = platformRenderSurface.paint;
-////        World world = platformRenderSurface.getWorld();
-//
-//        canvas.save();
-//
-//        // Draw any prototype Paths and Extensions
-////        drawPathPrototype(platformRenderSurface);
-////        drawExtensionPrototype(platformRenderSurface);
-//
-//        canvas.restore();
-//    }
-
-//    // TODO: Make this into a shape and put this on a separate layerIndex!
-//    public void drawPathPrototype(PlatformRenderSurface platformRenderSurface) {
-//
-//        Canvas canvas = platformRenderSurface.canvas;
-//        Paint paint = platformRenderSurface.paint;
-//        World world = platformRenderSurface.getWorld();
-//
-//
-//        if (world.pathPrototypeVisibility2 == Visibility2.VISIBLE) {
-//
-//            double triangleWidth = 20;
-//            double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
-//            double triangleSpacing = 35;
-//
-//            // Color
-//            paint.setStyle(Paint.Style.STROKE);
-//            paint.setStrokeWidth(15.0f);
-////            paint.setColor(this.getUniqueColor());
-//
-//            double pathRotationAngle = Geometry.getAngle(
-//                    world.pathPrototypeSourcePosition,
-//                    world.pathPrototypeDestinationCoordinate
-//            );
-//
-//            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
-//                    world.pathPrototypeSourcePosition,
-//                    pathRotationAngle,
-//                    2 * triangleSpacing
-//            );
-//
-//            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
-//                    world.pathPrototypeDestinationCoordinate,
-//                    pathRotationAngle + 180,
-//                    2 * triangleSpacing
-//            );
-//
-//            paint.setColor(Color.parseColor("#efefef"));
-//            platformRenderSurface.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight);
-//
-//            // Color
-//            paint.setStyle(Paint.Style.FILL);
-////            paint.setColor(Color.parseColor("#efefef"));
-//            double shapeRadius = 40.0;
-//            platformRenderSurface.drawCircle(world.pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
-//        }
-//    }
-
-//    public void drawExtensionPrototype(PlatformRenderSurface platformRenderSurface) {
-//
-//        Canvas canvas = platformRenderSurface.canvas;
-//        Paint paint = platformRenderSurface.paint;
-//        World world = platformRenderSurface.getWorld();
-//
-////        if (world.extensionPrototypeVisibility2 == Visibility2.VISIBLE) {
-//        if (world.extensionPrototype.getComponent(Visibility.class).isVisible) {
-//
-//            double pathRotationAngle = Geometry.getAngle(
-//                    world.pathPrototypeSourcePosition,
-////                    world.extensionPrototypePosition
-//                    world.extensionPrototype.getComponent(Transform.class)
-//            );
-//
-//            paint.setStyle(Paint.Style.FILL);
-//            paint.setColor(Color.parseColor("#fff7f7f7"));
-//
-////            platformRenderSurface.drawRectangle(world.extensionPrototypePosition, pathRotationAngle + 180, 200, 200);
-////            platformRenderSurface.drawRectangle(world.extensionPrototype.getComponent(Transform.class), pathRotationAngle + 180, 200, 200);
-//        }
-//    }
 
     public void drawOverlay(PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        World world = platformRenderSurface.getWorld();
+        // World world = platformRenderSurface.getWorld();
 
         int linePosition = 0;
 

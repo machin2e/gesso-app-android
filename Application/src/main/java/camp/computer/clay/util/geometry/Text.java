@@ -18,11 +18,6 @@ public class Text extends Shape {
         return null;
     }
 
-    @Override
-    public void draw(PlatformRenderSurface platformRenderSurface) {
-
-    }
-
     public Text(Transform position) {
         super(position);
     }

@@ -118,8 +118,6 @@ public abstract class Shape<T extends Entity> extends Groupable {
 
     public abstract List<Transform> getVertices();
 
-    public abstract void draw(PlatformRenderSurface platformRenderSurface);
-
     // TODO: Delete!
     public List<Transform> getBoundary() {
         return this.boundary;

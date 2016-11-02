@@ -41,13 +41,6 @@ public class Line<T extends Entity> extends Shape<T> {
         return vertices;
     }
 
-    @Override
-    public void draw(PlatformRenderSurface platformRenderSurface) {
-//        if (isVisible()) {
-//            display.drawSegment(this);
-//        }
-    }
-
     /**
      * Returns a {@code Transform} on the {@code Line} offset from {@code position} by {@code offset}.
      *

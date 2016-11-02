@@ -122,19 +122,4 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         this.height = height;
         invalidate();
     }
-
-    @Override
-    public void draw(PlatformRenderSurface platformRenderSurface) {
-//        if (isVisible()) {
-            platformRenderSurface.drawRectangle(this);
-
-            /*
-            // Draw bounding box!
-            display.paint.setColor(Color.GREEN);
-            display.paint.setStyle(Paint.Style.STROKE);
-            display.paint.setStrokeWidth(2.0f);
-            display.drawPolygon(getBoundingBox());
-            */
-//        }
-    }
 }

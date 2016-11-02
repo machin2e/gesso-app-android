@@ -42,11 +42,4 @@ public class Polygon<T extends Entity> extends Shape<T> {
         return vertices;
     }
 
-    @Override
-    public void draw(PlatformRenderSurface platformRenderSurface) {
-//        if (isVisible()) {
-            platformRenderSurface.drawPolygon(this);
-//        }
-    }
-
 }

@@ -53,11 +53,4 @@ public class Polyline<T extends Entity> extends Shape<T> {
         return vertices;
     }
 
-    @Override
-    public void draw(PlatformRenderSurface platformRenderSurface) {
-//        if (isVisible()) {
-            platformRenderSurface.drawPolyline(this);
-//        }
-    }
-
 }

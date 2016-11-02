@@ -28,11 +28,13 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Text;
 import camp.computer.clay.util.geometry.Triangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.World;
@@ -540,6 +542,26 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     public void drawSegment(Transform source, Transform target) {
         canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
+    }
+
+    public void drawShape(Shape shape) {
+        if (shape.getClass() == Point.class) {
+            // TODO:
+        } else if (shape.getClass() == Segment.class) {
+            drawSegment((Segment) shape);
+        } else if (shape.getClass() == Polyline.class) {
+            drawPolyline((Polyline) shape);
+        } else if (shape.getClass() == Triangle.class) {
+            drawTriangle((Triangle) shape);
+        } else if (shape.getClass() == Rectangle.class) {
+            drawRectangle((Rectangle) shape);
+        } else if (shape.getClass() == Polygon.class) {
+            drawPolygon((Polygon) shape);
+        } else if (shape.getClass() == Circle.class) {
+            drawCircle((Circle) shape);
+        } else if (shape.getClass() == Text.class) {
+            // TODO:
+        }
     }
 
     public void drawSegment(Segment segment) {

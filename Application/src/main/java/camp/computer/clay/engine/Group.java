@@ -47,13 +47,16 @@ public class Group<E extends Groupable> implements List<E> {
     // TODO: <BUG>
     public E remove(UUID uuid) {
         E element = get(uuid);
-        remove(element); // TODO: BUG. Doesn't actually remove in place!
+        if (element != null) {
+            remove(element);
+        }
         return element;
     }
     // TODO: </BUG>
 
     // TODO: <BUG>
     public Group<E> remove(E entity) {
+        /*
         Group<E> group = new Group<>();
         for (int i = 0; i < this.elements.size(); i++) {
             if (elements.get(i) != entity) {
@@ -61,6 +64,10 @@ public class Group<E extends Groupable> implements List<E> {
             }
         }
         return group;
+        */
+        int elementIndex = indexOf(entity);
+        remove(elementIndex);
+        return this;
     }
     // TODO: </BUG>
 

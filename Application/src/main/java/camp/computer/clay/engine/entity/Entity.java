@@ -71,64 +71,11 @@ public final class Entity extends Groupable {
     // </COMPONENTS>
 
     public <C extends Component> void addComponent(C component) {
-
-        // Associate with Entity
-        component.setEntity(this);
-
-        // Add to Entity
-        this.components.add(component);
-//        if (component instanceof Transform) {
-//            this.transform = (Transform) component;
-//        } else if (component instanceof Image) {
-//            this.image = (Image) component;
-//        } else if (component instanceof Portable) {
-//            this.portable = (Portable) component;
-//        } else if (component instanceof Extension) {
-//            this.extension = (Extension) component;
-//        } else if (component instanceof Host) {
-//            this.host = (Host) component;
-//        } else if (component instanceof Port) {
-//            this.port = (Port) component;
-//        } else if (component instanceof Path) {
-//            this.path = (Path) component;
-//        } else if (component instanceof Camera) {
-//            this.camera = (Camera) component;
-//        } else if (component instanceof Label) {
-//            this.label = (Label) component;
-//        } else if (component instanceof Visibility) {
-//            this.visibility = (Visibility) component;
-//        } else if (component instanceof Boundary) {
-//            this.boundary = (Boundary) component;
-//        }
+        component.setEntity(this); // Associate Component with Entity
+        components.add(component); // Add to Entity
     }
 
     public <C extends Component> C getComponent(Class<C> type) {
-//        if (type == Transform.class) {
-//            return type.cast(this.transform);
-//        } else if (type == Image.class) {
-//            return type.cast(this.image);
-//        } else if (type == Portable.class) {
-//            return type.cast(this.portable);
-//        } else if (type == Extension.class) {
-//            return type.cast(this.extension);
-//        } else if (type == Host.class) {
-//            return type.cast(this.host);
-//        } else if (type == Port.class) {
-//            return type.cast(this.port);
-//        } else if (type == Path.class) {
-//            return type.cast(this.path);
-//        } else if (type == Camera.class) {
-//            return type.cast(this.camera);
-//        } else if (type == Label.class) {
-//            return type.cast(this.label);
-//        } else if (type == Visibility.class) {
-//            return type.cast(this.visibility);
-//        } else if (type == Boundary.class) {
-//            return type.cast(this.boundary);
-//        } else {
-//            return null;
-//        }
-
         for (int i = 0; i < components.size(); i++) {
             if (components.get(i).getClass() == type) {
                 return type.cast(components.get(i));

@@ -45,11 +45,4 @@ public class Triangle<T extends Entity> extends Shape<T> {
         vertices.add(c);
         return vertices;
     }
-
-    @Override
-    public void draw(PlatformRenderSurface platformRenderSurface) {
-//        if (isVisible()) {
-            platformRenderSurface.drawTriangle(this);
-//        }
-    }
 }
