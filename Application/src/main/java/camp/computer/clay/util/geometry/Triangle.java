@@ -6,7 +6,7 @@ import java.util.List;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
-public class Triangle<T extends Entity> extends Shape { // <T> {
+public class Triangle extends Shape {
 
     private Transform a = new Transform(0, 0);
     private Transform b = new Transform(0, 0);
@@ -16,10 +16,6 @@ public class Triangle<T extends Entity> extends Shape { // <T> {
 
     public Triangle() {
     }
-
-//    public Triangle(T entity) {
-//        this.entity = entity;
-//    }
 
     public Triangle(Transform position) {
         super(position);

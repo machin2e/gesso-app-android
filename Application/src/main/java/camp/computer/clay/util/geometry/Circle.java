@@ -9,7 +9,7 @@ import camp.computer.clay.engine.component.Transform;
 /**
  * Circle. By default, objects are unit circles.
  */
-public class Circle<T extends Entity> extends Shape { // <T> {
+public class Circle extends Shape {
 
     /**
      * The index of boundary to use to approximate the circle. By default, this is setValue to 12,
@@ -28,11 +28,6 @@ public class Circle<T extends Entity> extends Shape { // <T> {
         this.radius = radius;
         setup();
     }
-
-//    public Circle(T entity) {
-//        this.entity = entity;
-//        setup();
-//    }
 
     private void setup() {
         setupGeometry();

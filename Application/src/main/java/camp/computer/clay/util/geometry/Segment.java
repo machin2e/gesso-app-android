@@ -6,7 +6,7 @@ import java.util.List;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
-public class Segment<T extends Entity> extends Shape { // <T> {
+public class Segment extends Shape {
 
     protected Transform source = new Transform();
     protected Transform target = new Transform();
@@ -15,11 +15,6 @@ public class Segment<T extends Entity> extends Shape { // <T> {
         super();
         setup();
     }
-
-//    public Segment(T entity) {
-//        super(entity);
-//        setup();
-//    }
 
     public Segment(Transform source, Transform target) {
         setup();

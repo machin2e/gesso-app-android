@@ -8,7 +8,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.BoundarySystem;
 
-public class Rectangle<T extends Entity> extends Shape { // <T> {
+public class Rectangle extends Shape {
 
     public double width = 1.0;
 
@@ -21,11 +21,6 @@ public class Rectangle<T extends Entity> extends Shape { // <T> {
     public Rectangle() {
         setup();
     }
-
-//    public Rectangle(T entity) {
-//        this.entity = entity;
-//        setup();
-//    }
 
     public Rectangle(double width, double height) {
         super();

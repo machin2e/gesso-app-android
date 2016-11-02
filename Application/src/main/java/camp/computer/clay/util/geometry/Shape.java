@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.engine.component.Transform;
 
@@ -21,8 +20,6 @@ public abstract class Shape extends Groupable {
     protected String color = "#fff7f7f7";
     protected String outlineColor = "#ff000000";
     public double outlineThickness = 1.0;
-
-//    protected T entity = null;
 
     protected List<Transform> boundary = new ArrayList<>();
 
@@ -61,22 +58,6 @@ public abstract class Shape extends Groupable {
 
     public Shape(Transform position) {
         this.position.set(position);
-    }
-
-//    public void setEntity(T entity) {
-//        this.entity = entity;
-//    }
-
-//    public T getEntity() {
-//        return this.entity;
-//    }
-
-    public void setImagePosition(double x, double y) {
-        if (imagePosition == null) {
-            imagePosition = new Transform();
-        }
-        this.imagePosition.set(x, y);
-        invalidate();
     }
 
     // TODO: Move into ImageSystem, PortableLayoutSystem, or RenderSystem
@@ -118,7 +99,7 @@ public abstract class Shape extends Groupable {
 
     public abstract List<Transform> getVertices();
 
-    // TODO: Delete!
+    // TODO: Delete! Get boundary in BoundarySystem.
     public List<Transform> getBoundary() {
         return this.boundary;
     }

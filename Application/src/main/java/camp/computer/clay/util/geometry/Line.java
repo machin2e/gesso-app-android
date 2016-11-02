@@ -6,17 +6,12 @@ import java.util.List;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
-public class Line<T extends Entity> extends Shape { // <T> {
+public class Line extends Shape {
 
     public Line() {
         super();
         setup();
     }
-
-//    public Line(T entity) {
-//        super(entity);
-//        setup();
-//    }
 
     public Line(Transform position, double rotation) {
         setup();

@@ -7,7 +7,7 @@ import java.util.List;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
-public class Point<T extends Entity> extends Shape { // <T> {
+public class Point extends Shape {
 
     public Point() {
         setup();
@@ -17,11 +17,6 @@ public class Point<T extends Entity> extends Shape { // <T> {
         super(position);
         setup();
     }
-
-//    public Point(T entity) {
-//        this.entity = entity;
-//        setup();
-//    }
 
     private void setup() {
         setupGeometry();
