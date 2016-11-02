@@ -23,7 +23,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.image.Visibility2;
+import camp.computer.clay.util.image.Visible;
 import camp.computer.clay.engine.World;
 
 public class EventHandlerSystem extends System {
@@ -128,7 +128,7 @@ public class EventHandlerSystem extends System {
                 if (action.isTap()) {
                     // Title
                     setTitleText("Project");
-                    setTitleVisibility(Visibility2.VISIBLE);
+                    setTitleVisibility(Visible.VISIBLE);
                 }
 
             } else {
@@ -139,7 +139,7 @@ public class EventHandlerSystem extends System {
 //            if (action.isTap()) {
 
             // Title
-            // TODO: workspace.setTitleVisibility(Visibility2.INVISIBLE);
+            // TODO: workspace.setTitleVisibility(Visible.INVISIBLE);
 
             // Camera
             camera.getComponent(Camera.class).setFocus(World.getWorld());
@@ -165,13 +165,13 @@ public class EventHandlerSystem extends System {
             // Update position of prototype Extension
             World.getWorld().portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
 
-//                    hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility2.INVISIBLE);
+//                    hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visible.INVISIBLE);
 //                hostEntity.getComponent(Portable.class).setPathVisibility(false);
-            host.getComponent(Portable.class).getPaths().setVisibility(false);
+            host.getComponent(Portable.class).getPaths().setVisibility(Visible.INVISIBLE);
 
-//            World.getWorld().setExtensionPrototypeVisibility2(Visibility2.VISIBLE);
+//            World.getWorld().setExtensionPrototypeVisibility2(Visible.VISIBLE);
             Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-            extensionPrototype.getComponent(Visibility.class).isVisible = true;
+            extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
 //            } else if (action.isHolding()) {
 //
@@ -188,8 +188,8 @@ public class EventHandlerSystem extends System {
 //            if (action.isTap()) {
 
             // Focus on touched Host
-            host.getComponent(Portable.class).getPaths().setVisibility(true);
-            host.getComponent(Portable.class).getPorts().setVisibility(true);
+            host.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
+            host.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
 
             host.getComponent(Image.class).setTransparency(1.0);
 
@@ -201,11 +201,11 @@ public class EventHandlerSystem extends System {
                     Entity pathEntity = pathEntities.get(j);
 
                     // Show source and target Ports in Paths
-                    pathEntity.getComponent(Path.class).getSource().getComponent(Visibility.class).isVisible = true;
-                    pathEntity.getComponent(Path.class).getTarget().getComponent(Visibility.class).isVisible = true;
+                    pathEntity.getComponent(Path.class).getSource().getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                    pathEntity.getComponent(Path.class).getTarget().getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
                     // Show Path connection
-                    pathEntity.getComponent(Visibility.class).isVisible = true;
+                    pathEntity.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                 }
             }
 
@@ -227,7 +227,7 @@ public class EventHandlerSystem extends System {
 
             // Title
             World.getWorld().setTitleText("Host");
-            World.getWorld().setTitleVisibility(Visibility2.VISIBLE);
+            World.getWorld().setTitleVisibility(Visible.VISIBLE);
 
 //            } else {
 //
@@ -256,13 +256,13 @@ public class EventHandlerSystem extends System {
 //            }
 
             // Check if connecting to a Extension
-//            if (World.getWorld().getExtensionPrototypeVisibility2() == Visibility2.VISIBLE) {
+//            if (World.getWorld().getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
             Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
-            if (prototypeExtension.getComponent(Visibility.class).isVisible) {
+            if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
-//                World.getWorld().setExtensionPrototypeVisibility2(Visibility2.INVISIBLE);
+//                World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                extensionPrototype.getComponent(Visibility.class).isVisible = false;
+                extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
                 // Get cached extension profiles (and retrieve additional from Internet store)
                 List<Profile> profiles = Application.getView().getClay().getProfiles();
@@ -327,8 +327,8 @@ public class EventHandlerSystem extends System {
 //            if (action.isTap()) {
 
             // Focus on selected Host
-            extension.getComponent(Portable.class).getPaths().setVisibility(true);
-            extension.getComponent(Portable.class).getPorts().setVisibility(true);
+            extension.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
+            extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
             extensionImage.setTransparency(1.0);
 
             // Show Ports and Paths for selected Host
@@ -342,19 +342,19 @@ public class EventHandlerSystem extends System {
                     // Show Ports
                     Entity sourcePort = path.getComponent(Path.class).getSource();
                     Entity targetPort = path.getComponent(Path.class).getTarget();
-                    sourcePort.getComponent(Visibility.class).isVisible = true;
-                    targetPort.getComponent(Visibility.class).isVisible = true;
+                    sourcePort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                    targetPort.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
 
                     // Show Path
-                    path.getComponent(Visibility.class).isVisible = true;
+                    path.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                 }
             }
-            // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility2.VISIBLE);
+            // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visible.VISIBLE);
 
             // Title
             World.getWorld().setTitleText("Extension");
-            World.getWorld().setTitleVisibility(Visibility2.VISIBLE);
+            World.getWorld().setTitleVisibility(Visible.VISIBLE);
 
             // Camera
             Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
@@ -378,13 +378,13 @@ public class EventHandlerSystem extends System {
 
             // if (action.isDragging()) {
 
-            // Prototype Path Visibility2
+            // Prototype Path Visible
             // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
             World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getShape("Port").getPosition());
             World.getWorld().portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
-            World.getWorld().portableLayoutSystem.setPathPrototypeVisibility2(Visibility2.VISIBLE);
+            World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
 
-            // Prototype Extension Visibility2
+            // Prototype Extension Visible
             boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
 
             // <HACK>
@@ -409,16 +409,16 @@ public class EventHandlerSystem extends System {
 
             // Update position of prototype Path and Extension
             if (isCreateExtensionAction) {
-//                World.getWorld().setExtensionPrototypeVisibility2(Visibility2.VISIBLE);
+//                World.getWorld().setExtensionPrototypeVisibility2(Visible.VISIBLE);
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                extensionPrototype.getComponent(Visibility.class).isVisible = true;
+                extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                 // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
                 World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getShape("Port").getPosition());
                 World.getWorld().portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
             } else {
-//                World.getWorld().setExtensionPrototypeVisibility2(Visibility2.INVISIBLE);
+//                World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                extensionPrototype.getComponent(Visibility.class).isVisible = false;
+                extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
             }
 
             // Show Ports of nearby Hosts and Extensions
@@ -435,7 +435,7 @@ public class EventHandlerSystem extends System {
                     // <HACK>
                     // <STYLE>
                     extension.getComponent(Image.class).setTransparency(1.0f);
-                    extension.getComponent(Portable.class).getPorts().setVisibility(true);
+                    extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
                     // </STYLE>
 
                     if (extension.hasComponent(Extension.class)) { // HACK
@@ -545,7 +545,7 @@ public class EventHandlerSystem extends System {
 
                         }
 
-                        World.getWorld().portableLayoutSystem.setPathPrototypeVisibility2(Visibility2.INVISIBLE);
+                        World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
                     }
 
                 } else if (event.getFirstEvent().getTarget() != event.getTarget()) {
@@ -555,7 +555,7 @@ public class EventHandlerSystem extends System {
 
 //                    if (action.isDragging()) {
                     // Hide the prototype Path
-                    World.getWorld().portableLayoutSystem.setPathPrototypeVisibility2(Visibility2.INVISIBLE);
+                    World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
 
                     // Get the source and target Ports to be used in new Path
                     Entity sourcePort = event.getFirstEvent().getTarget();
@@ -583,22 +583,22 @@ public class EventHandlerSystem extends System {
                 // (Host.Port, ..., World) Action Pattern
 
                 // Hide prototype Path and prototype Extension
-                World.getWorld().portableLayoutSystem.setPathPrototypeVisibility2(Visibility2.INVISIBLE);
+                World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
 
                 Log.v("EventHandlerSystem", "creating extension");
 
                 // If prototype Extension is visible, create Extension
-//                if (World.getWorld().getExtensionPrototypeVisibility2() == Visibility2.VISIBLE) {
+//                if (World.getWorld().getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
                 Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                if (prototypeExtension.getComponent(Visibility.class).isVisible) {
+                if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
                     Log.v("EventHandlerSystem", "creating extension");
 
 //                    // Hide prototype Path and prototype Extension
-//                    World.getWorld().setPathPrototypeVisibility2(Visibility2.INVISIBLE);
-//                    World.getWorld().setExtensionPrototypeVisibility2(Visibility2.INVISIBLE);
+//                    World.getWorld().setPathPrototypeVisibility(Visible.INVISIBLE);
+//                    World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                     Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                    extensionPrototype.getComponent(Visibility.class).isVisible = false;
+                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
                     Entity hostPort = event.getFirstEvent().getTarget();
 
@@ -626,8 +626,8 @@ public class EventHandlerSystem extends System {
                     }
 
                     // Show all of Host's Paths and all Ports contained in those Paths
-                    hostPaths.setVisibility(true);
-                    hostPorts.setVisibility(true);
+                    hostPaths.setVisibility(Visible.VISIBLE);
+                    hostPorts.setVisibility(Visible.VISIBLE);
 
                     // Update layout
                     Entity host = hostPort.getParent(); // HACK

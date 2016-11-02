@@ -21,6 +21,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.util.image.Visible;
 
 public class Group<E extends Groupable> implements List<E> {
 
@@ -115,7 +116,7 @@ public class Group<E extends Groupable> implements List<E> {
             @Override
             public boolean filter(Entity entity, Boolean... data) {
                 Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.isVisible) {
+                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     return true;
                 } else {
                     return false;
@@ -163,13 +164,13 @@ public class Group<E extends Groupable> implements List<E> {
     public static class Mappers {
 
         // Expects Group<Entity>
-        // Requires components: Visibility2
-        public static Mapper setVisibility = new Mapper<Entity, Entity, Boolean>() {
+        // Requires components: Visible
+        public static Mapper setVisibility = new Mapper<Entity, Entity, Visible>() {
             @Override
-            public Entity map(Entity entity, Boolean isVisible) {
+            public Entity map(Entity entity, Visible visible) {
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null) {
-                    visibility.isVisible = isVisible;
+                    visibility.setVisible(visible);
                 }
                 return null;
             }
@@ -246,8 +247,8 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     // Assumes Group<Entity>
-    public void setVisibility(boolean isVisible) {
-        map(Mappers.setVisibility, isVisible);
+    public void setVisibility(Visible visible) {
+        map(Mappers.setVisibility, visible);
     }
 
     // Assumes Group<Entity>

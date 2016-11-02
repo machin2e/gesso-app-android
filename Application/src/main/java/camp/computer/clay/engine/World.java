@@ -26,7 +26,7 @@ import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.geometry.Shape;
-import camp.computer.clay.util.image.Visibility2;
+import camp.computer.clay.util.image.Visible;
 
 public class World {
 
@@ -115,7 +115,7 @@ public class World {
 
             // <HACK>
             // TODO: Set default visibility of Ports some other way?
-            port.getComponent(Visibility.class).isVisible = false;
+            port.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
             // </HACK>
 
             host.getComponent(Portable.class).addPort(port);
@@ -320,7 +320,7 @@ public class World {
         prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
 
         prototypeExtension.addComponent(new Visibility());
-        prototypeExtension.getComponent(Visibility.class).isVisible = false;
+        prototypeExtension.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
         prototypeExtension.addComponent(new Boundary());
 
@@ -347,7 +347,7 @@ public class World {
         prototypePath.getComponent(Label.class).setLabel("prototypePath");
 
         prototypePath.addComponent(new Visibility());
-        prototypePath.getComponent(Visibility.class).isVisible = false;
+        prototypePath.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
         prototypePath.addComponent(new Boundary());
 
@@ -394,7 +394,7 @@ public class World {
 
     // <TITLE_UI_COMPONENT>
     // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visibility2 titleVisibility2 = Visibility2.INVISIBLE;
+    protected Visible titleVisible = Visible.INVISIBLE;
     protected String titleText = "Project";
 
     public void setTitleText(String text) {
@@ -405,20 +405,20 @@ public class World {
         return this.titleText;
     }
 
-    public void setTitleVisibility(Visibility2 visibility2) {
-        if (titleVisibility2 == Visibility2.INVISIBLE && visibility2 == Visibility2.VISIBLE) {
+    public void setTitleVisibility(Visible visible) {
+        if (titleVisible == Visible.INVISIBLE && visible == Visible.VISIBLE) {
 //            Application.getPlatform().openTitleEditor(getTitleText());
-            this.titleVisibility2 = visibility2;
-        } else if (titleVisibility2 == Visibility2.VISIBLE && visibility2 == Visibility2.VISIBLE) {
+            this.titleVisible = visible;
+        } else if (titleVisible == Visible.VISIBLE && visible == Visible.VISIBLE) {
 //            Application.getPlatform().setTitleEditor(getTitleText());
-        } else if (titleVisibility2 == Visibility2.VISIBLE && visibility2 == Visibility2.INVISIBLE) {
+        } else if (titleVisible == Visible.VISIBLE && visible == Visible.INVISIBLE) {
 //            Application.getPlatform().closeTitleEditor();
-            this.titleVisibility2 = visibility2;
+            this.titleVisible = visible;
         }
     }
 
-    public Visibility2 getTitleVisibility() {
-        return this.titleVisibility2;
+    public Visible getTitleVisibility() {
+        return this.titleVisible;
     }
     // </TITLE_UI_COMPONENT>
 }

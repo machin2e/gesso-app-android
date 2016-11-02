@@ -18,7 +18,7 @@ import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.util.geometry.Shape;
-import camp.computer.clay.util.image.Visibility2;
+import camp.computer.clay.util.image.Visible;
 import camp.computer.clay.engine.World;
 
 public class PortableLayoutSystem extends System {
@@ -199,26 +199,19 @@ public class PortableLayoutSystem extends System {
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
             for (int i = 0; i < hostShapeBoundary.size(); i++) {
 
-                if (i < hostShapeBoundary.size() - 1) {
-                    Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
+                // Terminal points of segment
+                Transform p1 = hostShapeBoundary.get(i);
+                Transform p2 = (i < hostShapeBoundary.size() - 1 ? hostShapeBoundary.get(i + 1) : hostShapeBoundary.get(0));
 
-                    double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
+                Transform segmentMidpoint = Geometry.midpoint(p1, p2);
 
-                    if (distance < minimumSegmentDistance) {
-                        minimumSegmentDistance = distance;
-                        nearestSegmentIndex = i;
-                    }
-                } else {
-                    // Check last segment (first and last point in array)
-                    Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(0));
+                double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
 
-                    double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
-
-                    if (distance < minimumSegmentDistance) {
-                        minimumSegmentDistance = distance;
-                        nearestSegmentIndex = i;
-                    }
+                if (distance < minimumSegmentDistance) {
+                    minimumSegmentDistance = distance;
+                    nearestSegmentIndex = i;
                 }
+
             }
 
             indexCounts[nearestSegmentIndex]++;
@@ -237,6 +230,7 @@ public class PortableLayoutSystem extends System {
     }
 
     public static void setExtensionDistance(Entity host, double distance) {
+        // TODO: How is distanceToExtensions different from portableSeparation in setPortableSeparation()?
         host.getComponent(Host.class).distanceToExtensions = distance;
         updateExtensionLayout(host);
     }
@@ -253,8 +247,8 @@ public class PortableLayoutSystem extends System {
             hostComponent.headerExtensions.get(i).clear();
         }
 
-        // Assign the Extensions connected to this HostEntity to the most-strongly-connected Header.
-        // This can be thought of as the "high level layout" of ExtensionEntity relative to the HostEntity.
+        // Assign the Extensions connected to this Host to the most-strongly-connected Header.
+        // This can be thought of as the "high level layout" of Extension relative to the Host.
         for (int i = 0; i < extensions.size(); i++) {
             updateExtensionHeaderIndex(host, extensions.get(i));
         }
@@ -331,26 +325,25 @@ public class PortableLayoutSystem extends System {
      */
     public void adjustLayout() {
 
-//        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
-        Group<Image> hostImages = Entity.Manager.filterWithComponent(Host.class).getImages();
+        Group<Entity> hosts = Entity.Manager.filterWithComponent(Host.class);
 
         // Set position on grid layout
-        if (hostImages.size() == 1) {
-            hostImages.get(0).getEntity().getComponent(Transform.class).set(0, 0);
-        } else if (hostImages.size() == 2) {
-            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, 0);
-            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, 0);
-        } else if (hostImages.size() == 5) {
-            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, -600);
-            hostImages.get(0).getEntity().getComponent(Transform.class).setRotation(0);
-            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, -600);
-            hostImages.get(1).getEntity().getComponent(Transform.class).setRotation(20);
-            hostImages.get(2).getEntity().getComponent(Transform.class).set(-300, 0);
-            hostImages.get(2).getEntity().getComponent(Transform.class).setRotation(40);
-            hostImages.get(3).getEntity().getComponent(Transform.class).set(300, 0);
-            hostImages.get(3).getEntity().getComponent(Transform.class).setRotation(60);
-            hostImages.get(4).getEntity().getComponent(Transform.class).set(-300, 600);
-            hostImages.get(4).getEntity().getComponent(Transform.class).setRotation(80);
+        if (hosts.size() == 1) {
+            hosts.get(0).getComponent(Transform.class).set(0, 0);
+        } else if (hosts.size() == 2) {
+            hosts.get(0).getComponent(Transform.class).set(-300, 0);
+            hosts.get(1).getComponent(Transform.class).set(300, 0);
+        } else if (hosts.size() == 5) {
+            hosts.get(0).getComponent(Transform.class).set(-300, -600);
+            hosts.get(0).getComponent(Transform.class).setRotation(0);
+            hosts.get(1).getComponent(Transform.class).set(300, -600);
+            hosts.get(1).getComponent(Transform.class).setRotation(20);
+            hosts.get(2).getComponent(Transform.class).set(-300, 0);
+            hosts.get(2).getComponent(Transform.class).setRotation(40);
+            hosts.get(3).getComponent(Transform.class).set(300, 0);
+            hosts.get(3).getComponent(Transform.class).setRotation(60);
+            hosts.get(4).getComponent(Transform.class).set(-300, 600);
+            hosts.get(4).getComponent(Transform.class).setRotation(80);
         }
 
         // TODO: Set position on "scatter" layout
@@ -362,7 +355,7 @@ public class PortableLayoutSystem extends System {
 
     // <PROTOTYPES>
     public void setExtensionPrototypePosition(Transform position) {
-//        this.extensionPrototypePosition.set(position);
+
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
@@ -377,11 +370,11 @@ public class PortableLayoutSystem extends System {
         Segment segment = (Segment) pathPrototype.getComponent(Image.class).getShape("Path");
         Transform prototypePathSourceTransform = segment.getSource();
 
-        double pathRotationAngle = Geometry.getAngle(
+        double extensionRotation = Geometry.getAngle(
                 prototypePathSourceTransform,
                 extensionPrototype.getComponent(Transform.class)
         );
-        extensionPrototype.getComponent(Transform.class).setRotation(pathRotationAngle);
+        extensionPrototype.getComponent(Transform.class).setRotation(extensionRotation);
         // <REFACTOR>
 
         // <HACK>
@@ -391,30 +384,23 @@ public class PortableLayoutSystem extends System {
         // </HACK>
     }
 
-    public void setPathPrototypeVisibility2(Visibility2 visibility2) {
-//        pathPrototypeVisibility2 = visibility2;
+    public void setPathPrototypeVisibility(Visible visible) {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        if (visibility2 == Visibility2.INVISIBLE) {
-            pathPrototype.getComponent(Visibility.class).isVisible = false;
-        } else if (visibility2 == Visibility2.VISIBLE) {
-            pathPrototype.getComponent(Visibility.class).isVisible = true;
-        }
+        pathPrototype.getComponent(Visibility.class).setVisible(visible);
     }
 
-    public Visibility2 getPathPrototypeVisibility2() {
-//        return pathPrototypeVisibility2;
+    public Visible getPathPrototypeVisibility() {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        return pathPrototype.getComponent(Visibility.class).isVisible == true ? Visibility2.VISIBLE : Visibility2.INVISIBLE;
+        return pathPrototype.getComponent(Visibility.class).getVisibile();
     }
 
     public void setPathPrototypeSourcePosition(Transform position) {
-//        this.pathPrototypeSourcePosition.set(position);
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
@@ -424,7 +410,6 @@ public class PortableLayoutSystem extends System {
     }
 
     public void setPathPrototypeDestinationPosition(Transform position) {
-//        this.pathPrototypeDestinationCoordinate.set(position);
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
@@ -433,26 +418,20 @@ public class PortableLayoutSystem extends System {
         segment.setTarget(position);
     }
 
-    public void setExtensionPrototypeVisibility2(Visibility2 visibility2) {
-//        extensionPrototypeVisibility2 = visibility2;
+    public void setExtensionPrototypeVisibility(Visible visible) {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
         // </HACK>
-        if (visibility2 == Visibility2.INVISIBLE) {
-            extensionPrototype.getComponent(Visibility.class).isVisible = false;
-        } else if (visibility2 == Visibility2.VISIBLE) {
-            extensionPrototype.getComponent(Visibility.class).isVisible = true;
-        }
+        extensionPrototype.getComponent(Visibility.class).setVisible(visible);
     }
 
-    public Visibility2 getExtensionPrototypeVisibility2() {
-//        return extensionPrototypeVisibility2;
+    public Visible getExtensionPrototypeVisibility() {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
         // </HACK>
-        return extensionPrototype.getComponent(Visibility.class).isVisible == true ? Visibility2.VISIBLE : Visibility2.INVISIBLE;
+        return extensionPrototype.getComponent(Visibility.class).getVisibile();
     }
     // </PROTOTYPES>
 }

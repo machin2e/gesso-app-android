@@ -19,6 +19,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.util.image.Visible;
 
 public class RenderSystem extends System {
 
@@ -147,7 +148,7 @@ public class RenderSystem extends System {
                 Image image = entity.getComponent(Image.class);
 
                 Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.isVisible) {
+                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Entity pathEntity = image.getEntity();
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
                         // TODO: Draw Path between wirelessly connected Ports
@@ -155,7 +156,7 @@ public class RenderSystem extends System {
                     } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
                         platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
                     }
-                } else if (visibility != null && !visibility.isVisible) {
+                } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
                     Entity pathEntity = entity; // image.getPath();
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
                         platformRenderSurface.drawPhysicalPath(pathEntity, platformRenderSurface);
@@ -168,7 +169,7 @@ public class RenderSystem extends System {
             else if (entity.hasComponent(Image.class)) {
 
                 Visibility visibility = entity.getComponent(Visibility.class);
-                if (visibility != null && visibility.isVisible) {
+                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Image image = entity.getComponent(Image.class);
                     canvas.save();
                     for (int i = 0; i < image.getShapes().size(); i++) {

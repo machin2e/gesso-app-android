@@ -10,6 +10,7 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Shape;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.util.image.Visible;
 import camp.computer.clay.util.time.Clock;
 
 public class Camera extends Component {
@@ -309,8 +310,7 @@ public class Camera extends Component {
         Log.v("SetFocus", "setFocus(World)");
 
         // Hide Portables' Ports.
-//        world.hideAllPorts();
-        Entity.Manager.filterWithComponent(Path.class, Port.class).setVisibility(false);
+        Entity.Manager.filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
 
         // Update distance between Hosts and Extensions
         PortableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);

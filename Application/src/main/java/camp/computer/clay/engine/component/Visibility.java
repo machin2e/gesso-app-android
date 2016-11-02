@@ -1,16 +1,18 @@
 package camp.computer.clay.engine.component;
 
+import camp.computer.clay.util.image.Visible;
+
 public class Visibility extends Component {
 
     // TODO: Visibility(boolean defaultVisibility) constructor
 
-    public boolean isVisible = true;
+    Visible visible = Visible.VISIBLE;
 
-    public void setVisible(boolean isVisible) {
-        this.isVisible = isVisible;
+    public void setVisible(Visible visible) {
+        this.visible = visible;
     }
 
-    public boolean getVisibile() {
-        return this.isVisible;
+    public Visible getVisibile() {
+        return this.visible;
     }
 }
