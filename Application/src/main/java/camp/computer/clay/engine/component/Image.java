@@ -1,18 +1,10 @@
 package camp.computer.clay.engine.component;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.image.Shape;
 import camp.computer.clay.util.image.World;
-import camp.computer.clay.util.image.Visibility;
 
 public class Image extends Component {
 

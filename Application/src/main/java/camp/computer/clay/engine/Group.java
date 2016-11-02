@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
@@ -105,7 +106,7 @@ public class Group<E extends Groupable> implements List<E> {
         public static Filter filterVisibility = new Filter<Entity, Boolean>() {
             @Override
             public boolean filter(Entity entity, Boolean... data) {
-                camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+                Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.isVisible) {
                     return true;
                 } else {
@@ -154,11 +155,11 @@ public class Group<E extends Groupable> implements List<E> {
     public static class Mappers {
 
         // Expects Group<Entity>
-        // Requires components: Visibility
+        // Requires components: Visibility2
         public static Mapper setVisibility = new Mapper<Entity, Entity, Boolean>() {
             @Override
             public Entity map(Entity entity, Boolean isVisible) {
-                camp.computer.clay.engine.component.Visibility visibility = entity.getComponent(camp.computer.clay.engine.component.Visibility.class);
+                Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null) {
                     visibility.isVisible = isVisible;
                 }

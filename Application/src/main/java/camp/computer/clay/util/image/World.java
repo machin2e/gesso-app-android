@@ -11,6 +11,7 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.system.EventHandlerSystem;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
@@ -19,16 +20,14 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.util.geometry.Circle;
+import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Segment;
 
-// TODO: DO NOT extend Image. Try to remove World class. If cannot, then consider making it an
-// TODO: (...) Entity and adding a ActionListenerComponent.
-public class World { // extends Image {
+public class World {
 
     public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 400;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
@@ -37,10 +36,36 @@ public class World { // extends Image {
 
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
 
-    public Visibility extensionPrototypeVisibility = Visibility.INVISIBLE;
-    public Transform extensionPrototypePosition = new Transform();
+    public Entity extensionPrototype = null;
 
-    public Visibility pathPrototypeVisibility = Visibility.INVISIBLE;
+    // Serves as a "prop" for user to define new Extensions
+    public Entity createExtensionPrototype() {
+
+        Entity prototypeExtension = new Entity();
+
+        // extensionPrototype.addComponent(new Extension());
+        prototypeExtension.addComponent(new Transform());
+
+        Image image = new Image();
+        Rectangle rectangle = new Rectangle(200, 200);
+        rectangle.setColor("#fff7f7f7");
+        image.addShape(rectangle);
+        prototypeExtension.addComponent(image);
+        image.invalidate();
+
+        prototypeExtension.addComponent(new Label());
+        prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
+
+        prototypeExtension.addComponent(new Visibility());
+        prototypeExtension.addComponent(new Boundary());
+
+        return prototypeExtension;
+    }
+
+//    public Visibility2 extensionPrototypeVisibility2 = Visibility2.INVISIBLE;
+//    public Transform extensionPrototypePosition = new Transform();
+
+    public Visibility2 pathPrototypeVisibility2 = Visibility2.INVISIBLE;
     public Transform pathPrototypeSourcePosition = new Transform(0, 0);
     public Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
 
@@ -61,6 +86,8 @@ public class World { // extends Image {
         // <TODO: DELETE>
         World.world = this;
         // </TODO: DELETE>
+
+        this.extensionPrototype = createExtensionPrototype();
     }
 
     // <TODO: DELETE>
@@ -70,7 +97,6 @@ public class World { // extends Image {
         return World.world;
     }
     // </TODO: DELETE>
-
 
 
     public static Entity createEntity(Class<?> entityType) {
@@ -104,7 +130,7 @@ public class World { // extends Image {
         host.addComponent(new Transform());
         host.addComponent(new Image());
         host.addComponent(new Boundary());
-        host.addComponent(new camp.computer.clay.engine.component.Visibility());
+        host.addComponent(new Visibility());
 
         // Portable Component (Image Component depends on this)
         final int PORT_COUNT = 12;
@@ -117,7 +143,7 @@ public class World { // extends Image {
 
             // <HACK>
             // TODO: Set default visibility of Ports some other way?
-            port.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = false;
+            port.getComponent(Visibility.class).isVisible = false;
             // </HACK>
 
             host.getComponent(Portable.class).addPort(port);
@@ -200,7 +226,7 @@ public class World { // extends Image {
         extension.addComponent(new Transform());
         extension.addComponent(new Image());
         extension.addComponent(new Boundary());
-        extension.addComponent(new camp.computer.clay.engine.component.Visibility());
+        extension.addComponent(new Visibility());
 
         // <LOAD_GEOMETRY_FROM_FILE>
         Rectangle rectangle;
@@ -253,7 +279,7 @@ public class World { // extends Image {
         path.addComponent(new Transform());
         path.addComponent(pathImage); // Assign Image to Entity
         path.addComponent(new Boundary());
-        path.addComponent(new camp.computer.clay.engine.component.Visibility());
+        path.addComponent(new Visibility());
 
         return path;
     }
@@ -267,7 +293,7 @@ public class World { // extends Image {
         port.addComponent(new Transform());
         port.addComponent(new Image());
         port.addComponent(new Boundary());
-        port.addComponent(new camp.computer.clay.engine.component.Visibility());
+        port.addComponent(new Visibility());
         port.addComponent(new Label());
 
         // <LOAD_GEOMETRY_FROM_FILE>
@@ -395,12 +421,12 @@ public class World { // extends Image {
 
 
     // <EXTENSION_PROTOTYPE>
-    public void setPathPrototypeVisibility(Visibility visibility) {
-        pathPrototypeVisibility = visibility;
+    public void setPathPrototypeVisibility2(Visibility2 visibility2) {
+        pathPrototypeVisibility2 = visibility2;
     }
 
-    public Visibility getPathPrototypeVisibility() {
-        return pathPrototypeVisibility;
+    public Visibility2 getPathPrototypeVisibility2() {
+        return pathPrototypeVisibility2;
     }
 
     public void setPathPrototypeSourcePosition(Transform position) {
@@ -412,39 +438,42 @@ public class World { // extends Image {
     }
 
     public void setExtensionPrototypePosition(Transform position) {
-        this.extensionPrototypePosition.set(position);
+//        this.extensionPrototypePosition.set(position);
+        this.extensionPrototype.getComponent(Transform.class).set(position);
+
+        // <REFACTOR>
+        double pathRotationAngle = Geometry.getAngle(
+                pathPrototypeSourcePosition,
+                extensionPrototype.getComponent(Transform.class)
+        );
+        this.extensionPrototype.getComponent(Transform.class).setRotation(pathRotationAngle);
+        // <REFACTOR>
+
+        // <HACK>
+        // TODO: Move! Needed, but should be in a better place so it doesn't have to be explicitly called!
+        extensionPrototype.getComponent(Image.class).invalidate();
+        this.boundarySystem.updateImage(extensionPrototype);
+        // </HACK>
     }
 
-    public void setExtensionPrototypeVisibility(Visibility visibility) {
-        extensionPrototypeVisibility = visibility;
+    public void setExtensionPrototypeVisibility2(Visibility2 visibility2) {
+//        extensionPrototypeVisibility2 = visibility2;
+        if (visibility2 == Visibility2.INVISIBLE) {
+            this.extensionPrototype.getComponent(Visibility.class).isVisible = false;
+        } else if (visibility2 == Visibility2.VISIBLE) {
+            this.extensionPrototype.getComponent(Visibility.class).isVisible = true;
+        }
     }
 
-    public Visibility getExtensionPrototypeVisibility() {
-        return extensionPrototypeVisibility;
+    public Visibility2 getExtensionPrototypeVisibility2() {
+//        return extensionPrototypeVisibility2;
+        return extensionPrototype.getComponent(Visibility.class).isVisible == true ? Visibility2.VISIBLE : Visibility2.INVISIBLE;
     }
     // </EXTENSION_PROTOTYPE>
 
 
-    public void setPortableSeparation(double distance) {
-        // <HACK>
-        // TODO: Replace ASAP. This is shit.
-//        Group<Image> extensionImages = Entity.Manager.filterType2(ExtensionEntity.class).getImages();
-        Group<Image> extensionImages = Entity.Manager.filterWithComponent(Extension.class).getImages();
-        for (int i = 0; i < extensionImages.size(); i++) {
-            Image extensionImage = extensionImages.get(i);
-
-            Entity extension = extensionImage.getEntity();
-            if (extension.getComponent(Portable.class).getHosts().size() > 0) {
-                Entity hostEntity = extension.getComponent(Portable.class).getHosts().get(0);
-                PortableLayoutSystem.setExtensionDistance(hostEntity, distance);
-            }
-        }
-        // </HACK>
-    }
-
-
     public void hideAllPorts() {
-        // TODO: getEntities().filterType2(PortEntity.class).getShapes().setVisibility(Visibility.INVISIBLE);
+        // TODO: getEntities().filterType2(PortEntity.class).getShapes().setVisibility(Visibility2.INVISIBLE);
 
 //        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages();
 //        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class).getImages();
@@ -454,11 +483,11 @@ public class World { // extends Image {
         for (int i = 0; i < portableImages.size(); i++) {
             Image portableImage = portableImages.get(i);
             Entity portableEntity = portableImage.getEntity();
-//            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
-//            portableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.INVISIBLE);
+//            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility2.INVISIBLE);
+//            portableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility2.INVISIBLE);
             portableEntity.getComponent(Portable.class).getPorts().setVisibility(false);
             portableEntity.getComponent(Portable.class).getPaths().setVisibility(false);
-//            portableImage.setDockVisibility(Visibility.VISIBLE);
+//            portableImage.setDockVisibility(Visibility2.VISIBLE);
             portableImage.setTransparency(1.0);
         }
     }
@@ -466,7 +495,7 @@ public class World { // extends Image {
 
     // <TITLE>
     // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visibility titleVisibility = Visibility.INVISIBLE;
+    protected Visibility2 titleVisibility2 = Visibility2.INVISIBLE;
     protected String titleText = "Project";
 
     public void setTitleText(String text) {
@@ -477,20 +506,20 @@ public class World { // extends Image {
         return this.titleText;
     }
 
-    public void setTitleVisibility(Visibility visibility) {
-        if (titleVisibility == Visibility.INVISIBLE && visibility == Visibility.VISIBLE) {
+    public void setTitleVisibility2(Visibility2 visibility2) {
+        if (titleVisibility2 == Visibility2.INVISIBLE && visibility2 == Visibility2.VISIBLE) {
 //            Application.getPlatform().openTitleEditor(getTitleText());
-            this.titleVisibility = visibility;
-        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.VISIBLE) {
+            this.titleVisibility2 = visibility2;
+        } else if (titleVisibility2 == Visibility2.VISIBLE && visibility2 == Visibility2.VISIBLE) {
 //            Application.getPlatform().setTitleEditor(getTitleText());
-        } else if (titleVisibility == Visibility.VISIBLE && visibility == Visibility.INVISIBLE) {
+        } else if (titleVisibility2 == Visibility2.VISIBLE && visibility2 == Visibility2.INVISIBLE) {
 //            Application.getPlatform().closeTitleEditor();
-            this.titleVisibility = visibility;
+            this.titleVisibility2 = visibility2;
         }
     }
 
-    public Visibility getTitleVisibility() {
-        return this.titleVisibility;
+    public Visibility2 getTitleVisibility2() {
+        return this.titleVisibility2;
     }
     // </TITLE>
 }

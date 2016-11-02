@@ -312,7 +312,7 @@ public class Camera extends Component {
         world.hideAllPorts();
 
         // Update distance between Hosts and Extensions
-        world.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+        PortableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
 
         // Update scale and position
         adjustScale();

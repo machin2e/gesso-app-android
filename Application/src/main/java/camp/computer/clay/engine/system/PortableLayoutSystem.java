@@ -26,6 +26,23 @@ public class PortableLayoutSystem extends System {
         return false;
     }
 
+    public static void setPortableSeparation(double distance) {
+        // <HACK>
+        // TODO: Replace ASAP. This is shit.
+//        Group<Image> extensionImages = Entity.Manager.filterType2(ExtensionEntity.class).getImages();
+        Group<Image> extensionImages = Entity.Manager.filterWithComponent(Extension.class).getImages();
+        for (int i = 0; i < extensionImages.size(); i++) {
+            Image extensionImage = extensionImages.get(i);
+
+            Entity extension = extensionImage.getEntity();
+            if (extension.getComponent(Portable.class).getHosts().size() > 0) {
+                Entity hostEntity = extension.getComponent(Portable.class).getHosts().get(0);
+                PortableLayoutSystem.setExtensionDistance(hostEntity, distance);
+            }
+        }
+        // </HACK>
+    }
+
     /**
      * Creates a new {@code ExtensionEntity} connected to {@hostPort}.
      *
@@ -33,13 +50,13 @@ public class PortableLayoutSystem extends System {
      */
     public static Entity createExtension(Entity hostPort, Transform initialPosition) {
 
-        // TODO: Remove initialPosition... find the position by analyzing the geometry of the HostImage
+        // IASM Message:
+        // (1) touch extensionEntity to select from store, or
+        // (2) drag signal to base, or
+        // (3) touch elsewhere to cancel
 
-        //Log.v("ExtensionEntity", "Creating ExtensionEntity from PortEntity");
-
-        //Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
-
-        // TODO: Prompt to select extensionEntity to use! Then use that profile to create and configure ports for the extensionEntity.
+        // TODO: Prompt to select Extension from repository then copy that Extension configuration!
+        // TODO: (...) Then use that profile to create and configure Ports for the Extension.
 
         // Create Extension Entity
         Entity extension = World.createEntity(Extension.class); // HACK: Because Extension is a Component
@@ -59,33 +76,13 @@ public class PortableLayoutSystem extends System {
         extensionPort.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
 
         // Create Path from Host to Extension and configure the new Path
+        // TODO: Create the Path and then apply it. It should automatically configure the
+        // TODO: (...) Extension's Ports (so the previous segment of code can be removed and
+        // TODO: (...) automated!). The idea here is that a Path can be created given two Ports,
+        // TODO: (...) then a System will automatically configure the Ports based on the newly-
+        // TODO: (...) existing Path's Port dependencies.
         Entity path = World.createEntity(Path.class);
         path.getComponent(Path.class).set(hostPort, extensionPort);
-
-        // Remove focus from other Hosts and their Ports
-        Group<Entity> hosts = Entity.Manager.filterWithComponent(Host.class);
-        for (int i = 0; i < hosts.size(); i++) {
-            Entity host = hosts.get(i);
-            host.getComponent(Image.class).setTransparency(0.05f);
-            host.getComponent(Portable.class).getPorts().setVisibility(false);
-            host.getComponent(Portable.class).getPaths().setVisibility(false);
-        }
-
-        // Get all Ports in all Paths from the Host
-        Group<Entity> hostPaths = hostPort.getComponent(Port.class).getPaths();
-        Group<Entity> hostPorts = new Group<>();
-        for (int i = 0; i < hostPaths.size(); i++) {
-            Group<Entity> pathPorts = hostPaths.get(i).getComponent(Path.class).getPorts();
-            hostPorts.addAll(pathPorts);
-        }
-
-        // Show all of Host's Paths and all Ports contained in those Paths
-        hostPaths.setVisibility(true);
-        hostPorts.setVisibility(true);
-
-        // Update layout
-        Entity host = hostPort.getParent(); // HACK
-        updateExtensionLayout(host);
 
         return extension;
     }

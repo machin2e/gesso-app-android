@@ -13,16 +13,18 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.image.Visibility2;
 import camp.computer.clay.util.image.World;
-import camp.computer.clay.util.image.Visibility;
 
 public class EventHandlerSystem extends System {
 
@@ -75,6 +77,10 @@ public class EventHandlerSystem extends System {
             targetEntity = event.getFirstEvent().getTarget();
         }
 
+//        if (targetEntity.hasComponent(Label.class)) {
+//            Log.v("EventHandlerSystem", "" + event.getType() + ": " + targetEntity.getComponent(Label.class).getLabel());
+//        }
+
         // Dispatch the Event
         if (targetEntity.hasComponent(Camera.class)) {
             EventHandlerSystem.handleCameraEvent(targetEntity, event);
@@ -87,6 +93,13 @@ public class EventHandlerSystem extends System {
         } else if (targetEntity.hasComponent(Path.class)) {
             EventHandlerSystem.handlePathEvent(targetEntity, event);
         }
+//        else if (targetEntity.hasComponent(Image.class)) { // TODO: HACK!
+//
+//            if (targetEntity.hasComponent(Label.class)) {
+//                Log.v("EventHandlerSystem", "targetEntity: " + targetEntity.getComponent(Label.class).getLabel());
+//            }
+//
+//        }
     }
 
     // TODO: Make World an Entity?
@@ -115,7 +128,7 @@ public class EventHandlerSystem extends System {
                 if (action.isTap()) {
                     // Title
                     setTitleText("Project");
-                    setTitleVisibility(Visibility.VISIBLE);
+                    setTitleVisibility2(Visibility2.VISIBLE);
                 }
 
             } else {
@@ -126,7 +139,7 @@ public class EventHandlerSystem extends System {
 //            if (action.isTap()) {
 
             // Title
-            // TODO: workspace.setTitleVisibility(Visibility.INVISIBLE);
+            // TODO: workspace.setTitleVisibility2(Visibility2.INVISIBLE);
 
             // Camera
             camera.getComponent(Camera.class).setFocus(World.getWorld());
@@ -152,11 +165,11 @@ public class EventHandlerSystem extends System {
             // Update position of prototype Extension
             World.getWorld().setExtensionPrototypePosition(event.getPosition());
 
-//                    hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility.INVISIBLE);
+//                    hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility2.INVISIBLE);
 //                hostEntity.getComponent(Portable.class).setPathVisibility(false);
             host.getComponent(Portable.class).getPaths().setVisibility(false);
 
-            World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+            World.getWorld().setExtensionPrototypeVisibility2(Visibility2.VISIBLE);
 
 //            } else if (action.isHolding()) {
 //
@@ -186,11 +199,11 @@ public class EventHandlerSystem extends System {
                     Entity pathEntity = pathEntities.get(j);
 
                     // Show source and target Ports in Paths
-                    pathEntity.getComponent(Path.class).getSource().getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
-                    pathEntity.getComponent(Path.class).getTarget().getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
+                    pathEntity.getComponent(Path.class).getSource().getComponent(Visibility.class).isVisible = true;
+                    pathEntity.getComponent(Path.class).getTarget().getComponent(Visibility.class).isVisible = true;
 
                     // Show Path connection
-                    pathEntity.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
+                    pathEntity.getComponent(Visibility.class).isVisible = true;
                 }
             }
 
@@ -212,7 +225,7 @@ public class EventHandlerSystem extends System {
 
             // Title
             World.getWorld().setTitleText("Host");
-            World.getWorld().setTitleVisibility(Visibility.VISIBLE);
+            World.getWorld().setTitleVisibility2(Visibility2.VISIBLE);
 
 //            } else {
 //
@@ -241,9 +254,9 @@ public class EventHandlerSystem extends System {
 //            }
 
             // Check if connecting to a Extension
-            if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+            if (World.getWorld().getExtensionPrototypeVisibility2() == Visibility2.VISIBLE) {
 
-                World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                World.getWorld().setExtensionPrototypeVisibility2(Visibility2.INVISIBLE);
 
                 // Get cached extension profiles (and retrieve additional from Internet store)
                 List<Profile> profiles = Application.getView().getClay().getProfiles();
@@ -323,19 +336,19 @@ public class EventHandlerSystem extends System {
                     // Show Ports
                     Entity sourcePort = path.getComponent(Path.class).getSource();
                     Entity targetPort = path.getComponent(Path.class).getTarget();
-                    sourcePort.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
-                    targetPort.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
+                    sourcePort.getComponent(Visibility.class).isVisible = true;
+                    targetPort.getComponent(Visibility.class).isVisible = true;
 
 
                     // Show Path
-                    path.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = true;
+                    path.getComponent(Visibility.class).isVisible = true;
                 }
             }
-            // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility.VISIBLE);
+            // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility2.VISIBLE);
 
             // Title
             World.getWorld().setTitleText("Extension");
-            World.getWorld().setTitleVisibility(Visibility.VISIBLE);
+            World.getWorld().setTitleVisibility2(Visibility2.VISIBLE);
 
             // Camera
             Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
@@ -359,13 +372,13 @@ public class EventHandlerSystem extends System {
 
             // if (action.isDragging()) {
 
-            // Prototype Path Visibility
+            // Prototype Path Visibility2
             // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
             World.getWorld().setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getShape("Port").getPosition());
             World.getWorld().setPathPrototypeDestinationPosition(event.getPosition());
-            World.getWorld().setPathPrototypeVisibility(Visibility.VISIBLE);
+            World.getWorld().setPathPrototypeVisibility2(Visibility2.VISIBLE);
 
-            // Prototype Extension Visibility
+            // Prototype Extension Visibility2
             boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
 
             // <HACK>
@@ -390,12 +403,12 @@ public class EventHandlerSystem extends System {
 
             // Update position of prototype Path and Extension
             if (isCreateExtensionAction) {
-                World.getWorld().setExtensionPrototypeVisibility(Visibility.VISIBLE);
+                World.getWorld().setExtensionPrototypeVisibility2(Visibility2.VISIBLE);
                 // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
                 World.getWorld().setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getShape("Port").getPosition());
                 World.getWorld().setExtensionPrototypePosition(event.getPosition());
             } else {
-                World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+                World.getWorld().setExtensionPrototypeVisibility2(Visibility2.INVISIBLE);
             }
 
             // Show Ports of nearby Hosts and Extensions
@@ -522,7 +535,7 @@ public class EventHandlerSystem extends System {
 
                         }
 
-                        World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                        World.getWorld().setPathPrototypeVisibility2(Visibility2.INVISIBLE);
                     }
 
                 } else if (event.getFirstEvent().getTarget() != event.getTarget()) {
@@ -532,7 +545,7 @@ public class EventHandlerSystem extends System {
 
 //                    if (action.isDragging()) {
                     // Hide the prototype Path
-                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                    World.getWorld().setPathPrototypeVisibility2(Visibility2.INVISIBLE);
 
                     // Get the source and target Ports to be used in new Path
                     Entity sourcePort = event.getFirstEvent().getTarget();
@@ -549,24 +562,64 @@ public class EventHandlerSystem extends System {
 
                 }
 
-            } else if (event.getTarget().hasComponent(Camera.class)) {
+                //} else if (event.getTarget().hasComponent(Camera.class)) {
+            } else {
+
+                Log.v("EventHandlerSystem", "UNSELECT Port");
+                if (event.getTarget().hasComponent(Label.class)) {
+                    Log.v("EventHandlerSystem", "targetEntity: " + event.getTarget().getComponent(Label.class).getLabel());
+                }
 
                 // (Host.Port, ..., World) Action Pattern
 
                 // Hide prototype Path and prototype Extension
-                World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
+                World.getWorld().setPathPrototypeVisibility2(Visibility2.INVISIBLE);
+
+                Log.v("EventHandlerSystem", "creating extension");
 
                 // If prototype Extension is visible, create Extension
-                if (World.getWorld().getExtensionPrototypeVisibility() == Visibility.VISIBLE) {
+                if (World.getWorld().getExtensionPrototypeVisibility2() == Visibility2.VISIBLE) {
+
+                    Log.v("EventHandlerSystem", "creating extension");
 
 //                    // Hide prototype Path and prototype Extension
-//                    World.getWorld().setPathPrototypeVisibility(Visibility.INVISIBLE);
-                    World.getWorld().setExtensionPrototypeVisibility(Visibility.INVISIBLE);
+//                    World.getWorld().setPathPrototypeVisibility2(Visibility2.INVISIBLE);
+                    World.getWorld().setExtensionPrototypeVisibility2(Visibility2.INVISIBLE);
 
                     Entity hostPort = event.getFirstEvent().getTarget();
 
                     // Create new custom Extension. Custom Extension can be configured manually.
                     PortableLayoutSystem.createExtension(hostPort, event.getPosition());
+
+                    // <STYLE_AND_LAYOUT>
+                    // Remove focus from other Hosts and their Ports
+                    Group<Entity> hosts = Entity.Manager.filterWithComponent(Host.class);
+                    for (int i = 0; i < hosts.size(); i++) {
+                        Entity host = hosts.get(i);
+                        /*
+                        host.getComponent(Image.class).setTransparency(0.05f);
+                        */
+                        host.getComponent(Portable.class).getPorts().setVisibility(false);
+                        host.getComponent(Portable.class).getPaths().setVisibility(false);
+                    }
+
+                    // Get all Ports in all Paths from the Host
+                    Group<Entity> hostPaths = hostPort.getComponent(Port.class).getPaths();
+                    Group<Entity> hostPorts = new Group<>();
+                    for (int i = 0; i < hostPaths.size(); i++) {
+                        Group<Entity> pathPorts = hostPaths.get(i).getComponent(Path.class).getPorts();
+                        hostPorts.addAll(pathPorts);
+                    }
+
+                    // Show all of Host's Paths and all Ports contained in those Paths
+                    hostPaths.setVisibility(true);
+                    hostPorts.setVisibility(true);
+
+                    // Update layout
+                    Entity host = hostPort.getParent(); // HACK
+
+                    PortableLayoutSystem.updateExtensionLayout(host);
+                    // <STYLE_AND_LAYOUT>
 
                     // Set Camera focus on the Extension
                     // camera.setFocus(extension);
