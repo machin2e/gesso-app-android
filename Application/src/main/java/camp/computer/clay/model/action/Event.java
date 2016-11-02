@@ -21,7 +21,7 @@ public class Event {
 
     public static int MINIMUM_HOLD_DURATION = 600;
 
-    public static int MINIMUM_DRAG_DISTANCE = 35;
+    public static int MINIMUM_MOVE_DISTANCE = 35;
 
     final public static long DEFAULT_TIMESTAMP = 0L;
 

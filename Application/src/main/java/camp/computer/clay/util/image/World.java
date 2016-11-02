@@ -115,6 +115,11 @@ public class World { // extends Image {
             port.getComponent(Label.class).setLabel("Port " + (j + 1));
             port.getComponent(Port.class).setIndex(j);
 
+            // <HACK>
+            // TODO: Set default visibility of Ports some other way?
+            port.getComponent(camp.computer.clay.engine.component.Visibility.class).isVisible = false;
+            // </HACK>
+
             host.getComponent(Portable.class).addPort(port);
         }
 

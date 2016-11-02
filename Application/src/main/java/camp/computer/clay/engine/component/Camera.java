@@ -222,8 +222,10 @@ public class Camera extends Component {
             Log.v("SetFocus", "setFocus(HostEntity)");
 
             // <REFACTOR>
+            /*
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class).remove(entity);
             otherPortables.setTransparency(0.1);
+            */
 
             // Get ports along every PathEntity connected to the Ports on the touched PhoneHost
             Group<Entity> hostPathPorts = new Group<>();
@@ -260,8 +262,10 @@ public class Camera extends Component {
             Log.v("SetFocus", "setFocus(ExtensionEntity)");
 
             // <REFACTOR>
+            /*
             Group<Entity> otherPortables = Entity.Manager.filterWithComponent(Host.class, Extension.class).remove(entity);
             otherPortables.setTransparency(0.1);
+            */
 
             // Get Ports along every Path connected to the Ports on the selected Host
             Group<Entity> hostPathPortEntities = new Group<>();

@@ -1,20 +1,16 @@
 package camp.computer.clay.engine.system;
 
-import android.os.Handler;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import camp.computer.clay.application.Application;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.image.World;
 
 public class InputSystem extends System {
 
-    private Event previousEvent = null;
+//    private Event previousEvent = null;
 
     private List<Event> incomingEvents = new ArrayList<>();
 
@@ -48,7 +44,7 @@ public class InputSystem extends System {
 
         switch (event.getType()) {
             case SELECT: {
-                previousEvent = null;
+//                previousEvent = null;
                 break;
             }
 
@@ -57,12 +53,19 @@ public class InputSystem extends System {
                 // <HACK?>
                 // There might be a better way to do this. How can I assign reasonable coordinates to the synthetic HOLD event?
                 // TODO: Set coordinates of hold... to first event?
-                Event firstEvent = previousEvent.getFirstEvent();
+//                Event firstEvent = previousEvent.getFirstEvent();
+                Event firstEvent = event.getFirstEvent();
                 for (int i = 0; i < firstEvent.pointerCoordinates.length; i++) {
                     event.pointerCoordinates[i].x = firstEvent.pointerCoordinates[i].x;
                     event.pointerCoordinates[i].y = firstEvent.pointerCoordinates[i].y;
                 }
                 // </HACK?>
+
+                // <HACK>
+//                if (event.getDragDistance() >= Event.MINIMUM_MOVE_DISTANCE) {
+//                    return null;
+//                }
+                // </HACK>
 
                 break;
             }
@@ -76,13 +79,15 @@ public class InputSystem extends System {
             }
         }
 
-        // Set previous Event
-        if (previousEvent != null) {
-            event.previousEvent = previousEvent;
-        } else {
-            event.previousEvent = null;
-        }
-        previousEvent = event;
+//        // Set previous Event
+//        if (previousEvent != null) {
+//            event.previousEvent = previousEvent;
+//        } else {
+//            event.previousEvent = null;
+//        }
+//        previousEvent = event;
+
+//        Log.v("PlatformRenderSurface", "event.dragDistance: " + event.getDistance());
 
         return event;
     }

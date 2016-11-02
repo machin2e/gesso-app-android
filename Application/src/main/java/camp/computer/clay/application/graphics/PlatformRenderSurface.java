@@ -16,8 +16,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.system.InputSystem;
@@ -154,6 +152,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
 
+    private Event previousEvent = null;
+
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
@@ -186,14 +186,14 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
-                Entity cameraEntity = Entity.Manager.filterWithComponent(Camera.class).get(0);
+                Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Transform perspectivePosition = cameraEntity.getComponent(Camera.class).getEntity().getComponent(Transform.class);
-                    double perspectiveScale = cameraEntity.getComponent(Camera.class).getScale();
+                    Transform perspectivePosition = camera.getComponent(Camera.class).getEntity().getComponent(Transform.class);
+                    double perspectiveScale = camera.getComponent(Camera.class).getScale();
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
@@ -219,8 +219,18 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 // Update the state of the touched object based on the current pointerCoordinates event state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
 
-                    holdTimerHandler.removeCallbacks(holdTimerRunnable);
-                    holdTimerHandler.postDelayed(holdTimerRunnable, Event.MINIMUM_HOLD_DURATION);
+                    previousEvent = null;
+
+                    // Set previous Event
+                    if (previousEvent != null) {
+                        event.previousEvent = previousEvent;
+                    } else {
+                        event.previousEvent = null;
+                    }
+                    previousEvent = event;
+
+                    holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
+                    holdEventTimerHandler.postDelayed(holdEventTimerRunnable, Event.MINIMUM_HOLD_DURATION);
 
 //                    new Timer().schedule(new TimerTask() {
 //                        @Override
@@ -235,12 +245,34 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
+
+                    // Set previous Event
+                    if (previousEvent != null) {
+                        event.previousEvent = previousEvent;
+                    } else {
+                        event.previousEvent = null;
+                    }
+                    previousEvent = event;
+
                     event.setType(Event.Type.MOVE);
                     event.pointerIndex = pointerId;
-                    inputSystem.queueEvent(event);
+
+                    if (previousEvent.getDistance() > Event.MINIMUM_MOVE_DISTANCE) {
+                        holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
+                        inputSystem.queueEvent(event);
+                    }
+
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
 
-                    holdTimerHandler.removeCallbacks(holdTimerRunnable);
+                    // Set previous Event
+                    if (previousEvent != null) {
+                        event.previousEvent = previousEvent;
+                    } else {
+                        event.previousEvent = null;
+                    }
+                    previousEvent = event;
+
+                    holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
 
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
@@ -258,16 +290,16 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         return true;
     }
 
-    public Handler holdTimerHandler = new Handler();
+    public Handler holdEventTimerHandler = new Handler();
 
-    public Runnable holdTimerRunnable = new Runnable() {
+    public Runnable holdEventTimerRunnable = new Runnable() {
         @Override
         public void run() {
 
             int pointerIndex = 0;
 
 //            if (getFirstEvent().isPointing[pointerIndex]) {
-//                if (getDragDistance() < Event.MINIMUM_DRAG_DISTANCE) {
+//                if (getDragDistance() < Event.MINIMUM_MOVE_DISTANCE) {
 
 //            Event event = new Event();
 //            event.setType(Event.Type.HOLD);
@@ -277,14 +309,27 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //
 //            isHolding[pointerIndex] = true;
 
-            InputSystem inputSystem = world.inputSystem;
+            if (previousEvent.getDistance() < Event.MINIMUM_MOVE_DISTANCE) {
+                InputSystem inputSystem = world.inputSystem;
 
-            Event event = new Event();
-            // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-            // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-            event.setType(Event.Type.HOLD);
-            event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
-            inputSystem.queueEvent(event);
+                Event event = new Event();
+                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                event.setType(Event.Type.HOLD);
+                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+
+                // Set previous Event
+                if (previousEvent != null) {
+                    event.previousEvent = previousEvent;
+                } else {
+                    event.previousEvent = null;
+                }
+                previousEvent = event;
+
+                inputSystem.queueEvent(event);
+
+                Log.v("PlatformRenderSurface", "event.getDistance: " + event.getDistance());
+            }
 
 //                }
 //            }

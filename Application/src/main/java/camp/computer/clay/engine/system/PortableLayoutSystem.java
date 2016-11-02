@@ -124,23 +124,23 @@ public class PortableLayoutSystem extends System {
     }
 
     // TODO: Make PortableLayoutSystem. Iterate through Hosts and lay out Extensions each PortableLayoutSystem.update().
-    private static boolean autoConnectToHost(Entity host, Entity extensionEntity) {
+    private static boolean autoConnectToHost(Entity host, Entity extension) {
 
         // Automatically select, connect paths to, and configure the HostEntity's Ports
-        for (int i = 0; i < extensionEntity.getComponent(Portable.class).getPorts().size(); i++) {
+        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
 
             // Select an available HostEntity PortEntity
-            Entity selectedHostPortEntity = autoSelectNearestAvailableHostPort(host, extensionEntity);
+            Entity selectedHostPort = autoSelectNearestAvailableHostPort(host, extension);
 
             // Configure HostEntity's PortEntity
-            selectedHostPortEntity.getComponent(Port.class).setType(extensionEntity.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getType());
-            selectedHostPortEntity.getComponent(Port.class).setDirection(extensionEntity.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getDirection());
+            selectedHostPort.getComponent(Port.class).setType(extension.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getType());
+            selectedHostPort.getComponent(Port.class).setDirection(extension.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getDirection());
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
-            Entity pathEntity = World.createEntity(Path.class);
-            pathEntity.getComponent(Path.class).set(selectedHostPortEntity, extensionEntity.getComponent(Portable.class).getPorts().get(i));
+            Entity path = World.createEntity(Path.class);
+            path.getComponent(Path.class).set(selectedHostPort, extension.getComponent(Portable.class).getPorts().get(i));
 
-            pathEntity.getComponent(Path.class).setType(Path.Type.ELECTRONIC);
+            path.getComponent(Path.class).setType(Path.Type.ELECTRONIC);
         }
 
         return true;
