@@ -61,21 +61,21 @@ public class Clay {
         this.world = new World();
 
         // Create Camera
-        World.createEntity(Camera.class);
+        world.createEntity(Camera.class);
 
         Application.getView().getPlatformRenderSurface().setWorld(world);
 
         // <TEST>
-        World.createEntity(Host.class);
-        World.createEntity(Host.class);
-        World.createEntity(Host.class);
-        World.createEntity(Host.class);
-        World.createEntity(Host.class);
+        world.createEntity(Host.class);
+        world.createEntity(Host.class);
+        world.createEntity(Host.class);
+        world.createEntity(Host.class);
+        world.createEntity(Host.class);
         // </TEST>
 
         // <HACK>
         // TODO: Place in a LayoutSystem
-        this.world.adjustLayout();
+        this.world.portableLayoutSystem.adjustLayout();
         // </HACK>
     }
 

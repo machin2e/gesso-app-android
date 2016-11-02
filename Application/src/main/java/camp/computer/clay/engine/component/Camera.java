@@ -309,7 +309,8 @@ public class Camera extends Component {
         Log.v("SetFocus", "setFocus(World)");
 
         // Hide Portables' Ports.
-        world.hideAllPorts();
+//        world.hideAllPorts();
+        Entity.Manager.filterWithComponent(Path.class, Port.class).setVisibility(false);
 
         // Update distance between Hosts and Extensions
         PortableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);

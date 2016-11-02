@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
@@ -263,7 +264,6 @@ public class Group<E extends Groupable> implements List<E> {
         return map(Mappers.getPosition, null);
     }
 
-    // <TODO: REMOVE. REPLACE WITH CALLS TO SHAPES IN IMAGE API.>
     /**
      * Removes elements <em>that do not match</em> the regular expressions defined in
      * {@code labels}.
@@ -271,23 +271,25 @@ public class Group<E extends Groupable> implements List<E> {
      * @param labels The list of {@code Shape} objects matching the regular expressions list.
      * @return A list of {@code Shape} objects.
      */
-    public Group<Shape> filterLabel(String... labels) {
+    // Expects Group<Entity>
+    // Requires components: Label
+    public Group<Entity> filterLabel(String... labels) {
 
-        // HACK: Assumes Group<Shape>
+        // HACK: Assumes Group<Entity>
 
-        Group<Shape> shapeGroup = new Group<>();
+        Group<Entity> shapeGroup = new Group<>();
 
         for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < labels.length; j++) {
 
                 Pattern pattern = Pattern.compile(labels[j]);
-                Shape shape = (Shape) this.elements.get(i); // HACK: Forcing typecast to Shape. TODO: Make this safe...
-                Matcher matcher = pattern.matcher(shape.getLabel());
+                Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity. TODO: Make this safe...
+                Matcher matcher = pattern.matcher(entity.getComponent(Label.class).getLabel());
 
                 boolean isMatch = matcher.matches();
 
                 if (isMatch) {
-                    shapeGroup.add((Shape) this.elements.get(i)); // HACK: Forced type to be Shape
+                    shapeGroup.add((Entity) this.elements.get(i)); // HACK: Forced type to be Entity
                 }
             }
         }

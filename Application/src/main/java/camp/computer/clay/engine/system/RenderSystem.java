@@ -61,7 +61,7 @@ public class RenderSystem extends System {
 
         // TODO: renderSystem.update();
 
-        drawPrototypes(platformRenderSurface);
+//        drawPrototypes(platformRenderSurface);
         drawEntities(platformRenderSurface);
 
         canvas.restore();
@@ -180,7 +180,7 @@ public class RenderSystem extends System {
                     Entity pathEntity = image.getEntity();
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
                         // Draw PathEntity between Ports
-                        platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
+//                        platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
                     } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
                         platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
                     }
@@ -207,67 +207,67 @@ public class RenderSystem extends System {
         }
     }
 
-    public void drawPrototypes(PlatformRenderSurface platformRenderSurface) {
+//    public void drawPrototypes(PlatformRenderSurface platformRenderSurface) {
+//
+//        Canvas canvas = platformRenderSurface.canvas;
+//        Paint paint = platformRenderSurface.paint;
+////        World world = platformRenderSurface.getWorld();
+//
+//        canvas.save();
+//
+//        // Draw any prototype Paths and Extensions
+////        drawPathPrototype(platformRenderSurface);
+////        drawExtensionPrototype(platformRenderSurface);
+//
+//        canvas.restore();
+//    }
 
-        Canvas canvas = platformRenderSurface.canvas;
-        Paint paint = platformRenderSurface.paint;
+//    // TODO: Make this into a shape and put this on a separate layerIndex!
+//    public void drawPathPrototype(PlatformRenderSurface platformRenderSurface) {
+//
+//        Canvas canvas = platformRenderSurface.canvas;
+//        Paint paint = platformRenderSurface.paint;
 //        World world = platformRenderSurface.getWorld();
-
-        canvas.save();
-
-        // Draw any prototype Paths and Extensions
-        drawPathPrototype(platformRenderSurface);
-//        drawExtensionPrototype(platformRenderSurface);
-
-        canvas.restore();
-    }
-
-    // TODO: Make this into a shape and put this on a separate layerIndex!
-    public void drawPathPrototype(PlatformRenderSurface platformRenderSurface) {
-
-        Canvas canvas = platformRenderSurface.canvas;
-        Paint paint = platformRenderSurface.paint;
-        World world = platformRenderSurface.getWorld();
-
-
-        if (world.pathPrototypeVisibility2 == Visibility2.VISIBLE) {
-
-            double triangleWidth = 20;
-            double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
-            double triangleSpacing = 35;
-
-            // Color
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(15.0f);
-//            paint.setColor(this.getUniqueColor());
-
-            double pathRotationAngle = Geometry.getAngle(
-                    world.pathPrototypeSourcePosition,
-                    world.pathPrototypeDestinationCoordinate
-            );
-
-            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
-                    world.pathPrototypeSourcePosition,
-                    pathRotationAngle,
-                    2 * triangleSpacing
-            );
-
-            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
-                    world.pathPrototypeDestinationCoordinate,
-                    pathRotationAngle + 180,
-                    2 * triangleSpacing
-            );
-
-            paint.setColor(Color.parseColor("#efefef"));
-            platformRenderSurface.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight);
-
-            // Color
-            paint.setStyle(Paint.Style.FILL);
+//
+//
+//        if (world.pathPrototypeVisibility2 == Visibility2.VISIBLE) {
+//
+//            double triangleWidth = 20;
+//            double triangleHeight = triangleWidth * ((float) Math.sqrt(3.0) / 2);
+//            double triangleSpacing = 35;
+//
+//            // Color
+//            paint.setStyle(Paint.Style.STROKE);
+//            paint.setStrokeWidth(15.0f);
+////            paint.setColor(this.getUniqueColor());
+//
+//            double pathRotationAngle = Geometry.getAngle(
+//                    world.pathPrototypeSourcePosition,
+//                    world.pathPrototypeDestinationCoordinate
+//            );
+//
+//            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(
+//                    world.pathPrototypeSourcePosition,
+//                    pathRotationAngle,
+//                    2 * triangleSpacing
+//            );
+//
+//            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(
+//                    world.pathPrototypeDestinationCoordinate,
+//                    pathRotationAngle + 180,
+//                    2 * triangleSpacing
+//            );
+//
 //            paint.setColor(Color.parseColor("#efefef"));
-            double shapeRadius = 40.0;
-            platformRenderSurface.drawCircle(world.pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
-        }
-    }
+//            platformRenderSurface.drawTrianglePath(pathStartCoordinate, pathStopCoordinate, triangleWidth, triangleHeight);
+//
+//            // Color
+//            paint.setStyle(Paint.Style.FILL);
+////            paint.setColor(Color.parseColor("#efefef"));
+//            double shapeRadius = 40.0;
+//            platformRenderSurface.drawCircle(world.pathPrototypeDestinationCoordinate, shapeRadius, 0.0f);
+//        }
+//    }
 
 //    public void drawExtensionPrototype(PlatformRenderSurface platformRenderSurface) {
 //

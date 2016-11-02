@@ -430,6 +430,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
 
     // <PATH_IMAGE_HELPERS>
+    /*
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
@@ -456,6 +457,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         platformRenderSurface.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
     }
+    */
 
     public void drawLinePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 

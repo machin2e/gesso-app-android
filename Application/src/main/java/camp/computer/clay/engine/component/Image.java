@@ -1,5 +1,8 @@
 package camp.computer.clay.engine.component;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.util.Color;
@@ -92,6 +95,30 @@ public class Image extends Component {
         }
         return null;
     }
+
+    // TODO: <REMOVE?>
+    public Group<Shape> getShapes(String... labels) {
+
+        Group<Shape> shapeGroup = new Group<>();
+
+        for (int i = 0; i < this.shapes.size(); i++) {
+            for (int j = 0; j < labels.length; j++) {
+
+                Pattern pattern = Pattern.compile(labels[j]);
+                Shape shape = this.shapes.get(i); // HACK: Forcing typecast to Shape. TODO: Make this safe...
+                Matcher matcher = pattern.matcher(shape.getLabel());
+
+                boolean isMatch = matcher.matches();
+
+                if (isMatch) {
+                    shapeGroup.add(this.shapes.get(i)); // HACK: Forced type to be Shape
+                }
+            }
+        }
+
+        return shapeGroup;
+    }
+    // TODO: </REMOVE?>
 
     public Shape getShape(Entity entity) {
 //        for (int i = 0; i < shapes.size(); i++) {

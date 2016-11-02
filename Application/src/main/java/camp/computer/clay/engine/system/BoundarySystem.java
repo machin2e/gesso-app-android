@@ -68,7 +68,8 @@ public class BoundarySystem extends System {
     public void updateHostImage(Entity host) {
 
         // Get LED shapes
-        Group<Shape> lightShapeGroup = host.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
+//        Group<Shape> lightShapeGroup = host.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
+        Group<Shape> lightShapeGroup = host.getComponent(Image.class).getShapes("^LED (1[0-2]|[1-9])$");
 
         // Update Port LED color
         for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {

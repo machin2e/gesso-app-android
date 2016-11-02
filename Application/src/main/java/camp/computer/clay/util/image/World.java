@@ -20,6 +20,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
@@ -36,44 +37,17 @@ public class World {
 
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
 
-    public Entity extensionPrototype = null;
-
-    // Serves as a "prop" for user to define new Extensions
-    public Entity createExtensionPrototype() {
-
-        Entity prototypeExtension = new Entity();
-
-        // extensionPrototype.addComponent(new Extension());
-        prototypeExtension.addComponent(new Transform());
-
-        Image image = new Image();
-        Rectangle rectangle = new Rectangle(200, 200);
-        rectangle.setColor("#fff7f7f7");
-        image.addShape(rectangle);
-        prototypeExtension.addComponent(image);
-        image.invalidate();
-
-        prototypeExtension.addComponent(new Label());
-        prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
-
-        prototypeExtension.addComponent(new Visibility());
-        prototypeExtension.addComponent(new Boundary());
-
-        return prototypeExtension;
-    }
-
-//    public Visibility2 extensionPrototypeVisibility2 = Visibility2.INVISIBLE;
-//    public Transform extensionPrototypePosition = new Transform();
-
-    public Visibility2 pathPrototypeVisibility2 = Visibility2.INVISIBLE;
-    public Transform pathPrototypeSourcePosition = new Transform(0, 0);
-    public Transform pathPrototypeDestinationCoordinate = new Transform(0, 0);
+    // <DELETE>
+//    private Entity extensionPrototype = null;
+//    private Entity pathPrototype = null;
+    // </DELETE>
 
     // <WORLD_SYSTEMS>
     public CameraSystem cameraSystem = new CameraSystem();
     public RenderSystem renderSystem = new RenderSystem();
     public BoundarySystem boundarySystem = new BoundarySystem();
     public InputSystem inputSystem = new InputSystem();
+    public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem();
     public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem();
     // </WORLD_SYSTEMS>
 
@@ -87,7 +61,10 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
-        this.extensionPrototype = createExtensionPrototype();
+//        this.pathPrototype = createPrototypePathEntity();
+//        this.extensionPrototype = createPrototypeExtensionEntity();
+        createPrototypePathEntity();
+        createPrototypeExtensionEntity();
     }
 
     // <TODO: DELETE>
@@ -325,10 +302,66 @@ public class World {
         return cameraEntity;
     }
 
+    // TODO: Actually create and stage a real single-port Entity without a parent!?
+    // Serves as a "prop" for user to define new Extensions
+    public Entity createPrototypeExtensionEntity() {
+
+        Entity prototypeExtension = new Entity();
+
+        // extensionPrototype.addComponent(new Extension());
+        prototypeExtension.addComponent(new Transform());
+
+        Image image = new Image();
+        Rectangle rectangle = new Rectangle(200, 200);
+        rectangle.setColor("#fff7f7f7");
+        rectangle.setOutlineThickness(0.0);
+        image.addShape(rectangle);
+        image.invalidate();
+        prototypeExtension.addComponent(image);
+
+        prototypeExtension.addComponent(new Label());
+        prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
+
+        prototypeExtension.addComponent(new Visibility());
+        prototypeExtension.getComponent(Visibility.class).isVisible = false;
+
+        prototypeExtension.addComponent(new Boundary());
+
+        return prototypeExtension;
+    }
+
+    public Entity createPrototypePathEntity() {
+
+        Entity prototypePath = new Entity();
+
+        // extensionPrototype.addComponent(new Extension());
+        prototypePath.addComponent(new Transform());
+
+        Image image = new Image();
+        Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
+        segment.setLabel("Path");
+        segment.setOutlineColor("#ff333333");
+        segment.setOutlineThickness(10.0);
+        image.addShape(segment);
+        image.invalidate();
+        prototypePath.addComponent(image);
+
+        prototypePath.addComponent(new Label());
+        prototypePath.getComponent(Label.class).setLabel("prototypePath");
+
+        prototypePath.addComponent(new Visibility());
+        prototypePath.getComponent(Visibility.class).isVisible = false;
+
+        prototypePath.addComponent(new Boundary());
+
+        return prototypePath;
+    }
+
     public void updateSystems(Canvas canvas) {
         world.inputSystem.update(world);
         world.eventHandlerSystem.update(world);
         world.boundarySystem.update(world);
+        world.portableLayoutSystem.update(world);
         world.renderSystem.update(world, canvas); // TODO: Remove canvas!
         world.cameraSystem.update(world);
     }
@@ -362,138 +395,7 @@ public class World {
         */
     }
 
-    // TODO: Use base class's addImage() so Shapes are added to super.shapes. Then add an index instead of layers?
-
-    /**
-     * Automatically determines and assigns a valid position for all {@code HostEntity} {@code Image}s.
-     */
-    public void adjustLayout() {
-
-//        Group<Image> hostImages = Entity.Manager.filterType2(HostEntity.class).getImages();
-        Group<Image> hostImages = Entity.Manager.filterWithComponent(Host.class).getImages();
-
-        // Set position on grid layout
-        if (hostImages.size() == 1) {
-            hostImages.get(0).getEntity().getComponent(Transform.class).set(0, 0);
-        } else if (hostImages.size() == 2) {
-            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, 0);
-            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, 0);
-        } else if (hostImages.size() == 5) {
-            hostImages.get(0).getEntity().getComponent(Transform.class).set(-300, -600);
-            hostImages.get(0).getEntity().getComponent(Transform.class).setRotation(0);
-            hostImages.get(1).getEntity().getComponent(Transform.class).set(300, -600);
-            hostImages.get(1).getEntity().getComponent(Transform.class).setRotation(20);
-            hostImages.get(2).getEntity().getComponent(Transform.class).set(-300, 0);
-            hostImages.get(2).getEntity().getComponent(Transform.class).setRotation(40);
-            hostImages.get(3).getEntity().getComponent(Transform.class).set(300, 0);
-            hostImages.get(3).getEntity().getComponent(Transform.class).setRotation(60);
-            hostImages.get(4).getEntity().getComponent(Transform.class).set(-300, 600);
-            hostImages.get(4).getEntity().getComponent(Transform.class).setRotation(80);
-        }
-
-        // TODO: Set position on "scatter" layout
-
-        // Set rotation
-        // image.setRotation(Probability.getRandomGenerator().nextInt(360));
-    }
-
-    // TODO: Remove this! First don't extend Image on Shape (this class)? Make TouchableComponent?
-    public Group<Shape> getShapes() {
-        Group<Shape> shapes = new Group<>();
-        Group<Image> images = Entity.Manager.getImages();
-        for (int i = 0; i < images.size(); i++) {
-            shapes.addAll(images.get(i).getShapes());
-        }
-        return shapes;
-    }
-
-    public Shape getShape(Entity entity) {
-        Group<Image> images = Entity.Manager.getImages();
-        for (int i = 0; i < images.size(); i++) {
-            Image image = images.get(i);
-            Shape shape = image.getShape(entity);
-            if (shape != null) {
-                return shape;
-            }
-        }
-        return null;
-    }
-
-
-    // <EXTENSION_PROTOTYPE>
-    public void setPathPrototypeVisibility2(Visibility2 visibility2) {
-        pathPrototypeVisibility2 = visibility2;
-    }
-
-    public Visibility2 getPathPrototypeVisibility2() {
-        return pathPrototypeVisibility2;
-    }
-
-    public void setPathPrototypeSourcePosition(Transform position) {
-        this.pathPrototypeSourcePosition.set(position);
-    }
-
-    public void setPathPrototypeDestinationPosition(Transform position) {
-        this.pathPrototypeDestinationCoordinate.set(position);
-    }
-
-    public void setExtensionPrototypePosition(Transform position) {
-//        this.extensionPrototypePosition.set(position);
-        this.extensionPrototype.getComponent(Transform.class).set(position);
-
-        // <REFACTOR>
-        double pathRotationAngle = Geometry.getAngle(
-                pathPrototypeSourcePosition,
-                extensionPrototype.getComponent(Transform.class)
-        );
-        this.extensionPrototype.getComponent(Transform.class).setRotation(pathRotationAngle);
-        // <REFACTOR>
-
-        // <HACK>
-        // TODO: Move! Needed, but should be in a better place so it doesn't have to be explicitly called!
-        extensionPrototype.getComponent(Image.class).invalidate();
-        this.boundarySystem.updateImage(extensionPrototype);
-        // </HACK>
-    }
-
-    public void setExtensionPrototypeVisibility2(Visibility2 visibility2) {
-//        extensionPrototypeVisibility2 = visibility2;
-        if (visibility2 == Visibility2.INVISIBLE) {
-            this.extensionPrototype.getComponent(Visibility.class).isVisible = false;
-        } else if (visibility2 == Visibility2.VISIBLE) {
-            this.extensionPrototype.getComponent(Visibility.class).isVisible = true;
-        }
-    }
-
-    public Visibility2 getExtensionPrototypeVisibility2() {
-//        return extensionPrototypeVisibility2;
-        return extensionPrototype.getComponent(Visibility.class).isVisible == true ? Visibility2.VISIBLE : Visibility2.INVISIBLE;
-    }
-    // </EXTENSION_PROTOTYPE>
-
-
-    public void hideAllPorts() {
-        // TODO: getEntities().filterType2(PortEntity.class).getShapes().setVisibility(Visibility2.INVISIBLE);
-
-//        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class, ExtensionEntity.class).getImages();
-//        Group<Image> portableImages = Entity.Manager.filterType2(HostEntity.class).getImages();
-        Group<Image> portableImages = Entity.Manager.filterWithComponent(Host.class, Extension.class).getImages(); // HACK
-
-//        ImageGroup portableImages = getImages(HostEntity.class, ExtensionEntity.class);
-        for (int i = 0; i < portableImages.size(); i++) {
-            Image portableImage = portableImages.get(i);
-            Entity portableEntity = portableImage.getEntity();
-//            portableEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visibility2.INVISIBLE);
-//            portableEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visibility2.INVISIBLE);
-            portableEntity.getComponent(Portable.class).getPorts().setVisibility(false);
-            portableEntity.getComponent(Portable.class).getPaths().setVisibility(false);
-//            portableImage.setDockVisibility(Visibility2.VISIBLE);
-            portableImage.setTransparency(1.0);
-        }
-    }
-
-
-    // <TITLE>
+    // <TITLE_UI_COMPONENT>
     // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
     protected Visibility2 titleVisibility2 = Visibility2.INVISIBLE;
     protected String titleText = "Project";
@@ -506,7 +408,7 @@ public class World {
         return this.titleText;
     }
 
-    public void setTitleVisibility2(Visibility2 visibility2) {
+    public void setTitleVisibility(Visibility2 visibility2) {
         if (titleVisibility2 == Visibility2.INVISIBLE && visibility2 == Visibility2.VISIBLE) {
 //            Application.getPlatform().openTitleEditor(getTitleText());
             this.titleVisibility2 = visibility2;
@@ -518,8 +420,8 @@ public class World {
         }
     }
 
-    public Visibility2 getTitleVisibility2() {
+    public Visibility2 getTitleVisibility() {
         return this.titleVisibility2;
     }
-    // </TITLE>
+    // </TITLE_UI_COMPONENT>
 }
