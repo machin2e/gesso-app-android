@@ -1,22 +1,11 @@
 package camp.computer.clay.engine.system;
 
-import android.util.Log;
-
-import camp.computer.clay.application.Application;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.World;
-import camp.computer.clay.util.time.Clock;
+import camp.computer.clay.engine.World;
 
 public class CameraSystem extends System {
 

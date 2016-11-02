@@ -3,12 +3,10 @@ package camp.computer.clay.util.geometry;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Line<T extends Entity> extends Shape<T> {
+public class Line<T extends Entity> extends Shape { // <T> {
 
     public Line() {
         super();

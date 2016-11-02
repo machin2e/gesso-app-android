@@ -36,8 +36,8 @@ import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Text;
 import camp.computer.clay.util.geometry.Triangle;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.engine.World;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -540,10 +540,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
     // </PATH_IMAGE_HELPERS>
 
-    public void drawSegment(Transform source, Transform target) {
-        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
-    }
-
+    // TODO: Replace with more direct drawing? What's the minimal layering between image
+    // TODO: (...) representation and platform-level rendering?
     public void drawShape(Shape shape) {
         if (shape.getClass() == Point.class) {
             // TODO:
@@ -562,6 +560,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         } else if (shape.getClass() == Text.class) {
             // TODO:
         }
+    }
+
+    public void drawSegment(Transform source, Transform target) {
+        canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
     }
 
     public void drawSegment(Segment segment) {

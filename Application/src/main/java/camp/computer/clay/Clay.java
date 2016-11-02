@@ -25,7 +25,7 @@ import camp.computer.clay.old_model.Cache;
 import camp.computer.clay.old_model.Internet;
 import camp.computer.clay.old_model.Messenger;
 import camp.computer.clay.old_model.PhoneHost;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.engine.World;
 
 public class Clay {
 

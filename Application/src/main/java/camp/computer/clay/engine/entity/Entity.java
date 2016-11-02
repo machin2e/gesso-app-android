@@ -3,19 +3,8 @@ package camp.computer.clay.engine.entity;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.component.Boundary;
-import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Visibility;
 
 public final class Entity extends Groupable {
 
@@ -39,37 +28,6 @@ public final class Entity extends Groupable {
         Entity.Manager.add(this); // Add Entity to Manager
     }
 
-
-    // TODO: <DELETE>
-    private Entity parent;
-
-    public void setParent(Entity parent) {
-        this.parent = parent;
-    }
-
-    public Entity getParent() {
-        return this.parent;
-    }
-    // TODO: </DELETE>
-
-
-
-    // <COMPONENTS>
-    // TODO: Eventually, put this in the list of components.
-    // TODO: i.e., Store these in the Entity.components Group.
-//    private Transform transform = null;
-//    private Image image = null;
-//    private Portable portable = null;
-//    private Extension extension = null;
-//    private Host host = null;
-//    private Port port = null; // Only used by Ports (DUH)
-//    private Path path = null;
-//    private Camera camera = null;
-//    private Label label = null;
-//    private Visibility visibility = null;
-//    private Boundary boundary = null;
-    // </COMPONENTS>
-
     public <C extends Component> void addComponent(C component) {
         component.setEntity(this); // Associate Component with Entity
         components.add(component); // Add to Entity
@@ -91,10 +49,24 @@ public final class Entity extends Groupable {
     public <C extends Component> C removeComponent(Class<C> type) {
         C component = getComponent(type);
         if (component != null) {
-            components.remove(component); // TODO: FIX THIS BUG! This doesn't actually remove the component in place. It returns a new Group without the element!
+            components.remove(component);
         }
         return component;
     }
+
+
+
+    // TODO: <DELETE>
+    private Entity parent;
+
+    public void setParent(Entity parent) {
+        this.parent = parent;
+    }
+
+    public Entity getParent() {
+        return this.parent;
+    }
+    // TODO: </DELETE>
 
 
 

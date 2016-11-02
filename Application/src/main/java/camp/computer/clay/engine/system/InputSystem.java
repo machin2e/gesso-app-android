@@ -1,12 +1,10 @@
 package camp.computer.clay.engine.system;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.model.action.Event;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.engine.World;
 
 public class InputSystem extends System {
 

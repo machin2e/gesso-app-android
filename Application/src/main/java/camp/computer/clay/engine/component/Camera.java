@@ -8,8 +8,8 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.util.time.Clock;
 
 public class Camera extends Component {

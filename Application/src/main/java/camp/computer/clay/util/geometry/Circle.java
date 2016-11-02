@@ -3,15 +3,13 @@ package camp.computer.clay.util.geometry;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
 /**
  * Circle. By default, objects are unit circles.
  */
-public class Circle<T extends Entity> extends Shape<T> {
+public class Circle<T extends Entity> extends Shape { // <T> {
 
     /**
      * The index of boundary to use to approximate the circle. By default, this is setValue to 12,
@@ -21,16 +19,20 @@ public class Circle<T extends Entity> extends Shape<T> {
 
     public double radius = 1.0;
 
+    public Circle() {
+        setup();
+    }
+
     public Circle(double radius) {
         super(new Transform(0, 0));
         this.radius = radius;
         setup();
     }
 
-    public Circle(T entity) {
-        this.entity = entity;
-        setup();
-    }
+//    public Circle(T entity) {
+//        this.entity = entity;
+//        setup();
+//    }
 
     private void setup() {
         setupGeometry();

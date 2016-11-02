@@ -17,9 +17,9 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Segment;
-import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.geometry.Shape;
 import camp.computer.clay.util.image.Visibility2;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.engine.World;
 
 public class PortableLayoutSystem extends System {
 

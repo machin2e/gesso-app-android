@@ -5,9 +5,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.image.World;
 
 public class Portable extends Component {
 

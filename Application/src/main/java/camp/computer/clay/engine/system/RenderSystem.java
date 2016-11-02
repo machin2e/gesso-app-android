@@ -18,7 +18,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.engine.World;
 
 public class RenderSystem extends System {
 

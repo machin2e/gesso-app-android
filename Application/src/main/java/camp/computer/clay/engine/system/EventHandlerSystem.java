@@ -24,7 +24,7 @@ import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.image.Visibility2;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.engine.World;
 
 public class EventHandlerSystem extends System {
 
@@ -607,15 +607,15 @@ public class EventHandlerSystem extends System {
 
                     // <STYLE_AND_LAYOUT>
                     // Remove focus from other Hosts and their Ports
-                    Group<Entity> hosts = Entity.Manager.filterWithComponent(Host.class);
-                    for (int i = 0; i < hosts.size(); i++) {
-                        Entity host = hosts.get(i);
-                        /*
-                        host.getComponent(Image.class).setTransparency(0.05f);
-                        */
-                        host.getComponent(Portable.class).getPorts().setVisibility(false);
-                        host.getComponent(Portable.class).getPaths().setVisibility(false);
-                    }
+//                    Group<Entity> hosts = Entity.Manager.filterWithComponent(Host.class);
+//                    for (int i = 0; i < hosts.size(); i++) {
+//                        Entity host = hosts.get(i);
+//                        /*
+//                        host.getComponent(Image.class).setTransparency(0.05f);
+//                        */
+//                        host.getComponent(Portable.class).getPorts().setVisibility(false);
+//                        host.getComponent(Portable.class).getPaths().setVisibility(false);
+//                    }
 
                     // Get all Ports in all Paths from the Host
                     Group<Entity> hostPaths = hostPort.getComponent(Port.class).getPaths();
@@ -631,6 +631,8 @@ public class EventHandlerSystem extends System {
 
                     // Update layout
                     Entity host = hostPort.getParent(); // HACK
+
+                    PortableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
                     PortableLayoutSystem.updateExtensionLayout(host);
                     // <STYLE_AND_LAYOUT>

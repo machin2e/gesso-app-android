@@ -14,8 +14,8 @@ import camp.computer.clay.util.Color;
 import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.World;
+import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.engine.World;
 
 public class BoundarySystem extends System {
 

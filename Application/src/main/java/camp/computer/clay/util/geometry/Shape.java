@@ -1,15 +1,14 @@
-package camp.computer.clay.util.image;
+package camp.computer.clay.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.engine.component.Transform;
 
-public abstract class Shape<T extends Entity> extends Groupable {
+public abstract class Shape extends Groupable {
 
     protected String label = "";
 
@@ -23,7 +22,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
     protected String outlineColor = "#ff000000";
     public double outlineThickness = 1.0;
 
-    protected T entity = null;
+//    protected T entity = null;
 
     protected List<Transform> boundary = new ArrayList<>();
 
@@ -80,6 +79,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         invalidate();
     }
 
+    // TODO: Move into ImageSystem, PortableLayoutSystem, or RenderSystem
     public void setImagePosition(Transform point) {
         if (imagePosition == null) {
             imagePosition = new Transform();

@@ -1,4 +1,4 @@
-package camp.computer.clay.util.image;
+package camp.computer.clay.engine;
 
 import android.graphics.Canvas;
 
@@ -18,15 +18,15 @@ import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.util.geometry.Circle;
-import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Segment;
+import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.util.image.Visibility2;
 
 public class World {
 
@@ -36,11 +36,6 @@ public class World {
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
-
-    // <DELETE>
-//    private Entity extensionPrototype = null;
-//    private Entity pathPrototype = null;
-    // </DELETE>
 
     // <WORLD_SYSTEMS>
     public CameraSystem cameraSystem = new CameraSystem();
@@ -209,7 +204,8 @@ public class World {
         Rectangle rectangle;
 
         // Create Shapes for Image
-        rectangle = new Rectangle(extension);
+        //rectangle = new Rectangle(extension);
+        rectangle = new Rectangle();
         rectangle.setWidth(200);
         rectangle.setHeight(200);
         rectangle.setLabel("Board");
@@ -277,7 +273,8 @@ public class World {
         Circle circle;
 
         // Create Shapes for Image
-        circle = new Circle(port);
+        // circle = new Circle(port);
+        circle = new Circle();
         circle.setRadius(50.0);
         circle.setLabel("Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32

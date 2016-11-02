@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.BoundarySystem;
-import camp.computer.clay.util.image.Shape;
 
-public class Rectangle<T extends Entity> extends Shape<T> {
+public class Rectangle<T extends Entity> extends Shape { // <T> {
 
     public double width = 1.0;
 
@@ -20,10 +18,14 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     private ArrayList<Segment> segments = new ArrayList<>();
 
-    public Rectangle(T entity) {
-        this.entity = entity;
+    public Rectangle() {
         setup();
     }
+
+//    public Rectangle(T entity) {
+//        this.entity = entity;
+//        setup();
+//    }
 
     public Rectangle(double width, double height) {
         super();

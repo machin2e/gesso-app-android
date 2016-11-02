@@ -20,7 +20,7 @@ import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.util.geometry.Shape;
 
 public class Group<E extends Groupable> implements List<E> {
 

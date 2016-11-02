@@ -2,9 +2,7 @@ package camp.computer.clay.util.geometry;
 
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
 public class Text extends Shape {
 

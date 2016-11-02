@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Point<T extends Entity> extends Shape<T> {
+public class Point<T extends Entity> extends Shape { // <T> {
 
     public Point() {
         setup();
@@ -20,10 +18,10 @@ public class Point<T extends Entity> extends Shape<T> {
         setup();
     }
 
-    public Point(T entity) {
-        this.entity = entity;
-        setup();
-    }
+//    public Point(T entity) {
+//        this.entity = entity;
+//        setup();
+//    }
 
     private void setup() {
         setupGeometry();

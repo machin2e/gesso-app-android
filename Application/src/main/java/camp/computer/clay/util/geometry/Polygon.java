@@ -3,19 +3,21 @@ package camp.computer.clay.util.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Polygon<T extends Entity> extends Shape<T> {
+public class Polygon<T extends Entity> extends Shape { // <T> {
 
     protected List<Transform> vertices = new ArrayList<>();
 
-    public Polygon(T entity) {
-        this.entity = entity;
+    public Polygon() {
         setup();
     }
+
+//    public Polygon(T entity) {
+//        this.entity = entity;
+//        setup();
+//    }
 
     public Polygon(Transform position, List<Transform> vertices) {
         super(position);
