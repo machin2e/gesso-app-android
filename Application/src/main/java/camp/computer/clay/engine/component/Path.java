@@ -108,7 +108,7 @@ public class Path extends Component {
             sourcePortEntity.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
         }
         if (sourcePortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
-            sourcePortEntity.getComponent(Port.class).setType(Port.Type.next(sourcePortEntity.getComponent(Port.class).getType()));
+            sourcePortEntity.getComponent(Port.class).setType(Port.Type.getNext(sourcePortEntity.getComponent(Port.class).getType()));
         }
 
         // Update target PortEntity configuration

@@ -241,7 +241,7 @@ public class World {
         Segment segment;
 
         // Board
-        segment = new Segment<>();
+        segment = new Segment();
         segment.setOutlineThickness(2.0);
         segment.setLabel("PathEntity");
         segment.setColor("#1f1f1e"); // #f7f7f7

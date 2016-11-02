@@ -161,10 +161,6 @@ public abstract class Shape extends Groupable {
         this.label = label;
     }
 
-    public boolean hasLabel() {
-        return this.label != null && this.label.length() > 0;
-    }
-
     public String getLabel() {
         return this.label;
     }

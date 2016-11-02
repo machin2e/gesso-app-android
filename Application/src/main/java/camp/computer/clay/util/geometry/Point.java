@@ -1,10 +1,8 @@
 package camp.computer.clay.util.geometry;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
 public class Point extends Shape {
@@ -29,7 +27,7 @@ public class Point extends Shape {
 
     @Override
     public List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+        List<Transform> vertices = new ArrayList<>();
         vertices.add(new Transform(imagePosition));
         return vertices;
     }

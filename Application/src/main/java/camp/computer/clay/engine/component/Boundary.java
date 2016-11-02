@@ -1,7 +1,6 @@
 package camp.computer.clay.engine.component;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import camp.computer.clay.util.geometry.Geometry;
@@ -64,7 +63,7 @@ public class Boundary extends Component {
 
         Image image = getEntity().getComponent(Image.class);
 
-        List<Transform> shapeBoundaries = new LinkedList<>();
+        List<Transform> shapeBoundaries = new ArrayList<>();
         for (int i = 0; i < image.shapes.size(); i++) {
             shapeBoundaries.addAll(image.shapes.get(i).getBoundary());
         }

@@ -507,27 +507,27 @@ public class EventHandlerSystem extends System {
 
                             // Set initial Port Type
                             sourcePortComponent.setDirection(Port.Direction.INPUT);
-                            sourcePortComponent.setType(Port.Type.next(sourcePortComponent.getType()));
+                            sourcePortComponent.setType(Port.Type.getNext(sourcePortComponent.getType()));
 
                         } else if (!sourcePortComponent.hasPath()) {
 
                             // Change Port Type
                             Port.Type nextType = sourcePortComponent.getType();
                             while ((nextType == Port.Type.NONE) || (nextType == sourcePortComponent.getType())) {
-                                nextType = Port.Type.next(nextType);
+                                nextType = Port.Type.getNext(nextType);
                             }
                             sourcePortComponent.setType(nextType);
 
-                        } else if (sourcePort.getComponent(Port.class).hasVisiblePaths()) {
+                        } else {
 
-                            // Paths are being shown. Touching a Port changes its type. This will
-                            // also updates the corresponding Path's requirement (for Port types).
+                            // Touching a Port changes its type. This will also updates the
+                            // corresponding Path's requirement (for Port types).
 
-                            // Cycle to next Path Type
+                            // Cycle to getNext Path Type
                             // (Below: Updates each Port in the Path, to reflect this change.)
                             Port.Type nextType = sourcePortComponent.getType();
                             while ((nextType == Port.Type.NONE) || (nextType == sourcePortComponent.getType())) {
-                                nextType = Port.Type.next(nextType);
+                                nextType = Port.Type.getNext(nextType);
                             }
 
                             // Update each Port in the Path to reflect the new Port type

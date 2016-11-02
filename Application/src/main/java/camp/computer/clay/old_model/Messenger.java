@@ -118,7 +118,7 @@ public class Messenger {
     // TODO: Unify queues and rename to "queueEvent()" or "updateImage()"
     public void processIncomingMessages() {
 //        Log.v ("UDP_Processing", "<<< processIncomingQueue");
-        // Dequeue and queueEvent the next message on the incoming message queue.
+        // Dequeue and queueEvent the getNext message on the incoming message queue.
         if (hasIncomingMessages()) {
 //            Log.v("Clay_Time", "Processing incoming message");
             while (hasIncomingMessages()) {
@@ -247,9 +247,9 @@ public class Messenger {
     }
 
     /**
-     * Returns the next outgoing message but does not remove it.
+     * Returns the getNext outgoing message but does not remove it.
      *
-     * @return The next outgoing message.
+     * @return The getNext outgoing message.
      */
     public Message peekOutgoingMessage() {
         return outgoingMessages.get(0);
@@ -281,7 +281,7 @@ public class Messenger {
                 }
             }
 
-            // Get the next outgoing message.
+            // Get the getNext outgoing message.
             Message outgoingMessage = peekOutgoingMessage();
 
 //            Log.v("UDP", "                 Message: " + outgoingMessage.getDescriptor());

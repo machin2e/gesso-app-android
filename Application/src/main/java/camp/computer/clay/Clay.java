@@ -171,10 +171,6 @@ public class Clay {
         return this.phoneHosts;
     }
 
-    public boolean hasNetworkHost() {
-        return this.internet != null;
-    }
-
     // TODO: Create device profile. Add this to device profile. Change to getClay().getProfile().getInternetAddress()
     public String getInternetAddress() {
         Context context = Application.getContext();

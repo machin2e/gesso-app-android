@@ -72,6 +72,7 @@ public final class Entity extends Groupable {
 
     /*
     // <ENTITY_MANAGEMENT>
+    // TODO: Create non-static EntityManager in World?
     public static void addEntity(Entity entity) {
         Manager.add(entity);
     }

@@ -6,45 +6,23 @@ import camp.computer.clay.engine.entity.Entity;
 public class Port extends Component {
 
     public enum Direction {
-        NONE("none"),
-        OUTPUT("output"),
-        INPUT("input"),
-        BOTH("both"); // e.g., I2C, etc.
-
-        // TODO: Change the index to a UUID?
-        String label;
-
-        Direction(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return this.label;
-        }
+        NONE,
+        OUTPUT,
+        INPUT,
+        BOTH // e.g., I2C, etc.
     }
 
     // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
     public enum Type {
-        NONE("none"),
-        SWITCH("switch"),
-        PULSE("pulse"),
-        WAVE("wave"),
-        POWER_REFERENCE("reference"),
-        POWER_CMOS("+3.3v"),
-        POWER_TTL("+5v"); // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
+        NONE,
+        SWITCH,
+        PULSE,
+        WAVE,
+        POWER_REFERENCE,
+        POWER_CMOS,
+        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
 
-        // TODO: Change the index to a UUID?
-        String label;
-
-        Type(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return this.label;
-        }
-
-        public static Type next(Type currentType) {
+        public static Type getNext(Type currentType) {
             Type[] values = Type.values();
             int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
             return values[(currentIndex + 1) % values.length];
@@ -66,17 +44,11 @@ public class Port extends Component {
      * The {@code PortEntity}'s {@code index} can be used complementary to the {@code PortEntity}'s
      * {@code label} to refer to a specific {@code PortEntity}.
      */
-    protected int index = 0;
+    private int index = 0;
 
-    protected Type type = Type.NONE;
+    private Type type = Type.NONE;
 
-    protected Direction direction = Direction.NONE;
-
-    // <DELETE>
-    public Entity getPortable() {
-        return getEntity();
-    }
-    // </DELETE>
+    private Direction direction = Direction.NONE;
 
     public int getIndex() {
         return this.index;
@@ -105,19 +77,14 @@ public class Port extends Component {
     }
 
     public boolean hasPath() {
-        //Group<Entity> pathEntityGroup = Entity.Manager.filterType2(PathEntity.class);
-        Group<Entity> pathEntityGroup = Entity.Manager.filterWithComponent(Path.class);
-        for (int i = 0; i < pathEntityGroup.size(); i++) {
-            Entity pathEntity = pathEntityGroup.get(i);
-            if (pathEntity.getComponent(Path.class).contains(getEntity())) {
+        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        for (int i = 0; i < paths.size(); i++) {
+            Entity path = paths.get(i);
+            if (path.getComponent(Path.class).contains(getEntity())) {
                 return true;
             }
         }
         return false;
-    }
-
-    public boolean hasPath(Entity pathEntity) {
-        return Entity.Manager.contains(pathEntity.getUuid());
     }
 
     /**
@@ -128,56 +95,34 @@ public class Port extends Component {
      */
     public Group<Entity> getPaths() {
 
-        //Group<Entity> pathEntityGroup = Entity.Manager.filterType2(PathEntity.class);
-        Group<Entity> pathEntityGroup = Entity.Manager.filterWithComponent(Path.class);
+        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
 
         // TODO: Make into Filter
-        Group<Entity> pathEntities = new Group<>();
-        for (int i = 0; i < pathEntityGroup.size(); i++) {
-            Entity pathEntity = pathEntityGroup.get(i);
-            if (pathEntity.getComponent(Path.class).contains(getEntity())) {
-                pathEntities.add(pathEntity);
+        Group<Entity> portPaths = new Group<>();
+        for (int i = 0; i < paths.size(); i++) {
+            Entity path = paths.get(i);
+            if (path.getComponent(Path.class).contains(getEntity())) {
+                portPaths.add(path);
             }
         }
-        return pathEntities;
+        return portPaths;
     }
 
     // <HACK>
     public Entity getExtension() {
-        Group<Entity> pathEntities = getPaths();
-        for (int i = 0; i < pathEntities.size(); i++) {
-            Entity pathEntity = pathEntities.get(i);
-            if (pathEntity.getComponent(Path.class).getSource() == getEntity() || pathEntity.getComponent(Path.class).getTarget() == getEntity()) {
-                //if (pathEntity.getSource().getPortable().hasComponent(Extension.class)) {
-                // WRONG: if (pathEntity.getSource().getComponent(Port.class).getPortable().hasComponent(Extension.class)) {
-                if (pathEntity.getComponent(Path.class).getSource().getParent().hasComponent(Extension.class)) {
-                    return pathEntity.getComponent(Path.class).getSource().getParent(); //return pathEntity.getSource().getComponent(Port.class).getPortable();
-                } else if (pathEntity.getComponent(Path.class).getTarget().getParent().hasComponent(Extension.class)) {
-                    return pathEntity.getComponent(Path.class).getTarget().getParent();
+        Group<Entity> paths = getPaths();
+        for (int i = 0; i < paths.size(); i++) {
+            Entity path = paths.get(i);
+            Path pathComponent = path.getComponent(Path.class);
+            if (pathComponent.getSource() == getEntity() || pathComponent.getTarget() == getEntity()) {
+                if (pathComponent.getSource().getParent().hasComponent(Extension.class)) {
+                    return pathComponent.getSource().getParent();
+                } else if (pathComponent.getTarget().getParent().hasComponent(Extension.class)) {
+                    return pathComponent.getTarget().getParent();
                 }
             }
         }
         return null;
     }
     // </HACK>
-
-    public boolean hasVisiblePaths() {
-//        Group<Image> pathImages = getPaths().getImages();
-//        for (int i = 0; i < pathImages.size(); i++) {
-//            Image pathImage = pathImages.get(i);
-//            if (pathImage.isVisible()) {
-//                return true;
-//            }
-//        }
-
-        Group<Entity> paths = getPaths();
-        for (int i = 0; i < paths.size(); i++) {
-            Entity path = paths.get(i);
-            if (path.getComponent(Visibility.class).isVisible) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

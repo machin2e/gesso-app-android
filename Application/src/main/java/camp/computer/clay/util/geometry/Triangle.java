@@ -1,9 +1,8 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
 public class Triangle extends Shape {
@@ -35,7 +34,7 @@ public class Triangle extends Shape {
 
     @Override
     public List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+        List<Transform> vertices = new ArrayList<>();
         vertices.add(a);
         vertices.add(b);
         vertices.add(c);

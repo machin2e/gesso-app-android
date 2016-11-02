@@ -1,9 +1,8 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 
 public class Line extends Shape {
@@ -28,7 +27,7 @@ public class Line extends Shape {
 
     @Override
     public List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+        List<Transform> vertices = new ArrayList<>();
 //        vertices.add(new Transform(source));
 //        vertices.add(new Transform(target));
         return vertices;

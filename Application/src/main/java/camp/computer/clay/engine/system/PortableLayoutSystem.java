@@ -31,20 +31,14 @@ public class PortableLayoutSystem extends System {
     }
 
     public static void setPortableSeparation(double distance) {
-        // <HACK>
-        // TODO: Replace ASAP. This is shit.
-//        Group<Image> extensionImages = Entity.Manager.filterType2(ExtensionEntity.class).getImages();
-        Group<Image> extensionImages = Entity.Manager.filterWithComponent(Extension.class).getImages();
-        for (int i = 0; i < extensionImages.size(); i++) {
-            Image extensionImage = extensionImages.get(i);
-
-            Entity extension = extensionImage.getEntity();
+        Group<Entity> extensions = Entity.Manager.filterWithComponent(Extension.class);
+        for (int i = 0; i < extensions.size(); i++) {
+            Entity extension = extensions.get(i);
             if (extension.getComponent(Portable.class).getHosts().size() > 0) {
-                Entity hostEntity = extension.getComponent(Portable.class).getHosts().get(0);
-                PortableLayoutSystem.setExtensionDistance(hostEntity, distance);
+                Entity host = extension.getComponent(Portable.class).getHosts().get(0);
+                PortableLayoutSystem.setExtensionDistance(host, distance);
             }
         }
-        // </HACK>
     }
 
     /**
@@ -189,29 +183,41 @@ public class PortableLayoutSystem extends System {
         Shape boardShape = host.getComponent(Image.class).getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
-        Group<Entity> extensionPortEntities = extension.getComponent(Portable.class).getPorts();
-        for (int j = 0; j < extensionPortEntities.size(); j++) {
+        Group<Entity> extensionPorts = extension.getComponent(Portable.class).getPorts();
+        for (int j = 0; j < extensionPorts.size(); j++) {
 
-            Entity extensionPortEntity = extensionPortEntities.get(j);
+            Entity extensionPort = extensionPorts.get(j);
 
-            if (extensionPortEntity == null || extensionPortEntity.getComponent(Port.class).getPaths().size() == 0 || extensionPortEntity.getComponent(Port.class).getPaths().get(0) == null) {
+            if (extensionPort == null || extensionPort.getComponent(Port.class).getPaths().size() == 0 || extensionPort.getComponent(Port.class).getPaths().get(0) == null) {
                 continue;
             }
 
-            Entity hostPortEntity = extensionPortEntity.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK b/c using index 0
-            Transform hostPortPosition = hostPortEntity.getComponent(Image.class).getShape("Port").getPosition(); // World.getWorld().getShape(hostPortEntity).getPosition();
+            Entity hostPort = extensionPort.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK: Using hard-coded index 0.
+            Transform hostPortPosition = hostPort.getComponent(Image.class).getShape("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
-            for (int i = 0; i < hostShapeBoundary.size() - 1; i++) {
+            for (int i = 0; i < hostShapeBoundary.size(); i++) {
 
-                Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
+                if (i < hostShapeBoundary.size() - 1) {
+                    Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(i + 1));
 
-                double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
+                    double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
 
-                if (distance < minimumSegmentDistance) {
-                    minimumSegmentDistance = distance;
-                    nearestSegmentIndex = i;
+                    if (distance < minimumSegmentDistance) {
+                        minimumSegmentDistance = distance;
+                        nearestSegmentIndex = i;
+                    }
+                } else {
+                    // Check last segment (first and last point in array)
+                    Transform segmentMidpoint = Geometry.midpoint(hostShapeBoundary.get(i), hostShapeBoundary.get(0));
+
+                    double distance = Geometry.distance(hostPortPosition, segmentMidpoint);
+
+                    if (distance < minimumSegmentDistance) {
+                        minimumSegmentDistance = distance;
+                        nearestSegmentIndex = i;
+                    }
                 }
             }
 
