@@ -3,8 +3,8 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.BuilderImage.Rectangle;
 
 public class Boundary extends Component {
 
@@ -47,9 +47,9 @@ public class Boundary extends Component {
 
         Image image = getEntity().getComponent(Image.class);
 
-        for (int i = 0; i < image.shapes.size(); i++) {
+        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
             //if (shapes.get(i).contains(point)) {
-            if (Geometry.contains(image.shapes.get(i).getBoundary(), point)) {
+            if (Geometry.contains(image.getImage().getShapes().get(i).getBoundary(), point)) {
                 return true;
             }
         }
@@ -64,8 +64,8 @@ public class Boundary extends Component {
         Image image = getEntity().getComponent(Image.class);
 
         List<Transform> shapeBoundaries = new ArrayList<>();
-        for (int i = 0; i < image.shapes.size(); i++) {
-            shapeBoundaries.addAll(image.shapes.get(i).getBoundary());
+        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
+            shapeBoundaries.addAll(image.getImage().getShapes().get(i).getBoundary());
         }
         return Geometry.getBoundingBox(shapeBoundaries);
     }

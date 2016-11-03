@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.application.Application;
-import camp.computer.clay.application.graphics.controls.Prompt;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.controls.Prompt;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;

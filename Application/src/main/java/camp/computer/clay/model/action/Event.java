@@ -2,7 +2,7 @@ package camp.computer.clay.model.action;
 
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.util.time.Clock;
 
 public class Event {
@@ -43,7 +43,7 @@ public class Event {
     public int pointerIndex = -1;
 
     public Event() {
-        this.timestamp = Clock.getCurrentTime();
+        this.timestamp = Clock.getCurrentTime(); // TODO: Get from the World clock!
         setup();
     }
 

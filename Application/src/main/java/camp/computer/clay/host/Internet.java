@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
-import camp.computer.clay.application.Application;
+import camp.computer.clay.platform.Application;
 
 public class Internet implements InternetInterface {
 

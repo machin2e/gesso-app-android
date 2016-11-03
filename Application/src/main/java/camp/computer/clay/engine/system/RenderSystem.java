@@ -7,8 +7,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import camp.computer.clay.application.Application;
-import camp.computer.clay.application.graphics.PlatformRenderSurface;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -19,7 +19,7 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.engine.component.util.Visible;
 
 public class RenderSystem extends System {
 
@@ -172,8 +172,8 @@ public class RenderSystem extends System {
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Image image = entity.getComponent(Image.class);
                     canvas.save();
-                    for (int i = 0; i < image.getShapes().size(); i++) {
-                        platformRenderSurface.drawShape(image.getShapes().get(i));
+                    for (int i = 0; i < image.getImage().getShapes().size(); i++) {
+                        platformRenderSurface.drawShape(image.getImage().getShapes().get(i));
                     }
                     canvas.restore();
                 }

@@ -11,10 +11,10 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.BuilderImage.Point;
+import camp.computer.clay.util.BuilderImage.Rectangle;
+import camp.computer.clay.util.BuilderImage.Shape;
 import camp.computer.clay.engine.World;
 
 public class BoundarySystem extends System {
@@ -56,8 +56,8 @@ public class BoundarySystem extends System {
         Image image = entity.getComponent(Image.class);
 
         // Update Shapes
-        for (int i = 0; i < image.getShapes().size(); i++) {
-            Shape shape = image.getShapes().get(i);
+        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
+            Shape shape = image.getImage().getShapes().get(i);
             BoundarySystem.updateShapeGeometry(shape, image.getEntity().getComponent(Transform.class));
         }
     }
@@ -68,8 +68,7 @@ public class BoundarySystem extends System {
     public void updateHostImage(Entity host) {
 
         // Get LED shapes
-//        Group<Shape> lightShapeGroup = host.getComponent(Image.class).getShapes().filterLabel("^LED (1[0-2]|[1-9])$");
-        Group<Shape> lightShapeGroup = host.getComponent(Image.class).getShapes("^LED (1[0-2]|[1-9])$");
+        Group<Shape> lightShapeGroup = World.getWorld().imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
 
         // Update Port LED color
         for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
@@ -125,7 +124,10 @@ public class BoundarySystem extends System {
             port.getComponent(Transform.class).x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
             port.getComponent(Transform.class).y = 175; // i.e., Distance from board
 
-            port.getComponent(Image.class).invalidate();
+            // <HACK>
+            // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
+            World.getWorld().imageSystem.invalidate(port.getComponent(Image.class));
+            // </HACK>
         }
     }
 
@@ -150,7 +152,7 @@ public class BoundarySystem extends System {
         Image portableImage = extension.getComponent(Image.class);
 
         // Update Headers Geometry to match the corresponding ExtensionEntity Profile
-        Rectangle header = (Rectangle) portableImage.getShape("Header");
+        Rectangle header = (Rectangle) portableImage.getImage().getShape("Header");
         double headerWidth = World.PIXEL_PER_MILLIMETER * A;
         header.setWidth(headerWidth);
 
@@ -162,7 +164,7 @@ public class BoundarySystem extends System {
             } else {
                 Point point = new Point(new Transform(x, 107));
                 extension.getComponent(Portable.class).headerContactPositions.add(point);
-                portableImage.addShape(point);
+                portableImage.getImage().addShape(point);
             }
         }
     }
@@ -175,12 +177,13 @@ public class BoundarySystem extends System {
         // Update Port style
         for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
             Entity portEntity = extension.getComponent(Portable.class).getPorts().get(i);
-            Shape portShape = extension.getComponent(Image.class).getShape(portEntity);
 
-            // Update color of Port shape based on type
-            if (portShape != null) {
-                portShape.setColor(Color.getColor(portEntity.getComponent(Port.class).getType()));
-            }
+//            Shape portShape = extension.getComponent(Image.class).getShape(portEntity);
+//
+//            // Update color of Port shape based on type
+//            if (portShape != null) {
+//                portShape.setColor(Color.getColor(portEntity.getComponent(Port.class).getType()));
+//            }
         }
     }
 
@@ -196,7 +199,7 @@ public class BoundarySystem extends System {
         // Update color of Port shape based on its type
         Port.Type portType = port.getComponent(Port.class).getType();
         String portColor = camp.computer.clay.util.Color.getColor(portType);
-        port.getComponent(Image.class).getShape("Port").setColor(portColor);
+        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
 
         // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
         updatePortImageGeometry(port);
@@ -207,8 +210,8 @@ public class BoundarySystem extends System {
         Image image = entity.getComponent(Image.class);
 
         // Update Shapes
-        for (int i = 0; i < image.getShapes().size(); i++) {
-            Shape shape = image.getShapes().get(i);
+        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
+            Shape shape = image.getImage().getShapes().get(i);
 
             // <HACK>
             Transform imagePosition = image.getEntity().getComponent(Transform.class);

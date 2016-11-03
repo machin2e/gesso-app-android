@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.application.Application;
-import camp.computer.clay.application.graphics.controls.Prompt;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.controls.Prompt;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -22,8 +22,8 @@ import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.World;
 
 public class EventHandlerSystem extends System {
@@ -191,7 +191,7 @@ public class EventHandlerSystem extends System {
             host.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
             host.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
 
-            host.getComponent(Image.class).setTransparency(1.0);
+            World.getWorld().imageSystem.setTransparency(host.getComponent(Image.class), 1.0);
 
             // Show Ports and Paths of touched Host
             for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
@@ -329,7 +329,7 @@ public class EventHandlerSystem extends System {
             // Focus on selected Host
             extension.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
             extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
-            extensionImage.setTransparency(1.0);
+            World.getWorld().imageSystem.setTransparency(extensionImage, 1.0);
 
             // Show Ports and Paths for selected Host
             for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
@@ -380,7 +380,7 @@ public class EventHandlerSystem extends System {
 
             // Prototype Path Visible
             // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
-            World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getShape("Port").getPosition());
+            World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
             World.getWorld().portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
             World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
 
@@ -413,7 +413,7 @@ public class EventHandlerSystem extends System {
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                 // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
-                World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getShape("Port").getPosition());
+                World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
                 World.getWorld().portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
             } else {
 //                World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
@@ -434,7 +434,7 @@ public class EventHandlerSystem extends System {
 
                     // <HACK>
                     // <STYLE>
-                    extension.getComponent(Image.class).setTransparency(1.0f);
+                    World.getWorld().imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
                     extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
                     // </STYLE>
 

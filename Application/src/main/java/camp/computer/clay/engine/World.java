@@ -2,7 +2,12 @@ package camp.computer.clay.engine;
 
 import android.graphics.Canvas;
 
-import camp.computer.clay.application.Application;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import camp.computer.clay.engine.system.ImageSystem;
+import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -21,12 +26,13 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
-import camp.computer.clay.util.geometry.Circle;
-import camp.computer.clay.util.geometry.Point;
-import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.geometry.Segment;
-import camp.computer.clay.util.geometry.Shape;
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.util.BuilderImage.BuilderImage;
+import camp.computer.clay.util.BuilderImage.Circle;
+import camp.computer.clay.util.BuilderImage.Point;
+import camp.computer.clay.util.BuilderImage.Rectangle;
+import camp.computer.clay.util.BuilderImage.Segment;
+import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.engine.component.util.Visible;
 
 public class World {
 
@@ -39,6 +45,7 @@ public class World {
 
     // <WORLD_SYSTEMS>
     public CameraSystem cameraSystem = new CameraSystem();
+    public ImageSystem imageSystem = new ImageSystem();
     public RenderSystem renderSystem = new RenderSystem();
     public BoundarySystem boundarySystem = new BoundarySystem();
     public InputSystem inputSystem = new InputSystem();
@@ -122,8 +129,16 @@ public class World {
         }
 
         // Load geometry from file into Image Component
-        // TODO: Application.getPlatform().restoreGeometry(this, "Geometry.json");
-        Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
+        // TODO: Application.getPlatform().openFile(this, "Geometry.json");
+//        Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
+        InputStream inputStream = null;
+        try {
+            inputStream = Application.getContext().getAssets().open("Geometry.json");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BuilderImage builderImage = BuilderImage.open(inputStream);
+        host.getComponent(Image.class).setImage(builderImage);
 
         // <HACK>
 //        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
@@ -158,7 +173,7 @@ public class World {
         }
 
         // <HACK>
-        Group<Shape> pinContactPoints = host.getComponent(Image.class).getShapes();
+        List<Shape> pinContactPoints = host.getComponent(Image.class).getImage().getShapes();
         for (int i = 0; i < pinContactPoints.size(); i++) {
             if (pinContactPoints.get(i).getLabel().startsWith("Pin")) {
                 String label = pinContactPoints.get(i).getLabel();
@@ -201,17 +216,20 @@ public class World {
         extension.addComponent(new Visibility());
 
         // <LOAD_GEOMETRY_FROM_FILE>
+        BuilderImage builderImage = new BuilderImage();
+
         Rectangle rectangle;
 
         // Create Shapes for Image
-        //rectangle = new Rectangle(extension);
         rectangle = new Rectangle();
         rectangle.setWidth(200);
         rectangle.setHeight(200);
         rectangle.setLabel("Board");
         rectangle.setColor("#ff53BA5D"); // Gray: #f7f7f7, Greens: #32CD32
         rectangle.setOutlineThickness(0);
-        extension.getComponent(Image.class).addShape(rectangle);
+        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
+//        extension.getComponent(Image.class).addShape(rectangle);
+        builderImage.addShape(rectangle);
 
         // Headers
         rectangle = new Rectangle(50, 14);
@@ -220,11 +238,14 @@ public class World {
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
-        extension.getComponent(Image.class).addShape(rectangle);
+//        extension.getComponent(Image.class).addShape(rectangle);
+        builderImage.addShape(rectangle);
+
+        extension.getComponent(Image.class).setImage(builderImage);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Image Component
-        // TODO: Application.getPlatform().restoreGeometry(this, "Geometry.json");
+        // TODO: Application.getPlatform().openFile(this, "Geometry.json");
 
         return extension;
     }
@@ -233,26 +254,25 @@ public class World {
         Entity path = new Entity();
 
         // Add Path Component (for type identification)
-        path.addComponent(new Path());
-
-        Image pathImage = new Image(); // Create PathEntity Image
+        path.addComponent(new Path()); // Unique to Path
+        path.addComponent(new Transform());
+        path.addComponent(new Image());
+        path.addComponent(new Boundary());
+        path.addComponent(new Visibility());
 
         // <SETUP_PATH_IMAGE_GEOMETRY>
-        Segment segment;
+        BuilderImage builderImage = new BuilderImage();
 
         // Board
-        segment = new Segment();
+        Segment segment = new Segment();
         segment.setOutlineThickness(2.0);
         segment.setLabel("PathEntity");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
-        pathImage.addShape(segment);
-        // </SETUP_PATH_IMAGE_GEOMETRY>
+        builderImage.addShape(segment);
 
-        path.addComponent(new Transform());
-        path.addComponent(pathImage); // Assign Image to Entity
-        path.addComponent(new Boundary());
-        path.addComponent(new Visibility());
+        path.getComponent(Image.class).setImage(builderImage);
+        // </SETUP_PATH_IMAGE_GEOMETRY>
 
         return path;
     }
@@ -270,16 +290,17 @@ public class World {
         port.addComponent(new Label());
 
         // <LOAD_GEOMETRY_FROM_FILE>
-        Circle circle;
+        BuilderImage builderImage = new BuilderImage();
 
         // Create Shapes for Image
-        // circle = new Circle(port);
-        circle = new Circle();
+        Circle circle = new Circle();
         circle.setRadius(50.0);
         circle.setLabel("Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        port.getComponent(Image.class).addShape(circle);
+        builderImage.addShape(circle);
+
+        port.getComponent(Image.class).setImage(builderImage);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         return port;
@@ -288,15 +309,15 @@ public class World {
 
     private static Entity createCameraEntity() {
 
-        Entity cameraEntity = new Entity();
+        Entity camera = new Entity();
 
         // Add Path Component (for type identification)
-        cameraEntity.addComponent(new Camera());
+        camera.addComponent(new Camera());
 
         // Add Transform Component
-        cameraEntity.addComponent(new Transform());
+        camera.addComponent(new Transform());
 
-        return cameraEntity;
+        return camera;
     }
 
     // TODO: Actually create and stage a real single-port Entity without a parent!?
@@ -307,14 +328,18 @@ public class World {
 
         // extensionPrototype.addComponent(new Extension());
         prototypeExtension.addComponent(new Transform());
+        prototypeExtension.addComponent(new Image());
 
-        Image image = new Image();
+        BuilderImage builderImage = new BuilderImage();
+
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
-        image.addShape(rectangle);
-        image.invalidate();
-        prototypeExtension.addComponent(image);
+        builderImage.addShape(rectangle);
+
+        prototypeExtension.getComponent(Image.class).setImage(builderImage);
+
+        imageSystem.invalidate(prototypeExtension.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
 
         prototypeExtension.addComponent(new Label());
         prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
@@ -333,15 +358,19 @@ public class World {
 
         // extensionPrototype.addComponent(new Extension());
         prototypePath.addComponent(new Transform());
+        prototypePath.addComponent(new Image());
 
-        Image image = new Image();
+        BuilderImage builderImage = new BuilderImage();
+
         Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
         segment.setLabel("Path");
         segment.setOutlineColor("#ff333333");
         segment.setOutlineThickness(10.0);
-        image.addShape(segment);
-        image.invalidate();
-        prototypePath.addComponent(image);
+        builderImage.addShape(segment);
+
+        prototypePath.getComponent(Image.class).setImage(builderImage);
+
+        imageSystem.invalidate(prototypePath.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
 
         prototypePath.addComponent(new Label());
         prototypePath.getComponent(Label.class).setLabel("prototypePath");

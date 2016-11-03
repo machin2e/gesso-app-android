@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.engine.component.util.Visible;
 
 public class Visibility extends Component {
 

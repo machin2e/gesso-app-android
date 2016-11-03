@@ -2,15 +2,15 @@ package camp.computer.clay.engine.component;
 
 import android.util.Log;
 
-import camp.computer.clay.application.Application;
+import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.BuilderImage.Rectangle;
+import camp.computer.clay.util.BuilderImage.Shape;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.util.time.Clock;
 
 public class Camera extends Component {
@@ -21,14 +21,10 @@ public class Camera extends Component {
 
     public static double MAXIMUM_SCALE = 1.5;
 
-    /**
-     * Width of perspective --- actions (e.g., touches) are interpreted relative to this point
-     */
+    // Width of perspective --- actions (e.g., touches) are interpreted relative to this point
     public double width;
 
-    /**
-     * Height of perspective
-     */
+    // Height of perspective
     public double height;
 
     // Scale
@@ -49,7 +45,7 @@ public class Camera extends Component {
     }
 
     // <REFACTOR/DELETE>
-    // TODO: Put into PlatformRenderSurface? Elsewhere? Screen descriptor structure?
+    // TODO: Put into PlatformRenderSurface? Viewport? Elsewhere? Screen descriptor structure?
     public void setWidth(double width) {
         this.width = width;
     }
@@ -111,7 +107,6 @@ public class Camera extends Component {
     public void setOffset(double dx, double dy) {
         this.targetPosition.offset(dx, dy);
         this.originalPosition.offset(dx, dy);
-//        this.position.offset(dx, dy);
         getEntity().getComponent(Transform.class).offset(dx, dy);
     }
 
@@ -192,28 +187,26 @@ public class Camera extends Component {
     /**
      * Adjusts the focus for the prototype {@code PathEntity} being created.
      *
-     * @param sourcePortEntity
+     * @param sourcePort
      * @param targetPosition
      */
-    public void setFocus(Entity sourcePortEntity, Transform targetPosition) {
+    public void setFocus(Entity sourcePort, Transform targetPosition) {
 
         Log.v("SetFocus", "setFocus(sourcePortEntity, targetPosition)");
 
-//        // Check if a HostEntity Image is nearby
-//        Image nearestHostImage = getWorld().getImages().filterType2(HostEntity.class).getNearestImage(targetPosition);
-//        if (nearestHostImage != null) {
+//        // Check if a Host is nearby
+////        Image nearestHostImage = Entity.Manager.filterWithComponent(Host.class).getNearest(targetPosition);
+////        if (nearestHostImage != null) {
 //
-//            PortableEntity sourcePortable = sourcePortEntity.getPortable();
-//            PortableImage sourcePortableImage = (PortableImage) sourcePortable.getImage();
+//            double distanceToPortable = Geometry.distance(sourcePort.getComponent(Transform.class), targetPosition);
 //
-//            double distanceToPortable = Geometry.distance(sourcePortableImage.getPosition(), targetPosition);
-//
-//            if (distanceToPortable > 800) {
+//            if (distanceToPortable > 600) { // 800
 //                setScale(0.6f, 100); // Zoom out to show overview
 //            } else {
-//                setScale(1.0f, 100); // Zoom out to show overview
+//                // setScale(1.0f, 100); // Zoom out to show overview
+//                setFocus(sourcePort.getParent());
 //            }
-//        }
+////        }
     }
 
     public void setFocus(Entity entity) {
@@ -228,17 +221,17 @@ public class Camera extends Component {
             otherPortables.setTransparency(0.1);
             */
 
-            // Get ports along every PathEntity connected to the Ports on the touched PhoneHost
+            // Get all Ports in all Path connected to any of the Host's Ports
             Group<Entity> hostPathPorts = new Group<>();
             Group<Entity> hostPorts = entity.getComponent(Portable.class).getPorts();
             for (int i = 0; i < hostPorts.size(); i++) {
-                Entity portEntity = hostPorts.get(i);
+                Entity port = hostPorts.get(i);
 
-                if (!hostPathPorts.contains(portEntity)) {
-                    hostPathPorts.add(portEntity);
+                if (!hostPathPorts.contains(port)) {
+                    hostPathPorts.add(port);
                 }
 
-                Group<Entity> portPaths = portEntity.getComponent(Port.class).getPaths();
+                Group<Entity> portPaths = port.getComponent(Port.class).getPaths();
                 for (int j = 0; j < portPaths.size(); j++) {
                     Entity pathEntity = portPaths.get(j);
                     if (!hostPathPorts.contains(pathEntity.getComponent(Path.class).getSource())) {
@@ -260,7 +253,7 @@ public class Camera extends Component {
 
         } else if (entity.hasComponent(Extension.class)) {
 
-            Log.v("SetFocus", "setFocus(ExtensionEntity)");
+            Log.v("SetFocus", "setFocus(Extension)");
 
             // <REFACTOR>
             /*
@@ -269,23 +262,23 @@ public class Camera extends Component {
             */
 
             // Get Ports along every Path connected to the Ports on the selected Host
-            Group<Entity> hostPathPortEntities = new Group<>();
-            Group<Entity> extensionPortEntities = entity.getComponent(Portable.class).getPorts();
-            for (int i = 0; i < extensionPortEntities.size(); i++) {
-                Entity portEntity = extensionPortEntities.get(i);
+            Group<Entity> hostPathPorts = new Group<>();
+            Group<Entity> extensionPorts = entity.getComponent(Portable.class).getPorts();
+            for (int i = 0; i < extensionPorts.size(); i++) {
+                Entity port = extensionPorts.get(i);
 
-                if (!hostPathPortEntities.contains(portEntity)) {
-                    hostPathPortEntities.add(portEntity);
+                if (!hostPathPorts.contains(port)) {
+                    hostPathPorts.add(port);
                 }
 
-                Group<Entity> portPathEntities = portEntity.getComponent(Port.class).getPaths();
-                for (int j = 0; j < portPathEntities.size(); j++) {
-                    Entity pathEntity = portPathEntities.get(j);
-                    if (!hostPathPortEntities.contains(pathEntity.getComponent(Path.class).getSource())) {
-                        hostPathPortEntities.add(pathEntity.getComponent(Path.class).getSource());
+                Group<Entity> portPaths = port.getComponent(Port.class).getPaths();
+                for (int j = 0; j < portPaths.size(); j++) {
+                    Entity path = portPaths.get(j);
+                    if (!hostPathPorts.contains(path.getComponent(Path.class).getSource())) {
+                        hostPathPorts.add(path.getComponent(Path.class).getSource());
                     }
-                    if (!hostPathPortEntities.contains(pathEntity.getComponent(Path.class).getTarget())) {
-                        hostPathPortEntities.add(pathEntity.getComponent(Path.class).getTarget());
+                    if (!hostPathPorts.contains(path.getComponent(Path.class).getTarget())) {
+                        hostPathPorts.add(path.getComponent(Path.class).getTarget());
                     }
                 }
             }
@@ -295,7 +288,7 @@ public class Camera extends Component {
             Entity host = entity.getComponent(Portable.class).getHosts().get(0);
             PortableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-            Group<Shape> hostPathPortShapes = hostPathPortEntities.getImages().getShapes();
+            Group<Shape> hostPathPortShapes = hostPathPorts.getImages().getShapes();
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
             // Update scale and position
