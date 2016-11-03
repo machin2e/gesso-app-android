@@ -4,7 +4,7 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.engine.World;
 
 public class CameraSystem extends System {

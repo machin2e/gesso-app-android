@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.application.communication.TCPMessageClientHost;
+import camp.computer.clay.platform.communication.TCPMessageClientHost;
 
 // TODO: Integrate with PhoneHost in new entity. Also separate the entity (descriptive information that
 // TODO: (cont'd) provides a lookup table of sorts, and the simulation (includes virtual

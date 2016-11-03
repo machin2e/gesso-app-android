@@ -16,12 +16,12 @@ import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.BuilderImage.Rectangle;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.geometry.Shape;
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.engine.component.util.Visible;
 
 public class Group<E extends Groupable> implements List<E> {
 
@@ -181,7 +181,7 @@ public class Group<E extends Groupable> implements List<E> {
             public Entity map(Entity entity, Double transparency) {
 //                if (entity instanceof HostEntity) { // TODO: Replace with hasComponent(Transparency) -OR- entity.typeUuid == HostEntity.getTypeUuid()
                 if (entity.getComponent(Image.class) != null) {
-                    entity.getComponent(Image.class).setTransparency(transparency);
+                    World.getWorld().imageSystem.setTransparency(entity.getComponent(Image.class), transparency);
                 }
                 return entity;
             }
@@ -261,7 +261,7 @@ public class Group<E extends Groupable> implements List<E> {
         Group<Shape> shapes = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = (Image) elements.get(i);
-            shapes.addAll(image.getShapes());
+            shapes.addAll(image.getImage().getShapes());
         }
         return shapes;
     }

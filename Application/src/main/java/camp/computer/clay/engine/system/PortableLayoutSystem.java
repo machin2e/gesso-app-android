@@ -15,10 +15,10 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Segment;
-import camp.computer.clay.util.geometry.Shape;
-import camp.computer.clay.util.image.Visible;
+import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.BuilderImage.Segment;
+import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.World;
 
 public class PortableLayoutSystem extends System {
@@ -180,7 +180,7 @@ public class PortableLayoutSystem extends System {
             indexCounts[i] = 0;
         }
 
-        Shape boardShape = host.getComponent(Image.class).getShape("Board");
+        Shape boardShape = host.getComponent(Image.class).getImage().getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
         Group<Entity> extensionPorts = extension.getComponent(Portable.class).getPorts();
@@ -193,7 +193,7 @@ public class PortableLayoutSystem extends System {
             }
 
             Entity hostPort = extensionPort.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK: Using hard-coded index 0.
-            Transform hostPortPosition = hostPort.getComponent(Image.class).getShape("Port").getPosition();
+            Transform hostPortPosition = hostPort.getComponent(Image.class).getImage().getShape("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
@@ -304,7 +304,10 @@ public class PortableLayoutSystem extends System {
                 }
 
                 // Invalidate Image Component so its geometry (i.e., shapes) will be updated.
-                extension.getComponent(Image.class).invalidate();
+                // <HACK>
+                // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
+                World.getWorld().imageSystem.invalidate(extension.getComponent(Image.class));
+                // </HACK>
             }
         }
     }
@@ -367,7 +370,7 @@ public class PortableLayoutSystem extends System {
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getShape("Path");
+        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         Transform prototypePathSourceTransform = segment.getSource();
 
         double extensionRotation = Geometry.getAngle(
@@ -378,8 +381,12 @@ public class PortableLayoutSystem extends System {
         // <REFACTOR>
 
         // <HACK>
+        // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
+        World.getWorld().imageSystem.invalidate(extensionPrototype.getComponent(Image.class));
+        // </HACK>
+
+        // <HACK>
         // TODO: Move! Needed, but should be in a better place so it doesn't have to be explicitly called!
-        extensionPrototype.getComponent(Image.class).invalidate();
         World.getWorld().boundarySystem.updateImage(extensionPrototype);
         // </HACK>
     }
@@ -405,7 +412,7 @@ public class PortableLayoutSystem extends System {
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getShape("Path");
+        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         segment.setSource(position);
     }
 
@@ -414,7 +421,7 @@ public class PortableLayoutSystem extends System {
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getShape("Path");
+        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         segment.setTarget(position);
     }
 
