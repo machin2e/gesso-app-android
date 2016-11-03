@@ -83,7 +83,6 @@ public class BuilderImage {
     // <FILE_IO>
     // Opens image data from JSON file stored in custom format.
     // TODO: 11/2/2016 Consider adding support for constructing BuilderImage from SVG file.
-    //public static BuilderImage open(String filename) {
     public static BuilderImage open(InputStream inputStream) {
 
         // Create Empty image
@@ -201,10 +200,6 @@ public class BuilderImage {
                     builderImage.addShape(circle);
                 }
             }
-
-            // HostEntity host = new HostEntity();
-
-            Log.v("Configuration", "reading JSON name: " + hostTitle);
 
         } catch (JSONException e) {
             e.printStackTrace();

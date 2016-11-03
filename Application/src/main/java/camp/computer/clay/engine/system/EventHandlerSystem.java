@@ -59,6 +59,8 @@ public class EventHandlerSystem extends System {
         return null;
     }
 
+    public Entity previousTarget = null;
+
     private void dispatchEvent(Event event) {
 
         // Annotate the Event
@@ -100,6 +102,11 @@ public class EventHandlerSystem extends System {
 //            }
 //
 //        }
+
+        // Handle special bookkeeping storing previous target Entity
+        if (event.getType() == Event.Type.UNSELECT) {
+            previousTarget = event.getTarget();
+        }
     }
 
     // TODO: Make World an Entity?
@@ -313,6 +320,14 @@ public class EventHandlerSystem extends System {
 
             // Previous Action targeted also this Extension
             // TODO: Refactor
+
+            Log.v("EventHandlerSystem", "target: " + event.getTarget());
+            Log.v("EventHandlerSystem", "previousTarget: " + World.getWorld().eventHandlerSystem.previousTarget);
+            Log.v("EventHandlerSystem", "---");
+            if (World.getWorld().eventHandlerSystem.previousTarget == extension) {
+                Application.getView().openActionEditor(extensionImage.getEntity());
+            }
+
             /*
             if (action.getPrevious().getFirstEvent().getTarget() == extensionImage.getEntity()) {
 

@@ -8,8 +8,6 @@ import camp.computer.clay.engine.World;
 
 public class InputSystem extends System {
 
-//    private Event previousEvent = null;
-
     private List<Event> incomingEvents = new ArrayList<>();
 
     public InputSystem() {
