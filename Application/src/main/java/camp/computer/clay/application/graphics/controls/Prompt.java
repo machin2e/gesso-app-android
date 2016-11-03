@@ -31,15 +31,18 @@ public class Prompt {
     }
 
     public void promptAcknowledgment(final OnActionListener onActionListener) {
-        new AlertDialog.Builder(application.getView())
-                .setTitle("Notice")
-                .setMessage("The extension already has a profile.")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                        onActionListener.onComplete(null);
-                    }
-                })
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(application.getView())
+                        .setTitle("Notice")
+                        .setMessage("The extension already has a profile.")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                onActionListener.onComplete(null);
+                            }
+                        })
 //                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener()
 //                {
 //                    public void onClick(DialogInterface dialog, int which)
@@ -47,12 +50,14 @@ public class Prompt {
 //                        // do nothing
 //                    }
 //                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
     }
 
     public void promptInputText(final OnActionListener onActionListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(application.getView());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(application.getView());
         builder.setTitle("Create ExtensionEntity");
 
         // Set up the input
@@ -80,7 +85,12 @@ public class Prompt {
             }
         });
 
-        builder.show();
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                builder.show();
+            }
+        });
     }
 
     // TODO: public <T> void promptSelection(List<T> options, OnActionListener onActionListener) {
@@ -94,7 +104,7 @@ public class Prompt {
 //        options.add("Ultrasonic Rangefinder");
 //        options.add("Stepper Motor");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(application.getView());
         // dialogBuilder.setIcon(R.drawable.ic_launcher);
         dialogBuilder.setTitle("What do you want to connect?");
 
@@ -133,23 +143,27 @@ public class Prompt {
                 });
         */
 
-        final AlertDialog dialog = dialogBuilder.create();
-
-        dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        Application.getView().runOnUiThread(new Runnable() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void run() {
 
-                String selectionLabel = arrayAdapter.getItem(position);
-                Profile selection = options.get(position);
+                final AlertDialog dialog = dialogBuilder.create();
 
-                // Configure based on Profile
-                // Add Ports based on Profile
-                onActionListener.onComplete(selection);
+                dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        String selectionLabel = arrayAdapter.getItem(position);
+                        Profile selection = options.get(position);
+
+                        // Configure based on Profile
+                        // Add Ports based on Profile
+                        onActionListener.onComplete(selection);
 //                while (selection.getPortCount() < position + 1) {
-//                    selection.addPort(new Port());
+//                    selection.addPort(new PortEntity());
 //                }
 
-                // Response
+                        // Response
                 /*
                 AlertDialog.Builder builderInner = new AlertDialog.Builder(appContext);
                 builderInner.setMessage(selectionLabel);
@@ -169,17 +183,19 @@ public class Prompt {
                 builderInner.show();
                 */
 
-                dialog.dismiss();
+                        dialog.dismiss();
 
-                promptTasks();
+                        promptTasks();
+                    }
+                });
+
+                dialog.show();
             }
         });
-
-        dialog.show();
     }
 
-    // Break multi-update tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
-    // displayFloatingTaskDialog(<task list>, <task update to display>)
+    // Break multi-updateImage tasks up into a sequence of floating interface elements that must be completed to continue (or abandon the sequence)
+    // displayFloatingTaskDialog(<task list>, <task updateImage to display>)
 
     public void promptTasks() {
 

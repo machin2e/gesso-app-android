@@ -1,25 +1,17 @@
 package camp.computer.clay.engine.component;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.geometry.Geometry;
-import camp.computer.clay.util.geometry.Rectangle;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.Visibility;
-import camp.computer.clay.util.image.util.ShapeGroup;
+import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.engine.World;
 
 public class Image extends Component {
 
-    protected List<Shape> shapes = new LinkedList<>();
-
-    protected Visibility visibility = Visibility.VISIBLE;
+    protected Group<Shape> shapes = new Group<>();
 
     protected double targetTransparency = 1.0;
 
@@ -36,7 +28,7 @@ public class Image extends Component {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-        Space.getSpace().updateLayers();
+        World.getWorld().updateLayers();
     }
 
     /**
@@ -69,12 +61,12 @@ public class Image extends Component {
 
     /**
      * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
-     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code updateImage()}.
      * <p>
      * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
      * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
      * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
-     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     * in the first call to {@code updateImage()} following the call to {@code invalidate()}.
      */
     public void invalidate() {
         for (int i = 0; i < shapes.size(); i++) {
@@ -82,20 +74,8 @@ public class Image extends Component {
         }
     }
 
-    public Image(Entity entity) {
-        super(entity);
-    }
-
-    public boolean isVisible() {
-        return visibility == Visibility.VISIBLE;
-    }
-
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
-
-    public Visibility getVisibility() {
-        return visibility;
+    public Image() {
+        super();
     }
 
     public <T extends Shape> void addShape(T shape) {
@@ -116,63 +96,54 @@ public class Image extends Component {
         return null;
     }
 
-    public Shape getShape(Entity entity) {
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            if (shape.getEntity() == entity) {
-                return shape;
-            }
-        }
-        return null;
-    }
+    // TODO: <REMOVE?>
+    public Group<Shape> getShapes(String... labels) {
 
-    public Shape getShape(Transform point) {
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            if (shape.contains(point)) {
-                return shape;
-            }
-        }
-        return null;
-    }
-
-    public ShapeGroup getShapes() {
-        ShapeGroup shapeGroup = new ShapeGroup();
-        shapeGroup.addAll(this.shapes);
-        return shapeGroup;
-    }
-
-    public <T extends Entity> ShapeGroup getShapes(Class<? extends Entity>... entityTypes) {
-        return getShapes().filterType(entityTypes);
-    }
-
-    public <T extends Entity> ShapeGroup getShapes(Group<T> entities) {
-        return getShapes().filterEntity(entities);
-    }
-
-    /**
-     * Removes elements <em>that do not match</em> the regular expressions defined in
-     * {@code labels}.
-     *
-     * @param labelPatterns The list of {@code Shape} objects matching the regular expressions list.
-     * @return A list of {@code Shape} objects.
-     */
-    public ShapeGroup getShapes(String... labelPatterns) {
-
-        ShapeGroup shapeGroup = new ShapeGroup();
+        Group<Shape> shapeGroup = new Group<>();
 
         for (int i = 0; i < this.shapes.size(); i++) {
-            for (int j = 0; j < labelPatterns.length; j++) {
+            for (int j = 0; j < labels.length; j++) {
 
-                Pattern pattern = Pattern.compile(labelPatterns[j]);
-                Matcher matcher = pattern.matcher(this.shapes.get(i).getLabel());
+                Pattern pattern = Pattern.compile(labels[j]);
+                Shape shape = this.shapes.get(i); // HACK: Forcing typecast to Shape. TODO: Make this safe...
+                Matcher matcher = pattern.matcher(shape.getLabel());
 
-                if (matcher.matches()) {
-                    shapeGroup.add(this.shapes.get(i));
+                boolean isMatch = matcher.matches();
+
+                if (isMatch) {
+                    shapeGroup.add(this.shapes.get(i)); // HACK: Forced type to be Shape
                 }
             }
         }
 
+        return shapeGroup;
+    }
+    // TODO: </REMOVE?>
+
+    public Shape getShape(Entity entity) {
+//        for (int i = 0; i < shapes.size(); i++) {
+//            Shape shape = shapes.get(i);
+//            if (shape.getEntity() == entity) {
+//                return shape;
+//            }
+//        }
+        return null;
+    }
+
+//    public Shape getShape(Transform point) {
+//        for (int i = 0; i < shapes.size(); i++) {
+//            Shape shape = shapes.get(i);
+//            if (shape.contains(point)) {
+//                return shape;
+//            }
+//        }
+//        return null;
+//    }
+
+    public Group<Shape> getShapes() {
+        // TODO: Don't create a new Group. Will that work?
+        Group<Shape> shapeGroup = new Group<>();
+        shapeGroup.addAll(this.shapes);
         return shapeGroup;
     }
 
@@ -180,51 +151,34 @@ public class Image extends Component {
         return shapes.remove(index);
     }
 
-    public void update() {
-        updateGeometry();
-    }
+    // <COLLISION_COMPONENT>
 
-    public void updateGeometry() {
-
-        // Update Shapes
-        for (int i = 0; i < this.shapes.size(); i++) {
-            Shape shape = this.shapes.get(i);
-
-            // Update the Shape
-            shape.update(getEntity().getComponent(Transform.class));
-        }
-    }
-
-//    public void draw(Display display) {
+//    /**
+//     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
+//     * {@code point}.
+//     *
+//     * @param point
+//     * @return
+//     */
+//    public boolean contains(Transform point) {
+//        for (int i = 0; i < shapes.size(); i++) {
+//            //if (shapes.get(i).contains(point)) {
+//            if (Geometry.contains(shapes.get(i).getBoundary(), point)) {
+//                return true;
+//            }
+//        }
+//        return false;
 //    }
 
-    // <COLLISION_COMPONENT>
-    /**
-     * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
-     * {@code point}.
-     *
-     * @param point
-     * @return
-     */
-    public boolean contains(Transform point) {
-        if (isVisible()) {
-            for (int i = 0; i < shapes.size(); i++) {
-                if (shapes.get(i).contains(point)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public Rectangle getBoundingBox() {
-        List<Transform> shapeBoundaries = new LinkedList<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            shapeBoundaries.addAll(shapes.get(i).getBoundary());
-        }
-        return Geometry.getBoundingBox(shapeBoundaries);
-    }
-    // </COLLISION_COMPONENT>
+//    // TODO: Delete!
+//    public Rectangle getBoundingBox() {
+//        List<Transform> shapeBoundaries = new LinkedList<>();
+//        for (int i = 0; i < shapes.size(); i++) {
+//            shapeBoundaries.addAll(shapes.get(i).getBoundary());
+//        }
+//        return Geometry.getBoundingBox(shapeBoundaries);
+//    }
+//    // </COLLISION_COMPONENT>
 
     // <STYLE_COMPONENT?>
     // TODO: Delete?

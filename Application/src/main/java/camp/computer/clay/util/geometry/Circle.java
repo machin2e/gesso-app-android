@@ -1,17 +1,14 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
 /**
  * Circle. By default, objects are unit circles.
  */
-public class Circle<T extends Entity> extends Shape<T> {
+public class Circle extends Shape {
 
     /**
      * The index of boundary to use to approximate the circle. By default, this is setValue to 12,
@@ -21,14 +18,13 @@ public class Circle<T extends Entity> extends Shape<T> {
 
     public double radius = 1.0;
 
-    public Circle(double radius) {
-        super(new Transform(0, 0));
-        this.radius = radius;
+    public Circle() {
         setup();
     }
 
-    public Circle(T entity) {
-        this.entity = entity;
+    public Circle(double radius) {
+        super(new Transform(0, 0));
+        this.radius = radius;
         setup();
     }
 
@@ -49,8 +45,8 @@ public class Circle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+    public List<Transform> getVertices() {
+        List<Transform> vertices = new ArrayList<>();
         int segmentCount = BOUNDARY_VERTEX_COUNT - 1;
         for (int i = 0; i < segmentCount; i++) {
 
@@ -72,20 +68,5 @@ public class Circle<T extends Entity> extends Shape<T> {
     @Override
     public List<Transform> getBoundary() {
         return boundary;
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawCircle(this);
-
-            /*
-            // Draw bounding box!
-            display.paint.setColor(Color.GREEN);
-            display.paint.setStyle(Paint.Style.STROKE);
-            display.paint.setStrokeWidth(2.0f);
-            display.drawPolygon(getBoundingBox());
-            */
-        }
     }
 }

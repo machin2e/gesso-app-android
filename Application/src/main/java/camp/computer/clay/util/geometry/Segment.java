@@ -1,14 +1,11 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Segment<T extends Entity> extends Shape<T> {
+public class Segment extends Shape {
 
     protected Transform source = new Transform();
     protected Transform target = new Transform();
@@ -17,11 +14,6 @@ public class Segment<T extends Entity> extends Shape<T> {
         super();
         setup();
     }
-
-//    public Segment(T entity) {
-//        super(entity);
-//        setup();
-//    }
 
     public Segment(Transform source, Transform target) {
         setup();
@@ -38,18 +30,11 @@ public class Segment<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+    public List<Transform> getVertices() {
+        List<Transform> vertices = new ArrayList<>();
         vertices.add(new Transform(source));
         vertices.add(new Transform(target));
         return vertices;
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawSegment(this);
-        }
     }
 
     public Transform getSource() {

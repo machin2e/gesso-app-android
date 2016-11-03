@@ -1,14 +1,11 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Triangle<T extends Entity> extends Shape<T> {
+public class Triangle extends Shape {
 
     private Transform a = new Transform(0, 0);
     private Transform b = new Transform(0, 0);
@@ -16,9 +13,7 @@ public class Triangle<T extends Entity> extends Shape<T> {
 
     // Cached descriptive {@code Transform} geometry for the {@code Shape}.
 
-
-    public Triangle(T entity) {
-        this.entity = entity;
+    public Triangle() {
     }
 
     public Triangle(Transform position) {
@@ -38,18 +33,11 @@ public class Triangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+    public List<Transform> getVertices() {
+        List<Transform> vertices = new ArrayList<>();
         vertices.add(a);
         vertices.add(b);
         vertices.add(c);
         return vertices;
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawTriangle(this);
-        }
     }
 }

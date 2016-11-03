@@ -1,24 +1,16 @@
 package camp.computer.clay.util.geometry;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Line<T extends Entity> extends Shape<T> {
+public class Line extends Shape {
 
     public Line() {
         super();
         setup();
     }
-
-//    public Line(T entity) {
-//        super(entity);
-//        setup();
-//    }
 
     public Line(Transform position, double rotation) {
         setup();
@@ -34,18 +26,11 @@ public class Line<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
-        List<Transform> vertices = new LinkedList<>();
+    public List<Transform> getVertices() {
+        List<Transform> vertices = new ArrayList<>();
 //        vertices.add(new Transform(source));
 //        vertices.add(new Transform(target));
         return vertices;
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-//            display.drawSegment(this);
-        }
     }
 
     /**

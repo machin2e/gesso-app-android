@@ -1,15 +1,12 @@
 package camp.computer.clay.util.geometry;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
+import camp.computer.clay.engine.system.BoundarySystem;
 
-public class Rectangle<T extends Entity> extends Shape<T> {
+public class Rectangle extends Shape {
 
     public double width = 1.0;
 
@@ -19,8 +16,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
 
     private ArrayList<Segment> segments = new ArrayList<>();
 
-    public Rectangle(T entity) {
-        this.entity = entity;
+    public Rectangle() {
         setup();
     }
 
@@ -38,7 +34,7 @@ public class Rectangle<T extends Entity> extends Shape<T> {
         height = (bottom - top);
 
         setup();
-        updateBoundary(); // TODO: Replace with updateGeometry(this.position)
+        BoundarySystem.updateShapeBoundary(this); // TODO: Replace with updateExtensionGeometry(this.position)
     }
 
     protected void setup() {
@@ -71,9 +67,9 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
 
-        List<Transform> vertices = new LinkedList<>();
+        List<Transform> vertices = new ArrayList<>();
 
         vertices.add(new Transform(
                 0 - (width / 2.0),
@@ -120,20 +116,5 @@ public class Rectangle<T extends Entity> extends Shape<T> {
     public void setHeight(double height) {
         this.height = height;
         invalidate();
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawRectangle(this);
-
-            /*
-            // Draw bounding box!
-            display.paint.setColor(Color.GREEN);
-            display.paint.setStyle(Paint.Style.STROKE);
-            display.paint.setStrokeWidth(2.0f);
-            display.drawPolygon(getBoundingBox());
-            */
-        }
     }
 }

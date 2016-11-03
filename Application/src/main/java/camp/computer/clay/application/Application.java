@@ -35,14 +35,14 @@ import java.util.List;
 
 import camp.computer.clay.Clay;
 import camp.computer.clay.application.communication.UDPHost;
-import camp.computer.clay.application.graphics.Display;
+import camp.computer.clay.application.graphics.PlatformRenderSurface;
 import camp.computer.clay.application.graphics.controls.Prompt;
 import camp.computer.clay.application.sound.SpeechOutput;
 import camp.computer.clay.application.sound.ToneOutput;
 import camp.computer.clay.application.spatial.OrientationInput;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.host.DisplayHostInterface;
+import camp.computer.clay.host.PlatformInterface;
 import camp.computer.clay.host.Internet;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.old_model.PhoneHost;
@@ -51,7 +51,7 @@ import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Rectangle;
 import camp.computer.clay.util.geometry.Point;
 
-public class Application extends FragmentActivity implements DisplayHostInterface {
+public class Application extends FragmentActivity implements PlatformInterface {
 
     // <SETTINGS>
     private static final boolean ENABLE_TONE_OUTPUT = false;
@@ -69,7 +69,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private static final boolean ENABLE_FULLSCREEN = true;
     // </SETTINGS>
 
-    public Display display;
+    public PlatformRenderSurface platformRenderSurface;
 
     private SpeechOutput speechOutput;
 
@@ -251,11 +251,6 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-//    public static void hideSoftKeyboard(Activity activity) {
-//        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-//        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
-//    }
-
     public List<Entity> restoreHosts(String filename) {
 
         // e.g., filename = "Hosts.json"
@@ -321,8 +316,8 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         try {
             jsonObject = new JSONObject(jsonString);
 
-            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to HostEntity
-            String hostTitle = hostObject.getString("title"); // Handle to HostEntity's title
+            JSONObject hostObject = jsonObject.getJSONObject("host"); // Handle to Host
+            String hostTitle = hostObject.getString("title"); // Handle to Host's title
 
             JSONArray geometryArray = hostObject.getJSONArray("geometry"); // Handle to array of shapes
 
@@ -464,14 +459,14 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
 
         setContentView(R.layout.activity_main);
 
-        // Space Surface
-        display = (Display) findViewById(R.id.app_surface_view);
-        display.onResume();
+        // World Surface
+        platformRenderSurface = (PlatformRenderSurface) findViewById(R.id.app_surface_view);
+        platformRenderSurface.onResume();
 
         // based on... try it! better performance? https://www.javacodegeeks.com/2011/07/android-game-development-basic-game_05.html
         //setContentView(visualizationSurface);
 
-        // Path Editor
+        // PathEntity Editor
         final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
         pathEditor.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -521,7 +516,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         // Clay
         clay = new Clay();
 
-        clay.addDisplay(this); // Add the view provided by the host device.
+        clay.addPlatform(this); // Add the view provided by the host device.
 
         // UDP Datagram Server
         if (UDPHost == null) {
@@ -623,7 +618,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                                                     }
 
 //            @Override
-//            public boolean onTouch(Camera v, MotionEvent event) {
+//            public boolean onTouch(CameraEntity v, MotionEvent event) {
 //                int inType = timelineButton.getInputType(); // backup the input type
 //                timelineButton.setInputType(InputType.TYPE_NULL); // disable soft input
 //                timelineButton.onTouchEvent(event); // call native handler
@@ -894,7 +889,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
                 // Unicode arrow symbols: https://en.wikipedia.org/wiki/Template:Unicode_chart_Arrows
 
                 // final EditText chatEntry = (EditText) findViewById(R.id.chat_entry);
-//                messageContent.addDisplay(messageKey);
+//                messageContent.addPlatform(messageKey);
 //                contextScope.setText("✓");
 //                contextScope.setText("☉");
                 //contextScope.setText("☌"); // When dragging to connect path
@@ -913,7 +908,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
     private void addPathExtensionAction() {
 
         final TextView actionConstruct = new TextView(getContext());
-        actionConstruct.setText("Event (<Port> <Port> ... <Port>)\nExpose: <Port> <Port> ... <Port>");
+        actionConstruct.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
         int horizontalPadding = (int) convertDipToPx(20);
         int verticalPadding = (int) convertDipToPx(10);
         actionConstruct.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
@@ -996,7 +991,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         super.onPause();
 
         // <VISUALIZATION>
-        display.onPause();
+        platformRenderSurface.onPause();
         // </VISUALIZATION>
     }
 
@@ -1012,7 +1007,7 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         }
 
         // <VISUALIZATION>
-        display.onResume();
+        platformRenderSurface.onResume();
         // </VISUALIZATION>
     }
 
@@ -1055,28 +1050,19 @@ public class Application extends FragmentActivity implements DisplayHostInterfac
         return this.clay;
     }
 
-    @Override
-    public void addDeviceView(PhoneHost phoneHost) {
-
-    }
-
-    @Override
-    public void refreshListViewFromData(PhoneHost phoneHost) {
-        // TODO: Update the view to reflect the latest state of the object entity
-    }
-
-    // TODO: Rename to something else and make a getView() function specific to the
+    // TODO: Rename to something else and make a getPlatform() function specific to the
     // TODO: (cont'd) display interface.
     public static Application getView() {
         return Application.applicationView;
     }
 
-    public Display getDisplay() {
-        return this.display;
+    public PlatformRenderSurface getPlatformRenderSurface() {
+        return this.platformRenderSurface;
     }
 
+    // TODO: Delete!
     public double getFramesPerSecond() {
-        return getDisplay().getDisplayOutput().getFramesPerSecond();
+        return getPlatformRenderSurface().getPlatformRenderer().getFramesPerSecond();
     }
 
     public SpeechOutput getSpeechOutput() {

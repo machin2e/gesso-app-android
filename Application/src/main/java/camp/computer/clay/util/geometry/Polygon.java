@@ -3,17 +3,14 @@ package camp.computer.clay.util.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Polygon<T extends Entity> extends Shape<T> {
+public class Polygon extends Shape {
 
     protected List<Transform> vertices = new ArrayList<>();
 
-    public Polygon(T entity) {
-        this.entity = entity;
+    public Polygon() {
         setup();
     }
 
@@ -38,15 +35,8 @@ public class Polygon<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         return vertices;
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawPolygon(this);
-        }
     }
 
 }

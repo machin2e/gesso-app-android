@@ -1,20 +1,16 @@
-package camp.computer.clay.util.image;
+package camp.computer.clay.util.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.geometry.Geometry;
 import camp.computer.clay.engine.component.Transform;
 
-public abstract class Shape<T extends Entity> extends Groupable {
+public abstract class Shape extends Groupable {
 
     protected String label = "";
 
-    protected Visibility visibility = Visibility.VISIBLE;
     protected double targetTransparency = 1.0;
     protected double transparency = targetTransparency;
 
@@ -25,20 +21,18 @@ public abstract class Shape<T extends Entity> extends Groupable {
     protected String outlineColor = "#ff000000";
     public double outlineThickness = 1.0;
 
-    protected T entity = null;
-
     protected List<Transform> boundary = new ArrayList<>();
 
-    protected boolean isValid = false;
+    public boolean isValid = false;
 
     /**
      * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
-     * geometry, such as its boundary, to be updated during the subsequent call to {@code update()}.
+     * geometry, such as its boundary, to be updated during the subsequent call to {@code updateImage()}.
      * <p>
      * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
      * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
      * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
-     * in the first call to {@code update()} following the call to {@code invalidate()}.
+     * in the first call to {@code updateImage()} following the call to {@code invalidate()}.
      */
     public void invalidate() {
         this.isValid = false;
@@ -66,22 +60,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         this.position.set(position);
     }
 
-    public void setEntity(T entity) {
-        this.entity = entity;
-    }
-
-    public T getEntity() {
-        return this.entity;
-    }
-
-    public void setImagePosition(double x, double y) {
-        if (imagePosition == null) {
-            imagePosition = new Transform();
-        }
-        this.imagePosition.set(x, y);
-        invalidate();
-    }
-
+    // TODO: Move into ImageSystem, PortableLayoutSystem, or RenderSystem
     public void setImagePosition(Transform point) {
         if (imagePosition == null) {
             imagePosition = new Transform();
@@ -118,28 +97,11 @@ public abstract class Shape<T extends Entity> extends Groupable {
         return this.position.rotation;
     }
 
-    protected abstract List<Transform> getVertices();
+    public abstract List<Transform> getVertices();
 
-    public abstract void draw(Display display);
-
+    // TODO: Delete! Get boundary in BoundarySystem.
     public List<Transform> getBoundary() {
         return this.boundary;
-    }
-
-    public boolean contains(Transform point) {
-        return Geometry.contains(getBoundary(), point);
-    }
-
-    public void setVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
-
-    public Visibility getVisibility() {
-        return this.visibility;
-    }
-
-    public boolean isVisible() {
-        return visibility == Visibility.VISIBLE;
     }
 
     public void setColor(String color) {
@@ -199,65 +161,7 @@ public abstract class Shape<T extends Entity> extends Groupable {
         this.label = label;
     }
 
-    public boolean hasLabel() {
-        return this.label != null && this.label.length() > 0;
-    }
-
     public String getLabel() {
         return this.label;
-    }
-
-    public void update(Transform referencePoint) {
-        updateGeometry(referencePoint);
-    }
-
-    /**
-     * Updates the {@code Shape}'s geometry. Specifically, computes the absolute positioning,
-     * rotation, and scaling in preparation for drawing and collision detection.
-     *
-     * @param referencePoint Position of the containing {@code Image} relative to which the
-     *                       {@code Shape} will be drawn.
-     */
-    protected void updateGeometry(Transform referencePoint) {
-
-        if (!isValid) {
-            updatePosition(referencePoint); // Update the position
-            updateRotation(referencePoint); // Update rotation
-            updateBoundary(); // Update the bounds (using the results from the update position and rotation)
-            isValid = true;
-        }
-    }
-
-    /**
-     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
-     * the center position of the {@code Shape}. Effectively, this updates the position of the
-     * {@code Shape}.
-     *
-     * @param referencePoint
-     */
-    private void updatePosition(Transform referencePoint) {
-        position.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-        position.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-    }
-
-    private void updateRotation(Transform referencePoint) {
-        this.position.rotation = referencePoint.rotation + imagePosition.rotation;
-    }
-
-    /**
-     * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
-     * detection. Hey there, mango bongo.
-     */
-    protected void updateBoundary() {
-
-        List<Transform> vertices = getVertices();
-        List<Transform> boundary = getBoundary();
-
-        // Translate and rotate the boundary about the updated position
-        for (int i = 0; i < vertices.size(); i++) {
-            boundary.get(i).set(vertices.get(i));
-            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about Image position
-            Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
-        }
     }
 }

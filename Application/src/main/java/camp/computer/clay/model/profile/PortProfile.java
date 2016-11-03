@@ -2,7 +2,8 @@ package camp.computer.clay.model.profile;
 
 import java.util.UUID;
 
-import camp.computer.clay.engine.entity.Port;
+import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.entity.Entity;
 
 public class PortProfile {
     private UUID uuid = null;
@@ -17,10 +18,10 @@ public class PortProfile {
 
     }
 
-    public PortProfile(Port port) {
-        setType(port.getType());
-        setDirection(port.getDirection());
-        // setLabel(port.getLabel());
+    public PortProfile(Entity portEntity) {
+        setType(portEntity.getComponent(Port.class).getType());
+        setDirection(portEntity.getComponent(Port.class).getDirection());
+        // setLabel(portEntity.getLabel());
     }
 
     public UUID getUuid() {

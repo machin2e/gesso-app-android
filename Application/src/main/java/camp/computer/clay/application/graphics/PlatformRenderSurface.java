@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,58 +18,58 @@ import android.view.SurfaceView;
 import java.util.List;
 
 import camp.computer.clay.application.Application;
-import camp.computer.clay.engine.component.Actor;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.entity.Camera;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.entity.Path;
-import camp.computer.clay.engine.entity.Port;
 import camp.computer.clay.model.action.Event;
 import camp.computer.clay.util.geometry.Circle;
 import camp.computer.clay.util.geometry.Geometry;
+import camp.computer.clay.util.geometry.Point;
 import camp.computer.clay.util.geometry.Segment;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.geometry.Polygon;
 import camp.computer.clay.util.geometry.Polyline;
 import camp.computer.clay.util.geometry.Rectangle;
+import camp.computer.clay.util.geometry.Text;
 import camp.computer.clay.util.geometry.Triangle;
-import camp.computer.clay.util.image.Shape;
-import camp.computer.clay.util.image.Space;
-import camp.computer.clay.util.image.Visibility;
+import camp.computer.clay.util.geometry.Shape;
+import camp.computer.clay.engine.World;
 
-public class Display extends SurfaceView implements SurfaceHolder.Callback {
+public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
-    // Space Rendering Context
-    private Bitmap canvasBitmap = null;
+    // World Rendering Context
+    public Bitmap canvasBitmap = null;
     public Canvas canvas = null;
     private int canvasWidth;
     private int canvasHeight;
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private Matrix identityMatrix;
+    public Matrix identityMatrix;
 
-    // Space DisplayOutput
+    // World PlatformRenderer
     private SurfaceHolder surfaceHolder;
-    private DisplayOutput displayOutput;
+
+    public PlatformRenderer platformRenderer;
 
     // Coordinate System (Grid)
-    private Transform originPosition = new Transform();
+    public Transform originPosition = new Transform();
 
-    // Space
-    private Space space;
+    // World
+    public World world;
 
-    public Display(Context context) {
+    public PlatformRenderSurface(Context context) {
         super(context);
         setFocusable(true);
     }
 
-    public Display(Context context, AttributeSet attrs) {
+    public PlatformRenderSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public Display(Context context, AttributeSet attrs, int defStyle) {
+    public PlatformRenderSurface(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -87,7 +88,7 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         // Create Identity Matrix
         identityMatrix = new Matrix();
 
-        // Center the space coordinate system
+        // Center the world coordinate system
         originPosition.set(canvas.getWidth() / 2.0f, canvas.getHeight() / 2.0f);
     }
 
@@ -103,10 +104,10 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         /*
         // Kill the background Thread
         boolean retry = true;
-        // displayOutput.setRunning (false);
+        // platformRenderer.setRunning (false);
         while (retry) {
             try {
-                displayOutput.join ();
+                platformRenderer.join ();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace ();
@@ -121,9 +122,9 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
 
         // Create and start background Thread
-        displayOutput = new DisplayOutput(this);
-        displayOutput.setRunning(true);
-        displayOutput.start();
+        platformRenderer = new PlatformRenderer(this);
+        platformRenderer.setRunning(true);
+        platformRenderer.start();
 
 //        // Start communications
 //        getClay ().getCommunication ().startDatagramServer();
@@ -141,11 +142,11 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
         // Kill the background Thread
         boolean retry = true;
-        displayOutput.setRunning(false);
+        platformRenderer.setRunning(false);
 
         while (retry) {
             try {
-                displayOutput.join();
+                platformRenderer.join();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -153,211 +154,12 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    protected void doDraw(Canvas canvas) {
-        this.canvas = canvas;
-
-        if (this.space == null || this.canvas == null) {
-            return;
-        }
-
-        // Adjust the Camera
-        canvas.save();
-        adjustCamera();
-        canvas.drawColor(Color.WHITE); // Draw the background
-
-        getSpace().doDraw(this); // Space
-        drawEntities();
-
-        canvas.restore();
-
-        drawOverlay();
-
-        // Paint the bitmap to the "primary" canvas.
-        canvas.drawBitmap(canvasBitmap, identityMatrix, null);
-
-        /*
-        // Alternative to the above
-        canvas.save();
-        canvas.concat(identityMatrix);
-        canvas.drawBitmap(canvasBitmap, 0, 0, paint);
-        canvas.restore();
-        */
-    }
-
-    private void drawOverlay() {
-
-        int linePosition = 0;
-
-        // <FPS_LABEL>
-        canvas.save();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(35);
-
-        String fpsText = "FPS: " + (int) displayOutput.getFramesPerSecond();
-        Rect fpsTextBounds = new Rect();
-        paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        linePosition += 25 + fpsTextBounds.height();
-        canvas.drawText(fpsText, 25, linePosition, paint);
-        canvas.restore();
-        // </FPS_LABEL>
-
-        // <ENTITY_STATISTICS>
-        canvas.save();
-        int entityCount = Entity.Manager.size();
-//        int hostCount = Entity.Manager.filterType2(HostEntity.class).size();
-        int hostCount = Entity.Manager.filterWithComponent(Host.class).size();
-        int portCount = Entity.Manager.filterType2(Port.class).size();
-//        int extensionCount = Entity.Manager.filterType2(ExtensionEntity.class).size();
-        int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
-        int pathCount = Entity.Manager.filterType2(Path.class).size();
-
-        // Entities
-        String text = "Entities: " + entityCount;
-        Rect textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Hosts
-        canvas.save();
-        text = "Hosts: " + hostCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Ports
-        canvas.save();
-        text = "Ports: " + portCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Extensions
-        canvas.save();
-        text = "Extensions: " + extensionCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-
-        // Paths
-        canvas.save();
-        text = "Paths: " + pathCount;
-        textBounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
-        canvas.restore();
-        // </ENTITY_STATISTICS>
-    }
-
-    /**
-     * Adjust the perspective
-     */
-    private void adjustCamera() {
-//        canvas.translate((float) originPosition.x + (float) space.getEntity().getActor(0).getCamera().getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/, (float) originPosition.y + (float) space.getEntity().getActor(0).getCamera().getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */);
-//        canvas.scale((float) space.getEntity().getActor(0).getCamera().getScale(), (float) space.getEntity().getActor(0).getCamera().getScale());
-        Camera camera = getCamera();
-        canvas.translate(
-                (float) originPosition.x + (float) camera.getPosition().x /* + (float) Application.getView().getOrientationInput().getRotationY()*/,
-                (float) originPosition.y + (float) camera.getPosition().y /* - (float) Application.getView().getOrientationInput().getRotationX() */
-        );
-        canvas.scale(
-                (float) camera.getScale(),
-                (float) camera.getScale()
-        );
-    }
-
-    /**
-     * Returns {@code Camera} {@code Entity}.
-     * @return
-     */
-    private Camera getCamera() {
-        Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
-        return camera;
-    }
-
-    /**
-     * The function run in background thread, not UI thread.
-     */
-    public void update() {
-
-        if (space == null) {
-            return;
-        }
-
-        Canvas canvas = null;
-
-        SurfaceHolder holder = getHolder();
-
-        try {
-            canvas = holder.lockCanvas();
-
-            if (canvas != null) {
-                synchronized (holder) {
-
-
-                    // <UPDATE>
-
-                    // Update Actors
-                    space.getActor().update(); // HACK
-
-                    // Update
-                    updateEntities();
-
-                    // Update Camera(s)
-                    Camera camera = (Camera) Entity.Manager.filterType2(Camera.class).get(0);
-                    camera.update();
-                    // </UPDATE>
-
-
-
-                    // Draw
-                    doDraw(canvas);
-                }
-            }
-        } finally {
-            if (canvas != null) {
-                holder.unlockCanvasAndPost(canvas);
-            }
-        }
-    }
-
-    public DisplayOutput getDisplayOutput() {
-        return this.displayOutput;
-    }
-
-    public void setSpace(Space space) {
-        this.space = space;
-
-        // Get screen width and height of the device
-        DisplayMetrics metrics = new DisplayMetrics();
-        Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-
-//        space.getEntity().getActor(0).getCamera().setWidth(screenWidth);
-//        space.getEntity().getActor(0).getCamera().setHeight(screenHeight);
-        Camera camera = getCamera();
-        camera.setWidth(screenWidth);
-        camera.setHeight(screenHeight);
-    }
-
-    public Space getSpace() {
-        return this.space;
-    }
+    private Event previousEvent = null;
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
-        if (this.space == null) {
+        if (this.world == null) {
             return false;
         }
 
@@ -377,8 +179,8 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         int touchInteractionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
         final int pointerCount = motionEvent.getPointerCount();
 
-        // Get active actor
-        Actor actor = space.getActor();
+        // Get active inputSystem
+        InputSystem inputSystem = world.inputSystem;
 
         // Create pointerCoordinates event
         Event event = new Event();
@@ -386,12 +188,14 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
+                Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Transform perspectivePosition = actor.getCamera().getPosition();
-                    double perspectiveScale = actor.getCamera().getScale();
+                    Transform perspectivePosition = camera.getComponent(Camera.class).getEntity().getComponent(Transform.class);
+                    double perspectiveScale = camera.getComponent(Camera.class).getScale();
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
@@ -416,19 +220,65 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
 
                 // Update the state of the touched object based on the current pointerCoordinates event state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
+
+                    previousEvent = null;
+
+                    // Set previous Event
+                    if (previousEvent != null) {
+                        event.previousEvent = previousEvent;
+                    } else {
+                        event.previousEvent = null;
+                    }
+                    previousEvent = event;
+
+                    holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
+                    holdEventTimerHandler.postDelayed(holdEventTimerRunnable, Event.MINIMUM_HOLD_DURATION);
+
+//                    new Timer().schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            // this code will be executed after 2 seconds
+//                        }
+//                    }, 2000);
+
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
+                    inputSystem.queueEvent(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_DOWN) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
+
+                    // Set previous Event
+                    if (previousEvent != null) {
+                        event.previousEvent = previousEvent;
+                    } else {
+                        event.previousEvent = null;
+                    }
+                    previousEvent = event;
+
                     event.setType(Event.Type.MOVE);
                     event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
+
+                    if (previousEvent.getDistance() > Event.MINIMUM_MOVE_DISTANCE) {
+                        holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
+                        inputSystem.queueEvent(event);
+                    }
+
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
+
+                    // Set previous Event
+                    if (previousEvent != null) {
+                        event.previousEvent = previousEvent;
+                    } else {
+                        event.previousEvent = null;
+                    }
+                    previousEvent = event;
+
+                    holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
+
                     event.setType(Event.Type.UNSELECT);
                     event.pointerIndex = pointerId;
-                    actor.queueEvent(event);
+                    inputSystem.queueEvent(event);
                 } else if (touchInteractionType == MotionEvent.ACTION_POINTER_UP) {
                     // TODO: Handle additional pointers after the getFirstEvent pointerCoordinates!
                 } else if (touchInteractionType == MotionEvent.ACTION_CANCEL) {
@@ -442,91 +292,161 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    // TODO: Remove reference to Image. WTF.
-    public void updateEntities() {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            Entity entity = Entity.Manager.get(i);
-//            Image image = entity.getComponent(Image.class);
-//            if (image != null) {
-////                image.draw(this);
-//                image.update();
+    public Handler holdEventTimerHandler = new Handler();
+
+    public Runnable holdEventTimerRunnable = new Runnable() {
+        @Override
+        public void run() {
+
+            int pointerIndex = 0;
+
+//            if (getFirstEvent().isPointing[pointerIndex]) {
+//                if (getDragDistance() < Event.MINIMUM_MOVE_DISTANCE) {
+
+//            Event event = new Event();
+//            event.setType(Event.Type.HOLD);
+//            event.pointerIndex = getFirstEvent().pointerIndex;
+//            event.pointerCoordinates[0] = new Transform(getFirstEvent().getPosition()); // HACK. This should contain the state of ALL pointers (just set the previous event's since this is a synthetic event?)
+//            getFirstEvent().getInputSystem().queueEvent(event);
+//
+//            isHolding[pointerIndex] = true;
+
+            if (previousEvent.getDistance() < Event.MINIMUM_MOVE_DISTANCE) {
+                InputSystem inputSystem = world.inputSystem;
+
+                Event event = new Event();
+                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                event.setType(Event.Type.HOLD);
+                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+
+                // Set previous Event
+                if (previousEvent != null) {
+                    event.previousEvent = previousEvent;
+                } else {
+                    event.previousEvent = null;
+                }
+                previousEvent = event;
+
+                inputSystem.queueEvent(event);
+
+                Log.v("PlatformRenderSurface", "event.getDistance: " + event.getDistance());
+            }
+
+//                }
 //            }
-            entity.update();
+        }
+    };
+
+    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
+//                new Timer().schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        // this code will be executed after 2 seconds
+//
+//                        Event event = new Event();
+//                        // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+//                        // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+//                        event.setType(Event.Type.HOLD);
+//                        event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+//                        queueEvent(event);
+//
+//                        Log.v("HoldCallback", "Holding");
+//                    }
+//                }, 1000);
+
+//                final Handler handler = new Handler();
+
+//                Thread thread = new Thread() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            sleep(1000);
+//
+//                            Log.v("HOLD", "WAAAAAAAAAAIT");
+//
+//                            // If needs to run on UI thread.
+//                            /*
+//                            Application.getView().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//                                }
+//                            });
+//                            */
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                };
+//
+//                thread.start();
+
+    /**
+     * The function run in background thread, not UI thread.
+     */
+    public void update() {
+
+        if (world == null) {
+            return;
+        }
+
+        Canvas canvas = null;
+        SurfaceHolder holder = getHolder();
+
+        try {
+            canvas = holder.lockCanvas();
+            if (canvas != null) {
+                synchronized (holder) {
+                    world.updateSystems(canvas);
+                }
+            }
+        } finally {
+            if (canvas != null) {
+                holder.unlockCanvasAndPost(canvas);
+            }
         }
     }
 
-    public void drawEntities() {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            Entity entity = Entity.Manager.get(i);
-            Image image = entity.getComponent(Image.class);
-            if (image != null) {
-//                image.draw(this);
-                drawEntity(entity);
-            }
-        }
+    public PlatformRenderer getPlatformRenderer() {
+        return this.platformRenderer;
     }
 
-    public void drawEntity(Entity entity) {
+    public void setWorld(World world) {
+        this.world = world;
 
-        if (entity.hasComponent(Host.class)) {
+        // Get screen width and height of the device
+        DisplayMetrics metrics = new DisplayMetrics();
+        Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
 
-            Image image = entity.getComponent(Image.class);
-            if (image.isVisible()) {
-                canvas.save();
-                for (int i = 0; i < image.getShapes().size(); i++) {
-                    image.getShapes().get(i).draw(this);
-                }
-                canvas.restore();
-            }
+        // Set camera viewport dimensions
+        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        camera.getComponent(Camera.class).setWidth(screenWidth);
+        camera.getComponent(Camera.class).setHeight(screenHeight);
+    }
 
-        } else if (entity.hasComponent(Extension.class)) {
-
-            Image image = entity.getComponent(Image.class);
-            if (image.isVisible()) {
-                canvas.save();
-                for (int i = 0; i < image.getShapes().size(); i++) {
-                    image.getShapes().get(i).draw(this);
-                }
-                canvas.restore();
-            }
-
-        } else if (entity.getClass() == Path.class) {
-
-            Image image = entity.getComponent(Image.class);
-
-            if (image.isVisible()) {
-                Path path = (Path) image.getEntity();
-                if (path.getType() == Path.Type.MESH) {
-                    // Draw Path between Ports
-                    drawTrianglePath(path, this);
-                } else if (path.getType() == Path.Type.ELECTRONIC) {
-                    drawLinePath(path, this);
-                }
-            } else {
-                Path path = (Path) entity; // image.getPath();
-                if (path.getType() == Path.Type.ELECTRONIC) {
-                    drawPhysicalPath(path, this);
-                }
-            }
-
-        }
+    public World getWorld() {
+        return this.world;
     }
 
     // <PATH_IMAGE_HELPERS>
+    /*
     private double triangleWidth = 20;
     private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
     private double triangleSpacing = 35;
 
-    public void drawTrianglePath(Path path, Display display) {
+    public void drawTrianglePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
-        Paint paint = display.paint;
+        Paint paint = platformRenderSurface.paint;
 
-        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
-        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
+        Shape sourcePortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource());
+        Shape targetPortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget());
 
         // Show target port
-        targetPortShape.setVisibility(Visibility.VISIBLE);
-        //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
+//        targetPortShape.setVisibility(Visible.VISIBLE);
+        //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
         // Color
         paint.setStyle(Paint.Style.STROKE);
@@ -537,89 +457,110 @@ public class Display extends SurfaceView implements SurfaceHolder.Callback {
         Transform sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
         Transform targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
 
-        display.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
+        platformRenderSurface.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
     }
+    */
 
-    public void drawLinePath(Path path, Display display) {
+    public void drawLinePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
-        Paint paint = display.paint;
+        Paint paint = platformRenderSurface.paint;
 
-        Shape sourcePortShape = Space.getSpace().getShape(path.getSource());
-        Shape targetPortShape = Space.getSpace().getShape(path.getTarget());
+        Shape sourcePortShape = pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).getShape("Port");
+        Shape targetPortShape = pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).getShape("Port");
 
-        if (sourcePortShape != null && targetPortShape != null) {
+        // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
+        // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
+        Transform sourcePortPositition = sourcePortShape.getPosition();
+        Transform targetPortPositition = targetPortShape.getPosition();
+
+//        if (sourcePortShape != null && targetPortShape != null) {
 
             // Show target port
-            targetPortShape.setVisibility(Visibility.VISIBLE);
-            //// TODO: targetPortShape.setPathVisibility(Visibility.VISIBLE);
+//            targetPortShape.setVisibility(Visible.VISIBLE);
+            //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
             // Color
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(15.0f);
             paint.setColor(Color.parseColor(sourcePortShape.getColor()));
 
-            double pathRotationAngle = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotationAngle, 0);
-            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotationAngle + 180, 0);
+            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
 
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-//            double pathRotation = getSpace().getImages(getPath().getHosts()).getRotation();
+//            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
 
-            Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
+            Segment segment = (Segment) pathEntity.getComponent(Image.class).getShape("PathEntity");
             segment.setOutlineThickness(15.0);
             segment.setOutlineColor(sourcePortShape.getColor());
 
             segment.setSource(pathStartCoordinate);
             segment.setTarget(pathStopCoordinate);
 
-            display.drawSegment(segment);
-        }
+            platformRenderSurface.drawSegment(segment);
+//        }
     }
 
-    public void drawPhysicalPath(Path path, Display display) {
+    public void drawPhysicalPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
-        // Get HostEntity and ExtensionEntity Ports
-        Port hostPort = path.getSource();
-        Port extensionPort = path.getTarget();
+        // Get Host and Extension Ports
+        Entity hostPortEntity = pathEntity.getComponent(Path.class).getSource();
+        Entity extensionPortEntity = pathEntity.getComponent(Path.class).getTarget();
 
-        // Draw the connection to the HostEntity's Port
-
-        Image hostImage = hostPort.getPortable().getComponent(Image.class);
-        Image extensionImage = extensionPort.getPortable().getComponent(Image.class);
+        // Draw the connection between the Host Port and the Extension Port
+        Image hostImage = hostPortEntity.getParent().getComponent(Image.class);
+        Image extensionImage = extensionPortEntity.getParent().getComponent(Image.class);
 
         Entity host = hostImage.getEntity();
         Entity extension = extensionImage.getEntity();
 
-        if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getIndex()
-                && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPort.getIndex()) {
+        if (host.getComponent(Portable.class).headerContactPositions.size() > hostPortEntity.getComponent(Port.class).getIndex()
+                && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPortEntity.getComponent(Port.class).getIndex()) {
 
-            Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPort.getIndex()).getPosition();
-            Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPort.getIndex()).getPosition();
+            Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPortEntity.getComponent(Port.class).getIndex()).getPosition();
+            Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortEntity.getComponent(Port.class).getIndex()).getPosition();
 
             // Draw connection between Ports
-            display.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getType())));
-            display.paint.setStrokeWidth(10.0f);
-//            display.drawSegment(hostConnectorPosition, extensionConnectorPosition);
-
-//            Polyline polyline = new Polyline();
-//            polyline.addVertex(hostConnectorPosition);
-//            polyline.addVertex(extensionConnectorPosition);
-//            display.drawPolyline(polyline);
+            platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType())));
+            platformRenderSurface.paint.setStrokeWidth(10.0f);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) path.getComponent(Image.class).getShape("Path");
+            Segment segment = (Segment) pathEntity.getComponent(Image.class).getShape("PathEntity");
             segment.setOutlineThickness(10.0);
-            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getType()));
+            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType()));
 
             segment.setSource(hostConnectorPosition);
             segment.setTarget(extensionConnectorPosition);
 
-            display.drawSegment(segment);
+            platformRenderSurface.drawSegment(segment);
         }
     }
     // </PATH_IMAGE_HELPERS>
+
+    // TODO: Replace with more direct drawing? What's the minimal layering between image
+    // TODO: (...) representation and platform-level rendering?
+    public void drawShape(Shape shape) {
+        if (shape.getClass() == Point.class) {
+            // TODO:
+        } else if (shape.getClass() == Segment.class) {
+            drawSegment((Segment) shape);
+        } else if (shape.getClass() == Polyline.class) {
+            drawPolyline((Polyline) shape);
+        } else if (shape.getClass() == Triangle.class) {
+            drawTriangle((Triangle) shape);
+        } else if (shape.getClass() == Rectangle.class) {
+            drawRectangle((Rectangle) shape);
+        } else if (shape.getClass() == Polygon.class) {
+            drawPolygon((Polygon) shape);
+        } else if (shape.getClass() == Circle.class) {
+            drawCircle((Circle) shape);
+        } else if (shape.getClass() == Text.class) {
+            // TODO:
+        }
+    }
 
     public void drawSegment(Transform source, Transform target) {
         canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);

@@ -3,12 +3,10 @@ package camp.computer.clay.util.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.application.graphics.Display;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.image.Shape;
 
-public class Polyline<T extends Entity> extends Shape<T> {
+public class Polyline<T extends Entity> extends Shape { // extends Shape<T> {
 
     private List<Transform> vertices = new ArrayList<>();
 
@@ -17,16 +15,16 @@ public class Polyline<T extends Entity> extends Shape<T> {
         setup();
     }
 
-    public Polyline(T entity) {
-        this.entity = entity;
-        setup();
-    }
-
-    public Polyline(Transform position, List<Transform> vertices) {
-        super(position);
-        setup();
-        setVertices(vertices);
-    }
+//    public Polyline(T entity) {
+//        this.entity = entity;
+//        setup();
+//    }
+//
+//    public Polyline(Transform position, List<Transform> vertices) {
+//        super(position);
+//        setup();
+//        setVertices(vertices);
+//    }
 
     private void setup() {
         setupGeometry();
@@ -45,19 +43,12 @@ public class Polyline<T extends Entity> extends Shape<T> {
     }
 
     @Override
-    protected List<Transform> getVertices() {
+    public List<Transform> getVertices() {
         return vertices;
     }
 
     public List<Transform> getPoints() {
         return vertices;
-    }
-
-    @Override
-    public void draw(Display display) {
-        if (isVisible()) {
-            display.drawPolyline(this);
-        }
     }
 
 }
