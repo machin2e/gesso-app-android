@@ -129,11 +129,11 @@ public class World {
         }
 
         // Load geometry from file into Image Component
-        // TODO: Application.getPlatform().openFile(this, "Geometry.json");
-//        Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
+        // TODO: Application.getPlatform().openFile(this, "Host.json");
+//        Application.getView().restoreGeometry(host.getComponent(Image.class), "Host.json");
         InputStream inputStream = null;
         try {
-            inputStream = Application.getContext().getAssets().open("Geometry.json");
+            inputStream = Application.getContext().getAssets().open("Host.json");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -245,7 +245,7 @@ public class World {
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Image Component
-        // TODO: Application.getPlatform().openFile(this, "Geometry.json");
+        // TODO: Application.getPlatform().openFile(this, "Host.json");
 
         return extension;
     }

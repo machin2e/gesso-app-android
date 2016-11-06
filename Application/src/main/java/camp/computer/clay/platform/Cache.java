@@ -1,4 +1,4 @@
-package camp.computer.clay.old_model;
+package camp.computer.clay.platform;
 
 import camp.computer.clay.Clay;
 

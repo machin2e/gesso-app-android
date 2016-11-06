@@ -24,7 +24,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,21 +33,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
+import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UDPHost;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.platform.graphics.controls.Prompt;
 import camp.computer.clay.platform.sound.SpeechOutput;
 import camp.computer.clay.platform.sound.ToneOutput;
 import camp.computer.clay.platform.spatial.OrientationInput;
-import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.host.PlatformInterface;
-import camp.computer.clay.host.Internet;
-import camp.computer.clay.model.action.Event;
+import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.BuilderImage.Circle;
-import camp.computer.clay.util.BuilderImage.Rectangle;
-import camp.computer.clay.util.BuilderImage.Point;
 
 public class Application extends FragmentActivity implements PlatformInterface {
 
@@ -107,19 +101,19 @@ public class Application extends FragmentActivity implements PlatformInterface {
         }
     }
 
-    public Prompt getActionPrompts() {
+    public Prompt getUi() {
         return this.prompt;
     }
 
-    public void openActionEditor(Entity extensionEntity) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
-                pathEditor.setVisibility(View.VISIBLE);
-            }
-        });
-    }
+//    public void OLD_openActionEditor(Entity extensionEntity) {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                final RelativeLayout pathEditor = (RelativeLayout) findViewById(R.id.action_editor_view);
+//                pathEditor.setVisibility(View.VISIBLE);
+//            }
+//        });
+//    }
 
     // References:
     // - http://stackoverflow.com/questions/4165414/how-to-hide-soft-keyboard-on-android-after-clicking-outside-edittext
@@ -606,7 +600,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
 //        ).start();
         // </REDIS>
 
-//        openFile("Geometry.json");
+//        openFile("Host.json");
     }
 
     public void hideChat() {

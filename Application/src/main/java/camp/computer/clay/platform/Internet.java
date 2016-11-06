@@ -1,9 +1,9 @@
-package camp.computer.clay.old_model;
+package camp.computer.clay.platform;
 
 import java.util.ArrayList;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.host.InternetInterface;
+import camp.computer.clay.platform.communication.InternetInterface;
 
 public class Internet {
 

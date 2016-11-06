@@ -1,7 +1,6 @@
-package camp.computer.clay.host;
+package camp.computer.clay.platform;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.old_model.PhoneHost;
 
 public interface PlatformInterface {
 

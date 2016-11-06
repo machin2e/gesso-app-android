@@ -1,4 +1,4 @@
-package camp.computer.clay.old_model;
+package camp.computer.clay.platform;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import camp.computer.clay.Clay;
-import camp.computer.clay.host.MessengerInterface;
+import camp.computer.clay.platform.communication.MessengerInterface;
 
 public class Messenger {
 

@@ -25,7 +25,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.action.Event;
+import camp.computer.clay.engine.Event;
 import camp.computer.clay.util.BuilderImage.Circle;
 import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.util.BuilderImage.Point;
@@ -195,7 +195,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
                     Transform perspectivePosition = camera.getComponent(Camera.class).getEntity().getComponent(Transform.class);
-                    double perspectiveScale = camera.getComponent(Camera.class).getScale();
+//                    double perspectiveScale = camera.getComponent(Camera.class).getScale();
+                    double perspectiveScale = World.getWorld().cameraSystem.getScale(camera);
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
@@ -423,8 +424,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Set camera viewport dimensions
         Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
-        camera.getComponent(Camera.class).setWidth(screenWidth);
-        camera.getComponent(Camera.class).setHeight(screenHeight);
+//        camera.getComponent(Camera.class).setWidth(screenWidth);
+//        camera.getComponent(Camera.class).setHeight(screenHeight);
+        World.getWorld().cameraSystem.setWidth(camera, screenWidth);
+        World.getWorld().cameraSystem.setHeight(camera, screenHeight);
     }
 
     public World getWorld() {

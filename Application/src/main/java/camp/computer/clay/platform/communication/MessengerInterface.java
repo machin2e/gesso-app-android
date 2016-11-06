@@ -1,7 +1,7 @@
-package camp.computer.clay.host;
+package camp.computer.clay.platform.communication;
 
-import camp.computer.clay.old_model.Message;
-import camp.computer.clay.old_model.Messenger;
+import camp.computer.clay.platform.Message;
+import camp.computer.clay.platform.Messenger;
 
 public interface MessengerInterface {
 

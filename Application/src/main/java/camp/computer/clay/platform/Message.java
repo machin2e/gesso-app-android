@@ -1,4 +1,4 @@
-package camp.computer.clay.old_model;
+package camp.computer.clay.platform;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

@@ -1,4 +1,4 @@
-package camp.computer.clay.model.action;
+package camp.computer.clay.engine;
 
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;

@@ -49,8 +49,10 @@ public class RenderSystem extends System {
                 (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
         );
         canvas.scale(
-                (float) camera.getComponent(Camera.class).getScale(),
-                (float) camera.getComponent(Camera.class).getScale()
+//                (float) camera.getComponent(Camera.class).getScale(),
+//                (float) camera.getComponent(Camera.class).getScale()
+                (float) world.cameraSystem.getScale(camera),
+                (float) world.cameraSystem.getScale(camera)
         );
 
 

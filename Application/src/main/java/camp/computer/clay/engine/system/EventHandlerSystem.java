@@ -20,7 +20,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.action.Event;
+import camp.computer.clay.engine.Event;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.engine.component.util.Visible;
@@ -123,7 +123,8 @@ public class EventHandlerSystem extends System {
         } else if (event.getType() == Event.Type.MOVE) {
 
 //            if (action.isDragging()) {
-            camera.getComponent(Camera.class).setOffset(event.getOffset());
+//            camera.getComponent(Camera.class).setOffset(event.getOffset());
+            World.getWorld().cameraSystem.setOffset(camera, event.getOffset());
 //            }
 
         } else if (event.getType() == Event.Type.UNSELECT) {
@@ -149,7 +150,8 @@ public class EventHandlerSystem extends System {
             // TODO: workspace.setTitleVisibility(Visible.INVISIBLE);
 
             // Camera
-            camera.getComponent(Camera.class).setFocus(World.getWorld());
+//            camera.getComponent(Camera.class).setFocus(World.getWorld());
+            World.getWorld().cameraSystem.setFocus(camera, World.getWorld());
 //            }
 
         }
@@ -217,7 +219,8 @@ public class EventHandlerSystem extends System {
             }
 
             // Camera
-            camera.getComponent(Camera.class).setFocus(host);
+//            camera.getComponent(Camera.class).setFocus(host);
+            World.getWorld().cameraSystem.setFocus(camera, host);
 
             if (host.getComponent(Portable.class).getExtensions().size() > 0) {
                 /*
@@ -280,9 +283,9 @@ public class EventHandlerSystem extends System {
 
                 } else if (profiles.size() > 0) {
 
-                    // Prompt User to select an ExtensionEntity from the Store
+                    // Prompt Player to select an ExtensionEntity from the Store
                     // i.e., Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
-                    Application.getView().getActionPrompts().promptSelection(profiles, new Prompt.OnActionListener<Profile>() {
+                    Application.getView().getUi().promptSelection(profiles, new Prompt.OnActionListener<Profile>() {
                         @Override
                         public void onComplete(Profile profile) {
 
@@ -290,7 +293,8 @@ public class EventHandlerSystem extends System {
                             Entity extension = PortableLayoutSystem.restoreExtension(host, profile, event.getPosition());
 
                             // Camera
-                            camera.getComponent(Camera.class).setFocus(extension);
+//                            camera.getComponent(Camera.class).setFocus(extension);
+                            World.getWorld().cameraSystem.setFocus(camera, extension);
                         }
                     });
 
@@ -303,8 +307,6 @@ public class EventHandlerSystem extends System {
     }
 
     public static void handleExtensionEvent(final Entity extension, Event event) {
-
-        final Image extensionImage = extension.getComponent(Image.class);
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -325,26 +327,16 @@ public class EventHandlerSystem extends System {
             Log.v("EventHandlerSystem", "previousTarget: " + World.getWorld().eventHandlerSystem.previousTarget);
             Log.v("EventHandlerSystem", "---");
             if (World.getWorld().eventHandlerSystem.previousTarget == extension) {
-                Application.getView().openActionEditor(extensionImage.getEntity());
+//                Application.getView().getUi().OLD_openActionEditor(extension);
+                Application.getView().getUi().openActionEditor(extension);
             }
-
-            /*
-            if (action.getPrevious().getFirstEvent().getTarget() == extensionImage.getEntity()) {
-
-                if (action.isTap()) {
-                    // TODO: Replace with script editor/timeline
-                    Application.getView().openActionEditor(extensionImage.getEntity());
-                }
-
-            } else {
-            */
 
 //            if (action.isTap()) {
 
             // Focus on selected Host
             extension.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
             extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
-            World.getWorld().imageSystem.setTransparency(extensionImage, 1.0);
+            World.getWorld().imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
 
             // Show Ports and Paths for selected Host
             for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
@@ -373,7 +365,8 @@ public class EventHandlerSystem extends System {
 
             // Camera
             Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
-            camera.getComponent(Camera.class).setFocus(extensionImage.getEntity());
+//            camera.getComponent(Camera.class).setFocus(extension);
+            World.getWorld().cameraSystem.setFocus(camera, extension);
         }
 //        }
 //        }
@@ -490,7 +483,8 @@ public class EventHandlerSystem extends System {
             }
 
             // Camera
-            camera.getComponent(Camera.class).setFocus(sourcePort, event.getPosition());
+//            camera.getComponent(Camera.class).setFocus(sourcePort, event.getPosition());
+            World.getWorld().cameraSystem.setFocus(camera, sourcePort, event.getPosition());
 
 //            } else if (action.isHolding()) {
 //
@@ -582,7 +576,8 @@ public class EventHandlerSystem extends System {
 
                     // Focus Camera on Extension
                     Entity extension = path.getComponent(Path.class).getExtension();
-                    camera.getComponent(Camera.class).setFocus(extension);
+//                    camera.getComponent(Camera.class).setFocus(extension);
+                    World.getWorld().cameraSystem.setFocus(camera, extension);
 //                    }
 
                 }

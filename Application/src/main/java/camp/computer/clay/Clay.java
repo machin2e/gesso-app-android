@@ -17,14 +17,14 @@ import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.host.PlatformInterface;
-import camp.computer.clay.host.InternetInterface;
-import camp.computer.clay.host.MessengerInterface;
+import camp.computer.clay.platform.PlatformInterface;
+import camp.computer.clay.platform.communication.InternetInterface;
+import camp.computer.clay.platform.communication.MessengerInterface;
 import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.old_model.Cache;
-import camp.computer.clay.old_model.Internet;
-import camp.computer.clay.old_model.Messenger;
-import camp.computer.clay.old_model.PhoneHost;
+import camp.computer.clay.platform.Cache;
+import camp.computer.clay.platform.Internet;
+import camp.computer.clay.platform.Messenger;
+import camp.computer.clay.platform.PhoneHost;
 import camp.computer.clay.engine.World;
 
 public class Clay {
@@ -106,7 +106,7 @@ public class Clay {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Profile)
-            Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
+            Application.getView().getUi().promptInputText(new Prompt.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
 
@@ -126,7 +126,7 @@ public class Clay {
                 }
             });
         } else {
-            Application.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener() {
+            Application.getView().getUi().promptAcknowledgment(new Prompt.OnActionListener() {
                 @Override
                 public void onComplete(Object result) {
 

@@ -1,4 +1,4 @@
-package camp.computer.clay.host;
+package camp.computer.clay.platform.communication;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -8,7 +8,7 @@ import camp.computer.clay.platform.Application;
 
 public class Internet implements InternetInterface {
 
-    private camp.computer.clay.old_model.Internet manager;
+    private camp.computer.clay.platform.Internet manager;
 
     public Internet() {
 
@@ -27,7 +27,7 @@ public class Internet implements InternetInterface {
     }
 
     @Override
-    public void addHost(camp.computer.clay.old_model.Internet manager) {
+    public void addHost(camp.computer.clay.platform.Internet manager) {
         this.manager = manager;
     }
 }

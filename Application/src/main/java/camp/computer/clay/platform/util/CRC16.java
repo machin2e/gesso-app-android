@@ -1,4 +1,4 @@
-package camp.computer.clay.host.util;
+package camp.computer.clay.platform.util;
 
 /**
  * This CRC-16 class computes 16-bit CRC checksums.

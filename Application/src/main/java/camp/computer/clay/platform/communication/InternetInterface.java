@@ -1,6 +1,6 @@
-package camp.computer.clay.host;
+package camp.computer.clay.platform.communication;
 
-import camp.computer.clay.old_model.Internet;
+import camp.computer.clay.platform.Internet;
 
 public interface InternetInterface {
 
