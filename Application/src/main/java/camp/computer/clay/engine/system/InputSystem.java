@@ -10,10 +10,11 @@ public class InputSystem extends System {
 
     private List<Event> incomingEvents = new ArrayList<>();
 
-    public InputSystem() {
+    public InputSystem(World world) {
+        super(world);
     }
 
-    public boolean update(World world) {
+    public boolean update() {
 
         while (incomingEvents.size() > 0) {
             Event event = dequeueEvent();

@@ -44,13 +44,13 @@ public class World {
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
 
     // <WORLD_SYSTEMS>
-    public CameraSystem cameraSystem = new CameraSystem();
-    public ImageSystem imageSystem = new ImageSystem();
-    public RenderSystem renderSystem = new RenderSystem();
-    public BoundarySystem boundarySystem = new BoundarySystem();
-    public InputSystem inputSystem = new InputSystem();
-    public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem();
-    public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem();
+    public CameraSystem cameraSystem = new CameraSystem(this);
+    public ImageSystem imageSystem = new ImageSystem(this);
+    public RenderSystem renderSystem = new RenderSystem(this);
+    public BoundarySystem boundarySystem = new BoundarySystem(this);
+    public InputSystem inputSystem = new InputSystem(this);
+    public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem(this);
+    public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem(this);
     // </WORLD_SYSTEMS>
 
     public World() {
@@ -384,12 +384,12 @@ public class World {
     }
 
     public void updateSystems(Canvas canvas) {
-        world.inputSystem.update(world);
-        world.eventHandlerSystem.update(world);
-        world.boundarySystem.update(world);
-        world.portableLayoutSystem.update(world);
-        world.renderSystem.update(world, canvas); // TODO: Remove canvas!
-        world.cameraSystem.update(world);
+        world.inputSystem.update();
+        world.eventHandlerSystem.update();
+        world.boundarySystem.update();
+        world.portableLayoutSystem.update();
+        world.renderSystem.update(canvas); // TODO: Remove canvas!
+        world.cameraSystem.update();
     }
 
     /**

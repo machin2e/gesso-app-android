@@ -13,8 +13,12 @@ import camp.computer.clay.util.Color;
 
 public class ImageSystem extends System {
 
+    public ImageSystem(World world) {
+        super(world);
+    }
+
     @Override
-    public boolean update(World world) {
+    public boolean update() {
         return false;
     }
 
@@ -86,7 +90,7 @@ public class ImageSystem extends System {
         // Update layer ordering
         // <HACK>
         // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-        World.getWorld().imageSystem.invalidate(image);
+        world.imageSystem.invalidate(image);
         // </HACK>
 
         shape.invalidate(); // Invalidate Shape

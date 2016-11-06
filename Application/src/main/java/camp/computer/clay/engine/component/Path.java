@@ -9,10 +9,10 @@ public class Path extends Component {
 
     public enum Direction {
 
-        NONE(0),   // source  |  destination
-        OUTPUT(1), // source --> destination
-        INPUT(2),  // source <-- destination
-        BOTH(3);   // source <-> destination
+        NONE(0),   // sourcePortUuid  |  destination
+        OUTPUT(1), // sourcePortUuid --> destination
+        INPUT(2),  // sourcePortUuid <-- destination
+        BOTH(3);   // sourcePortUuid <-> destination
 
         // TODO: Change the index to a UUID?
         int index;
@@ -51,9 +51,9 @@ public class Path extends Component {
 
     private Direction direction = Direction.NONE;
 
-    private UUID source;
+    private UUID sourcePortUuid;
 
-    private UUID target;
+    private UUID targetPortUuid;
 
     public Path() {
         super();
@@ -64,7 +64,7 @@ public class Path extends Component {
         this.type = Type.ELECTRONIC; // Default to ELECTRONIC
         this.direction = Direction.BOTH; // Default to BOTH
 
-        // TODO: PathEntity.connectPath(source, destination) and do what the following constructor does... auto-configure Ports and PathEntity
+        // TODO: PathEntity.connectPath(sourcePortUuid, destination) and do what the following constructor does... auto-configure Ports and PathEntity
     }
 
     public Type getType() {
@@ -79,9 +79,9 @@ public class Path extends Component {
         // Update type of Ports in PathEntity (BUT NOT DIRECTION)
         // <FILTER>
         // TODO: Make PathEntity.Filter
-        Group<Entity> portEntities = getPorts();
-        for (int i = 0; i < portEntities.size(); i++) {
-            Entity portEntity = portEntities.get(i);
+        Group<Entity> ports = getPorts();
+        for (int i = 0; i < ports.size(); i++) {
+            Entity portEntity = ports.get(i);
             portEntity.getComponent(Port.class).setType(type);
         }
         // </FILTER>
@@ -95,52 +95,52 @@ public class Path extends Component {
         this.direction = direction;
     }
 
-    public void set(Entity sourcePortEntity, Entity targetPortEntity) {
+    public void set(Entity sourcePort, Entity targetPort) {
 
         this.type = Type.ELECTRONIC; // Default to ELECTRONIC
         this.direction = Direction.BOTH; // Default to BOTH
 
-        this.source = sourcePortEntity.getUuid();
-        this.target = targetPortEntity.getUuid();
+        this.sourcePortUuid = sourcePort.getUuid();
+        this.targetPortUuid = targetPort.getUuid();
 
-        // Update source PortEntity configuration
-        if (sourcePortEntity.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
-            sourcePortEntity.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
+        // Update sourcePortUuid PortEntity configuration
+        if (sourcePort.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
+            sourcePort.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
         }
-        if (sourcePortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
-            sourcePortEntity.getComponent(Port.class).setType(Port.Type.getNext(sourcePortEntity.getComponent(Port.class).getType()));
+        if (sourcePort.getComponent(Port.class).getType() == Port.Type.NONE) {
+            sourcePort.getComponent(Port.class).setType(Port.Type.getNext(sourcePort.getComponent(Port.class).getType()));
         }
 
-        // Update target PortEntity configuration
-        if (targetPortEntity.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
-            targetPortEntity.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
+        // Update targetPortUuid PortEntity configuration
+        if (targetPort.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
+            targetPort.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
         }
-        if (targetPortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
-            targetPortEntity.getComponent(Port.class).setType(sourcePortEntity.getComponent(Port.class).getType());
+        if (targetPort.getComponent(Port.class).getType() == Port.Type.NONE) {
+            targetPort.getComponent(Port.class).setType(sourcePort.getComponent(Port.class).getType());
         }
     }
 
     public void setSource(Entity portEntity) {
-        this.source = portEntity.getUuid();
+        this.sourcePortUuid = portEntity.getUuid();
     }
 
     public Entity getSource() {
-        return Entity.Manager.get(source);
+        return Entity.Manager.get(sourcePortUuid);
     }
 
     public void setTarget(Entity target) {
-        this.target = target.getUuid();
+        this.targetPortUuid = target.getUuid();
     }
 
     public Entity getTarget() {
-        return Entity.Manager.get(target);
+        return Entity.Manager.get(targetPortUuid);
     }
 
     public Group<Entity> getPorts() {
-        Group<Entity> portEntities = new Group<>();
-        portEntities.add(getSource());
-        portEntities.add(getTarget());
-        return portEntities;
+        Group<Entity> ports = new Group<>();
+        ports.add(getSource());
+        ports.add(getTarget());
+        return ports;
     }
 
     public Entity getHost() {
@@ -170,8 +170,8 @@ public class Path extends Component {
         return null;
     }
 
-    public boolean contains(Entity portEntity) {
-        if (this.source == portEntity.getUuid() || this.target == portEntity.getUuid()) {
+    public boolean contains(Entity port) {
+        if (this.sourcePortUuid == port.getUuid() || this.targetPortUuid == port.getUuid()) {
             return true;
         } else {
             return false;

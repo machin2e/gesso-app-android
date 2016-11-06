@@ -413,6 +413,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         return this.platformRenderer;
     }
 
+    // TODO: Remove this! Render shouldn't need to know about the whole world!
     public void setWorld(World world) {
         this.world = world;
 

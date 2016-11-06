@@ -23,20 +23,24 @@ import camp.computer.clay.engine.World;
 
 public class PortableLayoutSystem extends System {
 
+    public PortableLayoutSystem(World world) {
+        super(world);
+    }
+
     // TODO: Make static methods non-static and call them in the update function or from other systems.
 
     @Override
-    public boolean update(World world) {
+    public boolean update() {
         return false;
     }
 
-    public static void setPortableSeparation(double distance) {
+    public void setPortableSeparation(double distance) {
         Group<Entity> extensions = Entity.Manager.filterWithComponent(Extension.class);
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
             if (extension.getComponent(Portable.class).getHosts().size() > 0) {
                 Entity host = extension.getComponent(Portable.class).getHosts().get(0);
-                PortableLayoutSystem.setExtensionDistance(host, distance);
+                setExtensionDistance(host, distance);
             }
         }
     }
@@ -92,7 +96,7 @@ public class PortableLayoutSystem extends System {
      * @param initialPosition
      * @return
      */
-    public static Entity restoreExtension(Entity host, Profile profile, Transform initialPosition) {
+    public Entity restoreExtension(Entity host, Profile profile, Transform initialPosition) {
         // NOTE: Previously called fetchExtension(...)
 
         // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
@@ -229,13 +233,13 @@ public class PortableLayoutSystem extends System {
         return segmentIndex;
     }
 
-    public static void setExtensionDistance(Entity host, double distance) {
+    public void setExtensionDistance(Entity host, double distance) {
         // TODO: How is distanceToExtensions different from portableSeparation in setPortableSeparation()?
         host.getComponent(Host.class).distanceToExtensions = distance;
         updateExtensionLayout(host);
     }
 
-    public static void updateExtensionLayout(Entity host) {
+    public void updateExtensionLayout(Entity host) {
 
         // Get Extensions connected to the Host
         Group<Entity> extensions = host.getComponent(Portable.class).getExtensions();
@@ -306,7 +310,7 @@ public class PortableLayoutSystem extends System {
                 // Invalidate Image Component so its geometry (i.e., shapes) will be updated.
                 // <HACK>
                 // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-                World.getWorld().imageSystem.invalidate(extension.getComponent(Image.class));
+                world.imageSystem.invalidate(extension.getComponent(Image.class));
                 // </HACK>
             }
         }
@@ -382,12 +386,12 @@ public class PortableLayoutSystem extends System {
 
         // <HACK>
         // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-        World.getWorld().imageSystem.invalidate(extensionPrototype.getComponent(Image.class));
+        world.imageSystem.invalidate(extensionPrototype.getComponent(Image.class));
         // </HACK>
 
         // <HACK>
         // TODO: Move! Needed, but should be in a better place so it doesn't have to be explicitly called!
-        World.getWorld().boundarySystem.updateImage(extensionPrototype);
+        world.boundarySystem.updateImage(extensionPrototype);
         // </HACK>
     }
 

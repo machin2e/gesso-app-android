@@ -19,8 +19,12 @@ import camp.computer.clay.engine.World;
 
 public class BoundarySystem extends System {
 
+    public BoundarySystem(World world) {
+        super(world);
+    }
+
     @Override
-    public boolean update(World world) {
+    public boolean update() {
 
         updateEntityBoundaries(Entity.Manager);
 
@@ -68,7 +72,7 @@ public class BoundarySystem extends System {
     public void updateHostImage(Entity host) {
 
         // Get LED shapes
-        Group<Shape> lightShapeGroup = World.getWorld().imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
+        Group<Shape> lightShapeGroup = world.imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
 
         // Update Port LED color
         for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
@@ -126,7 +130,7 @@ public class BoundarySystem extends System {
 
             // <HACK>
             // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-            World.getWorld().imageSystem.invalidate(port.getComponent(Image.class));
+            world.imageSystem.invalidate(port.getComponent(Image.class));
             // </HACK>
         }
     }

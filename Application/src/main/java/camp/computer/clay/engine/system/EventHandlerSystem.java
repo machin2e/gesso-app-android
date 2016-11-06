@@ -33,11 +33,12 @@ public class EventHandlerSystem extends System {
 
     private List<Event> incomingEvents = new ArrayList<>();
 
-    public EventHandlerSystem() {
+    public EventHandlerSystem(World world) {
+        super(world);
     }
 
     @Override
-    public boolean update(World world) {
+    public boolean update() {
 
         // Dequeue actions and apply them to the targeted Entity
         while (incomingEvents.size() > 0) {
@@ -85,15 +86,15 @@ public class EventHandlerSystem extends System {
 
         // Dispatch the Event
         if (targetEntity.hasComponent(Camera.class)) {
-            EventHandlerSystem.handleCameraEvent(targetEntity, event);
+            world.eventHandlerSystem.handleCameraEvent(targetEntity, event);
         } else if (targetEntity.hasComponent(Host.class)) {
-            EventHandlerSystem.handleHostEvent(targetEntity, event);
+            world.eventHandlerSystem.handleHostEvent(targetEntity, event);
         } else if (targetEntity.hasComponent(Extension.class)) {
-            EventHandlerSystem.handleExtensionEvent(targetEntity, event);
+            world.eventHandlerSystem.handleExtensionEvent(targetEntity, event);
         } else if (targetEntity.hasComponent(Port.class)) {
-            EventHandlerSystem.handlePortEvent(targetEntity, event);
+            world.eventHandlerSystem.handlePortEvent(targetEntity, event);
         } else if (targetEntity.hasComponent(Path.class)) {
-            EventHandlerSystem.handlePathEvent(targetEntity, event);
+            world.eventHandlerSystem.handlePathEvent(targetEntity, event);
         }
 //        else if (targetEntity.hasComponent(Image.class)) { // TODO: HACK!
 //
@@ -110,7 +111,7 @@ public class EventHandlerSystem extends System {
     }
 
     // TODO: Make World an Entity?
-    public static void handleCameraEvent(final Entity workspace, Event event) {
+    public void handleCameraEvent(final Entity workspace, Event event) {
 
         Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -124,7 +125,7 @@ public class EventHandlerSystem extends System {
 
 //            if (action.isDragging()) {
 //            camera.getComponent(Camera.class).setOffset(event.getOffset());
-            World.getWorld().cameraSystem.setOffset(camera, event.getOffset());
+            world.cameraSystem.setOffset(camera, event.getOffset());
 //            }
 
         } else if (event.getType() == Event.Type.UNSELECT) {
@@ -151,13 +152,13 @@ public class EventHandlerSystem extends System {
 
             // Camera
 //            camera.getComponent(Camera.class).setFocus(World.getWorld());
-            World.getWorld().cameraSystem.setFocus(camera, World.getWorld());
+            world.cameraSystem.setFocus(camera, world);
 //            }
 
         }
     }
 
-    public static void handleHostEvent(final Entity host, final Event event) {
+    public void handleHostEvent(final Entity host, final Event event) {
 
         final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -172,13 +173,13 @@ public class EventHandlerSystem extends System {
 //            if (action.isDragging()) {
 
             // Update position of prototype Extension
-            World.getWorld().portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
+            world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
 
 //                    hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visible.INVISIBLE);
 //                hostEntity.getComponent(Portable.class).setPathVisibility(false);
             host.getComponent(Portable.class).getPaths().setVisibility(Visible.INVISIBLE);
 
-//            World.getWorld().setExtensionPrototypeVisibility2(Visible.VISIBLE);
+//            world.setExtensionPrototypeVisibility2(Visible.VISIBLE);
             Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
             extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
@@ -200,7 +201,7 @@ public class EventHandlerSystem extends System {
             host.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
             host.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
 
-            World.getWorld().imageSystem.setTransparency(host.getComponent(Image.class), 1.0);
+            world.imageSystem.setTransparency(host.getComponent(Image.class), 1.0);
 
             // Show Ports and Paths of touched Host
             for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
@@ -220,7 +221,7 @@ public class EventHandlerSystem extends System {
 
             // Camera
 //            camera.getComponent(Camera.class).setFocus(host);
-            World.getWorld().cameraSystem.setFocus(camera, host);
+            world.cameraSystem.setFocus(camera, host);
 
             if (host.getComponent(Portable.class).getExtensions().size() > 0) {
                 /*
@@ -231,13 +232,13 @@ public class EventHandlerSystem extends System {
                 // TODO: Move this into PortableLayoutSystem
                 // TODO: Replace ASAP. This is shit.
                 // TODO: Use "rectangle" or "circular" extension layout algorithms
-                PortableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+                world.portableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
                 // </HACK>
             }
 
             // Title
-            World.getWorld().setTitleText("Host");
-            World.getWorld().setTitleVisibility(Visible.VISIBLE);
+            world.setTitleText("Host");
+            world.setTitleVisibility(Visible.VISIBLE);
 
 //            } else {
 //
@@ -266,11 +267,11 @@ public class EventHandlerSystem extends System {
 //            }
 
             // Check if connecting to a Extension
-//            if (World.getWorld().getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
+//            if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
             Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
             if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
-//                World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
+//                world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
@@ -290,11 +291,11 @@ public class EventHandlerSystem extends System {
                         public void onComplete(Profile profile) {
 
                             // Add Extension from Profile
-                            Entity extension = PortableLayoutSystem.restoreExtension(host, profile, event.getPosition());
+                            Entity extension = world.portableLayoutSystem.restoreExtension(host, profile, event.getPosition());
 
                             // Camera
 //                            camera.getComponent(Camera.class).setFocus(extension);
-                            World.getWorld().cameraSystem.setFocus(camera, extension);
+                            world.cameraSystem.setFocus(camera, extension);
                         }
                     });
 
@@ -306,7 +307,7 @@ public class EventHandlerSystem extends System {
         }
     }
 
-    public static void handleExtensionEvent(final Entity extension, Event event) {
+    public void handleExtensionEvent(final Entity extension, Event event) {
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -324,9 +325,9 @@ public class EventHandlerSystem extends System {
             // TODO: Refactor
 
             Log.v("EventHandlerSystem", "target: " + event.getTarget());
-            Log.v("EventHandlerSystem", "previousTarget: " + World.getWorld().eventHandlerSystem.previousTarget);
+            Log.v("EventHandlerSystem", "previousTarget: " + world.eventHandlerSystem.previousTarget);
             Log.v("EventHandlerSystem", "---");
-            if (World.getWorld().eventHandlerSystem.previousTarget == extension) {
+            if (world.eventHandlerSystem.previousTarget == extension) {
 //                Application.getView().getUi().OLD_openActionEditor(extension);
                 Application.getView().getUi().openActionEditor(extension);
             }
@@ -336,7 +337,7 @@ public class EventHandlerSystem extends System {
             // Focus on selected Host
             extension.getComponent(Portable.class).getPaths().setVisibility(Visible.VISIBLE);
             extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
-            World.getWorld().imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
+            world.imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
 
             // Show Ports and Paths for selected Host
             for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
@@ -360,19 +361,19 @@ public class EventHandlerSystem extends System {
             // TODO: Replace above with?: portEntity.getComponent(Portable.class).getPorts().getImages().setVisibility(Visible.VISIBLE);
 
             // Title
-            World.getWorld().setTitleText("Extension");
-            World.getWorld().setTitleVisibility(Visible.VISIBLE);
+            world.setTitleText("Extension");
+            world.setTitleVisibility(Visible.VISIBLE);
 
             // Camera
             Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 //            camera.getComponent(Camera.class).setFocus(extension);
-            World.getWorld().cameraSystem.setFocus(camera, extension);
+            world.cameraSystem.setFocus(camera, extension);
         }
 //        }
 //        }
     }
 
-    public static void handlePortEvent(final Entity port, Event event) {
+    public void handlePortEvent(final Entity port, Event event) {
 
         final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
@@ -387,10 +388,10 @@ public class EventHandlerSystem extends System {
             // if (action.isDragging()) {
 
             // Prototype Path Visible
-            // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
-            World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
-            World.getWorld().portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
-            World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
+            // TODO: world.setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
+            world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
+            world.portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
+            world.portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
 
             // Prototype Extension Visible
             boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
@@ -417,14 +418,14 @@ public class EventHandlerSystem extends System {
 
             // Update position of prototype Path and Extension
             if (isCreateExtensionAction) {
-//                World.getWorld().setExtensionPrototypeVisibility2(Visible.VISIBLE);
+//                world.setExtensionPrototypeVisibility2(Visible.VISIBLE);
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
-                // TODO: World.getWorld().setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
-                World.getWorld().portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
-                World.getWorld().portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
+                // TODO: world.setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
+                world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
+                world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
             } else {
-//                World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
+//                world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                 Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
             }
@@ -442,7 +443,7 @@ public class EventHandlerSystem extends System {
 
                     // <HACK>
                     // <STYLE>
-                    World.getWorld().imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
+                    world.imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
                     extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
                     // </STYLE>
 
@@ -484,7 +485,7 @@ public class EventHandlerSystem extends System {
 
             // Camera
 //            camera.getComponent(Camera.class).setFocus(sourcePort, event.getPosition());
-            World.getWorld().cameraSystem.setFocus(camera, sourcePort, event.getPosition());
+            world.cameraSystem.setFocus(camera, sourcePort, event.getPosition());
 
 //            } else if (action.isHolding()) {
 //
@@ -554,7 +555,7 @@ public class EventHandlerSystem extends System {
 
                         }
 
-                        World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
+                        world.portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
                     }
 
                 } else if (event.getFirstEvent().getTarget() != event.getTarget()) {
@@ -564,7 +565,7 @@ public class EventHandlerSystem extends System {
 
 //                    if (action.isDragging()) {
                     // Hide the prototype Path
-                    World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
+                    world.portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
 
                     // Get the source and target Ports to be used in new Path
                     Entity sourcePort = event.getFirstEvent().getTarget();
@@ -577,7 +578,7 @@ public class EventHandlerSystem extends System {
                     // Focus Camera on Extension
                     Entity extension = path.getComponent(Path.class).getExtension();
 //                    camera.getComponent(Camera.class).setFocus(extension);
-                    World.getWorld().cameraSystem.setFocus(camera, extension);
+                    world.cameraSystem.setFocus(camera, extension);
 //                    }
 
                 }
@@ -593,20 +594,20 @@ public class EventHandlerSystem extends System {
                 // (Host.Port, ..., World) Action Pattern
 
                 // Hide prototype Path and prototype Extension
-                World.getWorld().portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
+                world.portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
 
                 Log.v("EventHandlerSystem", "creating extension");
 
                 // If prototype Extension is visible, create Extension
-//                if (World.getWorld().getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
+//                if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
                 Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
                     Log.v("EventHandlerSystem", "creating extension");
 
 //                    // Hide prototype Path and prototype Extension
-//                    World.getWorld().setPathPrototypeVisibility(Visible.INVISIBLE);
-//                    World.getWorld().setExtensionPrototypeVisibility2(Visible.INVISIBLE);
+//                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
+//                    world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
                     Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
@@ -642,9 +643,9 @@ public class EventHandlerSystem extends System {
                     // Update layout
                     Entity host = hostPort.getParent(); // HACK
 
-                    PortableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
+                    world.portableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-                    PortableLayoutSystem.updateExtensionLayout(host);
+                    world.portableLayoutSystem.updateExtensionLayout(host);
                     // <STYLE_AND_LAYOUT>
 
                     // Set Camera focus on the Extension
@@ -654,7 +655,7 @@ public class EventHandlerSystem extends System {
         }
     }
 
-    public static void handlePathEvent(final Entity path, Event event) {
+    public void handlePathEvent(final Entity path, Event event) {
 
         if (event.getType() == Event.Type.NONE) {
 

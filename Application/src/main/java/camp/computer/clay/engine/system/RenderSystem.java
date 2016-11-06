@@ -23,12 +23,16 @@ import camp.computer.clay.engine.component.util.Visible;
 
 public class RenderSystem extends System {
 
+    public RenderSystem(World world) {
+        super(world);
+    }
+
     @Override
-    public boolean update(World world) {
+    public boolean update() {
         return true;
     }
 
-    public boolean update(World world, Canvas canvas) {
+    public boolean update(Canvas canvas) {
 
         // <HACK>
         PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
