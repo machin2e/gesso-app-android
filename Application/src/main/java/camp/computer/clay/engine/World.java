@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.system.ImageSystem;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
@@ -171,14 +172,18 @@ public class World {
                     portable.getPort(i).getComponent(Transform.class).y * 6.0
             );
         }
+        // Add relative layout constraints
+        for (int i = 0; i < portable.getPorts().size(); i++) {
+            Entity port = portable.getPort(i);
+            port.addComponent(new RelativeLayoutConstraint());
+            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(host);
+        }
 
         // <HACK>
         List<Shape> pinContactPoints = host.getComponent(Image.class).getImage().getShapes();
         for (int i = 0; i < pinContactPoints.size(); i++) {
             if (pinContactPoints.get(i).getLabel().startsWith("Pin")) {
                 String label = pinContactPoints.get(i).getLabel();
-//                Entity portEntity = hostEntity.getComponent(Portable.class).getPort(label);
-//                pinContactPoints.get(i).setEntity(portEntity);
                 Point contactPointShape = (Point) pinContactPoints.get(i);
                 host.getComponent(Portable.class).headerContactPositions.add(contactPointShape);
             }
@@ -198,14 +203,21 @@ public class World {
         extension.addComponent(new Portable());
 
         // <PORTABLE_COMPONENT>
-        // Create Ports and add them to the ExtensionEntity
+        // Create Ports and add them to the Extension
         int defaultPortCount = 1;
         for (int j = 0; j < defaultPortCount; j++) {
 
-            Entity portEntity = World.createEntity(Port.class);
+            Entity port = World.createEntity(Port.class);
 
-            portEntity.getComponent(Port.class).setIndex(j);
-            extension.getComponent(Portable.class).addPort(portEntity);
+            port.getComponent(Port.class).setIndex(j);
+            extension.getComponent(Portable.class).addPort(port);
+        }
+        // Add relative layout constraints
+        Portable portable = extension.getComponent(Portable.class);
+        for (int i = 0; i < portable.getPorts().size(); i++) {
+            Entity port = portable.getPort(i);
+            port.addComponent(new RelativeLayoutConstraint());
+            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
         }
         // </PORTABLE_COMPONENT>
 
@@ -266,10 +278,27 @@ public class World {
         // Board
         Segment segment = new Segment();
         segment.setOutlineThickness(2.0);
-        segment.setLabel("PathEntity");
+        segment.setLabel("Path");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
         builderImage.addShape(segment);
+
+        Circle circle = new Circle();
+        circle.setRadius(50.0);
+        circle.setLabel("Source Port"); // TODO: Give proper name...
+        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
+        circle.setOutlineThickness(0);
+        builderImage.addShape(circle);
+
+        circle = new Circle();
+        circle.setRadius(50.0);
+        circle.setLabel("Target Port"); // TODO: Give proper name...
+        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
+        circle.setOutlineThickness(0);
+        builderImage.addShape(circle);
+
+        // TODO: 11/5/2016 Add Port circles to the Path? So moving paths around will be easier? Then Port images are always just the same color. They look different because of the Path image. Path can contain single node. Then can be stretched out to include another Port.
+        // TODO: 11/5/2016 Create corresponding world state CREATING_PATH, MODIFYING_PATH/MOVING_PATH, etc.
 
         path.getComponent(Image.class).setImage(builderImage);
         // </SETUP_PATH_IMAGE_GEOMETRY>
@@ -296,7 +325,7 @@ public class World {
         Circle circle = new Circle();
         circle.setRadius(50.0);
         circle.setLabel("Port"); // TODO: Give proper name...
-        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
+        circle.setColor("#f7f7f7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
         builderImage.addShape(circle);
 
@@ -388,8 +417,8 @@ public class World {
         world.eventHandlerSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();
-        world.renderSystem.update(canvas); // TODO: Remove canvas!
         world.cameraSystem.update();
+        world.renderSystem.update(canvas); // TODO: Remove canvas!
     }
 
     /**

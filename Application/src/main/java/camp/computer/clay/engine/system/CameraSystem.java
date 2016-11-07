@@ -26,14 +26,12 @@ public class CameraSystem extends System {
     }
 
     @Override
-    public boolean update() {
+    public void update() {
 
         Group<Entity> cameras = Entity.Manager.filterWithComponent(Camera.class);
         for (int i = 0; i < cameras.size(); i++) {
             updateCamera(cameras.get(i));
         }
-
-        return true;
     }
 
     private void updateCamera(Entity camera) {

@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.Prompt;
+import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -38,15 +39,13 @@ public class EventHandlerSystem extends System {
     }
 
     @Override
-    public boolean update() {
+    public void update() {
 
         // Dequeue actions and apply them to the targeted Entity
         while (incomingEvents.size() > 0) {
             Event event = dequeueEvent();
             dispatchEvent(event);
         }
-
-        return true;
     }
 
     public void queueEvent(Event event) {
@@ -69,6 +68,7 @@ public class EventHandlerSystem extends System {
         Entity targetEntity = null;
         if (targetEntities.size() > 0) {
             targetEntity = targetEntities.get(0);
+            Log.v("handlePathEvent", "targetEntities.size: " + targetEntities.size());
         } else {
             Group<Entity> cameras = Entity.Manager.filterWithComponent(Camera.class);
             targetEntity = cameras.get(0);
@@ -76,12 +76,18 @@ public class EventHandlerSystem extends System {
         event.setTarget(targetEntity);
 
         // Handle special cases for MOVE and UNSELECT actions
-        if (event.getType() == Event.Type.MOVE || event.getType() == Event.Type.UNSELECT) {
+//        if (event.getType() == Event.Type.MOVE || event.getType() == Event.Type.UNSELECT) {
+        if (event.getType() != Event.Type.SELECT) {
             targetEntity = event.getFirstEvent().getTarget();
+            // TODO: 11/6/2016 event.setTarget(targetEntity);
         }
 
-//        if (targetEntity.hasComponent(Label.class)) {
-//            Log.v("EventHandlerSystem", "" + event.getType() + ": " + targetEntity.getComponent(Label.class).getLabel());
+//        if (event.getFirstEvent() == null) {
+//            event.setTarget(targetEntities.get(0));
+//            targetEntity = targetEntities.get(0);
+//        } else {
+//            event.setTarget(event.getFirstEvent().getTarget());
+//            targetEntity = event.getFirstEvent().getTarget();
 //        }
 
         // Dispatch the Event
@@ -151,7 +157,6 @@ public class EventHandlerSystem extends System {
             // TODO: workspace.setTitleVisibility(Visible.INVISIBLE);
 
             // Camera
-//            camera.getComponent(Camera.class).setFocus(World.getWorld());
             world.cameraSystem.setFocus(camera, world);
 //            }
 
@@ -284,14 +289,14 @@ public class EventHandlerSystem extends System {
 
                 } else if (profiles.size() > 0) {
 
-                    // Prompt Player to select an ExtensionEntity from the Store
-                    // i.e., Prompt to select extension to use! Then use that profile to create and configure ports for the extension.
-                    Application.getView().getUi().promptSelection(profiles, new Prompt.OnActionListener<Profile>() {
+                    // NativeUi Player to select an ExtensionEntity from the Store
+                    // i.e., NativeUi to select extension to use! Then use that profile to create and configure ports for the extension.
+                    Application.getView().getNativeUi().promptSelection(profiles, new NativeUi.OnActionListener<Profile>() {
                         @Override
                         public void onComplete(Profile profile) {
 
                             // Add Extension from Profile
-                            Entity extension = world.portableLayoutSystem.restoreExtension(host, profile, event.getPosition());
+                            Entity extension = world.portableLayoutSystem.createExtensionFromProfile(host, profile, event.getPosition());
 
                             // Camera
 //                            camera.getComponent(Camera.class).setFocus(extension);
@@ -328,8 +333,8 @@ public class EventHandlerSystem extends System {
             Log.v("EventHandlerSystem", "previousTarget: " + world.eventHandlerSystem.previousTarget);
             Log.v("EventHandlerSystem", "---");
             if (world.eventHandlerSystem.previousTarget == extension) {
-//                Application.getView().getUi().OLD_openActionEditor(extension);
-                Application.getView().getUi().openActionEditor(extension);
+//                Application.getView().getNativeUi().OLD_openActionEditor(extension);
+                Application.getView().getNativeUi().openActionEditor(extension);
             }
 
 //            if (action.isTap()) {
@@ -375,6 +380,8 @@ public class EventHandlerSystem extends System {
 
     public void handlePortEvent(final Entity port, Event event) {
 
+        Log.v("EventHandlerSystem", "handlePortEvent");
+
         final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
 
         if (event.getType() == Event.Type.NONE) {
@@ -387,74 +394,77 @@ public class EventHandlerSystem extends System {
 
             // if (action.isDragging()) {
 
-            // Prototype Path Visible
-            // TODO: world.setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
-            world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
-            world.portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
-            world.portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
+            boolean portHasPath = false;
+            Entity firstPort = event.getFirstEvent().getTarget();
+            if (firstPort.getComponent(Port.class).getPaths().size() > 0) {
+                portHasPath = true;
+            }
 
-            // Prototype Extension Visible
-            boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
+            if (!portHasPath) {
 
-            // <HACK>
-            // Group<Entity> entities = Entity.Manager.filterWithComponent(Host.class, Extension.class);
-            Group<Entity> extensions = Entity.Manager.filterWithComponent(Extension.class);
+                // Prototype Path Visible
+                Transform position = event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition();
+                world.portableLayoutSystem.setPathPrototypeSourcePosition(position);
+                world.portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
+                world.portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
 
-            for (int i = 0; i < extensions.size(); i++) {
+                // Prototype Extension Visible
+                boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
 
-                // Update style of nearby Hosts
-                double distanceToHost = Geometry.distance(
-                        event.getPosition(),
-                        extensions.get(i).getComponent(Transform.class)
-                );
+                // <HACK>
+                Group<Entity> extensions = Entity.Manager.filterWithComponent(Extension.class);
 
-                if (distanceToHost < 375) { // 375, 500
-                    isCreateExtensionAction = false;
-                    break;
+                for (int i = 0; i < extensions.size(); i++) {
+
+                    // Update style of nearby Hosts
+                    double distanceToHost = Geometry.distance(
+                            event.getPosition(),
+                            extensions.get(i).getComponent(Transform.class)
+                    );
+
+                    if (distanceToHost < 375) { // 375, 500
+                        isCreateExtensionAction = false;
+                        break;
+                    }
+
+                    // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
                 }
 
-                // TODO: if distance > 800: connect to cloud service and show "cloud portable" image
-            }
-
-            // Update position of prototype Path and Extension
-            if (isCreateExtensionAction) {
+                // Update position of prototype Path and Extension
+                if (isCreateExtensionAction) {
 //                world.setExtensionPrototypeVisibility2(Visible.VISIBLE);
-                Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
-                // TODO: world.setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
-                world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
-                world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
-            } else {
+                    Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+                    // TODO: world.setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
+                    world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Port").getPosition());
+                    world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
+                } else {
 //                world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-                extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
-            }
+                    Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
+                }
 
-            // Show Ports of nearby Hosts and Extensions
-            Entity sourcePort = event.getFirstEvent().getTarget();
+                // Ports of nearby Hosts and Extensions
+                Entity sourcePort = event.getFirstEvent().getTarget();
+                Group<Entity> nearbyExtensions = extensions.filterArea(event.getPosition(), World.NEARBY_RADIUS_THRESHOLD);
 
-            // Show Ports of nearby Hosts and Extensions
-            Group<Entity> nearbyExtensions = extensions.filterArea(event.getPosition(), World.NEARBY_RADIUS_THRESHOLD);
+                for (int i = 0; i < extensions.size(); i++) {
+                    Entity extension = extensions.get(i);
 
-            for (int i = 0; i < extensions.size(); i++) {
-                Entity extension = extensions.get(i);
+                    if (extension == sourcePort.getParent() || nearbyExtensions.contains(extension)) {
 
-                if (extension == sourcePort.getParent() || nearbyExtensions.contains(extension)) {
+                        // <STYLE>
+                        // world.imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
+                        extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
+                        // </STYLE>
 
-                    // <HACK>
-                    // <STYLE>
-                    world.imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
-                    extension.getComponent(Portable.class).getPorts().setVisibility(Visible.VISIBLE);
-                    // </STYLE>
-
-                    if (extension.hasComponent(Extension.class)) { // HACK
                         if (!extension.getComponent(Extension.class).isPersistent()) {
 
                             // Determine if a new Port is required on the custom Extension
                             boolean addNewPort = true;
                             for (int j = 0; j < extension.getComponent(Portable.class).getPorts().size(); j++) {
-                                Entity existingPortEntity = extension.getComponent(Portable.class).getPorts().get(j);
-                                if (existingPortEntity.getComponent(Port.class).getType() == Port.Type.NONE) {
+                                Entity existingPort = extension.getComponent(Portable.class).getPorts().get(j);
+                                if (existingPort.getComponent(Port.class).getType() == Port.Type.NONE) {
                                     addNewPort = false;
                                     break;
                                 }
@@ -463,29 +473,23 @@ public class EventHandlerSystem extends System {
                             // Add new Port to the Extension (if determined necessary)
                             if (addNewPort) {
                                 Entity newPort = World.createEntity(Port.class);
+
+                                // <HACK>
+                                newPort.addComponent(new RelativeLayoutConstraint());
+                                newPort.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+                                // </HACK>
+
                                 int newPortIndex = extension.getComponent(Portable.class).getPorts().size();
                                 newPort.getComponent(Port.class).setIndex(newPortIndex);
                                 extension.getComponent(Portable.class).addPort(newPort);
                             }
                         }
+
                     }
-                    // </HACK>
-
-                } else {
-
-                    /*
-                    // TODO: Remove this if it's not needed... probably isn't!
-                    // Make Portable transparent and hide its Ports
-                    extension.getComponent(Image.class).setTransparency(0.1f);
-                    extension.getComponent(Portable.class).getPorts().setVisibility(false);
-                    */
-
                 }
-            }
 
-            // Camera
-//            camera.getComponent(Camera.class).setFocus(sourcePort, event.getPosition());
-            world.cameraSystem.setFocus(camera, sourcePort, event.getPosition());
+                // Camera
+                world.cameraSystem.setFocus(camera, sourcePort, event.getPosition());
 
 //            } else if (action.isHolding()) {
 //
@@ -493,13 +497,27 @@ public class EventHandlerSystem extends System {
 //
 //            }
 
+            } else if (portHasPath) {
+
+                // Port has path, so move the Port when moving it!
+                // TODO: Actually, don't want to move the port. Want to move the Path!
+                // TODO: Add isValid state to Path?
+
+                Log.v("EventHandlerSystem", "moving port");
+
+//                firstPort.getComponent(Transform.class).set(event.getPosition());
+//                world.imageSystem.invalidate(firstPort.getComponent(Image.class)); // HACK!!!!!!!!!!!
+
+            }
+
         } else if (event.getType() == Event.Type.UNSELECT) {
 
+            // TODO? Group<Entity> entitiesAtEventPosition = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+
+            // if (event.getTarget() != null && event.getTarget().hasComponent(Port.class)) {
             if (event.getTarget() != null && event.getTarget().hasComponent(Port.class)) {
 
                 // (Host.Port, ..., Host.Port) Action Pattern
-
-                // TODO: Delete stuff here that was previously used for connecting Hosts' ports
 
                 if (event.getFirstEvent().getTarget() == event.getTarget()) { // if (action.isTap()) {
 
@@ -508,8 +526,21 @@ public class EventHandlerSystem extends System {
 
                     // Get Port associated with the touched Port
                     Entity sourcePort = event.getFirstEvent().getTarget();
-
                     Port sourcePortComponent = sourcePort.getComponent(Port.class);
+
+                    // <PATH>
+                    // Set next Path type
+                    Group<Entity> paths = sourcePort.getComponent(Port.class).getPaths();
+                    for (int i = 0; i < paths.size(); i++) {
+                        Path pathComponent = paths.get(i).getComponent(Path.class);
+                        Path.Type nextType = Path.Type.getNext(pathComponent.getType());
+                        while ((nextType == Path.Type.NONE) || (nextType == pathComponent.getType())) {
+                            nextType = Path.Type.getNext(nextType);
+                        }
+                        paths.get(i).getComponent(Path.class).setType(nextType);
+//                        Log.v("EventHandlerSystem", "Setting path type to: " + nextType);
+                    }
+                    // <PATH>
 
                     if (sourcePortComponent.getExtension() == null || !sourcePortComponent.getExtension().getComponent(Extension.class).isPersistent()) {
 
@@ -543,9 +574,9 @@ public class EventHandlerSystem extends System {
                             // Update each Port in the Path to reflect the new Port type
                             // <TODO: MAKE FILTER>
                             // TODO: Make Filter/Editor to pass to Group.filter(Filter) or Group.filter(Editor)
-                            Group<Entity> paths = sourcePortComponent.getPaths();
-                            for (int i = 0; i < paths.size(); i++) {
-                                Entity path = paths.get(i);
+                            Group<Entity> paths2 = sourcePortComponent.getPaths();
+                            for (int i = 0; i < paths2.size(); i++) {
+                                Entity path = paths2.get(i);
                                 Group<Entity> ports = path.getComponent(Path.class).getPorts();
                                 for (int j = 0; j < ports.size(); j++) {
                                     ports.get(j).getComponent(Port.class).setType(nextType);
@@ -614,7 +645,7 @@ public class EventHandlerSystem extends System {
                     Entity hostPort = event.getFirstEvent().getTarget();
 
                     // Create new custom Extension. Custom Extension can be configured manually.
-                    PortableLayoutSystem.createExtension(hostPort, event.getPosition());
+                    world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
 
                     // <STYLE_AND_LAYOUT>
                     // Remove focus from other Hosts and their Ports
@@ -656,6 +687,8 @@ public class EventHandlerSystem extends System {
     }
 
     public void handlePathEvent(final Entity path, Event event) {
+
+        Log.v("handlePathEvent", "handlePathEvent");
 
         if (event.getType() == Event.Type.NONE) {
 

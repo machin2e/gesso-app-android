@@ -14,7 +14,7 @@ public class InputSystem extends System {
         super(world);
     }
 
-    public boolean update() {
+    public void update() {
 
         while (incomingEvents.size() > 0) {
             Event event = dequeueEvent();
@@ -22,8 +22,6 @@ public class InputSystem extends System {
 
             world.eventHandlerSystem.queueEvent(processedEvent);
         }
-
-        return true;
     }
 
     public void queueEvent(Event event) {

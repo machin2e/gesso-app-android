@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.Prompt;
+import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -106,7 +106,7 @@ public class Clay {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
             // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Profile)
-            Application.getView().getUi().promptInputText(new Prompt.OnActionListener<String>() {
+            Application.getView().getNativeUi().promptInputText(new NativeUi.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
 
@@ -126,7 +126,7 @@ public class Clay {
                 }
             });
         } else {
-            Application.getView().getUi().promptAcknowledgment(new Prompt.OnActionListener() {
+            Application.getView().getNativeUi().promptAcknowledgment(new NativeUi.OnActionListener() {
                 @Override
                 public void onComplete(Object result) {
 

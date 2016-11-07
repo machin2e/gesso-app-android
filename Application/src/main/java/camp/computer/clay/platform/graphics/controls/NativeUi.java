@@ -31,12 +31,12 @@ import camp.computer.clay.platform.Application;
 import camp.computer.clay.model.profile.Profile;
 import camp.computer.clay.platform.R;
 
-public class Prompt {
+public class NativeUi {
 
     private Application application = null;
     private Context context = null;
 
-    public Prompt(Application application) {
+    public NativeUi(Application application) {
         this.application = application;
         this.context = application.getApplicationContext();
     }

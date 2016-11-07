@@ -27,11 +27,8 @@ public class PortableLayoutSystem extends System {
         super(world);
     }
 
-    // TODO: Make static methods non-static and call them in the update function or from other systems.
-
     @Override
-    public boolean update() {
-        return false;
+    public void update() {
     }
 
     public void setPortableSeparation(double distance) {
@@ -50,14 +47,14 @@ public class PortableLayoutSystem extends System {
      *
      * @param hostPort
      */
-    public static Entity createExtension(Entity hostPort, Transform initialPosition) {
+    public Entity createCustomExtension(Entity hostPort, Transform initialPosition) {
 
         // IASM Message:
         // (1) touch extensionEntity to select from store, or
         // (2) drag signal to base, or
         // (3) touch elsewhere to cancel
 
-        // TODO: Prompt to select Extension from repository then copy that Extension configuration!
+        // TODO: NativeUi to select Extension from repository then copy that Extension configuration!
         // TODO: (...) Then use that profile to create and configure Ports for the Extension.
 
         // Create Extension Entity
@@ -96,7 +93,7 @@ public class PortableLayoutSystem extends System {
      * @param initialPosition
      * @return
      */
-    public Entity restoreExtension(Entity host, Profile profile, Transform initialPosition) {
+    public Entity createExtensionFromProfile(Entity host, Profile profile, Transform initialPosition) {
         // NOTE: Previously called fetchExtension(...)
 
         // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
@@ -123,7 +120,7 @@ public class PortableLayoutSystem extends System {
     }
 
     // TODO: Make PortableLayoutSystem. Iterate through Hosts and lay out Extensions each PortableLayoutSystem.update().
-    private static boolean autoConnectToHost(Entity host, Entity extension) {
+    private boolean autoConnectToHost(Entity host, Entity extension) {
 
         // Automatically select, connect paths to, and configure the HostEntity's Ports
         for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
@@ -145,39 +142,36 @@ public class PortableLayoutSystem extends System {
         return true;
     }
 
-    private static Entity autoSelectNearestAvailableHostPort(Entity host, Entity extension) {
+    private Entity autoSelectNearestAvailableHostPort(Entity host, Entity extension) {
 
         // Select an available Port on the Host
-        Entity selectedHostPort = null;
+        Entity nearestHostPort = null;
         double distanceToSelectedPort = Double.MAX_VALUE;
+
+        Portable hostPortable = host.getComponent(Portable.class);
         for (int j = 0; j < host.getComponent(Portable.class).getPorts().size(); j++) {
             if (host.getComponent(Portable.class).getPorts().get(j).getComponent(Port.class).getType() == Port.Type.NONE) {
 
-                Image hostImage = host.getComponent(Image.class);
-
-//                Entity host = hostImage.getEntity();
-                Portable hostPortable = host.getComponent(Portable.class);
-                Entity portEntity = hostPortable.getPorts().get(j);
+                Entity port = hostPortable.getPorts().get(j);
 
                 double distanceToPort = Geometry.distance(
-//                        hostPortable.getPortShapes().filterEntity(portEntity).get(0).getPosition(),
-                        portEntity.getComponent(Transform.class),
-                        extension.getComponent(Image.class).getEntity().getComponent(Transform.class)
+                        port.getComponent(Transform.class),
+                        extension.getComponent(Transform.class)
                 );
 
-                // Check if the port is the nearest
+                // Check if the Port is the nearest
                 if (distanceToPort < distanceToSelectedPort) {
-                    selectedHostPort = host.getComponent(Portable.class).getPorts().get(j);
+                    nearestHostPort = port;
                     distanceToSelectedPort = distanceToPort;
                 }
             }
         }
         // TODO: selectedHostPortEntity = (PortEntity) getPortShapes().getNearestImage(extensionImage.getPosition()).getEntity();
-        return selectedHostPort;
+        return nearestHostPort;
     }
 
     // TODO: Remove this?
-    public static int getHeaderIndex(Entity host, Entity extension) {
+    public int getHeaderIndex(Entity host, Entity extension) {
 
         int[] indexCounts = new int[4];
         for (int i = 0; i < indexCounts.length; i++) {
@@ -316,7 +310,7 @@ public class PortableLayoutSystem extends System {
         }
     }
 
-    public static void updateExtensionHeaderIndex(Entity host, Entity extension) {
+    public void updateExtensionHeaderIndex(Entity host, Entity extension) {
         if (extension.getComponent(Image.class) == null || extension.getComponent(Portable.class).getHosts().size() == 0) {
             return;
         }

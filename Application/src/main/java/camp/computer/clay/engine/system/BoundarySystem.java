@@ -6,11 +6,12 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.Color;
 import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.util.BuilderImage.Point;
 import camp.computer.clay.util.BuilderImage.Rectangle;
@@ -24,20 +25,19 @@ public class BoundarySystem extends System {
     }
 
     @Override
-    public boolean update() {
+    public void update() {
 
-        updateEntityBoundaries(Entity.Manager);
+        // Update Transform
+        Group<Entity> trasnformEntities = Entity.Manager.filterWithComponent(Transform.class);
+        for (int i = 0; i < trasnformEntities.size(); i++) {
+            Entity entity = trasnformEntities.get(i);
+            updateTransform(entity);
+        }
 
-        return true;
-    }
+        // Update Shapes
+        for (int i = 0; i < Entity.Manager.size(); i++) {
 
-
-
-    // <ENTITY>
-    public void updateEntityBoundaries(Group<Entity> entities) {
-        for (int i = 0; i < entities.size(); i++) {
-
-            Entity entity = entities.get(i);
+            Entity entity = Entity.Manager.get(i);
 
             // <HACK>
             if (entity.hasComponent(Extension.class)) {
@@ -46,24 +46,68 @@ public class BoundarySystem extends System {
                 updateHostImage(entity);
             } else if (entity.hasComponent(Port.class)) {
                 updatePortImage(entity);
+            } else if (entity.hasComponent(Path.class)) {
+                updatePathBoundaries(entity);
             }
             // </HACK>
         }
+
+        // Update Boundaries
+
+        // Update Renderables?
     }
-    // </ENTITY>
+
+    private void updateTransform(Entity entity) {
+
+    }
 
 
     // <IMAGE>
     // Previously: Image.update()
     // Required Components: Image, Transform
     public void updateImage(Entity entity) {
+        /*
         Image image = entity.getComponent(Image.class);
 
         // Update Shapes
         for (int i = 0; i < image.getImage().getShapes().size(); i++) {
             Shape shape = image.getImage().getShapes().get(i);
-            BoundarySystem.updateShapeGeometry(shape, image.getEntity().getComponent(Transform.class));
+            updateShapeGeometry(shape, image.getEntity().getComponent(Transform.class));
         }
+        */
+
+        /*
+        // Update color of Port shape based on its type
+        Port.Type portType = port.getComponent(Port.class).getType();
+        String portColor = camp.computer.clay.util.Color.getColor(portType);
+        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
+        */
+
+        // Call this so Portable.updateImage() will be called to updateImage Geometry
+        Image imageComponent = entity.getComponent(Image.class);
+
+        // Update Shapes
+        for (int i = 0; i < imageComponent.getImage().getShapes().size(); i++) {
+            Shape shape = imageComponent.getImage().getShapes().get(i);
+
+            Transform absoluteReferenceTransform = null;
+            if (entity.hasComponent(RelativeLayoutConstraint.class)) {
+                // <HACK>
+                Transform referenceTransform = entity.getComponent(RelativeLayoutConstraint.class).getReferenceEntity().getComponent(Transform.class);
+                Transform relativePosition = entity.getComponent(Transform.class);
+                absoluteReferenceTransform = new Transform();
+
+                absoluteReferenceTransform.x = referenceTransform.x + Geometry.distance(0, 0, relativePosition.x, relativePosition.y) * Math.cos(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativePosition.x, relativePosition.y)));
+                absoluteReferenceTransform.y = referenceTransform.y + Geometry.distance(0, 0, relativePosition.x, relativePosition.y) * Math.sin(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativePosition.x, relativePosition.y)));
+                // </HACK>
+            } else {
+                absoluteReferenceTransform = entity.getComponent(Transform.class);
+            }
+
+//            shape.update(transformedPoint);
+            updateShapeGeometry(shape, absoluteReferenceTransform);
+        }
+
     }
     // </IMAGE>
 
@@ -200,36 +244,86 @@ public class BoundarySystem extends System {
     // <PORT>
     public void updatePortImage(Entity port) {
 
+        /*
         // Update color of Port shape based on its type
         Port.Type portType = port.getComponent(Port.class).getType();
         String portColor = camp.computer.clay.util.Color.getColor(portType);
         port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
+        */
 
-        // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
-        updatePortImageGeometry(port);
-    }
-
-    public void updatePortImageGeometry(Entity entity) {
-
-        Image image = entity.getComponent(Image.class);
+        /*
+        // Call this so Portable.updateImage() will be called to updateImage Geometry
+        Image imageComponent = port.getComponent(Image.class);
 
         // Update Shapes
-        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            Shape shape = image.getImage().getShapes().get(i);
+        for (int i = 0; i < imageComponent.getImage().getShapes().size(); i++) {
+            Shape shape = imageComponent.getImage().getShapes().get(i);
 
-            // <HACK>
-            Transform imagePosition = image.getEntity().getComponent(Transform.class);
-            Transform referencePoint = image.getEntity().getParent().getComponent(Transform.class);
-            Transform transformedPoint = new Transform();
-            transformedPoint.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-            transformedPoint.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
-            // </HACK>
+            Transform transformedImagePosition = null;
+            if (port.hasComponent(RelativeLayoutConstraint.class)) {
+                // <HACK>
+//            Transform referencePoint = port.getParent().getComponent(Transform.class);
+                Transform referencePoint = port.getComponent(RelativeLayoutConstraint.class).getReferenceEntity().getComponent(Transform.class);
+                Transform imagePosition = port.getComponent(Transform.class);
+                transformedImagePosition = new Transform();
+
+                transformedImagePosition.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+                transformedImagePosition.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+                // </HACK>
+            } else {
+                transformedImagePosition = imageComponent.getEntity().getComponent(Transform.class);
+            }
 
 //            shape.update(transformedPoint);
-            BoundarySystem.updateShapeGeometry(shape, transformedPoint);
+            updateShapeGeometry(shape, transformedImagePosition);
         }
+        */
+
+        updateImage(port);
     }
     // </PORT>
+
+    // <PATH>
+    public void updatePathBoundaries(Entity path) {
+
+//        Log.v("handlePathEvent", "updatePathBoundaries");
+
+        // Get LED shapes
+//        Group<Shape> lightShapeGroup = world.imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
+
+        // Update Port LED color
+//        for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
+//
+//            // Update color of LED based on corresponding Port's type
+//            Entity port = host.getComponent(Portable.class).getPorts().get(i);
+//            String portColor = camp.computer.clay.util.Color.getColor(port.getComponent(Port.class).getType());
+//            lightShapeGroup.get(i).setColor(portColor);
+//        }
+
+        // Call this so PortableEntity.updateImage() will be called to updateImage Geometry
+        updateImage(path);
+
+//        // Call this so Portable.updateImage() will be called to updateImage Geometry
+//        Image imageComponent = path.getComponent(Image.class);
+//
+//        // Update Shapes
+//        for (int i = 0; i < imageComponent.getImage().getShapes().size(); i++) {
+//            Shape shape = imageComponent.getImage().getShapes().get(i);
+//
+//            // <HACK>
+//            Transform referencePoint = path.getParent().getComponent(Transform.class);
+//            Transform imagePosition = path.getComponent(Transform.class);
+//            Transform transformedPoint = new Transform();
+//
+//            transformedPoint.x = referencePoint.x + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+//            transformedPoint.y = referencePoint.y + Geometry.distance(0, 0, imagePosition.x, imagePosition.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, imagePosition.x, imagePosition.y)));
+//            // </HACK>
+//
+////            shape.update(transformedPoint);
+//            updateShapeGeometry(shape, transformedPoint);
+//        }
+    }
+    // </PATH>
 
 
 
@@ -264,7 +358,7 @@ public class BoundarySystem extends System {
      * @param referencePoint Position of the containing {@code Image} relative to which the
      *                       {@code Shape} will be drawn.
      */
-    public static void updateShapeGeometry(Shape shape, Transform referencePoint) {
+    public void updateShapeGeometry(Shape shape, Transform referencePoint) {
 
         if (!shape.isValid) {
             updateShapePosition(shape, referencePoint); // Update the position

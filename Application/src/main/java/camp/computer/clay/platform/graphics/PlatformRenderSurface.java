@@ -49,10 +49,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     public Matrix identityMatrix;
 
-    // World PlatformRenderer
+    // World PlatformRenderClock
     private SurfaceHolder surfaceHolder;
 
-    public PlatformRenderer platformRenderer;
+    public PlatformRenderClock platformRenderClock;
 
     // Coordinate System (Grid)
     public Transform originPosition = new Transform();
@@ -104,10 +104,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         /*
         // Kill the background Thread
         boolean retry = true;
-        // platformRenderer.setRunning (false);
+        // platformRenderClock.setRunning (false);
         while (retry) {
             try {
-                platformRenderer.join ();
+                platformRenderClock.join ();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace ();
@@ -122,12 +122,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         getHolder().addCallback(this);
 
         // Create and start background Thread
-        platformRenderer = new PlatformRenderer(this);
-        platformRenderer.setRunning(true);
-        platformRenderer.start();
+        platformRenderClock = new PlatformRenderClock(this);
+        platformRenderClock.setRunning(true);
+        platformRenderClock.start();
 
-//        // Start communications
-//        getClay ().getCommunication ().startDatagramServer();
+        // Start communications
+        // getClay().getCommunication().startDatagramServer();
 
         // Remove this?
         update();
@@ -135,18 +135,16 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
 
     public void onPause() {
-        // Log.v("MapView", "onPause");
-
         // Pause the communications
-//        getClay ().getCommunication ().stopDatagramServer (); // HACK: This was commented out to prevent the server from "crashing" into an invalid state!
+        //getClay().getCommunication ().stopDatagramServer (); // HACK: This was commented out to prevent the server from "crashing" into an invalid state!
 
         // Kill the background Thread
         boolean retry = true;
-        platformRenderer.setRunning(false);
+        platformRenderClock.setRunning(false);
 
         while (retry) {
             try {
-                platformRenderer.join();
+                platformRenderClock.join();
                 retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -293,9 +291,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         return true;
     }
 
-    public Handler holdEventTimerHandler = new Handler();
+    private Handler holdEventTimerHandler = new Handler();
 
-    public Runnable holdEventTimerRunnable = new Runnable() {
+    private Runnable holdEventTimerRunnable = new Runnable() {
         @Override
         public void run() {
 
@@ -339,50 +337,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     };
 
-    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
-//                new Timer().schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        // this code will be executed after 2 seconds
-//
-//                        Event event = new Event();
-//                        // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-//                        // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-//                        event.setType(Event.Type.HOLD);
-//                        event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
-//                        queueEvent(event);
-//
-//                        Log.v("HoldCallback", "Holding");
-//                    }
-//                }, 1000);
-
-//                final Handler handler = new Handler();
-
-//                Thread thread = new Thread() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            sleep(1000);
-//
-//                            Log.v("HOLD", "WAAAAAAAAAAIT");
-//
-//                            // If needs to run on UI thread.
-//                            /*
-//                            Application.getView().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//                                }
-//                            });
-//                            */
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                };
-//
-//                thread.start();
-
     /**
      * The function run in background thread, not UI thread.
      */
@@ -409,8 +363,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
 
-    public PlatformRenderer getPlatformRenderer() {
-        return this.platformRenderer;
+    public PlatformRenderClock getPlatformRenderer() {
+        return this.platformRenderClock;
     }
 
     // TODO: Remove this! Render shouldn't need to know about the whole world!
@@ -425,14 +379,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Set camera viewport dimensions
         Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
-//        camera.getComponent(Camera.class).setWidth(screenWidth);
-//        camera.getComponent(Camera.class).setHeight(screenHeight);
         World.getWorld().cameraSystem.setWidth(camera, screenWidth);
         World.getWorld().cameraSystem.setHeight(camera, screenHeight);
-    }
-
-    public World getWorld() {
-        return this.world;
     }
 
     // <PATH_IMAGE_HELPERS>
@@ -465,12 +413,27 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
     */
 
-    public void drawLinePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
+    public void drawEditablePath(Entity path, PlatformRenderSurface platformRenderSurface) {
 
         Paint paint = platformRenderSurface.paint;
 
-        Shape sourcePortShape = pathEntity.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
-        Shape targetPortShape = pathEntity.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
+//        Shape sourcePortShape = path.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
+//        Shape targetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
+
+        Shape hostSourcePortShape = path.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
+        Shape extensionTargetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
+
+        Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
+        Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
+
+        path.getComponent(Transform.class).set(
+                (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
+                (sourcePortShape.getPosition().y + targetPortShape.getPosition().y) / 2.0
+        );
+
+        sourcePortShape.setColor(hostSourcePortShape.getColor());
+        sourcePortShape.setPosition(hostSourcePortShape.getPosition());
+        targetPortShape.setPosition(extensionTargetPortShape.getPosition());
 
         // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
         // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
@@ -479,36 +442,55 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
 //        if (sourcePortShape != null && targetPortShape != null) {
 
-            // Show target port
+        // Show target port
 //            targetPortShape.setVisibility(Visible.VISIBLE);
-            //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
+        //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
-            // Color
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(15.0f);
-            paint.setColor(Color.parseColor(sourcePortShape.getColor()));
+        // Update color of Port shape based on its type
+        Path.Type pathType = path.getComponent(Path.class).getType();
+        String pathColor = camp.computer.clay.util.Color.getColor(pathType);
+//        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
+//        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
+        sourcePortShape.setColor(pathColor);
+        targetPortShape.setColor(pathColor);
 
-            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
-            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
-            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
+        // Color
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(15.0f);
+        //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
+        paint.setColor(Color.parseColor(pathColor));
+
+        double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
+        Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
+        Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
 
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
-            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+        // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 //            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
 
-            Segment segment = (Segment) pathEntity.getComponent(Image.class).getImage().getShape("PathEntity");
-            segment.setOutlineThickness(15.0);
-            segment.setOutlineColor(sourcePortShape.getColor());
+        Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
+        segment.setOutlineThickness(15.0);
+        segment.setOutlineColor(sourcePortShape.getColor());
 
-            segment.setSource(pathStartCoordinate);
-            segment.setTarget(pathStopCoordinate);
+        segment.setSource(pathStartCoordinate);
+        segment.setTarget(pathStopCoordinate);
 
-            platformRenderSurface.drawSegment(segment);
+        // Draw shapes in Path
+        platformRenderSurface.drawSegment(segment);
+        platformRenderSurface.drawShape(sourcePortShape);
+        platformRenderSurface.drawShape(targetPortShape);
+
+        paint.setStrokeWidth(3.0f);
+        paint.setStyle(Paint.Style.STROKE);
+        //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
+        paint.setColor(Color.CYAN);
+        platformRenderSurface.drawPolygon(sourcePortShape.getBoundary());
+//        platformRenderSurface.drawPolygon(hostSourcePortShape.getBoundary());
 //        }
     }
 
-    public void drawPhysicalPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
+    public void drawOverviewPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
 
         // Get Host and Extension Ports
         Entity hostPortEntity = pathEntity.getComponent(Path.class).getSource();
@@ -532,7 +514,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             platformRenderSurface.paint.setStrokeWidth(10.0f);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) pathEntity.getComponent(Image.class).getImage().getShape("PathEntity");
+            Segment segment = (Segment) pathEntity.getComponent(Image.class).getImage().getShape("Path");
             segment.setOutlineThickness(10.0);
             segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType()));
 
@@ -779,4 +761,48 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         canvas.drawPath(path, paint);
     }
+
+    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
+//                new Timer().schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        // this code will be executed after 2 seconds
+//
+//                        Event event = new Event();
+//                        // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+//                        // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+//                        event.setType(Event.Type.HOLD);
+//                        event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+//                        queueEvent(event);
+//
+//                        Log.v("HoldCallback", "Holding");
+//                    }
+//                }, 1000);
+
+//                final Handler handler = new Handler();
+
+//                Thread thread = new Thread() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            sleep(1000);
+//
+//                            Log.v("HOLD", "WAAAAAAAAAAIT");
+//
+//                            // If needs to run on UI thread.
+//                            /*
+//                            Application.getView().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//                                }
+//                            });
+//                            */
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                };
+//
+//                thread.start();
 }

@@ -40,7 +40,7 @@ public class Path extends Component {
             this.index = index;
         }
 
-        public static Type getNextType(Type currentType) {
+        public static Type getNext(Type currentType) {
             return Type.values()[(currentType.index + 1) % Type.values().length];
         }
     }

@@ -18,8 +18,7 @@ public class ImageSystem extends System {
     }
 
     @Override
-    public boolean update() {
-        return false;
+    public void update() {
     }
 
     /**

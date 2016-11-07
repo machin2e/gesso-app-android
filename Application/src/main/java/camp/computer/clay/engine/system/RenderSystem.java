@@ -28,11 +28,12 @@ public class RenderSystem extends System {
     }
 
     @Override
-    public boolean update() {
-        return true;
+    public void update() {
     }
 
     public boolean update(Canvas canvas) {
+
+        // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to render.
 
         // <HACK>
         PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
@@ -53,8 +54,6 @@ public class RenderSystem extends System {
                 (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
         );
         canvas.scale(
-//                (float) camera.getComponent(Camera.class).getScale(),
-//                (float) camera.getComponent(Camera.class).getScale()
                 (float) world.cameraSystem.getScale(camera),
                 (float) world.cameraSystem.getScale(camera)
         );
@@ -64,7 +63,6 @@ public class RenderSystem extends System {
 
         // TODO: renderSystem.update();
 
-//        drawPrototypes(platformRenderSurface);
         drawEntities(platformRenderSurface);
 
         canvas.restore();
@@ -93,61 +91,24 @@ public class RenderSystem extends System {
             // Paint paint = platformRenderSurface.paint;
             // World world = platformRenderSurface.getWorld();
 
-//            if (entity.hasComponent(Host.class)) {
-//
-//                Visibility visibility = entity.getComponent(Visibility.class);
-//                if (visibility != null && visibility.isVisible) {
-//                    Image image = entity.getComponent(Image.class);
-//                    canvas.save();
-//                    for (int i = 0; i < image.getShapes().size(); i++) {
-//                        image.getShapes().get(i).draw(platformRenderSurface);
-//                    }
-//                    canvas.restore();
-//                }
-//
-//            } else if (entity.hasComponent(Extension.class)) {
-//
-                // TODO: <MOVE_THIS_INTO_PORTABLE_SYSTEM>
-                /*
-                Group<Entity> ports = entity.getComponent(Portable.class).getPorts();
-                int size = ports.size();
-                for (int i = 0; i < size; i++) {
-                    Entity port = ports.get(i);
-                    if (port.getComponent(Port.class).getExtension() == null) {
-                        // TODO: Remove Port Entity!
-                        ports.remove(port);
+            // TODO: <MOVE_THIS_INTO_PORTABLE_SYSTEM>
+            /*
+            // TODO: Check world state to see if CREATING_PORT or CREATING_EXTENSION.
+            Group<Entity> ports = entity.getComponent(Portable.class).getPorts();
+            int size = ports.size();
+            for (int i = 0; i < size; i++) {
+                Entity port = ports.get(i);
+                if (port.getComponent(Port.class).getExtension() == null) {
+                    // TODO: Remove Port Entity!
+                    ports.remove(port);
 
-                        Entity.Manager.remove(port);
+                    Entity.Manager.remove(port);
 
-                        size--;
-                    }
+                    size--;
                 }
-                */
-                // TODO: </MOVE_THIS_INTO_PORTABLE_SYSTEM>
-//
-//                Visibility visibility = entity.getComponent(Visibility.class);
-//                if (visibility != null && visibility.isVisible) {
-//                    Image image = entity.getComponent(Image.class);
-//                    canvas.save();
-//                    for (int i = 0; i < image.getShapes().size(); i++) {
-//                        image.getShapes().get(i).draw(platformRenderSurface);
-//                    }
-//                    canvas.restore();
-//                }
-//
-//            } else if (entity.hasComponent(Port.class)) {
-//
-//                Visibility visibility = entity.getComponent(Visibility.class);
-//                if (visibility != null && visibility.isVisible) {
-//                    Image image = entity.getComponent(Image.class);
-//                    canvas.save();
-//                    for (int i = 0; i < image.getShapes().size(); i++) {
-//                        image.getShapes().get(i).draw(platformRenderSurface);
-//                    }
-//                    canvas.restore();
-//                }
-//
-//            } else
+            }
+            */
+            // TODO: </MOVE_THIS_INTO_PORTABLE_SYSTEM>
 
             if (entity.hasComponent(Path.class)) {
 
@@ -156,16 +117,19 @@ public class RenderSystem extends System {
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Entity pathEntity = image.getEntity();
+                    platformRenderSurface.drawEditablePath(pathEntity, platformRenderSurface);
+                    /*
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
                         // TODO: Draw Path between wirelessly connected Ports
                         // platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
                     } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
-                        platformRenderSurface.drawLinePath(pathEntity, platformRenderSurface);
+                        platformRenderSurface.drawEditablePath(pathEntity, platformRenderSurface);
                     }
+                    */
                 } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
                     Entity pathEntity = entity; // image.getPath();
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
-                        platformRenderSurface.drawPhysicalPath(pathEntity, platformRenderSurface);
+                        platformRenderSurface.drawOverviewPath(pathEntity, platformRenderSurface);
                     }
                 }
 
@@ -201,9 +165,9 @@ public class RenderSystem extends System {
         canvas.save();
         paint.setColor(Color.RED);
         paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(35);
+        paint.setTextSize(25);
 
-        String fpsText = "FPS: " + (int) platformRenderSurface.platformRenderer.getFramesPerSecond();
+        String fpsText = "FPS: " + (int) platformRenderSurface.platformRenderClock.getFramesPerSecond();
         Rect fpsTextBounds = new Rect();
         paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
         linePosition += 25 + fpsTextBounds.height();

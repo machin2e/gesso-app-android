@@ -3,6 +3,7 @@ package camp.computer.clay.util;
 import java.util.HashMap;
 import java.util.Random;
 
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.entity.Entity;
 
@@ -88,6 +89,22 @@ public abstract class Color {
             return PORT_COLOR_CMOS;
         } else if (portType == Port.Type.POWER_TTL) {
             return PORT_COLOR_TTL;
+        } else {
+            return PORT_COLOR_OFF;
+        }
+    }
+
+    public static String getColor(Path.Type pathType) {
+        if (pathType == Path.Type.NONE) {
+            return PORT_COLOR_OFF;
+        } else if (pathType == Path.Type.ELECTRONIC) {
+            return PORT_COLOR_SWITCH;
+        } else if (pathType == Path.Type.MESH) {
+            return PORT_COLOR_PULSE;
+        } else if (pathType == Path.Type.INTERNET) {
+            return PORT_COLOR_WAVE;
+        } else if (pathType == Path.Type.BLUETOOTH) {
+            return PORT_COLOR_REFERENCE;
         } else {
             return PORT_COLOR_OFF;
         }

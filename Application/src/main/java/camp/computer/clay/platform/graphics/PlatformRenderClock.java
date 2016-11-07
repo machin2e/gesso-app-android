@@ -3,11 +3,11 @@ package camp.computer.clay.platform.graphics;
 import camp.computer.clay.util.time.Clock;
 
 /**
- * PlatformRenderer is a background thread that periodically updates the world state
+ * PlatformRenderClock is a background thread that periodically updates the world state
  * and renders it. By default, the renderer targets frames per second, each time advancing the
  * world's state then re-rendering it.
  */
-public class PlatformRenderer extends Thread {
+public class PlatformRenderClock extends Thread {
 
     // <SETTINGS>
     final public static int DEFAULT_TARGET_FPS = 30;
@@ -23,7 +23,7 @@ public class PlatformRenderer extends Thread {
 
     private boolean isRunning = false;
 
-    PlatformRenderer(PlatformRenderSurface platformRenderSurface) {
+    PlatformRenderClock(PlatformRenderSurface platformRenderSurface) {
         super();
         this.platformRenderSurface = platformRenderSurface;
     }

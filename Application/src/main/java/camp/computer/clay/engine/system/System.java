@@ -18,5 +18,5 @@ public abstract class System {
         return this.world;
     }
 
-    public abstract boolean update();
+    public abstract void update();
 }
