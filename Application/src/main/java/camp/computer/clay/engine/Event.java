@@ -35,6 +35,7 @@ public class Event {
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
 
     private Entity[] targets = new Entity[MAXIMUM_POINT_COUNT];
+    private Entity[] intentTarget = new Entity[MAXIMUM_POINT_COUNT];
 
     private Type type = null;
 
@@ -88,6 +89,14 @@ public class Event {
 
     public Entity getTarget() {
         return this.targets[0];
+    }
+
+    public Entity getIntentTarget() {
+        return this.intentTarget[0];
+    }
+
+    public void setIntentTarget(Entity entity) {
+        this.intentTarget[0] = entity;
     }
 
     // <INTEGRATE_WITH_ACTION>

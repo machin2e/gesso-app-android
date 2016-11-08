@@ -6,7 +6,12 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.component.Camera;
@@ -65,9 +70,29 @@ public class RenderSystem extends System {
 
         drawEntities(platformRenderSurface);
 
+        for (int i = 0; i < notifications.size(); ) {
+            Notification notification = notifications.get(i);
+            if (notification.state == State.WAITING) {
+                notification.run();
+                drawNotification(notification, platformRenderSurface);
+            } else if (notification.state == State.RUNNING) {
+                drawNotification(notification, platformRenderSurface);
+                i++;
+            } else if (notification.state == State.COMPLETE) {
+                notifications.remove(i);
+            }
+        }
+//        if (addNotification) {
+//            drawNotification(echoText, (float) echoTextPosition.x, (float) echoTextPosition.y, platformRenderSurface);
+//        }
+
         canvas.restore();
 
         drawOverlay(platformRenderSurface);
+
+//        if (addNotification) {
+//            drawNotification("connected port", (float) position.x, (float) position.y, platformRenderSurface);
+//        }
 
         // Paint the bitmap to the "primary" canvas.
         canvas.drawBitmap(canvasBitmap, identityMatrix, null);
@@ -84,8 +109,11 @@ public class RenderSystem extends System {
     }
 
     public void drawEntities(PlatformRenderSurface platformRenderSurface) {
-        for (int j = 0; j < Entity.Manager.size(); j++) {
-            Entity entity = Entity.Manager.get(j);
+
+        Group<Entity> entities = Entity.Manager.filterWithComponent(Image.class).sortByLayer();
+
+        for (int j = 0; j < entities.size(); j++) {
+            Entity entity = entities.get(j);
 
             Canvas canvas = platformRenderSurface.canvas;
             // Paint paint = platformRenderSurface.paint;
@@ -151,6 +179,68 @@ public class RenderSystem extends System {
             }
             // TODO: </REFACTOR>
         }
+    }
+
+    public enum State {
+        WAITING,
+        RUNNING,
+        COMPLETE
+    }
+
+    public class Notification {
+        public String text = "";
+        public Transform position = new Transform(0, 0);
+        public float xOffset = 0;
+        public float yOffset = -50;
+        public long timeout = 1000;
+
+        public State state = State.WAITING;
+
+        public Notification(String text, Transform position, long timeout) {
+            this.text = text;
+            this.position.set(position);
+            this.timeout = timeout;
+        }
+
+        public void run() {
+            state = State.RUNNING;
+//            platformRenderSurface.startTimer(timeout);
+        }
+    }
+
+    private List<Notification> notifications = new ArrayList<>();
+
+    public void addNotification(String text, Transform position, long timeout) {
+        Notification notification = new Notification(text, position, timeout);
+        notifications.add(notification);
+
+        PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
+        platformRenderSurface.startTimer(timeout, notification);
+    }
+
+    private void drawNotification(Notification notification, PlatformRenderSurface platformRenderSurface) {
+
+        Canvas canvas = platformRenderSurface.canvas;
+        Paint paint = platformRenderSurface.paint;
+
+        canvas.save();
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(45);
+
+        // Font
+        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), "fonts/Dosis-Bold.ttf");
+        Typeface boldTypeface = Typeface.create(typeface, Typeface.BOLD);
+        paint.setTypeface(boldTypeface);
+
+        Rect textBounds = new Rect();
+        paint.getTextBounds(notification.text, 0, notification.text.length(), textBounds);
+        float centeredX = (float) (notification.position.x - (textBounds.width() / 2.0));
+        float centeredY = (float) (notification.position.y + (textBounds.height() / 2.0));
+        float x = centeredX + notification.xOffset;
+        float y = centeredY + notification.yOffset;
+        canvas.drawText(notification.text, x, y, paint);
+        canvas.restore();
     }
 
     public void drawOverlay(PlatformRenderSurface platformRenderSurface) {

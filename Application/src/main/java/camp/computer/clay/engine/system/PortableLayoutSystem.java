@@ -29,6 +29,79 @@ public class PortableLayoutSystem extends System {
 
     @Override
     public void update() {
+        updatePathPortConfiguration();
+        updatePortConfiguration();
+    }
+
+    // Update Port configurations based on contained Paths
+    private void updatePathPortConfiguration() {
+
+        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        for (int i = 0; i < paths.size(); i++) {
+            Entity path = paths.get(i);
+
+            Entity sourcePort = path.getComponent(Path.class).getSource();
+            Entity targetPort = path.getComponent(Path.class).getTarget();
+
+            Path.Type pathType = path.getComponent(Path.class).getType();
+            if (pathType == Path.Type.NONE) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.NONE);
+            } else if (pathType == Path.Type.SWITCH) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.SWITCH);
+            } else if (pathType == Path.Type.PULSE) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.PULSE);
+            } else if (pathType == Path.Type.WAVE) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.WAVE);
+            } else if (pathType == Path.Type.POWER_REFERENCE) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE);
+            } else if (pathType == Path.Type.POWER_CMOS) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.POWER_CMOS);
+            } else if (pathType == Path.Type.POWER_TTL) {
+                sourcePort.getComponent(Port.class).setType(Port.Type.POWER_TTL);
+            }
+
+            if (targetPort != null) {
+                if (pathType == Path.Type.NONE) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.NONE);
+                } else if (pathType == Path.Type.SWITCH) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.SWITCH);
+                } else if (pathType == Path.Type.PULSE) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.PULSE);
+                } else if (pathType == Path.Type.WAVE) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.WAVE);
+                } else if (pathType == Path.Type.POWER_REFERENCE) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE);
+                } else if (pathType == Path.Type.POWER_CMOS) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.POWER_CMOS);
+                } else if (pathType == Path.Type.POWER_TTL) {
+                    targetPort.getComponent(Port.class).setType(Port.Type.POWER_TTL);
+                }
+            }
+        }
+    }
+
+    // Cleans up path configurations
+    // Clears configuration if there are no Paths containing the Port
+    private void updatePortConfiguration() {
+
+        // Clear Ports that are not contained in any Path
+        Group<Entity> ports = Entity.Manager.filterWithComponent(Port.class);
+        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        for (int i = 0; i < ports.size(); i++) {
+            Entity port = ports.get(i);
+            boolean isPortInPath = false;
+            for (int j = 0; j < paths.size(); j++) {
+                Entity path = paths.get(j);
+                if (path.getComponent(Path.class).contains(port)) {
+                    isPortInPath = true;
+                    break;
+                }
+            }
+            if (!isPortInPath) {
+                port.getComponent(Port.class).setType(Port.Type.NONE);
+                port.getComponent(Port.class).setDirection(Port.Direction.NONE);
+            }
+        }
     }
 
     public void setPortableSeparation(double distance) {

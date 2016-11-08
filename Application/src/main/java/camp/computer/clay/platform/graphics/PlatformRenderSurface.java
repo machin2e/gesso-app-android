@@ -16,8 +16,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import camp.computer.clay.engine.system.BoundarySystem;
+import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Camera;
@@ -157,6 +160,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
+
+//        Log.v("HoldCallback", "started timer");
+//        startTimer();
 
         if (this.world == null) {
             return false;
@@ -597,11 +603,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
 
-    public void drawOverviewPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
+    public void drawOverviewPath(Entity path, PlatformRenderSurface platformRenderSurface) {
 
         // Get Host and Extension Ports
-        Entity hostPortEntity = pathEntity.getComponent(Path.class).getSource();
-        Entity extensionPortEntity = pathEntity.getComponent(Path.class).getTarget();
+        Entity hostPortEntity = path.getComponent(Path.class).getSource();
+        Entity extensionPortEntity = path.getComponent(Path.class).getTarget();
 
         // Draw the connection between the Host Port and the Extension Port
         Image hostImage = hostPortEntity.getParent().getComponent(Image.class);
@@ -621,7 +627,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             platformRenderSurface.paint.setStrokeWidth(10.0f);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) pathEntity.getComponent(Image.class).getImage().getShape("Path");
+            Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
             segment.setOutlineThickness(10.0);
             segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType()));
 
@@ -870,33 +876,37 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     }
 
     // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
-//                new Timer().schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        // this code will be executed after 2 seconds
-//
-//                        Event event = new Event();
-//                        // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-//                        // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-//                        event.setType(Event.Type.HOLD);
-//                        event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
-//                        queueEvent(event);
-//
-//                        Log.v("HoldCallback", "Holding");
-//                    }
-//                }, 1000);
+    public void startTimer(long timeout, final RenderSystem.Notification notification) {
 
-//                final Handler handler = new Handler();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // this code will be executed after 2 seconds
 
-//                Thread thread = new Thread() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            sleep(1000);
+//                Event event = new Event();
+//                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+//                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+//                event.setType(Event.Type.HOLD);
+//                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+//                queueEvent(event);
+
+                notification.state = RenderSystem.State.COMPLETE;
+//                World.getWorld().renderSystem.addNotification = false;
+                Log.v("HoldCallback", "Holding");
+            }
+        }, timeout);
+
+//        final Handler handler = new Handler();
 //
-//                            Log.v("HOLD", "WAAAAAAAAAAIT");
+//        Thread thread = new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    sleep(1000);
 //
-//                            // If needs to run on UI thread.
+//                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//
+//                    // If needs to run on UI thread.
 //                            /*
 //                            Application.getView().runOnUiThread(new Runnable() {
 //                                @Override
@@ -905,11 +915,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //                                }
 //                            });
 //                            */
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                };
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
 //
-//                thread.start();
+//        thread.start();
+    }
 }

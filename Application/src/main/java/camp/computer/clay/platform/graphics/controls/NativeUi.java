@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.text.InputType;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -25,7 +26,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
@@ -573,6 +579,16 @@ public class NativeUi {
 
         // NOTE: This is just a list of edit boxes. Each with a dropdown to save new script or load from the list. MVP, bitches.
 
+        // Get list of Ports connected to Extension
+        String portTypesString = "";
+        Group<Entity> ports = extension.getComponent(Portable.class).getPorts();
+        for (int i = 0; i < ports.size(); i++) {
+            Entity port = ports.get(i);
+            Log.v("PortType", "port type: " + port.getComponent(Port.class).getType());
+            portTypesString += port.getComponent(Port.class).getType() + " ";
+        }
+
+        final String finalPortTypesString = portTypesString;
         Application.getView().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -631,7 +647,7 @@ public class NativeUi {
 
                 // Default Action Controller based on Port Configuration
                 EditText defaultActionBasedOnPortConfiguration = (EditText) createActionEditorView();
-                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: Default Extension Action.");
+                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
                 linearLayout.addView(defaultActionBasedOnPortConfiguration);
 
                 // Button: "Add Action"
@@ -799,5 +815,55 @@ public class NativeUi {
         // actionList.addView(actionView);
 
         return actionView;
+    }
+
+    public void scheduleEvent() {
+        // TODO:
+    }
+
+    public void startTimer() {
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // this code will be executed after 2 seconds
+
+//                Event event = new Event();
+//                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+//                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+//                event.setType(Event.Type.HOLD);
+//                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+//                queueEvent(event);
+
+                Log.v("HoldCallback", "Holding");
+            }
+        }, 1000);
+
+//        final Handler handler = new Handler();
+//
+//        Thread thread = new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    sleep(1000);
+//
+//                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//
+//                    // If needs to run on UI thread.
+//                            /*
+//                            Application.getView().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//                                }
+//                            });
+//                            */
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//
+//        thread.start();
     }
 }

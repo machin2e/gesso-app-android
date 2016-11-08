@@ -243,19 +243,40 @@ public class Group<E extends Groupable> implements List<E> {
 
     // Expects Group<Entity>
     public Group<Entity> filterWithComponents(Class<? extends Component>... componentTypes) {
-
         Group<Entity> group = new Group<>();
-
         for (int i = 0; i < this.elements.size(); i++) {
-//            for (int j = 0; j < componentTypes.length; j++) {
-//                Class<? extends Component> type = componentTypes[j];
             Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
             if (entity.hasComponents(componentTypes)) {
                 group.add(entity);
             }
-//            }
         }
+        return group;
+    }
 
+    // Exepcts Group<Entity>
+    // Requires components: Image
+    public Group<Entity> sortByLayer() {
+        Group<Entity> group = new Group<>();
+        for (int i = 0; i < this.elements.size(); i++) {
+            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+//            if (entity.hasComponents(componentTypes)) {
+//                group.add(entity);
+//            }
+            // Insertion sort by layers
+            boolean isEntityInserted = false;
+            for (int j = 0; j < group.size(); j++) {
+                Entity sortedEntity = (Entity) group.get(j); // HACK: Forcing typecast to Entity
+                if (entity.getComponent(Image.class).layerIndex < sortedEntity.getComponent(Image.class).layerIndex) {
+                    group.add(j, entity);
+                    isEntityInserted = true;
+                    break;
+                }
+            }
+
+            if (!isEntityInserted) {
+                group.add(entity);
+            }
+        }
         return group;
     }
 

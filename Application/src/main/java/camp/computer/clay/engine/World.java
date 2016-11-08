@@ -301,6 +301,7 @@ public class World {
         // TODO: 11/5/2016 Create corresponding world state CREATING_PATH, MODIFYING_PATH/MOVING_PATH, etc.
 
         path.getComponent(Image.class).setImage(builderImage);
+        path.getComponent(Image.class).layerIndex = 10;
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         return path;

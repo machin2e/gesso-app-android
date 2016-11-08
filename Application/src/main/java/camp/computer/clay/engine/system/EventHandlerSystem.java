@@ -65,7 +65,8 @@ public class EventHandlerSystem extends System {
     private void dispatchEvent(Event event) {
 
         // Annotate the Event
-        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+//        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterWithComponent(Image.class).sortByLayer().filterContains(event.getPosition());
         Entity targetEntity = null;
         if (targetEntities.size() > 0) {
             //targetEntity = targetEntities.get(0);
@@ -82,6 +83,9 @@ public class EventHandlerSystem extends System {
         if (event.getType() != Event.Type.SELECT) {
             targetEntity = event.getFirstEvent().getTarget();
             // TODO: 11/6/2016 event.setTarget(targetEntity);
+            event.setIntentTarget(targetEntity);
+        } else {
+            event.setIntentTarget(event.getFirstEvent().getIntentTarget());
         }
 
 //        if (event.getFirstEvent() == null) {
@@ -93,17 +97,19 @@ public class EventHandlerSystem extends System {
 //        }
 
         // Dispatch the Event
-        if (targetEntity.hasComponent(Camera.class)) {
-            world.eventHandlerSystem.handleCameraEvent(targetEntity, event);
-        } else if (targetEntity.hasComponent(Host.class)) {
-            world.eventHandlerSystem.handleHostEvent(targetEntity, event);
-        } else if (targetEntity.hasComponent(Extension.class)) {
-            world.eventHandlerSystem.handleExtensionEvent(targetEntity, event);
-        } else if (targetEntity.hasComponent(Port.class)) {
-            world.eventHandlerSystem.handlePortEvent(targetEntity, event);
-        } else if (targetEntity.hasComponent(Path.class)) {
-            world.eventHandlerSystem.handlePathEvent(targetEntity, event);
-        }
+        Entity targetIntentEntity = event.getIntentTarget();
+        if (targetIntentEntity != null) {
+            if (targetIntentEntity.hasComponent(Camera.class)) {
+                world.eventHandlerSystem.handleCameraEvent(targetIntentEntity, event);
+            } else if (targetIntentEntity.hasComponent(Host.class)) {
+                world.eventHandlerSystem.handleHostEvent(targetIntentEntity, event);
+            } else if (targetIntentEntity.hasComponent(Extension.class)) {
+                world.eventHandlerSystem.handleExtensionEvent(targetIntentEntity, event);
+            } else if (targetIntentEntity.hasComponent(Port.class)) {
+                world.eventHandlerSystem.handlePortEvent(targetIntentEntity, event);
+            } else if (targetIntentEntity.hasComponent(Path.class)) {
+                world.eventHandlerSystem.handlePathEvent(targetIntentEntity, event);
+            }
 //        else if (targetEntity.hasComponent(Image.class)) { // TODO: HACK!
 //
 //            if (targetEntity.hasComponent(Label.class)) {
@@ -111,6 +117,7 @@ public class EventHandlerSystem extends System {
 //            }
 //
 //        }
+        }
 
         // Handle special bookkeeping storing previous target Entity
         if (event.getType() == Event.Type.UNSELECT) {
@@ -611,8 +618,10 @@ public class EventHandlerSystem extends System {
 
                     // Focus Camera on Extension
                     Entity extension = path.getComponent(Path.class).getExtension();
-//                    camera.getComponent(Camera.class).setFocus(extension);
                     world.cameraSystem.setFocus(camera, extension);
+
+                    // Notification
+                    World.getWorld().renderSystem.addNotification("added path", event.getPosition(), 1000);
 //                    }
 
                 }
@@ -620,24 +629,20 @@ public class EventHandlerSystem extends System {
                 //} else if (event.getTarget().hasComponent(Camera.class)) {
             } else {
 
-                Log.v("EventHandlerSystem", "UNSELECT Port");
-                if (event.getTarget().hasComponent(Label.class)) {
-                    Log.v("EventHandlerSystem", "targetEntity: " + event.getTarget().getComponent(Label.class).getLabel());
-                }
+//                Log.v("EventHandlerSystem", "UNSELECT Port");
+//                if (event.getTarget().hasComponent(Label.class)) {
+//                    Log.v("EventHandlerSystem", "targetEntity: " + event.getTarget().getComponent(Label.class).getLabel());
+//                }
 
                 // (Host.Port, ..., World) Action Pattern
 
                 // Hide prototype Path and prototype Extension
                 world.portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
 
-                Log.v("EventHandlerSystem", "creating extension");
-
                 // If prototype Extension is visible, create Extension
 //                if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
                 Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
-
-                    Log.v("EventHandlerSystem", "creating extension");
 
 //                    // Hide prototype Path and prototype Extension
 //                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
@@ -648,7 +653,10 @@ public class EventHandlerSystem extends System {
                     Entity hostPort = event.getFirstEvent().getTarget();
 
                     // Create new custom Extension. Custom Extension can be configured manually.
-                    world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
+                    Entity extension = world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
+
+                    // Notification
+                    World.getWorld().renderSystem.addNotification("added extension", extension.getComponent(Transform.class), 1000);
 
                     // <STYLE_AND_LAYOUT>
                     // Remove focus from other Hosts and their Ports
@@ -681,9 +689,6 @@ public class EventHandlerSystem extends System {
 
                     world.portableLayoutSystem.updateExtensionLayout(host);
                     // <STYLE_AND_LAYOUT>
-
-                    // Set Camera focus on the Extension
-                    // camera.setFocus(extension);
                 }
             }
         }
@@ -693,6 +698,28 @@ public class EventHandlerSystem extends System {
 
 //        Log.v("handlePathEvent", "handlePathEvent");
 
+        boolean isSingletonPath = path.getComponent(Path.class).getTarget() == null;
+
+        // Check if source or target in Path was moved, and reassign it
+        Group<Entity> touchedPorts = Entity.Manager.filterWithComponent(Port.class).filterContains(event.getPosition());
+
+        Entity touchedPort = null;
+        boolean isSourceTouched = false;
+        boolean isTargetTouched = false;
+        if (touchedPorts.size() > 0) {
+            touchedPort = touchedPorts.get(0); // NOTE: This gets the first port in the list, no matter how many there are or which Ports they are. Maybe not always work...
+        }
+
+        Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
+        Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
+        if (Geometry.contains(sourcePortShape.getBoundary(), event.getPosition())) {
+//            path.getComponent(Path.class).setSource(touchedPort);
+            isSourceTouched = true;
+        } else if (Geometry.contains(targetPortShape.getBoundary(), event.getPosition())) {
+//            path.getComponent(Path.class).setTarget(touchedPort);
+            isTargetTouched = true;
+        }
+
         if (event.getType() == Event.Type.NONE) {
 
         } else if (event.getType() == Event.Type.SELECT) {
@@ -701,12 +728,15 @@ public class EventHandlerSystem extends System {
 
         } else if (event.getType() == Event.Type.MOVE) {
 
-            if (path.getComponent(Path.class).getTarget() != null) {
+            if (!isSingletonPath) {
+
+                // Multi-Port Path (non-singleton)
+
                 Log.v("PathEvent", "Moving path.");
 
                 path.getComponent(Image.class).getImage().getShapes();
 
-                Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
+//                Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
                 if (Geometry.contains(sourcePortShape.getBoundary(), event.getPosition())) {
                     Log.v("PathEvent", "Touched Source");
                     sourcePortShape.setPosition(event.getPosition());
@@ -718,7 +748,7 @@ public class EventHandlerSystem extends System {
                     // </HACK>
                 }
 
-                Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
+//                Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
                 if (Geometry.contains(targetPortShape.getBoundary(), event.getPosition())) {
                     Log.v("PathEvent", "Touched Target");
                     targetPortShape.setPosition(event.getPosition());
@@ -732,7 +762,10 @@ public class EventHandlerSystem extends System {
 //            world.boundarySystem.updateImage(path);
 
             } else {
+
                 // Singleton Path
+
+                Log.v("PathEventHandler", "Moving on singleton Path.");
 
                 // Prototype Path Visible
                 Transform position = event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Source Port").getPosition();
@@ -801,6 +834,7 @@ public class EventHandlerSystem extends System {
                                     break;
                                 }
                             }
+                            Log.v("PathEventHandler", "addNewPort: " + addNewPort);
 
                             // Add new Port to the Extension (if determined necessary)
                             if (addNewPort) {
@@ -829,6 +863,9 @@ public class EventHandlerSystem extends System {
             Log.v("PathEvent", "UNSELECT PATH.");
 
             if (path.getComponent(Path.class).getTarget() != null) {
+
+                // Full Path (non-singleton Path)
+
                 if (path.getComponent(Path.class).state != Path.State.EDITING) {
                     // <PATH>
                     // Set next Path type
@@ -844,21 +881,35 @@ public class EventHandlerSystem extends System {
                     // TODO: Update the Port Type in the Path to Match the Path Type
                     Group<Entity> ports = path.getComponent(Path.class).getPorts();
 
+                    // Notification
+                    World.getWorld().renderSystem.addNotification("" + nextType, event.getPosition(), 800);
+
                 } else if (path.getComponent(Path.class).state == Path.State.EDITING) {
 
-                    Group<Entity> touchedPorts = Entity.Manager.filterWithComponent(Port.class).filterContains(event.getPosition());
+                    Group<Entity> touchedPorts2 = Entity.Manager.filterWithComponent(Port.class).filterContains(event.getPosition());
 
                     // Moved the Path to another Port
-                    if (touchedPorts.size() > 0) {
+                    if (touchedPorts2.size() > 0) {
 
-                        Entity touchedPort = touchedPorts.get(0); // NOTE: This gets the first port in the list, no matter how many there are or which Ports they are. Maybe not always work...
+                        Entity touchedPort2 = touchedPorts2.get(0); // NOTE: This gets the first port in the list, no matter how many there are or which Ports they are. Maybe not always work...
 
                         // Remap the Path's Port if the touched Port doesn't already have a Path
-                        if (touchedPort.getComponent(Port.class).getPaths().size() == 0) {
-                            path.getComponent(Path.class).setSource(touchedPort);
+                        if (touchedPort2.getComponent(Port.class).getPaths().size() == 0) {
+
+                            // Check if source or target in Path was moved, and reassign it
+                            Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
+                            Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
+                            if (Geometry.contains(sourcePortShape2.getBoundary(), event.getPosition())) {
+                                path.getComponent(Path.class).setSource(touchedPort2);
+                            } else if (Geometry.contains(targetPortShape2.getBoundary(), event.getPosition())) {
+                                path.getComponent(Path.class).setTarget(touchedPort2);
+                            }
 
                             // TODO: Configure new Port, clear configuration from old port
                         }
+
+                        // Notification
+                        World.getWorld().renderSystem.addNotification("moved path", event.getPosition(), 1000);
 
 //                    Entity extension = path.getComponent(Path.class).getExtension();
 //                    Group<Entity> paths = extension.getComponent(Portable.class).getPaths();
@@ -875,6 +926,9 @@ public class EventHandlerSystem extends System {
 
 //                    Group<Entity> extensionPorts1 = extension.getComponent(Portable.class).getPorts();
 //                    extensionPorts1.remove(extensionPort); // Remove from Portable
+
+                        // Notification
+                        World.getWorld().renderSystem.addNotification("removed path", event.getPosition(), 1000);
 
                         // Reset Ports that were in removed Path
                         Entity sourcePort = path.getComponent(Path.class).getSource();
@@ -908,6 +962,9 @@ public class EventHandlerSystem extends System {
                             }
 
                             Entity.Manager.remove(extension);
+
+                            // Notification
+                            World.getWorld().renderSystem.addNotification("removed extension", extension.getComponent(Transform.class), 1000);
                         }
 
                     }
@@ -951,7 +1008,10 @@ public class EventHandlerSystem extends System {
                     Log.v("ExtendPath", "hostPort: " + hostPort);
 
                     // Create new custom Extension. Custom Extension can be configured manually.
-                    world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
+                    Entity extension = world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
+
+                    // Notification
+                    World.getWorld().renderSystem.addNotification("added extension", extension.getComponent(Transform.class), 1000);
 
                     // <STYLE_AND_LAYOUT>
                     // Remove focus from other Hosts and their Ports
@@ -987,7 +1047,63 @@ public class EventHandlerSystem extends System {
 
                     // Set Camera focus on the Extension
                     // camera.setFocus(extension);
+
+                } else if (event.getFirstEvent().getTarget() == event.getTarget()) {
+
+                    // Change Singleton Path Type
+
+                    // <PATH>
+                    // Set next Path type
+                    Path pathComponent = path.getComponent(Path.class);
+                    Path.Type nextType = Path.Type.getNext(pathComponent.getType());
+                    while ((nextType == Path.Type.NONE) || (nextType == pathComponent.getType())) {
+                        nextType = Path.Type.getNext(nextType);
+                    }
+                    path.getComponent(Path.class).setType(nextType);
+//                Log.v("EventHandlerSystem", "Setting path type to: " + nextType);
+                    // <PATH>
+
+                } else if (event.getFirstEvent().getTarget() != event.getTarget()) {
+
+                    // Adding Path. Stretches singleton path to a target port.
+
+                    Log.v("PathEventHandler", "creating paaaaatthhh???");
+
+                    if (!event.getTarget().hasComponent(Port.class)) {
+                        return;
+                    }
+
+                    Entity targetPort = event.getTarget();
+
+                    path.getComponent(Path.class).setTarget(targetPort);
+
+                    World.getWorld().renderSystem.addNotification("added path", event.getPosition(), 1000);
+
+//                    // (Host.Port A, ..., Host.Port B) Action Pattern
+//                    // i.e., The Action's first and last Events address different Ports.
+//
+////                    if (action.isDragging()) {
+//                    // Hide the prototype Path
+//                    world.portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
+//
+//                    // Get the source and target Ports to be used in new Path
+//                    Entity sourcePort = event.getFirstEvent().getTarget();
+//                    Entity targetPort = event.getTarget();
+//
+//                    // Create Path and configure it
+//                    Entity path = World.createEntity(Path.class);
+//                    path.getComponent(Path.class).set(sourcePort, targetPort);
+//
+//                    // Focus Camera on Extension
+//                    Entity extension = path.getComponent(Path.class).getExtension();
+////                    world.cameraSystem.setFocus(camera, extension);
+//
+//                    // Notification
+//                    World.getWorld().renderSystem.addNotification("added path", event.getPosition(), 1000);
+////                    }
+
                 }
+
             }
         }
     }
