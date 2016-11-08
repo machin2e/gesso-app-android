@@ -110,7 +110,7 @@ public class RenderSystem extends System {
 
     public void drawEntities(PlatformRenderSurface platformRenderSurface) {
 
-        Group<Entity> entities = Entity.Manager.filterWithComponent(Image.class).sortByLayer();
+        Group<Entity> entities = Entity.Manager.filterActive(true).filterWithComponent(Image.class).sortByLayer();
 
         for (int j = 0; j < entities.size(); j++) {
             Entity entity = entities.get(j);

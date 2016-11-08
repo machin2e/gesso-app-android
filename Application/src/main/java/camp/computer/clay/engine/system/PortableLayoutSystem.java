@@ -36,7 +36,7 @@ public class PortableLayoutSystem extends System {
     // Update Port configurations based on contained Paths
     private void updatePathPortConfiguration() {
 
-        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        Group<Entity> paths = Entity.Manager.filterActive(true).filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
 

@@ -606,35 +606,42 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public void drawOverviewPath(Entity path, PlatformRenderSurface platformRenderSurface) {
 
         // Get Host and Extension Ports
-        Entity hostPortEntity = path.getComponent(Path.class).getSource();
-        Entity extensionPortEntity = path.getComponent(Path.class).getTarget();
+        Entity hostPort = path.getComponent(Path.class).getSource();
+        Entity extensionPort = path.getComponent(Path.class).getTarget();
 
-        // Draw the connection between the Host Port and the Extension Port
-        Image hostImage = hostPortEntity.getParent().getComponent(Image.class);
-        Image extensionImage = extensionPortEntity.getParent().getComponent(Image.class);
+        if (extensionPort == null) {
 
-        Entity host = hostImage.getEntity();
-        Entity extension = extensionImage.getEntity();
+            // TODO: Singleton Path
 
-        if (host.getComponent(Portable.class).headerContactPositions.size() > hostPortEntity.getComponent(Port.class).getIndex()
-                && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPortEntity.getComponent(Port.class).getIndex()) {
+        } else {
 
-            Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPortEntity.getComponent(Port.class).getIndex()).getPosition();
-            Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortEntity.getComponent(Port.class).getIndex()).getPosition();
+            // Draw the connection between the Host's Port and the Extension's Port
+            Image hostImage = hostPort.getParent().getComponent(Image.class);
+            Image extensionImage = extensionPort.getParent().getComponent(Image.class);
 
-            // Draw connection between Ports
-            platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType())));
-            platformRenderSurface.paint.setStrokeWidth(10.0f);
+            Entity host = hostImage.getEntity();
+            Entity extension = extensionImage.getEntity();
 
-            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
-            segment.setOutlineThickness(10.0);
-            segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPortEntity.getComponent(Port.class).getType()));
+            if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getComponent(Port.class).getIndex()
+                    && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPort.getComponent(Port.class).getIndex()) {
 
-            segment.setSource(hostConnectorPosition);
-            segment.setTarget(extensionConnectorPosition);
+                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPort.getComponent(Port.class).getIndex()).getPosition();
+                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPort.getComponent(Port.class).getIndex()).getPosition();
 
-            platformRenderSurface.drawSegment(segment);
+                // Draw connection between Ports
+                platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getComponent(Port.class).getType())));
+                platformRenderSurface.paint.setStrokeWidth(10.0f);
+
+                // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+                Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
+                segment.setOutlineThickness(10.0);
+                segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getComponent(Port.class).getType()));
+
+                segment.setSource(hostConnectorPosition);
+                segment.setTarget(extensionConnectorPosition);
+
+                platformRenderSurface.drawSegment(segment);
+            }
         }
     }
     // </PATH_IMAGE_HELPERS>

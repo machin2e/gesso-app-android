@@ -160,8 +160,12 @@ public class Path extends Component {
         }
     }
 
-    public void setSource(Entity portEntity) {
-        this.sourcePortUuid = portEntity.getUuid();
+    public void setSource(Entity source) {
+        if (source == null) {
+            this.sourcePortUuid = null;
+        } else {
+            this.sourcePortUuid = source.getUuid();
+        }
     }
 
     public Entity getSource() {
@@ -169,7 +173,11 @@ public class Path extends Component {
     }
 
     public void setTarget(Entity target) {
-        this.targetPortUuid = target.getUuid();
+        if (target == null) {
+            this.targetPortUuid = null;
+        } else {
+            this.targetPortUuid = target.getUuid();
+        }
     }
 
     public Entity getTarget() {
@@ -178,8 +186,12 @@ public class Path extends Component {
 
     public Group<Entity> getPorts() {
         Group<Entity> ports = new Group<>();
-        ports.add(getSource());
-        ports.add(getTarget());
+        if (getSource() != null) {
+            ports.add(getSource());
+        }
+        if (getTarget() != null) {
+            ports.add(getTarget());
+        }
         return ports;
     }
 

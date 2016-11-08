@@ -276,12 +276,13 @@ public class CameraSystem extends System {
 
                 Group<Entity> portPaths = port.getComponent(Port.class).getPaths();
                 for (int j = 0; j < portPaths.size(); j++) {
-                    Entity pathEntity = portPaths.get(j);
-                    if (!hostPathPorts.contains(pathEntity.getComponent(Path.class).getSource())) {
-                        hostPathPorts.add(pathEntity.getComponent(Path.class).getSource());
+                    Entity path = portPaths.get(j);
+                    if (!hostPathPorts.contains(path.getComponent(Path.class).getSource())) {
+                        hostPathPorts.add(path.getComponent(Path.class).getSource());
                     }
-                    if (!hostPathPorts.contains(pathEntity.getComponent(Path.class).getTarget())) {
-                        hostPathPorts.add(pathEntity.getComponent(Path.class).getTarget());
+                    if (path.getComponent(Path.class).getTarget() != null // HACK: for case when singleton Path has no Target Port
+                            && !hostPathPorts.contains(path.getComponent(Path.class).getTarget())) {
+                        hostPathPorts.add(path.getComponent(Path.class).getTarget());
                     }
                 }
             }
