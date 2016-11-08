@@ -124,6 +124,17 @@ public class Group<E extends Groupable> implements List<E> {
             }
         };
 
+        public static Filter filterActive = new Filter<Entity, Boolean>() {
+            @Override
+            public boolean filter(Entity entity, Boolean... data) {
+                if (entity.isActive) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+
         public static Filter filterContains = new Filter<Entity, Transform>() {
             @Override
             public boolean filter(Entity entity, Transform... points) {
@@ -213,21 +224,44 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     // Expects Group<Entity>
-    public <E extends Entity> Group<E> filterWithComponent(Class<? extends Component>... componentTypes) {
+    public Group<Entity> filterWithComponent(Class<? extends Component>... componentTypes) {
 
-        Group<E> group = new Group<>();
+        Group<Entity> group = new Group<>();
 
         for (int i = 0; i < this.elements.size(); i++) {
             for (int j = 0; j < componentTypes.length; j++) {
                 Class<? extends Component> type = componentTypes[j];
                 Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
                 if (entity.hasComponent(type)) {
-                    group.add((E) this.elements.get(i));
+                    group.add(entity);
                 }
             }
         }
 
         return group;
+    }
+
+    // Expects Group<Entity>
+    public Group<Entity> filterWithComponents(Class<? extends Component>... componentTypes) {
+
+        Group<Entity> group = new Group<>();
+
+        for (int i = 0; i < this.elements.size(); i++) {
+//            for (int j = 0; j < componentTypes.length; j++) {
+//                Class<? extends Component> type = componentTypes[j];
+            Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity
+            if (entity.hasComponents(componentTypes)) {
+                group.add(entity);
+            }
+//            }
+        }
+
+        return group;
+    }
+
+    // Expects Group<Entity>
+    public Group<E> filterActive(boolean isActive) {
+        return filter(Filters.filterActive, isActive); // OR: Mappers.setImageVisibility.filter(this);
     }
 
     // Expects Group<Entity>

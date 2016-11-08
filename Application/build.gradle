@@ -22,5 +22,6 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:23.0.+'
     compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
+    compile 'com.github.ericwlange:AndroidJSCore:3.0.1'
     compile 'com.facebook.rebound:rebound:0.3.8'
 }

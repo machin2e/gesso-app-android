@@ -1,11 +1,11 @@
-package camp.computer.clay.model.profile;
+package camp.computer.clay.model.configuration;
 
 import java.util.UUID;
 
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.entity.Entity;
 
-public class PortProfile {
+public class PortConfiguration {
     private UUID uuid = null;
 
     private String label = "";
@@ -14,11 +14,11 @@ public class PortProfile {
 
     private Port.Direction direction = Port.Direction.NONE;
 
-    public PortProfile() {
+    public PortConfiguration() {
 
     }
 
-    public PortProfile(Entity portEntity) {
+    public PortConfiguration(Entity portEntity) {
         setType(portEntity.getComponent(Port.class).getType());
         setDirection(portEntity.getComponent(Port.class).getDirection());
         // setLabel(portEntity.getLabel());

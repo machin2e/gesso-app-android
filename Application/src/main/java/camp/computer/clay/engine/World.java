@@ -413,12 +413,13 @@ public class World {
     }
 
     public void updateSystems(Canvas canvas) {
-        world.inputSystem.update();
+//        world.inputSystem.update();
         world.eventHandlerSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();
         world.cameraSystem.update();
         world.renderSystem.update(canvas); // TODO: Remove canvas!
+        world.inputSystem.update();
     }
 
     /**

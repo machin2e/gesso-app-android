@@ -117,7 +117,7 @@ public class Port extends Component {
             if (pathComponent.getSource() == getEntity() || pathComponent.getTarget() == getEntity()) {
                 if (pathComponent.getSource().getParent().hasComponent(Extension.class)) {
                     return pathComponent.getSource().getParent();
-                } else if (pathComponent.getTarget().getParent().hasComponent(Extension.class)) {
+                } else if (pathComponent.getTarget() != null && pathComponent.getTarget().getParent().hasComponent(Extension.class)) {
                     return pathComponent.getTarget().getParent();
                 }
             }

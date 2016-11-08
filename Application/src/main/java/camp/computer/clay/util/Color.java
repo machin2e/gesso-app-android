@@ -97,14 +97,18 @@ public abstract class Color {
     public static String getColor(Path.Type pathType) {
         if (pathType == Path.Type.NONE) {
             return PORT_COLOR_OFF;
-        } else if (pathType == Path.Type.ELECTRONIC) {
+        } else if (pathType == Path.Type.SWITCH) {
             return PORT_COLOR_SWITCH;
-        } else if (pathType == Path.Type.MESH) {
+        } else if (pathType == Path.Type.PULSE) {
             return PORT_COLOR_PULSE;
-        } else if (pathType == Path.Type.INTERNET) {
+        } else if (pathType == Path.Type.WAVE) {
             return PORT_COLOR_WAVE;
-        } else if (pathType == Path.Type.BLUETOOTH) {
+        } else if (pathType == Path.Type.POWER_REFERENCE) {
             return PORT_COLOR_REFERENCE;
+        } else if (pathType == Path.Type.POWER_CMOS) {
+            return PORT_COLOR_CMOS;
+        } else if (pathType == Path.Type.POWER_TTL) {
+            return PORT_COLOR_TTL;
         } else {
             return PORT_COLOR_OFF;
         }

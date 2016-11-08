@@ -14,7 +14,7 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.model.profile.Profile;
+import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.util.BuilderImage.Segment;
 import camp.computer.clay.util.BuilderImage.Shape;
@@ -71,8 +71,8 @@ public class PortableLayoutSystem extends System {
 
         // Configure Extension's Ports (i.e., the Path's target Port)
         Entity extensionPort = extension.getComponent(Portable.class).getPorts().get(0);
-        extensionPort.getComponent(Port.class).setDirection(Port.Direction.INPUT);
-        extensionPort.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
+//        extensionPort.getComponent(Port.class).setDirection(Port.Direction.INPUT);
+//        extensionPort.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
 
         // Create Path from Host to Extension and configure the new Path
         // TODO: Create the Path and then apply it. It should automatically configure the
@@ -80,8 +80,14 @@ public class PortableLayoutSystem extends System {
         // TODO: (...) automated!). The idea here is that a Path can be created given two Ports,
         // TODO: (...) then a System will automatically configure the Ports based on the newly-
         // TODO: (...) existing Path's Port dependencies.
-        Entity path = World.createEntity(Path.class);
-        path.getComponent(Path.class).set(hostPort, extensionPort);
+        if (!hostPort.getComponent(Port.class).hasPath()) {
+            Entity path = World.createEntity(Path.class);
+            path.getComponent(Path.class).set(hostPort, extensionPort);
+        } else {
+            Entity path = hostPort.getComponent(Port.class).getPaths().get(0);
+            path.getComponent(Path.class).set(hostPort, extensionPort);
+            path.getComponent(Path.class).setTarget(extensionPort);
+        }
 
         return extension;
     }
@@ -89,11 +95,11 @@ public class PortableLayoutSystem extends System {
     /**
      * Adds and existing {@code ExtensionEntity}.
      *
-     * @param profile
+     * @param configuration
      * @param initialPosition
      * @return
      */
-    public Entity createExtensionFromProfile(Entity host, Profile profile, Transform initialPosition) {
+    public Entity createExtensionFromProfile(Entity host, Configuration configuration, Transform initialPosition) {
         // NOTE: Previously called fetchExtension(...)
 
         // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
@@ -102,8 +108,8 @@ public class PortableLayoutSystem extends System {
         Entity extension = World.createEntity(Extension.class);
 
         // <HACK>
-        // TODO: Remove references to Profile in Portables. Remove Profile altogether!?
-        Clay.configureFromProfile(extension, profile);
+        // TODO: Remove references to Configuration in Portables. Remove Configuration altogether!?
+        Clay.configureFromProfile(extension, configuration);
         // </HACK>
 
         // Update ExtensionEntity Position
@@ -136,7 +142,7 @@ public class PortableLayoutSystem extends System {
             Entity path = World.createEntity(Path.class);
             path.getComponent(Path.class).set(selectedHostPort, extension.getComponent(Portable.class).getPorts().get(i));
 
-            path.getComponent(Path.class).setType(Path.Type.ELECTRONIC);
+            path.getComponent(Path.class).setMode(Path.Mode.ELECTRONIC);
         }
 
         return true;

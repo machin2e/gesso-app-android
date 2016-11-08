@@ -17,6 +17,7 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
+import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Camera;
@@ -421,73 +422,179 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        Shape targetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
 
         Shape hostSourcePortShape = path.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
-        Shape extensionTargetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
+        Shape extensionTargetPortShape = null;
 
-        Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
-        Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
+        if (path.getComponent(Path.class).getTarget() != null) {
+            extensionTargetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
 
-        path.getComponent(Transform.class).set(
-                (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
-                (sourcePortShape.getPosition().y + targetPortShape.getPosition().y) / 2.0
-        );
+            Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
+            Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
 
-        sourcePortShape.setColor(hostSourcePortShape.getColor());
-        sourcePortShape.setPosition(hostSourcePortShape.getPosition());
-        targetPortShape.setPosition(extensionTargetPortShape.getPosition());
+            path.getComponent(Transform.class).set(
+                    (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
+                    (sourcePortShape.getPosition().y + targetPortShape.getPosition().y) / 2.0
+            );
 
-        // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
-        // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
-        Transform sourcePortPositition = sourcePortShape.getPosition();
-        Transform targetPortPositition = targetPortShape.getPosition();
+            sourcePortShape.setColor(hostSourcePortShape.getColor());
+
+            if (path.getComponent(Path.class).state != Path.State.EDITING) {
+                sourcePortShape.setPosition(hostSourcePortShape.getPosition());
+                targetPortShape.setPosition(extensionTargetPortShape.getPosition());
+//        sourcePortShape.setPosition(path.getComponent(Path.class).getSource().getComponent(Transform.class));
+//        targetPortShape.setPosition(path.getComponent(Path.class).getTarget().getComponent(Transform.class));
+            }
+
+            // <HACK>
+            BoundarySystem.updateShapeBoundary(sourcePortShape);
+            BoundarySystem.updateShapeBoundary(targetPortShape);
+            // </HACK>
+
+            // <HACK>
+            // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
+//        world.imageSystem.invalidate(port.getComponent(Image.class));
+            // </HACK>
+
+            // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
+            // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
+            Transform sourcePortPositition = sourcePortShape.getPosition();
+            Transform targetPortPositition = targetPortShape.getPosition();
 
 //        if (sourcePortShape != null && targetPortShape != null) {
 
-        // Show target port
+            // Show target port
 //            targetPortShape.setVisibility(Visible.VISIBLE);
-        //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
+            //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
-        // Update color of Port shape based on its type
-        Path.Type pathType = path.getComponent(Path.class).getType();
-        String pathColor = camp.computer.clay.util.Color.getColor(pathType);
+            // Update color of Port shape based on its type
+            Path.Type pathType = path.getComponent(Path.class).getType();
+            String pathColor = camp.computer.clay.util.Color.getColor(pathType);
 //        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
 //        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
-        sourcePortShape.setColor(pathColor);
-        targetPortShape.setColor(pathColor);
+            sourcePortShape.setColor(pathColor);
+            targetPortShape.setColor(pathColor);
 
-        // Color
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(15.0f);
-        //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
-        paint.setColor(Color.parseColor(pathColor));
+            // Color
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(15.0f);
+            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
+            paint.setColor(Color.parseColor(pathColor));
 
-        double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
-        Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
-        Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
+            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
 
 //            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
-        // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 //            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
 
-        Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
-        segment.setOutlineThickness(15.0);
-        segment.setOutlineColor(sourcePortShape.getColor());
+            Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
+            segment.setOutlineThickness(15.0);
+            segment.setOutlineColor(sourcePortShape.getColor());
 
-        segment.setSource(pathStartCoordinate);
-        segment.setTarget(pathStopCoordinate);
+            segment.setSource(pathStartCoordinate);
+            segment.setTarget(pathStopCoordinate);
 
-        // Draw shapes in Path
-        platformRenderSurface.drawSegment(segment);
-        platformRenderSurface.drawShape(sourcePortShape);
-        platformRenderSurface.drawShape(targetPortShape);
+            // Draw shapes in Path
+            platformRenderSurface.drawSegment(segment);
+            platformRenderSurface.drawShape(sourcePortShape);
+            platformRenderSurface.drawShape(targetPortShape);
 
-        paint.setStrokeWidth(3.0f);
-        paint.setStyle(Paint.Style.STROKE);
-        //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
-        paint.setColor(Color.CYAN);
-        platformRenderSurface.drawPolygon(sourcePortShape.getBoundary());
-//        platformRenderSurface.drawPolygon(hostSourcePortShape.getBoundary());
+            // Draw boundaries
+            paint.setStrokeWidth(3.0f);
+            paint.setStyle(Paint.Style.STROKE);
+            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
+            paint.setColor(Color.CYAN);
+            platformRenderSurface.drawPolygon(sourcePortShape.getBoundary());
+            platformRenderSurface.drawPolygon(targetPortShape.getBoundary());
 //        }
+
+        } else {
+
+            // Singleton Path
+
+            Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
+
+//            path.getComponent(Transform.class).set(
+//                    (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
+//                    (sourcePortShape.getPosition().y + targetPortShape.getPosition().y) / 2.0
+//            );
+            path.getComponent(Transform.class).set(sourcePortShape.getPosition());
+
+            if (path.getComponent(Path.class).state != Path.State.EDITING) {
+                sourcePortShape.setPosition(hostSourcePortShape.getPosition());
+//                targetPortShape.setPosition(extensionTargetPortShape.getPosition());
+//        sourcePortShape.setPosition(path.getComponent(Path.class).getSource().getComponent(Transform.class));
+//        targetPortShape.setPosition(path.getComponent(Path.class).getTarget().getComponent(Transform.class));
+            }
+
+            // <HACK>
+            BoundarySystem.updateShapeBoundary(sourcePortShape);
+//            BoundarySystem.updateShapeBoundary(targetPortShape);
+            // </HACK>
+
+            // <HACK>
+            // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
+//        world.imageSystem.invalidate(port.getComponent(Image.class));
+            // </HACK>
+
+            // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
+            // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
+            Transform sourcePortPositition = sourcePortShape.getPosition();
+//            Transform targetPortPositition = targetPortShape.getPosition();
+
+//        if (sourcePortShape != null && targetPortShape != null) {
+
+            // Show target port
+//            targetPortShape.setVisibility(Visible.VISIBLE);
+            //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
+
+            // Update color of Port shape based on its type
+            Path.Type pathType = path.getComponent(Path.class).getType();
+            String pathColor = camp.computer.clay.util.Color.getColor(pathType);
+//        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
+//        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
+            sourcePortShape.setColor(pathColor);
+//            targetPortShape.setColor(pathColor);
+
+            sourcePortShape.setColor(pathColor);
+
+            // Color
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(15.0f);
+            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
+            paint.setColor(Color.parseColor(pathColor));
+
+//            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
+//            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
+//            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
+
+//            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
+
+            // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
+//            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
+
+//            Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
+//            segment.setOutlineThickness(15.0);
+//            segment.setOutlineColor(sourcePortShape.getColor());
+//
+//            segment.setSource(pathStartCoordinate);
+//            segment.setTarget(pathStopCoordinate);
+
+            // Draw shapes in Path
+//            platformRenderSurface.drawSegment(segment);
+            platformRenderSurface.drawShape(sourcePortShape);
+//            platformRenderSurface.drawShape(targetPortShape);
+
+            // Draw boundaries
+            paint.setStrokeWidth(3.0f);
+            paint.setStyle(Paint.Style.STROKE);
+            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
+            paint.setColor(Color.CYAN);
+            platformRenderSurface.drawPolygon(sourcePortShape.getBoundary());
+//            platformRenderSurface.drawPolygon(targetPortShape.getBoundary());
+
+        }
     }
 
     public void drawOverviewPath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {

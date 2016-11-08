@@ -22,7 +22,7 @@ public class Path extends Component {
         }
     }
 
-    public enum Type {
+    public enum Mode {
 
         NONE(0),
         ELECTRONIC(1),
@@ -36,16 +36,35 @@ public class Path extends Component {
         // TODO: Change the index to a UUID?
         int index;
 
-        Type(int index) {
+        Mode(int index) {
             this.index = index;
         }
 
-        public static Type getNext(Type currentType) {
-            return Type.values()[(currentType.index + 1) % Type.values().length];
+        public static Mode getNext(Mode currentType) {
+            return Mode.values()[(currentType.index + 1) % Mode.values().length];
+        }
+    }
+
+    // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
+    public enum Type {
+        NONE,
+        SWITCH,
+        PULSE,
+        WAVE,
+        POWER_REFERENCE,
+        POWER_CMOS,
+        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
+
+        public static Path.Type getNext(Path.Type currentType) {
+            Path.Type[] values = Path.Type.values();
+            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
+            return values[(currentIndex + 1) % values.length];
         }
     }
 
     // TODO: public enum Protocol (i.e., BLUETOOTH, TCP, UDP, HTTP, HTTPS)
+
+    private Mode mode = Mode.NONE;
 
     private Type type = Type.NONE;
 
@@ -55,13 +74,23 @@ public class Path extends Component {
 
     private UUID targetPortUuid;
 
+//    public boolean IS_EDITING = false;
+
+    public enum State {
+        NONE,
+        EDITING
+    }
+
+    public State state = State.NONE;
+
     public Path() {
         super();
         setup();
     }
 
     private void setup() {
-        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
+        this.mode = Mode.ELECTRONIC;
+        this.type = Type.NONE; // Default to ELECTRONIC
         this.direction = Direction.BOTH; // Default to BOTH
 
         // TODO: PathEntity.connectPath(sourcePortUuid, destination) and do what the following constructor does... auto-configure Ports and PathEntity
@@ -75,16 +104,24 @@ public class Path extends Component {
         this.type = type;
     }
 
-    public void setMode(Port.Type type) {
-        // Update type of Ports in PathEntity (BUT NOT DIRECTION)
-        // <FILTER>
-        // TODO: Make PathEntity.Filter
-        Group<Entity> ports = getPorts();
-        for (int i = 0; i < ports.size(); i++) {
-            Entity portEntity = ports.get(i);
-            portEntity.getComponent(Port.class).setType(type);
-        }
-        // </FILTER>
+//    public void setMode(Port.Type type) {
+//        // Update type of Ports in PathEntity (BUT NOT DIRECTION)
+//        // <FILTER>
+//        // TODO: Make PathEntity.Filter
+//        Group<Entity> ports = getPorts();
+//        for (int i = 0; i < ports.size(); i++) {
+//            Entity portEntity = ports.get(i);
+//            portEntity.getComponent(Port.class).setType(type);
+//        }
+//        // </FILTER>
+//    }
+
+    public Mode getMode() {
+        return this.mode;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
     }
 
     public Direction getDirection() {
@@ -97,7 +134,10 @@ public class Path extends Component {
 
     public void set(Entity sourcePort, Entity targetPort) {
 
-        this.type = Type.ELECTRONIC; // Default to ELECTRONIC
+        this.mode = Mode.ELECTRONIC; // Default to ELECTRONIC
+        if (this.type == Type.NONE) {
+            this.type = Type.getNext(this.type);
+        }
         this.direction = Direction.BOTH; // Default to BOTH
 
         this.sourcePortUuid = sourcePort.getUuid();

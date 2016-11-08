@@ -20,7 +20,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.platform.PlatformInterface;
 import camp.computer.clay.platform.communication.InternetInterface;
 import camp.computer.clay.platform.communication.MessengerInterface;
-import camp.computer.clay.model.profile.Profile;
+import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Cache;
 import camp.computer.clay.platform.Internet;
 import camp.computer.clay.platform.Messenger;
@@ -41,12 +41,12 @@ public class Clay {
     // Group of discovered PhoneHosts
     private List<PhoneHost> phoneHosts = new ArrayList<>();
 
-    private List<Profile> profiles = new ArrayList<>();
+    private List<Configuration> configurations = new ArrayList<>();
 
     private World world;
 
-    public List<Profile> getProfiles() {
-        return this.profiles;
+    public List<Configuration> getConfigurations() {
+        return this.configurations;
     }
 
     public Clay() {
@@ -82,16 +82,16 @@ public class Clay {
     // <EXTENSION_IMAGE_HELPERS>
     // TODO: Come up with better way to determine if the Extension already exists in the database.
     // TODO: Make more general for all Portables.
-    public static void configureFromProfile(Entity extension, Profile profile) {
+    public static void configureFromProfile(Entity extension, Configuration configuration) {
 
-        // Create Ports to match the Profile
-        for (int i = 0; i < profile.getPorts().size(); i++) {
+        // Create Ports to match the Configuration
+        for (int i = 0; i < configuration.getPorts().size(); i++) {
 
             Entity port = World.createEntity(Port.class);
 
             port.getComponent(Port.class).setIndex(i);
-            port.getComponent(Port.class).setType(profile.getPorts().get(i).getType());
-            port.getComponent(Port.class).setDirection(profile.getPorts().get(i).getDirection());
+            port.getComponent(Port.class).setType(configuration.getPorts().get(i).getType());
+            port.getComponent(Port.class).setDirection(configuration.getPorts().get(i).getDirection());
 
             extension.getComponent(Portable.class).addPort(port);
         }
@@ -105,24 +105,24 @@ public class Clay {
     public static void createExtensionProfile(final Entity extension) {
         if (!extension.getComponent(Extension.class).isPersistent()) {
 
-            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Profile)
+            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Configuration)
             Application.getView().getNativeUi().promptInputText(new NativeUi.OnActionListener<String>() {
                 @Override
                 public void onComplete(String text) {
 
-                    // Create Extension Profile
-                    Profile profile = new Profile(extension);
-                    profile.setLabel(text);
+                    // Create Extension Configuration
+                    Configuration configuration = new Configuration(extension);
+                    configuration.setLabel(text);
 
-                    // Assign the Profile to the ExtensionEntity
-                    Clay.configureFromProfile(extension, profile);
+                    // Assign the Configuration to the ExtensionEntity
+                    Clay.configureFromProfile(extension, configuration);
 
-                    // Cache the new ExtensionEntity Profile
-                    Application.getView().getClay().getProfiles().add(profile);
+                    // Cache the new ExtensionEntity Configuration
+                    Application.getView().getClay().getConfigurations().add(configuration);
 
-                    // TODO: Persist the profile in the user's private store (either local or online)
+                    // TODO: Persist the configuration in the user's private store (either local or online)
 
-                    // TODO: Persist the profile in the global store online
+                    // TODO: Persist the configuration in the global store online
                 }
             });
         } else {

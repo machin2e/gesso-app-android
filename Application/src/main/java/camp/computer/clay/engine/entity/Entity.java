@@ -8,6 +8,8 @@ import camp.computer.clay.engine.Group;
 
 public final class Entity extends Groupable {
 
+    public boolean isActive = true;
+
     // TODO?: Move into World. Allows World-specific Entities.
     public static Group<Entity> Manager = new Group<>();
 
@@ -44,6 +46,15 @@ public final class Entity extends Groupable {
 
     public boolean hasComponent(Class<? extends Component> type) {
         return getComponent(type) != null;
+    }
+
+    public boolean hasComponents(Class<? extends Component>... types) {
+        for(int i = 0; i < types.length; i++) {
+            if (!hasComponent(types[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public <C extends Component> C removeComponent(Class<C> type) {

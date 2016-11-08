@@ -4,6 +4,6 @@ public class Project
 {
     // private boolean isPublished = false;
 
-    // TODO: System Profile
+    // TODO: System Configuration
     // TODO: Images
 }
