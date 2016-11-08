@@ -327,5 +327,34 @@ public class RenderSystem extends System {
         canvas.drawText(text, 25, linePosition, paint);
         canvas.restore();
         // </ENTITY_STATISTICS>
+
+        // <CAMERA_SCALE_MONITOR>
+        canvas.save();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(25);
+
+        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0); // HACK
+        String cameraScaleText = "Camera Scale: " + camera.getComponent(Transform.class).scale;
+        Rect cameraScaleTextBounds = new Rect();
+        paint.getTextBounds(cameraScaleText, 0, cameraScaleText.length(), cameraScaleTextBounds);
+        linePosition += 25 + cameraScaleTextBounds.height();
+        canvas.drawText(cameraScaleText, 25, linePosition, paint);
+        canvas.restore();
+        // </CAMERA_SCALE_MONITOR>
+
+        // <CAMERA_POSITION_MONITOR>
+        canvas.save();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(25);
+
+        String cameraPositionText = "Camera Position: " + camera.getComponent(Transform.class).x + ", " + camera.getComponent(Transform.class).x;
+        Rect cameraPositionTextBounds = new Rect();
+        paint.getTextBounds(cameraPositionText, 0, cameraPositionText.length(), cameraPositionTextBounds);
+        linePosition += 25 + cameraPositionTextBounds.height();
+        canvas.drawText(cameraPositionText, 25, linePosition, paint);
+        canvas.restore();
+        // </CAMERA_POSITION_MONITOR>
     }
 }
