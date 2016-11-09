@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
-import camp.computer.clay.engine.manager.EntityManager;
+import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.ImageSystem;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
@@ -48,8 +48,7 @@ public class World {
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
 
     // <MANAGERS>
-//    public static EntityManager Manager = new EntityManager();
-    public EntityManager Manager = new EntityManager();
+    public camp.computer.clay.engine.manager.Manager Manager;
     // </MANAGERS>
 
     // <WORLD_SYSTEMS>
@@ -72,10 +71,8 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
-//        Manager = new EntityManager();
+        Manager = new Manager();
 
-//        this.pathPrototype = createPrototypePathEntity();
-//        this.extensionPrototype = createPrototypeExtensionEntity();
         createPrototypePathEntity();
         createPrototypeExtensionEntity();
     }
@@ -88,8 +85,14 @@ public class World {
     }
     // </TODO: DELETE>
 
+//    public boolean addSystem(System system) {
+//
+//    }
+//
+//    public System getSystem(Class<?> systemType) {
+//
+//    }
 
-    // TODO: Make non-static, or static that also takes World
     public Entity createEntity(Class<?> entityType) {
 
         Entity entity = null;
@@ -143,7 +146,7 @@ public class World {
             port.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
             // </HACK>
 
-            host.getComponent(Portable.class).addPort(port);
+            Portable.addPort(host, port);
         }
 
         // Load geometry from file into Image Component
@@ -171,27 +174,27 @@ public class World {
 
         // Position Port Images
         Portable portable = host.getComponent(Portable.class);
-        portable.getPort(0).getComponent(Transform.class).set(-19.0, 40.0);
-        portable.getPort(1).getComponent(Transform.class).set(0, 40.0);
-        portable.getPort(2).getComponent(Transform.class).set(19.0, 40.0);
-        portable.getPort(3).getComponent(Transform.class).set(40.0, 19.0);
-        portable.getPort(4).getComponent(Transform.class).set(40.0, 0.0);
-        portable.getPort(5).getComponent(Transform.class).set(40.0, -19.0);
-        portable.getPort(6).getComponent(Transform.class).set(19.0, -40.0);
-        portable.getPort(7).getComponent(Transform.class).set(0, -40.0);
-        portable.getPort(8).getComponent(Transform.class).set(-19.0, -40.0);
-        portable.getPort(9).getComponent(Transform.class).set(-40.0, -19.0);
-        portable.getPort(10).getComponent(Transform.class).set(-40.0, 0.0);
-        portable.getPort(11).getComponent(Transform.class).set(-40.0, 19.0);
-        for (int i = 0; i < portable.getPorts().size(); i++) {
-            portable.getPort(i).getComponent(Transform.class).set(
-                    portable.getPort(i).getComponent(Transform.class).x * 6.0,
-                    portable.getPort(i).getComponent(Transform.class).y * 6.0
+        Portable.getPort(host, 0).getComponent(Transform.class).set(-19.0, 40.0);
+        Portable.getPort(host, 1).getComponent(Transform.class).set(0, 40.0);
+        Portable.getPort(host, 2).getComponent(Transform.class).set(19.0, 40.0);
+        Portable.getPort(host, 3).getComponent(Transform.class).set(40.0, 19.0);
+        Portable.getPort(host, 4).getComponent(Transform.class).set(40.0, 0.0);
+        Portable.getPort(host, 5).getComponent(Transform.class).set(40.0, -19.0);
+        Portable.getPort(host, 6).getComponent(Transform.class).set(19.0, -40.0);
+        Portable.getPort(host, 7).getComponent(Transform.class).set(0, -40.0);
+        Portable.getPort(host, 8).getComponent(Transform.class).set(-19.0, -40.0);
+        Portable.getPort(host, 9).getComponent(Transform.class).set(-40.0, -19.0);
+        Portable.getPort(host, 10).getComponent(Transform.class).set(-40.0, 0.0);
+        Portable.getPort(host, 11).getComponent(Transform.class).set(-40.0, 19.0);
+        for (int i = 0; i < Portable.getPorts(host).size(); i++) {
+            Portable.getPort(host, i).getComponent(Transform.class).set(
+                    Portable.getPort(host, i).getComponent(Transform.class).x * 6.0,
+                    Portable.getPort(host, i).getComponent(Transform.class).y * 6.0
             );
         }
         // Add relative layout constraints
-        for (int i = 0; i < portable.getPorts().size(); i++) {
-            Entity port = portable.getPort(i);
+        for (int i = 0; i < Portable.getPorts(host).size(); i++) {
+            Entity port = Portable.getPort(host, i);
             port.addComponent(new RelativeLayoutConstraint());
             port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(host);
         }
@@ -227,12 +230,12 @@ public class World {
             Entity port = createEntity(Port.class);
 
             port.getComponent(Port.class).setIndex(j);
-            extension.getComponent(Portable.class).addPort(port);
+            Portable.addPort(extension, port);
         }
         // Add relative layout constraints
         Portable portable = extension.getComponent(Portable.class);
-        for (int i = 0; i < portable.getPorts().size(); i++) {
-            Entity port = portable.getPort(i);
+        for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
+            Entity port = Portable.getPort(extension, i);
             port.addComponent(new RelativeLayoutConstraint());
             port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
         }
@@ -456,7 +459,7 @@ public class World {
             port.getComponent(Port.class).setType(configuration.getPorts().get(i).getType());
             port.getComponent(Port.class).setDirection(configuration.getPorts().get(i).getDirection());
 
-            extension.getComponent(Portable.class).addPort(port);
+            Portable.addPort(extension, port);
         }
 
         // Set persistent to indicate the Extension is stored in a remote database

@@ -107,8 +107,8 @@ public class PortableLayoutSystem extends System {
         Group<Entity> extensions = world.Manager.getEntities().filterWithComponent(Extension.class);
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
-            if (extension.getComponent(Portable.class).getHosts().size() > 0) {
-                Entity host = extension.getComponent(Portable.class).getHosts().get(0);
+            if (Portable.getHosts(extension).size() > 0) {
+                Entity host = Portable.getHosts(extension).get(0);
                 setExtensionDistance(host, distance);
             }
         }
@@ -142,7 +142,7 @@ public class PortableLayoutSystem extends System {
         }
 
         // Configure Extension's Ports (i.e., the Path's target Port)
-        Entity extensionPort = extension.getComponent(Portable.class).getPorts().get(0);
+        Entity extensionPort = Portable.getPorts(extension).get(0);
 //        extensionPort.getComponent(Port.class).setDirection(Port.Direction.INPUT);
 //        extensionPort.getComponent(Port.class).setType(hostPort.getComponent(Port.class).getType());
 
@@ -201,18 +201,19 @@ public class PortableLayoutSystem extends System {
     private boolean autoConnectToHost(Entity host, Entity extension) {
 
         // Automatically select, connect paths to, and configure the HostEntity's Ports
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
+        Group<Entity> ports = Portable.getPorts(extension);
+        for (int i = 0; i < ports.size(); i++) {
 
             // Select an available HostEntity PortEntity
             Entity selectedHostPort = autoSelectNearestAvailableHostPort(host, extension);
 
             // Configure HostEntity's PortEntity
-            selectedHostPort.getComponent(Port.class).setType(extension.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getType());
-            selectedHostPort.getComponent(Port.class).setDirection(extension.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getDirection());
+            selectedHostPort.getComponent(Port.class).setType(ports.get(i).getComponent(Port.class).getType());
+            selectedHostPort.getComponent(Port.class).setDirection(ports.get(i).getComponent(Port.class).getDirection());
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
             Entity path = world.createEntity(Path.class);
-            path.getComponent(Path.class).set(selectedHostPort, extension.getComponent(Portable.class).getPorts().get(i));
+            path.getComponent(Path.class).set(selectedHostPort, ports.get(i));
 
             path.getComponent(Path.class).setMode(Path.Mode.ELECTRONIC);
         }
@@ -226,11 +227,11 @@ public class PortableLayoutSystem extends System {
         Entity nearestHostPort = null;
         double distanceToSelectedPort = Double.MAX_VALUE;
 
-        Portable hostPortable = host.getComponent(Portable.class);
-        for (int j = 0; j < host.getComponent(Portable.class).getPorts().size(); j++) {
-            if (host.getComponent(Portable.class).getPorts().get(j).getComponent(Port.class).getType() == Port.Type.NONE) {
+        Group<Entity> ports = Portable.getPorts(host);
+        for (int j = 0; j < ports.size(); j++) {
+            if (ports.get(j).getComponent(Port.class).getType() == Port.Type.NONE) {
 
-                Entity port = hostPortable.getPorts().get(j);
+                Entity port = ports.get(j);
 
                 double distanceToPort = Geometry.distance(
                         port.getComponent(Transform.class),
@@ -259,7 +260,7 @@ public class PortableLayoutSystem extends System {
         Shape boardShape = host.getComponent(Image.class).getImage().getShape("Board");
         List<Transform> hostShapeBoundary = boardShape.getBoundary();
 
-        Group<Entity> extensionPorts = extension.getComponent(Portable.class).getPorts();
+        Group<Entity> extensionPorts = Portable.getPorts(extension);
         for (int j = 0; j < extensionPorts.size(); j++) {
 
             Entity extensionPort = extensionPorts.get(j);
@@ -314,7 +315,7 @@ public class PortableLayoutSystem extends System {
     public void updateExtensionLayout(Entity host) {
 
         // Get Extensions connected to the Host
-        Group<Entity> extensions = host.getComponent(Portable.class).getExtensions();
+        Group<Entity> extensions = Portable.getExtensions(host);
 
         Host hostComponent = host.getComponent(Host.class);
 
@@ -389,7 +390,7 @@ public class PortableLayoutSystem extends System {
     }
 
     public void updateExtensionHeaderIndex(Entity host, Entity extension) {
-        if (extension.getComponent(Image.class) == null || extension.getComponent(Portable.class).getHosts().size() == 0) {
+        if (extension.getComponent(Image.class) == null || Portable.getHosts(extension).size() == 0) {
             return;
         }
         int segmentIndex = getHeaderIndex(host, extension);

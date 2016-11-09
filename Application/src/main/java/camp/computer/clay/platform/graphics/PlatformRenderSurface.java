@@ -201,7 +201,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     int id = motionEvent.getPointerId(i);
                     Transform perspectivePosition = camera.getComponent(Camera.class).getEntity().getComponent(Transform.class);
 //                    double perspectiveScale = camera.getComponent(Camera.class).getScale();
-                    double perspectiveScale = World.getWorld().cameraSystem.getScale(camera);
+                    double perspectiveScale = world.cameraSystem.getScale(camera);
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
                 }
@@ -386,8 +386,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Set camera viewport dimensions
         Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
-        World.getWorld().cameraSystem.setWidth(camera, screenWidth);
-        World.getWorld().cameraSystem.setHeight(camera, screenHeight);
+        world.cameraSystem.setWidth(camera, screenWidth);
+        world.cameraSystem.setHeight(camera, screenHeight);
     }
 
     // <PATH_IMAGE_HELPERS>

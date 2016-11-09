@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 
@@ -20,8 +21,9 @@ public class Configuration {
     }
 
     public Configuration(Entity portableEntity) {
-        for (int i = 0; i < portableEntity.getComponent(Portable.class).getPorts().size(); i++) {
-            Entity portEntity = portableEntity.getComponent(Portable.class).getPorts().get(i);
+        Group<Entity> ports = Portable.getPorts(portableEntity);
+        for (int i = 0; i < ports.size(); i++) {
+            Entity portEntity = ports.get(i);
             PortConfiguration portConfiguration = new PortConfiguration(portEntity);
             addPort(portConfiguration);
         }

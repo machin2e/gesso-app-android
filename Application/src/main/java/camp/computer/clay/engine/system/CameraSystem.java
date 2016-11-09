@@ -266,7 +266,7 @@ public class CameraSystem extends System {
 
             // Get all Ports in all Path connected to any of the Host's Ports
             Group<Entity> hostPathPorts = new Group<>();
-            Group<Entity> hostPorts = entity.getComponent(Portable.class).getPorts();
+            Group<Entity> hostPorts = Portable.getPorts(entity);
             for (int i = 0; i < hostPorts.size(); i++) {
                 Entity port = hostPorts.get(i);
 
@@ -307,7 +307,7 @@ public class CameraSystem extends System {
 
             // Get Ports along every Path connected to the Ports on the selected Host
             Group<Entity> hostPathPorts = new Group<>();
-            Group<Entity> extensionPorts = entity.getComponent(Portable.class).getPorts();
+            Group<Entity> extensionPorts = Portable.getPorts(entity);
             for (int i = 0; i < extensionPorts.size(); i++) {
                 Entity port = extensionPorts.get(i);
 
@@ -329,7 +329,7 @@ public class CameraSystem extends System {
             // </REFACTOR>
 
             // Increase distance between Host and Extension
-            Entity host = entity.getComponent(Portable.class).getHosts().get(0);
+            Entity host = Portable.getHosts(entity).get(0);
             world.portableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
             Group<Shape> hostPathPortShapes = hostPathPorts.getImages().getShapes();

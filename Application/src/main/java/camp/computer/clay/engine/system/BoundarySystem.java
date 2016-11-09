@@ -150,11 +150,13 @@ public class BoundarySystem extends System {
         // Get LED shapes
         Group<Shape> lightShapeGroup = world.imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
 
+        Group<Entity> ports = Portable.getPorts(host);
+
         // Update Port LED color
-        for (int i = 0; i < host.getComponent(Portable.class).getPorts().size(); i++) {
+        for (int i = 0; i < ports.size(); i++) {
 
             // Update color of LED based on corresponding Port's type
-            Entity port = host.getComponent(Portable.class).getPorts().get(i);
+            Entity port = ports.get(i);
             String portColor = camp.computer.clay.util.Color.getColor(port.getComponent(Port.class).getType());
             lightShapeGroup.get(i).setColor(portColor);
         }
@@ -181,11 +183,12 @@ public class BoundarySystem extends System {
         // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
 
         // Update Port positions based on the index of Port
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
-            Entity port = extension.getComponent(Portable.class).getPorts().get(i);
+        Group<Entity> ports = Portable.getPorts(extension);
+        for (int i = 0; i < ports.size(); i++) {
+            Entity port = ports.get(i);
 
             double portSpacing = 115;
-            port.getComponent(Transform.class).x = (i * portSpacing) - (((extension.getComponent(Portable.class).getPorts().size() - 1) * portSpacing) / 2.0);
+            port.getComponent(Transform.class).x = (i * portSpacing) - (((Portable.getPorts(extension).size() - 1) * portSpacing) / 2.0);
             port.getComponent(Transform.class).y = 175; // i.e., Distance from board
 
             // <HACK>
@@ -201,7 +204,7 @@ public class BoundarySystem extends System {
         // References:
         // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
 
-        final int contactCount = extension.getComponent(Portable.class).getPorts().size();
+        final int contactCount = Portable.getPorts(extension).size();
         final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
         final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
 
@@ -221,7 +224,7 @@ public class BoundarySystem extends System {
         header.setWidth(headerWidth);
 
         // Update Contact Positions for Header
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
+        for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < extension.getComponent(Portable.class).headerContactPositions.size()) {
                 extension.getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
@@ -236,8 +239,9 @@ public class BoundarySystem extends System {
     private void updateExtensionStyle(Entity extension) {
 
         // Update Port Colors
-        for (int i = 0; i < extension.getComponent(Portable.class).getPorts().size(); i++) {
-            Entity portEntity = extension.getComponent(Portable.class).getPorts().get(i);
+        Group<Entity> ports = Portable.getPorts(extension);
+        for (int i = 0; i < ports.size(); i++) {
+            Entity portEntity = ports.get(i);
 
 //            Shape portShape = extension.getComponent(Image.class).getShape(portEntity);
 //

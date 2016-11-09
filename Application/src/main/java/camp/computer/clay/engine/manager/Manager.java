@@ -5,12 +5,12 @@ import java.util.UUID;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 
-public class EntityManager {
+public class Manager {
 
     // NOTE: This should be the only language reference to each Entity.
     private Group<Entity> entities;
 
-    public EntityManager() {
+    public Manager() {
         setup();
     }
 

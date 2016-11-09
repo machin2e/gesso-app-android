@@ -581,7 +581,7 @@ public class NativeUi {
 
         // Get list of Ports connected to Extension
         String portTypesString = "";
-        Group<Entity> ports = extension.getComponent(Portable.class).getPorts();
+        Group<Entity> ports = Portable.getPorts(extension);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             Log.v("PortType", "port type: " + port.getComponent(Port.class).getType());
