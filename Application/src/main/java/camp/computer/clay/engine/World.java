@@ -139,7 +139,7 @@ public class World {
             Entity port = createEntity(Port.class);
 
             port.getComponent(Label.class).setLabel("Port " + (j + 1));
-            port.getComponent(Port.class).setIndex(j);
+            Port.setIndex(port, j);
 
             // <HACK>
             // TODO: Set default visibility of Ports some other way?
@@ -229,7 +229,7 @@ public class World {
 
             Entity port = createEntity(Port.class);
 
-            port.getComponent(Port.class).setIndex(j);
+            Port.setIndex(port, j);
             Portable.addPort(extension, port);
         }
         // Add relative layout constraints
@@ -455,9 +455,9 @@ public class World {
 
             Entity port = createEntity(Port.class);
 
-            port.getComponent(Port.class).setIndex(i);
-            port.getComponent(Port.class).setType(configuration.getPorts().get(i).getType());
-            port.getComponent(Port.class).setDirection(configuration.getPorts().get(i).getDirection());
+            Port.setIndex(port, i);
+            Port.setType(port, configuration.getPorts().get(i).getType());
+            Port.setDirection(port, configuration.getPorts().get(i).getDirection());
 
             Portable.addPort(extension, port);
         }

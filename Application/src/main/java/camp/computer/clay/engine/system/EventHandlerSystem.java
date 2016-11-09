@@ -218,7 +218,7 @@ public class EventHandlerSystem extends System {
 
             // Show Ports and Paths of touched Host
             for (int i = 0; i < Portable.getPorts(host).size(); i++) {
-                Group<Entity> pathEntities = Portable.getPort(host, i).getComponent(Port.class).getPaths();
+                Group<Entity> pathEntities = Port.getPaths(Portable.getPort(host, i));
 
                 for (int j = 0; j < pathEntities.size(); j++) {
                     Entity pathEntity = pathEntities.get(j);
@@ -357,9 +357,9 @@ public class EventHandlerSystem extends System {
 
             // Show Ports and Paths for selected Host
             for (int i = 0; i < extensionPorts.size(); i++) {
-                Entity portEntity = extensionPorts.get(i);
+                Entity port = extensionPorts.get(i);
 
-                Group<Entity> paths = portEntity.getComponent(Port.class).getPaths();
+                Group<Entity> paths = Port.getPaths(port);
                 for (int j = 0; j < paths.size(); j++) {
                     Entity path = paths.get(j);
 
@@ -422,7 +422,7 @@ public class EventHandlerSystem extends System {
                 // Check if the target Port is contained in any Path.
                 boolean portHasPath = false;
                 Entity firstPort = event.getFirstEvent().getTarget();
-                if (firstPort.getComponent(Port.class).getPaths().size() > 0) {
+                if (Port.getPaths(firstPort).size() > 0) {
                     portHasPath = true;
                 }
 
@@ -575,7 +575,7 @@ public class EventHandlerSystem extends System {
                             boolean addNewPort = true;
                             for (int j = 0; j < extensionPorts.size(); j++) {
                                 Entity existingPort = extensionPorts.get(j);
-                                if (existingPort.getComponent(Port.class).getType() == Port.Type.NONE) {
+                                if (Port.getType(existingPort) == Port.Type.NONE) {
                                     addNewPort = false;
                                     break;
                                 }
@@ -592,7 +592,7 @@ public class EventHandlerSystem extends System {
                                 // </HACK>
 
                                 int newPortIndex = extensionPorts.size();
-                                newPort.getComponent(Port.class).setIndex(newPortIndex);
+                                Port.setIndex(newPort, newPortIndex);
                                 Portable.addPort(extension, newPort);
                             }
                         }
@@ -640,7 +640,7 @@ public class EventHandlerSystem extends System {
                         Entity touchedPort2 = touchedPorts2.get(0); // NOTE: This gets the first port in the list, no matter how many there are or which Ports they are. Maybe not always work...
 
                         // Remap the Path's Port if the touched Port doesn't already have a Path
-                        Group<Entity> targetPaths = touchedPort2.getComponent(Port.class).getPaths();
+                        Group<Entity> targetPaths = Port.getPaths(touchedPort2);
                         if (targetPaths.size() > 0) {
 
                             if (targetPaths.get(0) == path) {
@@ -656,7 +656,7 @@ public class EventHandlerSystem extends System {
                             // Notification
                             world.renderSystem.addNotification("flipped path", event.getPosition(), 1000);
 
-                        } else if (touchedPort2.getComponent(Port.class).getPaths().size() == 0) {
+                        } else if (Port.getPaths(touchedPort2).size() == 0) {
 
                             // Remap the Path's Ports
 
@@ -719,9 +719,9 @@ public class EventHandlerSystem extends System {
 
                         // Reset Ports that were in removed Path
                         Entity sourcePort = path.getComponent(Path.class).getSource();
-                        sourcePort.getComponent(Port.class).setType(Port.Type.NONE);
+                        Port.setType(sourcePort, Port.Type.NONE);
                         Entity targetPort = path.getComponent(Path.class).getTarget();
-                        targetPort.getComponent(Port.class).setType(Port.Type.NONE);
+                        Port.setType(targetPort, Port.Type.NONE);
 
                         // Update the Path
                         Entity extension = path.getComponent(Path.class).getExtension();
@@ -813,7 +813,7 @@ public class EventHandlerSystem extends System {
 //                    }
 
                     // Get all Ports in all Paths from the Host
-                    Group<Entity> hostPaths = hostPort.getComponent(Port.class).getPaths();
+                    Group<Entity> hostPaths = Port.getPaths(hostPort);
                     Group<Entity> hostPorts = new Group<>();
                     for (int i = 0; i < hostPaths.size(); i++) {
                         Group<Entity> pathPorts = hostPaths.get(i).getComponent(Path.class).getPorts();

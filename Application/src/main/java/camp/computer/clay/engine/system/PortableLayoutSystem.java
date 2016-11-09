@@ -44,36 +44,36 @@ public class PortableLayoutSystem extends System {
 
             Path.Type pathType = path.getComponent(Path.class).getType();
             if (pathType == Path.Type.NONE) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.NONE);
+                Port.setType(sourcePort, Port.Type.NONE);
             } else if (pathType == Path.Type.SWITCH) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.SWITCH);
+                Port.setType(sourcePort, Port.Type.SWITCH);
             } else if (pathType == Path.Type.PULSE) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.PULSE);
+                Port.setType(sourcePort, Port.Type.PULSE);
             } else if (pathType == Path.Type.WAVE) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.WAVE);
+                Port.setType(sourcePort, Port.Type.WAVE);
             } else if (pathType == Path.Type.POWER_REFERENCE) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE);
+                Port.setType(sourcePort, Port.Type.POWER_REFERENCE);
             } else if (pathType == Path.Type.POWER_CMOS) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.POWER_CMOS);
+                Port.setType(sourcePort, Port.Type.POWER_CMOS);
             } else if (pathType == Path.Type.POWER_TTL) {
-                sourcePort.getComponent(Port.class).setType(Port.Type.POWER_TTL);
+                Port.setType(sourcePort, Port.Type.POWER_TTL);
             }
 
             if (targetPort != null) {
                 if (pathType == Path.Type.NONE) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.NONE);
+                    Port.setType(targetPort, Port.Type.NONE);
                 } else if (pathType == Path.Type.SWITCH) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.SWITCH);
+                    Port.setType(targetPort, Port.Type.SWITCH);
                 } else if (pathType == Path.Type.PULSE) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.PULSE);
+                    Port.setType(targetPort, Port.Type.PULSE);
                 } else if (pathType == Path.Type.WAVE) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.WAVE);
+                    Port.setType(targetPort, Port.Type.WAVE);
                 } else if (pathType == Path.Type.POWER_REFERENCE) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE);
+                    Port.setType(targetPort, Port.Type.POWER_REFERENCE);
                 } else if (pathType == Path.Type.POWER_CMOS) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.POWER_CMOS);
+                    Port.setType(targetPort, Port.Type.POWER_CMOS);
                 } else if (pathType == Path.Type.POWER_TTL) {
-                    targetPort.getComponent(Port.class).setType(Port.Type.POWER_TTL);
+                    Port.setType(targetPort, Port.Type.POWER_TTL);
                 }
             }
         }
@@ -97,8 +97,8 @@ public class PortableLayoutSystem extends System {
                 }
             }
             if (!isPortInPath) {
-                port.getComponent(Port.class).setType(Port.Type.NONE);
-                port.getComponent(Port.class).setDirection(Port.Direction.NONE);
+                Port.setType(port, Port.Type.NONE);
+                Port.setDirection(port, Port.Direction.NONE);
             }
         }
     }
@@ -136,9 +136,9 @@ public class PortableLayoutSystem extends System {
         extension.getComponent(Transform.class).set(initialPosition);
 
         // Configure Host's Port (i.e., the Path's source Port)
-        if (hostPort.getComponent(Port.class).getType() == Port.Type.NONE || hostPort.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
-            hostPort.getComponent(Port.class).setType(Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
-            hostPort.getComponent(Port.class).setDirection(Port.Direction.BOTH);
+        if (Port.getType(hostPort) == Port.Type.NONE || Port.getDirection(hostPort) == Port.Direction.NONE) {
+            Port.setType(hostPort, Port.Type.POWER_REFERENCE); // Set the default type to reference (ground)
+            Port.setDirection(hostPort, Port.Direction.BOTH);
         }
 
         // Configure Extension's Ports (i.e., the Path's target Port)
@@ -152,11 +152,11 @@ public class PortableLayoutSystem extends System {
         // TODO: (...) automated!). The idea here is that a Path can be created given two Ports,
         // TODO: (...) then a System will automatically configure the Ports based on the newly-
         // TODO: (...) existing Path's Port dependencies.
-        if (!hostPort.getComponent(Port.class).hasPath()) {
+        if (!Port.hasPath(hostPort)) {
             Entity path = world.createEntity(Path.class);
             path.getComponent(Path.class).set(hostPort, extensionPort);
         } else {
-            Entity path = hostPort.getComponent(Port.class).getPaths().get(0);
+            Entity path = Port.getPaths(hostPort).get(0);
             path.getComponent(Path.class).set(hostPort, extensionPort);
             path.getComponent(Path.class).setTarget(extensionPort);
         }
@@ -208,8 +208,8 @@ public class PortableLayoutSystem extends System {
             Entity selectedHostPort = autoSelectNearestAvailableHostPort(host, extension);
 
             // Configure HostEntity's PortEntity
-            selectedHostPort.getComponent(Port.class).setType(ports.get(i).getComponent(Port.class).getType());
-            selectedHostPort.getComponent(Port.class).setDirection(ports.get(i).getComponent(Port.class).getDirection());
+            Port.setType(selectedHostPort, Port.getType(ports.get(i)));
+            Port.setDirection(selectedHostPort, Port.getDirection(ports.get(i)));
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
             Entity path = world.createEntity(Path.class);
@@ -229,7 +229,7 @@ public class PortableLayoutSystem extends System {
 
         Group<Entity> ports = Portable.getPorts(host);
         for (int j = 0; j < ports.size(); j++) {
-            if (ports.get(j).getComponent(Port.class).getType() == Port.Type.NONE) {
+            if (Port.getType(ports.get(j)) == Port.Type.NONE) {
 
                 Entity port = ports.get(j);
 
@@ -265,11 +265,11 @@ public class PortableLayoutSystem extends System {
 
             Entity extensionPort = extensionPorts.get(j);
 
-            if (extensionPort == null || extensionPort.getComponent(Port.class).getPaths().size() == 0 || extensionPort.getComponent(Port.class).getPaths().get(0) == null) {
+            if (extensionPort == null || Port.getPaths(extensionPort).size() == 0 || Port.getPaths(extensionPort).get(0) == null) {
                 continue;
             }
 
-            Entity hostPort = extensionPort.getComponent(Port.class).getPaths().get(0).getComponent(Path.class).getHostPort(); // HACK: Using hard-coded index 0.
+            Entity hostPort = Port.getPaths(extensionPort).get(0).getComponent(Path.class).getHostPort(); // HACK: Using hard-coded index 0.
             Transform hostPortPosition = hostPort.getComponent(Image.class).getImage().getShape("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment

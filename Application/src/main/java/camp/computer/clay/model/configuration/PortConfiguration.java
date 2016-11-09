@@ -19,8 +19,8 @@ public class PortConfiguration {
     }
 
     public PortConfiguration(Entity portEntity) {
-        setType(portEntity.getComponent(Port.class).getType());
-        setDirection(portEntity.getComponent(Port.class).getDirection());
+        setType(Port.getType(portEntity));
+        setDirection(Port.getDirection(portEntity));
         // setLabel(portEntity.getLabel());
     }
 

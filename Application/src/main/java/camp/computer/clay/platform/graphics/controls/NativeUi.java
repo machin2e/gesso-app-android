@@ -584,8 +584,8 @@ public class NativeUi {
         Group<Entity> ports = Portable.getPorts(extension);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
-            Log.v("PortType", "port type: " + port.getComponent(Port.class).getType());
-            portTypesString += port.getComponent(Port.class).getType() + " ";
+            Log.v("PortType", "port type: " + Port.getType(port));
+            portTypesString += Port.getType(port) + " ";
         }
 
         final String finalPortTypesString = portTypesString;

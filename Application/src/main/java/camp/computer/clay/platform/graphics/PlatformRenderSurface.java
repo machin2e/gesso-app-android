@@ -622,20 +622,22 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             Entity host = hostImage.getEntity();
             Entity extension = extensionImage.getEntity();
 
-            if (host.getComponent(Portable.class).headerContactPositions.size() > hostPort.getComponent(Port.class).getIndex()
-                    && extension.getComponent(Portable.class).headerContactPositions.size() > extensionPort.getComponent(Port.class).getIndex()) {
+            if (host.getComponent(Portable.class).headerContactPositions.size() > Port.getIndex(hostPort)
+                    && extension.getComponent(Portable.class).headerContactPositions.size() > Port.getIndex(extensionPort)) {
 
-                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPort.getComponent(Port.class).getIndex()).getPosition();
-                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPort.getComponent(Port.class).getIndex()).getPosition();
+                int hostPortIndex = Port.getIndex(hostPort);
+                int extensionPortIndex = Port.getIndex(extensionPort);
+                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPortIndex).getPosition();
+                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortIndex).getPosition();
 
                 // Draw connection between Ports
-                platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(extensionPort.getComponent(Port.class).getType())));
+                platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
                 platformRenderSurface.paint.setStrokeWidth(10.0f);
 
                 // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
                 Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
                 segment.setOutlineThickness(10.0);
-                segment.setOutlineColor(camp.computer.clay.util.Color.getColor(extensionPort.getComponent(Port.class).getType()));
+                segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
 
                 segment.setSource(hostConnectorPosition);
                 segment.setTarget(extensionConnectorPosition);

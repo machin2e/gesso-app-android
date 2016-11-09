@@ -145,19 +145,19 @@ public class Path extends Component {
         this.targetPortUuid = targetPort.getUuid();
 
         // Update sourcePortUuid PortEntity configuration
-        if (sourcePort.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
-            sourcePort.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
+        if (Port.getDirection(sourcePort) == Port.Direction.NONE) {
+            Port.setDirection(sourcePort, Port.Direction.BOTH); // Default to BOTH
         }
-        if (sourcePort.getComponent(Port.class).getType() == Port.Type.NONE) {
-            sourcePort.getComponent(Port.class).setType(Port.Type.getNext(sourcePort.getComponent(Port.class).getType()));
+        if (Port.getType(sourcePort) == Port.Type.NONE) {
+            Port.setType(sourcePort, Port.Type.getNext(Port.getType(sourcePort)));
         }
 
         // Update targetPortUuid PortEntity configuration
-        if (targetPort.getComponent(Port.class).getDirection() == Port.Direction.NONE) {
-            targetPort.getComponent(Port.class).setDirection(Port.Direction.BOTH); // Default to BOTH
+        if (Port.getDirection(targetPort) == Port.Direction.NONE) {
+            Port.setDirection(targetPort, Port.Direction.BOTH); // Default to BOTH
         }
-        if (targetPort.getComponent(Port.class).getType() == Port.Type.NONE) {
-            targetPort.getComponent(Port.class).setType(sourcePort.getComponent(Port.class).getType());
+        if (Port.getType(targetPort) == Port.Type.NONE) {
+            Port.setType(targetPort, Port.getType(sourcePort));
         }
     }
 

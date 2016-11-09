@@ -274,7 +274,7 @@ public class CameraSystem extends System {
                     hostPathPorts.add(port);
                 }
 
-                Group<Entity> portPaths = port.getComponent(Port.class).getPaths();
+                Group<Entity> portPaths = Port.getPaths(port);
                 for (int j = 0; j < portPaths.size(); j++) {
                     Entity path = portPaths.get(j);
                     if (!hostPathPorts.contains(path.getComponent(Path.class).getSource())) {
@@ -315,7 +315,7 @@ public class CameraSystem extends System {
                     hostPathPorts.add(port);
                 }
 
-                Group<Entity> portPaths = port.getComponent(Port.class).getPaths();
+                Group<Entity> portPaths = Port.getPaths(port);
                 for (int j = 0; j < portPaths.size(); j++) {
                     Entity path = portPaths.get(j);
                     if (!hostPathPorts.contains(path.getComponent(Path.class).getSource())) {

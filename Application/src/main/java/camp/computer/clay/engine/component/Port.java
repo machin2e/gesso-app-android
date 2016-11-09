@@ -51,37 +51,40 @@ public class Port extends Component {
 
     private Direction direction = Direction.NONE;
 
-    public int getIndex() {
-        return this.index;
+
+
+    // <ABSTRACT_HELPER_INTERFACE>
+    public static int getIndex(Entity port) {
+        return port.getComponent(Port.class).index;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public static void setIndex(Entity port, int index) {
+        port.getComponent(Port.class).index = index;
     }
 
-    public Type getType() {
-        return this.type;
+    public static Type getType(Entity port) {
+        return port.getComponent(Port.class).type;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public static void setType(Entity port, Type type) {
+        port.getComponent(Port.class).type = type;
 
         // TODO: Update all other Ports in the connected PathEntity
     }
 
-    public Direction getDirection() {
-        return this.direction;
+    public static Direction getDirection(Entity port) {
+        return port.getComponent(Port.class).direction;
     }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    public static void setDirection(Entity port, Direction direction) {
+        port.getComponent(Port.class).direction = direction;
     }
 
-    public boolean hasPath() {
+    public static boolean hasPath(Entity port) {
         Group<Entity> paths = World.getWorld().Manager.getEntities().filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
-            if (path.getComponent(Path.class).contains(getEntity())) {
+            if (path.getComponent(Path.class).contains(port)) {
                 return true;
             }
         }
@@ -94,7 +97,7 @@ public class Port extends Component {
      *
      * @return List of paths in the graph containing the port.
      */
-    public Group<Entity> getPaths() {
+    public static Group<Entity> getPaths(Entity port) {
 
         Group<Entity> paths = World.getWorld().Manager.getEntities().filterWithComponent(Path.class);
 
@@ -102,7 +105,7 @@ public class Port extends Component {
         Group<Entity> portPaths = new Group<>();
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
-            if (path.getComponent(Path.class).contains(getEntity())) {
+            if (path.getComponent(Path.class).contains(port)) {
                 portPaths.add(path);
             }
         }
@@ -110,12 +113,12 @@ public class Port extends Component {
     }
 
     // <HACK>
-    public Entity getExtension() {
-        Group<Entity> paths = getPaths();
+    public static Entity getExtension(Entity port) {
+        Group<Entity> paths = Port.getPaths(port);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
             Path pathComponent = path.getComponent(Path.class);
-            if (pathComponent.getSource() == getEntity() || pathComponent.getTarget() == getEntity()) {
+            if (pathComponent.getSource() == port || pathComponent.getTarget() == port) {
                 if (pathComponent.getSource().getParent().hasComponent(Extension.class)) {
                     return pathComponent.getSource().getParent();
                 } else if (pathComponent.getTarget() != null && pathComponent.getTarget().getParent().hasComponent(Extension.class)) {
@@ -126,4 +129,5 @@ public class Port extends Component {
         return null;
     }
     // </HACK>
+    // </ABSTRACT_HELPER_INTERFACE>
 }

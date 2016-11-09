@@ -157,7 +157,7 @@ public class BoundarySystem extends System {
 
             // Update color of LED based on corresponding Port's type
             Entity port = ports.get(i);
-            String portColor = camp.computer.clay.util.Color.getColor(port.getComponent(Port.class).getType());
+            String portColor = camp.computer.clay.util.Color.getColor(Port.getType(port));
             lightShapeGroup.get(i).setColor(portColor);
         }
     }

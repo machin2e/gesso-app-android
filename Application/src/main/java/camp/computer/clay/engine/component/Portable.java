@@ -49,7 +49,7 @@ public class Portable extends Component {
         Group<Entity> ports = Portable.getPorts(portable);
         Group<Entity> extensions = new Group<>();
         for (int i = 0; i < ports.size(); i++) {
-            Entity extension = ports.get(i).getComponent(Port.class).getExtension();
+            Entity extension = Port.getExtension(ports.get(i));
             if (extension != null && !extensions.contains(extension)) {
                 extensions.add(extension);
             }
@@ -83,7 +83,7 @@ public class Portable extends Component {
         Portable portableComponent = portable.getComponent(Portable.class);
         Group<Entity> paths = new Group<>();
         for (int i = 0; i < portableComponent.ports.size(); i++) {
-            paths.addAll(portableComponent.ports.get(i).getComponent(Port.class).getPaths());
+            paths.addAll(Port.getPaths(portableComponent.ports.get(i)));
         }
         return paths;
     }
