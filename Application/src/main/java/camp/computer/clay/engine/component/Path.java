@@ -3,6 +3,7 @@ package camp.computer.clay.engine.component;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 
 public class Path extends Component {
@@ -169,7 +170,7 @@ public class Path extends Component {
     }
 
     public Entity getSource() {
-        return Entity.Manager.get(sourcePortUuid);
+        return World.getWorld().Manager.getEntities().get(sourcePortUuid);
     }
 
     public void setTarget(Entity target) {
@@ -181,7 +182,7 @@ public class Path extends Component {
     }
 
     public Entity getTarget() {
-        return Entity.Manager.get(targetPortUuid);
+        return World.getWorld().Manager.getEntities().get(targetPortUuid);
     }
 
     public Group<Entity> getPorts() {

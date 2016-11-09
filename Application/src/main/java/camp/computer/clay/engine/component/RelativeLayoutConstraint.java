@@ -2,6 +2,7 @@ package camp.computer.clay.engine.component;
 
 import java.util.UUID;
 
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 
 public class RelativeLayoutConstraint extends Component {
@@ -13,7 +14,7 @@ public class RelativeLayoutConstraint extends Component {
     private UUID entityUuid;
 
     public Entity getReferenceEntity() {
-        return Entity.Manager.get(entityUuid);
+        return World.getWorld().Manager.getEntities().get(entityUuid);
     }
 
     public void setReferenceEntity(Entity entity) {

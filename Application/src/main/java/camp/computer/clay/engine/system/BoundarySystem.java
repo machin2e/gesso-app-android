@@ -28,7 +28,7 @@ public class BoundarySystem extends System {
     public void update() {
 
         // Update Transform
-        Group<Entity> entitiesWithTransform = Entity.Manager.filterActive(true).filterWithComponents(Transform.class, Image.class);
+        Group<Entity> entitiesWithTransform = world.Manager.getEntities().filterActive(true).filterWithComponents(Transform.class, Image.class);
         for (int i = 0; i < entitiesWithTransform.size(); i++) {
             Entity entity = entitiesWithTransform.get(i);
             updateTransform(entity);

@@ -28,7 +28,7 @@ public class CameraSystem extends System {
     @Override
     public void update() {
 
-        Group<Entity> cameras = Entity.Manager.filterWithComponent(Camera.class);
+        Group<Entity> cameras = world.Manager.getEntities().filterWithComponent(Camera.class);
         for (int i = 0; i < cameras.size(); i++) {
             updateCamera(cameras.get(i));
         }
@@ -140,7 +140,7 @@ public class CameraSystem extends System {
     }
 
     public void adjustPosition(Entity camera) {
-        Transform centerPosition = Entity.Manager.filterWithComponent(Host.class, Extension.class).getCenterPoint();
+        Transform centerPosition = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getCenterPoint();
         setPosition(camera, centerPosition, Camera.DEFAULT_ADJUSTMENT_PERIOD);
     }
 
@@ -182,7 +182,7 @@ public class CameraSystem extends System {
     }
 
     public void adjustScale(Entity camera, double duration) {
-        Rectangle boundingBox = Entity.Manager.filterWithComponent(Host.class, Extension.class).getBoundingBox();
+        Rectangle boundingBox = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(camera, boundingBox, duration);
         }
@@ -347,7 +347,7 @@ public class CameraSystem extends System {
         Log.v("SetFocus", "setFocus(World)");
 
         // Hide Portables' Ports.
-        Entity.Manager.filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
+        world.Manager.getEntities().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
 
         // Update distance between Hosts and Extensions
         world.portableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);

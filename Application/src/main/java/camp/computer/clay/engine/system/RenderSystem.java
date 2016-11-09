@@ -52,7 +52,7 @@ public class RenderSystem extends System {
         // Adjust the Camera
         canvas.save();
 
-        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
         Transform cameraPosition = camera.getComponent(Transform.class);
         canvas.translate(
                 (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
@@ -110,7 +110,7 @@ public class RenderSystem extends System {
 
     public void drawEntities(PlatformRenderSurface platformRenderSurface) {
 
-        Group<Entity> entities = Entity.Manager.filterActive(true).filterWithComponent(Image.class).sortByLayer();
+        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
 
         for (int j = 0; j < entities.size(); j++) {
             Entity entity = entities.get(j);
@@ -190,8 +190,7 @@ public class RenderSystem extends System {
     public class Notification {
         public String text = "";
         public Transform position = new Transform(0, 0);
-        public float xOffset = 0;
-        public float yOffset = -50;
+        public Transform offset = new Transform(DEFAULT_NOTIFICATION_OFFSET_X, DEFAULT_NOTIFICATION_OFFSET_Y);
         public long timeout = 1000;
 
         public State state = State.WAITING;
@@ -218,6 +217,10 @@ public class RenderSystem extends System {
         platformRenderSurface.startTimer(timeout, notification);
     }
 
+    public static String NOTIFICATION_FONT = "fonts/ProggyClean.ttf";
+    public static float NOTIFICATION_FONT_SIZE = 45;
+    public static final float DEFAULT_NOTIFICATION_OFFSET_X = 0;
+    public static final float DEFAULT_NOTIFICATION_OFFSET_Y = -50;
     private void drawNotification(Notification notification, PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
@@ -226,60 +229,69 @@ public class RenderSystem extends System {
         canvas.save();
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(45);
+        paint.setTextSize(NOTIFICATION_FONT_SIZE);
 
         // Font
-        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), "fonts/Dosis-Bold.ttf");
-        Typeface boldTypeface = Typeface.create(typeface, Typeface.BOLD);
+        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), NOTIFICATION_FONT);
+        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
         paint.setTypeface(boldTypeface);
 
         Rect textBounds = new Rect();
         paint.getTextBounds(notification.text, 0, notification.text.length(), textBounds);
-        float centeredX = (float) (notification.position.x - (textBounds.width() / 2.0));
-        float centeredY = (float) (notification.position.y + (textBounds.height() / 2.0));
-        float x = centeredX + notification.xOffset;
-        float y = centeredY + notification.yOffset;
+        float x = (float) (notification.position.x - (textBounds.width() / 2.0)) + (float) notification.offset.x;
+        float y = (float) (notification.position.y + (textBounds.height() / 2.0)) + (float) notification.offset.y;
         canvas.drawText(notification.text, x, y, paint);
         canvas.restore();
     }
 
+    public static int OVERLAY_TOP_MARGIN = 25;
+    public static int OVERLAY_LEFT_MARGIN = 25;
+    public static int OVERLAY_LINE_SPACING = 10;
+    public static String OVERLAY_FONT = "fonts/ProggySquare.ttf";
+    public static float OVERLAY_FONT_SIZE = 25;
+    public static String OVERLAY_FONT_COLOR = "#ffff0000";
     public void drawOverlay(PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
         // World world = platformRenderSurface.getWorld();
 
+        // Font
+        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), OVERLAY_FONT);
+        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+        paint.setTypeface(boldTypeface);
+
         int linePosition = 0;
 
         // <FPS_LABEL>
         canvas.save();
-        paint.setColor(Color.RED);
+        paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
         paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(25);
+        paint.setTextSize(OVERLAY_FONT_SIZE);
 
         String fpsText = "FPS: " + (int) platformRenderSurface.platformRenderClock.getFramesPerSecond();
         Rect fpsTextBounds = new Rect();
         paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        linePosition += 25 + fpsTextBounds.height();
-        canvas.drawText(fpsText, 25, linePosition, paint);
+        linePosition += OVERLAY_TOP_MARGIN + fpsTextBounds.height();
+        canvas.drawText(fpsText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </FPS_LABEL>
 
         // <ENTITY_STATISTICS>
         canvas.save();
-        int entityCount = Entity.Manager.size();
-        int hostCount = Entity.Manager.filterWithComponent(Host.class).size();
-        int portCount = Entity.Manager.filterWithComponent(Port.class).size();
-        int extensionCount = Entity.Manager.filterWithComponent(Extension.class).size();
-        int pathCount = Entity.Manager.filterWithComponent(Path.class).size();
-        int cameraCount = Entity.Manager.filterWithComponent(Camera.class).size();
+        int entityCount = world.Manager.getEntities().size();
+        int hostCount = world.Manager.getEntities().filterWithComponent(Host.class).size();
+        int portCount = world.Manager.getEntities().filterWithComponent(Port.class).size();
+        int extensionCount = world.Manager.getEntities().filterWithComponent(Extension.class).size();
+        int pathCount = world.Manager.getEntities().filterWithComponent(Path.class).size();
+        int cameraCount = world.Manager.getEntities().filterWithComponent(Camera.class).size();
 
         // Entities
         String text = "Entities: " + entityCount;
         Rect textBounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Hosts
@@ -287,8 +299,8 @@ public class RenderSystem extends System {
         text = "Hosts: " + hostCount;
         textBounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Ports
@@ -296,8 +308,8 @@ public class RenderSystem extends System {
         text = "Ports: " + portCount;
         textBounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Extensions
@@ -305,8 +317,8 @@ public class RenderSystem extends System {
         text = "Extensions: " + extensionCount;
         textBounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Paths
@@ -314,8 +326,8 @@ public class RenderSystem extends System {
         text = "Paths: " + pathCount;
         textBounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 
         // Cameras
@@ -323,37 +335,29 @@ public class RenderSystem extends System {
         text = "Cameras: " + cameraCount;
         textBounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), textBounds);
-        linePosition += 25 + textBounds.height();
-        canvas.drawText(text, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + textBounds.height();
+        canvas.drawText(text, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </ENTITY_STATISTICS>
 
         // <CAMERA_SCALE_MONITOR>
         canvas.save();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(25);
-
-        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0); // HACK
+        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0); // HACK
         String cameraScaleText = "Camera Scale: " + camera.getComponent(Transform.class).scale;
         Rect cameraScaleTextBounds = new Rect();
         paint.getTextBounds(cameraScaleText, 0, cameraScaleText.length(), cameraScaleTextBounds);
-        linePosition += 25 + cameraScaleTextBounds.height();
-        canvas.drawText(cameraScaleText, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + cameraScaleTextBounds.height();
+        canvas.drawText(cameraScaleText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_SCALE_MONITOR>
 
         // <CAMERA_POSITION_MONITOR>
         canvas.save();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(25);
-
         String cameraPositionText = "Camera Position: " + camera.getComponent(Transform.class).x + ", " + camera.getComponent(Transform.class).x;
         Rect cameraPositionTextBounds = new Rect();
         paint.getTextBounds(cameraPositionText, 0, cameraPositionText.length(), cameraPositionTextBounds);
-        linePosition += 25 + cameraPositionTextBounds.height();
-        canvas.drawText(cameraPositionText, 25, linePosition, paint);
+        linePosition += OVERLAY_LINE_SPACING + cameraPositionTextBounds.height();
+        canvas.drawText(cameraPositionText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_POSITION_MONITOR>
     }

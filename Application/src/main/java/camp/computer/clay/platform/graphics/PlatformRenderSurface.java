@@ -193,7 +193,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         if (pointerCount <= Event.MAXIMUM_POINT_COUNT) {
             if (pointerIndex <= Event.MAXIMUM_POINT_COUNT - 1) {
 
-                Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+                Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
 
                 // Current
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
@@ -240,7 +240,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
                     holdEventTimerHandler.postDelayed(holdEventTimerRunnable, Event.MINIMUM_HOLD_DURATION);
 
-//                    new Timer().schedule(new TimerTask() {
+//                    new Timer().process(new TimerTask() {
 //                        @Override
 //                        public void run() {
 //                            // this code will be executed after 2 seconds
@@ -385,7 +385,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         int screenHeight = metrics.heightPixels;
 
         // Set camera viewport dimensions
-        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
         World.getWorld().cameraSystem.setWidth(camera, screenWidth);
         World.getWorld().cameraSystem.setHeight(camera, screenHeight);
     }

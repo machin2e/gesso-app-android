@@ -11,7 +11,7 @@ public final class Entity extends Groupable {
     public boolean isActive = true;
 
     // TODO?: Move into World. Allows World-specific Entities.
-    public static Group<Entity> Manager = new Group<>();
+//    public static Group<Entity> Manager = new Group<>();
 
     private Group<Component> components = null;
 
@@ -27,7 +27,7 @@ public final class Entity extends Groupable {
 
     private void setup() {
         components = new Group<>(); // Create list of Components
-        Entity.Manager.add(this); // Add Entity to Manager
+//        Entity.Manager.add(this); // Add Entity to Manager
     }
 
     public <C extends Component> void addComponent(C component) {

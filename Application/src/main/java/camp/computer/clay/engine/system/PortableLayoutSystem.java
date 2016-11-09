@@ -2,7 +2,6 @@ package camp.computer.clay.engine.system;
 
 import java.util.List;
 
-import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -36,7 +35,7 @@ public class PortableLayoutSystem extends System {
     // Update Port configurations based on contained Paths
     private void updatePathPortConfiguration() {
 
-        Group<Entity> paths = Entity.Manager.filterActive(true).filterWithComponent(Path.class);
+        Group<Entity> paths = world.Manager.getEntities().filterActive(true).filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
 
@@ -85,8 +84,8 @@ public class PortableLayoutSystem extends System {
     private void updatePortConfiguration() {
 
         // Clear Ports that are not contained in any Path
-        Group<Entity> ports = Entity.Manager.filterWithComponent(Port.class);
-        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        Group<Entity> ports = world.Manager.getEntities().filterWithComponent(Port.class);
+        Group<Entity> paths = world.Manager.getEntities().filterWithComponent(Path.class);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             boolean isPortInPath = false;
@@ -105,7 +104,7 @@ public class PortableLayoutSystem extends System {
     }
 
     public void setPortableSeparation(double distance) {
-        Group<Entity> extensions = Entity.Manager.filterWithComponent(Extension.class);
+        Group<Entity> extensions = world.Manager.getEntities().filterWithComponent(Extension.class);
         for (int i = 0; i < extensions.size(); i++) {
             Entity extension = extensions.get(i);
             if (extension.getComponent(Portable.class).getHosts().size() > 0) {
@@ -131,7 +130,7 @@ public class PortableLayoutSystem extends System {
         // TODO: (...) Then use that profile to create and configure Ports for the Extension.
 
         // Create Extension Entity
-        Entity extension = World.createEntity(Extension.class); // HACK: Because Extension is a Component
+        Entity extension = world.createEntity(Extension.class); // HACK: Because Extension is a Component
 
         // Set the initial position of the Extension
         extension.getComponent(Transform.class).set(initialPosition);
@@ -154,7 +153,7 @@ public class PortableLayoutSystem extends System {
         // TODO: (...) then a System will automatically configure the Ports based on the newly-
         // TODO: (...) existing Path's Port dependencies.
         if (!hostPort.getComponent(Port.class).hasPath()) {
-            Entity path = World.createEntity(Path.class);
+            Entity path = world.createEntity(Path.class);
             path.getComponent(Path.class).set(hostPort, extensionPort);
         } else {
             Entity path = hostPort.getComponent(Port.class).getPaths().get(0);
@@ -178,11 +177,11 @@ public class PortableLayoutSystem extends System {
         // Log.v("IASM", "(1) touch extensionEntity to select from store or (2) drag signal to base or (3) touch elsewhere to cancel");
 
         // Create the Extension
-        Entity extension = World.createEntity(Extension.class);
+        Entity extension = world.createEntity(Extension.class);
 
         // <HACK>
         // TODO: Remove references to Configuration in Portables. Remove Configuration altogether!?
-        Clay.configureFromProfile(extension, configuration);
+        world.configureExtensionFromProfile(extension, configuration);
         // </HACK>
 
         // Update ExtensionEntity Position
@@ -212,7 +211,7 @@ public class PortableLayoutSystem extends System {
             selectedHostPort.getComponent(Port.class).setDirection(extension.getComponent(Portable.class).getPorts().get(i).getComponent(Port.class).getDirection());
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
-            Entity path = World.createEntity(Path.class);
+            Entity path = world.createEntity(Path.class);
             path.getComponent(Path.class).set(selectedHostPort, extension.getComponent(Portable.class).getPorts().get(i));
 
             path.getComponent(Path.class).setMode(Path.Mode.ELECTRONIC);
@@ -405,7 +404,7 @@ public class PortableLayoutSystem extends System {
      */
     public void adjustLayout() {
 
-        Group<Entity> hosts = Entity.Manager.filterWithComponent(Host.class);
+        Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
 
         // Set position on grid layout
         if (hosts.size() == 1) {
@@ -429,7 +428,7 @@ public class PortableLayoutSystem extends System {
         // TODO: Set position on "scatter" layout
 
         // Set rotation
-        // image.setRotation(Probability.getRandomGenerator().nextInt(360));
+        // image.setRotation(Random.getRandomGenerator().nextInt(360));
     }
     // <HOST_LAYOUT>
 
@@ -438,14 +437,14 @@ public class PortableLayoutSystem extends System {
 
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
+        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
         // </HACK>
         extensionPrototype.getComponent(Transform.class).set(position);
 
         // <REFACTOR>
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
+        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
         Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         Transform prototypePathSourceTransform = segment.getSource();
@@ -471,7 +470,7 @@ public class PortableLayoutSystem extends System {
     public void setPathPrototypeVisibility(Visible visible) {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
+        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
         pathPrototype.getComponent(Visibility.class).setVisible(visible);
     }
@@ -479,7 +478,7 @@ public class PortableLayoutSystem extends System {
     public Visible getPathPrototypeVisibility() {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
+        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
         return pathPrototype.getComponent(Visibility.class).getVisibile();
     }
@@ -487,7 +486,7 @@ public class PortableLayoutSystem extends System {
     public void setPathPrototypeSourcePosition(Transform position) {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
+        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
         Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         segment.setSource(position);
@@ -496,7 +495,7 @@ public class PortableLayoutSystem extends System {
     public void setPathPrototypeDestinationPosition(Transform position) {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
+        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
         Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         segment.setTarget(position);
@@ -505,7 +504,7 @@ public class PortableLayoutSystem extends System {
     public void setExtensionPrototypeVisibility(Visible visible) {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
+        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
         // </HACK>
         extensionPrototype.getComponent(Visibility.class).setVisible(visible);
     }
@@ -513,7 +512,7 @@ public class PortableLayoutSystem extends System {
     public Visible getExtensionPrototypeVisibility() {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
+        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
         // </HACK>
         return extensionPrototype.getComponent(Visibility.class).getVisibile();
     }

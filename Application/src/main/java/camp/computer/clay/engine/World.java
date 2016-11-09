@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.manager.EntityManager;
 import camp.computer.clay.engine.system.ImageSystem;
+import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -27,6 +29,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.util.BuilderImage.BuilderImage;
 import camp.computer.clay.util.BuilderImage.Circle;
 import camp.computer.clay.util.BuilderImage.Point;
@@ -43,6 +46,11 @@ public class World {
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
+
+    // <MANAGERS>
+//    public static EntityManager Manager = new EntityManager();
+    public EntityManager Manager = new EntityManager();
+    // </MANAGERS>
 
     // <WORLD_SYSTEMS>
     public CameraSystem cameraSystem = new CameraSystem(this);
@@ -64,6 +72,8 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
+//        Manager = new EntityManager();
+
 //        this.pathPrototype = createPrototypePathEntity();
 //        this.extensionPrototype = createPrototypeExtensionEntity();
         createPrototypePathEntity();
@@ -79,27 +89,34 @@ public class World {
     // </TODO: DELETE>
 
 
-    public static Entity createEntity(Class<?> entityType) {
+    // TODO: Make non-static, or static that also takes World
+    public Entity createEntity(Class<?> entityType) {
+
+        Entity entity = null;
+
         if (entityType == Host.class) { // HACK (because Host is a Component)
-            return createHostEntity();
+            entity = createHostEntity();
         } else if (entityType == Extension.class) { // HACK (because Extension is a Component)
-            return createExtensionEntity();
+            entity = createExtensionEntity();
         } else if (entityType == Path.class) {
-            return createPathEntity();
+            entity = createPathEntity();
         } else if (entityType == Port.class) { // HACK (because Extension is a Component)
-            return createPortEntity();
+            entity = createPortEntity();
         } else if (entityType == Camera.class) {
-            return createCameraEntity();
-        } else {
-            return null;
+            entity = createCameraEntity();
         }
+
+        // Add Entity to Manager
+        Manager.add(entity);
+
+        return entity;
     }
 
     /**
      * Adds a <em>virtual</em> {@code HostEntity} that can be configured and later assigned to a physical
      * host.
      */
-    private static Entity createHostEntity() {
+    private Entity createHostEntity() {
 
         // Create Entity
         Entity host = new Entity();
@@ -116,7 +133,7 @@ public class World {
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
 
-            Entity port = World.createEntity(Port.class);
+            Entity port = createEntity(Port.class);
 
             port.getComponent(Label.class).setLabel("Port " + (j + 1));
             port.getComponent(Port.class).setIndex(j);
@@ -193,7 +210,7 @@ public class World {
         return host;
     }
 
-    private static Entity createExtensionEntity() {
+    private Entity createExtensionEntity() {
 
         // Create Entity
         Entity extension = new Entity();
@@ -207,7 +224,7 @@ public class World {
         int defaultPortCount = 1;
         for (int j = 0; j < defaultPortCount; j++) {
 
-            Entity port = World.createEntity(Port.class);
+            Entity port = createEntity(Port.class);
 
             port.getComponent(Port.class).setIndex(j);
             extension.getComponent(Portable.class).addPort(port);
@@ -262,7 +279,7 @@ public class World {
         return extension;
     }
 
-    private static Entity createPathEntity() {
+    private Entity createPathEntity() {
         Entity path = new Entity();
 
         // Add Path Component (for type identification)
@@ -307,7 +324,7 @@ public class World {
         return path;
     }
 
-    private static Entity createPortEntity() {
+    private Entity createPortEntity() {
 
         Entity port = new Entity();
 
@@ -337,7 +354,7 @@ public class World {
 
     }
 
-    private static Entity createCameraEntity() {
+    private Entity createCameraEntity() {
 
         Entity camera = new Entity();
 
@@ -379,6 +396,11 @@ public class World {
 
         prototypeExtension.addComponent(new Boundary());
 
+        // <HACK>
+        // TODO: Add to common createEntity method.
+        Manager.add(prototypeExtension);
+        // <HACK>
+
         return prototypeExtension;
     }
 
@@ -410,8 +432,72 @@ public class World {
 
         prototypePath.addComponent(new Boundary());
 
+        // <HACK>
+        // TODO: Add to common createEntity method.
+        Manager.add(prototypePath);
+        // <HACK>
+
         return prototypePath;
     }
+
+
+
+    // <EXTENSION_IMAGE_HELPERS>
+    // TODO: Come up with better way to determine if the Extension already exists in the database.
+    // TODO: Make more general for all Portables.
+    public void configureExtensionFromProfile(Entity extension, Configuration configuration) {
+
+        // Create Ports to match the Configuration
+        for (int i = 0; i < configuration.getPorts().size(); i++) {
+
+            Entity port = createEntity(Port.class);
+
+            port.getComponent(Port.class).setIndex(i);
+            port.getComponent(Port.class).setType(configuration.getPorts().get(i).getType());
+            port.getComponent(Port.class).setDirection(configuration.getPorts().get(i).getDirection());
+
+            extension.getComponent(Portable.class).addPort(port);
+        }
+
+        // Set persistent to indicate the Extension is stored in a remote database
+        // TODO: Replace with something more useful, like the URI or UUID of stored object in database
+        extension.getComponent(Extension.class).setPersistent(true);
+    }
+
+    // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
+    public void createExtensionProfile(final Entity extension) {
+        if (!extension.getComponent(Extension.class).isPersistent()) {
+
+            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Configuration)
+            Application.getView().getNativeUi().promptInputText(new NativeUi.OnActionListener<String>() {
+                @Override
+                public void onComplete(String text) {
+
+                    // Create Extension Configuration
+                    Configuration configuration = new Configuration(extension);
+                    configuration.setLabel(text);
+
+                    // Assign the Configuration to the ExtensionEntity
+                    configureExtensionFromProfile(extension, configuration);
+
+                    // Cache the new ExtensionEntity Configuration
+                    Application.getView().getClay().getConfigurations().add(configuration);
+
+                    // TODO: Persist the configuration in the user's private store (either local or online)
+
+                    // TODO: Persist the configuration in the global store online
+                }
+            });
+        } else {
+            Application.getView().getNativeUi().promptAcknowledgment(new NativeUi.OnActionListener() {
+                @Override
+                public void onComplete(Object result) {
+
+                }
+            });
+        }
+    }
+    // </EXTENSION_IMAGE_HELPERS>
 
     public void updateSystems(Canvas canvas) {
 //        world.inputSystem.update();
@@ -428,7 +514,7 @@ public class World {
      */
     public void updateLayers() {
 
-        Group<Image> images = Entity.Manager.getImages();
+        Group<Image> images = Manager.getEntities().getImages();
 
         for (int i = 0; i < images.size() - 1; i++) {
             for (int j = i + 1; j < images.size(); j++) {

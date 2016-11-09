@@ -79,63 +79,6 @@ public class Clay {
         // </HACK>
     }
 
-    // <EXTENSION_IMAGE_HELPERS>
-    // TODO: Come up with better way to determine if the Extension already exists in the database.
-    // TODO: Make more general for all Portables.
-    public static void configureFromProfile(Entity extension, Configuration configuration) {
-
-        // Create Ports to match the Configuration
-        for (int i = 0; i < configuration.getPorts().size(); i++) {
-
-            Entity port = World.createEntity(Port.class);
-
-            port.getComponent(Port.class).setIndex(i);
-            port.getComponent(Port.class).setType(configuration.getPorts().get(i).getType());
-            port.getComponent(Port.class).setDirection(configuration.getPorts().get(i).getDirection());
-
-            extension.getComponent(Portable.class).addPort(port);
-        }
-
-        // Set persistent to indicate the Extension is stored in a remote database
-        // TODO: Replace with something more useful, like the URI or UUID of stored object in database
-        extension.getComponent(Extension.class).setPersistent(true);
-    }
-
-    // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    public static void createExtensionProfile(final Entity extension) {
-        if (!extension.getComponent(Extension.class).isPersistent()) {
-
-            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Configuration)
-            Application.getView().getNativeUi().promptInputText(new NativeUi.OnActionListener<String>() {
-                @Override
-                public void onComplete(String text) {
-
-                    // Create Extension Configuration
-                    Configuration configuration = new Configuration(extension);
-                    configuration.setLabel(text);
-
-                    // Assign the Configuration to the ExtensionEntity
-                    Clay.configureFromProfile(extension, configuration);
-
-                    // Cache the new ExtensionEntity Configuration
-                    Application.getView().getClay().getConfigurations().add(configuration);
-
-                    // TODO: Persist the configuration in the user's private store (either local or online)
-
-                    // TODO: Persist the configuration in the global store online
-                }
-            });
-        } else {
-            Application.getView().getNativeUi().promptAcknowledgment(new NativeUi.OnActionListener() {
-                @Override
-                public void onComplete(Object result) {
-
-                }
-            });
-        }
-    }
-    // </EXTENSION_IMAGE_HELPERS>
-
     public void addHost(MessengerInterface messageManager) {
         this.messenger.addHost(messageManager);
     }
@@ -207,7 +150,7 @@ public class Clay {
             return null;
         }
 
-        World.createEntity(Host.class);
+        world.createEntity(Host.class);
 
         return null;
     }

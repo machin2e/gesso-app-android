@@ -1,6 +1,7 @@
 package camp.computer.clay.engine.component;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 
 public class Port extends Component {
@@ -77,7 +78,7 @@ public class Port extends Component {
     }
 
     public boolean hasPath() {
-        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        Group<Entity> paths = World.getWorld().Manager.getEntities().filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
             if (path.getComponent(Path.class).contains(getEntity())) {
@@ -95,7 +96,7 @@ public class Port extends Component {
      */
     public Group<Entity> getPaths() {
 
-        Group<Entity> paths = Entity.Manager.filterWithComponent(Path.class);
+        Group<Entity> paths = World.getWorld().Manager.getEntities().filterWithComponent(Path.class);
 
         // TODO: Make into Filter
         Group<Entity> portPaths = new Group<>();

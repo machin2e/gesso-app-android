@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -422,6 +423,13 @@ public class Application extends FragmentActivity implements PlatformInterface {
 //        new Thread(
 //                new RedisSubThread(this.jedis)
 //        ).start();
+        // </REDIS>
+
+
+
+        // <REDIS>
+//        RedisDBThread redisDB = new RedisDBThread();
+//        redisDB.start();
         // </REDIS>
 
 //        openFile("Host.json");
@@ -968,4 +976,14 @@ public class Application extends FragmentActivity implements PlatformInterface {
     public OrientationInput getOrientationInput() {
         return this.orientationInput;
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+            Log.v("Application", "ENTER");
+            // TODO: Open "hidden" settings options!
+            return true;
+        }
+        return super.dispatchKeyEvent(keyEvent);
+    };
 }

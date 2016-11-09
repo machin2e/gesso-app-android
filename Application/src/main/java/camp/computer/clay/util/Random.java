@@ -2,7 +2,7 @@ package camp.computer.clay.util;
 
 import java.security.SecureRandom;
 
-public abstract class Probability {
+public abstract class Random {
 
     // TODO: Interface to host's cryptographically strong random index generator adhering to
     // TODO: (cont'd) [RFC 1750](http://www.ietf.org/rfc/rfc1750.txt) and tests in
@@ -10,11 +10,11 @@ public abstract class Probability {
     private static SecureRandom randomGenerator = new SecureRandom();
 
     public static SecureRandom getRandomGenerator() {
-        return Probability.randomGenerator;
+        return Random.randomGenerator;
     }
 
     public static int generateRandomInteger(int minimum, int maximum) {
-        return (minimum + Probability.randomGenerator.nextInt(maximum - minimum));
+        return (minimum + Random.randomGenerator.nextInt(maximum - minimum));
     }
 
     public static int getRandomInteger(int... integers) {

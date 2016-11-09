@@ -66,14 +66,14 @@ public class EventHandlerSystem extends System {
 
         // Annotate the Event
 //        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
-        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterWithComponent(Image.class).sortByLayer().filterContains(event.getPosition());
+        Group<Entity> targetEntities = world.Manager.getEntities().filterVisibility(true).filterWithComponent(Image.class).sortByLayer().filterContains(event.getPosition());
         Entity targetEntity = null;
         if (targetEntities.size() > 0) {
             //targetEntity = targetEntities.get(0);
             targetEntity = targetEntities.get(targetEntities.size() - 1);
             Log.v("handlePathEvent", "targetEntities.size: " + targetEntities.size());
         } else {
-            Group<Entity> cameras = Entity.Manager.filterWithComponent(Camera.class);
+            Group<Entity> cameras = world.Manager.getEntities().filterWithComponent(Camera.class);
             targetEntity = cameras.get(0);
         }
         event.setTarget(targetEntity);
@@ -128,7 +128,7 @@ public class EventHandlerSystem extends System {
     // TODO: Make World an Entity?
     public void handleCameraEvent(final Entity workspace, Event event) {
 
-        Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -174,7 +174,7 @@ public class EventHandlerSystem extends System {
 
     public void handleHostEvent(final Entity host, final Event event) {
 
-        final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        final Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -194,7 +194,7 @@ public class EventHandlerSystem extends System {
             host.getComponent(Portable.class).getPaths().setVisibility(Visible.INVISIBLE);
 
 //            world.setExtensionPrototypeVisibility2(Visible.VISIBLE);
-            Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+            Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
             extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
 
 //            } else if (action.isHolding()) {
@@ -283,11 +283,11 @@ public class EventHandlerSystem extends System {
 
             // Check if connecting to a Extension
 //            if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
-            Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
+            Entity prototypeExtension = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
             if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
 //                world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
                 // Get cached extension configurations (and retrieve additional from Internet store)
@@ -330,7 +330,7 @@ public class EventHandlerSystem extends System {
 
         } else if (event.getType() == Event.Type.HOLD) {
 
-            Clay.createExtensionProfile(extension);
+            world.createExtensionProfile(extension);
 
         } else if (event.getType() == Event.Type.MOVE) {
 
@@ -380,7 +380,7 @@ public class EventHandlerSystem extends System {
             world.setTitleVisibility(Visible.VISIBLE);
 
             // Camera
-            Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+            Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
 //            camera.getComponent(Camera.class).setFocus(extension);
             world.cameraSystem.setFocus(camera, extension);
         }
@@ -392,7 +392,7 @@ public class EventHandlerSystem extends System {
 
         Log.v("EventHandlerSystem", "handlePortEvent");
 
-        final Entity camera = Entity.Manager.filterWithComponent(Camera.class).get(0);
+        final Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -444,7 +444,7 @@ public class EventHandlerSystem extends System {
         boolean isSingletonPath = path.getComponent(Path.class).getTarget() == null;
 
         // Check if source or target in Path was moved, and reassign it
-        Group<Entity> touchedPorts = Entity.Manager.filterWithComponent(Port.class).filterContains(event.getPosition());
+        Group<Entity> touchedPorts = world.Manager.getEntities().filterWithComponent(Port.class).filterContains(event.getPosition());
 
         Entity touchedPort = null;
         boolean isSourceTouched = false;
@@ -520,7 +520,7 @@ public class EventHandlerSystem extends System {
                 boolean isCreateExtensionAction = true; // TODO: Convert into Event to send to World?
 
                 // <HACK>
-                Group<Entity> extensions = Entity.Manager.filterWithComponent(Extension.class);
+                Group<Entity> extensions = world.Manager.getEntities().filterWithComponent(Extension.class);
 
                 for (int i = 0; i < extensions.size(); i++) {
 
@@ -541,14 +541,14 @@ public class EventHandlerSystem extends System {
                 // Update position of prototype Path and Extension
                 if (isCreateExtensionAction) {
 //                world.setExtensionPrototypeVisibility2(Visible.VISIBLE);
-                    Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
                     // TODO: world.setPathPrototypeSourcePosition(action.getFirstEvent().getTarget().getComponent(Transform.class));
                     world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Source Port").getPosition());
                     world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
                 } else {
 //                world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                    Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
                 }
 
@@ -581,7 +581,7 @@ public class EventHandlerSystem extends System {
 
                             // Add new Port to the Extension (if determined necessary)
                             if (addNewPort) {
-                                Entity newPort = World.createEntity(Port.class);
+                                Entity newPort = world.createEntity(Port.class);
 
                                 // <HACK>
                                 newPort.addComponent(new RelativeLayoutConstraint());
@@ -629,7 +629,7 @@ public class EventHandlerSystem extends System {
 
                 } else if (path.getComponent(Path.class).state == Path.State.EDITING) {
 
-                    Group<Entity> touchedPorts2 = Entity.Manager.filterWithComponent(Port.class).filterContains(event.getPosition());
+                    Group<Entity> touchedPorts2 = world.Manager.getEntities().filterWithComponent(Port.class).filterContains(event.getPosition());
 
                     // Moved the Path to another Port
                     if (touchedPorts2.size() > 0) {
@@ -706,7 +706,7 @@ public class EventHandlerSystem extends System {
 
                         // Remove the Path (and the Extension if the removed Path was the only one)
                         path.isActive = false;
-                        Entity.Manager.remove(path);
+                        world.Manager.getEntities().remove(path);
 
 //                    Group<Entity> extensionPorts1 = extension.getComponent(Portable.class).getPorts();
 //                    extensionPorts1.remove(extensionPort); // Remove from Portable
@@ -741,11 +741,11 @@ public class EventHandlerSystem extends System {
 //                        for (int i = 0; i < extensionPorts.size(); i++) {
                             while (extensionPorts.size() > 0) {
                                 Entity extensionPort = extensionPorts.get(0);
-                                Entity.Manager.remove(extensionPort);
+                                world.Manager.getEntities().remove(extensionPort);
                                 extensionPorts.remove(extensionPort); // Remove from Portable
                             }
 
-                            Entity.Manager.remove(extension);
+                            world.Manager.getEntities().remove(extension);
 
                             // Notification
                             World.getWorld().renderSystem.addNotification("removed extension", extension.getComponent(Transform.class), 1000);
@@ -775,7 +775,7 @@ public class EventHandlerSystem extends System {
 
                 // If prototype Extension is visible, create Extension
 //                if (world.getExtensionPrototypeVisibility2() == Visible.VISIBLE) {
-                Entity prototypeExtension = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                Entity prototypeExtension = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                 if (prototypeExtension.getComponent(Visibility.class).getVisibile() == Visible.VISIBLE) {
 
                     Log.v("EventHandlerSystem", "creating extension");
@@ -783,7 +783,7 @@ public class EventHandlerSystem extends System {
 //                    // Hide prototype Path and prototype Extension
 //                    world.setPathPrototypeVisibility(Visible.INVISIBLE);
 //                    world.setExtensionPrototypeVisibility2(Visible.INVISIBLE);
-                    Entity extensionPrototype = Entity.Manager.filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                    Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
 //                    Entity hostPort = event.getFirstEvent().getTarget();
@@ -861,12 +861,14 @@ public class EventHandlerSystem extends System {
 
                             // Combine the Paths into one, deleting one of them!
                             // TODO: Delete path on target
+                            // <CLEANUP_ENTITY_DELETE_CODE>
                             event.getTarget().isActive = false;
                             event.getTarget().getComponent(Path.class).state = Path.State.EDITING;
                             Entity tempSourcePort = event.getTarget().getComponent(Path.class).getSource();
                             event.getTarget().getComponent(Path.class).setSource(null); // Reset path
                             event.getTarget().getComponent(Path.class).setTarget(null); // Reset path
-                            Entity.Manager.remove(event.getTarget()); // Delete path!
+                            world.Manager.getEntities().remove(event.getTarget()); // Delete path!
+                            // </CLEANUP_ENTITY_DELETE_CODE>
 
                             // Update the Path from the source Port
                             Entity targetPort = tempSourcePort; // new target is source port from other path

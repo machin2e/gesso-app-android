@@ -17,6 +17,8 @@ import camp.computer.clay.platform.communication.TCPMessageClientHost;
 
 public class PhoneHost {
 
+    // TODO: Rename to "Platform"
+
     private Clay clay = null;
 
     private UUID uuid = null; // The unit's static, unchanging, UUID

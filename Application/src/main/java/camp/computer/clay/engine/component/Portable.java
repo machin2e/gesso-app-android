@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.BuilderImage.Point;
 
@@ -65,7 +66,7 @@ public class Portable extends Component {
     // Expects Extension
     private Group<Entity> getHosts(Entity extension) {
 
-        List<Entity> hostEntities = Entity.Manager.filterWithComponent(Host.class);
+        List<Entity> hostEntities = World.getWorld().Manager.getEntities().filterWithComponent(Host.class);
 
         Group<Entity> hostEntityGroup = new Group<>();
         for (int i = 0; i < hostEntities.size(); i++) {
