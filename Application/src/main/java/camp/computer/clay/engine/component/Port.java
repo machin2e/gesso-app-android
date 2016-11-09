@@ -53,7 +53,7 @@ public class Port extends Component {
 
 
 
-    // <ABSTRACT_HELPER_INTERFACE>
+    // <ABSTRACT_ENTITY_INTERFACE>
     public static int getIndex(Entity port) {
         return port.getComponent(Port.class).index;
     }
@@ -84,7 +84,7 @@ public class Port extends Component {
         Group<Entity> paths = World.getWorld().Manager.getEntities().filterWithComponent(Path.class);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
-            if (path.getComponent(Path.class).contains(port)) {
+            if (Path.contains(path, port)) {
                 return true;
             }
         }
@@ -105,7 +105,7 @@ public class Port extends Component {
         Group<Entity> portPaths = new Group<>();
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
-            if (path.getComponent(Path.class).contains(port)) {
+            if (Path.contains(path, port)) {
                 portPaths.add(path);
             }
         }
@@ -117,17 +117,16 @@ public class Port extends Component {
         Group<Entity> paths = Port.getPaths(port);
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
-            Path pathComponent = path.getComponent(Path.class);
-            if (pathComponent.getSource() == port || pathComponent.getTarget() == port) {
-                if (pathComponent.getSource().getParent().hasComponent(Extension.class)) {
-                    return pathComponent.getSource().getParent();
-                } else if (pathComponent.getTarget() != null && pathComponent.getTarget().getParent().hasComponent(Extension.class)) {
-                    return pathComponent.getTarget().getParent();
+            if (Path.getSource(path) == port || Path.getTarget(path) == port) {
+                if (Path.getSource(path).getParent().hasComponent(Extension.class)) {
+                    return Path.getSource(path).getParent();
+                } else if (Path.getTarget(path) != null && Path.getTarget(path).getParent().hasComponent(Extension.class)) {
+                    return Path.getTarget(path).getParent();
                 }
             }
         }
         return null;
     }
     // </HACK>
-    // </ABSTRACT_HELPER_INTERFACE>
+    // </ABSTRACT_ENTITY_INTERFACE>
 }

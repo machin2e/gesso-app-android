@@ -277,12 +277,12 @@ public class CameraSystem extends System {
                 Group<Entity> portPaths = Port.getPaths(port);
                 for (int j = 0; j < portPaths.size(); j++) {
                     Entity path = portPaths.get(j);
-                    if (!hostPathPorts.contains(path.getComponent(Path.class).getSource())) {
-                        hostPathPorts.add(path.getComponent(Path.class).getSource());
+                    if (!hostPathPorts.contains(Path.getSource(path))) {
+                        hostPathPorts.add(Path.getSource(path));
                     }
-                    if (path.getComponent(Path.class).getTarget() != null // HACK: for case when singleton Path has no Target Port
-                            && !hostPathPorts.contains(path.getComponent(Path.class).getTarget())) {
-                        hostPathPorts.add(path.getComponent(Path.class).getTarget());
+                    if (Path.getTarget(path) != null // HACK: for case when singleton Path has no Target Port
+                            && !hostPathPorts.contains(Path.getTarget(path))) {
+                        hostPathPorts.add(Path.getTarget(path));
                     }
                 }
             }
@@ -318,11 +318,11 @@ public class CameraSystem extends System {
                 Group<Entity> portPaths = Port.getPaths(port);
                 for (int j = 0; j < portPaths.size(); j++) {
                     Entity path = portPaths.get(j);
-                    if (!hostPathPorts.contains(path.getComponent(Path.class).getSource())) {
-                        hostPathPorts.add(path.getComponent(Path.class).getSource());
+                    if (!hostPathPorts.contains(Path.getSource(path))) {
+                        hostPathPorts.add(Path.getSource(path));
                     }
-                    if (!hostPathPorts.contains(path.getComponent(Path.class).getTarget())) {
-                        hostPathPorts.add(path.getComponent(Path.class).getTarget());
+                    if (!hostPathPorts.contains(Path.getTarget(path))) {
+                        hostPathPorts.add(Path.getTarget(path));
                     }
                 }
             }

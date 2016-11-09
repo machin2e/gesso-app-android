@@ -39,10 +39,10 @@ public class PortableLayoutSystem extends System {
         for (int i = 0; i < paths.size(); i++) {
             Entity path = paths.get(i);
 
-            Entity sourcePort = path.getComponent(Path.class).getSource();
-            Entity targetPort = path.getComponent(Path.class).getTarget();
+            Entity sourcePort = Path.getSource(path);
+            Entity targetPort = Path.getTarget(path);
 
-            Path.Type pathType = path.getComponent(Path.class).getType();
+            Path.Type pathType = Path.getType(path);
             if (pathType == Path.Type.NONE) {
                 Port.setType(sourcePort, Port.Type.NONE);
             } else if (pathType == Path.Type.SWITCH) {
@@ -91,7 +91,7 @@ public class PortableLayoutSystem extends System {
             boolean isPortInPath = false;
             for (int j = 0; j < paths.size(); j++) {
                 Entity path = paths.get(j);
-                if (path.getComponent(Path.class).contains(port)) {
+                if (Path.contains(path, port)) {
                     isPortInPath = true;
                     break;
                 }
@@ -154,11 +154,11 @@ public class PortableLayoutSystem extends System {
         // TODO: (...) existing Path's Port dependencies.
         if (!Port.hasPath(hostPort)) {
             Entity path = world.createEntity(Path.class);
-            path.getComponent(Path.class).set(hostPort, extensionPort);
+            Path.set(path, hostPort, extensionPort);
         } else {
             Entity path = Port.getPaths(hostPort).get(0);
-            path.getComponent(Path.class).set(hostPort, extensionPort);
-            path.getComponent(Path.class).setTarget(extensionPort);
+            Path.set(path, hostPort, extensionPort);
+            Path.setTarget(path, extensionPort);
         }
 
         return extension;
@@ -213,9 +213,9 @@ public class PortableLayoutSystem extends System {
 
             // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
             Entity path = world.createEntity(Path.class);
-            path.getComponent(Path.class).set(selectedHostPort, ports.get(i));
+            Path.set(path, selectedHostPort, ports.get(i));
 
-            path.getComponent(Path.class).setMode(Path.Mode.ELECTRONIC);
+            Path.setMode(path, Path.Mode.ELECTRONIC);
         }
 
         return true;
@@ -269,7 +269,7 @@ public class PortableLayoutSystem extends System {
                 continue;
             }
 
-            Entity hostPort = Port.getPaths(extensionPort).get(0).getComponent(Path.class).getHostPort(); // HACK: Using hard-coded index 0.
+            Entity hostPort = Path.getHostPort(Port.getPaths(extensionPort).get(0)); // HACK: Using hard-coded index 0.
             Transform hostPortPosition = hostPort.getComponent(Image.class).getImage().getShape("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment

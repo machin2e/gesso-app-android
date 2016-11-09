@@ -97,52 +97,43 @@ public class Path extends Component {
         // TODO: PathEntity.connectPath(sourcePortUuid, destination) and do what the following constructor does... auto-configure Ports and PathEntity
     }
 
-    public Type getType() {
-        return this.type;
+    // <ABSTRACT_ENTITY_INTERFACE>
+    public static Type getType(Entity path) {
+        return path.getComponent(Path.class).type;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public static void setType(Entity path, Type type) {
+        path.getComponent(Path.class).type = type;
     }
 
-//    public void setMode(Port.Type type) {
-//        // Update type of Ports in PathEntity (BUT NOT DIRECTION)
-//        // <FILTER>
-//        // TODO: Make PathEntity.Filter
-//        Group<Entity> ports = getPorts();
-//        for (int i = 0; i < ports.size(); i++) {
-//            Entity portEntity = ports.get(i);
-//            portEntity.getComponent(Port.class).setType(type);
-//        }
-//        // </FILTER>
-//    }
-
-    public Mode getMode() {
-        return this.mode;
+    public static Mode getMode(Entity path) {
+        return path.getComponent(Path.class).mode;
     }
 
-    public void setMode(Mode mode) {
-        this.mode = mode;
+    public static void setMode(Entity path, Mode mode) {
+        path.getComponent(Path.class).mode = mode;
     }
 
-    public Direction getDirection() {
-        return this.direction;
+    public static Direction getDirection(Entity path) {
+        return path.getComponent(Path.class).direction;
     }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    public static void setDirection(Entity path, Direction direction) {
+        path.getComponent(Path.class).direction = direction;
     }
 
-    public void set(Entity sourcePort, Entity targetPort) {
+    public static void set(Entity path, Entity sourcePort, Entity targetPort) {
 
-        this.mode = Mode.ELECTRONIC; // Default to ELECTRONIC
-        if (this.type == Type.NONE) {
-            this.type = Type.getNext(this.type);
+        Path pathComponent = path.getComponent(Path.class);
+
+        pathComponent.mode = Mode.ELECTRONIC; // Default to ELECTRONIC
+        if (pathComponent.type == Type.NONE) {
+            pathComponent.type = Type.getNext(pathComponent.type);
         }
-        this.direction = Direction.BOTH; // Default to BOTH
+        pathComponent.direction = Direction.BOTH; // Default to BOTH
 
-        this.sourcePortUuid = sourcePort.getUuid();
-        this.targetPortUuid = targetPort.getUuid();
+        pathComponent.sourcePortUuid = sourcePort.getUuid();
+        pathComponent.targetPortUuid = targetPort.getUuid();
 
         // Update sourcePortUuid PortEntity configuration
         if (Port.getDirection(sourcePort) == Port.Direction.NONE) {
@@ -161,73 +152,78 @@ public class Path extends Component {
         }
     }
 
-    public void setSource(Entity source) {
+    public static void setSource(Entity path, Entity source) {
+        Path pathComponent = path.getComponent(Path.class);
         if (source == null) {
-            this.sourcePortUuid = null;
+            pathComponent.sourcePortUuid = null;
         } else {
-            this.sourcePortUuid = source.getUuid();
+            pathComponent.sourcePortUuid = source.getUuid();
         }
     }
 
-    public Entity getSource() {
+    public static Entity getSource(Entity path) {
+        UUID sourcePortUuid = path.getComponent(Path.class).sourcePortUuid;
         return World.getWorld().Manager.getEntities().get(sourcePortUuid);
     }
 
-    public void setTarget(Entity target) {
+    public static void setTarget(Entity path, Entity target) {
         if (target == null) {
-            this.targetPortUuid = null;
+            path.getComponent(Path.class).targetPortUuid = null;
         } else {
-            this.targetPortUuid = target.getUuid();
+            path.getComponent(Path.class).targetPortUuid = target.getUuid();
         }
     }
 
-    public Entity getTarget() {
+    public static Entity getTarget(Entity path) {
+        UUID targetPortUuid = path.getComponent(Path.class).targetPortUuid;
         return World.getWorld().Manager.getEntities().get(targetPortUuid);
     }
 
-    public Group<Entity> getPorts() {
+    public static Group<Entity> getPorts(Entity path) {
         Group<Entity> ports = new Group<>();
-        if (getSource() != null) {
-            ports.add(getSource());
+        if (getSource(path) != null) {
+            ports.add(getSource(path));
         }
-        if (getTarget() != null) {
-            ports.add(getTarget());
+        if (getTarget(path) != null) {
+            ports.add(getTarget(path));
         }
         return ports;
     }
 
-    public Entity getHost() {
-        if (getSource().getParent().hasComponent(Host.class)) {
-            return getSource().getParent();
-        } else if (getTarget().getParent().hasComponent(Host.class)) {
-            return getTarget().getParent();
+    public static Entity getHost(Entity path) {
+        if (getSource(path).getParent().hasComponent(Host.class)) {
+            return getSource(path).getParent();
+        } else if (getTarget(path).getParent().hasComponent(Host.class)) {
+            return getTarget(path).getParent();
         }
         return null;
     }
 
-    public Entity getExtension() {
-        if (getSource().getParent().hasComponent(Extension.class)) {
-            return getSource().getParent();
-        } else if (getTarget().getParent().hasComponent(Extension.class)) {
-            return getTarget().getParent();
+    public static Entity getExtension(Entity path) {
+        if (getSource(path).getParent().hasComponent(Extension.class)) {
+            return getSource(path).getParent();
+        } else if (getTarget(path).getParent().hasComponent(Extension.class)) {
+            return getTarget(path).getParent();
         }
         return null;
     }
 
-    public Entity getHostPort() {
-        if (getSource().getParent().hasComponent(Host.class)) {
-            return getSource();
-        } else if (getTarget().getParent().hasComponent(Host.class)) {
-            return getTarget();
+    public static Entity getHostPort(Entity path) {
+        if (getSource(path).getParent().hasComponent(Host.class)) {
+            return getSource(path);
+        } else if (getTarget(path).getParent().hasComponent(Host.class)) {
+            return getTarget(path);
         }
         return null;
     }
 
-    public boolean contains(Entity port) {
-        if (this.sourcePortUuid == port.getUuid() || this.targetPortUuid == port.getUuid()) {
+    public static boolean contains(Entity path, Entity port) {
+        Path pathComponent = path.getComponent(Path.class);
+        if (pathComponent.sourcePortUuid == port.getUuid() || pathComponent.targetPortUuid == port.getUuid()) {
             return true;
         } else {
             return false;
         }
     }
+    // </ABSTRACT_ENTITY_INTERFACE>
 }

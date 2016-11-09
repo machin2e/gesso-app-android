@@ -427,11 +427,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        Shape sourcePortShape = path.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
 //        Shape targetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
 
-        Shape hostSourcePortShape = path.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
+        Shape hostSourcePortShape = Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
         Shape extensionTargetPortShape = null;
 
-        if (path.getComponent(Path.class).getTarget() != null) {
-            extensionTargetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
+        if (Path.getTarget(path) != null) {
+            extensionTargetPortShape = Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
 
             Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
             Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
@@ -472,7 +472,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
             // Update color of Port shape based on its type
-            Path.Type pathType = path.getComponent(Path.class).getType();
+            Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
 //        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
 //        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
@@ -556,7 +556,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
             // Update color of Port shape based on its type
-            Path.Type pathType = path.getComponent(Path.class).getType();
+            Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
 //        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
 //        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
@@ -606,8 +606,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public void drawOverviewPath(Entity path, PlatformRenderSurface platformRenderSurface) {
 
         // Get Host and Extension Ports
-        Entity hostPort = path.getComponent(Path.class).getSource();
-        Entity extensionPort = path.getComponent(Path.class).getTarget();
+        Entity hostPort = Path.getSource(path);
+        Entity extensionPort = Path.getTarget(path);
 
         if (extensionPort == null) {
 

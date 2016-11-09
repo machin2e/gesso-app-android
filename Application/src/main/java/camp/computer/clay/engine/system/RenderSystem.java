@@ -156,7 +156,7 @@ public class RenderSystem extends System {
                     */
                 } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
                     Entity pathEntity = entity; // image.getPath();
-                    if (pathEntity.getComponent(Path.class).getMode() == Path.Mode.ELECTRONIC) {
+                    if (Path.getMode(pathEntity) == Path.Mode.ELECTRONIC) {
                         platformRenderSurface.drawOverviewPath(pathEntity, platformRenderSurface);
                     }
                 }
