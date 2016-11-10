@@ -31,6 +31,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.platform.graphics.Palette;
 import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.util.BuilderImage.BuilderImage;
 import camp.computer.clay.util.BuilderImage.Circle;
@@ -531,7 +532,7 @@ public class World {
     public long renderTime = 0L;
     public long lookupCount = 0L;
 
-    public void updateSystems(Canvas canvas) {
+    public void updateSystems(Palette palette) {
 
 //        lookupCount = 0;
 
@@ -546,7 +547,7 @@ public class World {
 //        updateTime = Clock.getCurrentTime() - updateStartTime;
 
         long renderStartTime = Clock.getCurrentTime();
-        world.renderSystem.update(canvas); // TODO: Remove canvas!
+        world.renderSystem.update(palette); // TODO: Remove canvas!
         renderTime = Clock.getCurrentTime() - renderStartTime;
 //        world.inputSystem.update();
         updateTime = Clock.getCurrentTime() - updateStartTime;

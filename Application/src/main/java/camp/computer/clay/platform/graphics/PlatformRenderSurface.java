@@ -54,6 +54,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     public Matrix identityMatrix;
 
+    public Palette palette = new Palette();
+
     // World PlatformRenderClock
     private SurfaceHolder surfaceHolder;
 
@@ -68,14 +70,23 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public PlatformRenderSurface(Context context) {
         super(context);
         setFocusable(true);
+
+        palette.canvas = canvas;
+        palette.paint = paint;
     }
 
     public PlatformRenderSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        palette.canvas = canvas;
+        palette.paint = paint;
     }
 
     public PlatformRenderSurface(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        palette.canvas = canvas;
+        palette.paint = paint;
     }
 
     @Override
@@ -361,8 +372,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         try {
             canvas = holder.lockCanvas();
             if (canvas != null) {
+                palette.canvas = canvas;
                 synchronized (holder) {
-                    world.updateSystems(canvas);
+                    world.updateSystems(palette);
                 }
             }
         } finally {
@@ -392,42 +404,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         world.cameraSystem.setHeight(camera, screenHeight);
     }
 
-    // <PATH_IMAGE_HELPERS>
-    /*
-    private double triangleWidth = 20;
-    private double triangleHeight = triangleWidth * (Math.sqrt(3.0) / 2);
-    private double triangleSpacing = 35;
-
-    public void drawTrianglePath(Entity pathEntity, PlatformRenderSurface platformRenderSurface) {
-
-        Paint paint = platformRenderSurface.paint;
-
-        Shape sourcePortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getSource());
-        Shape targetPortShape = World.getWorld().getShape(pathEntity.getComponent(Path.class).getTarget());
-
-        // Show target port
-//        targetPortShape.setVisibility(Visible.VISIBLE);
-        //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
-
-        // Color
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(15.0f);
-        paint.setColor(Color.parseColor(sourcePortShape.getColor()));
-
-        double pathRotation = Geometry.getAngle(sourcePortShape.getPosition(), targetPortShape.getPosition());
-        Transform sourcePoint = Geometry.getRotateTranslatePoint(sourcePortShape.getPosition(), pathRotation, 2 * triangleSpacing);
-        Transform targetPoint = Geometry.getRotateTranslatePoint(targetPortShape.getPosition(), pathRotation + 180, 2 * triangleSpacing);
-
-        platformRenderSurface.drawTrianglePath(sourcePoint, targetPoint, triangleWidth, triangleHeight);
-    }
-    */
-
-    public void drawEditablePath(Entity path, PlatformRenderSurface platformRenderSurface) {
-
-        Paint paint = platformRenderSurface.paint;
-
-//        Shape sourcePortShape = path.getComponent(Path.class).getSource().getComponent(Image.class).getImage().getShape("Port");
-//        Shape targetPortShape = path.getComponent(Path.class).getTarget().getComponent(Image.class).getImage().getShape("Port");
+    public void drawEditablePath(Entity path, Palette palette) {
 
         Shape hostSourcePortShape = Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
         Shape extensionTargetPortShape = null;
@@ -448,8 +425,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             if (Path.getState(path) != Component.State.EDITING) {
                 sourcePortShape.setPosition(hostSourcePortShape.getPosition());
                 targetPortShape.setPosition(extensionTargetPortShape.getPosition());
-//        sourcePortShape.setPosition(path.getComponent(Path.class).getSource().getComponent(Transform.class));
-//        targetPortShape.setPosition(path.getComponent(Path.class).getTarget().getComponent(Transform.class));
             }
 
             // <HACK>
@@ -457,41 +432,26 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             BoundarySystem.updateShapeBoundary(targetPortShape);
             // </HACK>
 
-            // <HACK>
-            // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-//        world.imageSystem.invalidate(port.getComponent(Image.class));
-            // </HACK>
-
             // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
             // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
             Transform sourcePortPositition = sourcePortShape.getPosition();
             Transform targetPortPositition = targetPortShape.getPosition();
 
-//        if (sourcePortShape != null && targetPortShape != null) {
-
-            // Show target port
-//            targetPortShape.setVisibility(Visible.VISIBLE);
-            //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
-
             // Update color of Port shape based on its type
             Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-//        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
-//        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
             sourcePortShape.setColor(pathColor);
             targetPortShape.setColor(pathColor);
 
             // Color
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(15.0f);
+            palette.paint.setStyle(Paint.Style.STROKE);
+            palette.paint.setStrokeWidth(15.0f);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
-            paint.setColor(Color.parseColor(pathColor));
+            palette.paint.setColor(Color.parseColor(pathColor));
 
             double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
             Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
             Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
-
-//            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 //            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
@@ -504,17 +464,17 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             segment.setTarget(pathStopCoordinate);
 
             // Draw shapes in Path
-            platformRenderSurface.drawShape(segment);
-            platformRenderSurface.drawShape(sourcePortShape);
-            platformRenderSurface.drawShape(targetPortShape);
+            drawShape(segment, palette);
+            drawShape(sourcePortShape, palette);
+            drawShape(targetPortShape, palette);
 
             // Draw boundaries
-            paint.setStrokeWidth(3.0f);
-            paint.setStyle(Paint.Style.STROKE);
+            palette.paint.setStrokeWidth(3.0f);
+            palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
-            paint.setColor(Color.CYAN);
-            platformRenderSurface.drawPolygon(sourcePortShape.getBoundary());
-            platformRenderSurface.drawPolygon(targetPortShape.getBoundary());
+            palette.paint.setColor(Color.CYAN);
+            drawPolygon(sourcePortShape.getBoundary(), palette);
+            drawPolygon(targetPortShape.getBoundary(), palette);
 //        }
 
         } else {
@@ -568,10 +528,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             sourcePortShape.setColor(pathColor);
 
             // Color
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(15.0f);
+            palette.paint.setStyle(Paint.Style.STROKE);
+            palette.paint.setStrokeWidth(15.0f);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
-            paint.setColor(Color.parseColor(pathColor));
+            palette.paint.setColor(Color.parseColor(pathColor));
 
 //            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
 //            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
@@ -591,21 +551,21 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             // Draw shapes in Path
 //            platformRenderSurface.drawSegment(segment);
-            platformRenderSurface.drawShape(sourcePortShape);
+            drawShape(sourcePortShape, palette);
 //            platformRenderSurface.drawShape(targetPortShape);
 
             // Draw boundaries
-            paint.setStrokeWidth(3.0f);
-            paint.setStyle(Paint.Style.STROKE);
+            palette.paint.setStrokeWidth(3.0f);
+            palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
-            paint.setColor(Color.CYAN);
-            platformRenderSurface.drawPolygon(sourcePortShape.getBoundary());
+            palette.paint.setColor(Color.CYAN);
+            drawPolygon(sourcePortShape.getBoundary(), palette);
 //            platformRenderSurface.drawPolygon(targetPortShape.getBoundary());
 
         }
     }
 
-    public void drawOverviewPath(Entity path, PlatformRenderSurface platformRenderSurface) {
+    public void drawOverviewPath(Entity path, Palette palette) {
 
         // Get Host and Extension Ports
         Entity hostPort = Path.getSource(path);
@@ -633,8 +593,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortIndex).getPosition();
 
                 // Draw connection between Ports
-                platformRenderSurface.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
-                platformRenderSurface.paint.setStrokeWidth(10.0f);
+                palette.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
+                palette.paint.setStrokeWidth(10.0f);
 
                 // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
                 Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
@@ -644,7 +604,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 segment.setSource(hostConnectorPosition);
                 segment.setTarget(extensionConnectorPosition);
 
-                platformRenderSurface.drawSegment(segment);
+                drawSegment(segment, palette);
             }
         }
     }
@@ -652,198 +612,198 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     // TODO: Replace with more direct drawing? What's the minimal layering between image
     // TODO: (...) representation and platform-level rendering?
-    public void drawShape(Shape shape) {
+    public void drawShape(Shape shape, Palette palette) {
         if (shape.getClass() == Point.class) {
             // TODO:
         } else if (shape.getClass() == Segment.class) {
-            drawSegment((Segment) shape);
+            drawSegment((Segment) shape, palette);
         } else if (shape.getClass() == Polyline.class) {
-            drawPolyline((Polyline) shape);
+            drawPolyline((Polyline) shape, palette);
         } else if (shape.getClass() == Triangle.class) {
-            drawTriangle((Triangle) shape);
+            // TODO: drawTriangle((Triangle) shape);
         } else if (shape.getClass() == Rectangle.class) {
-            drawRectangle((Rectangle) shape);
+            drawRectangle((Rectangle) shape, palette);
         } else if (shape.getClass() == Polygon.class) {
-            drawPolygon((Polygon) shape);
+            drawPolygon((Polygon) shape, palette);
         } else if (shape.getClass() == Circle.class) {
-            drawCircle((Circle) shape);
+            drawCircle((Circle) shape, palette);
         } else if (shape.getClass() == Text.class) {
             // TODO:
         }
     }
 
-    public void drawSegment(Transform source, Transform target) {
+    public void drawSegment(Transform source, Transform target, Palette palette) {
         canvas.drawLine((float) source.x, (float) source.y, (float) target.x, (float) target.y, paint);
     }
 
-    public void drawSegment(Segment segment) {
+    public void drawSegment(Segment segment, Palette palette) {
 
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(segment.outlineColorCode);
-        paint.setStrokeWidth((float) segment.getOutlineThickness());
+        palette.paint.setStyle(Paint.Style.STROKE);
+        palette.paint.setColor(segment.outlineColorCode);
+        palette.paint.setStrokeWidth((float) segment.getOutlineThickness());
 
         // Color
-        canvas.drawLine((float) segment.getSource().x, (float) segment.getSource().y, (float) segment.getTarget().x, (float) segment.getTarget().y, paint);
+        palette.canvas.drawLine((float) segment.getSource().x, (float) segment.getSource().y, (float) segment.getTarget().x, (float) segment.getTarget().y, palette.paint);
     }
 
-    public void drawPolyline(Polyline polyline) {
-        drawPolyline(polyline.getPoints());
+    public void drawPolyline(Polyline polyline, Palette palette) {
+        drawPolyline(polyline.getPoints(), palette);
     }
 
     // TODO: Refactor with transforms
-    public void drawPolyline(List<Transform> vertices) {
+    public void drawPolyline(List<Transform> vertices, Palette palette) {
 
         for (int i = 0; i < vertices.size() - 1; i++) {
 
-            canvas.drawLine(
+            palette.canvas.drawLine(
                     (float) vertices.get(i).x,
                     (float) vertices.get(i).y,
                     (float) vertices.get(i + 1).x,
                     (float) vertices.get(i + 1).y,
-                    paint
+                    palette.paint
             );
         }
     }
 
-    public void drawCircle(Circle circle) {
+    public void drawCircle(Circle circle, Palette palette) {
 
-        canvas.save();
+        palette.canvas.save();
 
-        canvas.translate((float) circle.getPosition().x, (float) circle.getPosition().y);
-        canvas.rotate((float) circle.getPosition().rotation);
+        palette.canvas.translate((float) circle.getPosition().x, (float) circle.getPosition().y);
+        palette.canvas.rotate((float) circle.getPosition().rotation);
 
         // Fill
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(circle.colorCode);
-        canvas.drawCircle(0, 0, (float) circle.radius, paint);
+        palette.paint.setStyle(Paint.Style.FILL);
+        palette.paint.setColor(circle.colorCode);
+        palette.canvas.drawCircle(0, 0, (float) circle.radius, palette.paint);
 
         // Outline
         if (circle.getOutlineThickness() > 0) {
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(circle.outlineColorCode);
-            paint.setStrokeWidth((float) circle.outlineThickness);
+            palette.paint.setStyle(Paint.Style.STROKE);
+            palette.paint.setColor(circle.outlineColorCode);
+            palette.paint.setStrokeWidth((float) circle.outlineThickness);
 
-            canvas.drawCircle(0, 0, (float) circle.radius, paint);
+            palette.canvas.drawCircle(0, 0, (float) circle.radius, paint);
         }
 
-        canvas.restore();
+        palette.canvas.restore();
     }
 
-    public void drawCircle(Transform position, double radius, double angle) {
+//    public void drawCircle(Transform position, double radius, double angle) {
+//
+//        canvas.save();
+//
+//        canvas.translate((float) position.x, (float) position.y);
+//        canvas.rotate((float) angle);
+//
+//        canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
+//
+//        canvas.restore();
+//
+//    }
 
-        canvas.save();
-
-        canvas.translate((float) position.x, (float) position.y);
-        canvas.rotate((float) angle);
-
-        canvas.drawCircle(0.0f, 0.0f, (float) radius, paint);
-
-        canvas.restore();
-
-    }
-
-    public void drawRectangle(Rectangle rectangle) {
+    public void drawRectangle(Rectangle rectangle, Palette palette) {
 
         // Set style
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(rectangle.colorCode);
+        palette.paint.setStyle(Paint.Style.FILL);
+        palette.paint.setColor(rectangle.colorCode);
 
-        canvas.save();
-        canvas.translate((float) rectangle.getPosition().x, (float) rectangle.getPosition().y);
-        canvas.rotate((float) rectangle.getRotation());
+        palette.canvas.save();
+        palette.canvas.translate((float) rectangle.getPosition().x, (float) rectangle.getPosition().y);
+        palette.canvas.rotate((float) rectangle.getRotation());
 
-        canvas.drawRoundRect(
+        palette.canvas.drawRoundRect(
                 (float) (0 - (rectangle.width / 2.0)),
                 (float) (0 - (rectangle.height / 2.0)),
                 (float) (0 + (rectangle.width / 2.0)),
                 (float) (0 + (rectangle.height / 2.0)),
                 (float) rectangle.cornerRadius,
                 (float) rectangle.cornerRadius,
-                paint
+                palette.paint
         );
 
         // Draw Points in Shape
         if (rectangle.getOutlineThickness() > 0) {
 
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(rectangle.outlineColorCode);
-            paint.setStrokeWidth((float) rectangle.outlineThickness);
+            palette.paint.setStyle(Paint.Style.STROKE);
+            palette.paint.setColor(rectangle.outlineColorCode);
+            palette.paint.setStrokeWidth((float) rectangle.outlineThickness);
 
-            canvas.drawRoundRect(
+            palette.canvas.drawRoundRect(
                     (float) (0 - (rectangle.width / 2.0)),
                     (float) (0 - (rectangle.height / 2.0)),
                     (float) (0 + (rectangle.width / 2.0)),
                     (float) (0 + (rectangle.height / 2.0)),
                     (float) rectangle.cornerRadius,
                     (float) rectangle.cornerRadius,
-                    paint
+                    palette.paint
             );
         }
 
-        canvas.restore();
+        palette.canvas.restore();
     }
 
-    public void drawRectangle(Transform position, double angle, double width, double height) {
+//    public void drawRectangle(Transform position, double angle, double width, double height) {
+//
+//        canvas.save();
+//
+//        canvas.translate((float) position.x, (float) position.y);
+//        canvas.rotate((float) angle);
+//
+//        canvas.drawRect(
+//                (float) (0 - (width / 2.0f)),
+//                (float) (0 - (height / 2.0f)),
+//                (float) (0 + (width / 2.0f)),
+//                (float) (0 + (height / 2.0f)),
+//                paint
+//        );
+//
+//        canvas.restore();
+//    }
 
-        canvas.save();
-
-        canvas.translate((float) position.x, (float) position.y);
-        canvas.rotate((float) angle);
-
-        canvas.drawRect(
-                (float) (0 - (width / 2.0f)),
-                (float) (0 - (height / 2.0f)),
-                (float) (0 + (width / 2.0f)),
-                (float) (0 + (height / 2.0f)),
-                paint
-        );
-
-        canvas.restore();
-    }
-
-    public void drawText(Transform position, String text, double size) {
+    public void drawText(Transform position, String text, double size, Palette palette) {
 
         // Style
-        paint.setTextSize((float) size);
+        palette.paint.setTextSize((float) size);
 
         // Style (Guaranteed)
         text = text.toUpperCase();
-        paint.setStyle(Paint.Style.FILL);
+        palette.paint.setStyle(Paint.Style.FILL);
 
         // Draw
         Rect bounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-        canvas.drawText(text, (float) position.x, (float) position.y + bounds.height() / 2.0f, paint);
+        palette.paint.getTextBounds(text, 0, text.length(), bounds);
+        palette.canvas.drawText(text, (float) position.x, (float) position.y + bounds.height() / 2.0f, palette.paint);
     }
 
-    public void drawTrianglePath(Transform startPosition, Transform stopPosition, double triangleWidth, double triangleHeight) {
+//    public void drawTrianglePath(Transform startPosition, Transform stopPosition, double triangleWidth, double triangleHeight) {
+//
+//        double pathRotationAngle = Geometry.getAngle(startPosition, stopPosition);
+//
+//        double triangleRotationAngle = pathRotationAngle + 90.0f;
+//
+//        double pathDistance = Geometry.distance(startPosition, stopPosition);
+//
+//        int triangleCount = (int) (pathDistance / (triangleHeight + 15));
+//        double triangleSpacing2 = pathDistance / triangleCount;
+//
+//        for (int k = 0; k <= triangleCount; k++) {
+//
+//            // Calculate triangle position
+//            Transform triangleCenterPosition = Geometry.getRotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
+//
+//            paint.setStyle(Paint.Style.FILL);
+//            drawTriangle(triangleCenterPosition, triangleRotationAngle, triangleWidth, triangleHeight);
+//        }
+//    }
 
-        double pathRotationAngle = Geometry.getAngle(startPosition, stopPosition);
-
-        double triangleRotationAngle = pathRotationAngle + 90.0f;
-
-        double pathDistance = Geometry.distance(startPosition, stopPosition);
-
-        int triangleCount = (int) (pathDistance / (triangleHeight + 15));
-        double triangleSpacing2 = pathDistance / triangleCount;
-
-        for (int k = 0; k <= triangleCount; k++) {
-
-            // Calculate triangle position
-            Transform triangleCenterPosition = Geometry.getRotateTranslatePoint(startPosition, pathRotationAngle, k * triangleSpacing2);
-
-            paint.setStyle(Paint.Style.FILL);
-            drawTriangle(triangleCenterPosition, triangleRotationAngle, triangleWidth, triangleHeight);
-        }
+    // TODO: Refactor with transforms
+    public void drawPolygon(Polygon polygon, Palette palette) {
+        drawPolygon(polygon.getBoundary(), palette);
     }
 
     // TODO: Refactor with transforms
-    public void drawPolygon(Polygon polygon) {
-        drawPolygon(polygon.getBoundary());
-    }
-
-    // TODO: Refactor with transforms
-    public void drawPolygon(List<Transform> vertices) {
+    public void drawPolygon(List<Transform> vertices, Palette palette) {
 
         // Draw vertex Points in Shape
         android.graphics.Path path = new android.graphics.Path();
@@ -855,36 +815,31 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        path.lineTo((float) boundary.get(0).x, (float) boundary.get(0).y);
         path.close();
 
-        canvas.drawPath(path, paint);
+        palette.canvas.drawPath(path, palette.paint);
     }
 
-    // TODO: Refactor with transforms
-    public void drawTriangle(Triangle triangle) {
-        // TODO:
-    }
-
-    // TODO: Refactor with transforms
-    public void drawTriangle(Transform position, double angle, double width, double height) {
-
-        // Calculate pointerCoordinates before rotation
-        Transform p1 = new Transform(position.x + -(width / 2.0f), position.y + (height / 2.0f));
-        Transform p2 = new Transform(position.x + 0, position.y - (height / 2.0f));
-        Transform p3 = new Transform(position.x + (width / 2.0f), position.y + (height / 2.0f));
-
-        // Calculate pointerCoordinates after rotation
-        Transform rp1 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.distance(position, p1));
-        Transform rp2 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.distance(position, p2));
-        Transform rp3 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.distance(position, p3));
-
-        android.graphics.Path path = new android.graphics.Path();
-        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
-        path.moveTo((float) rp1.x, (float) rp1.y);
-        path.lineTo((float) rp2.x, (float) rp2.y);
-        path.lineTo((float) rp3.x, (float) rp3.y);
-        path.close();
-
-        canvas.drawPath(path, paint);
-    }
+//    // TODO: Refactor with transforms
+//    public void drawTriangle(Transform position, double angle, double width, double height) {
+//
+//        // Calculate pointerCoordinates before rotation
+//        Transform p1 = new Transform(position.x + -(width / 2.0f), position.y + (height / 2.0f));
+//        Transform p2 = new Transform(position.x + 0, position.y - (height / 2.0f));
+//        Transform p3 = new Transform(position.x + (width / 2.0f), position.y + (height / 2.0f));
+//
+//        // Calculate pointerCoordinates after rotation
+//        Transform rp1 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p1), Geometry.distance(position, p1));
+//        Transform rp2 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p2), Geometry.distance(position, p2));
+//        Transform rp3 = Geometry.getRotateTranslatePoint(position, angle + Geometry.getAngle(position, p3), Geometry.distance(position, p3));
+//
+//        android.graphics.Path path = new android.graphics.Path();
+//        path.setFillType(android.graphics.Path.FillType.EVEN_ODD);
+//        path.moveTo((float) rp1.x, (float) rp1.y);
+//        path.lineTo((float) rp2.x, (float) rp2.y);
+//        path.lineTo((float) rp3.x, (float) rp3.y);
+//        path.close();
+//
+//        canvas.drawPath(path, paint);
+//    }
 
     // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
     public void startTimer(long timeout, final RenderSystem.Notification notification) {

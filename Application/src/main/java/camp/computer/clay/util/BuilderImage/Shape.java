@@ -21,6 +21,9 @@ public abstract class Shape extends Groupable {
     protected String outlineColor = "#ff000000";
     public double outlineThickness = 1.0;
 
+    // TODO: RIGHT NOW EVERY FUCKING SHAPE COMPUTES A BOUNDING BOX. MOST OF THEM ARE NOT EVEN WANTED. THIS MUST CHANGE! IN FILE FORMAT, ADD FLAG TO CREATE BOUNDS!
+    // TODO: Start by moving boundary out of Shape into Image/Boundary.shapeBounds hashmap, with call to create bounds in Image/Boundary
+    // TODO: Then only compute boundary for Shapes/Images that need it!
     protected List<Transform> boundary = new ArrayList<>();
 
     public boolean isValid = false;

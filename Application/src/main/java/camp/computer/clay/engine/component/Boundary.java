@@ -1,6 +1,7 @@
 package camp.computer.clay.engine.component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
@@ -13,7 +14,8 @@ public class Boundary extends Component {
 
     private List<Transform> boundary = new ArrayList<>();
 
-    private List<List<Transform>> hitAreas = new ArrayList<>();
+//    private List<List<Transform>> shapeBounds = new ArrayList<>();
+    public HashMap<String, List<Transform>> shapeBounds = new HashMap<>();
 
     public void setBoundary(List<Transform> points) {
         this.boundary.clear();

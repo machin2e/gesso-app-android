@@ -14,6 +14,7 @@ import java.util.List;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.Palette;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -36,13 +37,14 @@ public class RenderSystem extends System {
     public void update() {
     }
 
-    public boolean update(Canvas canvas) {
+    // TODO: Move into platform layer (PlatformRenderSurface)?
+    public boolean update(Palette palette) {
 
         // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to render.
 
         // <HACK>
         PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
-        // Canvas canvas = platformRenderSurface.canvas;
+         Canvas canvas = platformRenderSurface.canvas;
         // </HACK>
 
         platformRenderSurface.canvas = canvas;
@@ -50,25 +52,25 @@ public class RenderSystem extends System {
         Matrix identityMatrix = platformRenderSurface.identityMatrix;
 
         // Adjust the Camera
-        canvas.save();
+        palette.canvas.save();
 
         Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
         Transform cameraPosition = camera.getComponent(Transform.class);
-        canvas.translate(
+        palette.canvas.translate(
                 (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
                 (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
         );
-        canvas.scale(
+        palette.canvas.scale(
                 (float) world.cameraSystem.getScale(camera),
                 (float) world.cameraSystem.getScale(camera)
         );
 
 
-        canvas.drawColor(Color.WHITE); // Draw the background
+        palette.canvas.drawColor(Color.WHITE); // Draw the background
 
         // TODO: renderSystem.update();
 
-        drawEntities(platformRenderSurface);
+        drawEntities(palette);
 
         for (int i = 0; i < notifications.size(); ) {
             Notification notification = notifications.get(i);
@@ -86,7 +88,7 @@ public class RenderSystem extends System {
 //            drawNotification(echoText, (float) echoTextPosition.x, (float) echoTextPosition.y, platformRenderSurface);
 //        }
 
-        canvas.restore();
+        palette.canvas.restore();
 
         drawOverlay(platformRenderSurface);
 
@@ -95,7 +97,7 @@ public class RenderSystem extends System {
 //        }
 
         // Paint the bitmap to the "primary" canvas.
-        canvas.drawBitmap(canvasBitmap, identityMatrix, null);
+        palette.canvas.drawBitmap(canvasBitmap, identityMatrix, null);
 
         /*
         // Alternative to the above
@@ -108,14 +110,18 @@ public class RenderSystem extends System {
         return true;
     }
 
-    public void drawEntities(PlatformRenderSurface platformRenderSurface) {
+    public void drawEntities(Palette palette) {
 
         Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
 
         for (int j = 0; j < entities.size(); j++) {
             Entity entity = entities.get(j);
 
-            Canvas canvas = platformRenderSurface.canvas;
+            // <HACK>
+            PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
+            // </HACK>
+
+//            Canvas canvas = platformRenderSurface.canvas;
             // Paint paint = platformRenderSurface.paint;
             // World world = platformRenderSurface.getWorld();
 
@@ -145,7 +151,7 @@ public class RenderSystem extends System {
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Entity pathEntity = image.getEntity();
-                    platformRenderSurface.drawEditablePath(pathEntity, platformRenderSurface);
+                    platformRenderSurface.drawEditablePath(pathEntity, palette);
                     /*
                     if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
                         // TODO: Draw Path between wirelessly connected Ports
@@ -157,7 +163,7 @@ public class RenderSystem extends System {
                 } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
                     Entity pathEntity = entity; // image.getPath();
                     if (Path.getMode(pathEntity) == Path.Mode.ELECTRONIC) {
-                        platformRenderSurface.drawOverviewPath(pathEntity, platformRenderSurface);
+                        platformRenderSurface.drawOverviewPath(pathEntity, palette);
                     }
                 }
 
@@ -169,11 +175,11 @@ public class RenderSystem extends System {
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Image image = entity.getComponent(Image.class);
-                    canvas.save();
+                    palette.canvas.save();
                     for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-                        platformRenderSurface.drawShape(image.getImage().getShapes().get(i));
+                        platformRenderSurface.drawShape(image.getImage().getShapes().get(i), palette);
                     }
-                    canvas.restore();
+                    palette.canvas.restore();
                 }
 
 //                // Create Buffer Bitmap
