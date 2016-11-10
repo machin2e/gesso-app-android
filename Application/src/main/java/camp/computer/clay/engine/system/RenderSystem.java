@@ -176,6 +176,22 @@ public class RenderSystem extends System {
                     canvas.restore();
                 }
 
+//                // Create Buffer Bitmap
+//                Bitmap b = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
+//                Canvas c = new Canvas(b);
+//                Paint p = new Paint();
+//                p.setColor(Color.RED);
+//                c.drawCircle(100, 100, 40, p);
+//
+//                if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
+//                    Image image = entity.getComponent(Image.class);
+//                    c.save();
+//                    for (int i = 0; i < image.getImage().getShapes().size(); i++) {
+//                        platformRenderSurface.drawShape(image.getImage().getShapes().get(i));
+//                    }
+//                    c.restore();
+//                }
+
             }
             // TODO: </REFACTOR>
         }
@@ -254,7 +270,7 @@ public class RenderSystem extends System {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
-        // World world = platformRenderSurface.getWorld();
+        // World world = platformRenderSurface.getWorld(););
 
         // Font
         Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), OVERLAY_FONT);

@@ -62,6 +62,7 @@ public abstract class Shape extends Groupable {
 
     // TODO: <DELETE>
     // TODO: Move into ImageSystem, PortableLayoutSystem, or RenderSystem
+    // TODO: Replace with RelativeLayoutConstraint
     public void setImagePosition(Transform point) {
         if (imagePosition == null) {
             imagePosition = new Transform();

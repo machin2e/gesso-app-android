@@ -504,7 +504,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             segment.setTarget(pathStopCoordinate);
 
             // Draw shapes in Path
-            platformRenderSurface.drawSegment(segment);
+            platformRenderSurface.drawShape(segment);
             platformRenderSurface.drawShape(sourcePortShape);
             platformRenderSurface.drawShape(targetPortShape);
 
