@@ -4,29 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import camp.computer.clay.engine.Group;
+
 public class Repository {
 
     // TODO: 11/8/2016 Consider renaming to Process, Program, Behavior, or Calendar
 
     // <TEMPORARY>
-    public static List<Process> processes = new ArrayList<>();
-    public static List<Action> actions = new ArrayList<>();
-    public static List<Script> scripts = new ArrayList<>();
+    public static Group<Process> processes = new Group<>();
+    public static Group<Action> actions = new Group<>();
+    public static Group<Script> scripts = new Group<>();
     // </TEMPORARY>
 
     private UUID uuid;
 
-    private List<UUID> scriptUuids;
-
-    private List<UUID> actionUuids;
-
-    private List<UUID> processUuids;
+//    // <DELETE>
+//    private Group<Script> scriptUuids;
+//    private Group<Action> actionUuids;
+//    private Group<Process> processUuids;
+//    // </DELETE>
 
     public Repository() {
         uuid = UUID.randomUUID();
-        scriptUuids = new ArrayList<>();
-        actionUuids = new ArrayList<>();
-        processUuids = new ArrayList<>();
+//        scriptUuids = new Group<>();
+//        actionUuids = new Group<>();
+//        processUuids = new Group<>();
     }
 
     public void populateTestData() {
@@ -40,6 +42,7 @@ public class Repository {
         script.setCode("console.log('Hello');");
 
         Action action = new Action();
+        action.setTitle("smooth();");
         action.setScript(script);
 
         Process process = new Process();
@@ -52,26 +55,38 @@ public class Repository {
     }
 
     public void addScript(Script script) {
-        if (!scriptUuids.contains(script.getUuid())) {
-            scriptUuids.add(script.getUuid());
-        }
+        scripts.add(script);
     }
 
-    // TODO: getScript(UUID uuid)
+    public Group<Script> getScripts() {
+        return scripts;
+    }
+
+    public Script getScript(UUID uuid) {
+        return scripts.get(uuid);
+    }
+
+    public Group<Action> getActions() {
+        return actions;
+    }
 
     public void addAction(Action action) {
-        if (!actionUuids.contains(action.getUuid())) {
-            actionUuids.add(action.getUuid());
-        }
+        actions.add(action);
     }
 
-    // TODO: getAction(UUID uuid)
+    public Action getAction(UUID uuid) {
+        return actions.get(uuid);
+    }
 
     public void addProcess(Process process) {
-        if (!processUuids.contains(process.getUuid())) {
-            processUuids.add(process.getUuid());
-        }
+        processes.add(process);
     }
 
-    // TODO: getProcess(UUID uuid)
+    public Group<Process> getProcesses() {
+        return processes;
+    }
+
+    public Process getProcess(UUID uuid) {
+        return processes.get(uuid);
+    }
 }

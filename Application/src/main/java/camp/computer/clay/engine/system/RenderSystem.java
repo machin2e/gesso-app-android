@@ -277,6 +277,57 @@ public class RenderSystem extends System {
         canvas.restore();
         // </FPS_LABEL>
 
+        // <FRAME_TIME>
+        canvas.save();
+        String frameTimeText = "Frame Time: " + (int) platformRenderSurface.platformRenderClock.currentFrameTime;
+        Rect frameTimeTextBounds = new Rect();
+        paint.getTextBounds(frameTimeText, 0, frameTimeText.length(), frameTimeTextBounds);
+        linePosition += OVERLAY_LINE_SPACING + frameTimeTextBounds.height();
+        canvas.drawText(frameTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </FRAME_TIME>
+
+        // <FRAME_SLEEP_TIME>
+        canvas.save();
+        String frameSleepTimeText = "Frame Sleep Time: " + (int) platformRenderSurface.platformRenderClock.currentSleepTime;
+        Rect frameSleepTimeTextBounds = new Rect();
+        paint.getTextBounds(frameSleepTimeText, 0, frameSleepTimeText.length(), frameSleepTimeTextBounds);
+        linePosition += OVERLAY_LINE_SPACING + frameSleepTimeTextBounds.height();
+        canvas.drawText(frameSleepTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </FRAME_SLEEP_TIME>
+
+        // <UPDATE_TIME>
+        canvas.save();
+        String updateTimeText = "Update Time: " + (int) world.updateTime;
+        Rect updateTimeTextBounds = new Rect();
+        paint.getTextBounds(updateTimeText, 0, updateTimeText.length(), updateTimeTextBounds);
+        linePosition += OVERLAY_LINE_SPACING + updateTimeTextBounds.height();
+        canvas.drawText(updateTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </UPDATE_TIME>
+
+        // <RENDER_TIME>
+        canvas.save();
+        String renderTimeText = "Render Time: " + (int) world.renderTime;
+        Rect renderTimeTextBounds = new Rect();
+        paint.getTextBounds(renderTimeText, 0, renderTimeText.length(), renderTimeTextBounds);
+        linePosition += OVERLAY_LINE_SPACING + renderTimeTextBounds.height();
+        canvas.drawText(renderTimeText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </RENDER_TIME>
+
+        // <RENDER_TIME>
+        canvas.save();
+        String filterWithComponentCountText = "Filter Count: " + (int) world.lookupCount;
+        Rect filterWithComponentCountTextBounds = new Rect();
+        paint.getTextBounds(filterWithComponentCountText, 0, filterWithComponentCountText.length(), filterWithComponentCountTextBounds);
+        linePosition += OVERLAY_LINE_SPACING + filterWithComponentCountTextBounds.height();
+        canvas.drawText(filterWithComponentCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        world.lookupCount = 0;
+        // </RENDER_TIME>
+
         // <ENTITY_STATISTICS>
         canvas.save();
         int entityCount = world.Manager.getEntities().size();

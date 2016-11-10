@@ -30,46 +30,54 @@ public class BoundarySystem extends System {
 
         // Update Transform
         Group<Entity> entitiesWithTransform = world.Manager.getEntities().filterActive(true).filterWithComponents(Transform.class, Image.class);
-        for (int i = 0; i < entitiesWithTransform.size(); i++) {
-            Entity entity = entitiesWithTransform.get(i);
-            updateTransform(entity);
-        }
+//        for (int i = 0; i < entitiesWithTransform.size(); i++) {
+//            Entity entity = entitiesWithTransform.get(i);
+//            updateTransform(entity);
+//        }
 
         // Update Shapes
         for (int i = 0; i < entitiesWithTransform.size(); i++) {
             Entity entity = entitiesWithTransform.get(i);
+
+            // Update Transform
+            updateTransform(entity);
+
+            // Update Shapes
             // <HACK>
             if (entity.hasComponent(Extension.class)) {
                 updateExtensionGeometry(entity);
-//                updateImage(entity);
             } else if (entity.hasComponent(Host.class)) {
-//                updateImage(entity); // NOTE: Call this so Portable.updateImage() will be called to updateImage Geometry
             } else if (entity.hasComponent(Port.class)) {
-//                updateImage(entity);
             } else if (entity.hasComponent(Path.class)) {
-//                updateImage(entity);
             }
             updateImage(entity);
             // </HACK>
-        }
 
-        // Update Boundaries
-
-        // Update Style
-        for (int i = 0; i < entitiesWithTransform.size(); i++) {
-            Entity entity = entitiesWithTransform.get(i);
-            // <HACK>
+            // Update Style
             if (entity.hasComponent(Extension.class)) {
                 updateExtensionStyle(entity);
             } else if (entity.hasComponent(Host.class)) {
                 updateHostStyle(entity);
             } else if (entity.hasComponent(Port.class)) {
-//                updatePortImage(entity);
             } else if (entity.hasComponent(Path.class)) {
-//                updatePathBoundaries(entity);
             }
-            // </HACK>
         }
+
+        // Update Boundaries
+
+        // Update Style
+//        for (int i = 0; i < entitiesWithTransform.size(); i++) {
+//            Entity entity = entitiesWithTransform.get(i);
+//            // <HACK>
+//            if (entity.hasComponent(Extension.class)) {
+//                updateExtensionStyle(entity);
+//            } else if (entity.hasComponent(Host.class)) {
+//                updateHostStyle(entity);
+//            } else if (entity.hasComponent(Port.class)) {
+//            } else if (entity.hasComponent(Path.class)) {
+//            }
+            // </HACK>
+//        }
 
         // Update Renderables?
     }
@@ -93,9 +101,9 @@ public class BoundarySystem extends System {
         }
         */
 
-        if (!entity.isActive) {
-            return;
-        }
+//        if (!entity.isActive) {
+//            return;
+//        }
 
         /*
         // Update color of Port shape based on its type
@@ -115,7 +123,7 @@ public class BoundarySystem extends System {
             if (entity.hasComponent(RelativeLayoutConstraint.class)) {
                 // <HACK>
                 RelativeLayoutConstraint layoutConstraint = entity.getComponent(RelativeLayoutConstraint.class);
-                Entity referenceEntity = layoutConstraint.getReferenceEntity();
+//                Entity referenceEntity = layoutConstraint.getReferenceEntity();
                 Transform referenceTransform = layoutConstraint.getReferenceEntity().getComponent(Transform.class);
                 Transform relativePosition = entity.getComponent(Transform.class);
                 absoluteReferenceTransform = new Transform();
@@ -275,6 +283,12 @@ public class BoundarySystem extends System {
      *                       {@code Shape} will be drawn.
      */
     public void updateShapeGeometry(Shape shape, Transform referencePoint) {
+
+//        if (!shape.isValid) {
+//            updateShapePositionAndRotation(shape, referencePoint); // Update the position
+//            updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
+//            shape.isValid = true;
+//        }
 
 //        if (!shape.isValid) {
             updateShapePositionAndRotation(shape, referencePoint); // Update the position

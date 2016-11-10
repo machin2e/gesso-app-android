@@ -17,15 +17,15 @@ public class Camera extends Component {
     // Scale
     protected final double DEFAULT_SCALE = 1.0f;
     public double targetScale = DEFAULT_SCALE;
-    protected int scalePeriod = DEFAULT_SCALE_PERIOD;
-    public double scaleDelta = 0;
+//    protected int scalePeriod = DEFAULT_SCALE_PERIOD;
+//    public double scaleDelta = 0;
 
     // Position
     protected final Transform DEFAULT_POSITION = new Transform(0, 0);
     public Transform targetPosition = DEFAULT_POSITION;
-    public int positionFrameIndex = 0;
-    public int positionFrameLimit = 0;
-    public Transform originalPosition = new Transform();
+//    public int positionFrameIndex = 0;
+//    public int positionFrameLimit = 0;
+//    public Transform originalPosition = new Transform();
 
     public Camera() {
         super();

@@ -1,5 +1,7 @@
 package camp.computer.clay.model.configuration;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +25,11 @@ public class Configuration {
     public Configuration(Entity portableEntity) {
         Group<Entity> ports = Portable.getPorts(portableEntity);
         for (int i = 0; i < ports.size(); i++) {
-            Entity portEntity = ports.get(i);
-            PortConfiguration portConfiguration = new PortConfiguration(portEntity);
+            Entity port = ports.get(i);
+            PortConfiguration portConfiguration = new PortConfiguration(port);
             addPort(portConfiguration);
         }
+        Log.v("Configuration", "created Extension Configuration with # ports: " + ports.size());
     }
 
     public void setLabel(String label) {

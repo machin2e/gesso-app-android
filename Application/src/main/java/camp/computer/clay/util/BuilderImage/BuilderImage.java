@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import camp.computer.clay.engine.World;
+
 /**
  * Custom composable, structured, vector image format and API.
  *
@@ -55,6 +57,7 @@ public class BuilderImage {
     }
 
     public Shape getShape(String label) {
+        World.getWorld().lookupCount++;
         for (int i = 0; i < shapes.size(); i++) {
             Shape shape = shapes.get(i);
             if (shape.getLabel().equals(label)) {

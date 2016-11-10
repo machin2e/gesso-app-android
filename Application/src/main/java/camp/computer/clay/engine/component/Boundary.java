@@ -3,38 +3,22 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.BuilderImage.Geometry;
 import camp.computer.clay.util.BuilderImage.Rectangle;
+import camp.computer.clay.util.BuilderImage.Shape;
 
 public class Boundary extends Component {
 
     private List<Transform> boundary = new ArrayList<>();
 
+    private List<List<Transform>> hitAreas = new ArrayList<>();
+
     public void setBoundary(List<Transform> points) {
         this.boundary.clear();
         this.boundary.addAll(points);
     }
-
-//    public List<Transform> getBoundary() {
-//        return this.boundary;
-//    }
-
-//    /**
-//     * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
-//     * detection. Hey there, mango bongo.
-//     */
-//    protected void updateShapeBoundary() {
-//
-//        List<Transform> vertices = getVertices();
-//        List<Transform> boundary = getBoundary();
-//
-//        // Translate and rotate the boundary about the updated position
-//        for (int i = 0; i < vertices.size(); i++) {
-//            boundary.get(i).set(vertices.get(i));
-//            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about Image position
-//            Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
-//        }
-//    }
 
     /**
      * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
@@ -43,9 +27,9 @@ public class Boundary extends Component {
      * @param point
      * @return
      */
-    public boolean contains(Transform point) {
+    public static boolean contains(Entity entity, Transform point) {
 
-        Image image = getEntity().getComponent(Image.class);
+        Image image = entity.getComponent(Image.class);
 
         for (int i = 0; i < image.getImage().getShapes().size(); i++) {
             //if (shapes.get(i).contains(point)) {
@@ -59,13 +43,13 @@ public class Boundary extends Component {
     }
 
     // TODO: Compute bounding box for image when add/remove Shapes and store it here!
-    public Rectangle getBoundingBox() {
+    public static Rectangle getBoundingBox(Entity entity) {
 
-        Image image = getEntity().getComponent(Image.class);
+        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
 
         List<Transform> shapeBoundaries = new ArrayList<>();
-        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            shapeBoundaries.addAll(image.getImage().getShapes().get(i).getBoundary());
+        for (int i = 0; i < shapes.size(); i++) {
+            shapeBoundaries.addAll(shapes.get(i).getBoundary());
         }
         return Geometry.getBoundingBox(shapeBoundaries);
     }

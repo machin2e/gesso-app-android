@@ -2,29 +2,35 @@ package camp.computer.clay.model;
 
 import java.util.UUID;
 
-public class Action {
+import camp.computer.clay.engine.Groupable;
 
-    private UUID uuid;
+public class Action extends Groupable {
+
+    private String title = "";
 
     private UUID scriptUuid;
 
     public Action() {
-        uuid = UUID.randomUUID();
+        super();
 
         // <TEMPORARY>
-        Repository.actions.add(this);
+//        Repository.actions.add(this);
         // </TEMPORARY>
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void setScript(Script script) {
         scriptUuid = script.getUuid();
     }
 
-    public Script getScript(UUID uuid) {
-        return null; // TODO: Return the actual Script object!
+    public Script getScript() {
+        return Repository.scripts.get(scriptUuid);
     }
 }

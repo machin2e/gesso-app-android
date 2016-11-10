@@ -138,7 +138,7 @@ public class Group<E extends Groupable> implements List<E> {
         public static Filter filterContains = new Filter<Entity, Transform>() {
             @Override
             public boolean filter(Entity entity, Transform... points) {
-                if (entity.getComponent(Boundary.class).contains(points[0])) {
+                if (Boundary.contains(entity, points[0])) {
                     return true;
                 } else {
                     return false;
@@ -427,8 +427,7 @@ public class Group<E extends Groupable> implements List<E> {
         List<Transform> imageBoundaries = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
-            Boundary boundary = entity.getComponent(Boundary.class);
-            imageBoundaries.addAll(boundary.getBoundingBox().getBoundary());
+            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getBoundary());
         }
 
         return Geometry.getBoundingBox(imageBoundaries);

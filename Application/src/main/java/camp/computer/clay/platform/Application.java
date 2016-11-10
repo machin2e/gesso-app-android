@@ -456,6 +456,13 @@ public class Application extends FragmentActivity implements PlatformInterface {
         JSValue fact_a = context.property("fact_a");
         Log.v("AndroidJSCore", df.format(fact_a.toNumber())); // 3628800.0
         // </JAVASCRIPT_ENGINE>
+
+
+        // <CHECK_HARDWARE_ACCELERATION>
+        View view = findViewById(R.id.application_view);
+        boolean isHardwareAccelerated = view.isHardwareAccelerated();
+        Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
+        // </CHECK_HARDWARE_ACCELERATION>
     }
 
     @Override

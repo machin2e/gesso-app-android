@@ -1,5 +1,9 @@
 package camp.computer.clay.engine.manager;
 
+import android.util.Log;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
@@ -25,12 +29,30 @@ public class Manager {
     public UUID add(Entity entity) {
         if (entity != null && !entities.contains(entity)) {
             entities.add(entity);
+
+            /*
+            Collections.sort(entities, new Comparator<Entity>() {
+                @Override
+                public int compare(Entity entity1, Entity entity2) {
+                    return entity1.getUuid().compareTo(entity2.getUuid());
+                }
+            });
+            */
+
             return entity.getUuid();
         }
         return null;
     }
 
     public Entity get(UUID uuid) {
+
+//        Collections.binarySearch(entities, uuid, new Comparator<Entity>() {
+//            @Override
+//            public int compare(Entity entity1, Entity entity2) {
+//                return entity1.getUuid().compareTo(entity2.getUuid());
+//            }
+//        });
+
         return entities.get(uuid);
     }
 

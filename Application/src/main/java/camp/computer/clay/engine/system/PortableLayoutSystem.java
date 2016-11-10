@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.system;
 
+import android.util.Log;
+
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
@@ -184,6 +186,8 @@ public class PortableLayoutSystem extends System {
         world.configureExtensionFromProfile(extension, configuration);
         // </HACK>
 
+        Log.v("Configuration", "extension from profile # ports: " + Portable.getPorts(extension).size());
+
         // Update ExtensionEntity Position
         extension.getComponent(Transform.class).set(initialPosition);
 
@@ -207,13 +211,39 @@ public class PortableLayoutSystem extends System {
             // Select an available HostEntity PortEntity
             Entity selectedHostPort = autoSelectNearestAvailableHostPort(host, extension);
 
-            // Configure HostEntity's PortEntity
-            Port.setType(selectedHostPort, Port.getType(ports.get(i)));
-            Port.setDirection(selectedHostPort, Port.getDirection(ports.get(i)));
+//            // Configure HostEntity's PortEntity
+//            Port.setType(selectedHostPort, Port.getType(ports.get(i)));
+//            Port.setDirection(selectedHostPort, Port.getDirection(ports.get(i)));
 
-            // Create PathEntity from ExtensionEntity PortEntity to HostEntity PortEntity
+            // Create Path from Extension Ports to Host Ports
             Entity path = world.createEntity(Path.class);
             Path.set(path, selectedHostPort, ports.get(i));
+
+            // <HACK>
+            switch (Port.getType(ports.get(i))) {
+                case NONE:
+                    Path.setType(path, Path.Type.NONE);
+                    break;
+                case SWITCH:
+                    Path.setType(path, Path.Type.SWITCH);
+                    break;
+                case PULSE:
+                    Path.setType(path, Path.Type.PULSE);
+                    break;
+                case WAVE:
+                    Path.setType(path, Path.Type.WAVE);
+                    break;
+                case POWER_REFERENCE:
+                    Path.setType(path, Path.Type.POWER_REFERENCE);
+                    break;
+                case POWER_TTL:
+                    Path.setType(path, Path.Type.POWER_TTL);
+                    break;
+                case POWER_CMOS:
+                    Path.setType(path, Path.Type.POWER_CMOS);
+                    break;
+            }
+            // </HACK>
 
             Path.setMode(path, Path.Mode.ELECTRONIC);
         }
@@ -459,12 +489,12 @@ public class PortableLayoutSystem extends System {
 
         // <HACK>
         // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-        world.imageSystem.invalidate(extensionPrototype.getComponent(Image.class));
+//        world.imageSystem.invalidate(extensionPrototype.getComponent(Image.class));
         // </HACK>
 
         // <HACK>
         // TODO: Move! Needed, but should be in a better place so it doesn't have to be explicitly called!
-        world.boundarySystem.updateImage(extensionPrototype);
+//        world.boundarySystem.updateImage(extensionPrototype);
         // </HACK>
     }
 

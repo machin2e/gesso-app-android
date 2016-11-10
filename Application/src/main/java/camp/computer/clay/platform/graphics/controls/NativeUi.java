@@ -30,9 +30,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.model.Action;
 import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
@@ -577,9 +579,6 @@ public class NativeUi {
 
     public void openActionEditor_ScriptJumpList(Entity extension) {
 
-        final Repository repository = new Repository();
-        repository.populateTestData();
-
         // TODO: Hack into the JS engine in V8 to execute this pure JS. Fuck it.
 
         // NOTE: This is just a list of edit boxes. Each with a dropdown to save new script or load from the list. MVP, bitches.
@@ -672,9 +671,14 @@ public class NativeUi {
                 final List<String> spinnerArray = new ArrayList<>();
                 spinnerArray.add("Add Action"); // load script from browser
                 spinnerArray.add("new script");
-                spinnerArray.add("demo script 1");
-                spinnerArray.add("demo script 2");
-                spinnerArray.add("demo script 3");
+//                spinnerArray.add("demo script 1");
+//                spinnerArray.add("demo script 2");
+//                spinnerArray.add("demo script 3");
+                Group<Action> actions = World.getWorld().repository.getActions();
+                Log.v("Spinner", "actions.size(): " + actions.size());
+                for (int i = 0; i < actions.size(); i++) {
+                    spinnerArray.add(actions.get(i).getTitle());
+                }
                 // TODO: Load Scripts from Repository
                 ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -709,6 +713,7 @@ public class NativeUi {
 
                 linearLayout.addView(spinner);
 
+                /*
                 // Button: "Add Action"
                 Button button2 = new Button(context);
                 button2.setText("Add Action");
@@ -756,6 +761,7 @@ public class NativeUi {
                     }
                 });
                 linearLayout.addView(button2);
+                */
 
                 // Title: "More"
                 final TextView textView2 = new TextView(context);

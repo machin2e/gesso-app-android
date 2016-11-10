@@ -51,36 +51,41 @@ public class CameraSystem extends System {
         Transform t = camera.getComponent(Transform.class);
 
         // Scale
-        if (Math.abs(t.scale - c.targetScale) <= c.scaleDelta) {
-            t.scale = c.targetScale;
-        } else if (t.scale > c.targetScale) {
-            t.scale -= c.scaleDelta;
-        } else {
-            t.scale += c.scaleDelta;
-        }
+//        if (Math.abs(t.scale - c.targetScale) <= c.scaleDelta) {
+//            t.scale = c.targetScale;
+//        } else if (t.scale > c.targetScale) {
+//            t.scale -= c.scaleDelta;
+//        } else {
+//            t.scale += c.scaleDelta;
+//        }
+
+        t.scale = c.targetScale;
 
         // Position
-        if (c.positionFrameIndex < c.positionFrameLimit) {
+//        if (c.positionFrameIndex < c.positionFrameLimit) {
+//
+//            double totalDistanceToTarget = Geometry.distance(c.originalPosition, c.targetPosition);
+//            double totalDistanceToTargetX = c.targetPosition.x - c.originalPosition.x;
+//            double totalDistanceToTargetY = c.targetPosition.y - c.originalPosition.y;
+//
+//            double currentDistanceTarget = ((((double) (c.positionFrameIndex + 1) / (double) c.positionFrameLimit) * totalDistanceToTarget) / totalDistanceToTarget) /* (1.0 / scale) */;
+//
+//            c.getEntity().getComponent(Transform.class).set(
+//                    t.scale * (currentDistanceTarget * totalDistanceToTargetX + c.originalPosition.x),
+//                    t.scale * (currentDistanceTarget * totalDistanceToTargetY + c.originalPosition.y)
+//            );
+//
+//            c.positionFrameIndex++;
+//
+//        } else { // if (positionFrameIndex >= positionFrameLimit) {
+//
+//            c.getEntity().getComponent(Transform.class).x = c.targetPosition.x * t.scale;
+//            c.getEntity().getComponent(Transform.class).y = c.targetPosition.y * t.scale;
+//
+//        }
 
-            double totalDistanceToTarget = Geometry.distance(c.originalPosition, c.targetPosition);
-            double totalDistanceToTargetX = c.targetPosition.x - c.originalPosition.x;
-            double totalDistanceToTargetY = c.targetPosition.y - c.originalPosition.y;
-
-            double currentDistanceTarget = ((((double) (c.positionFrameIndex + 1) / (double) c.positionFrameLimit) * totalDistanceToTarget) / totalDistanceToTarget) /* (1.0 / scale) */;
-
-            c.getEntity().getComponent(Transform.class).set(
-                    t.scale * (currentDistanceTarget * totalDistanceToTargetX + c.originalPosition.x),
-                    t.scale * (currentDistanceTarget * totalDistanceToTargetY + c.originalPosition.y)
-            );
-
-            c.positionFrameIndex++;
-
-        } else { // if (positionFrameIndex >= positionFrameLimit) {
-
-            c.getEntity().getComponent(Transform.class).x = c.targetPosition.x * t.scale;
-            c.getEntity().getComponent(Transform.class).y = c.targetPosition.y * t.scale;
-
-        }
+        c.getEntity().getComponent(Transform.class).x = c.targetPosition.x * t.scale;
+        c.getEntity().getComponent(Transform.class).y = c.targetPosition.y * t.scale;
     }
 
     // <REFACTOR/DELETE>
@@ -109,34 +114,37 @@ public class CameraSystem extends System {
 
         Camera cameraComponent = camera.getComponent(Camera.class);
 
-        if (duration == 0.0) {
+        cameraComponent.targetPosition.set(-x, -y);
+        cameraComponent.getEntity().getComponent(Transform.class).set(x, y);
 
-            cameraComponent.targetPosition.set(-x, -y);
-            cameraComponent.originalPosition.set(x, y);
-            //this.position.set(x, y);
-            cameraComponent.getEntity().getComponent(Transform.class).set(x, y);
-
-            cameraComponent.positionFrameIndex = cameraComponent.positionFrameLimit;
-
-        } else {
-
-            /*
-            // Solution 1: This works without per-frame adjustment. It's a starting point for that.
-            // this.targetPosition.setAbsoluteX(-targetPosition.x * targetScale);
-            // this.targetPosition.setAbsoluteY(-targetPosition.y * targetScale);
-            */
-
-            cameraComponent.targetPosition.set(-x, -y);
-
-            // <PLAN_ANIMATION>
-            cameraComponent.originalPosition.set(cameraComponent.getEntity().getComponent(Transform.class));
-
-            // TODO: Replace this with deltaTime so no longer will be doing frame animation
-            cameraComponent.positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND));
-            // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
-            cameraComponent.positionFrameIndex = 0;
-            // </PLAN_ANIMATION>
-        }
+//        if (duration == 0.0) {
+//
+//            cameraComponent.targetPosition.set(-x, -y);
+//            cameraComponent.originalPosition.set(x, y);
+//            //this.position.set(x, y);
+//            cameraComponent.getEntity().getComponent(Transform.class).set(x, y);
+//
+//            cameraComponent.positionFrameIndex = cameraComponent.positionFrameLimit;
+//
+//        } else {
+//
+//            /*
+//            // Solution 1: This works without per-frame adjustment. It's a starting point for that.
+//            // this.targetPosition.setAbsoluteX(-targetPosition.x * targetScale);
+//            // this.targetPosition.setAbsoluteY(-targetPosition.y * targetScale);
+//            */
+//
+//            cameraComponent.targetPosition.set(-x, -y);
+//
+//            // <PLAN_ANIMATION>
+//            cameraComponent.originalPosition.set(cameraComponent.getEntity().getComponent(Transform.class));
+//
+//            // TODO: Replace this with deltaTime so no longer will be doing frame animation
+//            cameraComponent.positionFrameLimit = (int) (Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND));
+//            // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
+//            cameraComponent.positionFrameIndex = 0;
+//            // </PLAN_ANIMATION>
+//        }
     }
 
     public void adjustPosition(Entity camera) {
@@ -147,10 +155,10 @@ public class CameraSystem extends System {
     public void setOffset(Entity camera, double dx, double dy) {
         Camera cameraComponent = camera.getComponent(Camera.class);
         cameraComponent.targetPosition.offset(dx, dy);
-        cameraComponent.originalPosition.offset(dx, dy);
-        cameraComponent.getEntity().getComponent(Transform.class).offset(dx, dy);
-        cameraComponent.positionFrameIndex = 0;
-        cameraComponent.positionFrameLimit = 0;
+//        cameraComponent.originalPosition.offset(dx, dy);
+        camera.getComponent(Transform.class).offset(dx, dy);
+//        cameraComponent.positionFrameIndex = 0;
+//        cameraComponent.positionFrameLimit = 0;
     }
 
     public void setOffset(Entity camera, Transform point) {
@@ -164,13 +172,15 @@ public class CameraSystem extends System {
 
         cameraComponent.targetScale = scale;
 
-        if (duration == 0) {
-            transform.scale = scale;
-        } else {
-            double frameCount = Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND);
-            // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
-            cameraComponent.scaleDelta = Math.abs(scale - transform.scale) / frameCount;
-        }
+        transform.scale = scale;
+
+//        if (duration == 0) {
+//            transform.scale = scale;
+//        } else {
+//            double frameCount = Application.getView().getFramesPerSecond() * (duration / Clock.MILLISECONDS_PER_SECOND);
+//            // ^ use positionFrameLimit as index into function to change animation by maing stepDistance vary with positionFrameLimit
+//            cameraComponent.scaleDelta = Math.abs(scale - transform.scale) / frameCount;
+//        }
     }
 
     public double getScale(Entity camera) {

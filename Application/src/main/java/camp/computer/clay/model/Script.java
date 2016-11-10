@@ -1,25 +1,19 @@
 package camp.computer.clay.model;
 
-import java.util.UUID;
+import camp.computer.clay.engine.Groupable;
 
-public class Script {
-
-    private UUID uuid;
+public class Script extends Groupable {
 
     private String title = "";
 
     private String code = "";
 
     public Script() {
-        uuid = UUID.randomUUID();
+        super();
 
         // <TEMPORARY>
-        Repository.scripts.add(this);
+//        Repository.scripts.add(this);
         // </TEMPORARY>
-    }
-
-    public UUID getUuid() {
-        return uuid;
     }
 
     public void setTitle(String title) {

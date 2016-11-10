@@ -1,6 +1,7 @@
 package camp.computer.clay.engine;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.util.List;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.ImageSystem;
+import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
@@ -37,6 +39,7 @@ import camp.computer.clay.util.BuilderImage.Rectangle;
 import camp.computer.clay.util.BuilderImage.Segment;
 import camp.computer.clay.util.BuilderImage.Shape;
 import camp.computer.clay.engine.component.util.Visible;
+import camp.computer.clay.util.time.Clock;
 
 public class World {
 
@@ -46,6 +49,10 @@ public class World {
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
+
+    // <TEMPORARY>
+    public Repository repository = new Repository();
+    // </TEMPORARY>
 
     // <MANAGERS>
     public camp.computer.clay.engine.manager.Manager Manager;
@@ -75,6 +82,10 @@ public class World {
 
         createPrototypePathEntity();
         createPrototypeExtensionEntity();
+
+        // <TEMPORARY>
+        repository.populateTestData();
+        // </TEMPORARY>
     }
 
     // <TODO: DELETE>
@@ -453,13 +464,25 @@ public class World {
         // Create Ports to match the Configuration
         for (int i = 0; i < configuration.getPorts().size(); i++) {
 
-            Entity port = createEntity(Port.class);
+            Entity port = null;
+            if (i < Portable.getPorts(extension).size()) {
+                port = Portable.getPort(extension, i);
+            } else {
+                port = createEntity(Port.class);
+            }
+
+            // <HACK>
+            port.addComponent(new RelativeLayoutConstraint());
+            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+            // </HACK>
 
             Port.setIndex(port, i);
             Port.setType(port, configuration.getPorts().get(i).getType());
             Port.setDirection(port, configuration.getPorts().get(i).getDirection());
 
-            Portable.addPort(extension, port);
+            if (i >= Portable.getPorts(extension).size()) {
+                Portable.addPort(extension, port);
+            }
         }
 
         // Set persistent to indicate the Extension is stored in a remote database
@@ -480,8 +503,10 @@ public class World {
                     Configuration configuration = new Configuration(extension);
                     configuration.setLabel(text);
 
+                    Log.v("Configuration", "configuration # ports: " + configuration.getPorts().size());
+
                     // Assign the Configuration to the ExtensionEntity
-                    configureExtensionFromProfile(extension, configuration);
+//                    configureExtensionFromProfile(extension, configuration);
 
                     // Cache the new ExtensionEntity Configuration
                     Application.getView().getClay().getConfigurations().add(configuration);
@@ -502,14 +527,29 @@ public class World {
     }
     // </EXTENSION_IMAGE_HELPERS>
 
+    public long updateTime = 0L;
+    public long renderTime = 0L;
+    public long lookupCount = 0L;
+
     public void updateSystems(Canvas canvas) {
-//        world.inputSystem.update();
+
+//        lookupCount = 0;
+
+        long updateStartTime = Clock.getCurrentTime();
+
+        world.inputSystem.update();
         world.eventHandlerSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();
         world.cameraSystem.update();
+//        world.inputSystem.update();
+//        updateTime = Clock.getCurrentTime() - updateStartTime;
+
+        long renderStartTime = Clock.getCurrentTime();
         world.renderSystem.update(canvas); // TODO: Remove canvas!
-        world.inputSystem.update();
+        renderTime = Clock.getCurrentTime() - renderStartTime;
+//        world.inputSystem.update();
+        updateTime = Clock.getCurrentTime() - updateStartTime;
     }
 
     /**

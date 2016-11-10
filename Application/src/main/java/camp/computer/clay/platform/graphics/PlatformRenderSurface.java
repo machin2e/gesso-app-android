@@ -135,7 +135,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         // getClay().getCommunication().startDatagramServer();
 
         // Remove this?
-        update();
+//        update();
 
     }
 
@@ -348,14 +348,15 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     /**
      * The function run in background thread, not UI thread.
      */
+    SurfaceHolder holder = getHolder();
     public void update() {
 
         if (world == null) {
             return;
         }
 
-        Canvas canvas = null;
-        SurfaceHolder holder = getHolder();
+//        Canvas canvas = null;
+//        SurfaceHolder holder = getHolder();
 
         try {
             canvas = holder.lockCanvas();
