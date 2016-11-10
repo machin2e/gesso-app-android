@@ -10,15 +10,23 @@ import camp.computer.clay.util.BuilderImage.Point;
 
 public class Portable extends Component {
 
+    // <COMPONENT_DATA>
     protected Group<Entity> ports = new Group<>();
 
     public List<Point> headerContactPositions = new ArrayList<>();
+    // </COMPONENT_DATA>
 
+
+
+    // <CONSTRUCTOR>
     public Portable() {
         super();
     }
+    // </CONSTRUCTOR>
 
-    // <MOVE_TO_SYSTEM?>
+
+
+    // <COMPONENT_DATA>
     public static Group<Entity> getPorts(Entity portable) {
         return portable.getComponent(Portable.class).ports;
     }
@@ -58,23 +66,22 @@ public class Portable extends Component {
         return extensions;
     }
 
-    // <EXTENSION>
-    // HACK: Assumes Extension
+    // Expects Extension
+    // Requires components: Portable, Extension
     public static Group<Entity> getHosts(Entity portable) {
-        List<Entity> hostEntities = World.getWorld().Manager.getEntities().filterWithComponent(Host.class);
+        List<Entity> hosts = World.getWorld().Manager.getEntities().filterWithComponent(Host.class);
 
-        Group<Entity> hostEntityGroup = new Group<>();
-        for (int i = 0; i < hostEntities.size(); i++) {
-            if (Portable.getExtensions(hostEntities.get(i)).contains(portable)) {
-                if (!hostEntityGroup.contains(hostEntities.get(i))) {
-                    hostEntityGroup.add(hostEntities.get(i));
+        Group<Entity> portableHosts = new Group<>();
+        for (int i = 0; i < hosts.size(); i++) {
+            if (Portable.getExtensions(hosts.get(i)).contains(portable)) {
+                if (!portableHosts.contains(hosts.get(i))) {
+                    portableHosts.add(hosts.get(i));
                 }
             }
         }
 
-        return hostEntityGroup;
+        return portableHosts;
     }
-    // </EXTENSION>
 
     // TODO: Make a Mapper in Group
     // Expects Group<Entity>
@@ -87,5 +94,5 @@ public class Portable extends Component {
         }
         return paths;
     }
-    // </MOVE_TO_SYSTEM?>
+    // </COMPONENT_DATA>
 }

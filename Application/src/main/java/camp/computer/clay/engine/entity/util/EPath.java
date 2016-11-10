@@ -1,123 +1,59 @@
-package camp.computer.clay.engine.component;
+package camp.computer.clay.engine.entity.util;
 
 import java.util.UUID;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.entity.Entity;
 
-public class Path extends Component {
+public abstract class EPath {
 
-    // <COMPONENT_DATA>
-    public enum Direction {
+    // TODO: Impelement these abstact classes
+    // TODO: Finish wiring up Repository, Process, Action, Script, etc.
 
-        NONE(0),   // sourcePortUuid  |  destination
-        OUTPUT(1), // sourcePortUuid --> destination
-        INPUT(2),  // sourcePortUuid <-- destination
-        BOTH(3);   // sourcePortUuid <-> destination
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        Direction(int index) {
-            this.index = index;
+    /*
+    if (entity.isType(EPath.class)) { // or EPath.matchesType(entity) // if (entity.hasComponent(Path.class)) {
+        if (Path.getState(entity) != Path.State.EDITING) {
+            absoluteReferenceTransform = entity.getComponent(Transform.class);
         }
     }
+    */
 
-    public enum Mode {
-
-        NONE(0),
-        ELECTRONIC(1),
-        BLUETOOTH(2),
-        MESH(3),
-        INTERNET(4);
-
-        // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
-        // TODO: TCP, UDP, HTTP, HTTPS
-
-        // TODO: Change the index to a UUID?
-        int index;
-
-        Mode(int index) {
-            this.index = index;
-        }
-
-        public static Mode getNext(Mode currentType) {
-            return Mode.values()[(currentType.index + 1) % Mode.values().length];
-        }
-    }
-
-    // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
-    public enum Type {
-        NONE,
-        SWITCH,
-        PULSE,
-        WAVE,
-        POWER_REFERENCE,
-        POWER_CMOS,
-        POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
-
-        public static Path.Type getNext(Path.Type currentType) {
-            Path.Type[] values = Path.Type.values();
-            int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
-            return values[(currentIndex + 1) % values.length];
-        }
-    }
-
-    // TODO: public enum Protocol (i.e., BLUETOOTH, TCP, UDP, HTTP, HTTPS)
-
-    public Mode mode = Mode.NONE;
-
-    public Type type = Type.NONE;
-
-    public Direction direction = Direction.NONE;
-
-    public UUID sourcePortUuid;
-
-    public UUID targetPortUuid;
-    // </COMPONENT_DATA>
-
-
-
-    // <CONSTRUCTOR>
-    public Path() {
-        super();
-        setup();
-    }
-
-    private void setup() {
-        this.mode = Mode.ELECTRONIC;
-        this.type = Type.NONE; // Default to ELECTRONIC
-        this.direction = Direction.BOTH; // Default to BOTH
-
-        // TODO: PathEntity.connectPath(sourcePortUuid, destination) and do what the following constructor does... auto-configure Ports and PathEntity
-    }
-    // </CONSTRUCTOR>
-
-
-
+    /*
     // <ABSTRACT_ENTITY_INTERFACE>
-    public static Type getType(Entity path) {
+    public static Path.State getState(Entity path) {
+        return path.getComponent(Path.class).state;
+    }
+
+    public static void setState(Entity path, Path.State state) {
+        path.getComponent(Path.class).state = state;
+    }
+
+    public static Path.Type getType(Entity path) {
         return path.getComponent(Path.class).type;
     }
 
-    public static void setType(Entity path, Type type) {
+    public static void setType(Entity path, Path.Type type) {
         path.getComponent(Path.class).type = type;
     }
 
-    public static Mode getMode(Entity path) {
+    public static Path.Mode getMode(Entity path) {
         return path.getComponent(Path.class).mode;
     }
 
-    public static void setMode(Entity path, Mode mode) {
+    public static void setMode(Entity path, Path.Mode mode) {
         path.getComponent(Path.class).mode = mode;
     }
 
-    public static Direction getDirection(Entity path) {
+    public static Path.Direction getDirection(Entity path) {
         return path.getComponent(Path.class).direction;
     }
 
-    public static void setDirection(Entity path, Direction direction) {
+    public static void setDirection(Entity path, Path.Direction direction) {
         path.getComponent(Path.class).direction = direction;
     }
 
@@ -125,11 +61,11 @@ public class Path extends Component {
 
         Path pathComponent = path.getComponent(Path.class);
 
-        pathComponent.mode = Mode.ELECTRONIC; // Default to ELECTRONIC
-        if (pathComponent.type == Type.NONE) {
-            pathComponent.type = Type.getNext(pathComponent.type);
+        pathComponent.mode = Path.Mode.ELECTRONIC; // Default to ELECTRONIC
+        if (pathComponent.type == Path.Type.NONE) {
+            pathComponent.type = Path.Type.getNext(pathComponent.type);
         }
-        pathComponent.direction = Direction.BOTH; // Default to BOTH
+        pathComponent.direction = Path.Direction.BOTH; // Default to BOTH
 
         pathComponent.sourcePortUuid = sourcePort.getUuid();
         pathComponent.targetPortUuid = targetPort.getUuid();
@@ -225,4 +161,5 @@ public class Path extends Component {
         }
     }
     // </ABSTRACT_ENTITY_INTERFACE>
+    */
 }

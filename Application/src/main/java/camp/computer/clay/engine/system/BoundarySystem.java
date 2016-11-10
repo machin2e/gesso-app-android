@@ -3,6 +3,7 @@ package camp.computer.clay.engine.system;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -126,7 +127,7 @@ public class BoundarySystem extends System {
 
                 // HACK!
                 if (entity.hasComponent(Path.class)) {
-                    if (entity.getComponent(Path.class).state != Path.State.EDITING) {
+                    if (Path.getState(entity) != Component.State.EDITING) {
                         absoluteReferenceTransform = entity.getComponent(Transform.class);
                     }
                 } else {

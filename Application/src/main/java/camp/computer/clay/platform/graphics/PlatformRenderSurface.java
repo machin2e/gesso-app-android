@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
@@ -443,7 +444,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             sourcePortShape.setColor(hostSourcePortShape.getColor());
 
-            if (path.getComponent(Path.class).state != Path.State.EDITING) {
+            if (Path.getState(path) != Component.State.EDITING) {
                 sourcePortShape.setPosition(hostSourcePortShape.getPosition());
                 targetPortShape.setPosition(extensionTargetPortShape.getPosition());
 //        sourcePortShape.setPosition(path.getComponent(Path.class).getSource().getComponent(Transform.class));
@@ -527,7 +528,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //            );
             path.getComponent(Transform.class).set(sourcePortShape.getPosition());
 
-            if (path.getComponent(Path.class).state != Path.State.EDITING) {
+            if (Path.getState(path) != Component.State.EDITING) {
                 sourcePortShape.setPosition(hostSourcePortShape.getPosition());
 //                targetPortShape.setPosition(extensionTargetPortShape.getPosition());
 //        sourcePortShape.setPosition(path.getComponent(Path.class).getSource().getComponent(Transform.class));

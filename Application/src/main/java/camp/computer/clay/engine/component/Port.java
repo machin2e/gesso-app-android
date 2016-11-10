@@ -6,11 +6,20 @@ import camp.computer.clay.engine.entity.Entity;
 
 public class Port extends Component {
 
+    // <COMPONENT_DATA>
     public enum Direction {
-        NONE,
-        OUTPUT,
-        INPUT,
-        BOTH // e.g., I2C, etc.
+
+        NONE(0),   // sourcePortUuid  |  destination
+        OUTPUT(1), // sourcePortUuid --> destination
+        INPUT(2),  // sourcePortUuid <-- destination
+        BOTH(3);   // sourcePortUuid <-> destination
+
+        // TODO: Change the index to a UUID?
+        int index;
+
+        Direction(int index) {
+            this.index = index;
+        }
     }
 
     // TODO: none, 5v, 3.3v, (data) I2C, SPI, (monitor) A2D, voltage, current
@@ -23,33 +32,45 @@ public class Port extends Component {
         POWER_CMOS,
         POWER_TTL; // TODO: Should contain parameters for voltage (5V, 3.3V), current (constant?).
 
+        // TODO: NONE, ELECTRONIC, MESH, INTERNET, BLUETOOTH
+        // TODO: TCP, UDP, HTTP, HTTPS
+
         public static Type getNext(Type currentType) {
             Type[] values = Type.values();
             int currentIndex = java.util.Arrays.asList(values).indexOf(currentType);
             return values[(currentIndex + 1) % values.length];
         }
     }
+    // </COMPONENT_DATA>
 
+
+
+    // <CONSTRUCTOR>
     public Port() {
         super();
     }
+    // </CONSTRUCTOR>
 
+
+
+    // <COMPONENT_DATA>
     /**
-     * The {@code index} is a unique number that uniquely identifies the {@code PortEntity}. Concretely,
+     * The {@code index} is a unique number that uniquely identifies the {@code Port}. Concretely,
      * the {@code index} identifier is equal to the pin number defined for a particular I/O pin on
      * the physical device (if any).
      * <p>
      * The {@code index} is assumed to be zero-indexed, so the corresponding I/O pin number may be
      * offset by a value of one. (Note that this may changed to be one-indexed.)
      * <p>
-     * The {@code PortEntity}'s {@code index} can be used complementary to the {@code PortEntity}'s
-     * {@code label} to refer to a specific {@code PortEntity}.
+     * The {@code Port}'s {@code index} can be used complementary to the {@code Port}'s
+     * {@code label} to refer to a specific {@code Port}.
      */
     private int index = 0;
 
     private Type type = Type.NONE;
 
     private Direction direction = Direction.NONE;
+    // </COMPONENT_DATA>
 
 
 

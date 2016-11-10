@@ -33,9 +33,11 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.R;
+import camp.computer.clay.util.Random;
 
 public class NativeUi {
 
@@ -575,13 +577,16 @@ public class NativeUi {
 
     public void openActionEditor_ScriptJumpList(Entity extension) {
 
+        final Repository repository = new Repository();
+        repository.populateTestData();
+
         // TODO: Hack into the JS engine in V8 to execute this pure JS. Fuck it.
 
         // NOTE: This is just a list of edit boxes. Each with a dropdown to save new script or load from the list. MVP, bitches.
 
         // Get list of Ports connected to Extension
         String portTypesString = "";
-        Group<Entity> ports = Portable.getPorts(extension);
+        final Group<Entity> ports = Portable.getPorts(extension);
         for (int i = 0; i < ports.size(); i++) {
             Entity port = ports.get(i);
             Log.v("PortType", "port type: " + Port.getType(port));
@@ -619,12 +624,41 @@ public class NativeUi {
                 textView.setGravity(Gravity.CENTER_HORIZONTAL);
                 linearLayout.addView(textView);
 
-                // Layout (Linear Vertical): Actions
+                // Layout (Linear Vertical): Action List
                 final LinearLayout linearLayout2 = new LinearLayout(context);
                 linearLayout2.setOrientation(LinearLayout.VERTICAL);
                 linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                Spinner spinner = new Spinner(context);
+                // Default Action Controller based on Port Configuration
+                /*
+                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionEditorView();
+                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
+                linearLayout.addView(defaultActionBasedOnPortConfiguration);
+                */
+
+                LinearLayout portableLayout = new LinearLayout(context);
+                portableLayout.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayout.addView(portableLayout);
+
+                // Ports
+                for (int i = 0; i < ports.size(); i++) {
+                    EditText button6 = new EditText(context);
+                    button6.setHint("" + Port.getType(ports.get(i)));
+                    button6.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                    button6.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i)))));
+
+                    LinearLayout.LayoutParams params4 = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    params4.setMargins(0, dpToPx(5), 0, 0);
+                    button6.setLayoutParams(params4);
+
+                    portableLayout.addView(button6);
+                }
+
+                // Spinner: Action Browser
+                final Spinner spinner = new Spinner(context);
                 spinner.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
                 spinner.setBackgroundColor(Color.parseColor("#44000000"));
 
@@ -635,20 +669,45 @@ public class NativeUi {
                 params2.setMargins(0, dpToPx(5), 0, 0);
                 spinner.setLayoutParams(params2);
 
-                List<String> spinnerArray = new ArrayList<>();
-                spinnerArray.add("load script from browser");
-                spinnerArray.add("script 1");
-                spinnerArray.add("script 2");
-                spinnerArray.add("script 3");
+                final List<String> spinnerArray = new ArrayList<>();
+                spinnerArray.add("Add Action"); // load script from browser
+                spinnerArray.add("new script");
+                spinnerArray.add("demo script 1");
+                spinnerArray.add("demo script 2");
+                spinnerArray.add("demo script 3");
+                // TODO: Load Scripts from Repository
                 ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(spinnerArrayAdapter);
-                linearLayout.addView(spinner);
 
-                // Default Action Controller based on Port Configuration
-                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionEditorView();
-                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
-                linearLayout.addView(defaultActionBasedOnPortConfiguration);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (i > 0) {
+                            String selectedText = spinnerArray.get(i);
+
+                            if (selectedText.equals("new script")) {
+
+                                View actionEditorView = createActionEditorView();
+                                linearLayout2.addView(actionEditorView);
+
+                            } else {
+                                EditText actionEditorView = (EditText) createActionEditorView();
+                                actionEditorView.setText(selectedText);
+                                linearLayout2.addView(actionEditorView);
+                            }
+
+                            spinner.setSelection(0);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
+                linearLayout.addView(spinner);
 
                 // Button: "Add Action"
                 Button button2 = new Button(context);
@@ -661,7 +720,7 @@ public class NativeUi {
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
                 params3.setMargins(0, dpToPx(5), 0, 0);
-                button2.setLayoutParams(params2);
+                button2.setLayoutParams(params3);
 
                 button2.setOnTouchListener(new View.OnTouchListener() {
                     @Override
@@ -769,7 +828,7 @@ public class NativeUi {
         // Text: "Data Sources (Imports)"
         final EditText actionView = new EditText(context);
         actionView.setTextSize(11.0f);
-        actionView.setHint("TODO: <describe>");
+        actionView.setHint("TODO: <describe to search scripts>");
         actionView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
         actionView.setBackgroundColor(Color.parseColor("#44000000"));
 

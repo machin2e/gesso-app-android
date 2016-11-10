@@ -5,6 +5,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
@@ -15,7 +17,6 @@ import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
@@ -391,9 +392,7 @@ public class EventHandlerSystem extends System {
 
     public void handlePortEvent(final Entity port, Event event) {
 
-        Log.v("EventHandlerSystem", "handlePortEvent");
-
-        final Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+        // Log.v("EventHandlerSystem", "handlePortEvent");
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -404,10 +403,6 @@ public class EventHandlerSystem extends System {
         } else if (event.getType() == Event.Type.MOVE) {
 
         } else if (event.getType() == Event.Type.UNSELECT) {
-
-            // TODO? Group<Entity> entitiesAtEventPosition = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
-
-//            if (event.getTarget() != null && event.getTarget().hasComponent(Port.class)) {
 
             // (Host.Port, ..., Host.Port) Action Pattern
 
@@ -434,7 +429,6 @@ public class EventHandlerSystem extends System {
                 }
 
             }
-//            }
         }
     }
 
@@ -442,7 +436,7 @@ public class EventHandlerSystem extends System {
 
 //        Log.v("handlePathEvent", "handlePathEvent");
 
-        boolean isSingletonPath = Path.getTarget(path) == null;
+        boolean isSingletonPath = (Path.getTarget(path) == null);
 
         // Check if source or target in Path was moved, and reassign it
         Group<Entity> touchedPorts = world.Manager.getEntities().filterWithComponent(Port.class).filterContains(event.getPosition());
@@ -485,10 +479,10 @@ public class EventHandlerSystem extends System {
                     Log.v("PathEvent", "Touched Source");
                     sourcePortShape.setPosition(event.getPosition());
 
-                    path.getComponent(Path.class).state = Path.State.EDITING;
+                    Path.setState(path, Component.State.EDITING);
 
                     // <HACK>
-                    BoundarySystem.updateShapeBoundary(sourcePortShape);
+                    world.boundarySystem.updateShapeBoundary(sourcePortShape);
                     // </HACK>
                 }
 
@@ -497,10 +491,10 @@ public class EventHandlerSystem extends System {
                     Log.v("PathEvent", "Touched Target");
                     targetPortShape.setPosition(event.getPosition());
 
-                    path.getComponent(Path.class).state = Path.State.EDITING;
+                    Path.setState(path, Component.State.EDITING);
 
                     // <HACK>
-                    BoundarySystem.updateShapeBoundary(targetPortShape);
+                    world.boundarySystem.updateShapeBoundary(targetPortShape);
                     // </HACK>
                 }
 //            world.boundarySystem.updateImage(path);
@@ -614,7 +608,8 @@ public class EventHandlerSystem extends System {
 
                 // Full Path (non-singleton Path)
 
-                if (path.getComponent(Path.class).state != Path.State.EDITING) {
+                if (Path.getState(path) != Component.State.EDITING) {
+
                     // <PATH>
                     // Set next Path type
                     Path.Type nextType = Path.Type.getNext(Path.getType(path));
@@ -631,7 +626,7 @@ public class EventHandlerSystem extends System {
                     // Notification
                     world.renderSystem.addNotification("" + nextType, event.getPosition(), 800);
 
-                } else if (path.getComponent(Path.class).state == Path.State.EDITING) {
+                } else if (Path.getState(path) == Component.State.EDITING) {
 
                     Group<Entity> touchedPorts2 = world.Manager.getEntities().filterWithComponent(Port.class).filterContains(event.getPosition());
 
@@ -642,17 +637,15 @@ public class EventHandlerSystem extends System {
 
                         // Remap the Path's Port if the touched Port doesn't already have a Path
                         Group<Entity> targetPaths = Port.getPaths(touchedPort2);
-                        if (targetPaths.size() > 0) {
+                        if (targetPaths.size() > 0 && targetPaths.get(0) == path) {
 
-                            if (targetPaths.get(0) == path) {
-                                // Swap the Path's Ports (Flip Direction)
-                                Log.v("PathEventHandler", "flipping the path");
-                                Entity sourcePort = Path.getSource(path);
-                                Path.setSource(path, Path.getTarget(path));
-                                Path.setSource(path, sourcePort);
+                            // Swap the Path's Ports (Flip Direction)
+                            Log.v("PathEventHandler", "flipping the path");
+                            Entity sourcePort = Path.getSource(path);
+                            Path.setSource(path, Path.getTarget(path));
+                            Path.setTarget(path, sourcePort);
 
-                                // TODO: path.getComponent(Path.class).setDirection();
-                            }
+                            // TODO: path.getComponent(Path.class).setDirection();
 
                             // Notification
                             world.renderSystem.addNotification("flipped path", event.getPosition(), 1000);
@@ -759,7 +752,7 @@ public class EventHandlerSystem extends System {
 
                 }
 
-                path.getComponent(Path.class).state = Path.State.NONE;
+                Path.setState(path, Component.State.NONE);
 
             } else {
 
@@ -867,7 +860,7 @@ public class EventHandlerSystem extends System {
                             // TODO: Delete path on target
                             // <CLEANUP_ENTITY_DELETE_CODE>
                             event.getTarget().isActive = false;
-                            event.getTarget().getComponent(Path.class).state = Path.State.EDITING;
+                            Path.setState(event.getTarget(), Component.State.EDITING);
                             Entity tempSourcePort = Path.getSource(event.getTarget());
                             Path.setSource(event.getTarget(), null); // Reset path
                             Path.setTarget(event.getTarget(), null); // Reset path

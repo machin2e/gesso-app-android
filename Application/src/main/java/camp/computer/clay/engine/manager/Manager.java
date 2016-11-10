@@ -38,4 +38,39 @@ public class Manager {
     public void remove(Entity entity) {
         entities.remove(entity);
     }
+
+    /*
+    // <ENTITY_MANAGEMENT>
+    // TODO: Create non-static Manager in World?
+    public static void addEntity(Entity entity) {
+        Manager.add(entity);
+    }
+
+    public static boolean hasEntity(UUID uuid) {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Entity getEntity(UUID uuid) {
+        for (int i = 0; i < Entity.Manager.size(); i++) {
+            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
+                return Entity.Manager.get(i);
+            }
+        }
+        return null;
+    }
+
+    public static Entity removeEntity(UUID uuid) {
+        Entity entity = Manager.get(uuid);
+        if (entity != null) {
+            Entity.Manager.remove(entity);
+        }
+        return entity;
+    }
+    // </ENTITY_MANAGEMENT>
+    */
 }
