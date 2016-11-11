@@ -468,7 +468,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(sourcePortShape, palette);
             drawShape(targetPortShape, palette);
 
-            // Draw boundaries
+            // Draw shapeBoundaries
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
@@ -554,7 +554,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(sourcePortShape, palette);
 //            platformRenderSurface.drawShape(targetPortShape);
 
-            // Draw boundaries
+            // Draw shapeBoundaries
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path

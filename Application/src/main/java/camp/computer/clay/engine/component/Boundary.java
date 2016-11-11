@@ -12,6 +12,9 @@ import camp.computer.clay.util.BuilderImage.Shape;
 
 public class Boundary extends Component {
 
+//    public static HashMap<Shape, Shape.ShapeBoundary> shapeBoundaries = new HashMap<>();
+public static HashMap<Shape, ArrayList<Transform>> shapeBoundaries = new HashMap<>();
+
     private List<Transform> boundary = new ArrayList<>();
 
 //    private List<List<Transform>> shapeBounds = new ArrayList<>();

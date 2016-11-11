@@ -3,6 +3,7 @@ package camp.computer.clay.util.BuilderImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 
 public class Segment extends Shape {
@@ -25,8 +26,8 @@ public class Segment extends Shape {
     }
 
     private void setupGeometry() {
-        boundary.add(new Transform(source));
-        boundary.add(new Transform(target));
+        Boundary.shapeBoundaries.get(this).add(new Transform(source));
+        Boundary.shapeBoundaries.get(this).add(new Transform(target));
     }
 
     @Override

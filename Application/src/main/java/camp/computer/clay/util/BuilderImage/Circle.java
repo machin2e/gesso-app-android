@@ -3,6 +3,7 @@ package camp.computer.clay.util.BuilderImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 
 /**
@@ -33,7 +34,8 @@ public class Circle extends Shape {
     }
 
     private void setupGeometry() {
-        this.boundary = Geometry.getRegularPolygon(position, this.radius, BOUNDARY_VERTEX_COUNT);
+        ArrayList<Transform> boundary = Boundary.shapeBoundaries.get(this);
+        boundary.addAll(Geometry.getRegularPolygon(position, this.radius, BOUNDARY_VERTEX_COUNT));
     }
 
     public double getRadius() {
@@ -59,14 +61,14 @@ public class Circle extends Shape {
         return vertices;
     }
 
-    /**
-     * Returns list of pointerCoordinates on the perimeter of the circle that define a regular polygon that
-     * approximates the circle.
-     *
-     * @return
-     */
-    @Override
-    public List<Transform> getBoundary() {
-        return boundary;
-    }
+//    /**
+//     * Returns list of pointerCoordinates on the perimeter of the circle that define a regular polygon that
+//     * approximates the circle.
+//     *
+//     * @return
+//     */
+//    @Override
+//    public List<Transform> getBoundary() {
+//        return boundary;
+//    }
 }

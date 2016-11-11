@@ -4,10 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Groupable;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.engine.component.Transform;
 
 public abstract class Shape extends Groupable {
+
+//    public class ShapeBoundary {
+//        public Shape shape;
+//        public List<Transform> boundary;
+//        public ShapeBoundary(Shape shape) {
+//            this.shape = shape;
+//            this.boundary = new ArrayList<>();
+//        }
+//    }
+
+//    public static HashMap<Shape, ShapeBoundary> shapeBoundaries = new HashMap<>();
 
     protected String label = "";
 
@@ -24,7 +36,8 @@ public abstract class Shape extends Groupable {
     // TODO: RIGHT NOW EVERY FUCKING SHAPE COMPUTES A BOUNDING BOX. MOST OF THEM ARE NOT EVEN WANTED. THIS MUST CHANGE! IN FILE FORMAT, ADD FLAG TO CREATE BOUNDS!
     // TODO: Start by moving boundary out of Shape into Image/Boundary.shapeBounds hashmap, with call to create bounds in Image/Boundary
     // TODO: Then only compute boundary for Shapes/Images that need it!
-    protected List<Transform> boundary = new ArrayList<>();
+//    protected List<Transform> boundary;
+//    protected ShapeBoundary shapeBoundary;
 
     public boolean isValid = false;
 
@@ -57,9 +70,17 @@ public abstract class Shape extends Groupable {
     // </LAYER>
 
     public Shape() {
+//        boundary = new ArrayList<>();
+//        shapeBoundary = new ShapeBoundary(this);
+//        Boundary.shapeBoundaries.put(this, new ShapeBoundary(this));
+        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
     }
 
     public Shape(Transform position) {
+//        boundary = new ArrayList<>();
+//        shapeBoundary = new ShapeBoundary(this);
+//        Boundary.shapeBoundaries.put(this, new ShapeBoundary(this));
+        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
         this.position.set(position);
     }
 
@@ -107,7 +128,9 @@ public abstract class Shape extends Groupable {
 
     // TODO: Delete! Get boundary in BoundarySystem.
     public List<Transform> getBoundary() {
-        return this.boundary;
+//        return this.shapeBoundary.boundary;
+//        return Boundary.shapeBoundaries.get(this).boundary;
+        return Boundary.shapeBoundaries.get(this);
     }
 
     public void setColor(String color) {

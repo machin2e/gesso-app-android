@@ -1,7 +1,10 @@
 package camp.computer.clay.engine.component;
 
+import java.util.HashMap;
+
 import camp.computer.clay.util.BuilderImage.BuilderImage;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.util.BuilderImage.Shape;
 
 public class Image extends Component {
 

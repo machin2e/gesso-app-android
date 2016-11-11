@@ -321,10 +321,14 @@ public class BoundarySystem extends System {
     public static void updateShapeBoundary(Shape shape) {
 
         List<Transform> vertices = shape.getVertices();
+//        List<Transform> boundary = shape.getBoundary();
         List<Transform> boundary = shape.getBoundary();
 
         // Translate and rotate the boundary about the updated position
         for (int i = 0; i < vertices.size(); i++) {
+//            if (boundary.size() < vertices.size()) {
+//                return;
+//            }
             boundary.get(i).set(vertices.get(i));
             Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
             Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape

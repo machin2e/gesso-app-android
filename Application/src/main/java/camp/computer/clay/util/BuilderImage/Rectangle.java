@@ -3,6 +3,7 @@ package camp.computer.clay.util.BuilderImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.BoundarySystem;
 
@@ -49,10 +50,10 @@ public class Rectangle extends Shape {
         Transform bottomRight = new Transform(0 + (width / 2.0), 0 + (height / 2.0));
         Transform bottomLeft = new Transform(0 - (width / 2.0), 0 + (height / 2.0));
 
-        boundary.add(topLeft);
-        boundary.add(topRight);
-        boundary.add(bottomRight);
-        boundary.add(bottomLeft);
+        Boundary.shapeBoundaries.get(this).add(topLeft);
+        Boundary.shapeBoundaries.get(this).add(topRight);
+        Boundary.shapeBoundaries.get(this).add(bottomRight);
+        Boundary.shapeBoundaries.get(this).add(bottomLeft);
 
         // Create segment Lines (relative to the Shape)
         Segment top = new Segment(topLeft, topRight);
