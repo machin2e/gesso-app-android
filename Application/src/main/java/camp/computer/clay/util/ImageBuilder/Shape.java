@@ -1,10 +1,13 @@
 package camp.computer.clay.util.ImageBuilder;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.component.Boundary;
+import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.util.Color;
 import camp.computer.clay.engine.component.Transform;
 
@@ -134,9 +137,11 @@ public abstract class Shape extends Groupable {
 //        return Boundary.shapeBoundaries.get(this).boundary;
         if (isBoundary) {
             if (!Boundary.shapeBoundaries.containsKey(this)) {
+                Log.v("Boundz", "adding boundary for " + this);
                 ArrayList<Transform> boundary = new ArrayList<>();
                 boundary.addAll(getVertices());
                 Boundary.shapeBoundaries.put(this, boundary);
+                BoundarySystem.updateShapeBoundary(this);
             }
             return Boundary.shapeBoundaries.get(this);
         } else {

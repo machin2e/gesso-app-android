@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,62 +24,16 @@ import camp.computer.clay.engine.component.util.Visible;
 
 public class Group<E extends Groupable> implements List<E> {
 
-    protected List<E> elements = new ArrayList<>();
-
-    public E get(long uuid) {
-        for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).uuid == uuid) {
-                return elements.get(i);
-            }
-        }
-        return null;
-    }
-
-    public boolean contains(long uuid) {
-        for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).uuid == uuid) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // TODO: <BUG>
-    public E remove(long uuid) {
-        E element = get(uuid);
-        if (element != null) {
-            remove(element);
-        }
-        return element;
-    }
-    // TODO: </BUG>
-
-    // TODO: <BUG>
-    public Group<E> remove(E entity) {
-        /*
-        Group<E> group = new Group<>();
-        for (int i = 0; i < this.elements.size(); i++) {
-            if (elements.get(i) != entity) {
-                group.add(this.elements.get(i));
-            }
-        }
-        return group;
-        */
-        int elementIndex = indexOf(entity);
-        remove(elementIndex);
-        return this;
-    }
-    // TODO: </BUG>
-
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
 
+    // <GROUP_LOOKUP>
     public interface Filter<V extends Groupable, D> {
-        boolean filter(V entity, D... data);
+        boolean filter(V entity, D data);
     }
 
-    public <D> Group filter(Filter filter, D... data) {
+    public <D> Group filter(Filter filter, D data) {
         Group<E> result = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             if (filter.filter(elements.get(i), data) == true) {
@@ -99,22 +52,23 @@ public class Group<E extends Groupable> implements List<E> {
         return this;
     }
 
+    // "Filters" namespace
     public static class Filters {
 
-//        public static Filter filterType = new Filter<Entity, Class<?>>() {
-//            @Override
-//            public boolean filter(Entity entity, Class<?>... entityTypes) {
-//                if (Arrays.asList(entityTypes).contains(entity.getClass())) {
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
-//        };
+        public static Filter filterUuid = new Filter<Entity, Long>() {
+            @Override
+            public boolean filter(Entity entity, Long uuid) {
+                if (entity.uuid == uuid) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
 
         public static Filter filterVisibility = new Filter<Entity, Boolean>() {
             @Override
-            public boolean filter(Entity entity, Boolean... data) {
+            public boolean filter(Entity entity, Boolean data) {
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     return true;
@@ -126,7 +80,7 @@ public class Group<E extends Groupable> implements List<E> {
 
         public static Filter filterActive = new Filter<Entity, Boolean>() {
             @Override
-            public boolean filter(Entity entity, Boolean... data) {
+            public boolean filter(Entity entity, Boolean data) {
                 if (entity.isActive) {
                     return true;
                 } else {
@@ -137,8 +91,8 @@ public class Group<E extends Groupable> implements List<E> {
 
         public static Filter filterContains = new Filter<Entity, Transform>() {
             @Override
-            public boolean filter(Entity entity, Transform... points) {
-                if (Boundary.contains(entity, points[0])) {
+            public boolean filter(Entity entity, Transform point) {
+                if (Boundary.contains(entity, point)) {
                     return true;
                 } else {
                     return false;
@@ -172,6 +126,7 @@ public class Group<E extends Groupable> implements List<E> {
         return group;
     }
 
+    // "Mappers" namespace
     public static class Mappers {
 
         // Expects Group<Entity>
@@ -278,6 +233,11 @@ public class Group<E extends Groupable> implements List<E> {
             }
         }
         return group;
+    }
+
+    // Expects Group<Entity>
+    public Group<E> filterUuid(long uuid) {
+        return filter(Filters.filterUuid, uuid); // OR: Mappers.setImageVisibility.filter(this);
     }
 
     // Expects Group<Entity>
@@ -432,6 +392,58 @@ public class Group<E extends Groupable> implements List<E> {
 
         return Geometry.getBoundingBox(imageBoundaries);
     }
+    // </GROUP_LOOKUP>
+
+
+
+    // <GROUP>
+    protected List<E> elements = new ArrayList<>();
+
+    public E get(long uuid) {
+        /*
+        // METHOD 1: Without filter(...).
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).uuid == uuid) {
+                return elements.get(i);
+            }
+        }
+        return null;
+        */
+
+        // METHOD 2: With filter(...).
+        Group<E> result = filterUuid(uuid);
+        if (result.size() > 0) {
+            return result.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public boolean contains(long uuid) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (elements.get(i).uuid == uuid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public E remove(long uuid) {
+        E element = get(uuid);
+        if (element != null) {
+            remove(element);
+        }
+        return element;
+    }
+
+    public Group<E> remove(E entity) {
+        int elementIndex = indexOf(entity);
+        remove(elementIndex);
+        return this;
+    }
+    // </GROUP>
+
+
 
     // <LIST_INTERFACE>
 

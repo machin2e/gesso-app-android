@@ -44,7 +44,7 @@ import camp.computer.clay.util.time.Clock;
 
 public class World {
 
-    public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 400;
+    public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 325;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
 
     public static double PIXEL_PER_MILLIMETER = 6.0;

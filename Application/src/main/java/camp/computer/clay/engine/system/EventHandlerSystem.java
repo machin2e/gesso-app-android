@@ -66,7 +66,7 @@ public class EventHandlerSystem extends System {
     private void dispatchEvent(Event event) {
 
         // Annotate the Event
-//        Group<Entity> targetEntities = Entity.Manager.filterVisibility(true).filterContains(event.getPosition());
+//        Group<Entity> targetEntities = Entity.Manager.filterUuid(true).filterContains(event.getPosition());
         Group<Entity> targetEntities = world.Manager.getEntities().filterVisibility(true).filterWithComponent(Image.class).sortByLayer().filterContains(event.getPosition());
         Entity targetEntity = null;
         if (targetEntities.size() > 0) {

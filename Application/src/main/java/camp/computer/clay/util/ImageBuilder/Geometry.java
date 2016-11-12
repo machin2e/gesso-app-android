@@ -210,6 +210,7 @@ public abstract class Geometry {
             // Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
             Rectangle rectangle = new Rectangle(minX, minY, maxX, maxY);
             // <HACK>
+            // TODO/BUG: This allocates a temporary boundary that is not removed from the shape boundary hashmap!
             rectangle.isBoundary = true;
             // </HACK>
             return rectangle;
