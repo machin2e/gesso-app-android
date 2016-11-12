@@ -882,6 +882,220 @@ public class NativeUi {
         return actionView;
     }
 
+    public void openSettings() {
+
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final RelativeLayout relativeLayout = new RelativeLayout(context);
+                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        relativeLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Title: "Actions"
+                TextView textView = new TextView(context);
+                textView.setText("Settings");
+                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setTextSize(20);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView);
+
+                // Layout (Linear Vertical): Action List
+                final LinearLayout linearLayout2 = new LinearLayout(context);
+                linearLayout2.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Default Action Controller based on Port Configuration
+                /*
+                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionEditorView();
+                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
+                linearLayout.addView(defaultActionBasedOnPortConfiguration);
+                */
+
+                LinearLayout portableLayout = new LinearLayout(context);
+                portableLayout.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayout.addView(portableLayout);
+
+                // Spinner: Action Browser
+                final Spinner spinner = new Spinner(context);
+                spinner.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                spinner.setBackgroundColor(Color.parseColor("#44000000"));
+
+                LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params2.setMargins(0, dpToPx(5), 0, 0);
+                spinner.setLayoutParams(params2);
+
+                final List<String> spinnerArray = new ArrayList<>();
+                spinnerArray.add("Add Action"); // load script from browser
+                spinnerArray.add("new script");
+//                spinnerArray.add("demo script 1");
+//                spinnerArray.add("demo script 2");
+//                spinnerArray.add("demo script 3");
+                Group<Action> actions = World.getWorld().repository.getActions();
+                Log.v("Spinner", "actions.size(): " + actions.size());
+                for (int i = 0; i < actions.size(); i++) {
+                    spinnerArray.add(actions.get(i).getTitle());
+                }
+                // TODO: Load Scripts from Repository
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
+                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(spinnerArrayAdapter);
+
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (i > 0) {
+                            String selectedText = spinnerArray.get(i);
+
+                            if (selectedText.equals("new script")) {
+
+                                View actionEditorView = createActionEditorView();
+                                linearLayout2.addView(actionEditorView);
+
+                            } else {
+                                EditText actionEditorView = (EditText) createActionEditorView();
+                                actionEditorView.setText(selectedText);
+                                linearLayout2.addView(actionEditorView);
+                            }
+
+                            spinner.setSelection(0);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
+                linearLayout.addView(spinner);
+
+                /*
+                // Button: "Add Action"
+                Button button2 = new Button(context);
+                button2.setText("Add Action");
+                button2.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                button2.setBackgroundColor(Color.parseColor("#44000000"));
+
+                LinearLayout.LayoutParams params3 = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params3.setMargins(0, dpToPx(5), 0, 0);
+                button2.setLayoutParams(params3);
+
+                button2.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                        int pointerId = motionEvent.getPointerId(pointerIndex);
+                        //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
+                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                        int pointCount = motionEvent.getPointerCount();
+
+                        // Update the state of the touched object based on the current pointerCoordinates interaction state.
+                        if (touchActionType == MotionEvent.ACTION_DOWN) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                            View actionEditorView = createActionEditorView();
+                            linearLayout2.addView(actionEditorView);
+
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                            // TODO:
+                        } else {
+                            // TODO:
+                        }
+
+                        return true;
+                    }
+                });
+                linearLayout.addView(button2);
+                */
+
+                // Title: "More"
+                final TextView textView2 = new TextView(context);
+                textView2.setText("More");
+                textView2.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView2.setTextSize(20);
+                textView2.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView2.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView2);
+
+                // Layout (Linear Vertical): More Options
+                final LinearLayout linearLayout3 = new LinearLayout(context);
+                linearLayout3.setOrientation(LinearLayout.VERTICAL);
+                linearLayout3.setVisibility(View.GONE);
+                linearLayout.addView(linearLayout3, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                final boolean[] moreOptionsVisible = {false};
+                textView2.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        switch (motionEvent.getAction()) {
+                            case MotionEvent.ACTION_UP:
+                                moreOptionsVisible[0] = !moreOptionsVisible[0];
+                                if (moreOptionsVisible[0]) {
+                                    linearLayout3.setVisibility(View.VISIBLE);
+                                    textView2.setText("Less");
+                                } else {
+                                    linearLayout3.setVisibility(View.GONE);
+                                    textView2.setText("More");
+                                }
+                        }
+                        return true;
+                    }
+                });
+
+                // Button: "Test Run"
+                Button button3a = new Button(context);
+                button3a.setText("Test Run (V8)");
+                linearLayout3.addView(button3a);
+
+                // Button: "Browse Actions"
+                Button button3 = new Button(context);
+                button3.setText("Browse Actions for Ext/Port Config");
+                linearLayout3.addView(button3);
+
+                Button button4 = new Button(context);
+                button4.setText("Add TODO");
+                linearLayout3.addView(button4);
+
+                Button button5 = new Button(context);
+                button5.setText("Add Note");
+                linearLayout3.addView(button5);
+
+                // Add to main Application View
+                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
+    }
+
     public void scheduleEvent() {
         // TODO:
     }

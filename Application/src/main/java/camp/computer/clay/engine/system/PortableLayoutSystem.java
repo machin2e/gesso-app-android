@@ -16,11 +16,12 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.configuration.Configuration;
-import camp.computer.clay.util.BuilderImage.Geometry;
-import camp.computer.clay.util.BuilderImage.Segment;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.Geometry;
+import camp.computer.clay.util.ImageBuilder.Segment;
+import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.util.Random;
 
 public class PortableLayoutSystem extends System {
 
@@ -435,25 +436,101 @@ public class PortableLayoutSystem extends System {
      */
     public void adjustLayout() {
 
-        Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
+        int strategy = 1;
 
-        // Set position on grid layout
-        if (hosts.size() == 1) {
-            hosts.get(0).getComponent(Transform.class).set(0, 0);
-        } else if (hosts.size() == 2) {
-            hosts.get(0).getComponent(Transform.class).set(-300, 0);
-            hosts.get(1).getComponent(Transform.class).set(300, 0);
-        } else if (hosts.size() == 5) {
-            hosts.get(0).getComponent(Transform.class).set(-300, -600);
-            hosts.get(0).getComponent(Transform.class).setRotation(0);
-            hosts.get(1).getComponent(Transform.class).set(300, -600);
-            hosts.get(1).getComponent(Transform.class).setRotation(20);
-            hosts.get(2).getComponent(Transform.class).set(-300, 0);
-            hosts.get(2).getComponent(Transform.class).setRotation(40);
-            hosts.get(3).getComponent(Transform.class).set(300, 0);
-            hosts.get(3).getComponent(Transform.class).setRotation(60);
-            hosts.get(4).getComponent(Transform.class).set(-300, 600);
-            hosts.get(4).getComponent(Transform.class).setRotation(80);
+        if (strategy == 0) {
+            Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
+
+            // Set position on grid layout
+            if (hosts.size() == 1) {
+                hosts.get(0).getComponent(Transform.class).set(0, 0);
+            } else if (hosts.size() == 2) {
+                hosts.get(0).getComponent(Transform.class).set(-300, 0);
+                hosts.get(1).getComponent(Transform.class).set(300, 0);
+            } else if (hosts.size() == 5) {
+                hosts.get(0).getComponent(Transform.class).set(-300, -600);
+                hosts.get(0).getComponent(Transform.class).setRotation(0);
+                hosts.get(1).getComponent(Transform.class).set(300, -600);
+                hosts.get(1).getComponent(Transform.class).setRotation(20);
+                hosts.get(2).getComponent(Transform.class).set(-300, 0);
+                hosts.get(2).getComponent(Transform.class).setRotation(40);
+                hosts.get(3).getComponent(Transform.class).set(300, 0);
+                hosts.get(3).getComponent(Transform.class).setRotation(60);
+                hosts.get(4).getComponent(Transform.class).set(-300, 600);
+                hosts.get(4).getComponent(Transform.class).setRotation(80);
+            }
+        } else if (strategy == 1) {
+
+            Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
+
+            int minX = -800, maxX = 800;
+            int minY = -800, maxY = 800;
+            int minDistanceBetweenPoints = 800;
+
+            for (int i = 0; i < hosts.size(); i++) {
+
+                if (i == 0) {
+                    // Set initial position to (0, 0)
+                    hosts.get(i).getComponent(Transform.class).set(0, 0);
+                } else {
+
+                    // Iterate through previously-placed points to find a new one
+                    Transform minDistanceTransform = null;
+                    double minTotalDistance = Double.MAX_VALUE;
+                    for (int j = 0; j < hosts.size(); j++) {
+
+                        // Generate point at each angle
+                        int startAngle = Random.getRandomInteger(0, 360);
+                        for (int angle = startAngle; angle < startAngle + 360; angle++) {
+
+                            // Generate candidate point i
+                            Transform newPoint = Geometry.getRotateTranslatePoint(
+                                    hosts.get(j).getComponent(Transform.class),
+                                    angle % 360,
+                                    minDistanceBetweenPoints
+                            );
+
+                            // Check if point is valid. Check if minimum distance from all previous points.
+                            boolean isValid = true;
+                            double totalDistanceToPreviousPoints = 0;
+                            for (int jj = 0; jj < hosts.size(); jj++) {
+
+                                // Get distance between previously generated points and point i
+                                double distanceBetweenPoints = Geometry.distance(
+                                        newPoint,
+                                        hosts.get(jj).getComponent(Transform.class)
+                                );
+
+                                // Check if point is valid
+                                if (distanceBetweenPoints < minDistanceBetweenPoints) {
+                                    isValid = false;
+                                    break;
+                                }
+
+                                // Add distance to point
+                                totalDistanceToPreviousPoints += distanceBetweenPoints;
+                            }
+
+                            // Check if point is best candidate (nearest to all other points)
+                            if (isValid) {
+                                if (totalDistanceToPreviousPoints < minTotalDistance) {
+                                    minTotalDistance = totalDistanceToPreviousPoints;
+                                    minDistanceTransform = newPoint;
+                                }
+                            }
+                        }
+                    }
+
+                    // Set the new point
+                    hosts.get(i).getComponent(Transform.class).set(
+                            minDistanceTransform
+                    );
+                }
+
+                hosts.get(i).getComponent(Transform.class).setRotation(Random.generateRandomInteger(0, 360));
+
+            }
+
         }
 
         // TODO: Set position on "scatter" layout

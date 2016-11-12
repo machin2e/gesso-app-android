@@ -12,12 +12,10 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.platform.Application;
-import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.util.BuilderImage.Rectangle;
-import camp.computer.clay.util.BuilderImage.Shape;
-import camp.computer.clay.util.time.Clock;
+import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class CameraSystem extends System {
 

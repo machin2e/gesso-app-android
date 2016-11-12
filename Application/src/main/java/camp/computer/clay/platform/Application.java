@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UDPHost;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
@@ -249,7 +250,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
@@ -336,78 +336,15 @@ public class Application extends FragmentActivity implements PlatformInterface {
         );
         // </CHAT>
 
-        // </CONTEXT_SCOPE>
-        contextScope.setOnTouchListener(new View.OnTouchListener()
-
-                                        {
-                                            @Override
-                                            public boolean onTouch(View v, MotionEvent event) {
-
-                                                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                                                } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-
-                                                    // Get button holder
-                                                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
-
-                                                    // Get screen width and height of the device
-                                                    DisplayMetrics metrics = new DisplayMetrics();
-                                                    Application.getView().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                                                    int screenWidth = metrics.widthPixels;
-                                                    int screenHeight = metrics.heightPixels;
-
-                                                    // Get button width and height
-                                                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams();
-                                                    int buttonWidth = relativeLayout.getWidth();
-                                                    int buttonHeight = relativeLayout.getHeight();
-
-                                                    // Reposition button
-                                                    params.rightMargin = screenWidth - (int) event.getRawX() - (int) (buttonWidth / 2.0f);
-                                                    params.bottomMargin = screenHeight - (int) event.getRawY() - (int) (buttonHeight / 2.0f);
-
-                                                    relativeLayout.requestLayout();
-                                                    relativeLayout.invalidate();
-
-                                                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                                                    // Get button holder
-                                                    RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.context_button_holder);
-
-                                                    // TODO: Compute relative to dependant sprite position
-                                                    android.graphics.Point originPoint = new android.graphics.Point(959, 1655);
-
-//                    Animation animation = new Animation();
-//                    animation.moveToPoint(relativeLayout, originPoint, 300);
-
-                                                    // Reset the message envelope
-                                                    messageContent.removeAllViews();
-                                                    messageKeyboardLayout.setVisibility(View.GONE);
-
-                                                    // Replace the hint
-                                                    messageContent.addView(messageContentHint);
-                                                    messageContentHint.setVisibility(View.VISIBLE);
-                                                }
-
-                                                return false;
-                                            }
-                                        }
-
-        );
-        // </CONTEXT_SCOPE>
-
         // Start the initial worker thread (runnable task) by posting through the messagingThreadHandler
         messagingThreadHandler.post(messaingThread);
 
         // Check availability of speech synthesis engine on Android host device.
-        if (ENABLE_SPEECH_OUTPUT)
-
-        {
+        if (ENABLE_SPEECH_OUTPUT) {
             SpeechOutput.checkAvailability(this);
         }
 
-        if (ENABLE_TONE_OUTPUT)
-
-        {
+        if (ENABLE_TONE_OUTPUT) {
             toneOutput = new ToneOutput();
         }
 
@@ -424,7 +361,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
 //                new RedisSubThread(this.jedis)
 //        ).start();
         // </REDIS>
-
 
 
         // <REDIS>
@@ -466,6 +402,29 @@ public class Application extends FragmentActivity implements PlatformInterface {
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_S: {
+                nativeUi.openSettings();
+                //your Action code
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_R: {
+                World.getWorld().portableLayoutSystem.adjustLayout();
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_L: {
+                // TODO: log
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -503,10 +462,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
     public static Context getContext() {
         return Application.context;
     }
-
-
-
-
 
 
     //----------------------------------------------------------------------------------------------
@@ -689,7 +644,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         messageContentLayout.setVisibility(View.GONE);
@@ -702,7 +656,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         ViewGroup.MarginLayoutParams chatLayoutParams = (ViewGroup.MarginLayoutParams) messageContentLayout.getLayoutParams();
 
@@ -762,7 +715,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById(R.id.context_button);
 
         // <CHAT>
 
@@ -798,9 +750,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById(R.id.context_button);
-
-        contextScope.setText("✓");
     }
 
     private void appendToChatMessage(String text) {
@@ -810,7 +759,6 @@ public class Application extends FragmentActivity implements PlatformInterface {
         final RelativeLayout messageKeyboardLayout = (RelativeLayout) findViewById(R.id.message_keyboard_layout);
         final HorizontalScrollView messageKeyboardLayoutPerspective = (HorizontalScrollView) findViewById(R.id.message_keyboard_layout_perspective);
         final LinearLayout messageKeyboard = (LinearLayout) findViewById(R.id.message_keyboard);
-        final Button contextScope = (Button) findViewById(R.id.context_button);
         // </CHAT_AND_CONTEXT_SCOPE>
 
         // <CHAT>
@@ -992,5 +940,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
             return true;
         }
         return super.dispatchKeyEvent(keyEvent);
-    };
+    }
+
+    ;
 }

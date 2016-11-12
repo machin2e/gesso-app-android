@@ -16,11 +16,11 @@ import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.BuilderImage.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.engine.component.util.Visible;
 
 public class Group<E extends Groupable> implements List<E> {

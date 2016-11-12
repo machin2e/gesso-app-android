@@ -1,21 +1,34 @@
 package camp.computer.clay.engine.component;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
-import camp.computer.clay.util.BuilderImage.BuilderImage;
+import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.util.BuilderImage.Shape;
 
 public class Image extends Component {
 
-    private BuilderImage builderImage = null;
+    private ImageBuilder imageBuilder = null;
 
-    public void setImage(BuilderImage builderImage) {
-        this.builderImage = builderImage;
+    public List<Transform> boundary = new ArrayList<>();
+
+    public void setImage(ImageBuilder imageBuilder) {
+        this.imageBuilder = imageBuilder;
+
+        // Compute Image-level bounding box
+//        Group<Shape> shapes = new Group<>();
+//        shapes.addAll(getImage().getShapes());
+//        boundary.addAll(shapes.getBoundingBox().getVertices());
+
+//        for (int i = 0; i < getImage().getShapes().size(); i++) {
+//            //if (shapes.get(i).contains(point)) {
+////            if (Geometry.contains(image.getImage().getShapes().get(i).getBoundary(), point)) {
+//            getImage().getShapes().get(i).getBoundary()
+//        }
     }
 
-    public BuilderImage getImage() {
-        return this.builderImage;
+    public ImageBuilder getImage() {
+        return this.imageBuilder;
     }
 
     public double targetTransparency = 1.0;

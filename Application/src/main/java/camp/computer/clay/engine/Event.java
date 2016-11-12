@@ -2,7 +2,7 @@ package camp.computer.clay.engine;
 
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.time.Clock;
 
 public class Event {

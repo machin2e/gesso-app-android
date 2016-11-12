@@ -26,6 +26,8 @@ import camp.computer.clay.platform.Internet;
 import camp.computer.clay.platform.Messenger;
 import camp.computer.clay.platform.PhoneHost;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.util.Random;
+import camp.computer.clay.util.time.Clock;
 
 public class Clay {
 
@@ -66,11 +68,12 @@ public class Clay {
         Application.getView().getPlatformRenderSurface().setWorld(world);
 
         // <TEST>
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
+        int minHostCount = 2;
+        int maxHostCount = 10;
+        int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
+        for (int i = 0; i < hostCount; i++) {
+            world.createEntity(Host.class);
+        }
         // </TEST>
 
         // <HACK>

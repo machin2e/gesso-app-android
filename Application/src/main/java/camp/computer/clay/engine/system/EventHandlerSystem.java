@@ -23,10 +23,10 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Event;
-import camp.computer.clay.util.BuilderImage.Geometry;
+import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class EventHandlerSystem extends System {
 

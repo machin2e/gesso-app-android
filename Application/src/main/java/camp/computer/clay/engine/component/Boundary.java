@@ -4,21 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.BuilderImage.Geometry;
-import camp.computer.clay.util.BuilderImage.Rectangle;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.Geometry;
+import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class Boundary extends Component {
 
-//    public static HashMap<Shape, Shape.ShapeBoundary> shapeBoundaries = new HashMap<>();
-public static HashMap<Shape, ArrayList<Transform>> shapeBoundaries = new HashMap<>();
+    public static HashMap<Shape, ArrayList<Transform>> shapeBoundaries = new HashMap<>();
 
     private List<Transform> boundary = new ArrayList<>();
-
-//    private List<List<Transform>> shapeBounds = new ArrayList<>();
-    public HashMap<String, List<Transform>> shapeBounds = new HashMap<>();
 
     public void setBoundary(List<Transform> points) {
         this.boundary.clear();
@@ -37,7 +32,6 @@ public static HashMap<Shape, ArrayList<Transform>> shapeBoundaries = new HashMap
         Image image = entity.getComponent(Image.class);
 
         for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            //if (shapes.get(i).contains(point)) {
             if (Geometry.contains(image.getImage().getShapes().get(i).getBoundary(), point)) {
                 return true;
             }

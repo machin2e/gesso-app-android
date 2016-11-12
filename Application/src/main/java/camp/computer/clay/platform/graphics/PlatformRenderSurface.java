@@ -31,17 +31,17 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.Event;
-import camp.computer.clay.util.BuilderImage.Circle;
-import camp.computer.clay.util.BuilderImage.Geometry;
-import camp.computer.clay.util.BuilderImage.Point;
-import camp.computer.clay.util.BuilderImage.Segment;
+import camp.computer.clay.util.ImageBuilder.Circle;
+import camp.computer.clay.util.ImageBuilder.Geometry;
+import camp.computer.clay.util.ImageBuilder.Point;
+import camp.computer.clay.util.ImageBuilder.Segment;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.BuilderImage.Polygon;
-import camp.computer.clay.util.BuilderImage.Polyline;
-import camp.computer.clay.util.BuilderImage.Rectangle;
-import camp.computer.clay.util.BuilderImage.Text;
-import camp.computer.clay.util.BuilderImage.Triangle;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.Polygon;
+import camp.computer.clay.util.ImageBuilder.Polyline;
+import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Text;
+import camp.computer.clay.util.ImageBuilder.Triangle;
+import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.engine.World;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {

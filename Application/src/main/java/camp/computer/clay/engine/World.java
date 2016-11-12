@@ -1,6 +1,5 @@
 package camp.computer.clay.engine;
 
-import android.graphics.Canvas;
 import android.util.Log;
 
 import java.io.IOException;
@@ -33,12 +32,12 @@ import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.platform.graphics.Palette;
 import camp.computer.clay.platform.graphics.controls.NativeUi;
-import camp.computer.clay.util.BuilderImage.BuilderImage;
-import camp.computer.clay.util.BuilderImage.Circle;
-import camp.computer.clay.util.BuilderImage.Point;
-import camp.computer.clay.util.BuilderImage.Rectangle;
-import camp.computer.clay.util.BuilderImage.Segment;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.ImageBuilder;
+import camp.computer.clay.util.ImageBuilder.Circle;
+import camp.computer.clay.util.ImageBuilder.Point;
+import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Segment;
+import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.util.time.Clock;
 
@@ -170,8 +169,8 @@ public class World {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        BuilderImage builderImage = BuilderImage.open(inputStream);
-        host.getComponent(Image.class).setImage(builderImage);
+        ImageBuilder imageBuilder = ImageBuilder.open(inputStream);
+        host.getComponent(Image.class).setImage(imageBuilder);
 
         // <HACK>
 //        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
@@ -260,7 +259,7 @@ public class World {
         extension.addComponent(new Visibility());
 
         // <LOAD_GEOMETRY_FROM_FILE>
-        BuilderImage builderImage = new BuilderImage();
+        ImageBuilder imageBuilder = new ImageBuilder();
 
         Rectangle rectangle;
 
@@ -273,7 +272,7 @@ public class World {
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
 //        extension.getComponent(Image.class).addShape(rectangle);
-        builderImage.addShape(rectangle);
+        imageBuilder.addShape(rectangle);
 
         // Headers
         rectangle = new Rectangle(50, 14);
@@ -283,9 +282,9 @@ public class World {
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
 //        extension.getComponent(Image.class).addShape(rectangle);
-        builderImage.addShape(rectangle);
+        imageBuilder.addShape(rectangle);
 
-        extension.getComponent(Image.class).setImage(builderImage);
+        extension.getComponent(Image.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Image Component
@@ -305,7 +304,7 @@ public class World {
         path.addComponent(new Visibility());
 
         // <SETUP_PATH_IMAGE_GEOMETRY>
-        BuilderImage builderImage = new BuilderImage();
+        ImageBuilder imageBuilder = new ImageBuilder();
 
         // Board
         Segment segment = new Segment();
@@ -313,26 +312,26 @@ public class World {
         segment.setLabel("Path");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
-        builderImage.addShape(segment);
+        imageBuilder.addShape(segment);
 
         Circle circle = new Circle();
         circle.setRadius(50.0);
         circle.setLabel("Source Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        builderImage.addShape(circle);
+        imageBuilder.addShape(circle);
 
         circle = new Circle();
         circle.setRadius(50.0);
         circle.setLabel("Target Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        builderImage.addShape(circle);
+        imageBuilder.addShape(circle);
 
         // TODO: 11/5/2016 Add Port circles to the Path? So moving paths around will be easier? Then Port images are always just the same color. They look different because of the Path image. Path can contain single node. Then can be stretched out to include another Port.
         // TODO: 11/5/2016 Create corresponding world state CREATING_PATH, MODIFYING_PATH/MOVING_PATH, etc.
 
-        path.getComponent(Image.class).setImage(builderImage);
+        path.getComponent(Image.class).setImage(imageBuilder);
         path.getComponent(Image.class).layerIndex = 10;
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
@@ -352,7 +351,7 @@ public class World {
         port.addComponent(new Label());
 
         // <LOAD_GEOMETRY_FROM_FILE>
-        BuilderImage builderImage = new BuilderImage();
+        ImageBuilder imageBuilder = new ImageBuilder();
 
         // Create Shapes for Image
         Circle circle = new Circle();
@@ -360,9 +359,9 @@ public class World {
         circle.setLabel("Port"); // TODO: Give proper name...
         circle.setColor("#f7f7f7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        builderImage.addShape(circle);
+        imageBuilder.addShape(circle);
 
-        port.getComponent(Image.class).setImage(builderImage);
+        port.getComponent(Image.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         return port;
@@ -392,14 +391,14 @@ public class World {
         prototypeExtension.addComponent(new Transform());
         prototypeExtension.addComponent(new Image());
 
-        BuilderImage builderImage = new BuilderImage();
+        ImageBuilder imageBuilder = new ImageBuilder();
 
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
-        builderImage.addShape(rectangle);
+        imageBuilder.addShape(rectangle);
 
-        prototypeExtension.getComponent(Image.class).setImage(builderImage);
+        prototypeExtension.getComponent(Image.class).setImage(imageBuilder);
 
         imageSystem.invalidate(prototypeExtension.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
 
@@ -427,15 +426,15 @@ public class World {
         prototypePath.addComponent(new Transform());
         prototypePath.addComponent(new Image());
 
-        BuilderImage builderImage = new BuilderImage();
+        ImageBuilder imageBuilder = new ImageBuilder();
 
         Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
         segment.setLabel("Path");
         segment.setOutlineColor("#ff333333");
         segment.setOutlineThickness(10.0);
-        builderImage.addShape(segment);
+        imageBuilder.addShape(segment);
 
-        prototypePath.getComponent(Image.class).setImage(builderImage);
+        prototypePath.getComponent(Image.class).setImage(imageBuilder);
 
         imageSystem.invalidate(prototypePath.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
 

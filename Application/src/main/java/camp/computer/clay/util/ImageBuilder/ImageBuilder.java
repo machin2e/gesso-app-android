@@ -1,6 +1,4 @@
-package camp.computer.clay.util.BuilderImage;
-
-import android.util.Log;
+package camp.computer.clay.util.ImageBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,7 +35,7 @@ import camp.computer.clay.engine.World;
  * @author Computer Camp
  * @version 1.0.0-alpha
  */
-public class BuilderImage {
+public class ImageBuilder {
 
     // TODO: Rename to BuildableImage? Collage? ImageBuilder?
 
@@ -85,11 +83,11 @@ public class BuilderImage {
 
     // <FILE_IO>
     // Opens image data from JSON file stored in custom format.
-    // TODO: 11/2/2016 Consider adding support for constructing BuilderImage from SVG file.
-    public static BuilderImage open(InputStream inputStream) {
+    // TODO: 11/2/2016 Consider adding support for constructing ImageBuilder from SVG file.
+    public static ImageBuilder open(InputStream inputStream) {
 
         // Create Empty image
-        BuilderImage builderImage = new BuilderImage();
+        ImageBuilder imageBuilder = new ImageBuilder();
 
         // Open specified JSON file.
         String jsonString = null;
@@ -169,7 +167,7 @@ public class BuilderImage {
                     point.setOutlineColor(outlineColor);
                     point.setOutlineThickness(outlineThickness);
 
-                    builderImage.addShape(point);
+                    imageBuilder.addShape(point);
 
                 } else if (type.equals("Rectangle")) {
 
@@ -186,7 +184,7 @@ public class BuilderImage {
                     rectangle.setOutlineColor(outlineColor);
                     rectangle.setOutlineThickness(outlineThickness);
 
-                    builderImage.addShape(rectangle);
+                    imageBuilder.addShape(rectangle);
 
                 } else if (type.equals("Circle")) {
 
@@ -200,7 +198,7 @@ public class BuilderImage {
                     circle.setOutlineColor(outlineColor);
                     circle.setOutlineThickness(outlineThickness);
 
-                    builderImage.addShape(circle);
+                    imageBuilder.addShape(circle);
                 }
             }
 
@@ -208,7 +206,7 @@ public class BuilderImage {
             e.printStackTrace();
         }
 
-        return builderImage;
+        return imageBuilder;
     }
     // </FILE_IO>
 }

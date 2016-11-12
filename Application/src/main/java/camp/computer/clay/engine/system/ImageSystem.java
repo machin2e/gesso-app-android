@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.BuilderImage.BuilderImage;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.util.ImageBuilder.ImageBuilder;
+import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.util.Color;
 
 public class ImageSystem extends System {
@@ -27,7 +27,7 @@ public class ImageSystem extends System {
     public void updateLayers(Image image) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -66,7 +66,7 @@ public class ImageSystem extends System {
     public void invalidate(Image image) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -79,7 +79,7 @@ public class ImageSystem extends System {
     public <T extends Shape> void addShape(Image image, T shape) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -99,7 +99,7 @@ public class ImageSystem extends System {
     public Shape getShape(Image image, String label) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -117,7 +117,7 @@ public class ImageSystem extends System {
     public Group<Shape> getShapes(Image image, String... labels) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -140,7 +140,7 @@ public class ImageSystem extends System {
     public Group<Shape> getShapes(Image image) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -154,7 +154,7 @@ public class ImageSystem extends System {
     public Shape removeShape(Image image, int index) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 
@@ -166,7 +166,7 @@ public class ImageSystem extends System {
     public void setTransparency(Image image, final double transparency) {
 
         if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+            image.setImage(new ImageBuilder());
         }
         List<Shape> shapes = image.getImage().getShapes();
 

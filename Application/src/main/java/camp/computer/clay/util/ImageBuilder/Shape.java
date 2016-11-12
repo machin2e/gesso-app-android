@@ -1,4 +1,4 @@
-package camp.computer.clay.util.BuilderImage;
+package camp.computer.clay.util.ImageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +21,9 @@ public abstract class Shape extends Groupable {
 
 //    public static HashMap<Shape, ShapeBoundary> shapeBoundaries = new HashMap<>();
 
-    protected String label = "";
+    protected String label = ""; // Component
 
-    protected double targetTransparency = 1.0;
+    protected double targetTransparency = 1.0; // Visibility
     protected double transparency = targetTransparency;
 
     protected Transform imagePosition = null;
