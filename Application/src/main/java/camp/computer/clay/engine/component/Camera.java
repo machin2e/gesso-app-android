@@ -8,6 +8,9 @@ public class Camera extends Component {
 
     public static double MAXIMUM_SCALE = 1.5;
 
+    public static double SCALE_LEVEL_1 = 0.8;
+    public static double SCALE_LEVEL_2 = 1.5;
+
     // Width of perspective --- actions (e.g., touches) are interpreted relative to this point
     // TODO: Delete!
     public double width;

@@ -40,10 +40,11 @@ public class CameraSystem extends System {
         transformComponent.scale = cameraComponent.targetScale;
 
         // Position
-        cameraComponent.getEntity().getComponent(Transform.class).set(
+        camera.getComponent(Transform.class).set(
                 cameraComponent.targetPosition.x * transformComponent.scale,
                 cameraComponent.targetPosition.y * transformComponent.scale
         );
+
     }
 
     // <REFACTOR/DELETE>
@@ -66,34 +67,44 @@ public class CameraSystem extends System {
     // </REFACTOR/DELETE>
 
     private void setPosition(Entity camera, Transform position, double duration) {
+        Log.v("CameraSystem", "setPosition");
         camera.getComponent(Camera.class).targetPosition.set(-position.x, -position.y);
-        camera.getComponent(Transform.class).set(position.x, position.y);
+//        camera.getComponent(Transform.class).set(-position.x, -position.y);
     }
 
-    public void adjustPosition(Entity camera) {
+    private void adjustPosition(Entity camera) {
+        Log.v("CameraSystem", "adjustPosition");
         Transform centerPosition = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getCenterPoint();
         setPosition(camera, centerPosition, Camera.DEFAULT_ADJUSTMENT_PERIOD);
     }
 
     public void setOffset(Entity camera, double dx, double dy) {
         camera.getComponent(Camera.class).targetPosition.offset(dx, dy);
-        // camera.getComponent(Transform.class).offset(dx, dy);
     }
 
     public void setOffset(Entity camera, Transform point) {
         setOffset(camera, point.x, point.y);
     }
 
-    public void setScale(Entity camera, double scale, double duration) {
-        camera.getComponent(Camera.class).targetScale = scale;
-        camera.getComponent(Transform.class).scale = scale;
+    private void setScale(Entity camera, double scale, double duration) {
+
+        if (Math.abs(scale - Camera.SCALE_LEVEL_1) < Math.abs(scale - Camera.SCALE_LEVEL_2)) {
+            camera.getComponent(Camera.class).targetScale = Camera.SCALE_LEVEL_1;
+            camera.getComponent(Transform.class).scale = Camera.SCALE_LEVEL_1;
+        } else {
+            camera.getComponent(Camera.class).targetScale = Camera.SCALE_LEVEL_2;
+            camera.getComponent(Transform.class).scale = Camera.SCALE_LEVEL_2;
+        }
+
+//        camera.getComponent(Camera.class).targetScale = scale;
+//        camera.getComponent(Transform.class).scale = scale;
     }
 
     public double getScale(Entity camera) {
         return camera.getComponent(Transform.class).scale;
     }
 
-    public void adjustScale(Entity camera, double duration) {
+    private void adjustScale(Entity camera, double duration) {
         Rectangle boundingBox = world.Manager.getEntities().filterWithComponent(Host.class, Extension.class).getBoundingBox();
         if (boundingBox.width > 0 && boundingBox.height > 0) {
             adjustScale(camera, boundingBox, duration);
@@ -106,7 +117,7 @@ public class CameraSystem extends System {
      *
      * @param boundingBox The bounding box to fit into the display area.
      */
-    public void adjustScale(Entity camera, Rectangle boundingBox) {
+    private void adjustScale(Entity camera, Rectangle boundingBox) {
         adjustScale(camera, boundingBox, Camera.DEFAULT_SCALE_PERIOD);
     }
 
@@ -116,7 +127,7 @@ public class CameraSystem extends System {
      * @param boundingBox The bounding box to fit into the display area.
      * @param duration    The duration of the scale adjustment.
      */
-    public void adjustScale(Entity camera, Rectangle boundingBox, double duration) {
+    private void adjustScale(Entity camera, Rectangle boundingBox, double duration) {
 
         /*
         // Multiply the bounding box
@@ -141,7 +152,21 @@ public class CameraSystem extends System {
 
     public void setFocus(Entity camera, Entity entity) {
 
-        if (entity.hasComponent(Host.class)) {
+        if (entity == null) {
+
+            Log.v("SetFocus", "setFocus(World)");
+
+            // Hide Portables' Ports.
+            world.Manager.getEntities().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
+
+            // Update distance between Hosts and Extensions
+            world.portableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+
+            // Update scale and position
+            adjustScale(camera, Camera.DEFAULT_SCALE_PERIOD);
+            adjustPosition(camera);
+
+        } else if (entity.hasComponent(Host.class)) {
 
             Log.v("SetFocus", "setFocus(HostEntity)");
 
@@ -227,20 +252,5 @@ public class CameraSystem extends System {
             setPosition(camera, boundingBox.getPosition(), Camera.DEFAULT_ADJUSTMENT_PERIOD);
 
         }
-    }
-
-    public void setFocus(Entity camera, World world) {
-
-        Log.v("SetFocus", "setFocus(World)");
-
-        // Hide Portables' Ports.
-        world.Manager.getEntities().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
-
-        // Update distance between Hosts and Extensions
-        world.portableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
-
-        // Update scale and position
-        adjustScale(camera, Camera.DEFAULT_SCALE_PERIOD);
-        adjustPosition(camera);
     }
 }

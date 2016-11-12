@@ -401,6 +401,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // </CHECK_HARDWARE_ACCELERATION>
     }
 
+    // TODO: Queue key events in inputSystem
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -418,6 +419,16 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
             case KeyEvent.KEYCODE_L: {
                 // TODO: log
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_M: {
+                // Monitor
+                if (World.ENABLE_DRAW_OVERLAY) {
+                    World.ENABLE_DRAW_OVERLAY = false;
+                } else {
+                    World.ENABLE_DRAW_OVERLAY = true;
+                }
                 return true;
             }
         }

@@ -10,6 +10,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.component.Camera;
@@ -125,10 +126,18 @@ public class EventHandlerSystem extends System {
         }
     }
 
-    // TODO: Make World an Entity?
-    public void handleCameraEvent(final Entity workspace, Event event) {
+    // Everything can subscribe to everything, so there can be some whacky-ass dope-ass subscribers to do nuanced behavior based on cross-categorical events.
+    // TODO: World.register(System)
+    // TODO:
+    public void subscribe(Entity requester, Event.Type eventType) {
+        // adds to list of subscribers for the event type
+    }
 
-        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+
+
+    // TODO: Make World an Entity?
+    double lastDx = 0, lastDy = 0;
+    public void handleCameraEvent(final Entity camera, Event event) {
 
         if (event.getType() == Event.Type.NONE) {
 
@@ -138,9 +147,13 @@ public class EventHandlerSystem extends System {
 
         } else if (event.getType() == Event.Type.MOVE) {
 
+            lastDx = event.getPosition().x - lastDx;
+            lastDy = event.getPosition().y - lastDy;
+
 //            if (action.isDragging()) {
-//            camera.getComponent(Camera.class).setOffset(event.getOffset());
-            world.cameraSystem.setOffset(camera, event.getOffset());
+            // TODO: Make sure there's no inconsistency "information access sequence" between this EventHandlerSystem, InputSystem, and PlatformRenderSurface.onTouch. Should only access info from previously dispatched? event
+            world.cameraSystem.setOffset(camera, event.xOffset, event.yOffset);
+            Log.v("CameraEvent", "offset.x: " + event.getOffset().y + ", y: " + event.getOffset().y);
 //            }
 
         } else if (event.getType() == Event.Type.UNSELECT) {
@@ -166,8 +179,9 @@ public class EventHandlerSystem extends System {
             // TODO: workspace.setTitleVisibility(Visible.INVISIBLE);
 
             // Camera
-            world.cameraSystem.setFocus(camera, world);
-//            }
+            if (event.isTap()) {
+                world.cameraSystem.setFocus(camera, null);
+            }
 
         }
     }
@@ -186,16 +200,19 @@ public class EventHandlerSystem extends System {
 
 //            if (action.isDragging()) {
 
-            // Update position of prototype Extension
-            world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
+            // Show prototype Extension if any are saved and available in the repository
+            if (Application.getView().getClay().getConfigurations().size() > 0) {
+                // Update position of prototype Extension
+                world.portableLayoutSystem.setPathPrototypeSourcePosition(host.getComponent(Transform.class));
+                world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
 
-//                    hostEntity.getComponent(Portable.class).getPortShapes().setVisibility(Visible.INVISIBLE);
-//                hostEntity.getComponent(Portable.class).setPathVisibility(false);
-            Portable.getPaths(host).setVisibility(Visible.INVISIBLE);
+                // Show the prototype Extension
+                Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
+                extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+            }
 
-//            world.setExtensionPrototypeVisibility2(Visible.VISIBLE);
-            Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-            extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
+            // Show all Paths to Host
+            // Portable.getPaths(host).setVisibility(Visible.INVISIBLE);
 
 //            } else if (action.isHolding()) {
 //

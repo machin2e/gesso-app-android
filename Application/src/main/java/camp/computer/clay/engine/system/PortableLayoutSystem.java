@@ -436,9 +436,9 @@ public class PortableLayoutSystem extends System {
      */
     public void adjustLayout() {
 
-        int strategy = 1;
+        int layoutStrategy = 1;
 
-        if (strategy == 0) {
+        if (layoutStrategy == 0) {
             Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
 
             // Set position on grid layout
@@ -459,7 +459,7 @@ public class PortableLayoutSystem extends System {
                 hosts.get(4).getComponent(Transform.class).set(-300, 600);
                 hosts.get(4).getComponent(Transform.class).setRotation(80);
             }
-        } else if (strategy == 1) {
+        } else if (layoutStrategy == 1) {
 
             Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
 

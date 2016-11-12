@@ -50,6 +50,10 @@ public class World {
 
     public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
 
+    // <SETTINGS>
+    public static boolean ENABLE_DRAW_OVERLAY = true;
+    // </SETTINGS>
+
     // <TEMPORARY>
     public Repository repository = new Repository();
     // </TEMPORARY>
@@ -532,8 +536,6 @@ public class World {
     public long lookupCount = 0L;
 
     public void updateSystems(Palette palette) {
-
-//        lookupCount = 0;
 
         long updateStartTime = Clock.getCurrentTime();
 

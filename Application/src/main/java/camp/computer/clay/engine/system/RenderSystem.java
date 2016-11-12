@@ -38,6 +38,7 @@ public class RenderSystem extends System {
     }
 
     // TODO: Move into platform layer (PlatformRenderSurface)?
+    Entity camera = null;
     public boolean update(Palette palette) {
 
         // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to render.
@@ -54,7 +55,9 @@ public class RenderSystem extends System {
         // Adjust the Camera
         palette.canvas.save();
 
-        Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+        if (camera == null) {
+            camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
+        }
         Transform cameraPosition = camera.getComponent(Transform.class);
         palette.canvas.translate(
                 (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
@@ -90,7 +93,9 @@ public class RenderSystem extends System {
 
         palette.canvas.restore();
 
-        drawOverlay(platformRenderSurface);
+        if (World.ENABLE_DRAW_OVERLAY) {
+            drawOverlay(platformRenderSurface);
+        }
 
 //        if (addNotification) {
 //            drawNotification("connected port", (float) position.x, (float) position.y, platformRenderSurface);

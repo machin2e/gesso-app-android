@@ -211,12 +211,15 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 // Update pointerCoordinates state based the pointerCoordinates given by the host OS (e.g., Android).
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
-                    Transform perspectivePosition = camera.getComponent(Camera.class).getEntity().getComponent(Transform.class);
-//                    double perspectiveScale = camera.getComponent(Camera.class).getScale();
-                    double perspectiveScale = world.cameraSystem.getScale(camera);
-                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+                    Transform cameraTransform = camera.getComponent(Transform.class);
+                    double cameraScale = world.cameraSystem.getScale(camera);
+                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + cameraTransform.x)) / cameraScale;
+                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + cameraTransform.y)) / cameraScale;
+//                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (cameraTransform.x)) / cameraScale;
+//                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (cameraTransform.y)) / cameraScale;
                 }
+
+//                Log.v("PlatformRenderSurface", "x: " + event.pointerCoordinates[0].x + ", y: " + event.pointerCoordinates[0].y);
 
                 // ACTION_DOWN is called only for the getFirstEvent pointer that touches the screen. This
                 // starts the gesture. The pointer data for this pointer is always at index 0 in
@@ -239,25 +242,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 // Update the state of the touched object based on the current pointerCoordinates event state.
                 if (touchInteractionType == MotionEvent.ACTION_DOWN) {
 
-                    previousEvent = null;
-
                     // Set previous Event
-                    if (previousEvent != null) {
-                        event.previousEvent = previousEvent;
-                    } else {
-                        event.previousEvent = null;
-                    }
                     previousEvent = event;
 
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
                     holdEventTimerHandler.postDelayed(holdEventTimerRunnable, Event.MINIMUM_HOLD_DURATION);
-
-//                    new Timer().process(new TimerTask() {
-//                        @Override
-//                        public void run() {
-//                            // this code will be executed after 2 seconds
-//                        }
-//                    }, 2000);
 
                     event.setType(Event.Type.SELECT);
                     event.pointerIndex = pointerId;
@@ -267,11 +256,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 } else if (touchInteractionType == MotionEvent.ACTION_MOVE) {
 
                     // Set previous Event
-                    if (previousEvent != null) {
-                        event.previousEvent = previousEvent;
-                    } else {
-                        event.previousEvent = null;
-                    }
+                    event.setPreviousEvent(previousEvent);
                     previousEvent = event;
 
                     event.setType(Event.Type.MOVE);
@@ -285,11 +270,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 } else if (touchInteractionType == MotionEvent.ACTION_UP) {
 
                     // Set previous Event
-                    if (previousEvent != null) {
-                        event.previousEvent = previousEvent;
-                    } else {
-                        event.previousEvent = null;
-                    }
+                    event.setPreviousEvent(previousEvent);
                     previousEvent = event;
 
                     holdEventTimerHandler.removeCallbacks(holdEventTimerRunnable);
@@ -340,9 +321,9 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
                 // Set previous Event
                 if (previousEvent != null) {
-                    event.previousEvent = previousEvent;
+                    event.setPreviousEvent(previousEvent);
                 } else {
-                    event.previousEvent = null;
+                    event.setPreviousEvent(null);
                 }
                 previousEvent = event;
 
@@ -360,6 +341,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
      * The function run in background thread, not UI thread.
      */
     SurfaceHolder holder = getHolder();
+
     public void update() {
 
         if (world == null) {

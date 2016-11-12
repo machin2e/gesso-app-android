@@ -1,5 +1,7 @@
 package camp.computer.clay.engine;
 
+import android.util.Log;
+
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.ImageBuilder.Geometry;
@@ -100,9 +102,34 @@ public class Event {
     }
 
     // <INTEGRATE_WITH_ACTION>
-    public Event previousEvent = null;
+    private Event previousEvent = null;
 
-    private Transform offset = new Transform();
+    public void setPreviousEvent(Event previousEvent) {
+        this.previousEvent = previousEvent;
+
+//        this.offset.set(
+//                getPosition().x - getFirstEvent().getPosition().x,
+//                getPosition().y - getFirstEvent().getPosition().y
+//        );
+
+        if (previousEvent != null) {
+//            this.xOffset = previousEvent.xOffset + (getPosition().x - previousEvent.getPosition().x);
+//            this.yOffset = previousEvent.yOffset + (getPosition().y - previousEvent.getPosition().x);
+            this.xOffset = (getPosition().x - previousEvent.getPosition().x);
+            this.yOffset = (getPosition().y - previousEvent.getPosition().y);
+        } else {
+            this.xOffset = 0;
+            this.yOffset = 0;
+        }
+    }
+
+    public Event getPreviousEvent() {
+        return previousEvent;
+    }
+
+    //    private Transform offset = new Transform();
+    public double xOffset = 0;
+    public double yOffset = 0;
 
     public Event getFirstEvent() {
         Event firstEvent = this;
@@ -110,6 +137,16 @@ public class Event {
             firstEvent = firstEvent.previousEvent;
         }
         return firstEvent;
+    }
+
+    public int getEventCount() {
+        int count = 1;
+        Event firstEvent = this;
+        while (firstEvent.previousEvent != null) {
+            count++;
+            firstEvent = firstEvent.previousEvent;
+        }
+        return count;
     }
 
     public long getDuration() {
@@ -143,11 +180,11 @@ public class Event {
     }
 
     public Transform getOffset() {
-        this.offset.set(
-                getPosition().x - getFirstEvent().getPosition().x,
-                getPosition().y - getFirstEvent().getPosition().y
-        );
-        return offset;
+//        this.offset.set(
+//                getPosition().x - getFirstEvent().getPosition().x,
+//                getPosition().y - getFirstEvent().getPosition().y
+//        );
+        return new Transform(xOffset, yOffset);
     }
     // </INTEGRATE_WITH_ACTION>
 }
