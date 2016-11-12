@@ -11,7 +11,7 @@ public class RelativeLayoutConstraint extends Component {
      * The Entity with this component will be drawn relative to the reference Entity's Transform
      * component.
      */
-    private UUID entityUuid;
+    private long entityUuid;
 
     public Entity getReferenceEntity() {
         return World.getWorld().Manager.getEntities().get(entityUuid);

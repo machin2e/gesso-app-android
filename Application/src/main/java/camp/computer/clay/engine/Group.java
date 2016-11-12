@@ -27,18 +27,18 @@ public class Group<E extends Groupable> implements List<E> {
 
     protected List<E> elements = new ArrayList<>();
 
-    public E get(UUID uuid) {
+    public E get(long uuid) {
         for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).getUuid().equals(uuid)) {
+            if (elements.get(i).uuid == uuid) {
                 return elements.get(i);
             }
         }
         return null;
     }
 
-    public boolean contains(UUID uuid) {
+    public boolean contains(long uuid) {
         for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).getUuid().equals(uuid)) {
+            if (elements.get(i).uuid == uuid) {
                 return true;
             }
         }
@@ -46,7 +46,7 @@ public class Group<E extends Groupable> implements List<E> {
     }
 
     // TODO: <BUG>
-    public E remove(UUID uuid) {
+    public E remove(long uuid) {
         E element = get(uuid);
         if (element != null) {
             remove(element);

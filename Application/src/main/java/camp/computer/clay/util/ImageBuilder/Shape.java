@@ -23,6 +23,8 @@ public abstract class Shape extends Groupable {
 
     protected String label = ""; // Component
 
+    public boolean isBoundary = false;
+
     protected double targetTransparency = 1.0; // Visibility
     protected double transparency = targetTransparency;
 
@@ -73,14 +75,14 @@ public abstract class Shape extends Groupable {
 //        boundary = new ArrayList<>();
 //        shapeBoundary = new ShapeBoundary(this);
 //        Boundary.shapeBoundaries.put(this, new ShapeBoundary(this));
-        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
+//        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
     }
 
     public Shape(Transform position) {
 //        boundary = new ArrayList<>();
 //        shapeBoundary = new ShapeBoundary(this);
 //        Boundary.shapeBoundaries.put(this, new ShapeBoundary(this));
-        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
+//        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
         this.position.set(position);
     }
 
@@ -130,7 +132,16 @@ public abstract class Shape extends Groupable {
     public List<Transform> getBoundary() {
 //        return this.shapeBoundary.boundary;
 //        return Boundary.shapeBoundaries.get(this).boundary;
-        return Boundary.shapeBoundaries.get(this);
+        if (isBoundary) {
+            if (!Boundary.shapeBoundaries.containsKey(this)) {
+                ArrayList<Transform> boundary = new ArrayList<>();
+                boundary.addAll(getVertices());
+                Boundary.shapeBoundaries.put(this, boundary);
+            }
+            return Boundary.shapeBoundaries.get(this);
+        } else {
+            return null;
+        }
     }
 
     public void setColor(String color) {

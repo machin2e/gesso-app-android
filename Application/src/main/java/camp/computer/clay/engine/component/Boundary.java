@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
@@ -31,8 +32,10 @@ public class Boundary extends Component {
 
         Image image = entity.getComponent(Image.class);
 
-        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            if (Geometry.contains(image.getImage().getShapes().get(i).getBoundary(), point)) {
+        List<Shape> shapes = image.getImage().getShapes();
+        for (int i = 0; i < shapes.size(); i++) {
+            if (shapes.get(i).isBoundary
+                    && Geometry.contains(shapes.get(i).getBoundary(), point)) {
                 return true;
             }
         }
@@ -44,12 +47,15 @@ public class Boundary extends Component {
     // TODO: Compute bounding box for image when add/remove Shapes and store it here!
     public static Rectangle getBoundingBox(Entity entity) {
 
-        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
-
         List<Transform> shapeBoundaries = new ArrayList<>();
+
+        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
         for (int i = 0; i < shapes.size(); i++) {
-            shapeBoundaries.addAll(shapes.get(i).getBoundary());
+            if (shapes.get(i).isBoundary) {
+                shapeBoundaries.addAll(shapes.get(i).getBoundary());
+            }
         }
+
         return Geometry.getBoundingBox(shapeBoundaries);
     }
 }

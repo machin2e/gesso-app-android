@@ -16,7 +16,8 @@
         "style": {
           "color": "#1f1f1e",
           "outlineThickness": 0.0
-        }
+        },
+        "boundary": true
       },
       {
         "label": "Header 1",

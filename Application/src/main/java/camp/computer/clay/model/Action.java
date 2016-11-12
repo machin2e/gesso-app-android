@@ -8,7 +8,7 @@ public class Action extends Groupable {
 
     private String title = "";
 
-    private UUID scriptUuid;
+    private long scriptUuid;
 
     public Action() {
         super();

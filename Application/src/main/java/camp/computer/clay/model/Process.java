@@ -10,7 +10,7 @@ public class Process extends Groupable {
 
     // TODO: 11/8/2016 Consider renaming to Process, Program, Behavior, or Calendar
 
-    private List<UUID> actionUuids;
+    private List<Long> actionUuids;
 
     public Process() {
         actionUuids = new ArrayList<>();
@@ -25,7 +25,7 @@ public class Process extends Groupable {
     }
 
     public Action getAction(int index) {
-        UUID actionUuid = actionUuids.get(index);
+        long actionUuid = actionUuids.get(index);
         return Repository.actions.get(actionUuid);
     }
 

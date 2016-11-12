@@ -62,7 +62,7 @@ public class Repository {
         return scripts;
     }
 
-    public Script getScript(UUID uuid) {
+    public Script getScript(long uuid) {
         return scripts.get(uuid);
     }
 
@@ -74,7 +74,7 @@ public class Repository {
         actions.add(action);
     }
 
-    public Action getAction(UUID uuid) {
+    public Action getAction(long uuid) {
         return actions.get(uuid);
     }
 
@@ -86,7 +86,7 @@ public class Repository {
         return processes;
     }
 
-    public Process getProcess(UUID uuid) {
+    public Process getProcess(long uuid) {
         return processes.get(uuid);
     }
 }

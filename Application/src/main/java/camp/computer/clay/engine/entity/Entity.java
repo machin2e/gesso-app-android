@@ -20,10 +20,10 @@ public final class Entity extends Groupable {
         setup();
     }
 
-    public Entity(UUID uuid) {
-        super(uuid);
-        setup();
-    }
+//    public Entity(UUID uuid) {
+//        super(uuid);
+//        setup();
+//    }
 
     private void setup() {
         components = new Group<>(); // Create list of Components

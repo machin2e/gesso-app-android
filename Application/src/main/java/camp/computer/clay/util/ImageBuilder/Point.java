@@ -23,7 +23,7 @@ public class Point extends Shape {
 
     private void setupGeometry() {
 //        Boundary.shapeBoundaries.get(this).boundary = new ArrayList<>();
-        Boundary.shapeBoundaries.get(this).add(new Transform());
+//        Boundary.shapeBoundaries.get(this).add(new Transform());
     }
 
     @Override

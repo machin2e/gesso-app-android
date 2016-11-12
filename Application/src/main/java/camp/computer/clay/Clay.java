@@ -68,8 +68,8 @@ public class Clay {
         Application.getView().getPlatformRenderSurface().setWorld(world);
 
         // <TEST>
-        int minHostCount = 2;
-        int maxHostCount = 10;
+        int minHostCount = 5;
+        int maxHostCount = 6;
         int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
         for (int i = 0; i < hostCount; i++) {
             world.createEntity(Host.class);

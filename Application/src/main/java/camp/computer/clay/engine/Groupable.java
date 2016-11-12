@@ -1,28 +1,31 @@
 package camp.computer.clay.engine;
 
-import java.util.UUID;
-
 public abstract class Groupable {
 
-    protected UUID uuid = null;
+    // TODO: Add UUID back in, but don't use for frequent lookups in engine. Can do lookup by UUID for infrequent events like UI-driven.
+    // TODO: protected UUID uuid = null;
+
+    private static long count = 0L;
+    public long uuid = 0L;
+    public static long INVALID_UUID = -1L;
 
     public Groupable() {
-        setup(null);
+        setup(INVALID_UUID);
     }
 
-    public Groupable(UUID uuid) {
+    public Groupable(long uuid) {
         setup(uuid);
     }
 
-    private void setup(UUID uuid) {
-        if (uuid == null) {
-            this.uuid = UUID.randomUUID();
+    private void setup(long uuid) {
+        if (uuid < 0) {
+            this.uuid = count++;
         } else {
             this.uuid = uuid;
         }
     }
 
-    public UUID getUuid() {
+    public long getUuid() {
         return this.uuid;
     }
 }

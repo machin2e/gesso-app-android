@@ -72,9 +72,9 @@ public class Path extends Component {
 
     public Direction direction = Direction.NONE;
 
-    public UUID sourcePortUuid;
+    public long sourcePortUuid;
 
-    public UUID targetPortUuid;
+    public long targetPortUuid;
     // </COMPONENT_DATA>
 
 
@@ -154,27 +154,27 @@ public class Path extends Component {
     public static void setSource(Entity path, Entity source) {
         Path pathComponent = path.getComponent(Path.class);
         if (source == null) {
-            pathComponent.sourcePortUuid = null;
+            pathComponent.sourcePortUuid = -1;
         } else {
             pathComponent.sourcePortUuid = source.getUuid();
         }
     }
 
     public static Entity getSource(Entity path) {
-        UUID sourcePortUuid = path.getComponent(Path.class).sourcePortUuid;
+        long sourcePortUuid = path.getComponent(Path.class).sourcePortUuid;
         return World.getWorld().Manager.getEntities().get(sourcePortUuid);
     }
 
     public static void setTarget(Entity path, Entity target) {
         if (target == null) {
-            path.getComponent(Path.class).targetPortUuid = null;
+            path.getComponent(Path.class).targetPortUuid = -1;
         } else {
             path.getComponent(Path.class).targetPortUuid = target.getUuid();
         }
     }
 
     public static Entity getTarget(Entity path) {
-        UUID targetPortUuid = path.getComponent(Path.class).targetPortUuid;
+        long targetPortUuid = path.getComponent(Path.class).targetPortUuid;
         return World.getWorld().Manager.getEntities().get(targetPortUuid);
     }
 

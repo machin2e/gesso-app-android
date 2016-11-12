@@ -11,6 +11,7 @@ import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.ImageSystem;
 import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -122,12 +123,26 @@ public class World {
             entity = createPortEntity();
         } else if (entityType == Camera.class) {
             entity = createCameraEntity();
+        } else if (entityType == Player.class) {
+            entity = createPlayerEntity();
         }
 
         // Add Entity to Manager
         Manager.add(entity);
 
         return entity;
+    }
+
+    private Entity createPlayerEntity() {
+
+        // Create Entity
+        Entity player = new Entity();
+
+        // Add Components
+        player.addComponent(new Player()); // Unique to Player
+        player.addComponent(new Transform());
+
+        return player;
     }
 
     /**
@@ -276,6 +291,7 @@ public class World {
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
 //        extension.getComponent(Image.class).addShape(rectangle);
+        rectangle.isBoundary = true;
         imageBuilder.addShape(rectangle);
 
         // Headers
@@ -323,6 +339,7 @@ public class World {
         circle.setLabel("Source Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
+        circle.isBoundary = true;
         imageBuilder.addShape(circle);
 
         circle = new Circle();
@@ -330,6 +347,7 @@ public class World {
         circle.setLabel("Target Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
+        circle.isBoundary = true;
         imageBuilder.addShape(circle);
 
         // TODO: 11/5/2016 Add Port circles to the Path? So moving paths around will be easier? Then Port images are always just the same color. They look different because of the Path image. Path can contain single node. Then can be stretched out to include another Port.
@@ -363,6 +381,7 @@ public class World {
         circle.setLabel("Port"); // TODO: Give proper name...
         circle.setColor("#f7f7f7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
+        circle.isBoundary = true;
         imageBuilder.addShape(circle);
 
         port.getComponent(Image.class).setImage(imageBuilder);
@@ -459,7 +478,6 @@ public class World {
     }
 
 
-
     // <EXTENSION_IMAGE_HELPERS>
     // TODO: Come up with better way to determine if the Extension already exists in the database.
     // TODO: Make more general for all Portables.
@@ -535,52 +553,22 @@ public class World {
     public long renderTime = 0L;
     public long lookupCount = 0L;
 
-    public void updateSystems(Palette palette) {
+    // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
+    public void update() {
         long updateStartTime = Clock.getCurrentTime();
-
         world.inputSystem.update();
         world.eventHandlerSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();
         world.cameraSystem.update();
-//        world.inputSystem.update();
-//        updateTime = Clock.getCurrentTime() - updateStartTime;
-
-        long renderStartTime = Clock.getCurrentTime();
-        world.renderSystem.update(palette); // TODO: Remove canvas!
-        renderTime = Clock.getCurrentTime() - renderStartTime;
-//        world.inputSystem.update();
         updateTime = Clock.getCurrentTime() - updateStartTime;
     }
 
-    /**
-     * Sorts {@code Image}s by layer.
-     */
-    public void updateLayers() {
-
-        Group<Image> images = Manager.getEntities().getImages();
-
-        for (int i = 0; i < images.size() - 1; i++) {
-            for (int j = i + 1; j < images.size(); j++) {
-                // Check for out-of-order pairs, and swap them
-                if (images.get(i).layerIndex > images.get(j).layerIndex) {
-                    Image image = images.get(i);
-                    images.set(i, images.get(j));
-                    images.set(j, image);
-                }
-            }
-        }
-
-        /*
-        // TODO: Sort using this after making Group implement List
-        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
-            @Override
-            public int compare(MyObject o1, MyObject o2) {
-                return o1.getStartDate().compareTo(o2.getStartDate());
-            }
-        });
-        */
+    public void draw() {
+        long renderStartTime = Clock.getCurrentTime();
+        world.renderSystem.update();
+        renderTime = Clock.getCurrentTime() - renderStartTime;
     }
 
     // <TITLE_UI_COMPONENT>

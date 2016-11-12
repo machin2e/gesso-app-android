@@ -64,15 +64,13 @@ public class PlatformRenderClock extends Thread {
             // This reduces energy consumption thereby increasing battery life.
             frameSleepTime = framePeriod - (frameStopTime - frameStartTime);
             try {
-                /*
+                sleepStartTime = Clock.getCurrentTime();
                 if (frameSleepTime > 0) {
                     Thread.sleep(frameSleepTime);
                 } else {
                     Thread.sleep(10);
                 }
-                */
-                sleepStartTime = Clock.getCurrentTime();
-                Thread.sleep(sleepDuration); // HACK
+//                Thread.sleep(sleepDuration); // HACK
             } catch (Exception e) {
                 e.printStackTrace();
             }

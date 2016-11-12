@@ -170,6 +170,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     private Event previousEvent = null;
 
+    // https://developer.android.com/training/gestures/scale.html
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
 
@@ -351,12 +352,15 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        Canvas canvas = null;
 //        SurfaceHolder holder = getHolder();
 
+        world.update();
+
         try {
             canvas = holder.lockCanvas();
             if (canvas != null) {
                 palette.canvas = canvas;
                 synchronized (holder) {
-                    world.updateSystems(palette);
+                    // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK TREE!!!!!!!!!!!!! FUCK!!!!!!!!
+                    world.draw();
                 }
             }
         } finally {

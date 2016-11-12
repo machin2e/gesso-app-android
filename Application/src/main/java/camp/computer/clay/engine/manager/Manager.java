@@ -26,7 +26,7 @@ public class Manager {
         return entities;
     }
 
-    public UUID add(Entity entity) {
+    public long add(Entity entity) {
         if (entity != null && !entities.contains(entity)) {
             entities.add(entity);
 
@@ -41,10 +41,10 @@ public class Manager {
 
             return entity.getUuid();
         }
-        return null;
+        return -1;
     }
 
-    public Entity get(UUID uuid) {
+    public Entity get(long uuid) {
 
 //        Collections.binarySearch(entities, uuid, new Comparator<Entity>() {
 //            @Override

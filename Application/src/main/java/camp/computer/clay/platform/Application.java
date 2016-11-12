@@ -3,6 +3,7 @@ package camp.computer.clay.platform;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -122,6 +123,9 @@ public class Application extends FragmentActivity implements PlatformInterface {
         // from the current context, that is tied to the lifetime of the process rather than the
         // current component." (Android Documentation)
         Application.context = getApplicationContext();
+
+        // Lock screen orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Sensor Interface
         if (ENABLE_MOTION_INPUT) {
@@ -609,7 +613,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
     // TODO: <BUILDER_SYSTEMS_HDL>
     public List<Entity> restoreHosts(String filename) {
 
-        // e.g., filename = "Hosts.json"
+        // e.g., filename = "HostHDL.json"
 
         List<Entity> hostEntities = new ArrayList<>();
 

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.Palette;
@@ -33,19 +34,18 @@ public class RenderSystem extends System {
         super(world);
     }
 
-    @Override
-    public void update() {
-    }
-
     // TODO: Move into platform layer (PlatformRenderSurface)?
     Entity camera = null;
-    public boolean update(Palette palette) {
 
-        // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to render.
+    @Override
+    public void update() {
+
+        // TODO: 11/5/2016 Remove need to pass canvas. Do this in a way that separates platform-specific rendering from preparation to draw.
 
         // <HACK>
         PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
-         Canvas canvas = platformRenderSurface.canvas;
+        Palette palette = platformRenderSurface.palette;
+        Canvas canvas = platformRenderSurface.canvas;
         // </HACK>
 
         platformRenderSurface.canvas = canvas;
@@ -111,12 +111,11 @@ public class RenderSystem extends System {
         canvas.drawBitmap(canvasBitmap, 0, 0, paint);
         canvas.restore();
         */
-
-        return true;
     }
 
     public void drawEntities(Palette palette) {
 
+        // TODO: This call is expensive. Make it way faster. Cache? Sublist?
         Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
 
         for (int j = 0; j < entities.size(); j++) {
@@ -153,6 +152,8 @@ public class RenderSystem extends System {
 
                 Image image = entity.getComponent(Image.class);
 
+                // TODO: Make the rendering state automatic... enable or disable geometry sets in the image?
+
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     Entity pathEntity = image.getEntity();
@@ -174,7 +175,7 @@ public class RenderSystem extends System {
 
             }
             // TODO: <REFACTOR>
-            // This was added so Prototype Extension/Path would render without Extension/Path components
+            // This was added so Prototype Extension/Path would draw without Extension/Path components
             else if (entity.hasComponent(Image.class)) {
 
                 Visibility visibility = entity.getComponent(Visibility.class);
@@ -248,6 +249,7 @@ public class RenderSystem extends System {
     public static float NOTIFICATION_FONT_SIZE = 45;
     public static final float DEFAULT_NOTIFICATION_OFFSET_X = 0;
     public static final float DEFAULT_NOTIFICATION_OFFSET_Y = -50;
+
     private void drawNotification(Notification notification, PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
@@ -277,6 +279,11 @@ public class RenderSystem extends System {
     public static String OVERLAY_FONT = "fonts/ProggySquare.ttf";
     public static float OVERLAY_FONT_SIZE = 25;
     public static String OVERLAY_FONT_COLOR = "#ffff0000";
+    private static Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), OVERLAY_FONT);
+    private static Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+
+    double minFps = Double.MAX_VALUE;
+    double maxFps = Double.MIN_VALUE;
     public void drawOverlay(PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
@@ -284,8 +291,6 @@ public class RenderSystem extends System {
         // World world = platformRenderSurface.getWorld(););
 
         // Font
-        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), OVERLAY_FONT);
-        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
         paint.setTypeface(boldTypeface);
 
         int linePosition = 0;
@@ -296,12 +301,21 @@ public class RenderSystem extends System {
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(OVERLAY_FONT_SIZE);
 
-        String fpsText = "FPS: " + (int) platformRenderSurface.platformRenderClock.getFramesPerSecond();
+        String fpsText = "FPS: " + (int) minFps + " " + (int) platformRenderSurface.platformRenderClock.getFramesPerSecond() + " " + (int) maxFps;
         Rect fpsTextBounds = new Rect();
         paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
         linePosition += OVERLAY_TOP_MARGIN + fpsTextBounds.height();
         canvas.drawText(fpsText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
+
+        // <HACK>
+        double fps = platformRenderSurface.platformRenderClock.getFramesPerSecond();
+        if (fps < minFps) {
+            minFps = fps;
+        } else if (fps > maxFps) {
+            maxFps = fps;
+        }
+        // </HACK>
         // </FPS_LABEL>
 
         // <FRAME_TIME>
@@ -438,5 +452,15 @@ public class RenderSystem extends System {
         canvas.drawText(cameraPositionText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
         // </CAMERA_POSITION_MONITOR>
+
+        // <BOUNDARY_COUNT>
+        canvas.save();
+        String shapeBoundaryCountText = "Boundary Count: appx. " + Boundary.shapeBoundaries.size();
+        Rect shapeBoundaryCountBounds = new Rect();
+        paint.getTextBounds(shapeBoundaryCountText, 0, shapeBoundaryCountText.length(), shapeBoundaryCountBounds);
+        linePosition += OVERLAY_LINE_SPACING + shapeBoundaryCountBounds.height();
+        canvas.drawText(shapeBoundaryCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </BOUNDARY_COUNT>
     }
 }

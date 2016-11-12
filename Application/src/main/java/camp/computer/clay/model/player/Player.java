@@ -1,6 +1,8 @@
 package camp.computer.clay.model.player;
 
-public class Player {
+import camp.computer.clay.engine.component.Component;
+
+public class Player extends Component {
 
     // TODO: Username, etc.
 

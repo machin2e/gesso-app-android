@@ -26,8 +26,8 @@ public class Segment extends Shape {
     }
 
     private void setupGeometry() {
-        Boundary.shapeBoundaries.get(this).add(new Transform(source));
-        Boundary.shapeBoundaries.get(this).add(new Transform(target));
+//        Boundary.shapeBoundaries.get(this).add(new Transform(source));
+//        Boundary.shapeBoundaries.get(this).add(new Transform(target));
     }
 
     @Override

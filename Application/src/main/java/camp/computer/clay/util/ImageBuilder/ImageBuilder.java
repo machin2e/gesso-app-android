@@ -138,6 +138,12 @@ public class ImageBuilder {
                 double y = position.getDouble("y") * scaleFactor;
                 double rotation = shape.getDouble("rotation");
 
+                // Boundary
+                boolean isBoundary = false;
+                if (shape.has("boundary")) {
+                    isBoundary = shape.getBoolean("boundary");
+                }
+
                 // Style
                 String color = "#ffffff";
                 String outlineColor = "#000000";
@@ -166,6 +172,7 @@ public class ImageBuilder {
                     point.setColor(color);
                     point.setOutlineColor(outlineColor);
                     point.setOutlineThickness(outlineThickness);
+                    point.isBoundary = isBoundary;
 
                     imageBuilder.addShape(point);
 
@@ -183,6 +190,7 @@ public class ImageBuilder {
                     rectangle.setColor(color);
                     rectangle.setOutlineColor(outlineColor);
                     rectangle.setOutlineThickness(outlineThickness);
+                    rectangle.isBoundary = isBoundary;
 
                     imageBuilder.addShape(rectangle);
 
@@ -197,6 +205,7 @@ public class ImageBuilder {
                     circle.setColor(color);
                     circle.setOutlineColor(outlineColor);
                     circle.setOutlineThickness(outlineThickness);
+                    circle.isBoundary = isBoundary;
 
                     imageBuilder.addShape(circle);
                 }

@@ -208,7 +208,11 @@ public abstract class Geometry {
             }
 
             // Log.v("BBB", "minX: " + minX + ", maxX: " + maxX + ", minY: " + minY + ", maxY: " + maxY);
-            return new Rectangle(minX, minY, maxX, maxY);
+            Rectangle rectangle = new Rectangle(minX, minY, maxX, maxY);
+            // <HACK>
+            rectangle.isBoundary = true;
+            // </HACK>
+            return rectangle;
         }
     }
 
