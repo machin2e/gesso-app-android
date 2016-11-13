@@ -181,20 +181,10 @@ public class RenderSystem extends System {
 
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    Entity pathEntity = image.getEntity();
-                    platformRenderSurface.drawEditablePath(pathEntity, palette);
-                    /*
-                    if (pathEntity.getComponent(Path.class).getType() == Path.Type.MESH) {
-                        // TODO: Draw Path between wirelessly connected Ports
-                        // platformRenderSurface.drawTrianglePath(pathEntity, platformRenderSurface);
-                    } else if (pathEntity.getComponent(Path.class).getType() == Path.Type.ELECTRONIC) {
-                        platformRenderSurface.drawEditablePath(pathEntity, platformRenderSurface);
-                    }
-                    */
+                    platformRenderSurface.drawEditablePath(entity, palette);
                 } else if (visibility != null && visibility.getVisibile() == Visible.INVISIBLE) {
-                    Entity pathEntity = entity; // image.getPath();
-                    if (Path.getMode(pathEntity) == Path.Mode.ELECTRONIC) {
-                        platformRenderSurface.drawOverviewPath(pathEntity, palette);
+                    if (Path.getMode(entity) == Path.Mode.ELECTRONIC) {
+                        platformRenderSurface.drawOverviewPath(entity, palette);
                     }
                 }
 

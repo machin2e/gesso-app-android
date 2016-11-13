@@ -19,13 +19,13 @@ public class Camera extends Component {
     // TODO: Delete!
     public double height;
 
-    // Scale
-    protected final double DEFAULT_SCALE = 1.0f;
-    public double targetScale = DEFAULT_SCALE;
+//    // Scale
+//    protected final double DEFAULT_SCALE = 1.0f;
+//    public double targetScale = DEFAULT_SCALE;
 
-    // Position
-    protected final Transform DEFAULT_POSITION = new Transform(0, 0);
-    public Transform targetPosition = DEFAULT_POSITION;
+//    // Position
+//    protected final Transform DEFAULT_POSITION = new Transform(0, 0);
+//    public Transform targetTransform = DEFAULT_POSITION;
 
     public Camera() {
         super();

@@ -14,6 +14,7 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Prototype;
@@ -164,6 +165,7 @@ public class World {
         host.addComponent(new Host()); // Unique to Host
         host.addComponent(new Portable()); // Add Portable Component (so can add Ports)
         host.addComponent(new Transform());
+        host.addComponent(new Physics());
         host.addComponent(new Image());
         host.addComponent(new Boundary());
         host.addComponent(new Visibility());
@@ -279,6 +281,7 @@ public class World {
 
         // Add Components
         extension.addComponent(new Transform());
+        extension.addComponent(new Physics());
         extension.addComponent(new Image());
         extension.addComponent(new Boundary());
         extension.addComponent(new Visibility());
@@ -325,6 +328,7 @@ public class World {
         // Add Path Component (for type identification)
         path.addComponent(new Path()); // Unique to Path
         path.addComponent(new Transform());
+        path.addComponent(new Physics());
         path.addComponent(new Image());
         path.addComponent(new Boundary());
         path.addComponent(new Visibility());
@@ -374,6 +378,7 @@ public class World {
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
         port.addComponent(new Image());
+        port.addComponent(new Physics());
         port.addComponent(new Boundary());
         port.addComponent(new Visibility());
         port.addComponent(new Label());
@@ -406,6 +411,7 @@ public class World {
 
         // Add Transform Component
         camera.addComponent(new Transform());
+        camera.addComponent(new Physics());
 
         return camera;
     }
@@ -476,6 +482,7 @@ public class World {
 
         prototypeExtension.addComponent(new Prototype()); // Unique to Prototypes/Props
         prototypeExtension.addComponent(new Transform());
+        prototypeExtension.addComponent(new Physics());
         prototypeExtension.addComponent(new Image());
 
         ImageBuilder imageBuilder = new ImageBuilder();
@@ -510,6 +517,7 @@ public class World {
 //        prototypePath.addComponent(new Path()); // NOTE: Just used as a placeholder. Consider actually using the prototype, removing the Prototype component.
 //        prototypePath.addComponent(new Prototype()); // Unique to Prototypes/Props
         prototypePath.addComponent(new Transform());
+        prototypePath.addComponent(new Physics());
         prototypePath.addComponent(new Image());
 
         ImageBuilder imageBuilder = new ImageBuilder();

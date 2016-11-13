@@ -8,6 +8,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
@@ -36,13 +37,14 @@ public class CameraSystem extends System {
 
         Camera cameraComponent = camera.getComponent(Camera.class);
         Transform transformComponent = camera.getComponent(Transform.class);
+        Physics physicsComponent = camera.getComponent(Physics.class);
 
-        transformComponent.scale = cameraComponent.targetScale;
+        transformComponent.scale = physicsComponent.targetTransform.scale;
 
         // Position
         camera.getComponent(Transform.class).set(
-                cameraComponent.targetPosition.x * transformComponent.scale,
-                cameraComponent.targetPosition.y * transformComponent.scale
+                physicsComponent.targetTransform.x * transformComponent.scale,
+                physicsComponent.targetTransform.y * transformComponent.scale
         );
 
     }
@@ -68,7 +70,7 @@ public class CameraSystem extends System {
 
     private void setPosition(Entity camera, Transform position, double duration) {
         Log.v("CameraSystem", "setPosition");
-        camera.getComponent(Camera.class).targetPosition.set(-position.x, -position.y);
+        camera.getComponent(Physics.class).targetTransform.set(-position.x, -position.y);
 //        camera.getComponent(Transform.class).set(-position.x, -position.y);
     }
 
@@ -79,7 +81,7 @@ public class CameraSystem extends System {
     }
 
     public void setOffset(Entity camera, double dx, double dy) {
-        camera.getComponent(Camera.class).targetPosition.offset(dx, dy);
+        camera.getComponent(Physics.class).targetTransform.offset(dx, dy);
     }
 
     public void setOffset(Entity camera, Transform point) {
@@ -99,7 +101,7 @@ public class CameraSystem extends System {
         }
          */
 
-        camera.getComponent(Camera.class).targetScale = scale;
+        camera.getComponent(Physics.class).targetTransform.scale = scale;
         camera.getComponent(Transform.class).scale = scale;
     }
 

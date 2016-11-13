@@ -464,8 +464,6 @@ public class PortableLayoutSystem extends System {
 
             Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
 
-            int minX = -800, maxX = 800;
-            int minY = -800, maxY = 800;
             int minDistanceBetweenPoints = 800;
 
             for (int i = 0; i < hosts.size(); i++) {
