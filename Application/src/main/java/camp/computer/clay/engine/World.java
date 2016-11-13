@@ -12,9 +12,11 @@ import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
@@ -124,6 +126,8 @@ public class World {
             entity = createCameraEntity();
         } else if (entityType == Player.class) {
             entity = createPlayerEntity();
+        } else if (entityType == Notification.class) {
+            entity = createNotificationEntity();
         }
 
         // Add Entity to Manager
@@ -403,13 +407,27 @@ public class World {
         return camera;
     }
 
+    private Entity createNotificationEntity() {
+
+        Entity notification = new Entity();
+
+        // Components
+        notification.addComponent(new Notification()); // Unique to Notification Entity
+        notification.addComponent(new Transform());
+
+        return notification;
+    }
+
     // TODO: Actually create and stage a real single-port Entity without a parent!?
     // Serves as a "prop" for user to define new Extensions
     public Entity createPrototypeExtensionEntity() {
 
         Entity prototypeExtension = new Entity();
 
-        // extensionPrototype.addComponent(new Extension());
+//        // prototypeExtension.addComponent(new Extension()); // NOTE: Just used as a placeholder. Consider actually using the prototype, removing the Prototype component.
+//        prototypeExtension.addComponent(new Portable());
+
+        prototypeExtension.addComponent(new Prototype()); // Unique to Prototypes/Props
         prototypeExtension.addComponent(new Transform());
         prototypeExtension.addComponent(new Image());
 
@@ -421,8 +439,6 @@ public class World {
         imageBuilder.addShape(rectangle);
 
         prototypeExtension.getComponent(Image.class).setImage(imageBuilder);
-
-        imageSystem.invalidate(prototypeExtension.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
 
         prototypeExtension.addComponent(new Label());
         prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
@@ -444,21 +460,44 @@ public class World {
 
         Entity prototypePath = new Entity();
 
-        // extensionPrototype.addComponent(new Extension());
+//        prototypePath.addComponent(new Path()); // NOTE: Just used as a placeholder. Consider actually using the prototype, removing the Prototype component.
+//        prototypePath.addComponent(new Prototype()); // Unique to Prototypes/Props
         prototypePath.addComponent(new Transform());
         prototypePath.addComponent(new Image());
 
         ImageBuilder imageBuilder = new ImageBuilder();
 
+        // Image
         Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
         segment.setLabel("Path");
         segment.setOutlineColor("#ff333333");
         segment.setOutlineThickness(10.0);
         imageBuilder.addShape(segment);
 
-        prototypePath.getComponent(Image.class).setImage(imageBuilder);
+//        Segment segment = new Segment();
+//        segment.setOutlineThickness(2.0);
+//        segment.setLabel("Path");
+//        segment.setColor("#1f1f1e"); // #f7f7f7
+//        segment.setOutlineThickness(1);
+//        imageBuilder.addShape(segment);
+//
+//        Circle circle = new Circle();
+//        circle.setRadius(50.0);
+//        circle.setLabel("Source Port"); // TODO: Give proper name...
+//        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
+//        circle.setOutlineThickness(0);
+//        circle.isBoundary = true;
+//        imageBuilder.addShape(circle);
+//
+//        circle = new Circle();
+//        circle.setRadius(50.0);
+//        circle.setLabel("Target Port"); // TODO: Give proper name...
+//        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
+//        circle.setOutlineThickness(0);
+//        circle.isBoundary = true;
+//        imageBuilder.addShape(circle);
 
-        imageSystem.invalidate(prototypePath.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
+        prototypePath.getComponent(Image.class).setImage(imageBuilder);
 
         prototypePath.addComponent(new Label());
         prototypePath.getComponent(Label.class).setLabel("prototypePath");

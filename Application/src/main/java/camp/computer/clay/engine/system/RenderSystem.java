@@ -17,6 +17,7 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Transform;
@@ -74,6 +75,31 @@ public class RenderSystem extends System {
 
         drawEntities(palette);
 
+        // <HACK>
+        Group<Entity> notifications = world.Manager.getEntities().filterWithComponent(Notification.class);
+        for (int i = 0; i < notifications.size(); i++) {
+            Entity notification = notifications.get(i);
+
+//            drawNotification(notification, platformRenderSurface);
+
+            Notification notificationComponent = notification.getComponent(Notification.class);
+            if (notificationComponent.state == State.WAITING) {
+                notificationComponent.state = State.RUNNING; // notification.run();
+                platformRenderSurface.autoDestructTimer(notificationComponent.timeout, notification);
+                drawNotification(notification, platformRenderSurface);
+            } else if (notificationComponent.state == State.RUNNING) {
+                drawNotification(notification, platformRenderSurface);
+//                i++;
+            } else if (notificationComponent.state == State.COMPLETE) {
+//                notifications.remove(i);
+                notification.isActive = false;
+                world.Manager.remove(notification);
+                // TODO: Delete Entity and Components!
+            }
+        }
+        // </HACK>
+
+        /*
         for (int i = 0; i < notifications.size(); ) {
             Notification notification = notifications.get(i);
             if (notification.state == State.WAITING) {
@@ -86,6 +112,7 @@ public class RenderSystem extends System {
                 notifications.remove(i);
             }
         }
+        */
 //        if (addNotification) {
 //            drawNotification(echoText, (float) echoTextPosition.x, (float) echoTextPosition.y, platformRenderSurface);
 //        }
@@ -214,7 +241,7 @@ public class RenderSystem extends System {
         COMPLETE
     }
 
-    public class Notification {
+    public class Notification2 {
         public String text = "";
         public Transform position = new Transform(0, 0);
         public Transform offset = new Transform(DEFAULT_NOTIFICATION_OFFSET_X, DEFAULT_NOTIFICATION_OFFSET_Y);
@@ -222,7 +249,7 @@ public class RenderSystem extends System {
 
         public State state = State.WAITING;
 
-        public Notification(String text, Transform position, long timeout) {
+        public Notification2(String text, Transform position, long timeout) {
             this.text = text;
             this.position.set(position);
             this.timeout = timeout;
@@ -234,14 +261,21 @@ public class RenderSystem extends System {
         }
     }
 
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Notification2> notifications = new ArrayList<>();
 
     public void addNotification(String text, Transform position, long timeout) {
+        /*
         Notification notification = new Notification(text, position, timeout);
         notifications.add(notification);
 
         PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
         platformRenderSurface.startTimer(timeout, notification);
+        */
+
+        Entity notification = world.createEntity(Notification.class);
+        notification.getComponent(Notification.class).message = text;
+        notification.getComponent(Notification.class).timeout = timeout;
+        notification.getComponent(Transform.class).set(position);
     }
 
     public static String NOTIFICATION_FONT = "fonts/ProggyClean.ttf";
@@ -249,7 +283,7 @@ public class RenderSystem extends System {
     public static final float DEFAULT_NOTIFICATION_OFFSET_X = 0;
     public static final float DEFAULT_NOTIFICATION_OFFSET_Y = -50;
 
-    private void drawNotification(Notification notification, PlatformRenderSurface platformRenderSurface) {
+    private void drawNotification2(Notification2 notification, PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
         Paint paint = platformRenderSurface.paint;
@@ -269,6 +303,32 @@ public class RenderSystem extends System {
         float x = (float) (notification.position.x - (textBounds.width() / 2.0)) + (float) notification.offset.x;
         float y = (float) (notification.position.y + (textBounds.height() / 2.0)) + (float) notification.offset.y;
         canvas.drawText(notification.text, x, y, paint);
+        canvas.restore();
+    }
+
+    private void drawNotification(Entity notification, PlatformRenderSurface platformRenderSurface) {
+
+        Notification notificationComponent = notification.getComponent(Notification.class);
+        Transform transformComponent = notification.getComponent(Transform.class);
+
+        Canvas canvas = platformRenderSurface.canvas;
+        Paint paint = platformRenderSurface.paint;
+
+        canvas.save();
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(NOTIFICATION_FONT_SIZE);
+
+        // Font
+        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), NOTIFICATION_FONT);
+        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+        paint.setTypeface(boldTypeface);
+
+        Rect textBounds = new Rect();
+        paint.getTextBounds(notificationComponent.message, 0, notificationComponent.message.length(), textBounds);
+        float x = (float) (transformComponent.x - (textBounds.width() / 2.0)); // + (float) offset.x;
+        float y = (float) (transformComponent.y + (textBounds.height() / 2.0)); // + (float) offset.y;
+        canvas.drawText(notificationComponent.message, x, y, paint);
         canvas.restore();
     }
 

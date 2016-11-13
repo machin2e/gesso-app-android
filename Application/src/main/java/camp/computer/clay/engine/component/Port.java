@@ -44,13 +44,11 @@ public class Port extends Component {
     // </COMPONENT_DATA>
 
 
-
     // <CONSTRUCTOR>
     public Port() {
         super();
     }
     // </CONSTRUCTOR>
-
 
 
     // <COMPONENT_DATA>
@@ -71,7 +69,6 @@ public class Port extends Component {
 
     private Direction direction = Direction.NONE;
     // </COMPONENT_DATA>
-
 
 
     // <ABSTRACT_ENTITY_INTERFACE>

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 
 public class Image extends Component {
 

@@ -45,6 +45,13 @@ public class PortableLayoutSystem extends System {
             Entity sourcePort = Path.getSource(path);
             Entity targetPort = Path.getTarget(path);
 
+            // <HACK>
+            // TODO/NOTE: For Prototype Entities that are missing some data...
+            if (sourcePort == null) {
+                continue;
+            }
+            // </HACK>
+
             Path.Type pathType = Path.getType(path);
             if (pathType == Path.Type.NONE) {
                 Port.setType(sourcePort, Port.Type.NONE);
@@ -410,12 +417,6 @@ public class PortableLayoutSystem extends System {
                 } else if (headerIndex == 3) {
                     extension.getComponent(Transform.class).setRotation(hostRotation + 270);
                 }
-
-                // Invalidate Image Component so its geometry (i.e., shapes) will be updated.
-                // <HACK>
-                // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-                world.imageSystem.invalidate(extension.getComponent(Image.class));
-                // </HACK>
             }
         }
     }
@@ -546,6 +547,10 @@ public class PortableLayoutSystem extends System {
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
+//        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Extension.class, Prototype.class).get(0);
+//        Log.v("ExtensionPrototype", "extensionPrototype1: " + extensionPrototype);
+//        Log.v("ExtensionPrototype", "extensionPrototype: " + extensionPrototype);
+//        Log.v("ExtensionPrototype", "----");
         // </HACK>
         extensionPrototype.getComponent(Transform.class).set(position);
 

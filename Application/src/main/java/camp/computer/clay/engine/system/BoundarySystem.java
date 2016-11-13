@@ -126,7 +126,7 @@ public class BoundarySystem extends System {
 //            shape.update(transformedPoint);
             if (absoluteReferenceTransform != null) {
                 updateShapeTransform(shape, absoluteReferenceTransform);
-                updateShapeBoundary(shape);
+//                updateShapeBoundary(shape);
                 shape.isValid = true;
             }
         }
@@ -140,6 +140,7 @@ public class BoundarySystem extends System {
     public void updateHostStyle(Entity host) {
 
         // Get LED shapes
+        // TODO: Optimize! Cache!
         Group<Shape> lightShapeGroup = world.imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
 
         Group<Entity> ports = Portable.getPorts(host);

@@ -24,6 +24,7 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -413,10 +414,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 targetPortShape.setPosition(extensionTargetPortShape.getPosition());
             }
 
-//            // <HACK>
+            // <HACK>
 //            BoundarySystem.updateShapeBoundary(sourcePortShape);
 //            BoundarySystem.updateShapeBoundary(targetPortShape);
-//            // </HACK>
+            // </HACK>
 
             // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
             // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
@@ -827,7 +828,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //    }
 
     // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
-    public void startTimer(long timeout, final RenderSystem.Notification notification) {
+    public void startTimer(long timeout, final RenderSystem.Notification2 notification) {
 
         new Timer().schedule(new TimerTask() {
             @Override
@@ -842,6 +843,55 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //                queueEvent(event);
 
                 notification.state = RenderSystem.State.COMPLETE;
+//                World.getWorld().renderSystem.addNotification = false;
+                Log.v("HoldCallback", "Holding");
+            }
+        }, timeout);
+
+//        final Handler handler = new Handler();
+//
+//        Thread thread = new Thread() {
+//            @Override
+//            public void run() {
+//                try {
+//                    sleep(1000);
+//
+//                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//
+//                    // If needs to run on UI thread.
+//                            /*
+//                            Application.getView().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
+//                                }
+//                            });
+//                            */
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//
+//        thread.start();
+    }
+
+    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
+    public void autoDestructTimer(long timeout, final Entity notification) {
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // this code will be executed after 2 seconds
+
+//                Event event = new Event();
+//                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
+//                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
+//                event.setType(Event.Type.HOLD);
+//                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
+//                queueEvent(event);
+
+                notification.getComponent(Notification.class).state = RenderSystem.State.COMPLETE;
 //                World.getWorld().renderSystem.addNotification = false;
                 Log.v("HoldCallback", "Holding");
             }

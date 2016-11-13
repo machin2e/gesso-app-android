@@ -11,11 +11,11 @@ import camp.computer.clay.util.ImageBuilder.Point;
 public class Portable extends Component {
 
     // <COMPONENT_DATA>
-    protected Group<Entity> ports = new Group<>();
+    // TODO: Change to Group<Long>
+    public Group<Entity> ports = new Group<>();
 
     public List<Point> headerContactPositions = new ArrayList<>();
     // </COMPONENT_DATA>
-
 
 
     // <CONSTRUCTOR>
@@ -23,7 +23,6 @@ public class Portable extends Component {
         super();
     }
     // </CONSTRUCTOR>
-
 
 
     // <COMPONENT_DATA>

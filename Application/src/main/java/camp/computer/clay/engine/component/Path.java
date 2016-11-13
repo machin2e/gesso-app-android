@@ -1,7 +1,5 @@
 package camp.computer.clay.engine.component;
 
-import java.util.UUID;
-
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
@@ -78,7 +76,6 @@ public class Path extends Component {
     // </COMPONENT_DATA>
 
 
-
     // <CONSTRUCTOR>
     public Path() {
         super();
@@ -93,7 +90,6 @@ public class Path extends Component {
         // TODO: PathEntity.connectPath(sourcePortUuid, destination) and do what the following constructor does... auto-configure Ports and PathEntity
     }
     // </CONSTRUCTOR>
-
 
 
     // <ABSTRACT_ENTITY_INTERFACE>
