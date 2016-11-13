@@ -67,6 +67,7 @@ public class World {
     // </MANAGERS>
 
     // <WORLD_SYSTEMS>
+    // public List<System> systems = new ArrayList<>();
     public CameraSystem cameraSystem = new CameraSystem(this);
     public ImageSystem imageSystem = new ImageSystem(this);
     public RenderSystem renderSystem = new RenderSystem(this);

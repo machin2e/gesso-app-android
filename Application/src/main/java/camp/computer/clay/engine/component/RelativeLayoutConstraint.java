@@ -5,6 +5,8 @@ import camp.computer.clay.engine.entity.Entity;
 
 public class RelativeLayoutConstraint extends Component {
 
+    // TODO: 11/12/2016 public Type type = RELATIVE_LAYOUT;
+
     /**
      * The Entity with this component will be drawn relative to the reference Entity's Transform
      * component.

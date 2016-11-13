@@ -4,6 +4,8 @@ import camp.computer.clay.engine.World;
 
 public abstract class System {
 
+    // TODO: private int priority = 0;
+
     protected World world = null;
 
     public System(World world) {
