@@ -19,30 +19,30 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.system.BoundarySystem;
-import camp.computer.clay.engine.system.RenderSystem;
-import camp.computer.clay.platform.Application;
-import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.engine.Event;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.Event;
+import camp.computer.clay.engine.system.BoundarySystem;
+import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.platform.Application;
 import camp.computer.clay.util.ImageBuilder.Circle;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Point;
-import camp.computer.clay.util.ImageBuilder.Segment;
-import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.util.ImageBuilder.Polygon;
 import camp.computer.clay.util.ImageBuilder.Polyline;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Segment;
+import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.util.ImageBuilder.Text;
 import camp.computer.clay.util.ImageBuilder.Triangle;
-import camp.computer.clay.util.ImageBuilder.Shape;
-import camp.computer.clay.engine.World;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -454,13 +454,13 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(sourcePortShape, palette);
             drawShape(targetPortShape, palette);
 
-            // Draw shapeBoundaries
+            // Draw innerBoundaries
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(sourcePortShape.getBoundary(), palette);
-            drawPolygon(targetPortShape.getBoundary(), palette);
+            drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
+            drawPolygon(BoundarySystem.getBoundary(targetPortShape), palette);
 //        }
 
         } else {
@@ -540,13 +540,13 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(sourcePortShape, palette);
 //            platformRenderSurface.drawShape(targetPortShape);
 
-            // Draw shapeBoundaries
+            // Draw innerBoundaries
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(sourcePortShape.getBoundary(), palette);
-//            platformRenderSurface.drawPolygon(targetPortShape.getBoundary());
+            drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
+//            platformRenderSurface.drawPolygon(targetPortBoundarySystem.getBoundary());
 
         }
     }
@@ -785,7 +785,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     // TODO: Refactor with transforms
     public void drawPolygon(Polygon polygon, Palette palette) {
-        drawPolygon(polygon.getBoundary(), palette);
+        drawPolygon(BoundarySystem.getBoundary(polygon), palette);
     }
 
     // TODO: Refactor with transforms

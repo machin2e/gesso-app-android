@@ -22,8 +22,8 @@ public class Point extends Shape {
     }
 
     private void setupGeometry() {
-//        Boundary.shapeBoundaries.get(this).boundary = new ArrayList<>();
-//        Boundary.shapeBoundaries.get(this).add(new Transform());
+//        Boundary.innerBoundaries.get(this).boundary = new ArrayList<>();
+//        Boundary.innerBoundaries.get(this).add(new Transform());
     }
 
     @Override

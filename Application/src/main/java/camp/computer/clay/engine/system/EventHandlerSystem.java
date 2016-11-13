@@ -5,28 +5,27 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.RelativeLayoutConstraint;
-import camp.computer.clay.model.configuration.Configuration;
-import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.PlatformRenderSurface;
-import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.Event;
-import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.engine.component.util.Visible;
-import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class EventHandlerSystem extends System {
@@ -134,9 +133,9 @@ public class EventHandlerSystem extends System {
     }
 
 
-
     // TODO: Make World an Entity?
     double lastDx = 0, lastDy = 0;
+
     public void handleCameraEvent(final Entity camera, Event event) {
 
         if (event.getType() == Event.Type.NONE) {
@@ -467,10 +466,10 @@ public class EventHandlerSystem extends System {
 
         Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
         Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
-        if (Geometry.contains(sourcePortShape.getBoundary(), event.getPosition())) {
+        if (Geometry.contains(BoundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
 //            path.getComponent(Path.class).setSource(touchedPort);
             isSourceTouched = true;
-        } else if (Geometry.contains(targetPortShape.getBoundary(), event.getPosition())) {
+        } else if (Geometry.contains(BoundarySystem.getBoundary(targetPortShape), event.getPosition())) {
 //            path.getComponent(Path.class).setTarget(touchedPort);
             isTargetTouched = true;
         }
@@ -492,7 +491,7 @@ public class EventHandlerSystem extends System {
                 path.getComponent(Image.class).getImage().getShapes();
 
 //                Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
-                if (Geometry.contains(sourcePortShape.getBoundary(), event.getPosition())) {
+                if (Geometry.contains(BoundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
                     Log.v("PathEvent", "Touched Source");
                     sourcePortShape.setPosition(event.getPosition());
 
@@ -504,7 +503,7 @@ public class EventHandlerSystem extends System {
                 }
 
 //                Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
-                if (Geometry.contains(targetPortShape.getBoundary(), event.getPosition())) {
+                if (Geometry.contains(BoundarySystem.getBoundary(targetPortShape), event.getPosition())) {
                     Log.v("PathEvent", "Touched Target");
                     targetPortShape.setPosition(event.getPosition());
 
@@ -674,7 +673,7 @@ public class EventHandlerSystem extends System {
                             // Check if source or target in Path was moved, and reassign it
                             Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
                             Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
-                            if (Geometry.contains(sourcePortShape2.getBoundary(), event.getPosition())) {
+                            if (Geometry.contains(BoundarySystem.getBoundary(sourcePortShape2), event.getPosition())) {
 
                                 // Check if the new Path's Port's would be on the same Portable
                                 if (Path.getTarget(path).getParent() == touchedPort2.getParent()) {
@@ -686,7 +685,7 @@ public class EventHandlerSystem extends System {
                                     Path.setSource(path, touchedPort2);
                                 }
 
-                            } else if (Geometry.contains(targetPortShape2.getBoundary(), event.getPosition())) {
+                            } else if (Geometry.contains(BoundarySystem.getBoundary(targetPortShape2), event.getPosition())) {
 //                                // Check if the new Port is not on the same Portable
 //                                if (path.getComponent(Path.class).getSource().getParent() != touchedPort2.getParent()) {
 //                                    path.getComponent(Path.class).setTarget(touchedPort2);

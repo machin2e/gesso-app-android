@@ -6,13 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import camp.computer.clay.engine.component.RelativeLayoutConstraint;
-import camp.computer.clay.engine.manager.Manager;
-import camp.computer.clay.engine.system.ImageSystem;
-import camp.computer.clay.model.Repository;
-import camp.computer.clay.model.configuration.Configuration;
-import camp.computer.clay.model.player.Player;
-import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -21,25 +14,31 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
-import camp.computer.clay.engine.system.EventHandlerSystem;
+import camp.computer.clay.engine.component.util.Visible;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
+import camp.computer.clay.engine.system.EventHandlerSystem;
+import camp.computer.clay.engine.system.ImageSystem;
 import camp.computer.clay.engine.system.InputSystem;
-import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
-import camp.computer.clay.platform.graphics.Palette;
+import camp.computer.clay.model.Repository;
+import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.model.player.Player;
+import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.NativeUi;
-import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.util.ImageBuilder.Circle;
+import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.util.ImageBuilder.Point;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Segment;
 import camp.computer.clay.util.ImageBuilder.Shape;
-import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.util.time.Clock;
 
 public class World {
@@ -556,6 +555,7 @@ public class World {
     // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
     public void update() {
+//        Boundary.innerBoundaries.clear();
         long updateStartTime = Clock.getCurrentTime();
         world.inputSystem.update();
         world.eventHandlerSystem.update();

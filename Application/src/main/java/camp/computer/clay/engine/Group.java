@@ -12,15 +12,16 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
-import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.Visibility;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.ImageBuilder.Shape;
+import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.BoundarySystem;
+import camp.computer.clay.util.ImageBuilder.Geometry;
+import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class Group<E extends Groupable> implements List<E> {
 
@@ -376,7 +377,7 @@ public class Group<E extends Groupable> implements List<E> {
         Group<Transform> positions = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = (Shape) elements.get(i);
-            positions.addAll(shape.getBoundary());
+            positions.addAll(BoundarySystem.getBoundary(shape));
         }
         return positions;
     }
@@ -387,13 +388,12 @@ public class Group<E extends Groupable> implements List<E> {
         List<Transform> imageBoundaries = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
-            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getBoundary());
+            imageBoundaries.addAll(BoundarySystem.getBoundary(Boundary.getBoundingBox(entity)));
         }
 
         return Geometry.getBoundingBox(imageBoundaries);
     }
     // </GROUP_LOOKUP>
-
 
 
     // <GROUP>
@@ -442,7 +442,6 @@ public class Group<E extends Groupable> implements List<E> {
         return this;
     }
     // </GROUP>
-
 
 
     // <LIST_INTERFACE>

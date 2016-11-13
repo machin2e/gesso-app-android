@@ -1,15 +1,10 @@
 package camp.computer.clay.util.ImageBuilder;
 
-import android.util.Log;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.component.Boundary;
-import camp.computer.clay.engine.system.BoundarySystem;
-import camp.computer.clay.util.Color;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.util.Color;
 
 public abstract class Shape extends Groupable {
 
@@ -22,7 +17,7 @@ public abstract class Shape extends Groupable {
 //        }
 //    }
 
-//    public static HashMap<Shape, ShapeBoundary> shapeBoundaries = new HashMap<>();
+//    public static HashMap<Shape, ShapeBoundary> innerBoundaries = new HashMap<>();
 
     protected String label = ""; // Component
 
@@ -70,22 +65,14 @@ public abstract class Shape extends Groupable {
 
     public void setLayerIndex(int layerIndex) {
         this.layerIndex = layerIndex;
-//        parentImage.updateLayers();
+        // parentImage.updateLayers();
     }
     // </LAYER>
 
     public Shape() {
-//        boundary = new ArrayList<>();
-//        shapeBoundary = new ShapeBoundary(this);
-//        Boundary.shapeBoundaries.put(this, new ShapeBoundary(this));
-//        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
     }
 
     public Shape(Transform position) {
-//        boundary = new ArrayList<>();
-//        shapeBoundary = new ShapeBoundary(this);
-//        Boundary.shapeBoundaries.put(this, new ShapeBoundary(this));
-//        Boundary.shapeBoundaries.put(this, new ArrayList<Transform>());
         this.position.set(position);
     }
 
@@ -130,24 +117,6 @@ public abstract class Shape extends Groupable {
     }
 
     public abstract List<Transform> getVertices();
-
-    // TODO: Delete! Get boundary in BoundarySystem.
-    public List<Transform> getBoundary() {
-//        return this.shapeBoundary.boundary;
-//        return Boundary.shapeBoundaries.get(this).boundary;
-        if (isBoundary) {
-            if (!Boundary.shapeBoundaries.containsKey(this)) {
-                Log.v("Boundz", "adding boundary for " + this);
-                ArrayList<Transform> boundary = new ArrayList<>();
-                boundary.addAll(getVertices());
-                Boundary.shapeBoundaries.put(this, boundary);
-                BoundarySystem.updateShapeBoundary(this);
-            }
-            return Boundary.shapeBoundaries.get(this);
-        } else {
-            return null;
-        }
-    }
 
     public void setColor(String color) {
         this.color = color;

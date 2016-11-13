@@ -3,6 +3,7 @@ package camp.computer.clay.engine.system;
 import android.util.Log;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -13,7 +14,6 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.engine.World;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Shape;
 
@@ -88,6 +88,8 @@ public class CameraSystem extends System {
 
     private void setScale(Entity camera, double scale, double duration) {
 
+        /*
+        // TODO: Implement Zoom Levels
         if (Math.abs(scale - Camera.SCALE_LEVEL_1) < Math.abs(scale - Camera.SCALE_LEVEL_2)) {
             camera.getComponent(Camera.class).targetScale = Camera.SCALE_LEVEL_1;
             camera.getComponent(Transform.class).scale = Camera.SCALE_LEVEL_1;
@@ -95,9 +97,10 @@ public class CameraSystem extends System {
             camera.getComponent(Camera.class).targetScale = Camera.SCALE_LEVEL_2;
             camera.getComponent(Transform.class).scale = Camera.SCALE_LEVEL_2;
         }
+         */
 
-//        camera.getComponent(Camera.class).targetScale = scale;
-//        camera.getComponent(Transform.class).scale = scale;
+        camera.getComponent(Camera.class).targetScale = scale;
+        camera.getComponent(Transform.class).scale = scale;
     }
 
     public double getScale(Entity camera) {

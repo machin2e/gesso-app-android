@@ -1,8 +1,10 @@
 package camp.computer.clay.engine.system;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
@@ -17,7 +19,6 @@ import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Point;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Shape;
-import camp.computer.clay.engine.World;
 
 public class BoundarySystem extends System {
 
@@ -76,7 +77,7 @@ public class BoundarySystem extends System {
 //            } else if (entity.hasComponent(Port.class)) {
 //            } else if (entity.hasComponent(Path.class)) {
 //            }
-            // </HACK>
+        // </HACK>
 //        }
 
         // Update Renderables?
@@ -177,6 +178,7 @@ public class BoundarySystem extends System {
     // </HOST>
 
     // <EXTENSION>
+
     /**
      * Update the {@code Image} to match the state of the corresponding {@code Entity}.
      */
@@ -271,18 +273,13 @@ public class BoundarySystem extends System {
     // </EXTENSION>
 
 
-
-
-
-
-
     // <SHAPE>
     // TODO: Move into Image API specific to my shape-based Image format.
 
     /**
      * Computes and updates the {@code Shape}'s absolute positioning, rotation, and scaling in
      * preparation for drawing and collision detection.
-     *
+     * <p>
      * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
      * the center position of the {@code Shape}. Effectively, this updates the position of the
      * {@code Shape}.
@@ -300,15 +297,15 @@ public class BoundarySystem extends System {
 
 //        if (!shape.isValid) {
 
-            // Position
-            shape.getPosition().x = referencePoint.x + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
-            shape.getPosition().y = referencePoint.y + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+        // Position
+        shape.getPosition().x = referencePoint.x + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+        shape.getPosition().y = referencePoint.y + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
 
-            // Rotation
-            shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
+        // Rotation
+        shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
 
 //            updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
-            //shape.isValid = true;
+        //shape.isValid = true;
 //        }
     }
 
@@ -316,24 +313,64 @@ public class BoundarySystem extends System {
      * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
      * detection. Hey there, mango bongo.
      */
-    public static void updateShapeBoundary(Shape shape) {
+//    public static void updateShapeBoundary(Shape shape) {
+//
+//        if (shape.isBoundary) {
+//            List<Transform> vertices = shape.getVertices();
+//            List<Transform> boundary = getBoundary(shape);
+//
+//            // Translate and rotate the boundary about the updated position
+//            for (int i = 0; i < vertices.size(); i++) {
+//                boundary.get(i).set(vertices.get(i));
+//                Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
+//                Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape
+//            }
+//            // shape.isValid = true;
+//        }
+//    }
+
+    // TODO: Delete?
+//    public static List<Transform> getBoundary(Shape shape) {
+//        if (shape.isBoundary) {
+//            if (!Boundary.innerBoundaries.containsKey(shape)) {
+//                ArrayList<Transform> boundary = new ArrayList<>();
+//                boundary.addAll(shape.getVertices());
+//                Boundary.innerBoundaries.put(shape, boundary);
+//                BoundarySystem.updateShapeBoundary(shape);
+//            }
+//            return Boundary.innerBoundaries.get(shape);
+//        } else {
+//            return null;
+//        }
+//    }
+    public static List<Transform> updateShapeBoundary(Shape shape) {
 
         if (shape.isBoundary) {
             List<Transform> vertices = shape.getVertices();
-//        List<Transform> boundary = shape.getBoundary();
-            List<Transform> boundary = shape.getBoundary();
+            List<Transform> boundary = new ArrayList<>(vertices);
 
             // Translate and rotate the boundary about the updated position
             for (int i = 0; i < vertices.size(); i++) {
-//            if (boundary.size() < vertices.size()) {
-//                return;
-//            }
                 boundary.get(i).set(vertices.get(i));
                 Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
                 Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape
             }
             // shape.isValid = true;
+
+            return boundary;
         }
+        return null;
     }
+
+    public static List<Transform> getBoundary(Shape shape) {
+        return updateShapeBoundary(shape);
+    }
+
+//    // TODO: Delete! Get boundary in BoundarySystem.
+//    public static List<Transform> getBoundary(Shape shape) {
+//        ArrayList<Transform> boundary = new ArrayList<>();
+//        boundary.addAll(shape.getVertices());
+//        return boundary;
+//    }
     // </SHAPE>
 }

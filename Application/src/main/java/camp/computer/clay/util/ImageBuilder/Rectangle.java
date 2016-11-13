@@ -50,10 +50,10 @@ public class Rectangle extends Shape {
         Transform bottomRight = new Transform(0 + (width / 2.0), 0 + (height / 2.0));
         Transform bottomLeft = new Transform(0 - (width / 2.0), 0 + (height / 2.0));
 
-//        Boundary.shapeBoundaries.get(this).add(topLeft);
-//        Boundary.shapeBoundaries.get(this).add(topRight);
-//        Boundary.shapeBoundaries.get(this).add(bottomRight);
-//        Boundary.shapeBoundaries.get(this).add(bottomLeft);
+//        Boundary.innerBoundaries.get(this).add(topLeft);
+//        Boundary.innerBoundaries.get(this).add(topRight);
+//        Boundary.innerBoundaries.get(this).add(bottomRight);
+//        Boundary.innerBoundaries.get(this).add(bottomLeft);
 
         // Create segment Lines (relative to the Shape)
         Segment top = new Segment(topLeft, topRight);

@@ -12,21 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
-import camp.computer.clay.engine.component.Boundary;
-import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.Palette;
-import camp.computer.clay.platform.graphics.PlatformRenderSurface;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.util.Visible;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.Palette;
+import camp.computer.clay.platform.graphics.PlatformRenderSurface;
 
 public class RenderSystem extends System {
 
@@ -284,6 +283,7 @@ public class RenderSystem extends System {
 
     double minFps = Double.MAX_VALUE;
     double maxFps = Double.MIN_VALUE;
+
     public void drawOverlay(PlatformRenderSurface platformRenderSurface) {
 
         Canvas canvas = platformRenderSurface.canvas;
@@ -453,14 +453,14 @@ public class RenderSystem extends System {
         canvas.restore();
         // </CAMERA_POSITION_MONITOR>
 
-        // <BOUNDARY_COUNT>
-        canvas.save();
-        String shapeBoundaryCountText = "Boundary Count: appx. " + Boundary.shapeBoundaries.size();
-        Rect shapeBoundaryCountBounds = new Rect();
-        paint.getTextBounds(shapeBoundaryCountText, 0, shapeBoundaryCountText.length(), shapeBoundaryCountBounds);
-        linePosition += OVERLAY_LINE_SPACING + shapeBoundaryCountBounds.height();
-        canvas.drawText(shapeBoundaryCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
-        canvas.restore();
-        // </BOUNDARY_COUNT>
+//        // <BOUNDARY_COUNT>
+//        canvas.save();
+//        String shapeBoundaryCountText = "Boundary Count: appx. " + Boundary.innerBoundaries.size();
+//        Rect shapeBoundaryCountBounds = new Rect();
+//        paint.getTextBounds(shapeBoundaryCountText, 0, shapeBoundaryCountText.length(), shapeBoundaryCountBounds);
+//        linePosition += OVERLAY_LINE_SPACING + shapeBoundaryCountBounds.height();
+//        canvas.drawText(shapeBoundaryCountText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+//        canvas.restore();
+//        // </BOUNDARY_COUNT>
     }
 }

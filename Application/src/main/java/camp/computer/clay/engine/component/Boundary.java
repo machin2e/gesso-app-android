@@ -1,18 +1,17 @@
 package camp.computer.clay.engine.component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class Boundary extends Component {
 
-    public static HashMap<Shape, ArrayList<Transform>> shapeBoundaries = new HashMap<>();
+//    public static HashMap<Shape, ArrayList<Transform>> innerBoundaries = new HashMap<>();
 
     private List<Transform> boundary = new ArrayList<>();
 
@@ -35,7 +34,7 @@ public class Boundary extends Component {
         List<Shape> shapes = image.getImage().getShapes();
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).isBoundary
-                    && Geometry.contains(shapes.get(i).getBoundary(), point)) {
+                    && Geometry.contains(BoundarySystem.getBoundary(shapes.get(i)), point)) {
                 return true;
             }
         }
@@ -52,7 +51,7 @@ public class Boundary extends Component {
         List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).isBoundary) {
-                shapeBoundaries.addAll(shapes.get(i).getBoundary());
+                shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i)));
             }
         }
 
