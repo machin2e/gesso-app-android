@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -16,15 +17,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -32,7 +30,6 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.InputSystem;
-import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.util.ImageBuilder.Circle;
 import camp.computer.clay.util.ImageBuilder.Geometry;
@@ -614,7 +611,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         } else if (shape.getClass() == Circle.class) {
             drawCircle((Circle) shape, palette);
         } else if (shape.getClass() == Text.class) {
-            // TODO:
+            drawText((Text) shape, palette);
         }
     }
 
@@ -747,10 +744,47 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        canvas.restore();
 //    }
 
+    public void drawText(Text text, Palette palette) {
+
+        Log.v("DrawText", "drawText");
+
+        palette.canvas.save();
+        palette.canvas.translate((float) text.getPosition().x, (float) text.getPosition().y);
+        palette.canvas.rotate((float) text.getPosition().rotation);
+
+        // Style
+        palette.paint.setColor(Color.BLACK);
+        palette.paint.setStyle(Paint.Style.FILL);
+        palette.paint.setTextSize((float) text.size);
+
+        // Font
+        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), text.font);
+        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+        paint.setTypeface(boldTypeface);
+
+        // Style (Guaranteed)
+        String printText = text.getText().toUpperCase();
+        palette.paint.setStyle(Paint.Style.FILL);
+
+        // Draw
+        Rect textBounds = new Rect();
+        palette.paint.getTextBounds(printText, 0, printText.length(), textBounds);
+        palette.canvas.drawText(printText, (float) 0 - textBounds.width() / 2.0f, (float) 0 + textBounds.height() / 2.0f, palette.paint);
+
+        palette.canvas.restore();
+    }
+
     public void drawText(Transform position, String text, double size, Palette palette) {
 
         // Style
         palette.paint.setTextSize((float) size);
+
+        /*
+        // Font
+        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), NOTIFICATION_FONT);
+        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+        paint.setTypeface(boldTypeface);
+        */
 
         // Style (Guaranteed)
         text = text.toUpperCase();
@@ -826,102 +860,4 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //
 //        canvas.drawPath(path, paint);
 //    }
-
-    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
-    public void startTimer(long timeout, final RenderSystem.Notification2 notification) {
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // this code will be executed after 2 seconds
-
-//                Event event = new Event();
-//                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-//                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-//                event.setType(Event.Type.HOLD);
-//                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
-//                queueEvent(event);
-
-                notification.state = RenderSystem.State.COMPLETE;
-//                World.getWorld().renderSystem.addNotification = false;
-                Log.v("HoldCallback", "Holding");
-            }
-        }, timeout);
-
-//        final Handler handler = new Handler();
-//
-//        Thread thread = new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    sleep(1000);
-//
-//                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//
-//                    // If needs to run on UI thread.
-//                            /*
-//                            Application.getView().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//                                }
-//                            });
-//                            */
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//
-//        thread.start();
-    }
-
-    // TODO: Make generic Timer function that spawns a background thread that blocks for <time> then calls a function.
-    public void autoDestructTimer(long timeout, final Entity notification) {
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // this code will be executed after 2 seconds
-
-//                Event event = new Event();
-//                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-//                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-//                event.setType(Event.Type.HOLD);
-//                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
-//                queueEvent(event);
-
-                notification.getComponent(Notification.class).state = RenderSystem.State.COMPLETE;
-//                World.getWorld().renderSystem.addNotification = false;
-                Log.v("HoldCallback", "Holding");
-            }
-        }, timeout);
-
-//        final Handler handler = new Handler();
-//
-//        Thread thread = new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    sleep(1000);
-//
-//                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//
-//                    // If needs to run on UI thread.
-//                            /*
-//                            Application.getView().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//                                }
-//                            });
-//                            */
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//
-//        thread.start();
-    }
 }

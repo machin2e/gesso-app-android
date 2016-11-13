@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
@@ -17,7 +16,6 @@ import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Transform;
@@ -27,6 +25,7 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.Palette;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
+import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class RenderSystem extends System {
 
@@ -75,29 +74,29 @@ public class RenderSystem extends System {
 
         drawEntities(palette);
 
-        // <HACK>
-        Group<Entity> notifications = world.Manager.getEntities().filterWithComponent(Notification.class);
-        for (int i = 0; i < notifications.size(); i++) {
-            Entity notification = notifications.get(i);
-
-//            drawNotification(notification, platformRenderSurface);
-
-            Notification notificationComponent = notification.getComponent(Notification.class);
-            if (notificationComponent.state == State.WAITING) {
-                notificationComponent.state = State.RUNNING; // notification.run();
-                platformRenderSurface.autoDestructTimer(notificationComponent.timeout, notification);
-                drawNotification(notification, platformRenderSurface);
-            } else if (notificationComponent.state == State.RUNNING) {
-                drawNotification(notification, platformRenderSurface);
-//                i++;
-            } else if (notificationComponent.state == State.COMPLETE) {
-//                notifications.remove(i);
-                notification.isActive = false;
-                world.Manager.remove(notification);
-                // TODO: Delete Entity and Components!
-            }
-        }
-        // </HACK>
+//        // <HACK>
+//        Group<Entity> notifications = world.Manager.getEntities().filterWithComponent(Notification.class);
+//        for (int i = 0; i < notifications.size(); i++) {
+//            Entity notification = notifications.get(i);
+//
+////            drawNotification(notification, platformRenderSurface);
+//
+//            Notification notificationComponent = notification.getComponent(Notification.class);
+//            if (notificationComponent.state == State.WAITING) {
+//                notificationComponent.state = State.RUNNING; // notification.run();
+//                platformRenderSurface.onTimeout(notificationComponent.timeout, notification);
+//                drawNotification(notification, platformRenderSurface);
+//            } else if (notificationComponent.state == State.RUNNING) {
+//                drawNotification(notification, platformRenderSurface);
+////                i++;
+//            } else if (notificationComponent.state == State.COMPLETE) {
+////                notifications.remove(i);
+//                notification.isActive = false;
+//                world.Manager.remove(notification);
+//                // TODO: Delete Entity and Components!
+//            }
+//        }
+//        // </HACK>
 
         /*
         for (int i = 0; i < notifications.size(); ) {
@@ -113,7 +112,7 @@ public class RenderSystem extends System {
             }
         }
         */
-//        if (addNotification) {
+//        if (createAndConfigureNotification) {
 //            drawNotification(echoText, (float) echoTextPosition.x, (float) echoTextPosition.y, platformRenderSurface);
 //        }
 
@@ -123,7 +122,7 @@ public class RenderSystem extends System {
             drawOverlay(platformRenderSurface);
         }
 
-//        if (addNotification) {
+//        if (createAndConfigureNotification) {
 //            drawNotification("connected port", (float) position.x, (float) position.y, platformRenderSurface);
 //        }
 
@@ -206,10 +205,10 @@ public class RenderSystem extends System {
 
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
-                    Image image = entity.getComponent(Image.class);
                     palette.canvas.save();
-                    for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-                        platformRenderSurface.drawShape(image.getImage().getShapes().get(i), palette);
+                    List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+                    for (int i = 0; i < shapes.size(); i++) {
+                        platformRenderSurface.drawShape(shapes.get(i), palette);
                     }
                     palette.canvas.restore();
                 }
@@ -235,102 +234,11 @@ public class RenderSystem extends System {
         }
     }
 
-    public enum State {
-        WAITING,
-        RUNNING,
-        COMPLETE
-    }
-
-    public class Notification2 {
-        public String text = "";
-        public Transform position = new Transform(0, 0);
-        public Transform offset = new Transform(DEFAULT_NOTIFICATION_OFFSET_X, DEFAULT_NOTIFICATION_OFFSET_Y);
-        public long timeout = 1000;
-
-        public State state = State.WAITING;
-
-        public Notification2(String text, Transform position, long timeout) {
-            this.text = text;
-            this.position.set(position);
-            this.timeout = timeout;
-        }
-
-        public void run() {
-            state = State.RUNNING;
-//            platformRenderSurface.startTimer(timeout);
-        }
-    }
-
-    private List<Notification2> notifications = new ArrayList<>();
-
-    public void addNotification(String text, Transform position, long timeout) {
-        /*
-        Notification notification = new Notification(text, position, timeout);
-        notifications.add(notification);
-
-        PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
-        platformRenderSurface.startTimer(timeout, notification);
-        */
-
-        Entity notification = world.createEntity(Notification.class);
-        notification.getComponent(Notification.class).message = text;
-        notification.getComponent(Notification.class).timeout = timeout;
-        notification.getComponent(Transform.class).set(position);
-    }
-
     public static String NOTIFICATION_FONT = "fonts/ProggyClean.ttf";
     public static float NOTIFICATION_FONT_SIZE = 45;
+    public static final long DEFAULT_NOTIFICATION_TIMEOUT = 1000;
     public static final float DEFAULT_NOTIFICATION_OFFSET_X = 0;
     public static final float DEFAULT_NOTIFICATION_OFFSET_Y = -50;
-
-    private void drawNotification2(Notification2 notification, PlatformRenderSurface platformRenderSurface) {
-
-        Canvas canvas = platformRenderSurface.canvas;
-        Paint paint = platformRenderSurface.paint;
-
-        canvas.save();
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(NOTIFICATION_FONT_SIZE);
-
-        // Font
-        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), NOTIFICATION_FONT);
-        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
-        paint.setTypeface(boldTypeface);
-
-        Rect textBounds = new Rect();
-        paint.getTextBounds(notification.text, 0, notification.text.length(), textBounds);
-        float x = (float) (notification.position.x - (textBounds.width() / 2.0)) + (float) notification.offset.x;
-        float y = (float) (notification.position.y + (textBounds.height() / 2.0)) + (float) notification.offset.y;
-        canvas.drawText(notification.text, x, y, paint);
-        canvas.restore();
-    }
-
-    private void drawNotification(Entity notification, PlatformRenderSurface platformRenderSurface) {
-
-        Notification notificationComponent = notification.getComponent(Notification.class);
-        Transform transformComponent = notification.getComponent(Transform.class);
-
-        Canvas canvas = platformRenderSurface.canvas;
-        Paint paint = platformRenderSurface.paint;
-
-        canvas.save();
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(NOTIFICATION_FONT_SIZE);
-
-        // Font
-        Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), NOTIFICATION_FONT);
-        Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
-        paint.setTypeface(boldTypeface);
-
-        Rect textBounds = new Rect();
-        paint.getTextBounds(notificationComponent.message, 0, notificationComponent.message.length(), textBounds);
-        float x = (float) (transformComponent.x - (textBounds.width() / 2.0)); // + (float) offset.x;
-        float y = (float) (transformComponent.y + (textBounds.height() / 2.0)); // + (float) offset.y;
-        canvas.drawText(notificationComponent.message, x, y, paint);
-        canvas.restore();
-    }
 
     public static int OVERLAY_TOP_MARGIN = 25;
     public static int OVERLAY_LEFT_MARGIN = 25;

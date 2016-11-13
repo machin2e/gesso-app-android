@@ -8,6 +8,9 @@ public class Text extends Shape {
 
     protected String text = "";
 
+    public String font = null;
+    public double size = 12;
+
     public Text() {
     }
 

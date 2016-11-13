@@ -18,6 +18,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
@@ -41,6 +42,7 @@ import camp.computer.clay.util.ImageBuilder.Point;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Segment;
 import camp.computer.clay.util.ImageBuilder.Shape;
+import camp.computer.clay.util.ImageBuilder.Text;
 import camp.computer.clay.util.time.Clock;
 
 public class World {
@@ -414,9 +416,53 @@ public class World {
         // Components
         notification.addComponent(new Notification()); // Unique to Notification Entity
         notification.addComponent(new Transform());
+        notification.addComponent(new Image());
+        notification.addComponent(new Visibility());
+        notification.addComponent(new Timer());
+
+        // <HACK>
+        notification.getComponent(Timer.class).timeout = RenderSystem.DEFAULT_NOTIFICATION_TIMEOUT;
+        // </HACK>
+
+        // Image
+        ImageBuilder imageBuilder = new ImageBuilder();
+
+        Text text = new Text();
+        text.setText("DEFAULT_TEXT");
+        text.size = RenderSystem.NOTIFICATION_FONT_SIZE;
+        text.setColor("#ff000000");
+        text.setPosition(0, 0);
+        text.font = RenderSystem.NOTIFICATION_FONT;
+
+        imageBuilder.addShape(text);
+
+        // <HACK>
+        notification.getComponent(Image.class).layerIndex = 20;
+        // </HACK>
+
+        notification.getComponent(Image.class).setImage(imageBuilder);
 
         return notification;
     }
+
+    // <TODO:REFACTOR>
+    public void createAndConfigureNotification(String text, Transform position, long timeout) {
+
+        Entity notification = world.createEntity(Notification.class);
+
+        notification.getComponent(Notification.class).message = text;
+        notification.getComponent(Notification.class).timeout = timeout;
+        notification.getComponent(Transform.class).set(position);
+
+        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
+        text2.setText(notification.getComponent(Notification.class).message);
+        text2.setColor("#ff0000");
+
+        // <HACK>
+        notification.getComponent(Timer.class).onTimeout(notification);
+        // </HACK>
+    }
+    // </TODO:REFACTOR>
 
     // TODO: Actually create and stage a real single-port Entity without a parent!?
     // Serves as a "prop" for user to define new Extensions

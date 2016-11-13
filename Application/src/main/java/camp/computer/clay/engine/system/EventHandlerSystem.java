@@ -640,7 +640,7 @@ public class EventHandlerSystem extends System {
 //                    Group<Entity> ports = Path.getPorts(path);
 
                     // Notification
-                    world.renderSystem.addNotification("" + nextType, event.getPosition(), 800);
+                    world.createAndConfigureNotification("" + nextType, event.getPosition(), 800);
 
                 } else if (Path.getState(path) == Component.State.EDITING) {
 
@@ -664,7 +664,7 @@ public class EventHandlerSystem extends System {
                             // TODO: path.getComponent(Path.class).setDirection();
 
                             // Notification
-                            world.renderSystem.addNotification("flipped path", event.getPosition(), 1000);
+                            world.createAndConfigureNotification("flipped path", event.getPosition(), 1000);
 
                         } else if (targetPaths.size() > 0 && targetPaths.get(0) != path) {
 
@@ -698,7 +698,7 @@ public class EventHandlerSystem extends System {
                             // TODO: path.getComponent(Path.class).setDirection();
 
                             // Notification
-                            world.renderSystem.addNotification("swapped paths", event.getPosition(), 1000);
+                            world.createAndConfigureNotification("swapped paths", event.getPosition(), 1000);
 
                         } else if (Port.getPaths(touchedPort2).size() == 0) {
 
@@ -739,7 +739,7 @@ public class EventHandlerSystem extends System {
                             // TODO: Configure new Port, clear configuration from old port
 
                             // Notification
-                            world.renderSystem.addNotification("moved path", event.getPosition(), 1000);
+                            world.createAndConfigureNotification("moved path", event.getPosition(), 1000);
                         }
 
 //                    Entity extension = path.getComponent(Path.class).getExtension();
@@ -759,7 +759,7 @@ public class EventHandlerSystem extends System {
 //                    extensionPorts1.remove(extensionPort); // Remove from Portable
 
                         // Notification
-                        world.renderSystem.addNotification("removed path", event.getPosition(), 1000);
+                        world.createAndConfigureNotification("removed path", event.getPosition(), 1000);
 
                         // Reset Ports that were in removed Path
                         Entity sourcePort = Path.getSource(path);
@@ -795,7 +795,7 @@ public class EventHandlerSystem extends System {
                             world.Manager.getEntities().remove(extension);
 
                             // Notification
-                            world.renderSystem.addNotification("removed extension", extension.getComponent(Transform.class), 1000);
+                            world.createAndConfigureNotification("removed extension", extension.getComponent(Transform.class), 1000);
                         }
 
                     }
@@ -842,7 +842,7 @@ public class EventHandlerSystem extends System {
                     Entity extension = world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
 
                     // Notification
-                    world.renderSystem.addNotification("added extension", extension.getComponent(Transform.class), 1000);
+                    world.createAndConfigureNotification("added extension", extension.getComponent(Transform.class), 1000);
 
                     // <STYLE_AND_LAYOUT>
                     // Remove focus from other Hosts and their Ports
@@ -932,7 +932,7 @@ public class EventHandlerSystem extends System {
 
                     Path.setTarget(path, targetPort);
 
-                    world.renderSystem.addNotification("added path", event.getPosition(), 1000);
+                    world.createAndConfigureNotification("added path", event.getPosition(), 1000);
 
 //                    // (Host.Port A, ..., Host.Port B) Action Pattern
 //                    // i.e., The Action's first and last Events address different Ports.
@@ -954,7 +954,7 @@ public class EventHandlerSystem extends System {
 ////                    world.cameraSystem.setFocus(camera, extension);
 //
 //                    // Notification
-//                    world.renderSystem.addNotification("added path", event.getPosition(), 1000);
+//                    world.createAndConfigureNotification("added path", event.getPosition(), 1000);
 ////                    }
 
                 }
