@@ -655,7 +655,7 @@ public class EventHandlerSystem extends System {
                         Group<Entity> targetPaths = Port.getPaths(touchedPort2);
                         if (targetPaths.size() > 0 && targetPaths.get(0) == path) {
 
-                            // Swap the Path's Ports (Flip Direction)
+                            // Swap the Path's Ports in the SAME path (swap Ports/flip direction)
                             Log.v("PathEventHandler", "flipping the path");
                             Entity sourcePort = Path.getSource(path);
                             Path.setSource(path, Path.getTarget(path));
@@ -665,6 +665,58 @@ public class EventHandlerSystem extends System {
 
                             // Notification
                             world.renderSystem.addNotification("flipped path", event.getPosition(), 1000);
+
+                        } else if (targetPaths.size() > 0 && targetPaths.get(0) != path) {
+
+                            // TODO: Make sure both Ports are connected between both a common Host and Extension
+
+                            // Swap ports ACROSS different paths (swap Paths)
+                            Log.v("PathEventHandler", "swapping the paths");
+                            if (touchedPort2 == Path.getSource(targetPaths.get(0))) {
+                                Entity sourcePort = Path.getSource(path);
+                                Path.setSource(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
+                                Path.setSource(targetPaths.get(0), sourcePort);
+                            } else if (touchedPort2 == Path.getTarget(path)) {
+                                Entity targetPort = Path.getTarget(path);
+                                Path.setTarget(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
+                                Path.setTarget(targetPaths.get(0), targetPort);
+                            }
+
+                            Entity pathPortToSwap = null;
+                            if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
+                                // Moving source port shape...
+                                pathPortToSwap = Path.getSource(path);
+
+                                Entity otherPathPortToSwap = null;
+                                if (touchedPort2 == Path.getSource(targetPaths.get(0))) {
+                                    Entity sourcePort = Path.getSource(path);
+                                    Path.setSource(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
+                                    Path.setSource(targetPaths.get(0), sourcePort);
+                                } else if (touchedPort2 == Path.getTarget(targetPaths.get(0))) {
+                                    Entity sourcePort = Path.getSource(path);
+                                    Path.setSource(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
+                                    Path.setTarget(targetPaths.get(0), sourcePort);
+                                }
+
+                            } else if (Geometry.contains(world.boundarySystem.getBoundary(targetPortShape), event.getPosition())) {
+                                // Moving target port shape...
+                                pathPortToSwap = Path.getTarget(path);
+                                Entity otherPathPortToSwap = null;
+                                if (touchedPort2 == Path.getSource(targetPaths.get(0))) {
+                                    Entity targetPath = Path.getTarget(path);
+                                    Path.setTarget(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
+                                    Path.setSource(targetPaths.get(0), targetPath);
+                                } else if (touchedPort2 == Path.getTarget(targetPaths.get(0))) {
+                                    Entity targetPath = Path.getTarget(path);
+                                    Path.setTarget(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
+                                    Path.setTarget(targetPaths.get(0), targetPath);
+                                }
+                            }
+
+                            // TODO: path.getComponent(Path.class).setDirection();
+
+                            // Notification
+                            world.renderSystem.addNotification("swapped paths", event.getPosition(), 1000);
 
                         } else if (Port.getPaths(touchedPort2).size() == 0) {
 

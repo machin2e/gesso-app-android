@@ -1,7 +1,6 @@
 package camp.computer.clay.engine.component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import camp.computer.clay.engine.entity.Entity;
@@ -12,7 +11,7 @@ import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class Boundary extends Component {
 
-    public static HashMap<Shape, ArrayList<Transform>> innerBoundaries = new HashMap<>();
+//    public static HashMap<Shape, ArrayList<Transform>> innerBoundaries = new HashMap<>();
 
     private List<Transform> boundary = new ArrayList<>();
 
