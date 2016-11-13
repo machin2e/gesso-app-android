@@ -35,11 +35,9 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.Action;
-import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.R;
-import camp.computer.clay.util.Random;
 
 public class NativeUi {
 

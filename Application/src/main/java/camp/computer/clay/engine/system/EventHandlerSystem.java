@@ -637,7 +637,7 @@ public class EventHandlerSystem extends System {
                     // <PATH>
 
                     // TODO: Update the Port Type in the Path to Match the Path Type
-                    Group<Entity> ports = Path.getPorts(path);
+//                    Group<Entity> ports = Path.getPorts(path);
 
                     // Notification
                     world.renderSystem.addNotification("" + nextType, event.getPosition(), 800);
@@ -671,23 +671,8 @@ public class EventHandlerSystem extends System {
                             // TODO: Make sure both Ports are connected between both a common Host and Extension
 
                             // Swap ports ACROSS different paths (swap Paths)
-                            Log.v("PathEventHandler", "swapping the paths");
-                            if (touchedPort2 == Path.getSource(targetPaths.get(0))) {
-                                Entity sourcePort = Path.getSource(path);
-                                Path.setSource(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
-                                Path.setSource(targetPaths.get(0), sourcePort);
-                            } else if (touchedPort2 == Path.getTarget(path)) {
-                                Entity targetPort = Path.getTarget(path);
-                                Path.setTarget(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
-                                Path.setTarget(targetPaths.get(0), targetPort);
-                            }
-
-                            Entity pathPortToSwap = null;
                             if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
-                                // Moving source port shape...
-                                pathPortToSwap = Path.getSource(path);
-
-                                Entity otherPathPortToSwap = null;
+                                // Swapping path A source port shape...
                                 if (touchedPort2 == Path.getSource(targetPaths.get(0))) {
                                     Entity sourcePort = Path.getSource(path);
                                     Path.setSource(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
@@ -697,11 +682,8 @@ public class EventHandlerSystem extends System {
                                     Path.setSource(path, Path.getTarget(targetPaths.get(0))); // Path.getTarget(path));
                                     Path.setTarget(targetPaths.get(0), sourcePort);
                                 }
-
                             } else if (Geometry.contains(world.boundarySystem.getBoundary(targetPortShape), event.getPosition())) {
-                                // Moving target port shape...
-                                pathPortToSwap = Path.getTarget(path);
-                                Entity otherPathPortToSwap = null;
+                                // Swapping path A target port shape...
                                 if (touchedPort2 == Path.getSource(targetPaths.get(0))) {
                                     Entity targetPath = Path.getTarget(path);
                                     Path.setTarget(path, Path.getSource(targetPaths.get(0))); // Path.getTarget(path));
