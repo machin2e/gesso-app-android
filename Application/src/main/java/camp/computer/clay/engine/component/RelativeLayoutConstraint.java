@@ -1,7 +1,5 @@
 package camp.computer.clay.engine.component;
 
-import java.util.UUID;
-
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
 

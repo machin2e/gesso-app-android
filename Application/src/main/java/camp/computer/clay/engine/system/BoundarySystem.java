@@ -92,34 +92,12 @@ public class BoundarySystem extends System {
     // Previously: Image.update()
     // Required Components: Image, Transform
     public void updateImage(Entity entity) {
-        /*
-        Image image = entity.getComponent(Image.class);
+
+        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
 
         // Update Shapes
-        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            Shape shape = image.getImage().getShapes().get(i);
-            updateShapeTransform(shape, image.getEntity().getComponent(Transform.class));
-        }
-        */
-
-//        if (!entity.isActive) {
-//            return;
-//        }
-
-        /*
-        // Update color of Port shape based on its type
-        Port.Type portType = port.getComponent(Port.class).getType();
-        String portColor = camp.computer.clay.util.Color.getColor(portType);
-        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
-        */
-
-        // <TODO:PUT_INTO_UPDATE_TRANSFORM>
-        // Call this so Portable.updateImage() will be called to updateImage Geometry
-        Image imageComponent = entity.getComponent(Image.class);
-
-        // Update Shapes
-        for (int i = 0; i < imageComponent.getImage().getShapes().size(); i++) {
-            Shape shape = imageComponent.getImage().getShapes().get(i);
+        for (int i = 0; i < shapes.size(); i++) {
+            Shape shape = shapes.get(i);
 
             Transform absoluteReferenceTransform = null;
             if (entity.hasComponent(RelativeLayoutConstraint.class)) {
@@ -153,7 +131,7 @@ public class BoundarySystem extends System {
             }
         }
 
-        // </TODO:PUT_INTO_UPDATE_TRANSFORM>
+//        updateImageBoundary(entity);
     }
     // </IMAGE>
 
@@ -343,7 +321,7 @@ public class BoundarySystem extends System {
 //            return null;
 //        }
 //    }
-    public static List<Transform> updateShapeBoundary(Shape shape) {
+    private static List<Transform> updateShapeBoundary(Shape shape) {
 
         if (shape.isBoundary) {
             List<Transform> vertices = shape.getVertices();
@@ -363,7 +341,7 @@ public class BoundarySystem extends System {
     }
 
     public static List<Transform> getBoundary(Shape shape) {
-        return updateShapeBoundary(shape);
+        return BoundarySystem.updateShapeBoundary(shape);
     }
 
 //    // TODO: Delete! Get boundary in BoundarySystem.
@@ -373,4 +351,11 @@ public class BoundarySystem extends System {
 //        return boundary;
 //    }
     // </SHAPE>
+
+//    public void updateImageBoundary(Entity entity) {
+//        List<Transform> boundary = BoundarySystem.getBoundary(Boundary.getBoundingBox(entity));
+//        if (boundary != null) {
+//            entity.getComponent(Boundary.class).setBoundary(boundary);
+//        }
+//    }
 }

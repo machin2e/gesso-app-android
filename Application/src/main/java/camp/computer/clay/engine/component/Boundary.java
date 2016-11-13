@@ -20,6 +20,10 @@ public class Boundary extends Component {
         this.boundary.addAll(points);
     }
 
+    public List<Transform> getBoundary() {
+        return this.boundary;
+    }
+
     /**
      * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
      * {@code point}.
@@ -39,6 +43,8 @@ public class Boundary extends Component {
             }
         }
         return false;
+
+        // TODO: return Geometry.contains(entity.getComponent(Boundary.class).boundary, point);
 
         // TODO?: return Geometry.contains(this.boundary, point);
     }

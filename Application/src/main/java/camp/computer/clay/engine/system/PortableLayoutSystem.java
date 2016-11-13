@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.List;
 
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -14,13 +15,12 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
+import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Segment;
 import camp.computer.clay.util.ImageBuilder.Shape;
-import camp.computer.clay.engine.component.util.Visible;
-import camp.computer.clay.engine.World;
 import camp.computer.clay.util.Random;
 
 public class PortableLayoutSystem extends System {
@@ -289,7 +289,7 @@ public class PortableLayoutSystem extends System {
         }
 
         Shape boardShape = host.getComponent(Image.class).getImage().getShape("Board");
-        List<Transform> hostShapeBoundary = BoundarySystem.getBoundary(boardShape);
+        List<Transform> hostShapeBoundary = world.boundarySystem.getBoundary(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
         for (int j = 0; j < extensionPorts.size(); j++) {

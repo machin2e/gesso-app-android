@@ -3,9 +3,7 @@ package camp.computer.clay.util.ImageBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.system.BoundarySystem;
 
 public class Rectangle extends Shape {
 
@@ -35,7 +33,7 @@ public class Rectangle extends Shape {
         height = (bottom - top);
 
         setup();
-        BoundarySystem.updateShapeBoundary(this); // TODO: Replace with updateExtensionGeometry(this.position)
+//        BoundarySystem.updateShapeBoundary(this); // TODO: Replace with updateExtensionGeometry(this.position)
     }
 
     protected void setup() {

@@ -466,10 +466,10 @@ public class EventHandlerSystem extends System {
 
         Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
         Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
-        if (Geometry.contains(BoundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
+        if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
 //            path.getComponent(Path.class).setSource(touchedPort);
             isSourceTouched = true;
-        } else if (Geometry.contains(BoundarySystem.getBoundary(targetPortShape), event.getPosition())) {
+        } else if (Geometry.contains(world.boundarySystem.getBoundary(targetPortShape), event.getPosition())) {
 //            path.getComponent(Path.class).setTarget(touchedPort);
             isTargetTouched = true;
         }
@@ -491,26 +491,26 @@ public class EventHandlerSystem extends System {
                 path.getComponent(Image.class).getImage().getShapes();
 
 //                Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
-                if (Geometry.contains(BoundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
+                if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
                     Log.v("PathEvent", "Touched Source");
                     sourcePortShape.setPosition(event.getPosition());
 
                     Path.setState(path, Component.State.EDITING);
 
                     // <HACK>
-                    world.boundarySystem.updateShapeBoundary(sourcePortShape);
+//                    world.boundarySystem.updateShapeBoundary(sourcePortShape);
                     // </HACK>
                 }
 
 //                Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
-                if (Geometry.contains(BoundarySystem.getBoundary(targetPortShape), event.getPosition())) {
+                if (Geometry.contains(world.boundarySystem.getBoundary(targetPortShape), event.getPosition())) {
                     Log.v("PathEvent", "Touched Target");
                     targetPortShape.setPosition(event.getPosition());
 
                     Path.setState(path, Component.State.EDITING);
 
                     // <HACK>
-                    world.boundarySystem.updateShapeBoundary(targetPortShape);
+//                    world.boundarySystem.updateShapeBoundary(targetPortShape);
                     // </HACK>
                 }
 //            world.boundarySystem.updateImage(path);
@@ -673,7 +673,7 @@ public class EventHandlerSystem extends System {
                             // Check if source or target in Path was moved, and reassign it
                             Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
                             Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
-                            if (Geometry.contains(BoundarySystem.getBoundary(sourcePortShape2), event.getPosition())) {
+                            if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape2), event.getPosition())) {
 
                                 // Check if the new Path's Port's would be on the same Portable
                                 if (Path.getTarget(path).getParent() == touchedPort2.getParent()) {
@@ -685,7 +685,7 @@ public class EventHandlerSystem extends System {
                                     Path.setSource(path, touchedPort2);
                                 }
 
-                            } else if (Geometry.contains(BoundarySystem.getBoundary(targetPortShape2), event.getPosition())) {
+                            } else if (Geometry.contains(world.boundarySystem.getBoundary(targetPortShape2), event.getPosition())) {
 //                                // Check if the new Port is not on the same Portable
 //                                if (path.getComponent(Path.class).getSource().getParent() != touchedPort2.getParent()) {
 //                                    path.getComponent(Path.class).setTarget(touchedPort2);

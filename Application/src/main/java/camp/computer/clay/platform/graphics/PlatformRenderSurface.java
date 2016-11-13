@@ -413,10 +413,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 targetPortShape.setPosition(extensionTargetPortShape.getPosition());
             }
 
-            // <HACK>
-            BoundarySystem.updateShapeBoundary(sourcePortShape);
-            BoundarySystem.updateShapeBoundary(targetPortShape);
-            // </HACK>
+//            // <HACK>
+//            BoundarySystem.updateShapeBoundary(sourcePortShape);
+//            BoundarySystem.updateShapeBoundary(targetPortShape);
+//            // </HACK>
 
             // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
             // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
@@ -483,8 +483,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             }
 
             // <HACK>
-            BoundarySystem.updateShapeBoundary(sourcePortShape);
-//            BoundarySystem.updateShapeBoundary(targetPortShape);
+//            BoundarySystem.updateShapeBoundary(sourcePortShape);
             // </HACK>
 
             // <HACK>
