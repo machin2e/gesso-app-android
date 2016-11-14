@@ -169,10 +169,6 @@ public class EventHandlerSystem extends System {
 
         } else if (event.getType() == Event.Type.UNSELECT) {
 
-            if (world.eventHandlerSystem.previousTarget == host) {
-                Application.getView().getNativeUi().createImageEditor(host);
-            }
-
             // Focus on touched Host
             Portable.getPaths(host).setVisibility(Visible.VISIBLE);
             Portable.getPorts(host).setVisibility(Visible.VISIBLE);

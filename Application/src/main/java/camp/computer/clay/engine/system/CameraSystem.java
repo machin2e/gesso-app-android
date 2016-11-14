@@ -254,7 +254,7 @@ public class CameraSystem extends System {
 
             // Update scale and position
             adjustScale(camera, boundingBox);
-            setPosition(camera, boundingBox.getPosition(), Camera.DEFAULT_ADJUSTMENT_PERIOD);
+            setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
 
         }
     }

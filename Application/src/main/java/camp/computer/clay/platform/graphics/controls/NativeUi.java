@@ -8,7 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.text.Html;
 import android.text.InputType;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -42,10 +45,12 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.model.Action;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.R;
+import camp.computer.clay.platform.util.ViewGroupHelper;
 
 public class NativeUi {
 
@@ -449,10 +454,10 @@ public class NativeUi {
     }
 
     public void openActionEditor(Entity extension) {
-        openActionEditor_ScriptJumpList(extension);
+        createActionEditor_v3(extension);
     }
 
-    public void openActionEditor1(Entity extension) {
+    public void createActionEditor_v1(Entity extension) {
 
         Application.getView().runOnUiThread(new Runnable() {
             @Override
@@ -542,7 +547,7 @@ public class NativeUi {
                             // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                            View actionEditorView = createActionEditorView();
+                            View actionEditorView = createActionView_v1();
                             linearLayout2.addView(actionEditorView);
 
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -583,7 +588,7 @@ public class NativeUi {
         });
     }
 
-    public void openActionEditor_ScriptJumpList(Entity extension) {
+    public void createActionEditor_v2(Entity extension) {
 
         // TODO: Hack into the JS engine in V8 to execute this pure JS. Fuck it.
 
@@ -636,7 +641,7 @@ public class NativeUi {
 
                 // Default Action Controller based on Port Configuration
                 /*
-                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionEditorView();
+                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionView_v1();
                 defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
                 linearLayout.addView(defaultActionBasedOnPortConfiguration);
                 */
@@ -686,7 +691,7 @@ public class NativeUi {
                     spinnerArray.add(actions.get(i).getTitle());
                 }
                 // TODO: Load Scripts from Repository
-                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
                 spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(spinnerArrayAdapter);
 
@@ -698,11 +703,13 @@ public class NativeUi {
 
                             if (selectedText.equals("new script")) {
 
-                                View actionEditorView = createActionEditorView();
+                                // View actionEditorView = createActionView_v1();
+                                TextView actionEditorView = (TextView) createActionView_v2();
                                 linearLayout2.addView(actionEditorView);
 
                             } else {
-                                EditText actionEditorView = (EditText) createActionEditorView();
+                                // EditText actionEditorView = (EditText) createActionView_v1();
+                                TextView actionEditorView = (TextView) createActionView_v2();
                                 actionEditorView.setText(selectedText);
                                 linearLayout2.addView(actionEditorView);
                             }
@@ -752,7 +759,7 @@ public class NativeUi {
                             // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                            View actionEditorView = createActionEditorView();
+                            View actionEditorView = createActionView_v1();
                             linearLayout2.addView(actionEditorView);
 
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -828,7 +835,337 @@ public class NativeUi {
         });
     }
 
-    private View createActionEditorView() {
+    public void createActionEditor_v3(final Entity extension) {
+
+        // TODO: Hack into the JS engine in V8 to execute this pure JS. Fuck it.
+
+        // NOTE: This is just a list of edit boxes. Each with a dropdown to save new script or load from the list. MVP, bitches.
+
+        // Get list of Ports connected to Extension
+        String portTypesString = "";
+        final Group<Entity> ports = Portable.getPorts(extension);
+        for (int i = 0; i < ports.size(); i++) {
+            Entity port = ports.get(i);
+            Log.v("PortType", "port type: " + Port.getType(port));
+            portTypesString += Port.getType(port) + " ";
+        }
+
+        final String finalPortTypesString = portTypesString;
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final RelativeLayout relativeLayout = new RelativeLayout(context);
+                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        relativeLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Title: "Actions"
+                TextView textView = new TextView(context);
+                textView.setText("Extension Controller");
+                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setTextSize(20);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView);
+
+                // Layout (Linear Vertical): Action List
+                final LinearLayout linearLayout2 = new LinearLayout(context);
+                linearLayout2.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Default Action Controller based on Port Configuration
+                /*
+                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionView_v1();
+                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
+                linearLayout.addView(defaultActionBasedOnPortConfiguration);
+                */
+
+                LinearLayout portableLayout = new LinearLayout(context);
+                portableLayout.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayout.addView(portableLayout);
+
+                // Ports
+                /*
+                for (int i = 0; i < ports.size(); i++) {
+                    EditText button6 = new EditText(context);
+
+                    button6.setHint("" + Port.getType(ports.get(i)));
+                    // Digital/Switch: on/off [binary selector]
+                    // PWM/Pulse: period, duty cycle [analog sliders in bounded range] (alt: sine wave parameters)
+                    // ADC/Wave: ADC value [analog slider in ADC range] (alt: amplitude)
+
+                    button6.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                    button6.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i)))));
+
+                    LinearLayout.LayoutParams params4 = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    params4.setMargins(0, dpToPx(5), 0, 0);
+                    button6.setLayoutParams(params4);
+
+                    portableLayout.addView(button6);
+                }
+                */
+
+                for (int i = 0; i < ports.size(); i++) {
+
+                    if (Port.getType(ports.get(i)) == Port.Type.SWITCH) {
+                        // <DIGITAL_PORT_CONTROL>
+                        View digitalPortLayout = createSwitchControllerView(ports.get(i));
+                        linearLayout.addView(digitalPortLayout);
+                        // </DIGITAL_PORT_CONTROL>
+                    }
+
+                    if (Port.getType(ports.get(i)) == Port.Type.PULSE) {
+                        // <PWM_PORT_CONTROL>
+                        View pulsePortLayout = createPulseControllerView(ports.get(i));
+                        linearLayout.addView(pulsePortLayout);
+                        // </PWM_PORT_CONTROL>
+                    }
+
+                    if (Port.getType(ports.get(i)) == Port.Type.WAVE) {
+                        // <ADC_PORT_CONTROL>
+                        View wavePortLayout = createWaveControllerView(ports.get(i));
+                        linearLayout.addView(wavePortLayout);
+                        // </ADC_PORT_CONTROL>
+                    }
+                }
+
+//                // Button: "Add Action"
+//                Button button1 = new Button(context);
+//                button1.setText("Add Action");
+//                button1.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+//                button1.setBackgroundColor(Color.parseColor("#44000000"));
+//
+//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                        LinearLayout.LayoutParams.MATCH_PARENT,
+//                        LinearLayout.LayoutParams.WRAP_CONTENT
+//                );
+//                params.setMargins(0, dpToPx(5), 0, 0);
+//                button1.setLayoutParams(params);
+//
+//                linearLayout.addView(button1);
+
+                // Button: "Add Action"
+                Button button2 = new Button(context);
+                button2.setText("Add Action");
+                button2.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                button2.setBackgroundColor(Color.parseColor("#44000000"));
+
+                LinearLayout.LayoutParams params3 = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params3.setMargins(0, dpToPx(5), 0, 0);
+                button2.setLayoutParams(params3);
+                linearLayout.addView(button2);
+
+                button2.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                        int pointerId = motionEvent.getPointerId(pointerIndex);
+                        //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
+                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                        int pointCount = motionEvent.getPointerCount();
+
+                        // Update the state of the touched object based on the current pointerCoordinates interaction state.
+                        if (touchActionType == MotionEvent.ACTION_DOWN) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                            View actionEditorView = createActionView(extension);
+//                            linearLayout2.addView(actionEditorView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                            linearLayout2.addView(actionEditorView);
+
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                            // TODO:
+                        } else {
+                            // TODO:
+                        }
+
+                        return true;
+                    }
+                });
+
+                // Button: Test Script
+                Button button3 = new Button(context);
+                button3.setText("Test");
+                button3.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                button3.setBackgroundColor(Color.parseColor("#44000000"));
+
+                LinearLayout.LayoutParams params4 = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params4.setMargins(0, dpToPx(5), 0, 0);
+                button3.setLayoutParams(params4);
+                linearLayout.addView(button3);
+
+                // Add to main Application View
+                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
+    }
+
+    private View createSwitchControllerView(Entity port) {
+        return createSwitchControllerView_v1(port);
+    }
+
+    private View createPulseControllerView(Entity port) {
+        return createPulseControllerView_v1(port);
+    }
+
+    private View createWaveControllerView(Entity port) {
+        return createWaveControllerView_v1(port);
+    }
+
+    private View createSwitchControllerView_v1(Entity port) {
+
+        LinearLayout digitalPortLayout = new LinearLayout(context);
+        digitalPortLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout.LayoutParams digitalLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        digitalLayoutParams.setMargins(0, dpToPx(5), 0, 0);
+        digitalPortLayout.setLayoutParams(digitalLayoutParams);
+
+        digitalPortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.SWITCH)));
+
+        // Digital Label
+        View digitalText = createTextView("Switch", 2);
+        digitalPortLayout.addView(digitalText);
+
+        // Text: "Data Sources (Imports)"
+        final EditText digitalValue = new EditText(context);
+        digitalValue.setTextSize(11.0f);
+        digitalValue.setHint("[on|off]");
+        digitalValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        digitalValue.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, dpToPx(5), 0, 0);
+        digitalValue.setLayoutParams(params);
+        digitalPortLayout.addView(digitalValue);
+
+        return digitalPortLayout;
+    }
+
+    private View createPulseControllerView_v1(Entity port) {
+
+        LinearLayout pulsePortLayout = new LinearLayout(context);
+        pulsePortLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout.LayoutParams pulseLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        pulseLayoutParams.setMargins(0, dpToPx(5), 0, 0);
+        pulsePortLayout.setLayoutParams(pulseLayoutParams);
+
+        pulsePortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.PULSE)));
+
+        // Pulse Label
+        View pulseText = createTextView("Pulse", 2);
+        pulsePortLayout.addView(pulseText);
+
+        // Pulse Value (Duty Cycle)
+        final EditText pulseDutyCycleValue = new EditText(context);
+        pulseDutyCycleValue.setTextSize(11.0f);
+        pulseDutyCycleValue.setHint("on time (duty cycle)");
+        pulseDutyCycleValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        pulseDutyCycleValue.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams pulseParams1 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        pulseParams1.setMargins(0, dpToPx(5), 0, 0);
+        pulseDutyCycleValue.setLayoutParams(pulseParams1);
+        pulsePortLayout.addView(pulseDutyCycleValue);
+
+        // Pulse Value (Period)
+        final EditText pulsePeriodValue = new EditText(context);
+        pulsePeriodValue.setTextSize(11.0f);
+        pulsePeriodValue.setHint("interval (period)");
+        pulsePeriodValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        pulsePeriodValue.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams pulseParams2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        pulseParams2.setMargins(0, dpToPx(5), 0, 0);
+        pulsePeriodValue.setLayoutParams(pulseParams2);
+        pulsePortLayout.addView(pulsePeriodValue);
+
+        return pulsePortLayout;
+    }
+
+    private View createWaveControllerView_v1(Entity port) {
+
+        LinearLayout wavePortLayout = new LinearLayout(context);
+        wavePortLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout.LayoutParams waveLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        waveLayoutParams.setMargins(0, dpToPx(5), 0, 0);
+        wavePortLayout.setLayoutParams(waveLayoutParams);
+
+        wavePortLayout.setBackgroundColor(Color.parseColor(camp.computer.clay.util.Color.getColor(Port.Type.WAVE)));
+
+        // Wave Label
+        View waveText = createTextView("Wave", 2);
+        wavePortLayout.addView(waveText);
+
+        // Text: "Data Sources (Imports)"
+        final EditText waveValue = new EditText(context);
+        waveValue.setTextSize(11.0f);
+        waveValue.setHint("amplitude (voltage/ADC)");
+        waveValue.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        waveValue.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params2.setMargins(0, dpToPx(5), 0, 0);
+        waveValue.setLayoutParams(params2);
+        wavePortLayout.addView(waveValue);
+
+        return wavePortLayout;
+    }
+
+    private View createActionView_v1() {
 
 //        final TextView actionView = new TextView(context);
 //        actionView.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
@@ -888,6 +1225,448 @@ public class NativeUi {
         return actionView;
     }
 
+    private View createActionView_v2() {
+
+//        final TextView actionView = new TextView(context);
+//        actionView.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
+//        int horizontalPadding = (int) Application.getView().convertDipToPx(20);
+//        int verticalPadding = (int) Application.getView().convertDipToPx(10);
+//        actionView.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+//        actionView.setBackgroundColor(Color.parseColor("#44000000"));
+
+        // Text: "Data Sources (Imports)"
+        final TextView actionView = new TextView(context);
+        actionView.setTextSize(11.0f);
+        actionView.setText("TODO: <describe to search scripts>");
+        actionView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        actionView.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, dpToPx(5), 0, 0);
+        actionView.setLayoutParams(params);
+
+        // final LinearLayout actionList = (LinearLayout) view;
+
+        actionView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    createScriptEditorView_v1();
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        // actionList.addView(actionView);
+
+        return actionView;
+    }
+
+    private View createActionView(final Entity extension) {
+        return createActionView_v3(extension);
+    }
+
+    private View createActionView_v3(final Entity extension) {
+
+        final LinearLayout containerLayout = new LinearLayout(context);
+        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        containerLayout.setLayoutParams(layoutParams);
+
+        TextView browseActionEventView, scriptEditorEventView, playPauseEventView, moveUpEventView, moveDownEventView, removeEventView;
+
+        browseActionEventView = (TextView) createTextView("\uD83D\uDD0D", 1);
+        containerLayout.addView(browseActionEventView);
+
+        scriptEditorEventView = (TextView) createTextView("NEW/EDIT", 1);
+        ((LinearLayout.LayoutParams) scriptEditorEventView.getLayoutParams()).weight = 2.0f;
+        containerLayout.addView(scriptEditorEventView);
+
+        /*
+        playPauseEventView = (TextView) createTextView("\u25ba", 1); // Play/Pause
+        containerLayout.addView(playPauseEventView);
+
+        moveUpEventView = (TextView) createTextView("\u25b2", 1); // Move Up
+        containerLayout.addView(moveUpEventView);
+
+        moveDownEventView = (TextView) createTextView("\u25bc", 1); // Move Down
+        containerLayout.addView(moveDownEventView);
+        */
+
+        removeEventView = (TextView) createTextView("\u2716", 1); // Remove
+        containerLayout.addView(removeEventView);
+
+        // final LinearLayout actionList = (LinearLayout) view;
+
+        scriptEditorEventView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    // Remove current View
+                    //View containerView = Application.getView().findViewById(imageEditorId);
+//                    View containerView = containerLayout;
+//                    ((ViewManager) containerView.getParent()).removeView(containerView);
+
+                    // Replace with new View
+                    View newActionView = createNewActionView_v3(extension);
+
+                    ViewGroupHelper.replaceView(containerLayout, newActionView);
+
+                    openScriptEditor(extension);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        removeEventView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    //View containerView = Application.getView().findViewById(imageEditorId);
+                    View containerView = containerLayout;
+                    ((ViewManager) containerView.getParent()).removeView(containerView);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        // actionList.addView(actionView);
+
+        return containerLayout;
+    }
+
+    private View createNewActionView_v3(final Entity extension) {
+
+        final LinearLayout containerLayout = new LinearLayout(context);
+        containerLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        containerLayout.setLayoutParams(layoutParams);
+
+        View view;
+
+        view = createTextView("Action Title [Edit/Branch] [Remove]", 0);
+        containerLayout.addView(view);
+
+        // final LinearLayout actionList = (LinearLayout) view;
+
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                    openScriptEditor(extension);
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        // actionList.addView(actionView);
+
+        return containerLayout;
+    }
+
+    /*
+    // <HELPERS>
+    // ASCII format for Network Interchange (RFC20)
+    // References:
+    // - https://en.wikipedia.org/wiki/ASCII
+    // - https://tools.ietf.org/html/rfc20
+    public static final String ASCII_CODE_TAB = "&#09;";
+
+    // HTML Character Entity References
+    // Reference: https://www.w3.org/TR/html401/sgml/entities.html
+    public static final String HTML_CHARACTER_NON_BREAKABLE_SPACE = "&nbsp;";
+    public static final String HTML_CHARACTER_EN_SPACE = "&ensp;";
+    public static final String HTML_CHARACTER_EM_SPACE = "&emsp;";
+    public static final String HTML_CHARACTER_THIN_SPACE = "&thinsp;";
+    // </HELPERS>
+    */
+
+    // <SETTINGS>
+    public static float SCRIPT_EDITOR_TEXT_SIZE = 15.0f;
+    public static float SCRIPT_EDITOR_LINE_SPACING_MULTIPLIER = 1.5f; // e.g., 1 for single spacing, 2 for double spacing, etc.
+    public static float SCRIPT_EDITOR_LINE_SPACING = 0.0f;
+    // </SETTINGS>
+
+    public void openScriptEditor(Entity extension) {
+        createScriptEditorView_v2(extension);
+    }
+
+    public View createScriptEditorView_v1() {
+
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final RelativeLayout relativeLayout = new RelativeLayout(context);
+                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        relativeLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                // Title: "Actions"
+                TextView textView = new TextView(context);
+                textView.setText("Script Editor");
+                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setTextSize(20);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView);
+
+                // EditText: Script Editor
+                Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), RenderSystem.NOTIFICATION_FONT);
+                // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+
+                final EditText scriptEditorView = new EditText(context);
+                scriptEditorView.setTypeface(typeface);
+                scriptEditorView.setTextSize(SCRIPT_EDITOR_TEXT_SIZE);
+                scriptEditorView.setLineSpacing(SCRIPT_EDITOR_LINE_SPACING, SCRIPT_EDITOR_LINE_SPACING_MULTIPLIER);
+                // scriptEditorView.setHint("");
+                String formattedScriptText = "" +
+                        "<font color=\"#47a842\">var</font> action = <font color=\"#47a842\">function</font>(<font color=\"#3498db\">data</font>) {<br />" +
+                        "\u0009<font color=\"#47a842\">print</font>(\"Hello World!\");<br />" +
+                        "\u0009// <strong>TODO:</strong> Use Clay API to code action's script.</font><br />" +
+                        "}<br /><br />" +
+                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Refer to examples/tutorial below to get started.</font><br />" +
+                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Cast to larger screen and attach keyboard.</font><br />" +
+                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Open script and action editors on two screens.</font>";
+                scriptEditorView.setText(Html.fromHtml(formattedScriptText));
+                scriptEditorView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                scriptEditorView.setBackgroundColor(Color.parseColor("#44000000"));
+                scriptEditorView.setGravity(Gravity.TOP | Gravity.LEFT);
+
+                // scriptEditorView.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
+                scriptEditorView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                scriptEditorView.setVerticalScrollBarEnabled(true);
+                scriptEditorView.setMovementMethod(ScrollingMovementMethod.getInstance());
+                scriptEditorView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                );
+                params.setMargins(0, dpToPx(5), 0, 0);
+                scriptEditorView.setLayoutParams(params);
+
+                linearLayout.addView(scriptEditorView);
+
+                // TODO: Add keyboard handler to EditText so a Bluetooth or USB keyboard can be used to write code (say, in combination with casting to a monitor or tablet).
+
+                // Add to main Application View
+                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
+
+        return null;
+    }
+
+    public View createScriptEditorView_v2(Entity extension) {
+
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final RelativeLayout relativeLayout = new RelativeLayout(context);
+                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        relativeLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                // Title: "Actions"
+                TextView textView = new TextView(context);
+                textView.setText("Script Editor");
+                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setTextSize(20);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView);
+
+                // EditText: Script Editor
+                Typeface typeface = Typeface.createFromAsset(Application.getView().getAssets(), RenderSystem.NOTIFICATION_FONT);
+                // Typeface boldTypeface = Typeface.create(typeface, Typeface.NORMAL);
+
+                EditText scriptEditorView = new EditText(context);
+                scriptEditorView.setTypeface(typeface);
+                scriptEditorView.setTextSize(SCRIPT_EDITOR_TEXT_SIZE);
+                scriptEditorView.setLineSpacing(SCRIPT_EDITOR_LINE_SPACING, SCRIPT_EDITOR_LINE_SPACING_MULTIPLIER);
+                // scriptEditorView.setHint("");
+                String formattedScriptText = "" +
+                        "<font color=\"#47a842\">var</font> action = <font color=\"#47a842\">function</font>(<font color=\"#3498db\">data</font>) {<br />" +
+                        "\u0009<font color=\"#47a842\">print</font>(\"Hello World!\");<br />" +
+                        "\u0009// <strong>TODO:</strong> Use Clay API to code action's script.</font><br />" +
+                        "}<br /><br />" +
+                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Refer to examples/tutorial below to get started.</font><br />" +
+                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Cast to larger screen and attach keyboard.</font><br />" +
+                        "<font color=\"#c5c5c5\">// <strong>NOTE:</strong> Open script and action editors on two screens.</font>";
+                scriptEditorView.setText(Html.fromHtml(formattedScriptText));
+                scriptEditorView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+                scriptEditorView.setBackgroundColor(Color.parseColor("#44000000"));
+                scriptEditorView.setGravity(Gravity.TOP | Gravity.LEFT);
+
+                // scriptEditorView.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
+                scriptEditorView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+                scriptEditorView.setVerticalScrollBarEnabled(true);
+                scriptEditorView.setMovementMethod(ScrollingMovementMethod.getInstance());
+                scriptEditorView.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                );
+                params.setMargins(0, dpToPx(5), 0, 0);
+                scriptEditorView.setLayoutParams(params);
+
+                linearLayout.addView(scriptEditorView);
+
+                // TODO: Add keyboard handler to EditText so a Bluetooth or USB keyboard can be used to write code (say, in combination with casting to a monitor or tablet).
+                /*
+                // <TODO:REPLACE_WITH_GLOBAL_INPUT_SYSTEM>
+                scriptEditorView.setKeyListener(new KeyListener() {
+                    @Override
+                    public int getInputType() {
+                        return 0;
+                    }
+
+                    @Override
+                    public boolean onKeyDown(View view, Editable editable, int i, KeyEvent keyEvent) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onKeyUp(View view, Editable editable, int keyCode, KeyEvent keyEvent) {
+                        switch (keyCode) {
+                            case KeyEvent.KEYCODE_ENTER:
+                            case KeyEvent.KEYCODE_NUMPAD_ENTER: {
+//                                scriptEditorView.getText().append("\n// TODO:");
+//                                nativeUi.openSettings();
+                                //your Action code
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onKeyOther(View view, Editable editable, KeyEvent keyEvent) {
+                        return false;
+                    }
+
+                    @Override
+                    public void clearMetaKeyState(View view, Editable editable, int i) {
+
+                    }
+                });
+                // </TODO:REPLACE_WITH_GLOBAL_INPUT_SYSTEM>
+                */
+
+                // Add to main Application View
+                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
+
+        return null;
+    }
+
     public void openSettings() {
 
         Application.getView().runOnUiThread(new Runnable() {
@@ -927,7 +1706,7 @@ public class NativeUi {
 
                 // Default Action Controller based on Port Configuration
                 /*
-                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionEditorView();
+                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionView_v1();
                 defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
                 linearLayout.addView(defaultActionBasedOnPortConfiguration);
                 */
@@ -972,11 +1751,11 @@ public class NativeUi {
 
                             if (selectedText.equals("new script")) {
 
-                                View actionEditorView = createActionEditorView();
+                                View actionEditorView = createActionView_v1();
                                 linearLayout2.addView(actionEditorView);
 
                             } else {
-                                EditText actionEditorView = (EditText) createActionEditorView();
+                                EditText actionEditorView = (EditText) createActionView_v1();
                                 actionEditorView.setText(selectedText);
                                 linearLayout2.addView(actionEditorView);
                             }
@@ -1026,7 +1805,7 @@ public class NativeUi {
                             // TODO:
                         } else if (touchActionType == MotionEvent.ACTION_UP) {
 
-                            View actionEditorView = createActionEditorView();
+                            View actionEditorView = createActionView_v1();
                             linearLayout2.addView(actionEditorView);
 
                         } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
@@ -1319,5 +2098,43 @@ public class NativeUi {
 //        };
 //
 //        thread.start();
+    }
+
+    //----------------
+
+    public View createTextView(String text, int layoutStrategy) {
+
+        // Text: "Data Sources (Imports)"
+        final TextView actionView = new TextView(context);
+        actionView.setTextSize(10.0f);
+        actionView.setText(text);
+        actionView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        actionView.setBackgroundColor(Color.parseColor("#44000000"));
+
+        LinearLayout.LayoutParams params = null;
+        if (layoutStrategy == 0) {
+            // NOTE: (Strategy 1) Sets TextView width to MATCH_PARENT
+            params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+        } else if (layoutStrategy == 1) {
+            // NOTE: (Strategy 2) Sets TextView width to fill horizontal space equally (e.g., use to create multiple horizontal TextViews with equal width)
+            params = new LinearLayout.LayoutParams(
+                    0, // NOTE: set layout_width to 0dp and set the layout_weight to 1 for filling horizontal space available
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1.0f
+            );
+        } else if (layoutStrategy == 2) {
+            // NOTE: (Strategy 3) Sets TextView to wrap content horizontally and MATCH_PARENT vertically. Use to add multiple variable-width Views of equal height to a horizontal layout.
+            params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, // NOTE: set layout_width to 0dp and set the layout_weight to 1 for filling horizontal space available
+                    LinearLayout.LayoutParams.MATCH_PARENT
+            );
+        }
+        params.setMargins(0, dpToPx(5), 0, 0);
+        actionView.setLayoutParams(params);
+
+        return actionView;
     }
 }

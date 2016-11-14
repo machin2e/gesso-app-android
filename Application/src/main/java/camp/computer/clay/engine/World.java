@@ -38,6 +38,7 @@ import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.util.Color;
 import camp.computer.clay.util.ImageBuilder.Circle;
 import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.util.ImageBuilder.Point;
@@ -45,6 +46,7 @@ import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Segment;
 import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.util.ImageBuilder.Text;
+import camp.computer.clay.util.Random;
 import camp.computer.clay.util.time.Clock;
 
 public class World {
@@ -295,10 +297,11 @@ public class World {
 
         // Create Shapes for Image
         rectangle = new Rectangle();
-        rectangle.setWidth(200);
-        rectangle.setHeight(200);
+        int randomHeight = Random.generateRandomInteger(125, 200);
+        rectangle.setHeight(randomHeight); // was 200
+        rectangle.setWidth(Random.generateRandomInteger(125, 200)); // was 200
         rectangle.setLabel("Board");
-        rectangle.setColor("#ff53BA5D"); // Gray: #f7f7f7, Greens: #32CD32
+        rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
 //        extension.getComponent(Image.class).addShape(rectangle);
@@ -308,7 +311,7 @@ public class World {
         // Headers
         rectangle = new Rectangle(50, 14);
         rectangle.setLabel("Header");
-        rectangle.setPosition(0, 107);
+        rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);

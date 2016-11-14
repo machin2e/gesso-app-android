@@ -9,7 +9,36 @@ import camp.computer.clay.engine.entity.Entity;
 
 public abstract class Color {
 
-    public static int[] PATH_COLOR_PALETTE = new int[] {
+    public static String GREEN_POLOLU = "#FF336633"; // web-safe from #347A1F
+    public static String RED_SPARKFUN = "#FFE62C2E"; // Source: https://learn.sparkfun.com/tutorials/make-your-own-fritzing-parts
+    public static String PURPLE_LILYPAD = "#FF582E67";
+    public static String BLUE_ARDUINO = "#FF91730F";
+    public static String ORANGE = "#FFFF4500";
+    public static String BLACK = "#FF1D1A1C";
+    public static String YELLOW = "#FFFFE512";
+    public static String WHITE_BREADBOARD = "#FFD9D9D9";
+
+    public static String RED_BREADBOARD = "#5E5EEE";
+    public static String BLUE_BREADBOARd = "#EE5E5E";
+
+    // <TEMPORARY>
+    public static String getRandomBoardColor() {
+        int randomIndex = camp.computer.clay.util.Random.generateRandomInteger(0, 8);
+        String colors[] = {
+                GREEN_POLOLU,
+                RED_SPARKFUN,
+                PURPLE_LILYPAD,
+                BLUE_ARDUINO,
+                ORANGE,
+                BLACK,
+                YELLOW,
+                WHITE_BREADBOARD
+        };
+        return colors[randomIndex];
+    }
+    // </TEMPORARY>
+
+    public static int[] PATH_COLOR_PALETTE = new int[]{
             android.graphics.Color.parseColor("#19B5FE"),
             android.graphics.Color.parseColor("#2ECC71"),
             android.graphics.Color.parseColor("#F22613"),
