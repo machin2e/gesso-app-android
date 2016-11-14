@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -38,7 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.Clay;
+import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UDPHost;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
@@ -46,9 +48,6 @@ import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.platform.sound.SpeechOutput;
 import camp.computer.clay.platform.sound.ToneOutput;
 import camp.computer.clay.platform.spatial.OrientationInput;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.Event;
-import camp.computer.clay.engine.component.Transform;
 
 public class Application extends FragmentActivity implements PlatformInterface {
 

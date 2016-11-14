@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
@@ -12,12 +15,15 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -28,11 +34,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.Action;
 import camp.computer.clay.model.configuration.Configuration;
@@ -1092,6 +1100,175 @@ public class NativeUi {
                 frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             }
         });
+    }
+
+    int imageEditorId;
+
+    public void createImageEditor(Entity extension) {
+
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final RelativeLayout relativeLayout = new RelativeLayout(context);
+                imageEditorId = generateViewId();
+                relativeLayout.setId(imageEditorId);
+                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        relativeLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                // Drawing Editor
+                View imageView = createBitmapEditor();
+                relativeLayout.addView(imageView);
+
+                // Add to main view
+                // TODO: Create in separate fragment!
+                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
+    }
+
+    // <NATIVE_UI_UTILS>
+    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+
+    /**
+     * Generate a value suitable for use in {@link #setId(int)}.
+     * This value will not collide with ID values generated at build time by aapt for R.id.
+     *
+     * @return a generated ID value
+     */
+    public static int generateViewId() {
+        for (; ; ) {
+            final int result = sNextGeneratedId.get();
+            // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+            int newValue = result + 1;
+            if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
+            if (sNextGeneratedId.compareAndSet(result, newValue)) {
+                return result;
+            }
+        }
+    }
+    // </NATIVE_UI_UTILS>
+
+    private List<Transform> imagePoints = new ArrayList<>();
+
+    public View createBitmapEditor() {
+
+        imagePoints.clear();
+
+        // Drawing Canvas
+        ImageView imageView = new ImageView(context);
+
+        final int imageViewId = generateViewId();
+        imageView.setId(imageViewId);
+
+        LinearLayout.LayoutParams params6 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        params6.setMargins(0, dpToPx(5), 0, 0);
+        imageView.setLayoutParams(params6);
+
+        // ViewTreeObserver
+        ViewTreeObserver vto = imageView.getViewTreeObserver();
+        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+
+                // Remove callback to onPreDraw
+                final ImageView imageView = (ImageView) Application.getView().findViewById(imageViewId);
+                imageView.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                // Get dimension of ImageView
+                int finalHeight = imageView.getMeasuredHeight();
+                int finalWidth = imageView.getMeasuredWidth();
+
+                // Create bitmap, canvas, and paint for rendering the drawing
+                final Bitmap bitmap = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888);
+                final Canvas canvas = new Canvas(bitmap);
+                final Paint paint = new Paint();
+                paint.setAntiAlias(true);
+
+                // Set background color
+                canvas.drawColor(Color.WHITE);
+
+                // Configure interaction handler for drawing editor
+                imageView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+
+                        if (touchActionType == MotionEvent.ACTION_DOWN) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                            // <HACK>
+                            if (motionEvent.getX() < 50 && motionEvent.getY() < 50) {
+                                View containerView = Application.getView().findViewById(imageEditorId);
+                                ((ViewManager) containerView.getParent()).removeView(containerView);
+                            }
+                            // </HACK>
+
+                            // Add point to Image
+                            imagePoints.add(new Transform(motionEvent.getX(), motionEvent.getY()));
+
+                            // Set background color
+                            canvas.drawColor(Color.WHITE);
+
+                            for (int i = 0; i < imagePoints.size(); i++) {
+                                Transform transform = imagePoints.get(i);
+
+                                paint.setColor(Color.BLACK);
+                                paint.setStyle(Paint.Style.FILL);
+                                canvas.drawCircle((float) transform.x, (float) transform.y, 4, paint);
+
+                                paint.setColor(Color.BLACK);
+                                paint.setStyle(Paint.Style.FILL);
+                                paint.setTextSize(15);
+                                canvas.drawText("" + (int) transform.x + ", " + (int) transform.y, (float) transform.x, (float) transform.y, paint);
+                            }
+
+                            imageView.invalidate();
+
+                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                            // TODO:
+                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                            // TODO:
+                        } else {
+                            // TODO:
+                        }
+
+                        return true;
+                    }
+                });
+
+
+                imageView.setImageBitmap(bitmap);
+
+                imageView.invalidate();
+
+                // View view = Application.getView().findViewById(R.id.application_view);
+                // view.invalidate();
+
+                return true;
+            }
+        });
+
+        // return imageViewId;
+        return imageView;
     }
 
     public void scheduleEvent() {

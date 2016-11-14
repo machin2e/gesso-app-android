@@ -666,34 +666,4 @@ public class World {
         world.renderSystem.update();
         renderTime = Clock.getCurrentTime() - renderStartTime;
     }
-
-    // <TITLE_UI_COMPONENT>
-    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visible titleVisible = Visible.INVISIBLE;
-    protected String titleText = "Project";
-
-    public void setTitleText(String text) {
-        this.titleText = text;
-    }
-
-    public String getTitleText() {
-        return this.titleText;
-    }
-
-    public void setTitleVisibility(Visible visible) {
-        if (titleVisible == Visible.INVISIBLE && visible == Visible.VISIBLE) {
-//            Application.getPlatform().openTitleEditor(getTitleText());
-            this.titleVisible = visible;
-        } else if (titleVisible == Visible.VISIBLE && visible == Visible.VISIBLE) {
-//            Application.getPlatform().setTitleEditor(getTitleText());
-        } else if (titleVisible == Visible.VISIBLE && visible == Visible.INVISIBLE) {
-//            Application.getPlatform().closeTitleEditor();
-            this.titleVisible = visible;
-        }
-    }
-
-    public Visible getTitleVisibility() {
-        return this.titleVisible;
-    }
-    // </TITLE_UI_COMPONENT>
 }
