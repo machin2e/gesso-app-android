@@ -35,6 +35,8 @@ public class EventHandlerSystem extends System {
 
     private List<Event> incomingEvents = new ArrayList<>();
 
+    public Entity previousTarget = null;
+
     public EventHandlerSystem(World world) {
         super(world);
     }
@@ -59,8 +61,6 @@ public class EventHandlerSystem extends System {
         }
         return null;
     }
-
-    public Entity previousTarget = null;
 
     private void dispatchEvent(Event event) {
 

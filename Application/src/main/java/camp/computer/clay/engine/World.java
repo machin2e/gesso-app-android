@@ -30,6 +30,7 @@ import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.EventHandlerSystem;
 import camp.computer.clay.engine.system.ImageSystem;
 import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.model.Repository;
@@ -76,6 +77,7 @@ public class World {
     public InputSystem inputSystem = new InputSystem(this);
     public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem(this);
     public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem(this);
+    public PhysicsSystem physicsSystem = new PhysicsSystem(this);
     // </WORLD_SYSTEMS>
 
     public World() {
@@ -649,10 +651,10 @@ public class World {
     // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
     public void update() {
-//        Boundary.innerBoundaries.clear();
         long updateStartTime = Clock.getCurrentTime();
         world.inputSystem.update();
         world.eventHandlerSystem.update();
+        world.physicsSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();
         world.cameraSystem.update();

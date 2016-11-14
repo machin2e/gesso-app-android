@@ -11,6 +11,7 @@ import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
@@ -470,7 +471,7 @@ public class PortableLayoutSystem extends System {
 
                 if (i == 0) {
                     // Set initial position to (0, 0)
-                    hosts.get(i).getComponent(Transform.class).set(0, 0);
+                    hosts.get(i).getComponent(Physics.class).targetTransform.set(0, 0);
                 } else {
 
                     // Iterate through previously-placed points to find a new one
@@ -484,7 +485,7 @@ public class PortableLayoutSystem extends System {
 
                             // Generate candidate point i
                             Transform newPoint = Geometry.getRotateTranslatePoint(
-                                    hosts.get(j).getComponent(Transform.class),
+                                    hosts.get(j).getComponent(Physics.class).targetTransform,
                                     angle % 360,
                                     minDistanceBetweenPoints
                             );
@@ -497,7 +498,7 @@ public class PortableLayoutSystem extends System {
                                 // Get distance between previously generated points and point i
                                 double distanceBetweenPoints = Geometry.distance(
                                         newPoint,
-                                        hosts.get(jj).getComponent(Transform.class)
+                                        hosts.get(jj).getComponent(Physics.class).targetTransform
                                 );
 
                                 // Check if point is valid
@@ -521,12 +522,12 @@ public class PortableLayoutSystem extends System {
                     }
 
                     // Set the new point
-                    hosts.get(i).getComponent(Transform.class).set(
+                    hosts.get(i).getComponent(Physics.class).targetTransform.set(
                             minDistanceTransform
                     );
                 }
 
-                hosts.get(i).getComponent(Transform.class).setRotation(Random.generateRandomInteger(0, 360));
+                hosts.get(i).getComponent(Physics.class).targetTransform.setRotation(Random.generateRandomInteger(0, 360));
 
             }
 
