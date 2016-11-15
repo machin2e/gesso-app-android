@@ -18,6 +18,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
@@ -174,7 +175,7 @@ public class EventHandlerSystem extends System {
             Portable.getPorts(host).setVisibility(Visible.VISIBLE);
 
             // Update transparency
-            world.imageSystem.setTransparency(host.getComponent(Image.class), 1.0);
+            host.getComponent(Style.class).setTransparency(host, 1.0);
 
             // Show Ports and Paths of touched Host
             for (int i = 0; i < Portable.getPorts(host).size(); i++) {
@@ -293,7 +294,7 @@ public class EventHandlerSystem extends System {
             Group<Entity> extensionPorts = Portable.getPorts(extension);
             extensionPaths.setVisibility(Visible.VISIBLE);
             extensionPorts.setVisibility(Visible.VISIBLE);
-            world.imageSystem.setTransparency(extension.getComponent(Image.class), 1.0);
+            extension.getComponent(Style.class).setTransparency(extension, 1.0);
 
             // Show Ports and Paths for selected Host
             for (int i = 0; i < extensionPorts.size(); i++) {

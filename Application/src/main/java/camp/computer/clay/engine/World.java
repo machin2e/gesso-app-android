@@ -19,6 +19,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
@@ -171,6 +172,7 @@ public class World {
         host.addComponent(new Transform());
         host.addComponent(new Physics());
         host.addComponent(new Image());
+        host.addComponent(new Style());
         host.addComponent(new Boundary());
         host.addComponent(new Visibility());
 
@@ -287,6 +289,7 @@ public class World {
         extension.addComponent(new Transform());
         extension.addComponent(new Physics());
         extension.addComponent(new Image());
+        extension.addComponent(new Style());
         extension.addComponent(new Boundary());
         extension.addComponent(new Visibility());
 
@@ -335,6 +338,7 @@ public class World {
         path.addComponent(new Transform());
         path.addComponent(new Physics());
         path.addComponent(new Image());
+        path.addComponent(new Style());
         path.addComponent(new Boundary());
         path.addComponent(new Visibility());
 
@@ -383,6 +387,7 @@ public class World {
         port.addComponent(new Port()); // Unique to Port
         port.addComponent(new Transform());
         port.addComponent(new Image());
+        port.addComponent(new Style());
         port.addComponent(new Physics());
         port.addComponent(new Boundary());
         port.addComponent(new Visibility());
@@ -429,6 +434,7 @@ public class World {
         notification.addComponent(new Notification()); // Unique to Notification Entity
         notification.addComponent(new Transform());
         notification.addComponent(new Image());
+        notification.addComponent(new Style());
         notification.addComponent(new Visibility());
         notification.addComponent(new Timer());
 
@@ -489,6 +495,7 @@ public class World {
         prototypeExtension.addComponent(new Transform());
         prototypeExtension.addComponent(new Physics());
         prototypeExtension.addComponent(new Image());
+        prototypeExtension.addComponent(new Style());
 
         ImageBuilder imageBuilder = new ImageBuilder();
 
@@ -524,6 +531,7 @@ public class World {
         prototypePath.addComponent(new Transform());
         prototypePath.addComponent(new Physics());
         prototypePath.addComponent(new Image());
+        prototypePath.addComponent(new Style());
 
         ImageBuilder imageBuilder = new ImageBuilder();
 

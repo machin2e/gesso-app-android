@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.Color;
 import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.util.ImageBuilder.Shape;
 
@@ -69,34 +68,4 @@ public class ImageSystem extends System {
 
         return shapes.remove(index);
     }
-
-    // <STYLE_COMPONENT?>
-    // TODO: Delete?
-    public void setTransparency(Image image, final double transparency) {
-
-        if (image.getImage() == null) {
-            image.setImage(new ImageBuilder());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        image.targetTransparency = transparency;
-
-        for (int i = 0; i < shapes.size(); i++) {
-
-            Shape shape = shapes.get(i);
-
-            // Color
-            int intColor = android.graphics.Color.parseColor(shapes.get(i).getColor());
-            intColor = Color.setTransparency(intColor, image.targetTransparency);
-            shape.setColor(Color.getHexColorString(intColor));
-
-            // Outline Color
-            int outlineColorIndex = android.graphics.Color.parseColor(shapes.get(i).getOutlineColor());
-            outlineColorIndex = Color.setTransparency(outlineColorIndex, image.targetTransparency);
-            shape.setOutlineColor(Color.getHexColorString(outlineColorIndex));
-        }
-
-        image.transparency = image.targetTransparency;
-    }
-    // </STYLE_COMPONENT?>
 }
