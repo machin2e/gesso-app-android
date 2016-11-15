@@ -13,6 +13,8 @@ public class RelativeLayoutConstraint extends Component {
      */
     private long entityUuid;
 
+    public Transform relativeTransform = new Transform(); // HACK
+
     public Entity getReferenceEntity() {
         return World.getWorld().Manager.getEntities().get(entityUuid);
     }

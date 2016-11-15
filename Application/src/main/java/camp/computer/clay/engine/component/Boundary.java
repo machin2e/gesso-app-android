@@ -3,11 +3,11 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
-import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class Boundary extends Component {
 
@@ -33,12 +33,12 @@ public class Boundary extends Component {
      */
     public static boolean contains(Entity entity, Transform point) {
 
-        Image image = entity.getComponent(Image.class);
-
-        List<Shape> shapes = image.getImage().getShapes();
+//        Image image = entity.getComponent(Image.class);
+//        List<Shape> shapes = image.getImage().getShapes();
+        Group<Entity> shapes = Image.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
-            if (shapes.get(i).isBoundary
-                    && Geometry.contains(BoundarySystem.getBoundary(shapes.get(i)), point)) {
+            if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary // HACK
+                    && Geometry.contains(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape), point)) { // HACK
                 return true;
             }
         }
@@ -54,10 +54,11 @@ public class Boundary extends Component {
 
         List<Transform> shapeBoundaries = new ArrayList<>();
 
-        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+//        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+        Group<Entity> shapes = Image.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
-            if (shapes.get(i).isBoundary) {
-                shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i)));
+            if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary) { // HACK
+                shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape)); // HACK
             }
         }
 

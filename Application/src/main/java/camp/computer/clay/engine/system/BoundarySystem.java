@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.system;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.ImageBuilder.Geometry;
@@ -93,11 +96,18 @@ public class BoundarySystem extends System {
     // Required Components: Image, Transform
     public void updateImage(Entity entity) {
 
-        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+        // <HACK>
+//        if (entity.hasComponent(Extension.class)) {
+//            return;
+//        }
+        // </HACK>
+
+//        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+        Group<Entity> shapes = Image.getShapes(entity);
 
         // Update Shapes
         for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
+            Entity shape = shapes.get(i);
 
             Transform absoluteReferenceTransform = null;
             if (entity.hasComponent(RelativeLayoutConstraint.class)) {
@@ -105,7 +115,8 @@ public class BoundarySystem extends System {
                 RelativeLayoutConstraint layoutConstraint = entity.getComponent(RelativeLayoutConstraint.class);
 //                Entity referenceEntity = layoutConstraint.getReferenceEntity();
                 Transform referenceTransform = layoutConstraint.getReferenceEntity().getComponent(Transform.class);
-                Transform relativePosition = entity.getComponent(Transform.class);
+                //Transform relativePosition = entity.getComponent(Transform.class);
+                Transform relativePosition = layoutConstraint.relativeTransform;
                 absoluteReferenceTransform = new Transform();
 
                 absoluteReferenceTransform.x = referenceTransform.x + Geometry.distance(0, 0, relativePosition.x, relativePosition.y) * Math.cos(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativePosition.x, relativePosition.y)));
@@ -123,11 +134,17 @@ public class BoundarySystem extends System {
                 }
             }
 
+            //if (shape.hasComponent(Port.class) && shape.getComponent(Visibility.class).visible == Visible.VISIBLE) {
+            if (entity.hasComponent(Port.class)) {
+                Log.v("RenderSystem", "drawing port");
+            }
+
 //            shape.update(transformedPoint);
             if (absoluteReferenceTransform != null) {
-                updateShapeTransform(shape, absoluteReferenceTransform);
+//            if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+                updateShapeRelativeTransform(shape, absoluteReferenceTransform);
 //                updateShapeBoundary(shape);
-                shape.isValid = true;
+//                shape.isValid = true;
             }
         }
 
@@ -139,6 +156,7 @@ public class BoundarySystem extends System {
     // <HOST>
     public void updateHostStyle(Entity host) {
 
+        /*
         // Get LED shapes
         // TODO: Optimize! Cache!
         Group<Shape> lightShapeGroup = world.imageSystem.getShapes(host.getComponent(Image.class), "^LED (1[0-2]|[1-9])$");
@@ -149,10 +167,12 @@ public class BoundarySystem extends System {
         for (int i = 0; i < ports.size(); i++) {
 
             // Update color of LED based on corresponding Port's type
-            Entity port = ports.get(i);
+            Entity port = ports.get(i);co
             String portColor = camp.computer.clay.util.Color.getColor(Port.getType(port));
             lightShapeGroup.get(i).setColor(portColor);
         }
+        */
+//        Log.e("TODO", "BoundarySystem.updateHostStyle()");
     }
     // </HOST>
 
@@ -182,8 +202,10 @@ public class BoundarySystem extends System {
             Entity port = ports.get(i);
 
             double portSpacing = 115;
-            port.getComponent(Transform.class).x = (i * portSpacing) - (((Portable.getPorts(extension).size() - 1) * portSpacing) / 2.0);
-            port.getComponent(Transform.class).y = 175; // i.e., Distance from board
+//            port.getComponent(Transform.class).x = (i * portSpacing) - (((Portable.getPorts(extension).size() - 1) * portSpacing) / 2.0);
+//            port.getComponent(Transform.class).y = 175; // i.e., Distance from board
+            port.getComponent(RelativeLayoutConstraint.class).relativeTransform.x = (i * portSpacing) - (((Portable.getPorts(extension).size() - 1) * portSpacing) / 2.0);
+            port.getComponent(RelativeLayoutConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
 
             // <HACK>
             // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
@@ -213,19 +235,31 @@ public class BoundarySystem extends System {
         Image portableImage = extension.getComponent(Image.class);
 
         // Update Headers Geometry to match the corresponding ExtensionEntity Configuration
-        Rectangle header = (Rectangle) portableImage.getImage().getShape("Header");
+//        Rectangle header = (Rectangle) portableImage.getImage().getShape("Header");
+        Entity shape = Image.getShape(extension, "Header");
         double headerWidth = World.PIXEL_PER_MILLIMETER * A;
-        header.setWidth(headerWidth);
+        Rectangle headerShape = (Rectangle) shape.getComponent(ShapeComponent.class).shape;
+        headerShape.setWidth(headerWidth);
 
         // Update Contact Positions for Header
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < extension.getComponent(Portable.class).headerContactPositions.size()) {
-                extension.getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
+                //extension.getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
+                Entity headerContactShape = Image.getShape(extension, extension.getComponent(Portable.class).headerContactPositions.get(i));
+                headerContactShape.getComponent(Transform.class).x = x;
             } else {
                 Point point = new Point(new Transform(x, 107));
                 extension.getComponent(Portable.class).headerContactPositions.add(point);
-                portableImage.getImage().addShape(point);
+//                portableImage.getImage().addShape(point);
+
+                // Add new Port shape and set Position
+                // TODO: Find better place!
+                Entity headerContactShape = world.createEntity(ShapeComponent.class);
+                headerContactShape.getComponent(ShapeComponent.class).shape = point;
+                headerContactShape.getComponent(Transform.class).set(x, 107);
+                Image.addShape(extension, point);
+
             }
         }
     }
@@ -266,7 +300,7 @@ public class BoundarySystem extends System {
      * @param referencePoint Position of the containing {@code Image} relative to which the
      *                       {@code Shape} will be drawn.
      */
-    public void updateShapeTransform(Shape shape, Transform referencePoint) {
+    public void updateShapeRelativeTransform(Entity shape, Transform referencePoint) {
 
 //        if (!shape.isValid) {
 //            updateShapePositionAndRotation(shape, referencePoint); // Update the position
@@ -276,12 +310,31 @@ public class BoundarySystem extends System {
 
 //        if (!shape.isValid) {
 
+//        // Position
+//        shape.getPosition().x = referencePoint.x + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+//        shape.getPosition().y = referencePoint.y + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+//
+//        // Rotation
+//        shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
+
+        if (shape.hasComponent(Port.class)) {
+            Log.v("RenderSystem", "drawing port");
+        }
+
+        if (shape.getComponent(RelativeLayoutConstraint.class) == null) {
+            Log.v("RenderSystem", "drawing port");
+        }
+
+        if (shape.getComponent(RelativeLayoutConstraint.class).relativeTransform == null) {
+            Log.v("RenderSystem", "drawing port");
+        }
+
         // Position
-        shape.getPosition().x = referencePoint.x + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
-        shape.getPosition().y = referencePoint.y + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
+        shape.getComponent(Transform.class).x = referencePoint.x + Geometry.distance(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y)));
+        shape.getComponent(Transform.class).y = referencePoint.y + Geometry.distance(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y)));
 
         // Rotation
-        shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
+        shape.getComponent(Transform.class).rotation = referencePoint.rotation + shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation;
 
 //            updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
         //shape.isValid = true;

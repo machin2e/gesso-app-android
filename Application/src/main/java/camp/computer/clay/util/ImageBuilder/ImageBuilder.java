@@ -15,19 +15,19 @@ import camp.computer.clay.engine.World;
 
 /**
  * Custom composable, structured, vector image format and API.
- *
+ * <p>
  * Notes:
  * - This is a <em>descriptive</em> image format. That is, it just stores the structure of an image.
  * - The API provides functionality for accessing features of the image, such as the shapes
- *   defining the image, functionality for manipulating the image, and functionality for saving a
- *   revision of the image.
+ * defining the image, functionality for manipulating the image, and functionality for saving a
+ * revision of the image.
  * - API also provides functions for serialization and deserialization, and for reading and writing
- *   files representing the image.
- *
+ * files representing the image.
+ * <p>
  * Wishlist:
  * - Flexible enough to represent simple vector drawings to complex circuit diagrams and component
- *   layouts (a la Fritzing).
- *
+ * layouts (a la Fritzing).
+ * <p>
  * Inspiration:
  * - SVG
  * - JSON

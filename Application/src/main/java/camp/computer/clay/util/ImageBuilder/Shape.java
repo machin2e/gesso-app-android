@@ -19,6 +19,8 @@ public abstract class Shape extends Groupable {
 
 //    public static HashMap<Shape, ShapeBoundary> innerBoundaries = new HashMap<>();
 
+    // <TODO>
+    // TODO: 11/15/2016 Delete this after creating Shape component.
     protected String label = ""; // Component
 
     public boolean isBoundary = false;
@@ -28,6 +30,7 @@ public abstract class Shape extends Groupable {
 
     protected Transform imagePosition = null;
     protected Transform position = new Transform(0, 0);
+    // </TODO>
 
     protected String color = "#fff7f7f7";
     protected String outlineColor = "#ff000000";

@@ -14,6 +14,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
@@ -131,6 +132,7 @@ public class PortableLayoutSystem extends System {
      * @param hostPort
      */
     public Entity createCustomExtension(Entity hostPort, Transform initialPosition) {
+        // TODO: Remove initialPosition. Should be able to figure out the positioning since have the initial port (and thus a side of the board where the most ports are connected).
 
         // IASM Message:
         // (1) touch extensionEntity to select from store, or
@@ -144,7 +146,7 @@ public class PortableLayoutSystem extends System {
         Entity extension = world.createEntity(Extension.class); // HACK: Because Extension is a Component
 
         // Set the initial position of the Extension
-        extension.getComponent(Transform.class).set(initialPosition);
+        extension.getComponent(Transform.class).set(initialPosition); // TODO: Set Physics.targetPosition instead? Probs!
 
         // Configure Host's Port (i.e., the Path's source Port)
         if (Port.getType(hostPort) == Port.Type.NONE || Port.getDirection(hostPort) == Port.Direction.NONE) {
@@ -296,7 +298,7 @@ public class PortableLayoutSystem extends System {
             indexCounts[i] = 0;
         }
 
-        Shape boardShape = host.getComponent(Image.class).getImage().getShape("Board");
+        Shape boardShape = Image.getShape(host, "Board").getComponent(ShapeComponent.class).shape; // host.getComponent(Image.class).getImage().getShape("Board");
         List<Transform> hostShapeBoundary = world.boundarySystem.getBoundary(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
@@ -309,7 +311,7 @@ public class PortableLayoutSystem extends System {
             }
 
             Entity hostPort = Path.getHostPort(Port.getPaths(extensionPort).get(0)); // HACK: Using hard-coded index 0.
-            Transform hostPortPosition = hostPort.getComponent(Image.class).getImage().getShape("Port").getPosition();
+            Transform hostPortPosition = Image.getShape(hostPort, "Port").getComponent(Transform.class); // hostPort.getComponent(Image.class).getImage().getShape("Port").getPosition();
 
             double minimumSegmentDistance = Double.MAX_VALUE; // Stores the distance to the nearest segment
             int nearestSegmentIndex = 0; // Stores the index of the nearest segment (on the connected HostEntity)
@@ -558,7 +560,7 @@ public class PortableLayoutSystem extends System {
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
+        Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         Transform prototypePathSourceTransform = segment.getSource();
 
         double extensionRotation = Geometry.getAngle(
@@ -600,7 +602,7 @@ public class PortableLayoutSystem extends System {
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
+        Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         segment.setSource(position);
     }
 
@@ -609,7 +611,7 @@ public class PortableLayoutSystem extends System {
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
         Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
-        Segment segment = (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
+        Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         segment.setTarget(position);
     }
 

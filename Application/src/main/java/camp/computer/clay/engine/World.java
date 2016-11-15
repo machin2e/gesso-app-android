@@ -4,7 +4,6 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
@@ -19,6 +18,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Prototype;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
@@ -45,7 +45,6 @@ import camp.computer.clay.util.ImageBuilder.ImageBuilder;
 import camp.computer.clay.util.ImageBuilder.Point;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Segment;
-import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.util.ImageBuilder.Text;
 import camp.computer.clay.util.Random;
 import camp.computer.clay.util.time.Clock;
@@ -137,6 +136,8 @@ public class World {
             entity = createPlayerEntity();
         } else if (entityType == Notification.class) {
             entity = createNotificationEntity();
+        } else if (entityType == ShapeComponent.class) {
+            entity = createShapeEntity();
         }
 
         // Add Entity to Manager
@@ -182,7 +183,7 @@ public class World {
 
             Entity port = createEntity(Port.class);
 
-            port.getComponent(Label.class).setLabel("Port " + (j + 1));
+            Label.setLabel(port, "Port " + (j + 1));
             Port.setIndex(port, j);
 
             // <HACK>
@@ -196,6 +197,7 @@ public class World {
         // Load geometry from file into Image Component
         // TODO: Application.getPlatform().openFile(this, "Host.json");
 //        Application.getView().restoreGeometry(host.getComponent(Image.class), "Host.json");
+        // <PLATFORM_LAYER>
         InputStream inputStream = null;
         try {
             inputStream = Application.getContext().getAssets().open("Host.json");
@@ -203,7 +205,19 @@ public class World {
             e.printStackTrace();
         }
         ImageBuilder imageBuilder = ImageBuilder.open(inputStream);
-        host.getComponent(Image.class).setImage(imageBuilder);
+        // </PLATFORM_LAYER>
+//        host.getComponent(Image.class).setImage(imageBuilder);
+
+        // <GEOMETRY_LOADER>
+        for (int i = 0; i < imageBuilder.getShapes().size(); i++) {
+            long eid = Image.addShape(host, imageBuilder.getShapes().get(i));
+            // <HACK>
+            // Set Label
+            Entity shape = world.Manager.get(eid);
+            Label.setLabel(shape, imageBuilder.getShapes().get(i).getLabel());
+            // </HACK>
+        }
+        // </GEOMETRY_LOADER>
 
         // <HACK>
 //        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
@@ -214,28 +228,17 @@ public class World {
 //                shapes.get(i).setEntity(portEntity);
 //            }
 //        }
+
+//        Group<Entity> shapes = Image.getShapes(host); // host.getComponent(Image.class).getShapes();
+//        for (int i = 0; i < shapes.size(); i++) {
+//            if (shapes.get(i).getComponent(Label.class).label.startsWith("Port")) {
+//                String label = shapes.get(i).getComponent(Label.class).label;
+//                Entity portEntity = Image.getShape(host, label); // host.getComponent(Portable.class).getPort(label);
+//                shapes.get(i).getComponent(ShapeComponent.class).shape.setEntity(portEntity);
+//            }
+//        }
         // </HACK>
 
-        // Position Port Images
-        Portable portable = host.getComponent(Portable.class);
-        Portable.getPort(host, 0).getComponent(Transform.class).set(-19.0, 40.0);
-        Portable.getPort(host, 1).getComponent(Transform.class).set(0, 40.0);
-        Portable.getPort(host, 2).getComponent(Transform.class).set(19.0, 40.0);
-        Portable.getPort(host, 3).getComponent(Transform.class).set(40.0, 19.0);
-        Portable.getPort(host, 4).getComponent(Transform.class).set(40.0, 0.0);
-        Portable.getPort(host, 5).getComponent(Transform.class).set(40.0, -19.0);
-        Portable.getPort(host, 6).getComponent(Transform.class).set(19.0, -40.0);
-        Portable.getPort(host, 7).getComponent(Transform.class).set(0, -40.0);
-        Portable.getPort(host, 8).getComponent(Transform.class).set(-19.0, -40.0);
-        Portable.getPort(host, 9).getComponent(Transform.class).set(-40.0, -19.0);
-        Portable.getPort(host, 10).getComponent(Transform.class).set(-40.0, 0.0);
-        Portable.getPort(host, 11).getComponent(Transform.class).set(-40.0, 19.0);
-        for (int i = 0; i < Portable.getPorts(host).size(); i++) {
-            Portable.getPort(host, i).getComponent(Transform.class).set(
-                    Portable.getPort(host, i).getComponent(Transform.class).x * 6.0,
-                    Portable.getPort(host, i).getComponent(Transform.class).y * 6.0
-            );
-        }
         // Add relative layout constraints
         for (int i = 0; i < Portable.getPorts(host).size(); i++) {
             Entity port = Portable.getPort(host, i);
@@ -243,12 +246,52 @@ public class World {
             port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(host);
         }
 
+
+        // Relative Position Port Images
+//        Portable portable = host.getComponent(Portable.class);
+//        Portable.getPort(host, 0).getComponent(Transform.class).set(-19.0, 40.0);
+//        Portable.getPort(host, 1).getComponent(Transform.class).set(0, 40.0);
+//        Portable.getPort(host, 2).getComponent(Transform.class).set(19.0, 40.0);
+//        Portable.getPort(host, 3).getComponent(Transform.class).set(40.0, 19.0);
+//        Portable.getPort(host, 4).getComponent(Transform.class).set(40.0, 0.0);
+//        Portable.getPort(host, 5).getComponent(Transform.class).set(40.0, -19.0);
+//        Portable.getPort(host, 6).getComponent(Transform.class).set(19.0, -40.0);
+//        Portable.getPort(host, 7).getComponent(Transform.class).set(0, -40.0);
+//        Portable.getPort(host, 8).getComponent(Transform.class).set(-19.0, -40.0);
+//        Portable.getPort(host, 9).getComponent(Transform.class).set(-40.0, -19.0);
+//        Portable.getPort(host, 10).getComponent(Transform.class).set(-40.0, 0.0);
+//        Portable.getPort(host, 11).getComponent(Transform.class).set(-40.0, 19.0);
+//        for (int i = 0; i < Portable.getPorts(host).size(); i++) {
+//            Portable.getPort(host, i).getComponent(Transform.class).set(
+//                    Portable.getPort(host, i).getComponent(Transform.class).x * 6.0,
+//                    Portable.getPort(host, i).getComponent(Transform.class).y * 6.0
+//            );
+//        }
+        Portable.getPort(host, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-19.0, 40.0);
+        Portable.getPort(host, 1).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 40.0);
+        Portable.getPort(host, 2).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(19.0, 40.0);
+        Portable.getPort(host, 3).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(40.0, 19.0);
+        Portable.getPort(host, 4).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(40.0, 0.0);
+        Portable.getPort(host, 5).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(40.0, -19.0);
+        Portable.getPort(host, 6).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(19.0, -40.0);
+        Portable.getPort(host, 7).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, -40.0);
+        Portable.getPort(host, 8).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-19.0, -40.0);
+        Portable.getPort(host, 9).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-40.0, -19.0);
+        Portable.getPort(host, 10).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-40.0, 0.0);
+        Portable.getPort(host, 11).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-40.0, 19.0);
+        for (int i = 0; i < Portable.getPorts(host).size(); i++) {
+            Portable.getPort(host, i).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(
+                    Portable.getPort(host, i).getComponent(RelativeLayoutConstraint.class).relativeTransform.x * 6.0,
+                    Portable.getPort(host, i).getComponent(RelativeLayoutConstraint.class).relativeTransform.y * 6.0
+            );
+        }
+        // Add pin contact points to PortableComponent
         // <HACK>
-        List<Shape> pinContactPoints = host.getComponent(Image.class).getImage().getShapes();
+        Group<Entity> pinContactPoints = host.getComponent(Image.class).getShapes(host);
         for (int i = 0; i < pinContactPoints.size(); i++) {
-            if (pinContactPoints.get(i).getLabel().startsWith("Pin")) {
-                String label = pinContactPoints.get(i).getLabel();
-                Point contactPointShape = (Point) pinContactPoints.get(i);
+            Entity pinContactPoint = pinContactPoints.get(i);
+            if (Label.getLabel(pinContactPoint).startsWith("Pin")) {
+                Point contactPointShape = (Point) pinContactPoint.getComponent(ShapeComponent.class).shape;
                 host.getComponent(Portable.class).headerContactPositions.add(contactPointShape);
             }
         }
@@ -277,13 +320,12 @@ public class World {
             Portable.addPort(extension, port);
         }
         // Add relative layout constraints
-        Portable portable = extension.getComponent(Portable.class);
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             Entity port = Portable.getPort(extension, i);
             port.addComponent(new RelativeLayoutConstraint());
             port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
         }
-        // </PORTABLE_COMPONENT>
+//        Portable.getPort(extension, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 20.0 * 6.0);
 
         // Add Components
         extension.addComponent(new Transform());
@@ -293,35 +335,79 @@ public class World {
         extension.addComponent(new Boundary());
         extension.addComponent(new Visibility());
 
+//        // <LOAD_GEOMETRY_FROM_FILE>
+//        ImageBuilder imageBuilder = new ImageBuilder();
+//
+//        Rectangle rectangle;
+//
+//        // Create Shapes for Image
+//        rectangle = new Rectangle();
+//        int randomHeight = Random.generateRandomInteger(125, 200);
+//        rectangle.setHeight(randomHeight); // was 200
+//        rectangle.setWidth(Random.generateRandomInteger(125, 200)); // was 200
+//        rectangle.setLabel("Board");
+//        rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
+//        rectangle.setOutlineThickness(0);
+//        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
+////        extension.getComponent(Image.class).addShape(rectangle);
+//        rectangle.isBoundary = true;
+//        imageBuilder.addShape(rectangle);
+//
+//        // Headers
+//        rectangle = new Rectangle(50, 14);
+//        rectangle.setLabel("Header");
+//        rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
+//        rectangle.setRotation(0);
+//        rectangle.setColor("#3b3b3b");
+//        rectangle.setOutlineThickness(0);
+////        extension.getComponent(Image.class).addShape(rectangle);
+//        imageBuilder.addShape(rectangle);
+//
+//        extension.getComponent(Image.class).setImage(imageBuilder);
+//        // </LOAD_GEOMETRY_FROM_FILE>
+
         // <LOAD_GEOMETRY_FROM_FILE>
-        ImageBuilder imageBuilder = new ImageBuilder();
+//        ImageBuilder imageBuilder = new ImageBuilder();
 
         Rectangle rectangle;
+        long shapeUuid;
+        Entity shape;
 
         // Create Shapes for Image
         rectangle = new Rectangle();
         int randomHeight = Random.generateRandomInteger(125, 200);
         rectangle.setHeight(randomHeight); // was 200
         rectangle.setWidth(Random.generateRandomInteger(125, 200)); // was 200
-        rectangle.setLabel("Board");
+//        rectangle.setLabel("Board");
         rectangle.setColor(Color.getRandomBoardColor()); // Gray: #f7f7f7, Greens: #ff53BA5D, #32CD32
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
 //        extension.getComponent(Image.class).addShape(rectangle);
         rectangle.isBoundary = true;
-        imageBuilder.addShape(rectangle);
+//        imageBuilder.addShape(rectangle);
+        shapeUuid = Image.addShape(extension, rectangle);
+        shape = world.Manager.get(shapeUuid);
+        Label.setLabel(shape, "Board");
+
 
         // Headers
         rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header");
+//        rectangle.setLabel("Header");
         rectangle.setPosition(0, randomHeight / 2.0f + 7.0f); // was 0, 107
         rectangle.setRotation(0);
         rectangle.setColor("#3b3b3b");
         rectangle.setOutlineThickness(0);
 //        extension.getComponent(Image.class).addShape(rectangle);
-        imageBuilder.addShape(rectangle);
+//        imageBuilder.addShape(rectangle);
+        shapeUuid = Image.addShape(extension, rectangle);
+        shape = world.Manager.get(shapeUuid);
+        Label.setLabel(shape, "Header");
 
-        extension.getComponent(Image.class).setImage(imageBuilder);
+        // <HACK>
+        Portable.getPort(extension, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 25.0 * 6.0);
+        // </HACK>
+
+//        extension.getComponent(Image.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // Load geometry from file into Image Component
@@ -343,7 +429,7 @@ public class World {
         path.addComponent(new Visibility());
 
         // <SETUP_PATH_IMAGE_GEOMETRY>
-        ImageBuilder imageBuilder = new ImageBuilder();
+//        ImageBuilder imageBuilder = new ImageBuilder();
 
         // Board
         Segment segment = new Segment();
@@ -351,7 +437,14 @@ public class World {
         segment.setLabel("Path");
         segment.setColor("#1f1f1e"); // #f7f7f7
         segment.setOutlineThickness(1);
-        imageBuilder.addShape(segment);
+//        imageBuilder.addShape(segment);
+        long pathShapeUuid = Image.addShape(path, segment);
+
+        // <HACK>
+        // Set Label
+        Entity pathShapeEntity = world.Manager.get(pathShapeUuid);
+        pathShapeEntity.getComponent(Label.class).label = "Path";
+        // </HACK>
 
         Circle circle = new Circle();
         circle.setRadius(50.0);
@@ -359,7 +452,14 @@ public class World {
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
         circle.isBoundary = true;
-        imageBuilder.addShape(circle);
+//        imageBuilder.addShape(circle);
+        pathShapeUuid = Image.addShape(path, circle);
+
+        // <HACK>
+        // Set Label
+        pathShapeEntity = world.Manager.get(pathShapeUuid);
+        pathShapeEntity.getComponent(Label.class).label = "Source Port";
+        // </HACK>
 
         circle = new Circle();
         circle.setRadius(50.0);
@@ -367,12 +467,19 @@ public class World {
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
         circle.isBoundary = true;
-        imageBuilder.addShape(circle);
+//        imageBuilder.addShape(circle);
+        pathShapeUuid = Image.addShape(path, circle);
+
+        // <HACK>
+        // Set Label
+        pathShapeEntity = world.Manager.get(pathShapeUuid);
+        pathShapeEntity.getComponent(Label.class).label = "Target Port";
+        // </HACK>
 
         // TODO: 11/5/2016 Add Port circles to the Path? So moving paths around will be easier? Then Port images are always just the same color. They look different because of the Path image. Path can contain single node. Then can be stretched out to include another Port.
         // TODO: 11/5/2016 Create corresponding world state CREATING_PATH, MODIFYING_PATH/MOVING_PATH, etc.
 
-        path.getComponent(Image.class).setImage(imageBuilder);
+//        path.getComponent(Image.class).setImage(imageBuilder);
         path.getComponent(Image.class).layerIndex = 10;
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
@@ -394,7 +501,7 @@ public class World {
         port.addComponent(new Label());
 
         // <LOAD_GEOMETRY_FROM_FILE>
-        ImageBuilder imageBuilder = new ImageBuilder();
+//        ImageBuilder imageBuilder = new ImageBuilder();
 
         // Create Shapes for Image
         Circle circle = new Circle();
@@ -403,9 +510,16 @@ public class World {
         circle.setColor("#f7f7f7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
         circle.isBoundary = true;
-        imageBuilder.addShape(circle);
+//        imageBuilder.addShape(circle);
+        long portShapeUuid = Image.addShape(port, circle);
 
-        port.getComponent(Image.class).setImage(imageBuilder);
+        // <HACK>
+        // Set Label
+        Entity portShape = world.Manager.get(portShapeUuid);
+        portShape.getComponent(Label.class).label = "Port";
+        // </HACK>
+
+//        port.getComponent(Image.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
         return port;
@@ -426,6 +540,25 @@ public class World {
         return camera;
     }
 
+    private Entity createShapeEntity() {
+
+        Entity shape = new Entity();
+
+        // Components
+        shape.addComponent(new ShapeComponent()); // Unique to Shape Entity
+        shape.addComponent(new Label());
+        shape.addComponent(new Transform());
+        shape.addComponent(new Physics());
+        shape.addComponent(new Style());
+        shape.addComponent(new Boundary());
+        shape.addComponent(new Visibility());
+
+        shape.addComponent(new RelativeLayoutConstraint());
+        //shape.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+
+        return shape;
+    }
+
     private Entity createNotificationEntity() {
 
         Entity notification = new Entity();
@@ -443,7 +576,7 @@ public class World {
         // </HACK>
 
         // Image
-        ImageBuilder imageBuilder = new ImageBuilder();
+//        ImageBuilder imageBuilder = new ImageBuilder();
 
         Text text = new Text();
         text.setText("DEFAULT_TEXT");
@@ -451,14 +584,15 @@ public class World {
         text.setColor("#ff000000");
         text.setPosition(0, 0);
         text.font = RenderSystem.NOTIFICATION_FONT;
+        Image.addShape(notification, text);
 
-        imageBuilder.addShape(text);
+//        imageBuilder.addShape(text);
 
         // <HACK>
         notification.getComponent(Image.class).layerIndex = 20;
         // </HACK>
 
-        notification.getComponent(Image.class).setImage(imageBuilder);
+//        notification.getComponent(Image.class).setImage(imageBuilder);
 
         return notification;
     }
@@ -472,7 +606,8 @@ public class World {
         notification.getComponent(Notification.class).timeout = timeout;
         notification.getComponent(Transform.class).set(position);
 
-        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
+//        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
+        Text text2 = (Text) Image.getShapes(notification).get(0).getComponent(ShapeComponent.class).shape;
         text2.setText(notification.getComponent(Notification.class).message);
         text2.setColor("#ff0000");
 
@@ -497,17 +632,18 @@ public class World {
         prototypeExtension.addComponent(new Image());
         prototypeExtension.addComponent(new Style());
 
-        ImageBuilder imageBuilder = new ImageBuilder();
+//        ImageBuilder imageBuilder = new ImageBuilder();
 
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
-        imageBuilder.addShape(rectangle);
+        Image.addShape(prototypeExtension, rectangle);
+//        imageBuilder.addShape(rectangle);
 
-        prototypeExtension.getComponent(Image.class).setImage(imageBuilder);
+//        prototypeExtension.getComponent(Image.class).setImage(imageBuilder);
 
         prototypeExtension.addComponent(new Label());
-        prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
+        Label.setLabel(prototypeExtension, "prototypeExtension");
 
         prototypeExtension.addComponent(new Visibility());
         prototypeExtension.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
@@ -533,14 +669,21 @@ public class World {
         prototypePath.addComponent(new Image());
         prototypePath.addComponent(new Style());
 
-        ImageBuilder imageBuilder = new ImageBuilder();
+//        ImageBuilder imageBuilder = new ImageBuilder();
 
         // Image
         Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
         segment.setLabel("Path");
         segment.setOutlineColor("#ff333333");
         segment.setOutlineThickness(10.0);
-        imageBuilder.addShape(segment);
+        long pathShapeUuid = Image.addShape(prototypePath, segment);
+//        imageBuilder.addShape(segment);
+
+        // <HACK>
+        // Set Label
+        Entity pathShapeEntity = world.Manager.get(pathShapeUuid);
+        pathShapeEntity.getComponent(Label.class).label = "Path";
+        // </HACK>
 
 //        Segment segment = new Segment();
 //        segment.setOutlineThickness(2.0);
@@ -565,10 +708,10 @@ public class World {
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
 
-        prototypePath.getComponent(Image.class).setImage(imageBuilder);
+//        prototypePath.getComponent(Image.class).setImage(imageBuilder);
 
         prototypePath.addComponent(new Label());
-        prototypePath.getComponent(Label.class).setLabel("prototypePath");
+        Label.setLabel(prototypePath, "prototypePath");
 
         prototypePath.addComponent(new Visibility());
         prototypePath.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);

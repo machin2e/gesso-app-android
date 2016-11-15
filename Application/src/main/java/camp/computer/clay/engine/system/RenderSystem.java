@@ -8,8 +8,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 
-import java.util.List;
-
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
@@ -18,6 +16,7 @@ import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
@@ -25,7 +24,6 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.Palette;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
-import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class RenderSystem extends System {
 
@@ -193,15 +191,35 @@ public class RenderSystem extends System {
             // This was added so Prototype Extension/Path would draw without Extension/Path components
             else if (entity.hasComponent(Image.class)) {
 
+//                if (entity.hasComponent(Extension.class)) { // HACK
+//
+//                } else {
+
+//                if (entity.hasComponent(Port.class) && entity.getComponent(Visibility.class).visible == Visible.VISIBLE) {
+//                    Log.v("RenderSystem", "drawing port");
+//                }
+
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     palette.canvas.save();
-                    List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+//                    List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+                    Group<Entity> shapes = Image.getShapes(entity);
                     for (int i = 0; i < shapes.size(); i++) {
-                        platformRenderSurface.drawShape(shapes.get(i), palette);
+
+                        // <HACK>
+                        shapes.get(i).getComponent(ShapeComponent.class).shape.setPosition(
+                                shapes.get(i).getComponent(Transform.class)
+                        );
+                        shapes.get(i).getComponent(ShapeComponent.class).shape.setRotation(
+                                shapes.get(i).getComponent(Transform.class).getRotation()
+                        );
+                        // </HACK>
+
+                        platformRenderSurface.drawShape(shapes.get(i).getComponent(ShapeComponent.class).shape, palette);
                     }
                     palette.canvas.restore();
                 }
+//                }
 
 //                // Create Buffer Bitmap
 //                Bitmap b = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);

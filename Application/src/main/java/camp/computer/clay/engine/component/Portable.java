@@ -45,7 +45,7 @@ public class Portable extends Component {
     public static Entity getPort(Entity portable, String label) {
         Portable portableComponent = portable.getComponent(Portable.class);
         for (int i = 0; i < portableComponent.ports.size(); i++) {
-            if (portableComponent.ports.get(i).getComponent(Label.class).getLabel().equals(label)) {
+            if (Label.getLabel(portableComponent.ports.get(i)).equals(label)) {
                 return portableComponent.ports.get(i);
             }
         }

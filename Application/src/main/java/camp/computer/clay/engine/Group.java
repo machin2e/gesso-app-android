@@ -14,6 +14,7 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
@@ -278,7 +279,11 @@ public class Group<E extends Groupable> implements List<E> {
         Group<Shape> shapes = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Image image = (Image) elements.get(i);
-            shapes.addAll(image.getImage().getShapes());
+//            shapes.addAll(image.getImage().getShapes());
+            Group<Entity> shapeEntities = Image.getShapes(image.getEntity());
+            for (int j = 0; j < shapeEntities.size(); j++) {
+                shapes.add(shapeEntities.get(j).getComponent(ShapeComponent.class).shape);
+            }
         }
         return shapes;
     }
@@ -309,7 +314,7 @@ public class Group<E extends Groupable> implements List<E> {
 
                 Pattern pattern = Pattern.compile(labels[j]);
                 Entity entity = (Entity) this.elements.get(i); // HACK: Forcing typecast to Entity. TODO: Make this safe...
-                Matcher matcher = pattern.matcher(entity.getComponent(Label.class).getLabel());
+                Matcher matcher = pattern.matcher(Label.getLabel(entity));
 
                 boolean isMatch = matcher.matches();
 

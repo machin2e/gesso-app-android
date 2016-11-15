@@ -26,6 +26,7 @@ import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.BoundarySystem;
@@ -390,14 +391,16 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     public void drawEditablePath(Entity path, Palette palette) {
 
-        Shape hostSourcePortShape = Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
+        Entity sourcePort = Path.getSource(path);
+        Entity sourcePortShapeE = Image.getShape(sourcePort, "Port");
+        Shape hostSourcePortShape = sourcePortShapeE.getComponent(ShapeComponent.class).shape; // Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
         Shape extensionTargetPortShape = null;
 
         if (Path.getTarget(path) != null) {
-            extensionTargetPortShape = Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
+            extensionTargetPortShape = Image.getShape(Path.getTarget(path), "Port").getComponent(ShapeComponent.class).shape; // Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
 
-            Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
-            Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
+            Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
+            Shape targetPortShape = Image.getShape(path, "Target Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
 
             path.getComponent(Transform.class).set(
                     (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
@@ -440,7 +443,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 //            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
 
-            Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
+            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
             segment.setOutlineThickness(15.0);
             segment.setOutlineColor(sourcePortShape.getColor());
 
@@ -465,7 +468,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             // Singleton Path
 
-            Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
+            Entity sourcePortPathShapeE = Image.getShape(path, "Source Port");
+            Shape sourcePortShape = sourcePortPathShapeE.getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
 
 //            path.getComponent(Transform.class).set(
 //                    (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
@@ -580,7 +584,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 palette.paint.setStrokeWidth(10.0f);
 
                 // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-                Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
+                Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
                 segment.setOutlineThickness(10.0);
                 segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
 

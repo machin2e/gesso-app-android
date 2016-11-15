@@ -18,6 +18,7 @@ import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
@@ -381,8 +382,8 @@ public class EventHandlerSystem extends System {
         }
         */
 
-        Shape sourcePortShape = path.getComponent(Image.class).getImage().getShape("Source Port");
-        Shape targetPortShape = path.getComponent(Image.class).getImage().getShape("Target Port");
+        Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
+        Shape targetPortShape = Image.getShape(path, "Target Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
 
         /*
         if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape), event.getPosition())) {
@@ -436,7 +437,7 @@ public class EventHandlerSystem extends System {
                 Log.v("handlePathEvent", "Moving on singleton Path.");
 
                 // Prototype Path Visible
-                Transform position = event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Source Port").getPosition();
+                Transform position = Image.getShape(event.getFirstEvent().getTarget(), "Source Port").getComponent(Transform.class); // event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Source Port").getPosition();
                 world.portableLayoutSystem.setPathPrototypeSourcePosition(position);
                 world.portableLayoutSystem.setPathPrototypeDestinationPosition(event.getPosition());
                 world.portableLayoutSystem.setPathPrototypeVisibility(Visible.VISIBLE);
@@ -467,7 +468,8 @@ public class EventHandlerSystem extends System {
                 if (isCreateExtensionAction) {
                     Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
-                    world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Source Port").getPosition());
+                    //world.portableLayoutSystem.setPathPrototypeSourcePosition(event.getFirstEvent().getTarget().getComponent(Image.class).getImage().getShape("Source Port").getPosition());
+                    world.portableLayoutSystem.setPathPrototypeSourcePosition(Image.getShape(event.getFirstEvent().getTarget(), "Source Port").getComponent(Transform.class));
                     world.portableLayoutSystem.setExtensionPrototypePosition(event.getPosition());
                 } else {
                     Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
@@ -509,6 +511,7 @@ public class EventHandlerSystem extends System {
                                 // <HACK>
                                 newPort.addComponent(new RelativeLayoutConstraint());
                                 newPort.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+                                newPort.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 25.0 * 6.0);
                                 // </HACK>
 
                                 int newPortIndex = extensionPorts.size();
@@ -607,8 +610,8 @@ public class EventHandlerSystem extends System {
                             // Remap the Path's Ports
 
                             // Check if source or target in Path was moved, and reassign it
-                            Shape sourcePortShape2 = path.getComponent(Image.class).getImage().getShape("Source Port");
-                            Shape targetPortShape2 = path.getComponent(Image.class).getImage().getShape("Target Port");
+                            Shape sourcePortShape2 = Image.getShape(path, "Source Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
+                            Shape targetPortShape2 = Image.getShape(path, "Target Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
                             if (Geometry.contains(world.boundarySystem.getBoundary(sourcePortShape2), event.getPosition())) {
 
                                 // Check if the new Path's Port's would be on the same Portable

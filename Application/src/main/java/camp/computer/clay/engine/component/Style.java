@@ -1,10 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import java.util.List;
-
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.Color;
-import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class Style extends Component {
     // TODO: Consider renaming to "Appearance"
@@ -19,14 +15,12 @@ public class Style extends Component {
 
     // <TODO:MOVE_TO_SYSTEM>
     // TODO: Delete?
-    public void setTransparency(Entity entity, final double transparency) {
+    public static void setTransparency(Entity entity, final double transparency) {
 
-//        if (image.getImage() == null) {
-//            image.setImage(new ImageBuilder());
-//        }
-
-        Image image = entity.getComponent(Image.class);
-        List<Shape> shapes = image.getImage().getShapes();
+        /*
+//        Image image = entity.getComponent(Image.class);
+//        List<Shape> shapes = image.getImage().getShapes();
+        Group<Entity> shapes = Image.getShapes(entity);
 
         entity.getComponent(Style.class).targetTransparency = transparency;
 
@@ -46,6 +40,7 @@ public class Style extends Component {
         }
 
         entity.getComponent(Style.class).transparency = entity.getComponent(Style.class).targetTransparency;
+        */
     }
     // </TODO:MOVE_TO_SYSTEM>
 }
