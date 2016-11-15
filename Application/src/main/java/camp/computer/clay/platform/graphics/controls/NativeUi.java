@@ -35,8 +35,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import camp.computer.clay.engine.Group;
@@ -1227,13 +1225,6 @@ public class NativeUi {
 
     private View createActionView_v2() {
 
-//        final TextView actionView = new TextView(context);
-//        actionView.setText("Event (<PortEntity> <PortEntity> ... <PortEntity>)\nExpose: <PortEntity> <PortEntity> ... <PortEntity>");
-//        int horizontalPadding = (int) Application.getView().convertDipToPx(20);
-//        int verticalPadding = (int) Application.getView().convertDipToPx(10);
-//        actionView.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
-//        actionView.setBackgroundColor(Color.parseColor("#44000000"));
-
         // Text: "Data Sources (Imports)"
         final TextView actionView = new TextView(context);
         actionView.setTextSize(11.0f);
@@ -1690,7 +1681,7 @@ public class NativeUi {
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
                 relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                // Title: "Actions"
+                // Title: "Settings"
                 TextView textView = new TextView(context);
                 textView.setText("Settings");
                 textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
@@ -1704,175 +1695,28 @@ public class NativeUi {
                 linearLayout2.setOrientation(LinearLayout.VERTICAL);
                 linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                // Default Action Controller based on Port Configuration
-                /*
-                EditText defaultActionBasedOnPortConfiguration = (EditText) createActionView_v1();
-                defaultActionBasedOnPortConfiguration.setText("PLACEHOLDER: " + finalPortTypesString);
-                linearLayout.addView(defaultActionBasedOnPortConfiguration);
-                */
+                linearLayout.addView(createButtonView("portable separation distance"));
+                linearLayout.addView(createButtonView("extension separation MIN"));
+                linearLayout.addView(createButtonView("extension separation MAX"));
 
-                LinearLayout portableLayout = new LinearLayout(context);
-                portableLayout.setOrientation(LinearLayout.HORIZONTAL);
-                linearLayout.addView(portableLayout);
+                linearLayout.addView(createButtonView("add/remove Host"));
+                linearLayout.addView(createButtonView("enable/disable notifications"));
+                linearLayout.addView(createButtonView("enable/disable vibration"));
+                linearLayout.addView(createButtonView("enable/disable network"));
 
-                // Spinner: Action Browser
-                final Spinner spinner = new Spinner(context);
-                spinner.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-                spinner.setBackgroundColor(Color.parseColor("#44000000"));
+                // Title: "Settings"
+                TextView debugSubtitle = new TextView(context);
+                debugSubtitle.setText("Debug Section Subtitle!");
+                debugSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                debugSubtitle.setTextSize(12);
+                debugSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(debugSubtitle);
 
-                LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params2.setMargins(0, dpToPx(5), 0, 0);
-                spinner.setLayoutParams(params2);
-
-                final List<String> spinnerArray = new ArrayList<>();
-                spinnerArray.add("Add Action"); // load script from browser
-                spinnerArray.add("new script");
-//                spinnerArray.add("demo script 1");
-//                spinnerArray.add("demo script 2");
-//                spinnerArray.add("demo script 3");
-                Group<Action> actions = World.getWorld().repository.getActions();
-                Log.v("Spinner", "actions.size(): " + actions.size());
-                for (int i = 0; i < actions.size(); i++) {
-                    spinnerArray.add(actions.get(i).getTitle());
-                }
-                // TODO: Load Scripts from Repository
-                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
-                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(spinnerArrayAdapter);
-
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        if (i > 0) {
-                            String selectedText = spinnerArray.get(i);
-
-                            if (selectedText.equals("new script")) {
-
-                                View actionEditorView = createActionView_v1();
-                                linearLayout2.addView(actionEditorView);
-
-                            } else {
-                                EditText actionEditorView = (EditText) createActionView_v1();
-                                actionEditorView.setText(selectedText);
-                                linearLayout2.addView(actionEditorView);
-                            }
-
-                            spinner.setSelection(0);
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-                });
-
-                linearLayout.addView(spinner);
-
-                /*
-                // Button: "Add Action"
-                Button button2 = new Button(context);
-                button2.setText("Add Action");
-                button2.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-                button2.setBackgroundColor(Color.parseColor("#44000000"));
-
-                LinearLayout.LayoutParams params3 = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params3.setMargins(0, dpToPx(5), 0, 0);
-                button2.setLayoutParams(params3);
-
-                button2.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent motionEvent) {
-
-                        int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
-                        int pointerId = motionEvent.getPointerId(pointerIndex);
-                        //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
-                        int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
-                        int pointCount = motionEvent.getPointerCount();
-
-                        // Update the state of the touched object based on the current pointerCoordinates interaction state.
-                        if (touchActionType == MotionEvent.ACTION_DOWN) {
-                            // TODO:
-                        } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
-                            // TODO:
-                        } else if (touchActionType == MotionEvent.ACTION_MOVE) {
-                            // TODO:
-                        } else if (touchActionType == MotionEvent.ACTION_UP) {
-
-                            View actionEditorView = createActionView_v1();
-                            linearLayout2.addView(actionEditorView);
-
-                        } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
-                            // TODO:
-                        } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
-                            // TODO:
-                        } else {
-                            // TODO:
-                        }
-
-                        return true;
-                    }
-                });
-                linearLayout.addView(button2);
-                */
-
-                // Title: "More"
-                final TextView textView2 = new TextView(context);
-                textView2.setText("More");
-                textView2.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
-                textView2.setTextSize(20);
-                textView2.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                textView2.setGravity(Gravity.CENTER_HORIZONTAL);
-                linearLayout.addView(textView2);
-
-                // Layout (Linear Vertical): More Options
-                final LinearLayout linearLayout3 = new LinearLayout(context);
-                linearLayout3.setOrientation(LinearLayout.VERTICAL);
-                linearLayout3.setVisibility(View.GONE);
-                linearLayout.addView(linearLayout3, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-                final boolean[] moreOptionsVisible = {false};
-                textView2.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View view, MotionEvent motionEvent) {
-                        switch (motionEvent.getAction()) {
-                            case MotionEvent.ACTION_UP:
-                                moreOptionsVisible[0] = !moreOptionsVisible[0];
-                                if (moreOptionsVisible[0]) {
-                                    linearLayout3.setVisibility(View.VISIBLE);
-                                    textView2.setText("Less");
-                                } else {
-                                    linearLayout3.setVisibility(View.GONE);
-                                    textView2.setText("More");
-                                }
-                        }
-                        return true;
-                    }
-                });
-
-                // Button: "Test Run"
-                Button button3a = new Button(context);
-                button3a.setText("Test Run (V8)");
-                linearLayout3.addView(button3a);
-
-                // Button: "Browse Actions"
-                Button button3 = new Button(context);
-                button3.setText("Browse Actions for Ext/Port Config");
-                linearLayout3.addView(button3);
-
-                Button button4 = new Button(context);
-                button4.setText("Add TODO");
-                linearLayout3.addView(button4);
-
-                Button button5 = new Button(context);
-                button5.setText("Add Note");
-                linearLayout3.addView(button5);
+                linearLayout.addView(createButtonView("debug: show monitor"));
+                linearLayout.addView(createButtonView("debug: show boundaries"));
+                linearLayout.addView(createButtonView("debug: target fps"));
+                linearLayout.addView(createButtonView("debug: sleep time"));
 
                 // Add to main Application View
                 FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
@@ -1915,28 +1759,6 @@ public class NativeUi {
             }
         });
     }
-
-    // <NATIVE_UI_UTILS>
-    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
-
-    /**
-     * Generate a value suitable for use in {@link #setId(int)}.
-     * This value will not collide with ID values generated at build time by aapt for R.id.
-     *
-     * @return a generated ID value
-     */
-    public static int generateViewId() {
-        for (; ; ) {
-            final int result = sNextGeneratedId.get();
-            // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
-            int newValue = result + 1;
-            if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
-            if (sNextGeneratedId.compareAndSet(result, newValue)) {
-                return result;
-            }
-        }
-    }
-    // </NATIVE_UI_UTILS>
 
     private List<Transform> imagePoints = new ArrayList<>();
 
@@ -2050,66 +1872,37 @@ public class NativeUi {
         return imageView;
     }
 
-    public void scheduleEvent() {
-        // TODO:
-    }
+    // <NATIVE_UI_UTILS>
+    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
 
-    public void startTimer() {
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // this code will be executed after 2 seconds
-
-//                Event event = new Event();
-//                // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
-//                // event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + perspectivePosition.y)) / perspectiveScale;
-//                event.setType(Event.Type.HOLD);
-//                event.pointerIndex = 0; // HACK // TODO: event.pointerIndex = pointerId;
-//                queueEvent(event);
-
-                Log.v("HoldCallback", "Holding");
+    /**
+     * Generate a value suitable for use in {@link #setId(int)}.
+     * This value will not collide with ID values generated at build time by aapt for R.id.
+     *
+     * @return a generated ID value
+     */
+    public static int generateViewId() {
+        for (; ; ) {
+            final int result = sNextGeneratedId.get();
+            // aapt-generated IDs have the high byte nonzero; clamp to the range under that.
+            int newValue = result + 1;
+            if (newValue > 0x00FFFFFF) newValue = 1; // Roll over to 1, not 0.
+            if (sNextGeneratedId.compareAndSet(result, newValue)) {
+                return result;
             }
-        }, 1000);
-
-//        final Handler handler = new Handler();
-//
-//        Thread thread = new Thread() {
-//            @Override
-//            public void run() {
-//                try {
-//                    sleep(1000);
-//
-//                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//
-//                    // If needs to run on UI thread.
-//                            /*
-//                            Application.getView().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    Log.v("HOLD", "WAAAAAAAAAAIT");
-//                                }
-//                            });
-//                            */
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//
-//        thread.start();
+        }
     }
+    // </NATIVE_UI_UTILS>
 
-    //----------------
-
+    // <BASIC_UI>
     public View createTextView(String text, int layoutStrategy) {
 
         // Text: "Data Sources (Imports)"
-        final TextView actionView = new TextView(context);
-        actionView.setTextSize(10.0f);
-        actionView.setText(text);
-        actionView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        actionView.setBackgroundColor(Color.parseColor("#44000000"));
+        final TextView textView = new TextView(context);
+        textView.setTextSize(10.0f);
+        textView.setText(text);
+        textView.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        textView.setBackgroundColor(Color.parseColor("#44000000"));
 
         LinearLayout.LayoutParams params = null;
         if (layoutStrategy == 0) {
@@ -2133,8 +1926,82 @@ public class NativeUi {
             );
         }
         params.setMargins(0, dpToPx(5), 0, 0);
-        actionView.setLayoutParams(params);
+        textView.setLayoutParams(params);
 
-        return actionView;
+        return textView;
     }
+
+    public View createEditText(String text, String hintText) {
+
+        EditText editText = new EditText(context);
+
+        editText.setHint(hintText);
+
+        if (text != null && text.length() > 0) {
+            editText.setText(text);
+        }
+
+        editText.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.setMargins(0, dpToPx(5), 0, 0);
+        editText.setLayoutParams(layoutParams);
+
+        return editText;
+    }
+
+    private View createButtonView(String text) {
+
+        Button button = new Button(context);
+        button.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
+        button.setTextSize(11);
+        button.setBackgroundColor(Color.parseColor("#44000000"));
+
+        button.setText(text);
+
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.setMargins(0, dpToPx(5), 0, 0);
+        button.setLayoutParams(layoutParams);
+
+        // Interaction
+        button.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent motionEvent) {
+
+                int pointerIndex = ((motionEvent.getAction() & MotionEvent.ACTION_POINTER_ID_MASK) >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+                int pointerId = motionEvent.getPointerId(pointerIndex);
+                //int touchAction = (motionEvent.getEvent () & MotionEvent.ACTION_MASK);
+                int touchActionType = (motionEvent.getAction() & MotionEvent.ACTION_MASK);
+                int pointCount = motionEvent.getPointerCount();
+
+                // Update the state of the touched object based on the current pointerCoordinates interaction state.
+                if (touchActionType == MotionEvent.ACTION_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_DOWN) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_MOVE) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_UP) {
+
+                } else if (touchActionType == MotionEvent.ACTION_POINTER_UP) {
+                    // TODO:
+                } else if (touchActionType == MotionEvent.ACTION_CANCEL) {
+                    // TODO:
+                } else {
+                    // TODO:
+                }
+
+                return true;
+            }
+        });
+
+        return button;
+    }
+    // </BASIC_UI>
 }
