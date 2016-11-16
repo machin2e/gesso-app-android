@@ -14,6 +14,7 @@ public abstract class Geometry {
 
     /**
      * Rotates {@code point} by {@code rotation} degrees about point (0, 0).
+     *
      * @param point
      * @param rotation
      */

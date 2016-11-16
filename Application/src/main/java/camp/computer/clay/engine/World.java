@@ -34,6 +34,7 @@ import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.engine.system.StyleSystem;
 import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.model.player.Player;
@@ -74,6 +75,7 @@ public class World {
     // public List<System> systems = new ArrayList<>();
     public CameraSystem cameraSystem = new CameraSystem(this);
     public ImageSystem imageSystem = new ImageSystem(this);
+    public StyleSystem styleSystem = new StyleSystem(this);
     public RenderSystem renderSystem = new RenderSystem(this);
     public BoundarySystem boundarySystem = new BoundarySystem(this);
     public InputSystem inputSystem = new InputSystem(this);
@@ -805,6 +807,7 @@ public class World {
         world.inputSystem.update();
         world.eventHandlerSystem.update();
         world.imageSystem.update();
+        world.styleSystem.update();
         world.physicsSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();

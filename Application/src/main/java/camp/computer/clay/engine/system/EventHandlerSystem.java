@@ -8,6 +8,7 @@ import java.util.List;
 import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
@@ -66,7 +67,7 @@ public class EventHandlerSystem extends System {
     private void dispatchEvent(Event event) {
 
         // Annotate the Event
-        Group<Entity> targetEntities = world.Manager.getEntities().filterVisibility(true).filterWithComponent(Image.class).sortByLayer().filterContains(event.getPosition());
+        Group<Entity> targetEntities = world.Manager.getEntities().filterVisibility(true).filterWithComponents(Image.class, Boundary.class).sortByLayer().filterContains(event.getPosition());
         Entity targetEntity = null;
         if (targetEntities.size() > 0) {
             //targetEntity = targetEntities.get(0);

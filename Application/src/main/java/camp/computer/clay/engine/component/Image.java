@@ -2,6 +2,8 @@ package camp.computer.clay.engine.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
@@ -92,5 +94,28 @@ public class Image extends Component {
             shapes.add(shape);
         }
         return shapes;
+    }
+
+    public static Group<Entity> getShapes(Entity entity, String... labels) {
+
+//        if (image.getImage() == null) {
+//            image.setImage(new ImageBuilder());
+//        }
+//        List<Shape> shapes = image.getImage().getShapes();
+        Group<Entity> shapes = Image.getShapes(entity);
+
+        Group<Entity> matchingShapes = new Group<>();
+
+        for (int i = 0; i < shapes.size(); i++) {
+            for (int j = 0; j < labels.length; j++) {
+                Pattern pattern = Pattern.compile(labels[j]);
+                Matcher matcher = pattern.matcher(Label.getLabel(shapes.get(i)));
+                if (matcher.matches()) {
+                    matchingShapes.add(shapes.get(i));
+                }
+            }
+        }
+
+        return matchingShapes;
     }
 }

@@ -33,8 +33,6 @@ public class Boundary extends Component {
      */
     public static boolean contains(Entity entity, Transform point) {
 
-//        Image image = entity.getComponent(Image.class);
-//        List<Shape> shapes = image.getImage().getShapes();
         Group<Entity> shapes = Image.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary // HACK

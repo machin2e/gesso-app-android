@@ -630,4 +630,8 @@ public class PortableLayoutSystem extends System {
         return extensionPrototype.getComponent(Visibility.class).getVisibile();
     }
     // </PROTOTYPES>
+
+    private void updateExtensionPathRoutes(Entity extension) {
+        // TODO: Create routes between extension and host.
+    }
 }

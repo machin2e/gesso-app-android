@@ -1,17 +1,11 @@
 package camp.computer.clay.engine.system;
 
-import android.util.Log;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
@@ -22,7 +16,6 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Point;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
-import camp.computer.clay.util.ImageBuilder.Shape;
 
 public class ImageSystem extends System {
 
@@ -181,21 +174,11 @@ public class ImageSystem extends System {
                 }
             }
 
-            //if (shape.hasComponent(Port.class) && shape.getComponent(Visibility.class).visible == Visible.VISIBLE) {
-            if (entity.hasComponent(Port.class)) {
-                Log.v("RenderSystem", "drawing port");
-            }
-
-//            shape.update(transformedPoint);
             if (absoluteReferenceTransform != null) {
 //            if (shape.hasComponent(RelativeLayoutConstraint.class)) {
                 updateShapeRelativeTransform(shape, absoluteReferenceTransform);
-//                updateShapeBoundary(shape);
-//                shape.isValid = true;
             }
         }
-
-//        updateImageBoundary(entity);
     }
 
     /**
@@ -226,18 +209,6 @@ public class ImageSystem extends System {
 //        // Rotation
 //        shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
 
-        if (shape.hasComponent(Port.class)) {
-            Log.v("RenderSystem", "drawing port");
-        }
-
-        if (shape.getComponent(RelativeLayoutConstraint.class) == null) {
-            Log.v("RenderSystem", "drawing port");
-        }
-
-        if (shape.getComponent(RelativeLayoutConstraint.class).relativeTransform == null) {
-            Log.v("RenderSystem", "drawing port");
-        }
-
         // Position
         shape.getComponent(Transform.class).x = referencePoint.x + Geometry.distance(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y)));
         shape.getComponent(Transform.class).y = referencePoint.y + Geometry.distance(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y)));
@@ -254,30 +225,30 @@ public class ImageSystem extends System {
 
     // TODO: Remove! Image interaction should happen in ImageBuilder.
     // TODO: <REMOVE?>
-    public Group<Shape> getShapes(Image image, String... labels) {
-
-        Entity entity = image.getEntity();
-
-//        if (image.getImage() == null) {
-//            image.setImage(new ImageBuilder());
+//    public Group<Shape> getShapes(Image image, String... labels) {
+//
+//        Entity entity = image.getEntity();
+//
+////        if (image.getImage() == null) {
+////            image.setImage(new ImageBuilder());
+////        }
+////        List<Shape> shapes = image.getImage().getShapes();
+//        Group<Entity> shapes = Image.getShapes(entity);
+//
+//        Group<Shape> matchingShapes = new Group<>();
+//
+//        for (int i = 0; i < shapes.size(); i++) {
+//            for (int j = 0; j < labels.length; j++) {
+//                Pattern pattern = Pattern.compile(labels[j]);
+//                Matcher matcher = pattern.matcher(Label.getLabel(shapes.get(i)));
+//                if (matcher.matches()) {
+//                    matchingShapes.add(shapes.get(i).getComponent(ShapeComponent.class).shape);
+//                }
+//            }
 //        }
-//        List<Shape> shapes = image.getImage().getShapes();
-        Group<Entity> shapes = Image.getShapes(entity);
-
-        Group<Shape> matchingShapes = new Group<>();
-
-        for (int i = 0; i < shapes.size(); i++) {
-            for (int j = 0; j < labels.length; j++) {
-                Pattern pattern = Pattern.compile(labels[j]);
-                Matcher matcher = pattern.matcher(Label.getLabel(shapes.get(i)));
-                if (matcher.matches()) {
-                    matchingShapes.add(shapes.get(i).getComponent(ShapeComponent.class).shape);
-                }
-            }
-        }
-
-        return matchingShapes;
-    }
+//
+//        return matchingShapes;
+//    }
     // TODO: </REMOVE?>
 
 //    // TODO: Remove! Image interaction should happen in ImageBuilder.
