@@ -403,10 +403,6 @@ public class World {
         shape = world.Manager.get(shapeUuid);
         Label.setLabel(shape, "Header");
 
-        // <HACK>
-        Portable.getPort(extension, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 25.0 * 6.0);
-        // </HACK>
-
 //        extension.getComponent(Image.class).setImage(imageBuilder);
         // </LOAD_GEOMETRY_FROM_FILE>
 
@@ -808,6 +804,7 @@ public class World {
         long updateStartTime = Clock.getCurrentTime();
         world.inputSystem.update();
         world.eventHandlerSystem.update();
+        world.imageSystem.update();
         world.physicsSystem.update();
         world.boundarySystem.update();
         world.portableLayoutSystem.update();

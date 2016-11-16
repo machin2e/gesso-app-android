@@ -22,7 +22,6 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Segment;
-import camp.computer.clay.util.ImageBuilder.Shape;
 import camp.computer.clay.util.Random;
 
 public class PortableLayoutSystem extends System {
@@ -298,7 +297,7 @@ public class PortableLayoutSystem extends System {
             indexCounts[i] = 0;
         }
 
-        Shape boardShape = Image.getShape(host, "Board").getComponent(ShapeComponent.class).shape; // host.getComponent(Image.class).getImage().getShape("Board");
+        Entity boardShape = Image.getShape(host, "Board"); // host.getComponent(Image.class).getImage().getShape("Board");
         List<Transform> hostShapeBoundary = world.boundarySystem.getBoundary(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);

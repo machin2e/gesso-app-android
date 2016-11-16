@@ -38,7 +38,7 @@ public class Boundary extends Component {
         Group<Entity> shapes = Image.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary // HACK
-                    && Geometry.contains(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape), point)) { // HACK
+                    && Geometry.contains(BoundarySystem.getBoundary(shapes.get(i)), point)) { // HACK
                 return true;
             }
         }
@@ -58,7 +58,8 @@ public class Boundary extends Component {
         Group<Entity> shapes = Image.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
             if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary) { // HACK
-                shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape)); // HACK
+                //shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape)); // HACK
+                shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i))); // HACK
             }
         }
 

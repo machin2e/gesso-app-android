@@ -20,7 +20,6 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.util.ImageBuilder.Geometry;
 import camp.computer.clay.util.ImageBuilder.Rectangle;
 import camp.computer.clay.util.ImageBuilder.Shape;
@@ -383,7 +382,8 @@ public class Group<E extends Groupable> implements List<E> {
         Group<Transform> positions = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = (Shape) elements.get(i);
-            positions.addAll(BoundarySystem.getBoundary(shape));
+            positions.addAll(shape.getVertices()); // HACK: (shouldn't get Boundary if asking for Vertices. DISTINGUISH THESE SOMEHOW!)
+            // TODO: Fix this and replace previous line: //positions.addAll(BoundarySystem.getBoundary(shape));
         }
         return positions;
     }
@@ -394,7 +394,10 @@ public class Group<E extends Groupable> implements List<E> {
         List<Transform> imageBoundaries = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
-            imageBoundaries.addAll(BoundarySystem.getBoundary(Boundary.getBoundingBox(entity)));
+            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.getBoundary(Boundary.getBoundingBox(entity)));
+//            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
+            //imageBoundaries.addAll(entity.getComponent(Boundary.class).getBoundary());
+            imageBoundaries.add(entity.getComponent(Transform.class));
         }
 
         return Geometry.getBoundingBox(imageBoundaries);

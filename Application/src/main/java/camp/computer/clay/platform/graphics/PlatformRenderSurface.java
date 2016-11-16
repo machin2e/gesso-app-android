@@ -460,8 +460,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
-            drawPolygon(BoundarySystem.getBoundary(targetPortShape), palette);
+//            drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
+//            drawPolygon(BoundarySystem.getBoundary(targetPortShape), palette);
+            drawPolygon(BoundarySystem.getBoundary(Image.getShape(path, "Source Port")), palette);
+            drawPolygon(BoundarySystem.getBoundary(Image.getShape(path, "Target Port")), palette);
 //        }
 
         } else {
@@ -546,7 +548,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.paint.setStyle(Paint.Style.STROKE);
             //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
+            //drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
+            drawPolygon(BoundarySystem.getBoundary(Image.getShape(path, "Source Port")), palette);
 //            platformRenderSurface.drawPolygon(targetPortBoundarySystem.getBoundary());
 
         }
@@ -823,7 +826,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     // TODO: Refactor with transforms
     public void drawPolygon(Polygon polygon, Palette palette) {
-        drawPolygon(BoundarySystem.getBoundary(polygon), palette);
+        // TODO: drawPolygon(BoundarySystem.getBoundary(polygon), palette);
     }
 
     // TODO: Refactor with transforms
