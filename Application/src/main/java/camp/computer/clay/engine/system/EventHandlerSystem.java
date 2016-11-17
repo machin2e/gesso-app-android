@@ -455,8 +455,8 @@ public class EventHandlerSystem extends System {
 //                if (Geometry.contains(Boundary.getBoundary(sourcePortShape), event.getPosition())) {
                 if (event.getSecondaryTarget() == sourcePortShape) {
                     Log.v("handlePathEvent", "Touched Source");
-                    sourcePortShape.getComponent(ShapeComponent.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
-//                    sourcePortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
+                    //sourcePortShape.getComponent(ShapeComponent.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
+                    sourcePortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
 //                    sourcePortShape.getComponent(Physics.class).targetTransform.set(event.getPosition());
 
                     Path.setState(path, Component.State.EDITING);
@@ -469,8 +469,8 @@ public class EventHandlerSystem extends System {
                 //if (Geometry.contains(Boundary.getBoundary(targetPortShape), event.getPosition())) {
                 if (event.getSecondaryTarget() == targetPortShape) {
                     Log.v("handlePathEvent", "Touched Target");
-                    targetPortShape.getComponent(ShapeComponent.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
-//                    targetPortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
+//                    targetPortShape.getComponent(ShapeComponent.class).shape.setPosition(event.getPosition()); // TODO: Change TRANSFORM
+                    targetPortShape.getComponent(Transform.class).set(event.getPosition()); // TODO: Change TRANSFORM
 //                    targetPortShape.getComponent(Physics.class).targetTransform.set(event.getPosition()); // TODO: Change TRANSFORM
 
                     Path.setState(path, Component.State.EDITING);

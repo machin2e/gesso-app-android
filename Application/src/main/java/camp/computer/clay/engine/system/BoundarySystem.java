@@ -9,8 +9,8 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.Geometry;
 import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.util.Geometry;
 
 public class BoundarySystem extends System {
 
@@ -47,8 +47,10 @@ public class BoundarySystem extends System {
             // Translate and rotate the boundary about the updated position
             for (int i = 0; i < vertices.size(); i++) {
                 boundary.get(i).set(vertices.get(i));
-                Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
-                Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape
+//                Geometry.rotatePoint(boundary.get(i), shape.getPosition().rotation); // Rotate Shape boundary about Image position
+//                Geometry.translatePoint(boundary.get(i), shape.getPosition().x, shape.getPosition().y); // Translate Shape
+                Geometry.rotatePoint(boundary.get(i), entity.getComponent(Transform.class).rotation); // Rotate Shape boundary about Image position
+                Geometry.translatePoint(boundary.get(i), entity.getComponent(Transform.class).x, entity.getComponent(Transform.class).y); // Translate Shape
             }
 
             Boundary.setBoundary(entity, boundary);

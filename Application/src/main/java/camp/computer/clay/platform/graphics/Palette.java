@@ -6,4 +6,10 @@ import android.graphics.Paint;
 public class Palette {
     public Canvas canvas = null;
     public Paint paint = null;
+
+    // <SHAPE>
+    public String color;
+    public String outlineColor;
+    public double outlineThickness;
+    // </SHAPE>
 }

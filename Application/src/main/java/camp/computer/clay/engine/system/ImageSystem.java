@@ -11,9 +11,9 @@ import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.Geometry;
 import camp.computer.clay.lib.ImageBuilder.Point;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.util.Geometry;
 
 public class ImageSystem extends System {
 

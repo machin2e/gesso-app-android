@@ -435,30 +435,9 @@ public class PortableLayoutSystem extends System {
      */
     public void adjustLayout() {
 
-        int layoutStrategy = 1;
+        int layoutStrategy = 0;
 
         if (layoutStrategy == 0) {
-            Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
-
-            // Set position on grid layout
-            if (hosts.size() == 1) {
-                hosts.get(0).getComponent(Transform.class).set(0, 0);
-            } else if (hosts.size() == 2) {
-                hosts.get(0).getComponent(Transform.class).set(-300, 0);
-                hosts.get(1).getComponent(Transform.class).set(300, 0);
-            } else if (hosts.size() == 5) {
-                hosts.get(0).getComponent(Transform.class).set(-300, -600);
-                hosts.get(0).getComponent(Transform.class).setRotation(0);
-                hosts.get(1).getComponent(Transform.class).set(300, -600);
-                hosts.get(1).getComponent(Transform.class).setRotation(20);
-                hosts.get(2).getComponent(Transform.class).set(-300, 0);
-                hosts.get(2).getComponent(Transform.class).setRotation(40);
-                hosts.get(3).getComponent(Transform.class).set(300, 0);
-                hosts.get(3).getComponent(Transform.class).setRotation(60);
-                hosts.get(4).getComponent(Transform.class).set(-300, 600);
-                hosts.get(4).getComponent(Transform.class).setRotation(80);
-            }
-        } else if (layoutStrategy == 1) {
 
             Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
 
@@ -528,6 +507,32 @@ public class PortableLayoutSystem extends System {
 
             }
 
+        } else if (layoutStrategy == 1) {
+
+            // TODO: Make Grid Layout
+
+            /*
+            Group<Entity> hosts = world.Manager.getEntities().filterWithComponent(Host.class);
+
+            // Set position on grid layout
+            if (hosts.size() == 1) {
+                hosts.get(0).getComponent(Transform.class).set(0, 0);
+            } else if (hosts.size() == 2) {
+                hosts.get(0).getComponent(Transform.class).set(-300, 0);
+                hosts.get(1).getComponent(Transform.class).set(300, 0);
+            } else if (hosts.size() == 5) {
+                hosts.get(0).getComponent(Transform.class).set(-300, -600);
+                hosts.get(0).getComponent(Transform.class).setRotation(0);
+                hosts.get(1).getComponent(Transform.class).set(300, -600);
+                hosts.get(1).getComponent(Transform.class).setRotation(20);
+                hosts.get(2).getComponent(Transform.class).set(-300, 0);
+                hosts.get(2).getComponent(Transform.class).setRotation(40);
+                hosts.get(3).getComponent(Transform.class).set(300, 0);
+                hosts.get(3).getComponent(Transform.class).setRotation(60);
+                hosts.get(4).getComponent(Transform.class).set(-300, 600);
+                hosts.get(4).getComponent(Transform.class).setRotation(80);
+            }
+            */
         }
 
         // TODO: Set position on "scatter" layout

@@ -196,17 +196,17 @@ public class World {
 
         // Load geometry from file into Image Component
         // TODO: Application.getPlatform().openFile(this, "Host.json");
-        ImageBuilder imageBuilder = ImageBuilder.open("Host.json");
+        ImageBuilder imageBuilder = ImageBuilder.open2("Host.json", host);
 
         // <GEOMETRY_LOADER>
-        for (int i = 0; i < imageBuilder.getShapes().size(); i++) {
-            long eid = Image.addShape(host, imageBuilder.getShapes().get(i));
-            // <HACK>
-            // Set Label
-            Entity shape = world.Manager.get(eid);
-            Label.setLabel(shape, imageBuilder.getShapes().get(i).getLabel());
-            // </HACK>
-        }
+//        for (int i = 0; i < imageBuilder.getShapes().size(); i++) {
+//            long eid = Image.addShape(host, imageBuilder.getShapes().get(i));
+//            // <HACK>
+//            // Set Label
+//            Entity shape = world.Manager.get(eid);
+//            Label.setLabel(shape, imageBuilder.getShapes().get(i).getLabel());
+//            // </HACK>
+//        }
         // </GEOMETRY_LOADER>
 
         // Add relative layout constraints
@@ -401,6 +401,10 @@ public class World {
 //        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
         pathShapeUuid = Image.addShape(path, circle);
+        Entity shapeEntity = world.Manager.get(pathShapeUuid);
+        // <HACK>
+//        shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.set();
+        // </HACK>
 
         // <HACK>
         // Set Label
@@ -545,13 +549,16 @@ public class World {
     }
 
     // <TODO:REFACTOR>
-    public void createAndConfigureNotification(String text, Transform position, long timeout) {
+    public void createAndConfigureNotification(String text, Transform transform, long timeout) {
 
         Entity notification = world.createEntity(Notification.class);
 
         notification.getComponent(Notification.class).message = text;
         notification.getComponent(Notification.class).timeout = timeout;
-        notification.getComponent(Transform.class).set(position);
+        notification.getComponent(Transform.class).set(transform);
+        // <HACK>
+        notification.getComponent(Transform.class).rotation = 0;
+        // </HACK>
 
 //        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
         Text text2 = (Text) Image.getShapes(notification).get(0).getComponent(ShapeComponent.class).shape;
@@ -752,6 +759,19 @@ public class World {
     // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
     public void update() {
+//        long updateStartTime = Clock.getCurrentTime();
+//        world.inputSystem.update();
+//        world.eventHandlerSystem.update();
+//        world.imageSystem.update();
+//        world.styleSystem.update();
+//        world.physicsSystem.update();
+//        world.boundarySystem.update();
+//        world.portableLayoutSystem.update();
+//        world.cameraSystem.update();
+//        updateTime = Clock.getCurrentTime() - updateStartTime;
+    }
+
+    public void draw() {
         long updateStartTime = Clock.getCurrentTime();
         world.inputSystem.update();
         world.eventHandlerSystem.update();
@@ -762,9 +782,6 @@ public class World {
         world.portableLayoutSystem.update();
         world.cameraSystem.update();
         updateTime = Clock.getCurrentTime() - updateStartTime;
-    }
-
-    public void draw() {
         long renderStartTime = Clock.getCurrentTime();
         world.renderSystem.update();
         renderTime = Clock.getCurrentTime() - renderStartTime;

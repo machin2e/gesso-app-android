@@ -11,7 +11,7 @@ public abstract class Shape extends Groupable {
     // TODO: 11/15/2016 Delete this after creating Shape component.
     protected String label = ""; // Component
 
-    public boolean isBoundary = false;
+    // public boolean isBoundary = false;
 
     //    protected Transform imagePosition = null;
     protected Transform position = new Transform(0, 0);
@@ -29,6 +29,10 @@ public abstract class Shape extends Groupable {
     }
 
     public Transform getPosition() {
+        // <HACK>
+        position.set(0, 0);
+        position.rotation = 0;
+        // </HACK>
         return position;
     }
 
@@ -45,7 +49,8 @@ public abstract class Shape extends Groupable {
     }
 
     public double getRotation() {
-        return this.position.rotation;
+        // return this.position.rotation;
+        return 0;
     }
 
     public abstract List<Transform> getVertices();
