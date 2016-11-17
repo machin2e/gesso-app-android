@@ -435,8 +435,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             // TODO: Transform targetPortPosition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
 //            Transform sourcePortPosition = sourcePortShape.getPosition();
 //            Transform targetPortPosition = targetPortShape.getPosition();
-            Transform sourcePortPosition = sourcePortShapeE.getComponent(Transform.class);
-            Transform targetPortPosition = targetPortShapeE.getComponent(Transform.class);
+//            Transform sourcePortPosition = sourcePortShapeE.getComponent(Transform.class);
+//            Transform targetPortPosition = targetPortShapeE.getComponent(Transform.class);
 
             // Update color of Port shape based on its type
             Path.Type pathType = Path.getType(path);

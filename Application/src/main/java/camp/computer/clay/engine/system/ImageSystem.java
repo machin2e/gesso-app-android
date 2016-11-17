@@ -35,14 +35,24 @@ public class ImageSystem extends System {
                 updateExtensionGeometry(entity);
             }
             updateImage(entity);
+
+            // TODO: updateShape(entity) // FOR UPDATING LAYOUT CONSTRAINTS OF SHAPES
             // </HACK>
         }
+
+//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(ShapeComponent.class, RelativeLayoutConstraint.class, Transform.class);
+//
+//        for (int i = 0; i < shapeEntities.size(); i++) {
+//            Entity entity = shapeEntities.get(i);
+//            updateImage(entity);
+//        }
     }
 
     // Previously: Image.update()
     // Required Components: Image, Transform
     private void updateImage(Entity entity) {
 
+        // Start by transforming base images. They will never have more than one level of constraints (?).
         Transform absoluteReferenceTransform = null;
         if (entity.hasComponent(RelativeLayoutConstraint.class)) {
             // <HACK>
@@ -67,12 +77,29 @@ public class ImageSystem extends System {
             }
         }
 
+//        if (entity.hasComponent(ShapeComponent.class)) {
+//            if (absoluteReferenceTransform != null) {
+//                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+//                updateShapeRelativeTransform(entity, absoluteReferenceTransform);
+//            }
+//        } else {
         // Update Shapes
-        Group<Entity> shapes = Image.getShapes(entity);
-        for (int i = 0; i < shapes.size(); i++) {
-            if (absoluteReferenceTransform != null) {
-                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
-                updateShapeRelativeTransform(shapes.get(i), absoluteReferenceTransform);
+        if (entity.hasComponent(Path.class)) {
+//            // <REFACTOR>
+//            // TODO: Fix this... understand it. This works when REMOVED.
+//            Group<Entity> shapes = Image.getShapes(entity);
+//            for (int i = 0; i < shapes.size(); i++) {
+//                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+//                updateShapeRelativeTransform(shapes.get(i), shapes.get(i));
+//            }
+//            // </REFACTOR>
+        } else {
+            Group<Entity> shapes = Image.getShapes(entity);
+            for (int i = 0; i < shapes.size(); i++) {
+                if (absoluteReferenceTransform != null) {
+                    // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+                    updateShapeRelativeTransform(shapes.get(i), absoluteReferenceTransform);
+                }
             }
         }
     }
@@ -101,6 +128,10 @@ public class ImageSystem extends System {
 
         // Rotation
         shape.getComponent(Transform.class).rotation = referenceTransform.rotation + layoutConstraint.relativeTransform.rotation;
+
+//        // <HACK>
+//        if (shape.hasComponent())
+//        // </HACK>
     }
 
     /**

@@ -782,6 +782,8 @@ public class World {
         world.portableLayoutSystem.update();
         world.cameraSystem.update();
         updateTime = Clock.getCurrentTime() - updateStartTime;
+
+
         long renderStartTime = Clock.getCurrentTime();
         world.renderSystem.update();
         renderTime = Clock.getCurrentTime() - renderStartTime;

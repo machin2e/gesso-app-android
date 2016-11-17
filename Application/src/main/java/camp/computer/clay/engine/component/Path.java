@@ -154,6 +154,15 @@ public class Path extends Component {
         } else {
             pathComponent.sourcePortUuid = source.getUuid();
         }
+
+//        // <REFACTOR_INTO_SYSTEM>
+//        // Set up layout constraint
+//        Entity pathSourcePort = Image.getShape(path, "Source Port");
+//        if (!pathSourcePort.hasComponent(RelativeLayoutConstraint.class)) {
+//            pathSourcePort.addComponent(new RelativeLayoutConstraint());
+//        }
+//        pathSourcePort.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(source);
+//        // </REFACTOR_INTO_SYSTEM>
     }
 
     public static Entity getSource(Entity path) {
@@ -167,6 +176,15 @@ public class Path extends Component {
         } else {
             path.getComponent(Path.class).targetPortUuid = target.getUuid();
         }
+
+//        // <REFACTOR_INTO_SYSTEM>
+//        // Set up layout constraint
+//        Entity pathTargetPort = Image.getShape(path, "Target Port");
+//        if (!pathTargetPort.hasComponent(RelativeLayoutConstraint.class)) {
+//            pathTargetPort.addComponent(new RelativeLayoutConstraint());
+//        }
+//        pathTargetPort.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(target);
+//        // </REFACTOR_INTO_SYSTEM>
     }
 
     public static Entity getTarget(Entity path) {
