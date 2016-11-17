@@ -2,9 +2,6 @@ package camp.computer.clay.engine;
 
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
@@ -35,18 +32,18 @@ import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.engine.system.StyleSystem;
+import camp.computer.clay.lib.ImageBuilder.Circle;
+import camp.computer.clay.lib.ImageBuilder.ImageBuilder;
+import camp.computer.clay.lib.ImageBuilder.Point;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.ImageBuilder.Segment;
+import camp.computer.clay.lib.ImageBuilder.Text;
 import camp.computer.clay.model.Repository;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.model.player.Player;
 import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.graphics.controls.NativeUi;
 import camp.computer.clay.util.Color;
-import camp.computer.clay.util.ImageBuilder.Circle;
-import camp.computer.clay.util.ImageBuilder.ImageBuilder;
-import camp.computer.clay.util.ImageBuilder.Point;
-import camp.computer.clay.util.ImageBuilder.Rectangle;
-import camp.computer.clay.util.ImageBuilder.Segment;
-import camp.computer.clay.util.ImageBuilder.Text;
 import camp.computer.clay.util.Random;
 import camp.computer.clay.util.time.Clock;
 
@@ -55,9 +52,12 @@ public class World {
     public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 325;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
 
+    public static final double EXTENSION_PORT_SEPARATION_DISTANCE = 115;
+
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
-    public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
+    public static double NEARBY_EXTENSION_DISTANCE_THRESHOLD = 375; // 375, 500
+    public static double NEARBY_EXTENSION_RADIUS_THRESHOLD = 200 + 60;
 
     // <SETTINGS>
     public static boolean ENABLE_DRAW_OVERLAY = true;
@@ -182,7 +182,6 @@ public class World {
         // Portable Component (Image Component depends on this)
         final int PORT_COUNT = 12;
         for (int j = 0; j < PORT_COUNT; j++) {
-
             Entity port = createEntity(Port.class);
 
             Label.setLabel(port, "Port " + (j + 1));
@@ -198,17 +197,7 @@ public class World {
 
         // Load geometry from file into Image Component
         // TODO: Application.getPlatform().openFile(this, "Host.json");
-//        Application.getView().restoreGeometry(host.getComponent(Image.class), "Host.json");
-        // <PLATFORM_LAYER>
-        InputStream inputStream = null;
-        try {
-            inputStream = Application.getContext().getAssets().open("Host.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ImageBuilder imageBuilder = ImageBuilder.open(inputStream);
-        // </PLATFORM_LAYER>
-//        host.getComponent(Image.class).setImage(imageBuilder);
+        ImageBuilder imageBuilder = ImageBuilder.open("Host.json");
 
         // <GEOMETRY_LOADER>
         for (int i = 0; i < imageBuilder.getShapes().size(); i++) {
@@ -221,26 +210,6 @@ public class World {
         }
         // </GEOMETRY_LOADER>
 
-        // <HACK>
-//        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
-//        for (int i = 0; i < shapes.size(); i++) {
-//            if (shapes.get(i).getLabel().startsWith("Port")) {
-//                String label = shapes.get(i).getLabel();
-//                Entity portEntity = host.getComponent(Portable.class).getPort(label);
-//                shapes.get(i).setEntity(portEntity);
-//            }
-//        }
-
-//        Group<Entity> shapes = Image.getShapes(host); // host.getComponent(Image.class).getShapes();
-//        for (int i = 0; i < shapes.size(); i++) {
-//            if (shapes.get(i).getComponent(Label.class).label.startsWith("Port")) {
-//                String label = shapes.get(i).getComponent(Label.class).label;
-//                Entity portEntity = Image.getShape(host, label); // host.getComponent(Portable.class).getPort(label);
-//                shapes.get(i).getComponent(ShapeComponent.class).shape.setEntity(portEntity);
-//            }
-//        }
-        // </HACK>
-
         // Add relative layout constraints
         for (int i = 0; i < Portable.getPorts(host).size(); i++) {
             Entity port = Portable.getPort(host, i);
@@ -250,25 +219,6 @@ public class World {
 
 
         // Relative Position Port Images
-//        Portable portable = host.getComponent(Portable.class);
-//        Portable.getPort(host, 0).getComponent(Transform.class).set(-19.0, 40.0);
-//        Portable.getPort(host, 1).getComponent(Transform.class).set(0, 40.0);
-//        Portable.getPort(host, 2).getComponent(Transform.class).set(19.0, 40.0);
-//        Portable.getPort(host, 3).getComponent(Transform.class).set(40.0, 19.0);
-//        Portable.getPort(host, 4).getComponent(Transform.class).set(40.0, 0.0);
-//        Portable.getPort(host, 5).getComponent(Transform.class).set(40.0, -19.0);
-//        Portable.getPort(host, 6).getComponent(Transform.class).set(19.0, -40.0);
-//        Portable.getPort(host, 7).getComponent(Transform.class).set(0, -40.0);
-//        Portable.getPort(host, 8).getComponent(Transform.class).set(-19.0, -40.0);
-//        Portable.getPort(host, 9).getComponent(Transform.class).set(-40.0, -19.0);
-//        Portable.getPort(host, 10).getComponent(Transform.class).set(-40.0, 0.0);
-//        Portable.getPort(host, 11).getComponent(Transform.class).set(-40.0, 19.0);
-//        for (int i = 0; i < Portable.getPorts(host).size(); i++) {
-//            Portable.getPort(host, i).getComponent(Transform.class).set(
-//                    Portable.getPort(host, i).getComponent(Transform.class).x * 6.0,
-//                    Portable.getPort(host, i).getComponent(Transform.class).y * 6.0
-//            );
-//        }
         Portable.getPort(host, 0).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(-19.0, 40.0);
         Portable.getPort(host, 1).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(0, 40.0);
         Portable.getPort(host, 2).getComponent(RelativeLayoutConstraint.class).relativeTransform.set(19.0, 40.0);
@@ -385,7 +335,7 @@ public class World {
         rectangle.setOutlineThickness(0);
         // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
 //        extension.getComponent(Image.class).addShape(rectangle);
-        rectangle.isBoundary = true;
+//        rectangle.isBoundary = true;
 //        imageBuilder.addShape(rectangle);
         shapeUuid = Image.addShape(extension, rectangle);
         shape = world.Manager.get(shapeUuid);
@@ -449,7 +399,7 @@ public class World {
         circle.setLabel("Source Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        circle.isBoundary = true;
+//        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
         pathShapeUuid = Image.addShape(path, circle);
 
@@ -464,7 +414,7 @@ public class World {
         circle.setLabel("Target Port"); // TODO: Give proper name...
         circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        circle.isBoundary = true;
+//        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
         pathShapeUuid = Image.addShape(path, circle);
 
@@ -507,7 +457,7 @@ public class World {
         circle.setLabel("Port"); // TODO: Give proper name...
         circle.setColor("#f7f7f7"); // Gray: #f7f7f7, Greens: #32CD32
         circle.setOutlineThickness(0);
-        circle.isBoundary = true;
+//        circle.isBoundary = true;
 //        imageBuilder.addShape(circle);
         long portShapeUuid = Image.addShape(port, circle);
 
@@ -629,6 +579,7 @@ public class World {
         prototypeExtension.addComponent(new Physics());
         prototypeExtension.addComponent(new Image());
         prototypeExtension.addComponent(new Style());
+        prototypeExtension.addComponent(new Label());
 
 //        ImageBuilder imageBuilder = new ImageBuilder();
 
@@ -640,7 +591,6 @@ public class World {
 
 //        prototypeExtension.getComponent(Image.class).setImage(imageBuilder);
 
-        prototypeExtension.addComponent(new Label());
         Label.setLabel(prototypeExtension, "prototypeExtension");
 
         prototypeExtension.addComponent(new Visibility());

@@ -1,10 +1,8 @@
 package camp.computer.clay.engine;
 
-import android.util.Log;
-
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.ImageBuilder.Geometry;
+import camp.computer.clay.util.Geometry;
 import camp.computer.clay.util.time.Clock;
 
 public class Event {
@@ -37,7 +35,9 @@ public class Event {
     public boolean[] isPointing = new boolean[MAXIMUM_POINT_COUNT];
 
     private Entity[] targets = new Entity[MAXIMUM_POINT_COUNT];
-    private Entity[] intentTarget = new Entity[MAXIMUM_POINT_COUNT];
+    private Entity[] secondaryTarget = new Entity[MAXIMUM_POINT_COUNT];
+
+//    private Entity[] backgroundTargets = new Entity[MAXIMUM_POINT_COUNT];
 
     private Type type = null;
 
@@ -93,12 +93,12 @@ public class Event {
         return this.targets[0];
     }
 
-    public Entity getIntentTarget() {
-        return this.intentTarget[0];
+    public Entity getSecondaryTarget() {
+        return this.secondaryTarget[0];
     }
 
-    public void setIntentTarget(Entity entity) {
-        this.intentTarget[0] = entity;
+    public void setSecondaryTarget(Entity entity) {
+        this.secondaryTarget[0] = entity;
     }
 
     // <INTEGRATE_WITH_ACTION>

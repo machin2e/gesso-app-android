@@ -1,9 +1,8 @@
-package camp.computer.clay.util.ImageBuilder;
+package camp.computer.clay.lib.ImageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 
 public class Point extends Shape {
@@ -29,7 +28,7 @@ public class Point extends Shape {
     @Override
     public List<Transform> getVertices() {
         List<Transform> vertices = new ArrayList<>();
-        vertices.add(new Transform(imagePosition));
+        vertices.add(new Transform(position));
         return vertices;
     }
 }

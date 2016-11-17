@@ -6,6 +6,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
@@ -19,9 +20,9 @@ import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.lib.ImageBuilder.Segment;
 import camp.computer.clay.model.configuration.Configuration;
-import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.util.ImageBuilder.Segment;
+import camp.computer.clay.util.Geometry;
 import camp.computer.clay.util.Random;
 
 public class PortableLayoutSystem extends System {
@@ -298,7 +299,7 @@ public class PortableLayoutSystem extends System {
         }
 
         Entity boardShape = Image.getShape(host, "Board"); // host.getComponent(Image.class).getImage().getShape("Board");
-        List<Transform> hostShapeBoundary = world.boundarySystem.getBoundary(boardShape);
+        List<Transform> hostShapeBoundary = Boundary.getBoundary(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
         for (int j = 0; j < extensionPorts.size(); j++) {
@@ -542,22 +543,19 @@ public class PortableLayoutSystem extends System {
     // <HOST_LAYOUT>
 
     // <PROTOTYPES>
-    public void setExtensionPrototypePosition(Transform position) {
+    public void setExtensionPrototypePosition(Entity extensionPrototype, Transform position, double rotation) {
 
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
-//        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Extension.class, Prototype.class).get(0);
-//        Log.v("ExtensionPrototype", "extensionPrototype1: " + extensionPrototype);
-//        Log.v("ExtensionPrototype", "extensionPrototype: " + extensionPrototype);
-//        Log.v("ExtensionPrototype", "----");
-        // </HACK>
+//        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0);
         extensionPrototype.getComponent(Transform.class).set(position);
+        extensionPrototype.getComponent(Transform.class).setRotation(rotation);
 
         // <REFACTOR>
         // <HACK>
         // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
+        /*
+        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Prototype.class, Label.class).filterLabel("prototypePath").get(0);
         // </HACK>
         Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
         Transform prototypePathSourceTransform = segment.getSource();
@@ -567,17 +565,8 @@ public class PortableLayoutSystem extends System {
                 extensionPrototype.getComponent(Transform.class)
         );
         extensionPrototype.getComponent(Transform.class).setRotation(extensionRotation);
+        */
         // <REFACTOR>
-
-        // <HACK>
-        // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-//        world.imageSystem.invalidate(extensionPrototype.getComponent(Image.class));
-        // </HACK>
-
-        // <HACK>
-        // TODO: Move! Needed, but should be in a better place so it doesn't have to be explicitly called!
-//        world.boundarySystem.updateImage(extensionPrototype);
-        // </HACK>
     }
 
     public void setPathPrototypeVisibility(Visible visible) {

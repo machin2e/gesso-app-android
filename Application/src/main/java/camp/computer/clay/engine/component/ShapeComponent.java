@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.util.ImageBuilder.Shape;
+import camp.computer.clay.lib.ImageBuilder.Shape;
 
 public class ShapeComponent extends Component {
 

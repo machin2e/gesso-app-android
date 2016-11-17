@@ -6,7 +6,7 @@ import java.util.List;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.ImageBuilder.Point;
+import camp.computer.clay.lib.ImageBuilder.Point;
 
 public class Portable extends Component {
 

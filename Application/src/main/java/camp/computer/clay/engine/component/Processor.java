@@ -1,6 +1,5 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.model.Process;
 

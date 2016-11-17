@@ -1,9 +1,10 @@
-package camp.computer.clay.util.ImageBuilder;
+package camp.computer.clay.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
 
 public abstract class Geometry {
 
@@ -58,6 +59,12 @@ public abstract class Geometry {
      * @see <a href="http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html">PNPOLY - Transform Inclusion in Polygon Test (W. Randolph Franklin)</a>
      */
     public static boolean contains(List<Transform> vertices, Transform point) {
+
+        // <HACK>
+        if (vertices == null || vertices.size() == 0) {
+            return false;
+        }
+        // </HACK>
 
         double minX = vertices.get(0).x;
         double maxX = vertices.get(0).x;
@@ -212,7 +219,7 @@ public abstract class Geometry {
             Rectangle rectangle = new Rectangle(minX, minY, maxX, maxY);
             // <HACK>
             // TODO/BUG: This allocates a temporary boundary that is not removed from the shape boundary hashmap!
-            rectangle.isBoundary = true;
+//            rectangle.isBoundary = true;
             // </HACK>
             return rectangle;
         }

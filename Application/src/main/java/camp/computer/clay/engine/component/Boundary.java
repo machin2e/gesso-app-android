@@ -5,24 +5,34 @@ import java.util.List;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.system.BoundarySystem;
-import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.Geometry;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
 
 public class Boundary extends Component {
 
-//    public static HashMap<Shape, ArrayList<Transform>> innerBoundaries = new HashMap<>();
+    public List<Transform> boundary = new ArrayList<>();
 
-    private List<Transform> boundary = new ArrayList<>();
-
-    public void setBoundary(List<Transform> points) {
-        this.boundary.clear();
-        this.boundary.addAll(points);
+    public static void setBoundary(Entity entity, List<Transform> points) {
+        entity.getComponent(Boundary.class).boundary.clear();
+        entity.getComponent(Boundary.class).boundary.addAll(points);
     }
 
-    public List<Transform> getBoundary() {
-        return this.boundary;
+    public static List<Transform> getBoundary(Entity entity) {
+        if (entity.hasComponent(Boundary.class)
+                && entity.getComponent(Boundary.class).boundary.size() > 0) { // TODO: Remove check for size. Boundary existence should be enough!
+            return entity.getComponent(Boundary.class).boundary;
+        }
+        return null;
     }
+
+
+//    public static List<Transform> getBoundary(Entity entity) {
+//        if (entity.hasComponent(Boundary.class)
+//                && Boundary.getBoundary(entity).size() > 0) { // TODO: Remove check for size. Boundary existence should be enough!
+//            return Boundary.getBoundary(entity);
+//        }
+//        return null;
+//    }
 
     /**
      * Returns {@code true} if any of the {@code Shape}s in the {@code Image} contain the
@@ -33,12 +43,21 @@ public class Boundary extends Component {
      */
     public static boolean contains(Entity entity, Transform point) {
 
-        Group<Entity> shapes = Image.getShapes(entity);
-        for (int i = 0; i < shapes.size(); i++) {
-            if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary // HACK
-                    && Geometry.contains(BoundarySystem.getBoundary(shapes.get(i)), point)) { // HACK
-                return true;
+        // <HACK>
+        if (entity.hasComponent(Image.class)) {
+            Group<Entity> shapes = Image.getShapes(entity);
+            for (int i = 0; i < shapes.size(); i++) {
+                if (/*shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary // HACK
+                    &&*/ Geometry.contains(Boundary.getBoundary(shapes.get(i)), point)) { // HACK
+                    return true;
+                }
             }
+            return false;
+        }
+        // </HACK>
+
+        else if (Geometry.contains(Boundary.getBoundary(entity), point)) {
+            return true;
         }
         return false;
 
@@ -55,10 +74,10 @@ public class Boundary extends Component {
 //        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
         Group<Entity> shapes = Image.getShapes(entity);
         for (int i = 0; i < shapes.size(); i++) {
-            if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary) { // HACK
-                //shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape)); // HACK
-                shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i))); // HACK
-            }
+//            if (shapes.get(i).getComponent(ShapeComponent.class).shape.isBoundary) { // HACK
+            //shapeBoundaries.addAll(BoundarySystem.getBoundary(shapes.get(i).getComponent(ShapeComponent.class).shape)); // HACK
+            shapeBoundaries.addAll(Boundary.getBoundary(shapes.get(i))); // HACK
+//            }
         }
 
         return Geometry.getBoundingBox(shapeBoundaries);

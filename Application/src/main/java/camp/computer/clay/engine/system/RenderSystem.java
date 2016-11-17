@@ -16,7 +16,6 @@ import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
@@ -72,57 +71,11 @@ public class RenderSystem extends System {
 
         drawEntities(palette);
 
-//        // <HACK>
-//        Group<Entity> notifications = world.Manager.getEntities().filterWithComponent(Notification.class);
-//        for (int i = 0; i < notifications.size(); i++) {
-//            Entity notification = notifications.get(i);
-//
-////            drawNotification(notification, platformRenderSurface);
-//
-//            Notification notificationComponent = notification.getComponent(Notification.class);
-//            if (notificationComponent.state == State.WAITING) {
-//                notificationComponent.state = State.RUNNING; // notification.run();
-//                platformRenderSurface.onTimeout(notificationComponent.timeout, notification);
-//                drawNotification(notification, platformRenderSurface);
-//            } else if (notificationComponent.state == State.RUNNING) {
-//                drawNotification(notification, platformRenderSurface);
-////                i++;
-//            } else if (notificationComponent.state == State.COMPLETE) {
-////                notifications.remove(i);
-//                notification.isActive = false;
-//                world.Manager.remove(notification);
-//                // TODO: Delete Entity and Components!
-//            }
-//        }
-//        // </HACK>
-
-        /*
-        for (int i = 0; i < notifications.size(); ) {
-            Notification notification = notifications.get(i);
-            if (notification.state == State.WAITING) {
-                notification.run();
-                drawNotification(notification, platformRenderSurface);
-            } else if (notification.state == State.RUNNING) {
-                drawNotification(notification, platformRenderSurface);
-                i++;
-            } else if (notification.state == State.COMPLETE) {
-                notifications.remove(i);
-            }
-        }
-        */
-//        if (createAndConfigureNotification) {
-//            drawNotification(echoText, (float) echoTextPosition.x, (float) echoTextPosition.y, platformRenderSurface);
-//        }
-
         palette.canvas.restore();
 
         if (World.ENABLE_DRAW_OVERLAY) {
             drawOverlay(platformRenderSurface);
         }
-
-//        if (createAndConfigureNotification) {
-//            drawNotification("connected port", (float) position.x, (float) position.y, platformRenderSurface);
-//        }
 
         // Paint the bitmap to the "primary" canvas.
         palette.canvas.drawBitmap(canvasBitmap, identityMatrix, null);
@@ -140,6 +93,7 @@ public class RenderSystem extends System {
 
         // TODO: This call is expensive. Make it way faster. Cache? Sublist?
         Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class).sortByLayer();
+//        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponent(Image.class);
 
         for (int j = 0; j < entities.size(); j++) {
             Entity entity = entities.get(j);
@@ -147,10 +101,6 @@ public class RenderSystem extends System {
             // <HACK>
             PlatformRenderSurface platformRenderSurface = Application.getView().platformRenderSurface;
             // </HACK>
-
-//            Canvas canvas = platformRenderSurface.canvas;
-            // Paint paint = platformRenderSurface.paint;
-            // World world = platformRenderSurface.getWorld();
 
             // TODO: <MOVE_THIS_INTO_PORTABLE_SYSTEM>
             /*
@@ -173,8 +123,6 @@ public class RenderSystem extends System {
 
             if (entity.hasComponent(Path.class)) {
 
-                Image image = entity.getComponent(Image.class);
-
                 // TODO: Make the rendering state automatic... enable or disable geometry sets in the image?
 
                 Visibility visibility = entity.getComponent(Visibility.class);
@@ -191,31 +139,12 @@ public class RenderSystem extends System {
             // This was added so Prototype Extension/Path would draw without Extension/Path components
             else if (entity.hasComponent(Image.class)) {
 
-//                if (entity.hasComponent(Extension.class)) { // HACK
-//
-//                } else {
-
-//                if (entity.hasComponent(Port.class) && entity.getComponent(Visibility.class).visible == Visible.VISIBLE) {
-//                    Log.v("RenderSystem", "drawing port");
-//                }
-
                 Visibility visibility = entity.getComponent(Visibility.class);
                 if (visibility != null && visibility.getVisibile() == Visible.VISIBLE) {
                     palette.canvas.save();
-//                    List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
                     Group<Entity> shapes = Image.getShapes(entity);
                     for (int i = 0; i < shapes.size(); i++) {
-
-                        // <HACK>
-                        shapes.get(i).getComponent(ShapeComponent.class).shape.setPosition(
-                                shapes.get(i).getComponent(Transform.class)
-                        );
-                        shapes.get(i).getComponent(ShapeComponent.class).shape.setRotation(
-                                shapes.get(i).getComponent(Transform.class).getRotation()
-                        );
-                        // </HACK>
-
-                        platformRenderSurface.drawShape(shapes.get(i).getComponent(ShapeComponent.class).shape, palette);
+                        platformRenderSurface.drawShape(shapes.get(i), palette);
                     }
                     palette.canvas.restore();
                 }

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.ImageBuilder.Shape;
+import camp.computer.clay.lib.ImageBuilder.Shape;
 
 public class Image extends Component {
 

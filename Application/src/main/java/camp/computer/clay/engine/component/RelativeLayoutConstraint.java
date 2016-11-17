@@ -6,20 +6,27 @@ import camp.computer.clay.engine.entity.Entity;
 public class RelativeLayoutConstraint extends Component {
 
     // TODO: 11/12/2016 public Type type = RELATIVE_LAYOUT;
-
     /**
      * The Entity with this component will be drawn relative to the reference Entity's Transform
      * component.
      */
-    private long entityUuid;
+    private long referenceEntityUuid;
 
-    public Transform relativeTransform = new Transform(); // HACK
+    public Transform relativeTransform;
+
+    public RelativeLayoutConstraint() {
+        setup();
+    }
+
+    private void setup() {
+        relativeTransform = new Transform();
+    }
 
     public Entity getReferenceEntity() {
-        return World.getWorld().Manager.getEntities().get(entityUuid);
+        return World.getWorld().Manager.getEntities().get(referenceEntityUuid);
     }
 
     public void setReferenceEntity(Entity entity) {
-        this.entityUuid = entity.getUuid();
+        this.referenceEntityUuid = entity.getUuid();
     }
 }

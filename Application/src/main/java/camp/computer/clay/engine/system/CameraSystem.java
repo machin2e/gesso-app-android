@@ -14,9 +14,9 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.util.ImageBuilder.Rectangle;
-import camp.computer.clay.util.ImageBuilder.Shape;
+import camp.computer.clay.util.Geometry;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.ImageBuilder.Shape;
 
 public class CameraSystem extends System {
 

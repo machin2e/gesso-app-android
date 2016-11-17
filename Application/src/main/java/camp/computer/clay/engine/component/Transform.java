@@ -1,6 +1,6 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.util.ImageBuilder.Geometry;
+import camp.computer.clay.util.Geometry;
 
 public class Transform extends Component {
 

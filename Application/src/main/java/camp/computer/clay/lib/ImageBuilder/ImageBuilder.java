@@ -1,4 +1,4 @@
-package camp.computer.clay.util.ImageBuilder;
+package camp.computer.clay.lib.ImageBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.World;
+import camp.computer.clay.platform.Application;
 
 /**
  * Custom composable, structured, vector image format and API.
@@ -42,7 +43,7 @@ public class ImageBuilder {
     protected List<Shape> shapes = new ArrayList<>();
 
     public void addShape(Shape shape) {
-        shape.setImagePosition(shape.getPosition());
+//        shape.setImagePosition(shape.getPosition());
         shapes.add(shape);
     }
 
@@ -84,10 +85,18 @@ public class ImageBuilder {
     // <FILE_IO>
     // Opens image data from JSON file stored in custom format.
     // TODO: 11/2/2016 Consider adding support for constructing ImageBuilder from SVG file.
-    public static ImageBuilder open(InputStream inputStream) {
+    public static ImageBuilder open(String filename) {
 
         // Create Empty image
         ImageBuilder imageBuilder = new ImageBuilder();
+
+        // <PLATFORM_LAYER>
+        InputStream inputStream = null;
+        try {
+            inputStream = Application.getContext().getAssets().open(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // Open specified JSON file.
         String jsonString = null;
@@ -172,7 +181,7 @@ public class ImageBuilder {
                     point.setColor(color);
                     point.setOutlineColor(outlineColor);
                     point.setOutlineThickness(outlineThickness);
-                    point.isBoundary = isBoundary;
+//                    point.isBoundary = isBoundary;
 
                     imageBuilder.addShape(point);
 
@@ -190,7 +199,7 @@ public class ImageBuilder {
                     rectangle.setColor(color);
                     rectangle.setOutlineColor(outlineColor);
                     rectangle.setOutlineThickness(outlineThickness);
-                    rectangle.isBoundary = isBoundary;
+//                    rectangle.isBoundary = isBoundary;
 
                     imageBuilder.addShape(rectangle);
 
@@ -205,7 +214,7 @@ public class ImageBuilder {
                     circle.setColor(color);
                     circle.setOutlineColor(outlineColor);
                     circle.setOutlineThickness(outlineThickness);
-                    circle.isBoundary = isBoundary;
+//                    circle.isBoundary = isBoundary;
 
                     imageBuilder.addShape(circle);
                 }
@@ -214,6 +223,7 @@ public class ImageBuilder {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        // </PLATFORM_LAYER>
 
         return imageBuilder;
     }

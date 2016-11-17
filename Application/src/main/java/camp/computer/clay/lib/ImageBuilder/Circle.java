@@ -1,9 +1,8 @@
-package camp.computer.clay.util.ImageBuilder;
+package camp.computer.clay.lib.ImageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 
 /**

@@ -1,9 +1,8 @@
-package camp.computer.clay.util.ImageBuilder;
+package camp.computer.clay.lib.ImageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Transform;
 
 public class Segment extends Shape {
@@ -22,12 +21,6 @@ public class Segment extends Shape {
     }
 
     private void setup() {
-        setupGeometry();
-    }
-
-    private void setupGeometry() {
-//        Boundary.innerBoundaries.get(this).add(new Transform(source));
-//        Boundary.innerBoundaries.get(this).add(new Transform(target));
     }
 
     @Override
@@ -50,8 +43,6 @@ public class Segment extends Shape {
                 (this.target.x - this.source.x) / 2.0,
                 (this.target.y - this.source.y) / 2.0
         );
-
-        invalidate();
     }
 
     public Transform getTarget() {
@@ -66,8 +57,6 @@ public class Segment extends Shape {
                 (this.target.x - this.source.x) / 2.0,
                 (this.target.y - this.source.y) / 2.0
         );
-
-        invalidate();
     }
 
     public void set(Transform source, Transform target) {
@@ -79,7 +68,5 @@ public class Segment extends Shape {
                 (this.target.x - this.source.x) / 2.0,
                 (this.target.y - this.source.y) / 2.0
         );
-
-        invalidate();
     }
 }

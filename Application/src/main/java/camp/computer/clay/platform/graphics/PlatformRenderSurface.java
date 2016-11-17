@@ -20,6 +20,7 @@ import java.util.List;
 
 import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Image;
@@ -29,19 +30,18 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.lib.ImageBuilder.Circle;
+import camp.computer.clay.lib.ImageBuilder.Point;
+import camp.computer.clay.lib.ImageBuilder.Polygon;
+import camp.computer.clay.lib.ImageBuilder.Polyline;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.ImageBuilder.Segment;
+import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.lib.ImageBuilder.Text;
+import camp.computer.clay.lib.ImageBuilder.Triangle;
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.util.ImageBuilder.Circle;
-import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.util.ImageBuilder.Point;
-import camp.computer.clay.util.ImageBuilder.Polygon;
-import camp.computer.clay.util.ImageBuilder.Polyline;
-import camp.computer.clay.util.ImageBuilder.Rectangle;
-import camp.computer.clay.util.ImageBuilder.Segment;
-import camp.computer.clay.util.ImageBuilder.Shape;
-import camp.computer.clay.util.ImageBuilder.Text;
-import camp.computer.clay.util.ImageBuilder.Triangle;
+import camp.computer.clay.util.Geometry;
 
 public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -389,6 +389,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         world.cameraSystem.setHeight(camera, screenHeight);
     }
 
+    // TODO: 11/16/2016 Optimize! Big and slow! Should be fast!
     public void drawEditablePath(Entity path, Palette palette) {
 
         Entity sourcePort = Path.getSource(path);
@@ -396,7 +397,11 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         Shape hostSourcePortShape = sourcePortShapeE.getComponent(ShapeComponent.class).shape; // Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
         Shape extensionTargetPortShape = null;
 
-        if (Path.getTarget(path) != null) {
+        boolean isSingletonPath = (Path.getTarget(path) == null);
+
+        if (!isSingletonPath) {
+
+            Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
             extensionTargetPortShape = Image.getShape(Path.getTarget(path), "Port").getComponent(ShapeComponent.class).shape; // Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
 
             Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
@@ -412,6 +417,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             if (Path.getState(path) != Component.State.EDITING) {
                 sourcePortShape.setPosition(hostSourcePortShape.getPosition());
                 targetPortShape.setPosition(extensionTargetPortShape.getPosition());
+                // TODO: sourcePortShape.setPosition(sourcePortShapeE.getComponent(Transform.class));
+                // TODO: targetPortShape.setPosition(targetPortShapeE.getComponent(Transform.class));
             }
 
             // <HACK>
@@ -419,10 +426,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //            BoundarySystem.updateShapeBoundary(targetPortShape);
             // </HACK>
 
-            // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
-            // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
-            Transform sourcePortPositition = sourcePortShape.getPosition();
-            Transform targetPortPositition = targetPortShape.getPosition();
+            // TODO: Transform sourcePortPosition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
+            // TODO: Transform targetPortPosition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
+            Transform sourcePortPosition = sourcePortShape.getPosition();
+            Transform targetPortPosition = targetPortShape.getPosition();
+            // TODO: Transform sourcePortPosition = sourcePortShapeE.getComponent(Transform.class);
+            // TODO: Transform targetPortPosition = targetPortShapeE.getComponent(Transform.class);
 
             // Update color of Port shape based on its type
             Path.Type pathType = Path.getType(path);
@@ -433,15 +442,13 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             // Color
             palette.paint.setStyle(Paint.Style.STROKE);
             palette.paint.setStrokeWidth(15.0f);
-            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.parseColor(pathColor));
 
-            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
-            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
-            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
+            double pathRotationAngle = Geometry.getAngle(sourcePortPosition, targetPortPosition);
+            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPosition, pathRotationAngle, 0);
+            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPosition, pathRotationAngle + 180, 0);
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-//            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
 
             Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
             segment.setOutlineThickness(15.0);
@@ -455,15 +462,12 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             drawShape(sourcePortShape, palette);
             drawShape(targetPortShape, palette);
 
-            // Draw innerBoundaries
+            // Draw Boundaries
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
-            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.CYAN);
-//            drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
-//            drawPolygon(BoundarySystem.getBoundary(targetPortShape), palette);
-            drawPolygon(BoundarySystem.getBoundary(Image.getShape(path, "Source Port")), palette);
-            drawPolygon(BoundarySystem.getBoundary(Image.getShape(path, "Target Port")), palette);
+            drawPolygon(Boundary.getBoundary(Image.getShape(path, "Source Port")), palette);
+            drawPolygon(Boundary.getBoundary(Image.getShape(path, "Target Port")), palette);
 //        }
 
         } else {
@@ -473,84 +477,44 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             Entity sourcePortPathShapeE = Image.getShape(path, "Source Port");
             Shape sourcePortShape = sourcePortPathShapeE.getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
 
-//            path.getComponent(Transform.class).set(
-//                    (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
-//                    (sourcePortShape.getPosition().y + targetPortShape.getPosition().y) / 2.0
-//            );
             path.getComponent(Transform.class).set(sourcePortShape.getPosition());
 
             if (Path.getState(path) != Component.State.EDITING) {
                 sourcePortShape.setPosition(hostSourcePortShape.getPosition());
-//                targetPortShape.setPosition(extensionTargetPortShape.getPosition());
-//        sourcePortShape.setPosition(path.getComponent(Path.class).getSource().getComponent(Transform.class));
-//        targetPortShape.setPosition(path.getComponent(Path.class).getTarget().getComponent(Transform.class));
             }
-
-            // <HACK>
-//            BoundarySystem.updateShapeBoundary(sourcePortShape);
-            // </HACK>
-
-            // <HACK>
-            // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-//        world.imageSystem.invalidate(port.getComponent(Image.class));
-            // </HACK>
-
-            // TODO: Transform sourcePortPositition = pathEntity.getComponent(Path.class).getSource().getComponent(Transform.class);
-            // TODO: Transform targetPortPositition = pathEntity.getComponent(Path.class).getTarget().getComponent(Transform.class);
-            Transform sourcePortPositition = sourcePortShape.getPosition();
-//            Transform targetPortPositition = targetPortShape.getPosition();
-
-//        if (sourcePortShape != null && targetPortShape != null) {
-
-            // Show target port
-//            targetPortShape.setVisibility(Visible.VISIBLE);
-            //// TODO: targetPortShape.setPathVisibility(Visible.VISIBLE);
 
             // Update color of Port shape based on its type
             Path.Type pathType = Path.getType(path);
             String pathColor = camp.computer.clay.util.Color.getColor(pathType);
-//        port.getComponent(Image.class).getImage().getShape("Port").setColor(portColor);
-//        Log.v("EventHandlerSystem", "pathColor: " + pathColor);
             sourcePortShape.setColor(pathColor);
-//            targetPortShape.setColor(pathColor);
 
             sourcePortShape.setColor(pathColor);
 
             // Color
             palette.paint.setStyle(Paint.Style.STROKE);
             palette.paint.setStrokeWidth(15.0f);
-            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.parseColor(pathColor));
 
-//            double pathRotationAngle = Geometry.getAngle(sourcePortPositition, targetPortPositition);
-//            Transform pathStartCoordinate = Geometry.getRotateTranslatePoint(sourcePortPositition, pathRotationAngle, 0);
-//            Transform pathStopCoordinate = Geometry.getRotateTranslatePoint(targetPortPositition, pathRotationAngle + 180, 0);
-
-//            display.drawSegment(pathStartCoordinate, pathStopCoordinate);
-
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-//            double pathRotation = getWorld().getImages(getPath().getHosts()).getRotation();
+            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape;
+            segment.setOutlineThickness(15.0);
+            segment.setOutlineColor(sourcePortShape.getColor());
 
-//            Segment segment = (Segment) path.getComponent(Image.class).getImage().getShape("Path");
-//            segment.setOutlineThickness(15.0);
-//            segment.setOutlineColor(sourcePortShape.getColor());
-//
-//            segment.setSource(pathStartCoordinate);
-//            segment.setTarget(pathStopCoordinate);
+            segment.setSource(sourcePortPathShapeE.getComponent(Transform.class));
+            if (Path.getState(path) != Component.State.EDITING) {
+                segment.setTarget(sourcePortPathShapeE.getComponent(Transform.class));
+            }
 
             // Draw shapes in Path
-//            platformRenderSurface.drawSegment(segment);
+            drawSegment(segment, palette);
             drawShape(sourcePortShape, palette);
-//            platformRenderSurface.drawShape(targetPortShape);
+            // drawShape(targetPortShape);
 
-            // Draw innerBoundaries
+            // Draw Boundary
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
-            //paint.setColor(Color.parseColor(sourcePortShape.getColor())); // TODO: Get color from Path
             palette.paint.setColor(Color.CYAN);
-            //drawPolygon(BoundarySystem.getBoundary(sourcePortShape), palette);
-            drawPolygon(BoundarySystem.getBoundary(Image.getShape(path, "Source Port")), palette);
-//            platformRenderSurface.drawPolygon(targetPortBoundarySystem.getBoundary());
+            drawPolygon(Boundary.getBoundary(Image.getShape(path, "Source Port")), palette);
 
         }
     }
@@ -599,6 +563,20 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         }
     }
     // </PATH_IMAGE_HELPERS>
+
+    public void drawShape(Entity shape, Palette palette) {
+
+        // <HACK>
+        shape.getComponent(ShapeComponent.class).shape.setPosition(
+                shape.getComponent(Transform.class)
+        );
+        shape.getComponent(ShapeComponent.class).shape.setRotation(
+                shape.getComponent(Transform.class).getRotation()
+        );
+
+        drawShape(shape.getComponent(ShapeComponent.class).shape, palette);
+        // </HACK>
+    }
 
     // TODO: Replace with more direct drawing? What's the minimal layering between image
     // TODO: (...) representation and platform-level rendering?
@@ -752,8 +730,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //    }
 
     public void drawText(Text text, Palette palette) {
-
-        Log.v("DrawText", "drawText");
 
         palette.canvas.save();
         palette.canvas.translate((float) text.getPosition().x, (float) text.getPosition().y);

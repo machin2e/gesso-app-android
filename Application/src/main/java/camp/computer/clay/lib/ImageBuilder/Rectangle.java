@@ -1,4 +1,4 @@
-package camp.computer.clay.util.ImageBuilder;
+package camp.computer.clay.lib.ImageBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +96,6 @@ public class Rectangle extends Shape {
 
     public void setCornerRadius(double cornerRadius) {
         this.cornerRadius = cornerRadius;
-        invalidate();
     }
 
     public double getWidth() {
@@ -105,7 +104,6 @@ public class Rectangle extends Shape {
 
     public void setWidth(double width) {
         this.width = width;
-        invalidate();
     }
 
     public double getHeight() {
@@ -114,6 +112,5 @@ public class Rectangle extends Shape {
 
     public void setHeight(double height) {
         this.height = height;
-        invalidate();
     }
 }

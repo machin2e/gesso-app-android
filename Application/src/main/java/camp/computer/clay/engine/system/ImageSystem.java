@@ -4,18 +4,16 @@ import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.ImageBuilder.Geometry;
-import camp.computer.clay.util.ImageBuilder.Point;
-import camp.computer.clay.util.ImageBuilder.Rectangle;
+import camp.computer.clay.util.Geometry;
+import camp.computer.clay.lib.ImageBuilder.Point;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
 
 public class ImageSystem extends System {
 
@@ -26,22 +24,83 @@ public class ImageSystem extends System {
     @Override
     public void update() {
 
-        Group<Entity> entitiesWithTransform = world.Manager.getEntities().filterActive(true).filterWithComponents(Transform.class, Image.class);
+        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Image.class, Transform.class);
 
-        for (int i = 0; i < entitiesWithTransform.size(); i++) {
-            Entity entity = entitiesWithTransform.get(i);
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
 
             // Update Shapes
             // <HACK>
             if (entity.hasComponent(Extension.class)) {
                 updateExtensionGeometry(entity);
-            } else if (entity.hasComponent(Host.class)) {
-            } else if (entity.hasComponent(Port.class)) {
-            } else if (entity.hasComponent(Path.class)) {
             }
             updateImage(entity);
             // </HACK>
         }
+    }
+
+    // Previously: Image.update()
+    // Required Components: Image, Transform
+    private void updateImage(Entity entity) {
+
+        Transform absoluteReferenceTransform = null;
+        if (entity.hasComponent(RelativeLayoutConstraint.class)) {
+            // <HACK>
+            RelativeLayoutConstraint layoutConstraint = entity.getComponent(RelativeLayoutConstraint.class);
+            Transform referenceTransform = layoutConstraint.getReferenceEntity().getComponent(Transform.class);
+            Transform relativeTransform = layoutConstraint.relativeTransform;
+
+            absoluteReferenceTransform = new Transform();
+            absoluteReferenceTransform.x = referenceTransform.x + Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.cos(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
+            absoluteReferenceTransform.y = referenceTransform.y + Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.sin(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
+            // </HACK>
+        } else {
+
+            // HACK!
+            // TODO: Remove this. Shouldn't need this in addition to the previous block in this condition... i.e., paths shouldn't be a special case! Generalize handling EDITING state (or make it not important)
+            if (entity.hasComponent(Path.class)) {
+                if (Component.getState(entity) != Component.State.EDITING) {
+                    absoluteReferenceTransform = entity.getComponent(Transform.class);
+                }
+            } else {
+                absoluteReferenceTransform = entity.getComponent(Transform.class);
+            }
+        }
+
+        // Update Shapes
+        Group<Entity> shapes = Image.getShapes(entity);
+        for (int i = 0; i < shapes.size(); i++) {
+            if (absoluteReferenceTransform != null) {
+                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+                updateShapeRelativeTransform(shapes.get(i), absoluteReferenceTransform);
+            }
+        }
+    }
+
+    /**
+     * Computes and updates the {@code Shape}'s absolute positioning, rotation, and scaling in
+     * preparation for drawing and collision detection.
+     * <p>
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
+     * the center position of the {@code Shape}. Effectively, this updates the position of the
+     * {@code Shape}.
+     *
+     * @param referenceTransform Position of the containing {@code Image} relative to which the
+     *                           {@code Shape} will be drawn.
+     */
+    private void updateShapeRelativeTransform(Entity shape, Transform referenceTransform) {
+
+        RelativeLayoutConstraint layoutConstraint = shape.getComponent(RelativeLayoutConstraint.class);
+
+        // Position
+        double distanceToRelativeTransform = Geometry.distance(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
+        double angle = Geometry.getAngle(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
+
+        shape.getComponent(Transform.class).x = referenceTransform.x + distanceToRelativeTransform * Math.cos(Math.toRadians(referenceTransform.rotation + angle));
+        shape.getComponent(Transform.class).y = referenceTransform.y + distanceToRelativeTransform * Math.sin(Math.toRadians(referenceTransform.rotation + angle));
+
+        // Rotation
+        shape.getComponent(Transform.class).rotation = referenceTransform.rotation + layoutConstraint.relativeTransform.rotation;
     }
 
     /**
@@ -51,57 +110,46 @@ public class ImageSystem extends System {
 
         // TODO: Clean up/delete images/shapes for any removed ports...
 
-        updateExtensionPortPositions(extension);
-        updateExtensionHeaderGeometry(extension);
+        updateExtensionPortButtonPositions(extension);
+        updateExtensionHeaderDimensions(extension);
     }
 
     /**
      * Add or remove {@code Shape}'s for each of the {@code ExtensionEntity}'s {@code PortEntity}s.
      */
-    private void updateExtensionPortPositions(Entity extension) {
+    private void updateExtensionPortButtonPositions(Entity extension) {
 
         // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
 
         // Update Port positions based on the index of Port
         Group<Entity> ports = Portable.getPorts(extension);
+        double halfTotalPortsWidth = (((ports.size() - 1) * World.EXTENSION_PORT_SEPARATION_DISTANCE) / 2.0);
         for (int i = 0; i < ports.size(); i++) {
-            Entity port = ports.get(i);
-
-            double portSpacing = 115;
-//            port.getComponent(Transform.class).x = (i * portSpacing) - (((Portable.getPorts(extension).size() - 1) * portSpacing) / 2.0);
-//            port.getComponent(Transform.class).y = 175; // i.e., Distance from board
-            port.getComponent(RelativeLayoutConstraint.class).relativeTransform.x = (i * portSpacing) - (((Portable.getPorts(extension).size() - 1) * portSpacing) / 2.0);
-            port.getComponent(RelativeLayoutConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
-
-            // <HACK>
-            // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-//            world.imageSystem.invalidate(port.getComponent(Image.class));
-            // </HACK>
+            ports.get(i).getComponent(RelativeLayoutConstraint.class).relativeTransform.x = (i * World.EXTENSION_PORT_SEPARATION_DISTANCE) - halfTotalPortsWidth;
+            ports.get(i).getComponent(RelativeLayoutConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
         }
     }
 
-    private void updateExtensionHeaderGeometry(Entity extension) {
+    // Header Dimensions
+    // References:
+    // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
+    final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
+    final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
+    double contactSeparation = 2.54; // Measure in millimeters (mm)
+
+    private void updateExtensionHeaderDimensions(Entity extension) {
 
         // <FACTOR_OUT>
-        // References:
-        // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
-
         final int contactCount = Portable.getPorts(extension).size();
-        final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
-        final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
 
         double A = 2.54 * contactCount + errorToleranceA;
         double B = 2.54 * (contactCount - 1) + errorToleranceB;
 
-        final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
+        // final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
         double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
-        double contactSeparation = 2.54; // Measure in millimeters (mm)
         // </FACTOR_OUT>
 
-        Image portableImage = extension.getComponent(Image.class);
-
         // Update Headers Geometry to match the corresponding ExtensionEntity Configuration
-//        Rectangle header = (Rectangle) portableImage.getImage().getShape("Header");
         Entity shape = Image.getShape(extension, "Header");
         double headerWidth = World.PIXEL_PER_MILLIMETER * A;
         Rectangle headerShape = (Rectangle) shape.getComponent(ShapeComponent.class).shape;
@@ -130,149 +178,4 @@ public class ImageSystem extends System {
         }
     }
     // </EXTENSION>
-
-    // <IMAGE>
-    // Previously: Image.update()
-    // Required Components: Image, Transform
-    public void updateImage(Entity entity) {
-
-        // <HACK>
-//        if (entity.hasComponent(Extension.class)) {
-//            return;
-//        }
-        // </HACK>
-
-//        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
-        Group<Entity> shapes = Image.getShapes(entity);
-
-        // Update Shapes
-        for (int i = 0; i < shapes.size(); i++) {
-            Entity shape = shapes.get(i);
-
-            Transform absoluteReferenceTransform = null;
-            if (entity.hasComponent(RelativeLayoutConstraint.class)) {
-                // <HACK>
-                RelativeLayoutConstraint layoutConstraint = entity.getComponent(RelativeLayoutConstraint.class);
-//                Entity referenceEntity = layoutConstraint.getReferenceEntity();
-                Transform referenceTransform = layoutConstraint.getReferenceEntity().getComponent(Transform.class);
-                //Transform relativePosition = entity.getComponent(Transform.class);
-                Transform relativePosition = layoutConstraint.relativeTransform;
-                absoluteReferenceTransform = new Transform();
-
-                absoluteReferenceTransform.x = referenceTransform.x + Geometry.distance(0, 0, relativePosition.x, relativePosition.y) * Math.cos(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativePosition.x, relativePosition.y)));
-                absoluteReferenceTransform.y = referenceTransform.y + Geometry.distance(0, 0, relativePosition.x, relativePosition.y) * Math.sin(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativePosition.x, relativePosition.y)));
-                // </HACK>
-            } else {
-
-                // HACK!
-                if (entity.hasComponent(Path.class)) {
-                    if (Path.getState(entity) != Component.State.EDITING) {
-                        absoluteReferenceTransform = entity.getComponent(Transform.class);
-                    }
-                } else {
-                    absoluteReferenceTransform = entity.getComponent(Transform.class);
-                }
-            }
-
-            if (absoluteReferenceTransform != null) {
-//            if (shape.hasComponent(RelativeLayoutConstraint.class)) {
-                updateShapeRelativeTransform(shape, absoluteReferenceTransform);
-            }
-        }
-    }
-
-    /**
-     * Computes and updates the {@code Shape}'s absolute positioning, rotation, and scaling in
-     * preparation for drawing and collision detection.
-     * <p>
-     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
-     * the center position of the {@code Shape}. Effectively, this updates the position of the
-     * {@code Shape}.
-     *
-     * @param referencePoint Position of the containing {@code Image} relative to which the
-     *                       {@code Shape} will be drawn.
-     */
-    public void updateShapeRelativeTransform(Entity shape, Transform referencePoint) {
-
-//        if (!shape.isValid) {
-//            updateShapePositionAndRotation(shape, referencePoint); // Update the position
-//            updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
-//            shape.isValid = true;
-//        }
-
-//        if (!shape.isValid) {
-
-//        // Position
-//        shape.getPosition().x = referencePoint.x + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
-//        shape.getPosition().y = referencePoint.y + Geometry.distance(0, 0, shape.getImagePosition().x, shape.getImagePosition().y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getImagePosition().x, shape.getImagePosition().y)));
-//
-//        // Rotation
-//        shape.getPosition().rotation = referencePoint.rotation + shape.getImagePosition().rotation;
-
-        // Position
-        shape.getComponent(Transform.class).x = referencePoint.x + Geometry.distance(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y) * Math.cos(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y)));
-        shape.getComponent(Transform.class).y = referencePoint.y + Geometry.distance(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y) * Math.sin(Math.toRadians(referencePoint.rotation + Geometry.getAngle(0, 0, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.x, shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.y)));
-
-        // Rotation
-        shape.getComponent(Transform.class).rotation = referencePoint.rotation + shape.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation;
-
-//            updateShapeBoundary(shape); // Update the bounds (using the results from the updateImage position and rotation)
-        //shape.isValid = true;
-//        }
-    }
-    // </IMAGE>
-
-
-    // TODO: Remove! Image interaction should happen in ImageBuilder.
-    // TODO: <REMOVE?>
-//    public Group<Shape> getShapes(Image image, String... labels) {
-//
-//        Entity entity = image.getEntity();
-//
-////        if (image.getImage() == null) {
-////            image.setImage(new ImageBuilder());
-////        }
-////        List<Shape> shapes = image.getImage().getShapes();
-//        Group<Entity> shapes = Image.getShapes(entity);
-//
-//        Group<Shape> matchingShapes = new Group<>();
-//
-//        for (int i = 0; i < shapes.size(); i++) {
-//            for (int j = 0; j < labels.length; j++) {
-//                Pattern pattern = Pattern.compile(labels[j]);
-//                Matcher matcher = pattern.matcher(Label.getLabel(shapes.get(i)));
-//                if (matcher.matches()) {
-//                    matchingShapes.add(shapes.get(i).getComponent(ShapeComponent.class).shape);
-//                }
-//            }
-//        }
-//
-//        return matchingShapes;
-//    }
-    // TODO: </REMOVE?>
-
-//    // TODO: Remove! Image interaction should happen in ImageBuilder.
-//    public Group<Shape> getShapes(Image image) {
-//
-//        if (image.getImage() == null) {
-//            image.setImage(new ImageBuilder());
-//        }
-//        List<Shape> shapes = image.getImage().getShapes();
-//
-//        // TODO: Don't create a new Group. Will that work?
-//        Group<Shape> shapeGroup = new Group<>();
-//        shapeGroup.addAll(shapes);
-//        return shapeGroup;
-//    }
-//
-//    // TODO: Remove! Image interaction should happen in ImageBuilder.
-//    public Shape removeShape(Image image, int index) {
-//
-//        if (image.getImage() == null) {
-//            image.setImage(new ImageBuilder());
-//        }
-//        List<Shape> shapes = image.getImage().getShapes();
-//
-//        return shapes.remove(index);
-//    }
 }
