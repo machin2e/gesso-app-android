@@ -96,7 +96,6 @@ public class World {
 
         Manager = new Manager();
 
-        createPrototypePathEntity();
         createPrototypeExtensionEntity();
 
         // <TEMPORARY>

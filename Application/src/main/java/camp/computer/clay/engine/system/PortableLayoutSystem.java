@@ -10,17 +10,12 @@ import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.engine.component.Label;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.component.Visibility;
-import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Segment;
 import camp.computer.clay.model.configuration.Configuration;
 import camp.computer.clay.util.Geometry;
 import camp.computer.clay.util.Random;
@@ -541,84 +536,6 @@ public class PortableLayoutSystem extends System {
         // image.setRotation(Random.getRandomGenerator().nextInt(360));
     }
     // <HOST_LAYOUT>
-
-    // <PROTOTYPES>
-    public void setExtensionPrototypePosition(Entity extensionPrototype, Transform position, double rotation) {
-
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-//        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0);
-        extensionPrototype.getComponent(Transform.class).set(position);
-        extensionPrototype.getComponent(Transform.class).setRotation(rotation);
-
-        // <REFACTOR>
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        /*
-        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Prototype.class, Label.class).filterLabel("prototypePath").get(0);
-        // </HACK>
-        Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // (Segment) pathPrototype.getComponent(Image.class).getImage().getShape("Path");
-        Transform prototypePathSourceTransform = segment.getSource();
-
-        double extensionRotation = Geometry.getAngle(
-                prototypePathSourceTransform,
-                extensionPrototype.getComponent(Transform.class)
-        );
-        extensionPrototype.getComponent(Transform.class).setRotation(extensionRotation);
-        */
-        // <REFACTOR>
-    }
-
-    public void setPathPrototypeVisibility(Visible visible) {
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
-        // </HACK>
-        pathPrototype.getComponent(Visibility.class).setVisible(visible);
-    }
-
-    public Visible getPathPrototypeVisibility() {
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
-        // </HACK>
-        return pathPrototype.getComponent(Visibility.class).getVisibile();
-    }
-
-    public void setPathPrototypeSourcePosition(Transform position) {
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
-        // </HACK>
-        Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // pathPrototype.getComponent(Image.class).getImage().getShape("Path");
-        segment.setSource(position);
-    }
-
-    public void setPathPrototypeDestinationPosition(Transform position) {
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity pathPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypePath").get(0);
-        // </HACK>
-        Segment segment = (Segment) Image.getShape(pathPrototype, "Path").getComponent(ShapeComponent.class).shape; // pathPrototype.getComponent(Image.class).getImage().getShape("Path");
-        segment.setTarget(position);
-    }
-
-    public void setExtensionPrototypeVisibility(Visible visible) {
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
-        // </HACK>
-        extensionPrototype.getComponent(Visibility.class).setVisible(visible);
-    }
-
-    public Visible getExtensionPrototypeVisibility() {
-        // <HACK>
-        // TODO: This is a crazy expensive operation. Optimize the shit out of this.
-        Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0);
-        // </HACK>
-        return extensionPrototype.getComponent(Visibility.class).getVisibile();
-    }
-    // </PROTOTYPES>
 
     private void updateExtensionPathRoutes(Entity extension) {
         // TODO: Create routes between extension and host.

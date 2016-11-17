@@ -192,7 +192,7 @@ public class EventHandlerSystem extends System {
                 Entity extensionPrototype = world.Manager.getEntities().filterWithComponent(Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
 
                 // Update position of prototype Extension
-                world.portableLayoutSystem.setPathPrototypeSourcePosition(host.getComponent(Transform.class));
+                // world.portableLayoutSystem.setPathPrototypeSourcePosition(host.getComponent(Transform.class));
 
                 // Set Event Angle (angle from first Event to current Event)
                 double eventAngle = Geometry.getAngle(
@@ -200,7 +200,8 @@ public class EventHandlerSystem extends System {
                         event.getPosition()
                 );
 
-                world.portableLayoutSystem.setExtensionPrototypePosition(extensionPrototype, event.getPosition(), eventAngle);
+                extensionPrototype.getComponent(Transform.class).set(event.getPosition());
+                extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
 
                 // Show the prototype Extension
                 extensionPrototype.getComponent(Visibility.class).setVisible(Visible.VISIBLE);
@@ -535,8 +536,9 @@ public class EventHandlerSystem extends System {
                     );
 
                     //world.portableLayoutSystem.setExtensionPrototypePosition(extensionPrototype, event.getPosition());
-                    world.portableLayoutSystem.setExtensionPrototypePosition(extensionPrototype, event.getPosition(), eventAngle);
-//                    extensionPrototype.getComponent(Transform.class).set(event.getPosition());
+//                    world.portableLayoutSystem.setExtensionPrototypePosition(extensionPrototype, event.getPosition(), eventAngle);
+                    extensionPrototype.getComponent(Transform.class).set(event.getPosition());
+                    extensionPrototype.getComponent(Transform.class).setRotation(eventAngle);
                 } else {
                     Entity extensionPrototype = world.Manager.getEntities().filterWithComponents(Prototype.class, Label.class).filterLabel("prototypeExtension").get(0); // TODO: This is a crazy expensive operation. Optimize the shit out of this.
                     extensionPrototype.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
@@ -776,9 +778,6 @@ public class EventHandlerSystem extends System {
                 // (Host.Port, ..., World) Action Pattern
 
                 Group<Entity> targetAreaPorts = world.Manager.getEntities().filterWithComponent(Port.class).filterContains(event.getPosition());
-
-                // Hide prototype Path and prototype Extension
-                world.portableLayoutSystem.setPathPrototypeVisibility(Visible.INVISIBLE);
 
                 Log.v("handlePathEvent", "creating extension");
 
