@@ -67,7 +67,7 @@ public class Circle extends Shape {
 //     * @return
 //     */
 //    @Override
-//    public List<Transform> getBoundary() {
+//    public List<Transform> get() {
 //        return boundary;
 //    }
 }

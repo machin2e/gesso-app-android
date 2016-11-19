@@ -23,11 +23,11 @@ import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.engine.system.InputSystem;
@@ -393,7 +393,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         Entity sourcePort = Path.getSource(path);
         Entity sourcePortShapeE = Image.getShape(sourcePort, "Port");
-        Shape hostSourcePortShape = sourcePortShapeE.getComponent(ShapeComponent.class).shape; // Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
+        Shape hostSourcePortShape = sourcePortShapeE.getComponent(Geometry.class).shape; // Path.getSource(path).getComponent(Image.class).getImage().getShape("Port");
         Shape extensionTargetPortShape = null;
 
         boolean isSingletonPath = (Path.getTarget(path) == null);
@@ -403,10 +403,10 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             Entity targetPort = Path.getTarget(path);
 
             Entity targetPortShapeE = Image.getShape(Path.getTarget(path), "Port");
-            extensionTargetPortShape = Image.getShape(Path.getTarget(path), "Port").getComponent(ShapeComponent.class).shape; // Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
+            extensionTargetPortShape = Image.getShape(Path.getTarget(path), "Port").getComponent(Geometry.class).shape; // Path.getTarget(path).getComponent(Image.class).getImage().getShape("Port");
 
-            Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
-            Shape targetPortShape = Image.getShape(path, "Target Port").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
+            Shape sourcePortShape = Image.getShape(path, "Source Port").getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
+            Shape targetPortShape = Image.getShape(path, "Target Port").getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Target Port");
 
 //            path.getComponent(Transform.class).set(
 ////                    (sourcePortShape.getPosition().x + targetPortShape.getPosition().x) / 2.0,
@@ -455,7 +455,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
 
-            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
+            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
             segment.setOutlineThickness(15.0);
             segment.setOutlineColor(sourcePortShape.getColor());
 
@@ -471,8 +471,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(Boundary.getBoundary(Image.getShape(path, "Source Port")), palette);
-            drawPolygon(Boundary.getBoundary(Image.getShape(path, "Target Port")), palette);
+            drawPolygon(Boundary.get(Image.getShape(path, "Source Port")), palette);
+            drawPolygon(Boundary.get(Image.getShape(path, "Target Port")), palette);
 //        }
 
         } else {
@@ -480,7 +480,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             // Singleton Path
 
             Entity sourcePortPathShapeE = Image.getShape(path, "Source Port");
-            Shape sourcePortShape = sourcePortPathShapeE.getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
+            Shape sourcePortShape = sourcePortPathShapeE.getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Source Port");
 
             path.getComponent(Transform.class).set(sourcePort.getComponent(Transform.class)); // path.getComponent(Transform.class).set(sourcePortShape.getPosition());
 
@@ -504,7 +504,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.paint.setColor(Color.parseColor(pathColor));
 
             // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape;
+            Segment segment = (Segment) Image.getShape(path, "Path").getComponent(Geometry.class).shape;
             segment.setOutlineThickness(15.0);
             segment.setOutlineColor(sourcePortShape.getColor());
 
@@ -522,7 +522,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
             palette.paint.setStrokeWidth(3.0f);
             palette.paint.setStyle(Paint.Style.STROKE);
             palette.paint.setColor(Color.CYAN);
-            drawPolygon(Boundary.getBoundary(sourcePortPathShapeE), palette);
+            drawPolygon(Boundary.get(sourcePortPathShapeE), palette);
 
         }
     }
@@ -540,31 +540,30 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         } else {
 
             // Draw the connection between the Host's Port and the Extension's Port
-            Image hostImage = hostPort.getParent().getComponent(Image.class);
-            Image extensionImage = extensionPort.getParent().getComponent(Image.class);
+            Entity host = hostPort.getParent();
+            Entity extension = extensionPort.getParent();
 
-            Entity host = hostImage.getEntity();
-            Entity extension = extensionImage.getEntity();
-
-            if (host.getComponent(Portable.class).headerContactPositions.size() > Port.getIndex(hostPort)
-                    && extension.getComponent(Portable.class).headerContactPositions.size() > Port.getIndex(extensionPort)) {
+            if (host.getComponent(Portable.class).headerContactGeometries.size() > Port.getIndex(hostPort)
+                    && extension.getComponent(Portable.class).headerContactGeometries.size() > Port.getIndex(extensionPort)) {
 
                 int hostPortIndex = Port.getIndex(hostPort);
                 int extensionPortIndex = Port.getIndex(extensionPort);
-                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactPositions.get(hostPortIndex).getPosition();
-                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactPositions.get(extensionPortIndex).getPosition();
+//                Transform hostConnectorPosition = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getPosition();
+//                Transform extensionConnectorPosition = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getPosition();
+                Transform hostContactTransform = host.getComponent(Portable.class).headerContactGeometries.get(hostPortIndex).getComponent(Transform.class);
+                Transform extensionContactTransform = extension.getComponent(Portable.class).headerContactGeometries.get(extensionPortIndex).getComponent(Transform.class);
 
                 // Draw connection between Ports
                 palette.paint.setColor(android.graphics.Color.parseColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort))));
                 palette.paint.setStrokeWidth(10.0f);
 
                 // TODO: Create Segment and add it to the PathImage. Update its geometry to change position, rotation, etc.
-                Segment segment = (Segment) Image.getShape(path, "Path").getComponent(ShapeComponent.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
+                Segment segment = (Segment) Image.getShape(path, "Path").getComponent(Geometry.class).shape; // path.getComponent(Image.class).getImage().getShape("Path");
                 segment.setOutlineThickness(10.0);
                 segment.setOutlineColor(camp.computer.clay.util.Color.getColor(Port.getType(extensionPort)));
 
-                segment.setSource(hostConnectorPosition);
-                segment.setTarget(extensionConnectorPosition);
+                segment.setSource(hostContactTransform);
+                segment.setTarget(extensionContactTransform);
 
                 drawSegment(segment, palette);
             }
@@ -575,14 +574,14 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
     public void drawShape(Entity shape, Palette palette) {
 
         // <HACK>
-        shape.getComponent(ShapeComponent.class).shape.setPosition(
+        shape.getComponent(Geometry.class).shape.setPosition(
                 shape.getComponent(Transform.class)
         );
-        shape.getComponent(ShapeComponent.class).shape.setRotation(
+        shape.getComponent(Geometry.class).shape.setRotation(
                 shape.getComponent(Transform.class).getRotation()
         );
 
-        Shape s = shape.getComponent(ShapeComponent.class).shape;
+        Shape s = shape.getComponent(Geometry.class).shape;
 
         // Palette
         palette.paint.setStyle(Paint.Style.STROKE);
@@ -930,7 +929,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
     // TODO: Refactor with transforms
     public void drawPolygon(Polygon polygon, Palette palette) {
-        // TODO: drawPolygon(BoundarySystem.getBoundary(polygon), palette);
+        // TODO: drawPolygon(BoundarySystem.get(polygon), palette);
     }
 
     // TODO: Refactor with transforms

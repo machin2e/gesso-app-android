@@ -3,12 +3,12 @@ package camp.computer.clay.engine.system;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
@@ -52,7 +52,7 @@ public class StyleSystem extends System {
         // Update color of LEDs to color of corresponding Port shape
         for (int i = 0; i < ports.size(); i++) {
             String portColor = camp.computer.clay.util.Color.getColor(Port.getType(ports.get(i)));
-            lightShapes.get(i).getComponent(ShapeComponent.class).shape.setColor(portColor);
+            lightShapes.get(i).getComponent(Geometry.class).shape.setColor(portColor);
         }
     }
 

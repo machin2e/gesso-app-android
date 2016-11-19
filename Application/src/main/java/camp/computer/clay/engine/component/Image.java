@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.component;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,7 +19,7 @@ public class Image extends Component {
 //    public ImageBuilder image = null;
     // </TODO>
 
-    //public Group<ShapeComponent> shapes;
+    //public Group<Geometry> shapes;
     //public Group<Long> shapes;
     public List<Long> shapes;
 
@@ -48,8 +50,8 @@ public class Image extends Component {
     public static long addShape(Entity entity, Shape shape) {
 
         // Create Shape entity and assign shape to it
-        Entity shapeEntity = World.getWorld().createEntity(ShapeComponent.class);
-        shapeEntity.getComponent(ShapeComponent.class).shape = shape;
+        Entity shapeEntity = World.getWorld().createEntity(Geometry.class);
+        shapeEntity.getComponent(Geometry.class).shape = shape;
 
         shapeEntity.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(entity);
 
@@ -79,7 +81,7 @@ public class Image extends Component {
         List<Long> shapeUuids = entity.getComponent(Image.class).shapes;
         for (int i = 0; i < shapeUuids.size(); i++) {
             Entity shapeEntity = World.getWorld().Manager.get(shapeUuids.get(i));
-            if (shapeEntity.getComponent(ShapeComponent.class).shape == shape) {
+            if (shapeEntity.getComponent(Geometry.class).shape == shape) {
                 return shapeEntity;
             }
         }
@@ -87,6 +89,9 @@ public class Image extends Component {
     }
 
     public static Group<Entity> getShapes(Entity entity) {
+        if (entity.getComponent(Image.class) == null) {
+            Log.v("Gotcha", "Gotcha");
+        }
         List<Long> shapeUuids = entity.getComponent(Image.class).shapes;
         Group<Entity> shapes = new Group<>();
         for (int i = 0; i < shapeUuids.size(); i++) {

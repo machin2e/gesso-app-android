@@ -6,7 +6,6 @@ import java.util.List;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Point;
 
 public class Portable extends Component {
 
@@ -14,7 +13,11 @@ public class Portable extends Component {
     // TODO: Change to Group<Long>
     public Group<Entity> ports = new Group<>();
 
-    public List<Point> headerContactPositions = new ArrayList<>();
+    // <DELETE>
+    // TODO: Look up in the Image geometry.
+    //public List<Point> headerContactGeometries = new ArrayList<>(); // TODO: replace with List<Entity> for shapes
+    public List<Entity> headerContactGeometries = new ArrayList<>(); // TODO: replace with List<Entity> for shapes
+    // </DELETE>
     // </COMPONENT_DATA>
 
 

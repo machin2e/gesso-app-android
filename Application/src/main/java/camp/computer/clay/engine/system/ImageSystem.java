@@ -2,18 +2,16 @@ package camp.computer.clay.engine.system;
 
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
-import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.lib.ImageBuilder.Point;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
-import camp.computer.clay.util.Geometry;
 
 public class ImageSystem extends System {
 
@@ -40,7 +38,7 @@ public class ImageSystem extends System {
             // </HACK>
         }
 
-//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(ShapeComponent.class, RelativeLayoutConstraint.class, Transform.class);
+//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Geometry.class, RelativeLayoutConstraint.class, Transform.class);
 //
 //        for (int i = 0; i < shapeEntities.size(); i++) {
 //            Entity entity = shapeEntities.get(i);
@@ -61,23 +59,23 @@ public class ImageSystem extends System {
             Transform relativeTransform = layoutConstraint.relativeTransform;
 
             absoluteReferenceTransform = new Transform();
-            absoluteReferenceTransform.x = referenceTransform.x + Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.cos(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
-            absoluteReferenceTransform.y = referenceTransform.y + Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.sin(Math.toRadians(referenceTransform.rotation + Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
+            absoluteReferenceTransform.x = referenceTransform.x + camp.computer.clay.util.Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.cos(Math.toRadians(referenceTransform.rotation + camp.computer.clay.util.Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
+            absoluteReferenceTransform.y = referenceTransform.y + camp.computer.clay.util.Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.sin(Math.toRadians(referenceTransform.rotation + camp.computer.clay.util.Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
             // </HACK>
         } else {
 
-            // HACK!
-            // TODO: Remove this. Shouldn't need this in addition to the previous block in this condition... i.e., paths shouldn't be a special case! Generalize handling EDITING state (or make it not important)
-            if (entity.hasComponent(Path.class)) {
-                if (Component.getState(entity) != Component.State.EDITING) {
-                    absoluteReferenceTransform = entity.getComponent(Transform.class);
-                }
-            } else {
-                absoluteReferenceTransform = entity.getComponent(Transform.class);
-            }
+//            // HACK!
+//            // TODO: Remove this. Shouldn't need this in addition to the previous block in this condition... i.e., paths shouldn't be a special case! Generalize handling EDITING state (or make it not important)
+//            if (entity.hasComponent(Path.class)) {
+//                if (Component.getState(entity) != Component.State.EDITING) {
+//                    absoluteReferenceTransform = entity.getComponent(Transform.class);
+//                }
+//            } else {
+            absoluteReferenceTransform = entity.getComponent(Transform.class);
+//            }
         }
 
-//        if (entity.hasComponent(ShapeComponent.class)) {
+//        if (entity.hasComponent(Geometry.class)) {
 //            if (absoluteReferenceTransform != null) {
 //                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
 //                updateShapeRelativeTransform(entity, absoluteReferenceTransform);
@@ -120,8 +118,8 @@ public class ImageSystem extends System {
         RelativeLayoutConstraint layoutConstraint = shape.getComponent(RelativeLayoutConstraint.class);
 
         // Position
-        double distanceToRelativeTransform = Geometry.distance(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
-        double angle = Geometry.getAngle(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
+        double distanceToRelativeTransform = camp.computer.clay.util.Geometry.distance(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
+        double angle = camp.computer.clay.util.Geometry.getAngle(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
 
         shape.getComponent(Transform.class).x = referenceTransform.x + distanceToRelativeTransform * Math.cos(Math.toRadians(referenceTransform.rotation + angle));
         shape.getComponent(Transform.class).y = referenceTransform.y + distanceToRelativeTransform * Math.sin(Math.toRadians(referenceTransform.rotation + angle));
@@ -183,27 +181,34 @@ public class ImageSystem extends System {
         // Update Headers Geometry to match the corresponding ExtensionEntity Configuration
         Entity shape = Image.getShape(extension, "Header");
         double headerWidth = World.PIXEL_PER_MILLIMETER * A;
-        Rectangle headerShape = (Rectangle) shape.getComponent(ShapeComponent.class).shape;
+        Rectangle headerShape = (Rectangle) shape.getComponent(Geometry.class).shape;
         headerShape.setWidth(headerWidth);
 
         // Update Contact Positions for Header
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-            if (i < extension.getComponent(Portable.class).headerContactPositions.size()) {
-                //extension.getComponent(Portable.class).headerContactPositions.get(i).getImagePosition().x = x;
-                Entity headerContactShape = Image.getShape(extension, extension.getComponent(Portable.class).headerContactPositions.get(i));
-                headerContactShape.getComponent(Transform.class).x = x;
+            if (i < extension.getComponent(Portable.class).headerContactGeometries.size()) {
+                //extension.getComponent(Portable.class).headerContactGeometries.get(i).getImagePosition().x = x;
+                Entity headerContactGeometry = extension.getComponent(Portable.class).headerContactGeometries.get(i);
+//                headerContactGeometry.getComponent(Transform.class).x = x;
+                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
             } else {
-                Point point = new Point(new Transform(x, 107));
-                extension.getComponent(Portable.class).headerContactPositions.add(point);
+                Point headerContactShape = new Point();
+//                extension.getComponent(Portable.class).headerContactGeometries.add(headerContactShape);
 //                portableImage.getImage().addShape(point);
 
                 // Add new Port shape and set Position
                 // TODO: Find better place!
-                Entity headerContactShape = world.createEntity(ShapeComponent.class);
-                headerContactShape.getComponent(ShapeComponent.class).shape = point;
-                headerContactShape.getComponent(Transform.class).set(x, 107);
-                Image.addShape(extension, point);
+                Entity headerContactGeometry = world.createEntity(Geometry.class);
+                headerContactGeometry.getComponent(Geometry.class).shape = headerContactShape;
+//                headerContactGeometry.getComponent(Transform.class).set(x, 107);
+
+                // <REFACTOR_TO_REDUCE_REDUNDANCY>
+                Image.addShape(extension, headerContactShape);
+                extension.getComponent(Portable.class).headerContactGeometries.add(headerContactGeometry);
+//                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
+                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
+                // </REFACTOR_TO_REDUCE_REDUNDANCY>
 
             }
         }

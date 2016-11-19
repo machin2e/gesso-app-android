@@ -12,15 +12,14 @@ import java.util.regex.Pattern;
 
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
-import camp.computer.clay.engine.component.ShapeComponent;
 import camp.computer.clay.engine.component.Style;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.Geometry;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
 import camp.computer.clay.lib.ImageBuilder.Shape;
 
@@ -281,7 +280,7 @@ public class Group<E extends Groupable> implements List<E> {
 //            shapes.addAll(image.getImage().getShapes());
             Group<Entity> shapeEntities = Image.getShapes(image.getEntity());
             for (int j = 0; j < shapeEntities.size(); j++) {
-                shapes.add(shapeEntities.get(j).getComponent(ShapeComponent.class).shape);
+                shapes.add(shapeEntities.get(j).getComponent(Geometry.class).shape);
             }
         }
         return shapes;
@@ -338,7 +337,7 @@ public class Group<E extends Groupable> implements List<E> {
         Group<Entity> entities = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             Entity entity = (Entity) elements.get(i);
-            double distanceToEntity = Geometry.distance(point, entity.getComponent(Transform.class));
+            double distanceToEntity = camp.computer.clay.util.Geometry.distance(point, entity.getComponent(Transform.class));
             if (distanceToEntity < distance) {
                 entities.add(entity);
             }
@@ -374,7 +373,7 @@ public class Group<E extends Groupable> implements List<E> {
     // HACK: Expects Group<Image>
     // TODO: Restrict it to Group<Transform> and use reduce(Reducers.getCenterPoint)
     public Transform getCenterPoint() {
-        return Geometry.getCenterPoint(getPositions());
+        return camp.computer.clay.util.Geometry.getCenterPoint(getPositions());
     }
 
     // Expects Group<Shape>
@@ -383,7 +382,7 @@ public class Group<E extends Groupable> implements List<E> {
         for (int i = 0; i < elements.size(); i++) {
             Shape shape = (Shape) elements.get(i);
             positions.addAll(shape.getVertices()); // HACK: (shouldn't get Boundary if asking for Vertices. DISTINGUISH THESE SOMEHOW!)
-            // TODO: Fix this and replace previous line: //positions.addAll(BoundarySystem.getBoundary(shape));
+            // TODO: Fix this and replace previous line: //positions.addAll(BoundarySystem.get(shape));
         }
         return positions;
     }
@@ -394,13 +393,13 @@ public class Group<E extends Groupable> implements List<E> {
         List<Transform> imageBoundaries = new ArrayList<>();
         for (int i = 0; i < elements.size(); i++) {
             Entity entity = (Entity) elements.get(i); // HACK: Force cast to Entity. TODO: Add safety!
-            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.getBoundary(Boundary.getBoundingBox(entity)));
+            // TODO: Fix: imageBoundaries.addAll(BoundarySystem.get(Boundary.getBoundingBox(entity)));
 //            imageBoundaries.addAll(Boundary.getBoundingBox(entity).getVertices());
-            //imageBoundaries.addAll(entity.getComponent(Boundary.class).getBoundary());
+            //imageBoundaries.addAll(entity.getComponent(Boundary.class).get());
             imageBoundaries.add(entity.getComponent(Transform.class));
         }
 
-        return Geometry.getBoundingBox(imageBoundaries);
+        return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);
     }
     // </GROUP_LOOKUP>
 

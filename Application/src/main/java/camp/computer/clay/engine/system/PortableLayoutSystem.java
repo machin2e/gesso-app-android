@@ -294,7 +294,7 @@ public class PortableLayoutSystem extends System {
         }
 
         Entity boardShape = Image.getShape(host, "Board"); // host.getComponent(Image.class).getImage().getShape("Board");
-        List<Transform> hostShapeBoundary = Boundary.getBoundary(boardShape);
+        List<Transform> hostShapeBoundary = Boundary.get(boardShape);
 
         Group<Entity> extensionPorts = Portable.getPorts(extension);
         for (int j = 0; j < extensionPorts.size(); j++) {

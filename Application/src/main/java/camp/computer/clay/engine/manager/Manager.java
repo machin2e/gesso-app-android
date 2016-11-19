@@ -1,11 +1,5 @@
 package camp.computer.clay.engine.manager;
 
-import android.util.Log;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.UUID;
-
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 

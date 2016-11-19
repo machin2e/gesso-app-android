@@ -12,8 +12,48 @@ public class Event {
         SELECT,
         HOLD,
         MOVE,
-        UNSELECT;
+        UNSELECT
     }
+
+    public enum Commands {
+
+        // Path
+        PATH_CREATE,
+        PATH_MOVE_SOURCE_PORT,
+        PATH_MOVE_TARGET_PORT,
+        PATH_REMOVE_SOURCE_PORT,
+        PATH_REMOVE_TARGET_PORT,
+        PATH_REMOVE,
+        PATH_CHANGE_TYPE,
+        PATH_CHANGE_DIRECTION,
+
+        // Camera
+        CAMERA_SET_POSITION,
+        CAMERA_SET_ZOOM,
+        CAMERA_SET_FOCUS
+    }
+
+    // Clay: Entities can register events it will publish to EventManager. Others can subscribe to published messages.
+    // e.g.,
+    /*
+    ? CREATE_PORT
+    CHANGE_PORT_TYPE
+    CHANGE_PORT_DIRECTION
+    ? REMOVE_PORT
+
+    CREATE_PATH
+    MOVE_PATH_SOURCE_PORT -> MOVE_PORT
+    MOVE_PATH_TARGET_PORT -> MOVE_PORT
+    REMOVE_PATH_SOURCE_PORT -> REMOVE_PORT
+    REMOVE_PATH_TARGET_PORT -> REMOVE_PORT
+    REMOVE_PATH
+    CHANGE_PATH_TYPE
+    CHANGE_PATH_DIRECTION
+    subscribe(Event.Type.CREATE_PATH, new EventProcess() {
+        public void processEvent(Event event, EventData data) {
+        }
+    });
+    */
 
     public static int MAXIMUM_POINT_COUNT = 1;
 
