@@ -214,8 +214,6 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                     double cameraScale = world.cameraSystem.getScale(camera);
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + cameraTransform.x)) / cameraScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + cameraTransform.y)) / cameraScale;
-//                    event.pointerCoordinates[id].x = (motionEvent.getX(i) - (cameraTransform.x)) / cameraScale;
-//                    event.pointerCoordinates[id].y = (motionEvent.getY(i) - (cameraTransform.y)) / cameraScale;
                 }
 
 //                Log.v("PlatformRenderSurface", "x: " + event.pointerCoordinates[0].x + ", y: " + event.pointerCoordinates[0].y);

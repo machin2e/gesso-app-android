@@ -14,14 +14,14 @@ import camp.computer.clay.engine.entity.Entity;
 
 public class InputSystem extends System {
 
-    private List<Event> incomingEvents = new ArrayList<>();
+    private List<Event> eventQueue = new ArrayList<>();
 
     public InputSystem(World world) {
         super(world);
     }
 
     public void update() {
-        while (incomingEvents.size() > 0) {
+        while (eventQueue.size() > 0) {
             Event event = dequeueEvent();
             Event processedEvent = processEvent(event);
 
@@ -30,11 +30,11 @@ public class InputSystem extends System {
     }
 
     public void queueEvent(Event event) {
-        incomingEvents.add(event);
+        eventQueue.add(event);
     }
 
     private Event dequeueEvent() {
-        return incomingEvents.remove(0);
+        return eventQueue.remove(0);
     }
 
     private Event processEvent(Event event) {

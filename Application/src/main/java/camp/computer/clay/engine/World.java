@@ -104,7 +104,7 @@ public class World {
 
     // <MANAGERS>
     // TODO: Replace with Group directly!
-    public camp.computer.clay.engine.manager.Manager Manager;
+    public Manager Manager;
     // </MANAGERS>
 
     // <WORLD_SYSTEMS>

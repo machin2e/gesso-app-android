@@ -1,19 +1,12 @@
 package camp.computer.clay.engine.system;
 
-import android.util.Log;
-
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Path;
-import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.RelativeLayoutConstraint;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.lib.ImageBuilder.Point;
-import camp.computer.clay.lib.ImageBuilder.Rectangle;
 
 public class ImageSystem extends System {
 
@@ -31,9 +24,9 @@ public class ImageSystem extends System {
 
             // Update Shapes
             // <HACK>
-            if (entity.hasComponent(Extension.class)) {
-                updateExtensionGeometry(entity);
-            }
+//            if (entity.hasComponent(Extension.class)) {
+//                updateExtensionGeometry(entity);
+//            }
             updateImage(entity);
 
             // TODO: updateShape(entity) // FOR UPDATING LAYOUT CONSTRAINTS OF SHAPES
@@ -133,98 +126,4 @@ public class ImageSystem extends System {
 //        if (shape.hasComponent())
 //        // </HACK>
     }
-
-    /**
-     * Update the {@code Image} to match the state of the corresponding {@code Entity}.
-     */
-    public void updateExtensionGeometry(Entity extension) {
-
-        // TODO: Clean up/delete images/shapes for any removed ports...
-
-        updateExtensionPortButtonPositions(extension);
-        updateExtensionHeaderDimensions(extension);
-    }
-
-    /**
-     * Add or remove {@code Shape}'s for each of the {@code ExtensionEntity}'s {@code PortEntity}s.
-     */
-    private void updateExtensionPortButtonPositions(Entity extension) {
-
-        // TODO: Replace above with code that updates the position of Port images, creates new Ports, etc.
-
-        // Update Port positions based on the index of Port
-        Group<Entity> ports = Portable.getPorts(extension);
-        double halfTotalPortsWidth = (((ports.size() - 1) * World.EXTENSION_PORT_SEPARATION_DISTANCE) / 2.0);
-        for (int i = 0; i < ports.size(); i++) {
-            ports.get(i).getComponent(RelativeLayoutConstraint.class).relativeTransform.x = (i * World.EXTENSION_PORT_SEPARATION_DISTANCE) - halfTotalPortsWidth;
-            ports.get(i).getComponent(RelativeLayoutConstraint.class).relativeTransform.y = 175; // i.e., Distance from board
-        }
-    }
-
-    // Header Dimensions
-    // References:
-    // [1] http://www.shenzhen2u.com/image/data/Connector/Break%20Away%20Header-Machine%20Pin%20size.png
-    final double errorToleranceA = 0.0; // ±0.60 mm according to [1]
-    final double errorToleranceB = 0.0; // ±0.15 mm according to [1]
-    double contactSeparation = 2.54; // Measure in millimeters (mm)
-
-    private void updateExtensionHeaderDimensions(Entity extension) {
-
-        // <FACTOR_OUT>
-        final int contactCount = Portable.getPorts(extension).size();
-
-        double A = 2.54 * contactCount + errorToleranceA;
-        double B = 2.54 * (contactCount - 1) + errorToleranceB;
-
-        // final double errorToleranceContactSeparation = 0.0; // ±0.1 mm according to [1]
-        double contactOffset = (A - B) / 2.0; // Measure in millimeters (mm)
-        // </FACTOR_OUT>
-
-        // Update Headers Geometry to match the corresponding ExtensionEntity Configuration
-        Entity shape = Image.getShape(extension, "Header");
-        double headerWidth = World.PIXEL_PER_MILLIMETER * A;
-        Rectangle headerShape = (Rectangle) shape.getComponent(Geometry.class).shape;
-        headerShape.setWidth(headerWidth);
-
-        // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
-
-        // Update Contact Positions for Header
-        Log.v("HeaderContacts", "HeaderContactGeometries.size: " + extension.getComponent(Portable.class).headerContactGeometries.size());
-        for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
-            double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
-            if (i < extension.getComponent(Portable.class).headerContactGeometries.size()) {
-                //extension.getComponent(Portable.class).headerContactGeometries.get(i).getImagePosition().x = x;
-                Entity headerContactGeometry = extension.getComponent(Portable.class).headerContactGeometries.get(i);
-//                headerContactGeometry.getComponent(Transform.class).x = x;
-                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-            } else {
-                Point headerContactShape = new Point();
-//                extension.getComponent(Portable.class).headerContactGeometries.add(headerContactShape);
-//                portableImage.getImage().addShape(point);
-
-                // Add new Port shape and set Position
-                // TODO: Find better place!
-//                Entity headerContactGeometry = world.createEntity(Geometry.class);
-//                headerContactGeometry.getComponent(Geometry.class).shape = headerContactShape;
-//                headerContactGeometry.getComponent(Transform.class).set(x, 107);
-
-                // <ENTITY>
-                long eid = Image.addShape(extension, headerContactShape);
-                // <HACK>
-                // Set Label
-                Entity headerContactGeometry = World.getWorld().Manager.get(eid); // HACK
-//                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
-
-                // <REFACTOR_TO_REDUCE_REDUNDANCY>
-                Image.addShape(extension, headerContactShape);
-                extension.getComponent(Portable.class).headerContactGeometries.add(headerContactGeometry);
-//                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
-                // </REFACTOR_TO_REDUCE_REDUNDANCY>
-
-            }
-        }
-    }
-    // </EXTENSION>
 }
