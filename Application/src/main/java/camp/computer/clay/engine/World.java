@@ -2,6 +2,8 @@ package camp.computer.clay.engine;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import camp.computer.clay.engine.component.Boundary;
@@ -29,7 +31,6 @@ import camp.computer.clay.engine.manager.EventHandler;
 import camp.computer.clay.engine.manager.Manager;
 import camp.computer.clay.engine.system.BoundarySystem;
 import camp.computer.clay.engine.system.CameraSystem;
-import camp.computer.clay.engine.system.EventHandlerSystem;
 import camp.computer.clay.engine.system.ImageSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.system.PhysicsSystem;
@@ -51,6 +52,37 @@ import camp.computer.clay.util.Random;
 import camp.computer.clay.util.time.Clock;
 
 public class World {
+
+    // <EVENT_MANAGER>
+    private HashMap<Event.Type, ArrayList<EventHandler>> eventHandlers = new HashMap<>();
+
+    public boolean subscribe(Event.Type eventType, EventHandler<?> eventHandler) {
+        if (!eventHandlers.containsKey(eventType)) {
+            eventHandlers.put(eventType, new ArrayList());
+            eventHandlers.get(eventType).add(eventHandler);
+            return true;
+        } else if (eventHandlers.containsKey(eventType) && !eventHandlers.get(eventType).contains(eventHandler)) {
+            eventHandlers.get(eventType).add(eventHandler);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void notifySubscribers(Event event) {
+
+        // Get subscribers to Event
+        ArrayList<EventHandler> subscribedEventHandlers = eventHandlers.get(event.getType());
+        if (subscribedEventHandlers != null) {
+            for (int i = 0; i < subscribedEventHandlers.size(); i++) {
+                subscribedEventHandlers.get(i).execute(event);
+            }
+        }
+    }
+
+    // TODO: public boolean unsubscribe(...)
+
+    // </EVENT_MANAGER>
 
     public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 325;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
@@ -84,7 +116,6 @@ public class World {
     public BoundarySystem boundarySystem = new BoundarySystem(this);
     public InputSystem inputSystem = new InputSystem(this);
     public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem(this);
-    public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem(this);
     public PhysicsSystem physicsSystem = new PhysicsSystem(this);
     // </WORLD_SYSTEMS>
 
@@ -253,7 +284,7 @@ public class World {
         // </HACK>
 
         // <EVENT_HANDLERS>
-        world.eventHandlerSystem.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -284,7 +315,7 @@ public class World {
             }
         });
 
-        world.eventHandlerSystem.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
             @Override
             public void execute(final Event event) {
 
@@ -484,7 +515,7 @@ public class World {
         // TODO: Application.getPlatform().openFile(this, "Host.json");
 
         // <EVENT_HANDLERS>
-        world.eventHandlerSystem.subscribe(Event.Type.HOLD, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.HOLD, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -496,7 +527,7 @@ public class World {
             }
         });
 
-        world.eventHandlerSystem.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -504,7 +535,7 @@ public class World {
                     return;
                 }
 
-                if (world.eventHandlerSystem.previousPrimaryTarget == extension) {
+                if (world.inputSystem.previousPrimaryTarget == extension) {
 
                     boolean openImageEditor = false;
 
@@ -646,7 +677,7 @@ public class World {
         // </SETUP_PATH_IMAGE_GEOMETRY>
 
         // <EVENT_HANDLERS>
-        world.eventHandlerSystem.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -773,7 +804,7 @@ public class World {
             }
         });
 
-        world.eventHandlerSystem.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1124,7 +1155,7 @@ public class World {
         // </LOAD_GEOMETRY_FROM_FILE>
 
         // <EVENT_HANDLERS>
-        world.eventHandlerSystem.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1177,7 +1208,7 @@ public class World {
         camera.addComponent(new Physics());
 
         // <EVENT_HANDLERS>
-        world.eventHandlerSystem.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.MOVE, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1193,7 +1224,7 @@ public class World {
             }
         });
 
-        world.eventHandlerSystem.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
+        world.subscribe(Event.Type.UNSELECT, new EventHandler<Entity>() {
             @Override
             public void execute(Event event) {
 
@@ -1484,7 +1515,6 @@ public class World {
     public void update() {
 //        long updateStartTime = Clock.getCurrentTime();
 //        world.inputSystem.update();
-//        world.eventHandlerSystem.update();
 //        world.imageSystem.update();
 //        world.styleSystem.update();
 //        world.physicsSystem.update();
@@ -1497,7 +1527,6 @@ public class World {
     public void draw() {
         long updateStartTime = Clock.getCurrentTime();
         world.inputSystem.update();
-        world.eventHandlerSystem.update();
         world.imageSystem.update();
         world.styleSystem.update();
         world.physicsSystem.update();

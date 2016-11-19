@@ -1,5 +1,7 @@
 package camp.computer.clay.engine.system;
 
+import android.util.Log;
+
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Extension;
@@ -184,7 +186,10 @@ public class ImageSystem extends System {
         Rectangle headerShape = (Rectangle) shape.getComponent(Geometry.class).shape;
         headerShape.setWidth(headerWidth);
 
+        // TODO: 11/18/2016 Check if there are zero ports. If so, add one. There should always be at least one.
+
         // Update Contact Positions for Header
+        Log.v("HeaderContacts", "HeaderContactGeometries.size: " + extension.getComponent(Portable.class).headerContactGeometries.size());
         for (int i = 0; i < Portable.getPorts(extension).size(); i++) {
             double x = World.PIXEL_PER_MILLIMETER * ((contactOffset + i * contactSeparation) - (A / 2.0));
             if (i < extension.getComponent(Portable.class).headerContactGeometries.size()) {
@@ -199,9 +204,17 @@ public class ImageSystem extends System {
 
                 // Add new Port shape and set Position
                 // TODO: Find better place!
-                Entity headerContactGeometry = world.createEntity(Geometry.class);
-                headerContactGeometry.getComponent(Geometry.class).shape = headerContactShape;
+//                Entity headerContactGeometry = world.createEntity(Geometry.class);
+//                headerContactGeometry.getComponent(Geometry.class).shape = headerContactShape;
 //                headerContactGeometry.getComponent(Transform.class).set(x, 107);
+
+                // <ENTITY>
+                long eid = Image.addShape(extension, headerContactShape);
+                // <HACK>
+                // Set Label
+                Entity headerContactGeometry = World.getWorld().Manager.get(eid); // HACK
+//                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
+                //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
 
                 // <REFACTOR_TO_REDUCE_REDUNDANCY>
                 Image.addShape(extension, headerContactShape);
