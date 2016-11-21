@@ -59,9 +59,11 @@ public class RenderSystem extends System {
                 (float) platformRenderSurface.originPosition.x + (float) cameraPosition.x /* + (float) Application.getPlatform().getOrientationInput().getRotationY()*/,
                 (float) platformRenderSurface.originPosition.y + (float) cameraPosition.y /* - (float) Application.getPlatform().getOrientationInput().getRotationX() */
         );
+
+        double scale = world.getSystem(CameraSystem.class).getScale(camera);
         palette.canvas.scale(
-                (float) world.cameraSystem.getScale(camera),
-                (float) world.cameraSystem.getScale(camera)
+                (float) scale,
+                (float) scale
         );
 
 
@@ -200,6 +202,20 @@ public class RenderSystem extends System {
 
         int linePosition = 0;
 
+        // <TICKS_LABEL>
+        canvas.save();
+        paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(OVERLAY_FONT_SIZE);
+
+        String ticksText = "Ticks: " + (int) platformRenderSurface.platformRenderClock.tickCount;
+        Rect ticksTextBounds = new Rect();
+        paint.getTextBounds(ticksText, 0, ticksText.length(), ticksTextBounds);
+        linePosition += OVERLAY_TOP_MARGIN + ticksTextBounds.height();
+        canvas.drawText(ticksText, OVERLAY_LEFT_MARGIN, linePosition, paint);
+        canvas.restore();
+        // </TICKS_LABEL>
+
         // <FPS_LABEL>
         canvas.save();
         paint.setColor(Color.parseColor(OVERLAY_FONT_COLOR));
@@ -209,7 +225,7 @@ public class RenderSystem extends System {
         String fpsText = "FPS: " + (int) minFps + " " + (int) platformRenderSurface.platformRenderClock.getFramesPerSecond() + " " + (int) maxFps;
         Rect fpsTextBounds = new Rect();
         paint.getTextBounds(fpsText, 0, fpsText.length(), fpsTextBounds);
-        linePosition += OVERLAY_TOP_MARGIN + fpsTextBounds.height();
+        linePosition += OVERLAY_LINE_SPACING + fpsTextBounds.height();
         canvas.drawText(fpsText, OVERLAY_LEFT_MARGIN, linePosition, paint);
         canvas.restore();
 

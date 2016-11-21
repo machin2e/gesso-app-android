@@ -12,12 +12,10 @@ public class Processor extends Component {
     // </COMPONENT_DATA>
 
 
-
     // <CONSTRUCTOR>
     public Processor() {
     }
     // </CONSTRUCTOR>
-
 
 
     // <ABSTRACT_ENTITY_INTERFACE>

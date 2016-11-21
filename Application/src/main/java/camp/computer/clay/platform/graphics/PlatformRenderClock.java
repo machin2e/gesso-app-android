@@ -26,6 +26,7 @@ public class PlatformRenderClock extends Thread {
     private PlatformRenderSurface platformRenderSurface;
 
     private boolean isRunning = false;
+    public long tickCount;
 
     PlatformRenderClock(PlatformRenderSurface platformRenderSurface) {
         super();
@@ -52,6 +53,7 @@ public class PlatformRenderClock extends Thread {
             frameStartTime = Clock.getCurrentTime();
 
             // Advance the world state
+            tickCount++;
             platformRenderSurface.update();
 
             frameStopTime = Clock.getCurrentTime();

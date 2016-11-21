@@ -9,25 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Extension;
 import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.platform.PlatformInterface;
-import camp.computer.clay.platform.communication.InternetInterface;
-import camp.computer.clay.platform.communication.MessengerInterface;
+import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
+import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.platform.Application;
 import camp.computer.clay.platform.Cache;
 import camp.computer.clay.platform.Internet;
 import camp.computer.clay.platform.Messenger;
 import camp.computer.clay.platform.PhoneHost;
-import camp.computer.clay.engine.World;
+import camp.computer.clay.platform.PlatformInterface;
+import camp.computer.clay.platform.communication.InternetInterface;
+import camp.computer.clay.platform.communication.MessengerInterface;
 import camp.computer.clay.util.Random;
-import camp.computer.clay.util.time.Clock;
 
 public class Clay {
 
@@ -78,7 +74,7 @@ public class Clay {
 
         // <HACK>
         // TODO: Place in a LayoutSystem
-        this.world.portableLayoutSystem.adjustLayout();
+        this.world.getSystem(PortableLayoutSystem.class).adjustLayout(new NewProjectLayoutStrategy());
         // </HACK>
     }
 

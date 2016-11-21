@@ -2,7 +2,6 @@ package camp.computer.clay.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import camp.computer.clay.engine.Groupable;
 

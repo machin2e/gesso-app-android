@@ -1,7 +1,5 @@
 package camp.computer.clay.model;
 
-import java.util.UUID;
-
 import camp.computer.clay.engine.Groupable;
 
 public class Action extends Groupable {

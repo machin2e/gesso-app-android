@@ -3,6 +3,7 @@ package camp.computer.clay.engine.component;
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.manager.Manager;
 
 public class Path extends Component {
 
@@ -70,9 +71,9 @@ public class Path extends Component {
 
     public Direction direction = Direction.NONE;
 
-    public long sourcePortUuid;
+    public long sourcePortUuid = Manager.INVALID_UUID;
 
-    public long targetPortUuid;
+    public long targetPortUuid = Manager.INVALID_UUID;
     // </COMPONENT_DATA>
 
 

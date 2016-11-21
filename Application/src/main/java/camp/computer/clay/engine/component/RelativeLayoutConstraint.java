@@ -26,7 +26,7 @@ public class RelativeLayoutConstraint extends Component {
     }
 
     public Entity getReferenceEntity() {
-        return World.getWorld().Manager.getEntities().get(referenceEntityUuid);
+        return World.getWorld().Manager.get(referenceEntityUuid);
     }
 
     public void setReferenceEntity(Entity entity) {

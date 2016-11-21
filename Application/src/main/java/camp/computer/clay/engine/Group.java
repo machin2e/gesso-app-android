@@ -23,14 +23,49 @@ import camp.computer.clay.engine.entity.Entity;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
 import camp.computer.clay.lib.ImageBuilder.Shape;
 
-public class Group<E extends Groupable> implements List<E> {
+public class Group<E> implements List<E> {
 
     // TODO: Impelement a generic filter(...) interface so custom filters can be used. They should
     // TODO: (cont'd) be associated with a Entity type ID, so they only operate on the right entities.
     // TODO: (cont'd) Place custom filters in Entity classes (e.g., Entity.Filter.getPosition(...)).
 
+    // <GROUP>
+    private List<E> elements = new ArrayList<>();
+
+    public Group() {
+    }
+
+    public Group(Collection<? extends E> collection) {
+        this.elements.addAll(collection);
+    }
+
+    public E get(long uuid) {
+        Group<E> result = filterUuid(uuid);
+        if (result.size() > 0) {
+            return result.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public E remove(long uuid) {
+        E element = get(uuid);
+        if (element != null) {
+            remove(element);
+        }
+        return element;
+    }
+
+//    public Group<E> remove(E entity) {
+//        int elementIndex = indexOf(entity);
+//        remove(elementIndex);
+//        return this;
+//    }
+    // </GROUP>
+
+
     // <GROUP_LOOKUP>
-    public interface Filter<V extends Groupable, D> {
+    public interface Filter<V, D> {
         boolean filter(V entity, D data);
     }
 
@@ -100,8 +135,6 @@ public class Group<E extends Groupable> implements List<E> {
                 }
             }
         };
-
-        // TODO: hasComponent
     }
 
     /**
@@ -112,11 +145,11 @@ public class Group<E extends Groupable> implements List<E> {
      * @param <D> Type of data to pass to the {@code Mapper}. Set to {@code Void} if there's no
      *            data.
      */
-    public interface Mapper<E extends Groupable, M extends Groupable, D> {
+    public interface Mapper<E, M, D> {
         M map(E value, D data);
     }
 
-    public <V extends Groupable, M extends Groupable, D> Group<M> map(Mapper mapper, D data) {
+    public <V, M, D> Group<M> map(Mapper mapper, D data) {
         Group<M> group = new Group<>();
         for (int i = 0; i < elements.size(); i++) {
             M result = (M) mapper.map(elements.get(i), data);
@@ -402,54 +435,6 @@ public class Group<E extends Groupable> implements List<E> {
         return camp.computer.clay.util.Geometry.getBoundingBox(imageBoundaries);
     }
     // </GROUP_LOOKUP>
-
-
-    // <GROUP>
-    protected List<E> elements = new ArrayList<>();
-
-    public E get(long uuid) {
-        /*
-        // METHOD 1: Without filter(...).
-        for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).uuid == uuid) {
-                return elements.get(i);
-            }
-        }
-        return null;
-        */
-
-        // METHOD 2: With filter(...).
-        Group<E> result = filterUuid(uuid);
-        if (result.size() > 0) {
-            return result.get(0);
-        } else {
-            return null;
-        }
-    }
-
-    public boolean contains(long uuid) {
-        for (int i = 0; i < elements.size(); i++) {
-            if (elements.get(i).uuid == uuid) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public E remove(long uuid) {
-        E element = get(uuid);
-        if (element != null) {
-            remove(element);
-        }
-        return element;
-    }
-
-    public Group<E> remove(E entity) {
-        int elementIndex = indexOf(entity);
-        remove(elementIndex);
-        return this;
-    }
-    // </GROUP>
 
 
     // <LIST_INTERFACE>

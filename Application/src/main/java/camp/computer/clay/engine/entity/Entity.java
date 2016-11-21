@@ -1,12 +1,18 @@
 package camp.computer.clay.engine.entity;
 
-import java.util.UUID;
-
-import camp.computer.clay.engine.Groupable;
-import camp.computer.clay.engine.component.Component;
 import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.component.Component;
+import camp.computer.clay.engine.manager.Manager;
 
-public final class Entity extends Groupable {
+public final class Entity {
+
+    // <HACK>
+    public long uuid = Manager.count++; // Manager.INVALID_UUID;
+    // </HACK>
+
+    public long getUuid() {
+        return uuid;
+    }
 
     public boolean isActive = true;
 
@@ -20,14 +26,8 @@ public final class Entity extends Groupable {
         setup();
     }
 
-//    public Entity(UUID uuid) {
-//        super(uuid);
-//        setup();
-//    }
-
     private void setup() {
         components = new Group<>(); // Create list of Components
-//        Entity.Manager.add(this); // Add Entity to Manager
     }
 
     public <C extends Component> void addComponent(C component) {
@@ -49,7 +49,7 @@ public final class Entity extends Groupable {
     }
 
     public boolean hasComponents(Class<? extends Component>... types) {
-        for(int i = 0; i < types.length; i++) {
+        for (int i = 0; i < types.length; i++) {
             if (!hasComponent(types[i])) {
                 return false;
             }
@@ -64,7 +64,6 @@ public final class Entity extends Groupable {
         }
         return component;
     }
-
 
 
     // TODO: <DELETE>

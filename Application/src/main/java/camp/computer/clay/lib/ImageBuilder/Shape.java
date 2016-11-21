@@ -2,10 +2,9 @@ package camp.computer.clay.lib.ImageBuilder;
 
 import java.util.List;
 
-import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.component.Transform;
 
-public abstract class Shape extends Groupable {
+public abstract class Shape {
 
     // <TODO>
     // TODO: 11/15/2016 Delete this after creating Shape component.

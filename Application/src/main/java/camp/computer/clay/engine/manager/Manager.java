@@ -1,92 +1,46 @@
 package camp.computer.clay.engine.manager;
 
+import java.util.HashMap;
+
 import camp.computer.clay.engine.Group;
 import camp.computer.clay.engine.entity.Entity;
 
 public class Manager {
 
+    public static long count = 0L;
+    public long uuid = 0L;
+    public static long INVALID_UUID = -1L;
+
     // NOTE: This should be the only language reference to each Entity.
-    private Group<Entity> entities;
+    private HashMap<Long, Entity> entities;
 
     public Manager() {
         setup();
     }
 
     private void setup() {
-        entities = new Group<>();
+        entities = new HashMap<>();
     }
 
-    public Group<Entity> getEntities() {
-        return entities;
+    synchronized public Group<Entity> getEntities() {
+        Group<Entity> entityGroup = new Group<>();
+        entityGroup.addAll(entities.values());
+        return entityGroup;
     }
 
-    public long add(Entity entity) {
-        if (entity != null && !entities.contains(entity)) {
-            entities.add(entity);
-
-            /*
-            Collections.sort(entities, new Comparator<Entity>() {
-                @Override
-                public int compare(Entity entity1, Entity entity2) {
-                    return entity1.getUuid().compareTo(entity2.getUuid());
-                }
-            });
-            */
-
-            return entity.getUuid();
-        }
-        return -1;
+    synchronized public long add(Entity entity) {
+//        entity.uuid = count++;
+        entities.put(entity.uuid, entity);
+        return entity.uuid;
     }
 
-    public Entity get(long uuid) {
-
-//        Collections.binarySearch(entities, uuid, new Comparator<Entity>() {
-//            @Override
-//            public int compare(Entity entity1, Entity entity2) {
-//                return entity1.getUuid().compareTo(entity2.getUuid());
-//            }
-//        });
-
+    synchronized public Entity get(long uuid) {
         return entities.get(uuid);
     }
 
     // TODO: Return true or false depending on success or failure of removal
-    public void remove(Entity entity) {
-        entities.remove(entity);
+    synchronized public void remove(Entity entity) {
+        // TODO: 11/18/2016 Queue the removal operation and perform it at after the current render update completes.
+        entities.remove(entity.uuid);
     }
-
-    /*
-    // <ENTITY_MANAGEMENT>
-    // TODO: Create non-static Manager in World?
-    public static void addEntity(Entity entity) {
-        Manager.add(entity);
-    }
-
-    public static boolean hasEntity(UUID uuid) {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Entity getEntity(UUID uuid) {
-        for (int i = 0; i < Entity.Manager.size(); i++) {
-            if (Entity.Manager.get(i).getUuid().equals(uuid)) {
-                return Entity.Manager.get(i);
-            }
-        }
-        return null;
-    }
-
-    public static Entity removeEntity(UUID uuid) {
-        Entity entity = Manager.get(uuid);
-        if (entity != null) {
-            Entity.Manager.remove(entity);
-        }
-        return entity;
-    }
-    // </ENTITY_MANAGEMENT>
-    */
 }

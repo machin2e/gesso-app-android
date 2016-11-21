@@ -30,6 +30,7 @@ import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.CameraSystem;
 import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.lib.ImageBuilder.Circle;
 import camp.computer.clay.lib.ImageBuilder.Point;
@@ -196,7 +197,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
         final int pointerCount = motionEvent.getPointerCount();
 
         // Get active inputSystem
-        InputSystem inputSystem = world.inputSystem;
+        InputSystem inputSystem = world.getSystem(InputSystem.class);
 
         // Create pointerCoordinates event
         Event event = new Event();
@@ -211,7 +212,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
                 for (int i = 0; i < pointerCount; i++) {
                     int id = motionEvent.getPointerId(i);
                     Transform cameraTransform = camera.getComponent(Transform.class);
-                    double cameraScale = world.cameraSystem.getScale(camera);
+                    double cameraScale = world.getSystem(CameraSystem.class).getScale(camera);
                     event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + cameraTransform.x)) / cameraScale;
                     event.pointerCoordinates[id].y = (motionEvent.getY(i) - (originPosition.y + cameraTransform.y)) / cameraScale;
                 }
@@ -308,7 +309,7 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //            isHolding[pointerIndex] = true;
 
             if (previousEvent.getDistance() < Event.MINIMUM_MOVE_DISTANCE) {
-                InputSystem inputSystem = world.inputSystem;
+                InputSystem inputSystem = world.getSystem(InputSystem.class);
 
                 Event event = new Event();
                 // event.pointerCoordinates[id].x = (motionEvent.getX(i) - (originPosition.x + perspectivePosition.x)) / perspectiveScale;
@@ -339,6 +340,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
      */
     SurfaceHolder holder = getHolder();
 
+    public boolean isUpdated = false;
+
     public void update() {
 
         if (world == null) {
@@ -348,15 +351,21 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 //        Canvas canvas = null;
 //        SurfaceHolder holder = getHolder();
 
-        world.update();
+        if (!isUpdated) {
+            world.update();
+            isUpdated = true;
+        }
 
         try {
             canvas = holder.lockCanvas();
             if (canvas != null) {
-                palette.canvas = canvas;
-                synchronized (holder) {
-                    // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK TREE!!!!!!!!!!!!! FUCK!!!!!!!!
-                    world.draw();
+                if (isUpdated) {
+                    palette.canvas = canvas;
+                    synchronized (holder) {
+                        // TODO!!!!!!!!!!!! FLATTEN THE CALLBACK TREE!!!!!!!!!!!!! FUCK!!!!!!!!
+                        world.draw();
+                    }
+                    isUpdated = false;
                 }
             }
         } finally {
@@ -382,8 +391,8 @@ public class PlatformRenderSurface extends SurfaceView implements SurfaceHolder.
 
         // Set camera viewport dimensions
         Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
-        world.cameraSystem.setWidth(camera, screenWidth);
-        world.cameraSystem.setHeight(camera, screenHeight);
+        world.getSystem(CameraSystem.class).setWidth(camera, screenWidth);
+        world.getSystem(CameraSystem.class).setHeight(camera, screenHeight);
     }
 
     // TODO: 11/16/2016 Optimize! Big and slow! Should be fast!

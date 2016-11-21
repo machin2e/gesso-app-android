@@ -40,7 +40,9 @@ import camp.computer.clay.Clay;
 import camp.computer.clay.engine.Event;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
 import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.platform.communication.Internet;
 import camp.computer.clay.platform.communication.UDPHost;
 import camp.computer.clay.platform.graphics.PlatformRenderSurface;
@@ -416,7 +418,12 @@ public class Application extends FragmentActivity implements PlatformInterface {
             }
 
             case KeyEvent.KEYCODE_R: {
-                World.getWorld().portableLayoutSystem.adjustLayout();
+                World.getWorld().getSystem(PortableLayoutSystem.class).adjustLayout(new NewProjectLayoutStrategy());
+                return true;
+            }
+
+            case KeyEvent.KEYCODE_M: {
+                nativeUi.openMainMenu();
                 return true;
             }
 
@@ -425,7 +432,7 @@ public class Application extends FragmentActivity implements PlatformInterface {
                 return true;
             }
 
-            case KeyEvent.KEYCODE_M: {
+            case KeyEvent.KEYCODE_O: {
                 // Monitor
                 if (World.ENABLE_DRAW_OVERLAY) {
                     World.ENABLE_DRAW_OVERLAY = false;
@@ -948,11 +955,11 @@ public class Application extends FragmentActivity implements PlatformInterface {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent keyEvent) {
-        if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-            Log.v("Application", "ENTER");
-            // TODO: Open "hidden" settings options!
-            return true;
-        }
+//        if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+//            Log.v("Application", "ENTER");
+//            // TODO: Open "hidden" settings options!
+//            return true;
+//        }
         return super.dispatchKeyEvent(keyEvent);
     }
 

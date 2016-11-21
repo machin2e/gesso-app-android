@@ -1725,6 +1725,68 @@ public class NativeUi {
         });
     }
 
+    public void openMainMenu() {
+
+        Application.getView().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final RelativeLayout relativeLayout = new RelativeLayout(context);
+                relativeLayout.setBackgroundColor(Color.parseColor("#bb000000"));
+                // TODO: set layout_margin=20dp
+
+                // Background Event Handler
+                relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        relativeLayout.setVisibility(View.GONE);
+                        return true;
+                    }
+                });
+
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                relativeLayout.addView(linearLayout, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Title: "Main Menu"
+                TextView textView = new TextView(context);
+                textView.setText("Menu");
+                textView.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                textView.setTextSize(20);
+                textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                textView.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(textView);
+
+                // Layout (Linear Vertical): Action List
+                final LinearLayout linearLayout2 = new LinearLayout(context);
+                linearLayout2.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(linearLayout2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                linearLayout.addView(createButtonView("browse projects"));
+                linearLayout.addView(createButtonView("start from extensions"));
+                linearLayout.addView(createButtonView("free build"));
+
+                // Title: "Player"
+                TextView debugSubtitle = new TextView(context);
+                debugSubtitle.setText("Player");
+                debugSubtitle.setPadding(dpToPx(20), dpToPx(20), dpToPx(20), dpToPx(20));
+                debugSubtitle.setTextSize(12);
+                debugSubtitle.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                debugSubtitle.setGravity(Gravity.CENTER_HORIZONTAL);
+                linearLayout.addView(debugSubtitle);
+
+                linearLayout.addView(createButtonView("Projects"));
+                linearLayout.addView(createButtonView("Inventory"));
+                linearLayout.addView(createButtonView("Ideas"));
+                linearLayout.addView(createButtonView("Friends"));
+
+                // Add to main Application View
+                FrameLayout frameLayout = (FrameLayout) Application.getView().findViewById(R.id.application_view);
+                frameLayout.addView(relativeLayout, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            }
+        });
+    }
+
     int imageEditorId;
 
     public void createImageEditor(Entity extension) {
@@ -1953,12 +2015,28 @@ public class NativeUi {
         return editText;
     }
 
+    // TODO: Create content, style, layout parameters so they can be passed to a general function.
     private View createButtonView(String text) {
 
+        // <PARAMETERS>
+        int textSize = 10;
+        String textColor = "#ffffffff";
+        String backgroundColor = "#44000000";
+        int paddingLeft = dpToPx(20);
+        int paddingTop = dpToPx(12);
+        int paddingRight = dpToPx(20);
+        int paddingBottom = dpToPx(12);
+        int marginLeft = 0;
+        int marginTop = dpToPx(5);
+        int marginRight = 0;
+        int marginBottom = 0;
+        // </PARAMETERS>
+
         Button button = new Button(context);
-        button.setPadding(dpToPx(20), dpToPx(12), dpToPx(20), dpToPx(12));
-        button.setTextSize(11);
-        button.setBackgroundColor(Color.parseColor("#44000000"));
+        button.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+        button.setTextColor(Color.parseColor(textColor));
+        button.setTextSize(textSize);
+        button.setBackgroundColor(Color.parseColor(backgroundColor));
 
         button.setText(text);
 
@@ -1966,7 +2044,7 @@ public class NativeUi {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        layoutParams.setMargins(0, dpToPx(5), 0, 0);
+        layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom);
         button.setLayoutParams(layoutParams);
 
         // Interaction

@@ -14,8 +14,7 @@ public class Portable extends Component {
     public Group<Entity> ports = new Group<>();
 
     // <DELETE>
-    // TODO: Look up in the Image geometry.
-    //public List<Point> headerContactGeometries = new ArrayList<>(); // TODO: replace with List<Entity> for shapes
+    // TODO: Look up in the Image geometry?
     public List<Entity> headerContactGeometries = new ArrayList<>(); // TODO: replace with List<Entity> for shapes
     // </DELETE>
     // </COMPONENT_DATA>

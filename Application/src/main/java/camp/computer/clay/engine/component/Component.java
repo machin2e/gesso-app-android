@@ -1,9 +1,8 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Entity;
 
-public abstract class Component extends Groupable {
+public abstract class Component {
 
     public enum State {
         NONE,

@@ -14,9 +14,9 @@ import camp.computer.clay.engine.component.Portable;
 import camp.computer.clay.engine.component.Transform;
 import camp.computer.clay.engine.component.util.Visible;
 import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.util.Geometry;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
 import camp.computer.clay.lib.ImageBuilder.Shape;
+import camp.computer.clay.util.Geometry;
 
 public class CameraSystem extends System {
 
@@ -165,7 +165,7 @@ public class CameraSystem extends System {
             world.Manager.getEntities().filterWithComponent(Path.class, Port.class).setVisibility(Visible.INVISIBLE);
 
             // Update distance between Hosts and Extensions
-            world.portableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
+            world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_SHORT_DISTANCE);
 
             // Update scale and position
             adjustScale(camera, Camera.DEFAULT_SCALE_PERIOD);
@@ -247,7 +247,7 @@ public class CameraSystem extends System {
 
             // Increase distance between Host and Extension
             Entity host = Portable.getHosts(entity).get(0);
-            world.portableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+            world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
             Group<Shape> hostPathPortShapes = hostPathPorts.getImages().getShapes();
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());

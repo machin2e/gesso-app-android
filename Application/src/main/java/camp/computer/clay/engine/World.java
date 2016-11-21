@@ -37,6 +37,7 @@ import camp.computer.clay.engine.system.PhysicsSystem;
 import camp.computer.clay.engine.system.PortableLayoutSystem;
 import camp.computer.clay.engine.system.RenderSystem;
 import camp.computer.clay.engine.system.StyleSystem;
+import camp.computer.clay.engine.system.System;
 import camp.computer.clay.lib.ImageBuilder.Circle;
 import camp.computer.clay.lib.ImageBuilder.ImageBuilder;
 import camp.computer.clay.lib.ImageBuilder.Rectangle;
@@ -107,21 +108,30 @@ public class World {
     public Manager Manager;
     // </MANAGERS>
 
-    // <WORLD_SYSTEMS>
-    // public List<System> systems = new ArrayList<>();
-    public CameraSystem cameraSystem = new CameraSystem(this);
-    public ImageSystem imageSystem = new ImageSystem(this);
-    public StyleSystem styleSystem = new StyleSystem(this);
-    public RenderSystem renderSystem = new RenderSystem(this);
-    public BoundarySystem boundarySystem = new BoundarySystem(this);
-    public InputSystem inputSystem = new InputSystem(this);
-    public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem(this);
-    public PhysicsSystem physicsSystem = new PhysicsSystem(this);
-    // </WORLD_SYSTEMS>
+//    // <WORLD_SYSTEMS>
+//    // public List<System> systems = new ArrayList<>();
+//    public CameraSystem cameraSystem = new CameraSystem(this);
+//    public ImageSystem imageSystem = new ImageSystem(this);
+//    public StyleSystem styleSystem = new StyleSystem(this);
+//    public RenderSystem renderSystem = new RenderSystem(this);
+//    public BoundarySystem boundarySystem = new BoundarySystem(this);
+//    public InputSystem inputSystem = new InputSystem(this);
+//    public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem(this);
+//    public PhysicsSystem physicsSystem = new PhysicsSystem(this);
+//    // </WORLD_SYSTEMS>
 
     public World() {
         super();
         setup();
+
+        addSystem(new InputSystem(this));
+        addSystem(new ImageSystem(this));
+        addSystem(new StyleSystem(this));
+        addSystem(new PhysicsSystem(this));
+        addSystem(new BoundarySystem(this));
+        addSystem(new PortableLayoutSystem(this));
+        addSystem(new CameraSystem(this));
+        addSystem(new RenderSystem(this));
     }
 
     private void setup() {
@@ -146,13 +156,22 @@ public class World {
     }
     // </TODO: DELETE>
 
-//    public boolean addSystem(System system) {
-//
-//    }
-//
-//    public System getSystem(Class<?> systemType) {
-//
-//    }
+    private List<System> systems = new ArrayList<>();
+
+    public void addSystem(System system) {
+        if (!systems.contains(system)) {
+            systems.add(system);
+        }
+    }
+
+    public <S extends System> S getSystem(Class<S> systemType) {
+        for (int i = 0; i < systems.size(); i++) {
+            if (systems.get(i).getClass() == systemType) {
+                return systemType.cast(systems.get(i));
+            }
+        }
+        return null;
+    }
 
     public Entity createEntity(Class<?> entityType) {
 
@@ -349,7 +368,7 @@ public class World {
                 }
 
                 // Camera
-                world.cameraSystem.setFocus(camera, host);
+                world.getSystem(CameraSystem.class).setFocus(camera, host);
 
                 if (Portable.getExtensions(host).size() > 0) {
 
@@ -357,7 +376,7 @@ public class World {
                     // TODO: Move this into PortableLayoutSystem
                     // TODO: Replace ASAP. This is shit.
                     // TODO: Use "rectangle" or "circular" extension layout algorithms
-                    world.portableLayoutSystem.setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
+                    world.getSystem(PortableLayoutSystem.class).setExtensionDistance(host, World.HOST_TO_EXTENSION_LONG_DISTANCE);
                     // </HACK>
                 }
 
@@ -386,11 +405,11 @@ public class World {
                             public void onComplete(Configuration configuration) {
 
                                 // Add Extension from Configuration
-                                Entity extension = world.portableLayoutSystem.createExtensionFromProfile(host, configuration, event.getPosition());
+                                Entity extension = world.getSystem(PortableLayoutSystem.class).createExtensionFromProfile(host, configuration, event.getPosition());
 
                                 // Camera
 //                            camera.getComponent(Camera.class).setFocus(extension);
-                                world.cameraSystem.setFocus(camera, extension);
+                                world.getSystem(CameraSystem.class).setFocus(camera, extension);
                             }
                         });
 
@@ -535,7 +554,7 @@ public class World {
                     return;
                 }
 
-                if (world.inputSystem.previousPrimaryTarget == extension) {
+                if (world.getSystem(InputSystem.class).previousPrimaryTarget == extension) {
 
                     boolean openImageEditor = false;
 
@@ -597,7 +616,7 @@ public class World {
 
                 // Camera
                 Entity camera = world.Manager.getEntities().filterWithComponent(Camera.class).get(0);
-                world.cameraSystem.setFocus(camera, extension);
+                world.getSystem(CameraSystem.class).setFocus(camera, extension);
             }
         });
         // </EVENT_HANDLERS>
@@ -940,7 +959,7 @@ public class World {
 
                             // Remove the Path (and the Extension if the removed Path was the only one)
                             path.isActive = false;
-                            world.Manager.getEntities().remove(path);
+                            world.Manager.remove(path);
 
 //                    Group<Entity> extensionPorts1 = extension.getComponent(Portable.class).getPorts();
 //                    extensionPorts1.remove(extensionPort); // Remove from Portable
@@ -975,11 +994,11 @@ public class World {
 //                        for (int i = 0; i < extensionPorts.size(); i++) {
                                 while (extensionPorts.size() > 0) {
                                     Entity extensionPort = extensionPorts.get(0);
-                                    world.Manager.getEntities().remove(extensionPort);
+                                    world.Manager.remove(extensionPort);
                                     extensionPorts.remove(extensionPort); // Remove from Portable
                                 }
 
-                                world.Manager.getEntities().remove(extension);
+                                world.Manager.remove(extension);
 
                                 // Notification
                                 world.createAndConfigureNotification("removed extension", extension.getComponent(Transform.class), 1000);
@@ -1020,7 +1039,7 @@ public class World {
                         Log.v("handlePathEvent", "hostPort: " + hostPort);
 
                         // Create new custom Extension. Custom Extension can be configured manually.
-                        Entity extension = world.portableLayoutSystem.createCustomExtension(hostPort, event.getPosition());
+                        Entity extension = world.getSystem(PortableLayoutSystem.class).createCustomExtension(hostPort, event.getPosition());
 
                         // Notification
                         world.createAndConfigureNotification("added extension", extension.getComponent(Transform.class), 1000);
@@ -1040,9 +1059,9 @@ public class World {
                         // Update layout
                         Entity host = hostPort.getParent(); // HACK
 
-                        world.portableLayoutSystem.setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
+                        world.getSystem(PortableLayoutSystem.class).setPortableSeparation(World.HOST_TO_EXTENSION_LONG_DISTANCE);
 
-                        world.portableLayoutSystem.updateExtensionLayout(host);
+                        world.getSystem(PortableLayoutSystem.class).updateExtensionLayout(host);
                         // <STYLE_AND_LAYOUT>
 
                         // Set Camera focus on the Extension
@@ -1087,7 +1106,7 @@ public class World {
                                 Entity tempSourcePort = Path.getSource(dropTargetPath);
                                 Path.setSource(dropTargetPath, null); // Reset path
                                 Path.setTarget(dropTargetPath, null); // Reset path
-                                world.Manager.getEntities().remove(dropTargetPath); // Delete path!
+                                world.Manager.remove(dropTargetPath); // Delete path!
                                 // </CLEANUP_ENTITY_DELETE_CODE>
 
                                 // Update the Path from the source Port
@@ -1218,7 +1237,7 @@ public class World {
 
                 //            if (action.isDragging()) {
                 // TODO: Make sure there's no inconsistency "information access sequence" between this EventHandlerSystem, InputSystem, and PlatformRenderSurface.onTouch. Should only access info from previously dispatched? event
-                world.cameraSystem.setOffset(camera, event.xOffset, event.yOffset);
+                world.getSystem(CameraSystem.class).setOffset(camera, event.xOffset, event.yOffset);
                 Log.v("CameraEvent", "offset.x: " + event.getOffset().y + ", y: " + event.getOffset().y);
 //            }
             }
@@ -1236,7 +1255,7 @@ public class World {
 
                 // Camera
                 if (event.isTap()) {
-                    world.cameraSystem.setFocus(camera, null);
+                    world.getSystem(CameraSystem.class).setFocus(camera, null);
                 }
             }
         });
@@ -1338,25 +1357,19 @@ public class World {
         prototypeExtension.addComponent(new Transform());
         prototypeExtension.addComponent(new Physics());
         prototypeExtension.addComponent(new Image());
+        prototypeExtension.addComponent(new Boundary());
         prototypeExtension.addComponent(new Style());
+        prototypeExtension.addComponent(new Visibility());
         prototypeExtension.addComponent(new Label());
-
-//        ImageBuilder imageBuilder = new ImageBuilder();
 
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
         Image.addShape(prototypeExtension, rectangle);
-//        imageBuilder.addShape(rectangle);
-
-//        prototypeExtension.getComponent(Image.class).setImage(imageBuilder);
 
         Label.setLabel(prototypeExtension, "prototypeExtension");
 
-        prototypeExtension.addComponent(new Visibility());
         prototypeExtension.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
-
-        prototypeExtension.addComponent(new Boundary());
 
         // <HACK>
         // TODO: Add to common createEntity method.
@@ -1365,75 +1378,6 @@ public class World {
 
         return prototypeExtension;
     }
-
-    public Entity createPrototypePathEntity() {
-
-        Entity prototypePath = new Entity();
-
-//        prototypePath.addComponent(new Path()); // NOTE: Just used as a placeholder. Consider actually using the prototype, removing the Prototype component.
-//        prototypePath.addComponent(new Prototype()); // Unique to Prototypes/Props
-        prototypePath.addComponent(new Transform());
-        prototypePath.addComponent(new Physics());
-        prototypePath.addComponent(new Image());
-        prototypePath.addComponent(new Style());
-
-//        ImageBuilder imageBuilder = new ImageBuilder();
-
-        // Image
-        Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
-        segment.setLabel("Path");
-        segment.setOutlineColor("#ff333333");
-        segment.setOutlineThickness(10.0);
-        long pathShapeUuid = Image.addShape(prototypePath, segment);
-//        imageBuilder.addShape(segment);
-
-        // <HACK>
-        // Set Label
-        Entity pathShapeEntity = world.Manager.get(pathShapeUuid);
-        pathShapeEntity.getComponent(Label.class).label = "Path";
-        // </HACK>
-
-//        Segment segment = new Segment();
-//        segment.setOutlineThickness(2.0);
-//        segment.setLabel("Path");
-//        segment.setColor("#1f1f1e"); // #f7f7f7
-//        segment.setOutlineThickness(1);
-//        imageBuilder.addShape(segment);
-//
-//        Circle circle = new Circle();
-//        circle.setRadius(50.0);
-//        circle.setLabel("Source Port"); // TODO: Give proper name...
-//        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
-//        circle.setOutlineThickness(0);
-//        circle.isBoundary = true;
-//        imageBuilder.addShape(circle);
-//
-//        circle = new Circle();
-//        circle.setRadius(50.0);
-//        circle.setLabel("Target Port"); // TODO: Give proper name...
-//        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
-//        circle.setOutlineThickness(0);
-//        circle.isBoundary = true;
-//        imageBuilder.addShape(circle);
-
-//        prototypePath.getComponent(Image.class).setImage(imageBuilder);
-
-        prototypePath.addComponent(new Label());
-        Label.setLabel(prototypePath, "prototypePath");
-
-        prototypePath.addComponent(new Visibility());
-        prototypePath.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
-
-        prototypePath.addComponent(new Boundary());
-
-        // <HACK>
-        // TODO: Add to common createEntity method.
-        Manager.add(prototypePath);
-        // <HACK>
-
-        return prototypePath;
-    }
-
 
     // <EXTENSION_IMAGE_HELPERS>
     // TODO: Come up with better way to determine if the Extension already exists in the database.
@@ -1513,6 +1457,35 @@ public class World {
     // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
 
     public void update() {
+        long updateStartTime = Clock.getCurrentTime();
+//        world.inputSystem.update();
+//        world.imageSystem.update();
+//        world.styleSystem.update();
+//        world.physicsSystem.update();
+//        world.boundarySystem.update();
+//        world.portableLayoutSystem.update();
+//        world.cameraSystem.update();
+
+//        getSystem(InputSystem.class).update();
+//        getSystem(ImageSystem.class).update();
+//        getSystem(StyleSystem.class).update();
+//        getSystem(PhysicsSystem.class).update();
+//        getSystem(BoundarySystem.class).update();
+//        getSystem(PortableLayoutSystem.class).update();
+//        getSystem(CameraSystem.class).update();
+
+        for (int i = 0; i < systems.size(); i++) {
+            // <HACK>
+            if (systems.get(i).getClass() == RenderSystem.class) {
+                continue;
+            }
+            // </HACK>
+            systems.get(i).update();
+        }
+        updateTime = Clock.getCurrentTime() - updateStartTime;
+    }
+
+    public void draw() {
 //        long updateStartTime = Clock.getCurrentTime();
 //        world.inputSystem.update();
 //        world.imageSystem.update();
@@ -1522,22 +1495,10 @@ public class World {
 //        world.portableLayoutSystem.update();
 //        world.cameraSystem.update();
 //        updateTime = Clock.getCurrentTime() - updateStartTime;
-    }
-
-    public void draw() {
-        long updateStartTime = Clock.getCurrentTime();
-        world.inputSystem.update();
-        world.imageSystem.update();
-        world.styleSystem.update();
-        world.physicsSystem.update();
-        world.boundarySystem.update();
-        world.portableLayoutSystem.update();
-        world.cameraSystem.update();
-        updateTime = Clock.getCurrentTime() - updateStartTime;
 
 
         long renderStartTime = Clock.getCurrentTime();
-        world.renderSystem.update();
+        getSystem(RenderSystem.class).update();
         renderTime = Clock.getCurrentTime() - renderStartTime;
     }
 }
