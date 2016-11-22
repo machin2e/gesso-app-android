@@ -1,12 +1,16 @@
 package camp.computer.clay.model;
 
+import java.util.UUID;
+
 import camp.computer.clay.engine.Groupable;
 
 public class Script extends Groupable {
 
-    private String title = "";
+    private UUID parentAction;
 
     private String code = "";
+
+    private String description = "";
 
     public Script() {
         super();
@@ -16,12 +20,12 @@ public class Script extends Groupable {
         // </TEMPORARY>
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getTitle() {
-        return title;
+    public String getDescription() {
+        return description;
     }
 
     public void setCode(String code) {

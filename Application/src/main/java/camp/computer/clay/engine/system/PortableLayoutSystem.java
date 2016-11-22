@@ -429,7 +429,7 @@ public class PortableLayoutSystem extends System {
         }
     }
 
-    public void updateExtensionHeaderIndex(Entity host, Entity extension) {
+    private void updateExtensionHeaderIndex(Entity host, Entity extension) {
         if (extension.getComponent(Image.class) == null || Portable.getHosts(extension).size() == 0) {
             return;
         }
@@ -534,7 +534,7 @@ public class PortableLayoutSystem extends System {
                 long eid = Image.addShape(extension, headerContactShape);
                 // <HACK>
                 // Set Label
-                Entity headerContactGeometry = World.getWorld().Manager.get(eid); // HACK
+                Entity headerContactGeometry = world.Manager.get(eid); // HACK
 //                headerContactGeometry.getComponent(RelativeLayoutConstraint.class).relativeTransform.set(x, 107);
                 //shapeEntity.getComponent(RelativeLayoutConstraint.class).relativeTransform.rotation = rotation;
 

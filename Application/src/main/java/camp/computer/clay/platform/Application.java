@@ -404,6 +404,10 @@ public class Application extends FragmentActivity implements PlatformInterface {
         boolean isHardwareAccelerated = view.isHardwareAccelerated();
         Log.v("HardwareAcceleration", "isHardwareAccelerated: " + isHardwareAccelerated);
         // </CHECK_HARDWARE_ACCELERATION>
+
+        // <SHOW_MAIN_MENU>
+        nativeUi.openMainMenu();
+        // </SHOW_MAIN_MENU>
     }
 
     // TODO: Queue key events in inputSystem

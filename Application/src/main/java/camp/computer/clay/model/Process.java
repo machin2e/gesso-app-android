@@ -1,5 +1,7 @@
 package camp.computer.clay.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class Process extends Groupable {
     private List<Long> actionUuids;
 
     public Process() {
+        super();
         actionUuids = new ArrayList<>();
 
         // <TEMPORARY>
@@ -21,11 +24,38 @@ public class Process extends Groupable {
 
     public void addAction(Action action) {
         actionUuids.add(action.getUuid());
+
+//        Log.v("ActionEditor", "---");
+//        for (int i = 0; i < actionUuids.size(); i++) {
+//            Log.v("ActionEditor", "" + i + ": " + getAction(i).getTitle());
+//        }
+//        Log.v("ActionEditor", "---");
+
+        Log.v("ActionEditor", "added action (" + actionUuids.size() + "): " + action.getTitle());
+    }
+
+    public List<Action> getActions() {
+        List<Action> actions = new ArrayList<>();
+        for (int i = 0; i < actionUuids.size(); i++) {
+            actions.add(getAction(i));
+        }
+        return actions;
+    }
+
+    public void clear() {
+        actionUuids.clear();
     }
 
     public Action getAction(int index) {
         long actionUuid = actionUuids.get(index);
-        return Repository.actions.get(actionUuid);
+//        return Repository.actions.get(actionUuid);
+
+        for (int i = 0; i < Repository.actions.size(); i++) {
+            if (Repository.actions.get(i).getUuid() == actionUuid) {
+                return Repository.actions.get(i);
+            }
+        }
+        return null;
     }
 
     public void removeAction(int index) {

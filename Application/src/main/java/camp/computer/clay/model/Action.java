@@ -4,7 +4,13 @@ import camp.computer.clay.engine.Groupable;
 
 public class Action extends Groupable {
 
+    // TODO: Version/Revision UUID
+    // TODO: Execution pre-condition
+    // TODO: Repeat setting (once, number, forever, condition)
+
     private String title = "";
+
+    private String description = "";
 
     private long scriptUuid;
 
@@ -24,11 +30,25 @@ public class Action extends Groupable {
         return title;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     public void setScript(Script script) {
         scriptUuid = script.getUuid();
     }
 
     public Script getScript() {
-        return Repository.scripts.get(scriptUuid);
+//        return Repository.scripts.get(scriptUuid);
+        for (int i = 0; i < Repository.scripts.size(); i++) {
+            if (Repository.scripts.get(i).getUuid() == scriptUuid) {
+                return Repository.scripts.get(i);
+            }
+        }
+        return null;
     }
 }

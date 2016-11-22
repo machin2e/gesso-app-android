@@ -6,6 +6,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
 public class DeviceDimensionsHelper {
+
     // DeviceDimensionsHelper.getDisplayWidth(context) => (display width in pixels)
     public static int getDisplayWidth(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -31,4 +32,40 @@ public class DeviceDimensionsHelper {
         float dp = px / (metrics.densityDpi / 160f);
         return dp;
     }
+
+//    public int dpToPx(float dp) {
+//
+//        Resources r = context.getResources();
+//        int px = (int) TypedValue.applyDimension(
+//                TypedValue.COMPLEX_UNIT_DIP,
+//                dp,
+//                r.getDisplayMetrics()
+//        );
+//
+//        return px;
+//    }
+//
+//    public int mmToPx(float mm) {
+//
+//        Resources r = context.getResources();
+//        int px = (int) TypedValue.applyDimension(
+//                TypedValue.COMPLEX_UNIT_MM,
+//                mm,
+//                r.getDisplayMetrics()
+//        );
+//
+//        return px;
+//    }
+//
+//    public int inToPx(float in) {
+//
+//        Resources r = context.getResources();
+//        int px = (int) TypedValue.applyDimension(
+//                TypedValue.COMPLEX_UNIT_IN,
+//                in,
+//                r.getDisplayMetrics()
+//        );
+//
+//        return px;
+//    }
 }

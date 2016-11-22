@@ -208,6 +208,8 @@ public class CameraSystem extends System {
             Group<Shape> hostPathPortShapes = hostPathPorts.getImages().getShapes();
             Rectangle boundingBox = Geometry.getBoundingBox(hostPathPortShapes.getVertices());
 
+            Log.v("PortCount", "ports.size: " + hostPathPortShapes.size());
+
             // Update scale and position
             adjustScale(camera, boundingBox);
             setPosition(camera, entity.getComponent(Transform.class), Camera.DEFAULT_ADJUSTMENT_PERIOD);
