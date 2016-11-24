@@ -1,10 +1,14 @@
 package camp.computer.clay.util.time;
 
+import android.util.Log;
+
+import java.util.*;
+
 /**
  * References:
  * - <a href="https://developer.android.com/reference/android/os/SystemClock.html">Android SystemClock Documentation</a>
  */
-public class Clock {
+public class Clock { // extends Thread {
 
     public static final double MILLISECONDS_PER_SECOND = 1000.0f;
 

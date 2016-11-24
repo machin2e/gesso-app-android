@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import camp.computer.clay.old_model.Message;
-import camp.computer.clay.host.util.CRC16;
+import camp.computer.clay.platform.Message;
+import camp.computer.clay.platform.util.CRC16;
 
 public class TCPMessageClientHost {
 

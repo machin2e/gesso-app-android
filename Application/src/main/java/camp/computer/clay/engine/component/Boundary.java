@@ -3,37 +3,37 @@ package camp.computer.clay.engine.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import camp.computer.clay.util.BuilderImage.Geometry;
-import camp.computer.clay.util.BuilderImage.Rectangle;
+import camp.computer.clay.engine.manager.Group;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.util.Geometry;
 
 public class Boundary extends Component {
 
-    private List<Transform> boundary = new ArrayList<>();
+    public List<Transform> boundary = new ArrayList<>();
 
-    public void setBoundary(List<Transform> points) {
-        this.boundary.clear();
-        this.boundary.addAll(points);
+    public static class util {
+        public static void set(Entity entity, List<Transform> vertices) {
+            entity.getComponent(Boundary.class).boundary.clear();
+            entity.getComponent(Boundary.class).boundary.addAll(vertices);
+        }
     }
 
-//    public List<Transform> getBoundary() {
-//        return this.boundary;
-//    }
+    public static List<Transform> get(Entity entity) {
+        if (entity.hasComponent(Boundary.class)
+                && entity.getComponent(Boundary.class).boundary.size() > 0) { // TODO: Remove check for size. Boundary existence should be enough!
+            return entity.getComponent(Boundary.class).boundary;
+        }
+        return null;
+    }
 
-//    /**
-//     * Updates the bounds of the {@code Shape} for use in touch interaction, layout, and collision
-//     * detection. Hey there, mango bongo.
-//     */
-//    protected void updateShapeBoundary() {
-//
-//        List<Transform> vertices = getVertices();
-//        List<Transform> boundary = getBoundary();
-//
-//        // Translate and rotate the boundary about the updated position
-//        for (int i = 0; i < vertices.size(); i++) {
-//            boundary.get(i).set(vertices.get(i));
-//            Geometry.rotatePoint(boundary.get(i), position.rotation); // Rotate Shape boundary about Image position
-//            Geometry.translatePoint(boundary.get(i), position.x, position.y); // Translate Shape
+
+//    public static List<Transform> get(Entity entity) {
+//        if (entity.hasComponent(Boundary.class)
+//                && Boundary.get(entity).size() > 0) { // TODO: Remove check for size. Boundary existence should be enough!
+//            return Boundary.get(entity);
 //        }
+//        return null;
 //    }
 
     /**
@@ -43,30 +43,45 @@ public class Boundary extends Component {
      * @param point
      * @return
      */
-    public boolean contains(Transform point) {
+    public static boolean contains(Entity entity, Transform point) {
 
-        Image image = getEntity().getComponent(Image.class);
-
-        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            //if (shapes.get(i).contains(point)) {
-            if (Geometry.contains(image.getImage().getShapes().get(i).getBoundary(), point)) {
-                return true;
+        // <HACK>
+        if (entity.hasComponent(Image.class)) {
+            Group<Entity> shapes = Image.getShapes(entity);
+            for (int i = 0; i < shapes.size(); i++) {
+                if (/*shapes.get(i).getComponent(Geometry.class).shape.isBoundary // HACK
+                    &&*/ Geometry.contains(Boundary.get(shapes.get(i)), point)) { // HACK
+                    return true;
+                }
             }
+            return false;
+        }
+        // </HACK>
+
+        else if (Geometry.contains(Boundary.get(entity), point)) {
+            return true;
         }
         return false;
+
+        // TODO: return Geometry.contains(entity.getComponent(Boundary.class).boundary, point);
 
         // TODO?: return Geometry.contains(this.boundary, point);
     }
 
     // TODO: Compute bounding box for image when add/remove Shapes and store it here!
-    public Rectangle getBoundingBox() {
-
-        Image image = getEntity().getComponent(Image.class);
+    public static Rectangle getBoundingBox(Entity entity) {
 
         List<Transform> shapeBoundaries = new ArrayList<>();
-        for (int i = 0; i < image.getImage().getShapes().size(); i++) {
-            shapeBoundaries.addAll(image.getImage().getShapes().get(i).getBoundary());
+
+//        List<Shape> shapes = entity.getComponent(Image.class).getImage().getShapes();
+        Group<Entity> shapes = Image.getShapes(entity);
+        for (int i = 0; i < shapes.size(); i++) {
+//            if (shapes.get(i).getComponent(Geometry.class).shape.isBoundary) { // HACK
+            //shapeBoundaries.addAll(BoundarySystem.get(shapes.get(i).getComponent(Geometry.class).shape)); // HACK
+            shapeBoundaries.addAll(Boundary.get(shapes.get(i))); // HACK
+//            }
         }
+
         return Geometry.getBoundingBox(shapeBoundaries);
     }
 }

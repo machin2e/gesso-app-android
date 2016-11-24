@@ -1,5 +1,17 @@
-package camp.computer.clay.model.user;
+package camp.computer.clay.model.player;
 
-public class Inventory
-{
+import java.util.ArrayList;
+import java.util.List;
+
+public class Inventory {
+
+    private List<Item> items;
+
+    public Inventory() {
+        setup();
+    }
+
+    private void setup() {
+        items = new ArrayList<>();
+    }
 }

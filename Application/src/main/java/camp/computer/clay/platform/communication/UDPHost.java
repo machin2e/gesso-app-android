@@ -11,10 +11,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import camp.computer.clay.platform.Application;
-import camp.computer.clay.host.MessengerInterface;
-import camp.computer.clay.host.util.CRC16;
-import camp.computer.clay.old_model.Message;
-import camp.computer.clay.old_model.Messenger;
+import camp.computer.clay.platform.util.CRC16;
+import camp.computer.clay.platform.Message;
+import camp.computer.clay.platform.Messenger;
 
 public class UDPHost extends Thread implements MessengerInterface {
 

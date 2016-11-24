@@ -271,29 +271,4 @@
         </HorizontalScrollView>
     </RelativeLayout>
 
-    <!--<RelativeLayout--><!--android:id="@+id/message_content_layout"--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_gravity="bottom|center_horizontal"--><!--android:layout_marginBottom="15dp"--><!--android:layout_marginLeft="15dp"--><!--android:layout_marginRight="15dp">--><!--<EditText--><!--android:id="@+id/message_content"--><!--android:text=""--><!--android:textColor="#FFFFFFFF"--><!--android:textSize="14sp"--><!--android:padding="15dp"--><!--android:layout_width="match_parent"--><!--android:layout_height="50dp"--><!--android:background="@drawable/timeline_button"--><!--android:inputType="text"--><!--android:maxLines="1"--><!--android:hint="I want to..."--><!--/>--><!--</RelativeLayout>-->
-
-    <RelativeLayout
-        android:id="@+id/context_button_holder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:visibility="gone">
-
-        <Button
-            android:id="@+id/context_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/context_button"
-            android:padding="0dp"
-            android:text="\u21BA"
-            android:textColor="#FFFFFFFF"
-            android:textSize="20sp" />
-    </RelativeLayout>
-
-    <!--<RelativeLayout--><!--android:layout_width="wrap_content"--><!--android:layout_height="wrap_content"--><!--android:layout_gravity="bottom|right"--><!--android:layout_marginBottom="40dp"--><!--android:layout_marginLeft="40dp"--><!--android:layout_marginRight="60dp">--><!--<Button--><!--android:id="@+id/info_cue"--><!--android:text="!"--><!--android:textColor="#FFFFFFFF"--><!--android:textSize="14sp"--><!--android:padding="0dp"--><!--android:layout_width="20dp"--><!--android:layout_height="20dp"--><!--android:background="@drawable/context_button" />--><!--</RelativeLayout>-->
-
 </FrameLayout>

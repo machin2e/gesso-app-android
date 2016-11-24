@@ -1,190 +1,129 @@
 package camp.computer.clay.engine.system;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import camp.computer.clay.engine.Group;
+import camp.computer.clay.engine.manager.Group;
 import camp.computer.clay.engine.World;
 import camp.computer.clay.engine.component.Image;
-import camp.computer.clay.util.BuilderImage.BuilderImage;
-import camp.computer.clay.util.BuilderImage.Shape;
-import camp.computer.clay.util.Color;
+import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.Transform;
+import camp.computer.clay.engine.entity.Entity;
 
 public class ImageSystem extends System {
 
+    public ImageSystem(World world) {
+        super(world);
+    }
+
     @Override
-    public boolean update(World world) {
-        return false;
+    public void update() {
+
+        Group<Entity> entities = world.Manager.getEntities().filterActive(true).filterWithComponents(Image.class, Transform.class);
+
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+
+            // Update Shapes
+            // <HACK>
+//            if (entity.hasComponent(Extension.class)) {
+//                updateExtensionGeometry(entity);
+//            }
+            updateImage(entity);
+
+            // TODO: updateShape(entity) // FOR UPDATING LAYOUT CONSTRAINTS OF SHAPES
+            // </HACK>
+        }
+
+//        Group<Entity> shapeEntities = world.Manager.getEntities().filterActive(true).filterWithComponents(Geometry.class, RelativeLayoutConstraint.class, Transform.class);
+//
+//        for (int i = 0; i < shapeEntities.size(); i++) {
+//            Entity entity = shapeEntities.get(i);
+//            updateImage(entity);
+//        }
     }
 
-    /**
-     * Sorts {@code Shapes}s in the {@code Image} by layer.
-     */
-    public void updateLayers(Image image) {
+    // Previously: Image.update()
+    // Required Components: Image, Transform
+    private void updateImage(Entity entity) {
 
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
+        // Start by transforming base images. They will never have more than one level of constraints (?).
+        Transform absoluteReferenceTransform = null;
+        if (entity.hasComponent(RelativeLayoutConstraint.class)) {
+            // <HACK>
+            RelativeLayoutConstraint layoutConstraint = entity.getComponent(RelativeLayoutConstraint.class);
+            Transform referenceTransform = layoutConstraint.getReferenceEntity().getComponent(Transform.class);
+            Transform relativeTransform = layoutConstraint.relativeTransform;
+
+            absoluteReferenceTransform = new Transform();
+            absoluteReferenceTransform.x = referenceTransform.x + camp.computer.clay.util.Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.cos(Math.toRadians(referenceTransform.rotation + camp.computer.clay.util.Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
+            absoluteReferenceTransform.y = referenceTransform.y + camp.computer.clay.util.Geometry.distance(0, 0, relativeTransform.x, relativeTransform.y) * Math.sin(Math.toRadians(referenceTransform.rotation + camp.computer.clay.util.Geometry.getAngle(0, 0, relativeTransform.x, relativeTransform.y)));
+            // </HACK>
+        } else {
+
+//            // HACK!
+//            // TODO: Remove this. Shouldn't need this in addition to the previous block in this condition... i.e., paths shouldn't be a special case! Generalize handling EDITING state (or make it not important)
+//            if (entity.hasComponent(Path.class)) {
+//                if (Component.getState(entity) != Component.State.EDITING) {
+//                    absoluteReferenceTransform = entity.getComponent(Transform.class);
+//                }
+//            } else {
+            absoluteReferenceTransform = entity.getComponent(Transform.class);
+//            }
         }
-        List<Shape> shapes = image.getImage().getShapes();
 
-        for (int i = 0; i < shapes.size() - 1; i++) {
-            for (int j = i + 1; j < shapes.size(); j++) {
-                // Check for out-of-order pairs, and swap them
-                if (shapes.get(i).getLayerIndex() > shapes.get(j).getLayerIndex()) {
-                    Shape shape = shapes.get(i);
-                    shapes.set(i, shapes.get(j));
-                    shapes.set(j, shape);
+//        if (entity.hasComponent(Geometry.class)) {
+//            if (absoluteReferenceTransform != null) {
+//                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+//                updateShapeRelativeTransform(entity, absoluteReferenceTransform);
+//            }
+//        } else {
+        // Update Shapes
+        if (entity.hasComponent(Path.class)) {
+//            // <REFACTOR>
+//            // TODO: Fix this... understand it. This works when REMOVED.
+//            Group<Entity> shapes = Image.getShapes(entity);
+//            for (int i = 0; i < shapes.size(); i++) {
+//                // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+//                updateShapeRelativeTransform(shapes.get(i), shapes.get(i));
+//            }
+//            // </REFACTOR>
+        } else {
+            Group<Entity> shapes = Image.getShapes(entity);
+            for (int i = 0; i < shapes.size(); i++) {
+                if (absoluteReferenceTransform != null) {
+                    // TODO: if (shape.hasComponent(RelativeLayoutConstraint.class)) {
+                    updateShapeRelativeTransform(shapes.get(i), absoluteReferenceTransform);
                 }
             }
         }
-
-        /*
-        // TODO: Sort using this after making Group implement List
-        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
-            @Override
-            public int compare(MyObject o1, MyObject o2) {
-                return o1.getStartDate().compareTo(o2.getStartDate());
-            }
-        });
-        */
     }
-    // </LAYER>
 
     /**
-     * <em>Invalidates</em> the {@code Shape}. Invalidating a {@code Shape} causes its cached
-     * geometry, such as its boundary, to be updated during the subsequent call to {@code updateImage()}.
+     * Computes and updates the {@code Shape}'s absolute positioning, rotation, and scaling in
+     * preparation for drawing and collision detection.
      * <p>
-     * Note that a {@code Shape}'s geometry cache will only ever be updated when it is first
-     * invalidated by calling {@code invalidate()}. Therefore, to cause the {@code Shape}'s
-     * geometry cache to be updated, call {@code invalidate()}. The geometry cache will be updated
-     * in the first call to {@code updateImage()} following the call to {@code invalidate()}.
+     * Updates the x and y coordinates of {@code Shape} relative to this {@code Image}. Translate
+     * the center position of the {@code Shape}. Effectively, this updates the position of the
+     * {@code Shape}.
+     *
+     * @param referenceTransform Position of the containing {@code Image} relative to which the
+     *                           {@code Shape} will be drawn.
      */
-    public void invalidate(Image image) {
+    private void updateShapeRelativeTransform(Entity shape, Transform referenceTransform) {
 
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
+        RelativeLayoutConstraint layoutConstraint = shape.getComponent(RelativeLayoutConstraint.class);
 
-        for (int i = 0; i < shapes.size(); i++) {
-            shapes.get(i).invalidate();
-        }
+        // Position
+        double distanceToRelativeTransform = camp.computer.clay.util.Geometry.distance(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
+        double angle = camp.computer.clay.util.Geometry.getAngle(0, 0, layoutConstraint.relativeTransform.x, layoutConstraint.relativeTransform.y);
+
+        shape.getComponent(Transform.class).x = referenceTransform.x + distanceToRelativeTransform * Math.cos(Math.toRadians(referenceTransform.rotation + angle));
+        shape.getComponent(Transform.class).y = referenceTransform.y + distanceToRelativeTransform * Math.sin(Math.toRadians(referenceTransform.rotation + angle));
+
+        // Rotation
+        shape.getComponent(Transform.class).rotation = referenceTransform.rotation + layoutConstraint.relativeTransform.rotation;
+
+//        // <HACK>
+//        if (shape.hasComponent())
+//        // </HACK>
     }
-
-    // TODO: Remove! Image building should happen in ImageBuilder.
-    public <T extends Shape> void addShape(Image image, T shape) {
-
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        shape.setImagePosition(shape.getPosition());
-        shapes.add(shape);
-
-        // Update layer ordering
-        // <HACK>
-        // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-        World.getWorld().imageSystem.invalidate(image);
-        // </HACK>
-
-        shape.invalidate(); // Invalidate Shape
-    }
-
-    // TODO: Remove! Image interaction should happen in ImageBuilder.
-    public Shape getShape(Image image, String label) {
-
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        for (int i = 0; i < shapes.size(); i++) {
-            Shape shape = shapes.get(i);
-            if (shape.getLabel().equals(label)) {
-                return shape;
-            }
-        }
-        return null;
-    }
-
-    // TODO: Remove! Image interaction should happen in ImageBuilder.
-    // TODO: <REMOVE?>
-    public Group<Shape> getShapes(Image image, String... labels) {
-
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        Group<Shape> matchingShapes = new Group<>();
-        for (int i = 0; i < shapes.size(); i++) {
-            for (int j = 0; j < labels.length; j++) {
-                Pattern pattern = Pattern.compile(labels[j]);
-                Matcher matcher = pattern.matcher(shapes.get(i).getLabel());
-                if (matcher.matches()) {
-                    matchingShapes.add(shapes.get(i));
-                }
-            }
-        }
-
-        return matchingShapes;
-    }
-    // TODO: </REMOVE?>
-
-    // TODO: Remove! Image interaction should happen in ImageBuilder.
-    public Group<Shape> getShapes(Image image) {
-
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        // TODO: Don't create a new Group. Will that work?
-        Group<Shape> shapeGroup = new Group<>();
-        shapeGroup.addAll(shapes);
-        return shapeGroup;
-    }
-
-    // TODO: Remove! Image interaction should happen in ImageBuilder.
-    public Shape removeShape(Image image, int index) {
-
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        return shapes.remove(index);
-    }
-
-    // <STYLE_COMPONENT?>
-    // TODO: Delete?
-    public void setTransparency(Image image, final double transparency) {
-
-        if (image.getImage() == null) {
-            image.setImage(new BuilderImage());
-        }
-        List<Shape> shapes = image.getImage().getShapes();
-
-        image.targetTransparency = transparency;
-
-        for (int i = 0; i < shapes.size(); i++) {
-
-            Shape shape = shapes.get(i);
-
-            // Color
-            int intColor = android.graphics.Color.parseColor(shapes.get(i).getColor());
-            intColor = Color.setTransparency(intColor, image.targetTransparency);
-            shape.setColor(Color.getHexColorString(intColor));
-
-            // Outline Color
-            int outlineColorIndex = android.graphics.Color.parseColor(shapes.get(i).getOutlineColor());
-            outlineColorIndex = Color.setTransparency(outlineColorIndex, image.targetTransparency);
-            shape.setOutlineColor(Color.getHexColorString(outlineColorIndex));
-        }
-
-        image.transparency = image.targetTransparency;
-    }
-    // </STYLE_COMPONENT?>
 }

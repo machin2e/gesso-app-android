@@ -1,9 +1,13 @@
 package camp.computer.clay.engine.component;
 
-import camp.computer.clay.engine.Groupable;
 import camp.computer.clay.engine.entity.Entity;
 
-public abstract class Component extends Groupable {
+public abstract class Component {
+
+    public enum State {
+        NONE,
+        EDITING
+    }
 
     private Entity entity = null;
 
@@ -19,8 +23,17 @@ public abstract class Component extends Groupable {
         return this.entity;
     }
 
-    // TODO: PortableComponent
+    public State state = State.NONE;
 
+    public static State getState(Entity path) {
+        return path.getComponent(Path.class).state;
+    }
+
+    public static void setState(Entity path, State state) {
+        path.getComponent(Path.class).state = state;
+    }
+
+    // TODO: PortableComponent
     // TODO: TouchableComponent (enables touch interaction)
     // TODO: PositionComponent/TransformComponent
     // TODO: DrawableComponent/GraphicComponent

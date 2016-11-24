@@ -3,12 +3,63 @@ package camp.computer.clay.util;
 import java.util.HashMap;
 import java.util.Random;
 
+import camp.computer.clay.engine.component.Path;
 import camp.computer.clay.engine.component.Port;
 import camp.computer.clay.engine.entity.Entity;
 
 public abstract class Color {
 
-    public static int[] PATH_COLOR_PALETTE = new int[] {
+    public static String GREEN_POLOLU = "#FF336633"; // web-safe from #347A1F
+    public static String RED_SPARKFUN = "#FFE62C2E"; // Source: https://learn.sparkfun.com/tutorials/make-your-own-fritzing-parts
+    public static String PURPLE_LILYPAD = "#FF582E67";
+    public static String BLUE_ARDUINO = "#FF91730F";
+    // public static String ORANGE = "#FFFF4500";
+    public static String BLACK = "#FF1D1A1C";
+    public static String YELLOW = "#FFFFE512";
+    public static String WHITE_BREADBOARD = "#FFD9D9D9";
+
+    //    // from https://flatuicolors.com/
+//    public static String RED_BREADBOARD = "#5E5EEE";
+//    public static String BLUE_BREADBOARd = "#EE5E5E";
+//    public static String GREEN_TURTUOISE = "#1abc9c";
+//    public static String GREEN_GREEN_SEA = "#16a085";
+//    public static String GREEN_EMERALD = "#2ecc71";
+//    public static String GREEN_NEPHRITIS = "#27ae60";
+//    public static String BLUE_PETER_RIVER = "#3498db";
+//    public static String BLUE_BELIZE_HOLE = "#2980b9";
+//    public static String PURPLE_AMETHYST = "#9b59b6";
+//    public static String PURPLE_WISTERIA = "#8e44ad";
+//    public static String DARK_BLUE_WET_ASPHALT = "#34495e";
+//    public static String DARK_BLUE_MIDNIGHT_BLUE = "#2c3e50";
+//    public static String YELLOW_SUN_FLOWER = "#f1c40f";
+    public static String ORANGE = "#f39c12";
+//    public static String ORANGE_CARROT = "#e67e22";
+//    public static String ORANGE_PUMPKIN = "#d35400";
+//    public static String RED_ALIZARIN = "#e74c3c";
+//    public static String RED_POMEGRANATE = "#c0392b";
+//    public static String GRAY_CLOUDS = "#ecf0f1";
+//    public static String GRAY_SILVER = "#bdc3c7";
+//    public static String GRAY_CONCRETE = "#95a5a6";
+//    public static String GRAY_ASBESTOS = "#7f8c8d";
+
+    // <TEMPORARY>
+    public static String getRandomBoardColor() {
+        int randomIndex = camp.computer.clay.util.Random.generateRandomInteger(0, 8);
+        String colors[] = {
+                GREEN_POLOLU,
+                RED_SPARKFUN,
+                PURPLE_LILYPAD,
+                BLUE_ARDUINO,
+                ORANGE,
+                BLACK,
+                YELLOW,
+                WHITE_BREADBOARD
+        };
+        return colors[randomIndex];
+    }
+    // </TEMPORARY>
+
+    public static int[] PATH_COLOR_PALETTE = new int[]{
             android.graphics.Color.parseColor("#19B5FE"),
             android.graphics.Color.parseColor("#2ECC71"),
             android.graphics.Color.parseColor("#F22613"),
@@ -87,6 +138,26 @@ public abstract class Color {
         } else if (portType == Port.Type.POWER_CMOS) {
             return PORT_COLOR_CMOS;
         } else if (portType == Port.Type.POWER_TTL) {
+            return PORT_COLOR_TTL;
+        } else {
+            return PORT_COLOR_OFF;
+        }
+    }
+
+    public static String getColor(Path.Type pathType) {
+        if (pathType == Path.Type.NONE) {
+            return PORT_COLOR_OFF;
+        } else if (pathType == Path.Type.SWITCH) {
+            return PORT_COLOR_SWITCH;
+        } else if (pathType == Path.Type.PULSE) {
+            return PORT_COLOR_PULSE;
+        } else if (pathType == Path.Type.WAVE) {
+            return PORT_COLOR_WAVE;
+        } else if (pathType == Path.Type.POWER_REFERENCE) {
+            return PORT_COLOR_REFERENCE;
+        } else if (pathType == Path.Type.POWER_CMOS) {
+            return PORT_COLOR_CMOS;
+        } else if (pathType == Path.Type.POWER_TTL) {
             return PORT_COLOR_TTL;
         } else {
             return PORT_COLOR_OFF;

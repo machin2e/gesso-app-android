@@ -1,57 +1,103 @@
 package camp.computer.clay.engine;
 
-import android.graphics.Canvas;
+import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import camp.computer.clay.engine.system.ImageSystem;
-import camp.computer.clay.platform.Application;
 import camp.computer.clay.engine.component.Boundary;
 import camp.computer.clay.engine.component.Camera;
 import camp.computer.clay.engine.component.Extension;
+import camp.computer.clay.engine.component.Geometry;
 import camp.computer.clay.engine.component.Host;
 import camp.computer.clay.engine.component.Image;
 import camp.computer.clay.engine.component.Label;
+import camp.computer.clay.engine.component.Notification;
 import camp.computer.clay.engine.component.Path;
+import camp.computer.clay.engine.component.Physics;
 import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Visibility;
-import camp.computer.clay.engine.system.EventHandlerSystem;
-import camp.computer.clay.engine.system.BoundarySystem;
-import camp.computer.clay.engine.system.CameraSystem;
-import camp.computer.clay.engine.system.InputSystem;
 import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.component.Prototype;
+import camp.computer.clay.engine.component.RelativeLayoutConstraint;
+import camp.computer.clay.engine.component.Style;
+import camp.computer.clay.engine.component.Timer;
 import camp.computer.clay.engine.component.Transform;
-import camp.computer.clay.engine.system.PortableLayoutSystem;
-import camp.computer.clay.engine.system.RenderSystem;
-import camp.computer.clay.util.BuilderImage.BuilderImage;
-import camp.computer.clay.util.BuilderImage.Circle;
-import camp.computer.clay.util.BuilderImage.Point;
-import camp.computer.clay.util.BuilderImage.Rectangle;
-import camp.computer.clay.util.BuilderImage.Segment;
-import camp.computer.clay.util.BuilderImage.Shape;
+import camp.computer.clay.engine.component.Visibility;
 import camp.computer.clay.engine.component.util.Visible;
+import camp.computer.clay.engine.entity.Entity;
+import camp.computer.clay.engine.entity.util.EntityFactory;
+import camp.computer.clay.engine.manager.Event;
+import camp.computer.clay.engine.manager.EventHandler;
+import camp.computer.clay.engine.manager.Manager;
+import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.engine.system.System;
+import camp.computer.clay.lib.ImageBuilder.Rectangle;
+import camp.computer.clay.lib.ImageBuilder.Text;
+import camp.computer.clay.model.Repository;
+import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.model.player.Player;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.graphics.controls.NativeUi;
+import camp.computer.clay.util.time.Clock;
 
 public class World {
 
-    public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 400;
+    // <EVENT_MANAGER>
+    private HashMap<Event.Type, ArrayList<EventHandler>> eventHandlers = new HashMap<>();
+
+    public boolean subscribe(Event.Type eventType, EventHandler<?> eventHandler) {
+        if (!eventHandlers.containsKey(eventType)) {
+            eventHandlers.put(eventType, new ArrayList());
+            eventHandlers.get(eventType).add(eventHandler);
+            return true;
+        } else if (eventHandlers.containsKey(eventType) && !eventHandlers.get(eventType).contains(eventHandler)) {
+            eventHandlers.get(eventType).add(eventHandler);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void notifySubscribers(Event event) {
+
+        // Get subscribers to Event
+        ArrayList<EventHandler> subscribedEventHandlers = eventHandlers.get(event.getType());
+        if (subscribedEventHandlers != null) {
+            for (int i = 0; i < subscribedEventHandlers.size(); i++) {
+                subscribedEventHandlers.get(i).execute(event);
+            }
+        }
+    }
+
+    // TODO: public boolean unsubscribe(...)
+
+    // </EVENT_MANAGER>
+
+    public static final double HOST_TO_EXTENSION_SHORT_DISTANCE = 325;
     public static final double HOST_TO_EXTENSION_LONG_DISTANCE = 550;
+
+    public static final double EXTENSION_PORT_SEPARATION_DISTANCE = 115;
 
     public static double PIXEL_PER_MILLIMETER = 6.0;
 
-    public static double NEARBY_RADIUS_THRESHOLD = 200 + 60;
+    public static double NEARBY_EXTENSION_DISTANCE_THRESHOLD = 375; // 375, 500
+    public static double NEARBY_EXTENSION_RADIUS_THRESHOLD = 200 + 60;
 
-    // <WORLD_SYSTEMS>
-    public CameraSystem cameraSystem = new CameraSystem();
-    public ImageSystem imageSystem = new ImageSystem();
-    public RenderSystem renderSystem = new RenderSystem();
-    public BoundarySystem boundarySystem = new BoundarySystem();
-    public InputSystem inputSystem = new InputSystem();
-    public PortableLayoutSystem portableLayoutSystem = new PortableLayoutSystem();
-    public EventHandlerSystem eventHandlerSystem = new EventHandlerSystem();
-    // </WORLD_SYSTEMS>
+    public static double PATH_OVERVIEW_THICKNESS = 10.0;
+    public static double PATH_EDITVIEW_THICKNESS = 15.0;
+
+    // <SETTINGS>
+    public static boolean ENABLE_DRAW_OVERLAY = true;
+    // </SETTINGS>
+
+    // <TEMPORARY>
+    public Repository repository = new Repository();
+    // </TEMPORARY>
+
+    // <MANAGERS>
+    public Manager Manager;
+    // </MANAGERS>
 
     public World() {
         super();
@@ -63,10 +109,13 @@ public class World {
         World.world = this;
         // </TODO: DELETE>
 
-//        this.pathPrototype = createPrototypePathEntity();
-//        this.extensionPrototype = createPrototypeExtensionEntity();
-        createPrototypePathEntity();
+        Manager = new Manager();
+
         createPrototypeExtensionEntity();
+
+        // <TEMPORARY>
+        repository.populateTestData();
+        // </TEMPORARY>
     }
 
     // <TODO: DELETE>
@@ -77,248 +126,98 @@ public class World {
     }
     // </TODO: DELETE>
 
+    private List<System> systems = new ArrayList<>();
 
-    public static Entity createEntity(Class<?> entityType) {
-        if (entityType == Host.class) { // HACK (because Host is a Component)
-            return createHostEntity();
-        } else if (entityType == Extension.class) { // HACK (because Extension is a Component)
-            return createExtensionEntity();
-        } else if (entityType == Path.class) {
-            return createPathEntity();
-        } else if (entityType == Port.class) { // HACK (because Extension is a Component)
-            return createPortEntity();
-        } else if (entityType == Camera.class) {
-            return createCameraEntity();
-        } else {
-            return null;
+    public void addSystem(System system) {
+        if (!systems.contains(system)) {
+            systems.add(system);
         }
     }
 
-    /**
-     * Adds a <em>virtual</em> {@code HostEntity} that can be configured and later assigned to a physical
-     * host.
-     */
-    private static Entity createHostEntity() {
-
-        // Create Entity
-        Entity host = new Entity();
-
-        // Add Components
-        host.addComponent(new Host()); // Unique to Host
-        host.addComponent(new Portable()); // Add Portable Component (so can add Ports)
-        host.addComponent(new Transform());
-        host.addComponent(new Image());
-        host.addComponent(new Boundary());
-        host.addComponent(new Visibility());
-
-        // Portable Component (Image Component depends on this)
-        final int PORT_COUNT = 12;
-        for (int j = 0; j < PORT_COUNT; j++) {
-
-            Entity port = World.createEntity(Port.class);
-
-            port.getComponent(Label.class).setLabel("Port " + (j + 1));
-            port.getComponent(Port.class).setIndex(j);
-
-            // <HACK>
-            // TODO: Set default visibility of Ports some other way?
-            port.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
-            // </HACK>
-
-            host.getComponent(Portable.class).addPort(port);
-        }
-
-        // Load geometry from file into Image Component
-        // TODO: Application.getPlatform().openFile(this, "Geometry.json");
-//        Application.getView().restoreGeometry(host.getComponent(Image.class), "Geometry.json");
-        InputStream inputStream = null;
-        try {
-            inputStream = Application.getContext().getAssets().open("Geometry.json");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        BuilderImage builderImage = BuilderImage.open(inputStream);
-        host.getComponent(Image.class).setImage(builderImage);
-
-        // <HACK>
-//        Group<Shape> shapes = host.getComponent(Image.class).getShapes();
-//        for (int i = 0; i < shapes.size(); i++) {
-//            if (shapes.get(i).getLabel().startsWith("Port")) {
-//                String label = shapes.get(i).getLabel();
-//                Entity portEntity = host.getComponent(Portable.class).getPort(label);
-//                shapes.get(i).setEntity(portEntity);
-//            }
-//        }
-        // </HACK>
-
-        // Position Port Images
-        Portable portable = host.getComponent(Portable.class);
-        portable.getPort(0).getComponent(Transform.class).set(-19.0, 40.0);
-        portable.getPort(1).getComponent(Transform.class).set(0, 40.0);
-        portable.getPort(2).getComponent(Transform.class).set(19.0, 40.0);
-        portable.getPort(3).getComponent(Transform.class).set(40.0, 19.0);
-        portable.getPort(4).getComponent(Transform.class).set(40.0, 0.0);
-        portable.getPort(5).getComponent(Transform.class).set(40.0, -19.0);
-        portable.getPort(6).getComponent(Transform.class).set(19.0, -40.0);
-        portable.getPort(7).getComponent(Transform.class).set(0, -40.0);
-        portable.getPort(8).getComponent(Transform.class).set(-19.0, -40.0);
-        portable.getPort(9).getComponent(Transform.class).set(-40.0, -19.0);
-        portable.getPort(10).getComponent(Transform.class).set(-40.0, 0.0);
-        portable.getPort(11).getComponent(Transform.class).set(-40.0, 19.0);
-        for (int i = 0; i < portable.getPorts().size(); i++) {
-            portable.getPort(i).getComponent(Transform.class).set(
-                    portable.getPort(i).getComponent(Transform.class).x * 6.0,
-                    portable.getPort(i).getComponent(Transform.class).y * 6.0
-            );
-        }
-
-        // <HACK>
-        List<Shape> pinContactPoints = host.getComponent(Image.class).getImage().getShapes();
-        for (int i = 0; i < pinContactPoints.size(); i++) {
-            if (pinContactPoints.get(i).getLabel().startsWith("Pin")) {
-                String label = pinContactPoints.get(i).getLabel();
-//                Entity portEntity = hostEntity.getComponent(Portable.class).getPort(label);
-//                pinContactPoints.get(i).setEntity(portEntity);
-                Point contactPointShape = (Point) pinContactPoints.get(i);
-                host.getComponent(Portable.class).headerContactPositions.add(contactPointShape);
+    public <S extends System> S getSystem(Class<S> systemType) {
+        for (int i = 0; i < systems.size(); i++) {
+            if (systems.get(i).getClass() == systemType) {
+                return systemType.cast(systems.get(i));
             }
         }
+        return null;
+    }
+
+    public long updateTime = 0L;
+    public long renderTime = 0L;
+    public long lookupCount = 0L;
+
+    // TODO: Timer class with .start(), .stop() and keep history of records in list with timestamp.
+
+    public void update() {
+        long updateStartTime = Clock.getCurrentTime();
+        for (int i = 0; i < systems.size(); i++) {
+            // <HACK>
+            if (systems.get(i).getClass() == RenderSystem.class) {
+                continue;
+            }
+            // </HACK>
+            systems.get(i).update();
+        }
+        updateTime = Clock.getCurrentTime() - updateStartTime;
+    }
+
+    public void draw() {
+        long renderStartTime = Clock.getCurrentTime();
+        getSystem(RenderSystem.class).update();
+        renderTime = Clock.getCurrentTime() - renderStartTime;
+    }
+
+    public Entity createEntity(Class<?> entityType) {
+
+        Entity entity = null;
+
+        if (entityType == Host.class) { // HACK (because Host is a Component)
+            entity = EntityFactory.createHostEntity(this);
+        } else if (entityType == Extension.class) { // HACK (because Extension is a Component)
+            entity = EntityFactory.createExtensionEntity(this);
+        } else if (entityType == Path.class) {
+            entity = EntityFactory.createPathEntity(this);
+        } else if (entityType == Port.class) { // HACK (because Extension is a Component)
+            entity = EntityFactory.createPortEntity(this);
+        } else if (entityType == Camera.class) {
+            entity = EntityFactory.createCameraEntity(this);
+        } else if (entityType == Player.class) {
+            entity = EntityFactory.createPlayerEntity(this);
+        } else if (entityType == Notification.class) {
+            entity = EntityFactory.createNotificationEntity(this);
+        } else if (entityType == Geometry.class) {
+            entity = EntityFactory.createGeometryEntity(this);
+        }
+
+        // Add Entity to Manager
+        Manager.add(entity);
+
+        return entity;
+    }
+
+    // <TODO:REFACTOR>
+    public void createAndConfigureNotification(String text, Transform transform, long timeout) {
+
+        Entity notification = world.createEntity(Notification.class);
+
+        notification.getComponent(Notification.class).message = text;
+        notification.getComponent(Notification.class).timeout = timeout;
+        notification.getComponent(Transform.class).set(transform);
+        // <HACK>
+        notification.getComponent(Transform.class).rotation = 0;
         // </HACK>
 
-        return host;
+//        Text text2 = (Text) notification.getComponent(Image.class).getImage().getShapes().get(0);
+        Text text2 = (Text) Image.getShapes(notification).get(0).getComponent(Geometry.class).shape;
+        text2.setText(notification.getComponent(Notification.class).message);
+        text2.setColor("#ff0000");
+
+        // <HACK>
+        notification.getComponent(Timer.class).onTimeout(notification);
+        // </HACK>
     }
-
-    private static Entity createExtensionEntity() {
-
-        // Create Entity
-        Entity extension = new Entity();
-
-        // Add Components
-        extension.addComponent(new Extension()); // Unique to Extension
-        extension.addComponent(new Portable());
-
-        // <PORTABLE_COMPONENT>
-        // Create Ports and add them to the ExtensionEntity
-        int defaultPortCount = 1;
-        for (int j = 0; j < defaultPortCount; j++) {
-
-            Entity portEntity = World.createEntity(Port.class);
-
-            portEntity.getComponent(Port.class).setIndex(j);
-            extension.getComponent(Portable.class).addPort(portEntity);
-        }
-        // </PORTABLE_COMPONENT>
-
-        // Add Components
-        extension.addComponent(new Transform());
-        extension.addComponent(new Image());
-        extension.addComponent(new Boundary());
-        extension.addComponent(new Visibility());
-
-        // <LOAD_GEOMETRY_FROM_FILE>
-        BuilderImage builderImage = new BuilderImage();
-
-        Rectangle rectangle;
-
-        // Create Shapes for Image
-        rectangle = new Rectangle();
-        rectangle.setWidth(200);
-        rectangle.setHeight(200);
-        rectangle.setLabel("Board");
-        rectangle.setColor("#ff53BA5D"); // Gray: #f7f7f7, Greens: #32CD32
-        rectangle.setOutlineThickness(0);
-        // TODO: Create BuilderImages with geometry when initializing entity with BuildingImage!
-//        extension.getComponent(Image.class).addShape(rectangle);
-        builderImage.addShape(rectangle);
-
-        // Headers
-        rectangle = new Rectangle(50, 14);
-        rectangle.setLabel("Header");
-        rectangle.setPosition(0, 107);
-        rectangle.setRotation(0);
-        rectangle.setColor("#3b3b3b");
-        rectangle.setOutlineThickness(0);
-//        extension.getComponent(Image.class).addShape(rectangle);
-        builderImage.addShape(rectangle);
-
-        extension.getComponent(Image.class).setImage(builderImage);
-        // </LOAD_GEOMETRY_FROM_FILE>
-
-        // Load geometry from file into Image Component
-        // TODO: Application.getPlatform().openFile(this, "Geometry.json");
-
-        return extension;
-    }
-
-    private static Entity createPathEntity() {
-        Entity path = new Entity();
-
-        // Add Path Component (for type identification)
-        path.addComponent(new Path()); // Unique to Path
-        path.addComponent(new Transform());
-        path.addComponent(new Image());
-        path.addComponent(new Boundary());
-        path.addComponent(new Visibility());
-
-        // <SETUP_PATH_IMAGE_GEOMETRY>
-        BuilderImage builderImage = new BuilderImage();
-
-        // Board
-        Segment segment = new Segment();
-        segment.setOutlineThickness(2.0);
-        segment.setLabel("PathEntity");
-        segment.setColor("#1f1f1e"); // #f7f7f7
-        segment.setOutlineThickness(1);
-        builderImage.addShape(segment);
-
-        path.getComponent(Image.class).setImage(builderImage);
-        // </SETUP_PATH_IMAGE_GEOMETRY>
-
-        return path;
-    }
-
-    private static Entity createPortEntity() {
-
-        Entity port = new Entity();
-
-        // Add Components
-        port.addComponent(new Port()); // Unique to Port
-        port.addComponent(new Transform());
-        port.addComponent(new Image());
-        port.addComponent(new Boundary());
-        port.addComponent(new Visibility());
-        port.addComponent(new Label());
-
-        // <LOAD_GEOMETRY_FROM_FILE>
-        BuilderImage builderImage = new BuilderImage();
-
-        // Create Shapes for Image
-        Circle circle = new Circle();
-        circle.setRadius(50.0);
-        circle.setLabel("Port"); // TODO: Give proper name...
-        circle.setColor("#990000"); // Gray: #f7f7f7, Greens: #32CD32
-        circle.setOutlineThickness(0);
-        builderImage.addShape(circle);
-
-        port.getComponent(Image.class).setImage(builderImage);
-        // </LOAD_GEOMETRY_FROM_FILE>
-
-        return port;
-
-    }
-
-    private static Entity createCameraEntity() {
-
-        Entity camera = new Entity();
-
-        // Add Path Component (for type identification)
-        camera.addComponent(new Camera());
-
-        // Add Transform Component
-        camera.addComponent(new Transform());
-
-        return camera;
-    }
+    // </TODO:REFACTOR>
 
     // TODO: Actually create and stage a real single-port Entity without a parent!?
     // Serves as a "prop" for user to define new Extensions
@@ -326,128 +225,103 @@ public class World {
 
         Entity prototypeExtension = new Entity();
 
-        // extensionPrototype.addComponent(new Extension());
-        prototypeExtension.addComponent(new Transform());
-        prototypeExtension.addComponent(new Image());
+//        // prototypeExtension.addComponent(new Extension()); // NOTE: Just used as a placeholder. Consider actually using the prototype, removing the Prototype component.
+//        prototypeExtension.addComponent(new Portable());
 
-        BuilderImage builderImage = new BuilderImage();
+        prototypeExtension.addComponent(new Prototype()); // Unique to Prototypes/Props
+        prototypeExtension.addComponent(new Transform());
+        prototypeExtension.addComponent(new Physics());
+        prototypeExtension.addComponent(new Image());
+        prototypeExtension.addComponent(new Boundary());
+        prototypeExtension.addComponent(new Style());
+        prototypeExtension.addComponent(new Visibility());
+        prototypeExtension.addComponent(new Label());
 
         Rectangle rectangle = new Rectangle(200, 200);
         rectangle.setColor("#fff7f7f7");
         rectangle.setOutlineThickness(0.0);
-        builderImage.addShape(rectangle);
+        Image.addShape(prototypeExtension, rectangle);
 
-        prototypeExtension.getComponent(Image.class).setImage(builderImage);
+        Label.setLabel(prototypeExtension, "prototypeExtension");
 
-        imageSystem.invalidate(prototypeExtension.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-
-        prototypeExtension.addComponent(new Label());
-        prototypeExtension.getComponent(Label.class).setLabel("prototypeExtension");
-
-        prototypeExtension.addComponent(new Visibility());
         prototypeExtension.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
 
-        prototypeExtension.addComponent(new Boundary());
+        // <HACK>
+        // TODO: Add to common createEntity method.
+        Manager.add(prototypeExtension);
+        // <HACK>
 
         return prototypeExtension;
     }
 
-    public Entity createPrototypePathEntity() {
+    // <EXTENSION_IMAGE_HELPERS>
+    // TODO: Come up with better way to determine if the Extension already exists in the database.
+    // TODO: Make more general for all Portables.
+    public void configureExtensionFromProfile(Entity extension, Configuration configuration) {
 
-        Entity prototypePath = new Entity();
+        // Create Ports to match the Configuration
+        for (int i = 0; i < configuration.getPorts().size(); i++) {
 
-        // extensionPrototype.addComponent(new Extension());
-        prototypePath.addComponent(new Transform());
-        prototypePath.addComponent(new Image());
+            Entity port = null;
+            if (i < Portable.getPorts(extension).size()) {
+                port = Portable.getPort(extension, i);
+            } else {
+                port = createEntity(Port.class);
+            }
 
-        BuilderImage builderImage = new BuilderImage();
+            // <HACK>
+            port.addComponent(new RelativeLayoutConstraint());
+            port.getComponent(RelativeLayoutConstraint.class).setReferenceEntity(extension);
+            // </HACK>
 
-        Segment segment = new Segment(new Transform(-50, -50), new Transform(50, 50));
-        segment.setLabel("Path");
-        segment.setOutlineColor("#ff333333");
-        segment.setOutlineThickness(10.0);
-        builderImage.addShape(segment);
+            Port.setIndex(port, i);
+            Port.setType(port, configuration.getPorts().get(i).getType());
+            Port.setDirection(port, configuration.getPorts().get(i).getDirection());
 
-        prototypePath.getComponent(Image.class).setImage(builderImage);
+            if (i >= Portable.getPorts(extension).size()) {
+                Portable.addPort(extension, port);
+            }
+        }
 
-        imageSystem.invalidate(prototypePath.getComponent(Image.class)); // TODO: World shouldn't call systems. System should operate on the world and interact with other systems/entities in it.
-
-        prototypePath.addComponent(new Label());
-        prototypePath.getComponent(Label.class).setLabel("prototypePath");
-
-        prototypePath.addComponent(new Visibility());
-        prototypePath.getComponent(Visibility.class).setVisible(Visible.INVISIBLE);
-
-        prototypePath.addComponent(new Boundary());
-
-        return prototypePath;
+        // Set persistent to indicate the Extension is stored in a remote database
+        // TODO: Replace with something more useful, like the URI or UUID of stored object in database
+        extension.getComponent(Extension.class).setPersistent(true);
     }
 
-    public void updateSystems(Canvas canvas) {
-        world.inputSystem.update(world);
-        world.eventHandlerSystem.update(world);
-        world.boundarySystem.update(world);
-        world.portableLayoutSystem.update(world);
-        world.renderSystem.update(world, canvas); // TODO: Remove canvas!
-        world.cameraSystem.update(world);
-    }
+    // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
+    public void createExtensionProfile(final Entity extension) {
+        if (!extension.getComponent(Extension.class).isPersistent()) {
 
-    /**
-     * Sorts {@code Image}s by layer.
-     */
-    public void updateLayers() {
+            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Configuration)
+            Application.getView().getNativeUi().promptInputText(new NativeUi.OnActionListener<String>() {
+                @Override
+                public void onComplete(String text) {
 
-        Group<Image> images = Entity.Manager.getImages();
+                    // Create Extension Configuration
+                    Configuration configuration = new Configuration(extension);
+                    configuration.setLabel(text);
 
-        for (int i = 0; i < images.size() - 1; i++) {
-            for (int j = i + 1; j < images.size(); j++) {
-                // Check for out-of-order pairs, and swap them
-                if (images.get(i).layerIndex > images.get(j).layerIndex) {
-                    Image image = images.get(i);
-                    images.set(i, images.get(j));
-                    images.set(j, image);
+                    Log.v("Configuration", "configuration # ports: " + configuration.getPorts().size());
+
+                    // Assign the Configuration to the ExtensionEntity
+//                    configureExtensionFromProfile(extension, configuration);
+
+                    // Cache the new ExtensionEntity Configuration
+                    Application.getView().getClay().getConfigurations().add(configuration);
+
+                    // TODO: Persist the configuration in the user's private store (either local or online)
+
+                    // TODO: Persist the configuration in the global store online
                 }
-            }
-        }
+            });
+        } else {
+            Application.getView().getNativeUi().promptAcknowledgment(new NativeUi.OnActionListener() {
+                @Override
+                public void onComplete(Object result) {
 
-        /*
-        // TODO: Sort using this after making Group implement List
-        Collections.sort(Database.arrayList, new Comparator<MyObject>() {
-            @Override
-            public int compare(MyObject o1, MyObject o2) {
-                return o1.getStartDate().compareTo(o2.getStartDate());
-            }
-        });
-        */
-    }
-
-    // <TITLE_UI_COMPONENT>
-    // TODO: Allow user to setAbsolute and change a goal. Track it in relation to the actions taken and things built.
-    protected Visible titleVisible = Visible.INVISIBLE;
-    protected String titleText = "Project";
-
-    public void setTitleText(String text) {
-        this.titleText = text;
-    }
-
-    public String getTitleText() {
-        return this.titleText;
-    }
-
-    public void setTitleVisibility(Visible visible) {
-        if (titleVisible == Visible.INVISIBLE && visible == Visible.VISIBLE) {
-//            Application.getPlatform().openTitleEditor(getTitleText());
-            this.titleVisible = visible;
-        } else if (titleVisible == Visible.VISIBLE && visible == Visible.VISIBLE) {
-//            Application.getPlatform().setTitleEditor(getTitleText());
-        } else if (titleVisible == Visible.VISIBLE && visible == Visible.INVISIBLE) {
-//            Application.getPlatform().closeTitleEditor();
-            this.titleVisible = visible;
+                }
+            });
         }
     }
-
-    public Visible getTitleVisibility() {
-        return this.titleVisible;
-    }
-    // </TITLE_UI_COMPONENT>
+    // </EXTENSION_IMAGE_HELPERS>
 }

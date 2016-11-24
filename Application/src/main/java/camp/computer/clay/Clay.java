@@ -9,23 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import camp.computer.clay.platform.Application;
-import camp.computer.clay.platform.graphics.controls.Prompt;
-import camp.computer.clay.engine.component.Camera;
-import camp.computer.clay.engine.component.Extension;
-import camp.computer.clay.engine.component.Host;
-import camp.computer.clay.engine.component.Port;
-import camp.computer.clay.engine.component.Portable;
-import camp.computer.clay.engine.entity.Entity;
-import camp.computer.clay.host.PlatformInterface;
-import camp.computer.clay.host.InternetInterface;
-import camp.computer.clay.host.MessengerInterface;
-import camp.computer.clay.model.profile.Profile;
-import camp.computer.clay.old_model.Cache;
-import camp.computer.clay.old_model.Internet;
-import camp.computer.clay.old_model.Messenger;
-import camp.computer.clay.old_model.PhoneHost;
 import camp.computer.clay.engine.World;
+import camp.computer.clay.engine.component.Camera;
+import camp.computer.clay.engine.component.Host;
+import camp.computer.clay.engine.component.util.NewProjectLayoutStrategy;
+import camp.computer.clay.engine.system.BoundarySystem;
+import camp.computer.clay.engine.system.CameraSystem;
+import camp.computer.clay.engine.system.ImageSystem;
+import camp.computer.clay.engine.system.InputSystem;
+import camp.computer.clay.engine.system.PhysicsSystem;
+import camp.computer.clay.engine.system.PortableLayoutSystem;
+import camp.computer.clay.engine.system.RenderSystem;
+import camp.computer.clay.engine.system.StyleSystem;
+import camp.computer.clay.model.configuration.Configuration;
+import camp.computer.clay.platform.Application;
+import camp.computer.clay.platform.Cache;
+import camp.computer.clay.platform.Internet;
+import camp.computer.clay.platform.Messenger;
+import camp.computer.clay.platform.PhoneHost;
+import camp.computer.clay.platform.PlatformInterface;
+import camp.computer.clay.platform.communication.InternetInterface;
+import camp.computer.clay.platform.communication.MessengerInterface;
+import camp.computer.clay.util.Random;
 
 public class Clay {
 
@@ -41,12 +46,12 @@ public class Clay {
     // Group of discovered PhoneHosts
     private List<PhoneHost> phoneHosts = new ArrayList<>();
 
-    private List<Profile> profiles = new ArrayList<>();
+    private List<Configuration> configurations = new ArrayList<>();
 
     private World world;
 
-    public List<Profile> getProfiles() {
-        return this.profiles;
+    public List<Configuration> getConfigurations() {
+        return this.configurations;
     }
 
     public Clay() {
@@ -59,6 +64,14 @@ public class Clay {
 
         // Create World
         this.world = new World();
+        world.addSystem(new InputSystem(world));
+        world.addSystem(new ImageSystem(world));
+        world.addSystem(new StyleSystem(world));
+        world.addSystem(new PhysicsSystem(world));
+        world.addSystem(new BoundarySystem(world));
+        world.addSystem(new PortableLayoutSystem(world));
+        world.addSystem(new CameraSystem(world));
+        world.addSystem(new RenderSystem(world));
 
         // Create Camera
         world.createEntity(Camera.class);
@@ -66,75 +79,19 @@ public class Clay {
         Application.getView().getPlatformRenderSurface().setWorld(world);
 
         // <TEST>
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
-        world.createEntity(Host.class);
+        int minHostCount = 5;
+        int maxHostCount = 6;
+        int hostCount = Random.generateRandomInteger(minHostCount, maxHostCount);
+        for (int i = 0; i < hostCount; i++) {
+            world.createEntity(Host.class);
+        }
         // </TEST>
 
         // <HACK>
         // TODO: Place in a LayoutSystem
-        this.world.portableLayoutSystem.adjustLayout();
+        this.world.getSystem(PortableLayoutSystem.class).adjustLayout(new NewProjectLayoutStrategy());
         // </HACK>
     }
-
-    // <EXTENSION_IMAGE_HELPERS>
-    // TODO: Come up with better way to determine if the Extension already exists in the database.
-    // TODO: Make more general for all Portables.
-    public static void configureFromProfile(Entity extension, Profile profile) {
-
-        // Create Ports to match the Profile
-        for (int i = 0; i < profile.getPorts().size(); i++) {
-
-            Entity port = World.createEntity(Port.class);
-
-            port.getComponent(Port.class).setIndex(i);
-            port.getComponent(Port.class).setType(profile.getPorts().get(i).getType());
-            port.getComponent(Port.class).setDirection(profile.getPorts().get(i).getDirection());
-
-            extension.getComponent(Portable.class).addPort(port);
-        }
-
-        // Set persistent to indicate the Extension is stored in a remote database
-        // TODO: Replace with something more useful, like the URI or UUID of stored object in database
-        extension.getComponent(Extension.class).setPersistent(true);
-    }
-
-    // TODO: This is an action that Clay can perform. Place this better, maybe in Clay.
-    public static void createExtensionProfile(final Entity extension) {
-        if (!extension.getComponent(Extension.class).isPersistent()) {
-
-            // TODO: Only call promptInputText if the extensionEntity is a draft (i.e., does not have an associated Profile)
-            Application.getView().getActionPrompts().promptInputText(new Prompt.OnActionListener<String>() {
-                @Override
-                public void onComplete(String text) {
-
-                    // Create Extension Profile
-                    Profile profile = new Profile(extension);
-                    profile.setLabel(text);
-
-                    // Assign the Profile to the ExtensionEntity
-                    Clay.configureFromProfile(extension, profile);
-
-                    // Cache the new ExtensionEntity Profile
-                    Application.getView().getClay().getProfiles().add(profile);
-
-                    // TODO: Persist the profile in the user's private store (either local or online)
-
-                    // TODO: Persist the profile in the global store online
-                }
-            });
-        } else {
-            Application.getView().getActionPrompts().promptAcknowledgment(new Prompt.OnActionListener() {
-                @Override
-                public void onComplete(Object result) {
-
-                }
-            });
-        }
-    }
-    // </EXTENSION_IMAGE_HELPERS>
 
     public void addHost(MessengerInterface messageManager) {
         this.messenger.addHost(messageManager);
@@ -207,7 +164,7 @@ public class Clay {
             return null;
         }
 
-        World.createEntity(Host.class);
+        world.createEntity(Host.class);
 
         return null;
     }

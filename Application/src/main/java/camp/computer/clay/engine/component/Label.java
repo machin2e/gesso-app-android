@@ -1,18 +1,20 @@
 package camp.computer.clay.engine.component;
 
+import camp.computer.clay.engine.entity.Entity;
+
 public class Label extends Component {
 
-    protected String label = "";
+    public String label = "";
 
     public Label() {
         super();
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public static void setLabel(Entity entity, String label) {
+        entity.getComponent(Label.class).label = label;
     }
 
-    public String getLabel() {
-        return this.label;
+    public static String getLabel(Entity entity) {
+        return entity.getComponent(Label.class).label;
     }
 }

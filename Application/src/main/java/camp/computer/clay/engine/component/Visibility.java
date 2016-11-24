@@ -6,7 +6,10 @@ public class Visibility extends Component {
 
     // TODO: Visibility(boolean defaultVisibility) constructor
 
-    Visible visible = Visible.VISIBLE;
+    // TODO: 11/10/2016: protected double targetTransparency = 1.0; // Visibility
+    // TODO: 11/10/2016: protected double transparency = targetTransparency;
+
+    public Visible visible = Visible.VISIBLE;
 
     public void setVisible(Visible visible) {
         this.visible = visible;
